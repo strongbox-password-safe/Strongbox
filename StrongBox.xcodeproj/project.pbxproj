@@ -1,0 +1,612 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4D1757B81C8361D300E6356F /* AddGoogleDriveSafeTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17578A1C8361D200E6356F /* AddGoogleDriveSafeTableViewController.m */; };
+		4D1757B91C8361D300E6356F /* AddSafeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17578C1C8361D200E6356F /* AddSafeViewController.m */; };
+		4D1757BA1C8361D300E6356F /* AdvancedRecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17578E1C8361D200E6356F /* AdvancedRecordViewController.m */; };
+		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
+		4D1757BC1C8361D300E6356F /* core-model in Resources */ = {isa = PBXBuildFile; fileRef = 4D1757911C8361D200E6356F /* core-model */; };
+		4D1757BD1C8361D300E6356F /* DropBoxSafeTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757931C8361D200E6356F /* DropBoxSafeTableViewController.m */; };
+		4D1757BE1C8361D300E6356F /* DropboxStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757951C8361D200E6356F /* DropboxStorageProvider.m */; };
+		4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D1757961C8361D200E6356F /* formatV3.txt */; };
+		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
+		4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
+		4D1757C21C8361D300E6356F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D17579B1C8361D200E6356F /* Images.xcassets */; };
+		4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579D1C8361D200E6356F /* IOsUtils.m */; };
+		4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
+		4D1757C51C8361D300E6356F /* LockScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A11C8361D200E6356F /* LockScreenViewController.m */; };
+		4D1757C71C8361D300E6356F /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A41C8361D200E6356F /* Model.m */; };
+		4D1757C81C8361D300E6356F /* RecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A61C8361D300E6356F /* RecordViewController.m */; };
+		4D1757C91C8361D300E6356F /* SafeDetailsAndSettingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A81C8361D300E6356F /* SafeDetailsAndSettingsView.m */; };
+		4D1757CA1C8361D300E6356F /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757AA1C8361D300E6356F /* SafeMetaData.m */; };
+		4D1757CB1C8361D300E6356F /* SafesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757AC1C8361D300E6356F /* SafesCollection.m */; };
+		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
+		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
+		4D1757CF1C8361D300E6356F /* SettingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B41C8361D300E6356F /* SettingsView.m */; };
+		4D1757D41C8363A000E6356F /* SelectSafeLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */; };
+		4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBE5B381C8356C700C310BC /* AppDelegate.m */; };
+		4DD59F4D1D3A5A1C00F864ED /* SafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F411D3A5A1C00F864ED /* SafeDatabase.m */; };
+		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
+		4DD59F601D3A5AAC00F864ED /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F5C1D3A5AAC00F864ED /* crypt_argchk.c */; };
+		4DD59F611D3A5AAC00F864ED /* twofish_tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F5D1D3A5AAC00F864ED /* twofish_tab.c */; };
+		4DD59F621D3A5AAC00F864ED /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F5E1D3A5AAC00F864ED /* twofish.c */; };
+		4DD59F651D3A5B1F00F864ED /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F571D3A5AAC00F864ED /* Group.m */; };
+		4DD59F671D3A5B1F00F864ED /* SafeItemViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F5A1D3A5AAC00F864ED /* SafeItemViewModel.m */; };
+		4DD59F691D3A5B1F00F864ED /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F5F1D3A5AAC00F864ED /* Utils.m */; };
+		4DD59F6A1D3A5C1C00F864ED /* CoreModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE931EE1C83667600AC925E /* CoreModel.m */; };
+		4DD59F6E1D3A5C3300F864ED /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F6B1D3A5C3300F864ED /* Field.m */; };
+		4DD59F6F1D3A5C3300F864ED /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F6C1D3A5C3300F864ED /* Record.m */; };
+		4DD59F701D3A5C3300F864ED /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD59F6D1D3A5C3300F864ED /* SafeTools.m */; };
+		4DE932081C8368B600AC925E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE932041C8368B600AC925E /* Main_iPad.storyboard */; };
+		4DE932091C8368B600AC925E /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE932061C8368B600AC925E /* Main_iPhone.storyboard */; };
+		FB04BAAF6407B307D1F8DDDB /* libPods-StrongBox.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4787F36C7CEA57E0107C67B7 /* libPods-StrongBox.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4787F36C7CEA57E0107C67B7 /* libPods-StrongBox.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StrongBox.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D1757891C8361D200E6356F /* AddGoogleDriveSafeTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddGoogleDriveSafeTableViewController.h; sourceTree = "<group>"; };
+		4D17578A1C8361D200E6356F /* AddGoogleDriveSafeTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddGoogleDriveSafeTableViewController.m; sourceTree = "<group>"; };
+		4D17578B1C8361D200E6356F /* AddSafeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeViewController.h; sourceTree = "<group>"; };
+		4D17578C1C8361D200E6356F /* AddSafeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeViewController.m; sourceTree = "<group>"; };
+		4D17578D1C8361D200E6356F /* AdvancedRecordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedRecordViewController.h; sourceTree = "<group>"; };
+		4D17578E1C8361D200E6356F /* AdvancedRecordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedRecordViewController.m; sourceTree = "<group>"; };
+		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowseSafeView.h; sourceTree = "<group>"; };
+		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowseSafeView.m; sourceTree = "<group>"; };
+		4D1757911C8361D200E6356F /* core-model */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "core-model"; sourceTree = "<group>"; };
+		4D1757921C8361D200E6356F /* DropBoxSafeTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropBoxSafeTableViewController.h; sourceTree = "<group>"; };
+		4D1757931C8361D200E6356F /* DropBoxSafeTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropBoxSafeTableViewController.m; sourceTree = "<group>"; };
+		4D1757941C8361D200E6356F /* DropboxStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxStorageProvider.h; sourceTree = "<group>"; };
+		4D1757951C8361D200E6356F /* DropboxStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxStorageProvider.m; sourceTree = "<group>"; };
+		4D1757961C8361D200E6356F /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = formatV3.txt; sourceTree = "<group>"; };
+		4D1757971C8361D200E6356F /* GoogleDriveManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDriveManager.h; sourceTree = "<group>"; };
+		4D1757981C8361D200E6356F /* GoogleDriveManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDriveManager.m; sourceTree = "<group>"; };
+		4D1757991C8361D200E6356F /* GoogleDriveStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDriveStorageProvider.h; sourceTree = "<group>"; };
+		4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDriveStorageProvider.m; sourceTree = "<group>"; };
+		4D17579B1C8361D200E6356F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		4D17579C1C8361D200E6356F /* IOsUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOsUtils.h; sourceTree = "<group>"; };
+		4D17579D1C8361D200E6356F /* IOsUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IOsUtils.m; sourceTree = "<group>"; };
+		4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalDeviceStorageProvider.h; sourceTree = "<group>"; };
+		4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalDeviceStorageProvider.m; sourceTree = "<group>"; };
+		4D1757A01C8361D200E6356F /* LockScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockScreenViewController.h; sourceTree = "<group>"; };
+		4D1757A11C8361D200E6356F /* LockScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockScreenViewController.m; sourceTree = "<group>"; };
+		4D1757A21C8361D200E6356F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4D1757A31C8361D200E6356F /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		4D1757A41C8361D200E6356F /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
+		4D1757A51C8361D300E6356F /* RecordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordViewController.h; sourceTree = "<group>"; };
+		4D1757A61C8361D300E6356F /* RecordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordViewController.m; sourceTree = "<group>"; };
+		4D1757A71C8361D300E6356F /* SafeDetailsAndSettingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeDetailsAndSettingsView.h; sourceTree = "<group>"; };
+		4D1757A81C8361D300E6356F /* SafeDetailsAndSettingsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsAndSettingsView.m; sourceTree = "<group>"; };
+		4D1757A91C8361D300E6356F /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeMetaData.h; sourceTree = "<group>"; };
+		4D1757AA1C8361D300E6356F /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeMetaData.m; sourceTree = "<group>"; };
+		4D1757AB1C8361D300E6356F /* SafesCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesCollection.h; sourceTree = "<group>"; };
+		4D1757AC1C8361D300E6356F /* SafesCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesCollection.m; sourceTree = "<group>"; };
+		4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeStorageProvider.h; sourceTree = "<group>"; };
+		4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeStorageProvider.m; sourceTree = "<group>"; };
+		4D1757AF1C8361D300E6356F /* SafesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesViewController.h; sourceTree = "<group>"; };
+		4D1757B01C8361D300E6356F /* SafesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesViewController.m; sourceTree = "<group>"; };
+		4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectDestinationGroupController.h; sourceTree = "<group>"; };
+		4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectDestinationGroupController.m; sourceTree = "<group>"; };
+		4D1757B31C8361D300E6356F /* SettingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsView.h; sourceTree = "<group>"; };
+		4D1757B41C8361D300E6356F /* SettingsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsView.m; sourceTree = "<group>"; };
+		4D1757B51C8361D300E6356F /* StrongBox-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StrongBox-Info.plist"; sourceTree = "<group>"; };
+		4D1757D21C8363A000E6356F /* SelectSafeLocationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectSafeLocationViewController.h; sourceTree = "<group>"; };
+		4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectSafeLocationViewController.m; sourceTree = "<group>"; };
+		4DBE5B311C8356C700C310BC /* StrongBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StrongBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		4DBE5B381C8356C700C310BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		4DD59F381D3A5A1C00F864ED /* CoreModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreModel.h; path = "core-model/CoreModel.h"; sourceTree = "<group>"; };
+		4DD59F3A1D3A5A1C00F864ED /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = "core-model/Field.h"; sourceTree = "<group>"; };
+		4DD59F3C1D3A5A1C00F864ED /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Group.h; path = "core-model/Group.h"; sourceTree = "<group>"; };
+		4DD59F3E1D3A5A1C00F864ED /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = "core-model/Record.h"; sourceTree = "<group>"; };
+		4DD59F401D3A5A1C00F864ED /* SafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeDatabase.h; path = "core-model/SafeDatabase.h"; sourceTree = "<group>"; };
+		4DD59F411D3A5A1C00F864ED /* SafeDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeDatabase.m; path = "core-model/SafeDatabase.m"; sourceTree = "<group>"; };
+		4DD59F421D3A5A1C00F864ED /* SafeItemViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeItemViewModel.h; path = "core-model/SafeItemViewModel.h"; sourceTree = "<group>"; };
+		4DD59F441D3A5A1C00F864ED /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = "core-model/SafeTools.h"; sourceTree = "<group>"; };
+		4DD59F471D3A5A1C00F864ED /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = "core-model/Utils.h"; sourceTree = "<group>"; };
+		4DD59F571D3A5AAC00F864ED /* Group.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Group.m; path = "core-model/Group.m"; sourceTree = "<group>"; };
+		4DD59F5A1D3A5AAC00F864ED /* SafeItemViewModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafeItemViewModel.m; path = "core-model/SafeItemViewModel.m"; sourceTree = "<group>"; };
+		4DD59F5C1D3A5AAC00F864ED /* crypt_argchk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = "core-model/twofish/crypt_argchk.c"; sourceTree = "<group>"; };
+		4DD59F5D1D3A5AAC00F864ED /* twofish_tab.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish_tab.c; path = "core-model/twofish/twofish_tab.c"; sourceTree = "<group>"; };
+		4DD59F5E1D3A5AAC00F864ED /* twofish.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = "core-model/twofish/twofish.c"; sourceTree = "<group>"; };
+		4DD59F5F1D3A5AAC00F864ED /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = "core-model/Utils.m"; sourceTree = "<group>"; };
+		4DD59F6B1D3A5C3300F864ED /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Field.m; path = "core-model/Field.m"; sourceTree = "<group>"; };
+		4DD59F6C1D3A5C3300F864ED /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = "core-model/Record.m"; sourceTree = "<group>"; };
+		4DD59F6D1D3A5C3300F864ED /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = "core-model/SafeTools.m"; sourceTree = "<group>"; };
+		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
+		4DE931EE1C83667600AC925E /* CoreModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreModel.m; path = "core-model/CoreModel.m"; sourceTree = "<group>"; };
+		4DE932051C8368B600AC925E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		4DE932071C8368B600AC925E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		8A48CB913DB01CC3E35E9D8A /* Pods-StrongBox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.release.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.release.xcconfig"; sourceTree = "<group>"; };
+		B8B934F1843D05DAF0529BFF /* Pods-StrongBox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4DBE5B2E1C8356C700C310BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB04BAAF6407B307D1F8DDDB /* libPods-StrongBox.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		36939A7D77FBE7119DA027C2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4787F36C7CEA57E0107C67B7 /* libPods-StrongBox.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				4D1757B31C8361D300E6356F /* SettingsView.h */,
+				4D1757B41C8361D300E6356F /* SettingsView.m */,
+				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
+				4D1757901C8361D200E6356F /* BrowseSafeView.m */,
+				4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */,
+				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
+				4D1757A71C8361D300E6356F /* SafeDetailsAndSettingsView.h */,
+				4D1757A81C8361D300E6356F /* SafeDetailsAndSettingsView.m */,
+				4D1757891C8361D200E6356F /* AddGoogleDriveSafeTableViewController.h */,
+				4D17578A1C8361D200E6356F /* AddGoogleDriveSafeTableViewController.m */,
+				4D17578B1C8361D200E6356F /* AddSafeViewController.h */,
+				4D17578C1C8361D200E6356F /* AddSafeViewController.m */,
+				4D17578D1C8361D200E6356F /* AdvancedRecordViewController.h */,
+				4D17578E1C8361D200E6356F /* AdvancedRecordViewController.m */,
+				4D1757921C8361D200E6356F /* DropBoxSafeTableViewController.h */,
+				4D1757931C8361D200E6356F /* DropBoxSafeTableViewController.m */,
+				4D1757A01C8361D200E6356F /* LockScreenViewController.h */,
+				4D1757A11C8361D200E6356F /* LockScreenViewController.m */,
+				4D1757A51C8361D300E6356F /* RecordViewController.h */,
+				4D1757A61C8361D300E6356F /* RecordViewController.m */,
+				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
+				4D1757B01C8361D300E6356F /* SafesViewController.m */,
+				4D1757D21C8363A000E6356F /* SelectSafeLocationViewController.h */,
+				4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */,
+			);
+			name = ViewControllers;
+			sourceTree = "<group>";
+		};
+		4D62D6961C85F35E0051E13B /* StorageProviders */ = {
+			isa = PBXGroup;
+			children = (
+				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
+				4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */,
+				4D1757941C8361D200E6356F /* DropboxStorageProvider.h */,
+				4D1757951C8361D200E6356F /* DropboxStorageProvider.m */,
+				4D1757971C8361D200E6356F /* GoogleDriveManager.h */,
+				4D1757981C8361D200E6356F /* GoogleDriveManager.m */,
+				4D1757991C8361D200E6356F /* GoogleDriveStorageProvider.h */,
+				4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */,
+				4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */,
+				4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */,
+			);
+			name = StorageProviders;
+			sourceTree = "<group>";
+		};
+		4D62D6981C85F3AC0051E13B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4D1757911C8361D200E6356F /* core-model */,
+				4DD59F381D3A5A1C00F864ED /* CoreModel.h */,
+				4DE931EE1C83667600AC925E /* CoreModel.m */,
+				4DD59F5C1D3A5AAC00F864ED /* crypt_argchk.c */,
+				4DD59F3A1D3A5A1C00F864ED /* Field.h */,
+				4DD59F6B1D3A5C3300F864ED /* Field.m */,
+				4DD59F3C1D3A5A1C00F864ED /* Group.h */,
+				4DD59F571D3A5AAC00F864ED /* Group.m */,
+				4D1757A31C8361D200E6356F /* Model.h */,
+				4D1757A41C8361D200E6356F /* Model.m */,
+				4DD59F3E1D3A5A1C00F864ED /* Record.h */,
+				4DD59F6C1D3A5C3300F864ED /* Record.m */,
+				4DD59F401D3A5A1C00F864ED /* SafeDatabase.h */,
+				4DD59F411D3A5A1C00F864ED /* SafeDatabase.m */,
+				4DD59F421D3A5A1C00F864ED /* SafeItemViewModel.h */,
+				4DD59F5A1D3A5AAC00F864ED /* SafeItemViewModel.m */,
+				4D1757A91C8361D300E6356F /* SafeMetaData.h */,
+				4D1757AA1C8361D300E6356F /* SafeMetaData.m */,
+				4D1757AB1C8361D300E6356F /* SafesCollection.h */,
+				4D1757AC1C8361D300E6356F /* SafesCollection.m */,
+				4DD59F441D3A5A1C00F864ED /* SafeTools.h */,
+				4DD59F6D1D3A5C3300F864ED /* SafeTools.m */,
+				4DD59F5D1D3A5AAC00F864ED /* twofish_tab.c */,
+				4DD59F5E1D3A5AAC00F864ED /* twofish.c */,
+				4DD59F471D3A5A1C00F864ED /* Utils.h */,
+				4DD59F5F1D3A5AAC00F864ED /* Utils.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		4DBE5B281C8356C700C310BC = {
+			isa = PBXGroup;
+			children = (
+				4DBE5B331C8356C700C310BC /* StrongBox */,
+				4DBE5B321C8356C700C310BC /* Products */,
+				997631ABB70221FCC23A4998 /* Pods */,
+				36939A7D77FBE7119DA027C2 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		4DBE5B321C8356C700C310BC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4DBE5B311C8356C700C310BC /* StrongBox.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4DBE5B331C8356C700C310BC /* StrongBox */ = {
+			isa = PBXGroup;
+			children = (
+				4D62D6941C85F2B50051E13B /* ViewControllers */,
+				4D62D6961C85F35E0051E13B /* StorageProviders */,
+				4D62D6981C85F3AC0051E13B /* Model */,
+				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
+				4DBE5B381C8356C700C310BC /* AppDelegate.m */,
+				4D1757A21C8361D200E6356F /* main.m */,
+				4DE932041C8368B600AC925E /* Main_iPad.storyboard */,
+				4DE932061C8368B600AC925E /* Main_iPhone.storyboard */,
+				4D1757961C8361D200E6356F /* formatV3.txt */,
+				4D17579B1C8361D200E6356F /* Images.xcassets */,
+				4D17579C1C8361D200E6356F /* IOsUtils.h */,
+				4D17579D1C8361D200E6356F /* IOsUtils.m */,
+				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
+				4DBE5B341C8356C700C310BC /* Supporting Files */,
+				4DD59F731D3A6FC800F864ED /* secrets.h */,
+			);
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4DBE5B341C8356C700C310BC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				4DBE5B351C8356C700C310BC /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		997631ABB70221FCC23A4998 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B8B934F1843D05DAF0529BFF /* Pods-StrongBox.debug.xcconfig */,
+				8A48CB913DB01CC3E35E9D8A /* Pods-StrongBox.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4DBE5B301C8356C700C310BC /* StrongBox */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "StrongBox" */;
+			buildPhases = (
+				1CF7F3A29C13C05E089F7C4A /* Check Pods Manifest.lock */,
+				4DBE5B2D1C8356C700C310BC /* Sources */,
+				4DBE5B2E1C8356C700C310BC /* Frameworks */,
+				4DBE5B2F1C8356C700C310BC /* Resources */,
+				131B4DFA8DC1595D2E236A72 /* Embed Pods Frameworks */,
+				08D71E473DB213EF30B24E44 /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StrongBox;
+			productName = StrongBox;
+			productReference = 4DBE5B311C8356C700C310BC /* StrongBox.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4DBE5B291C8356C700C310BC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "Mark McGuill";
+				TargetAttributes = {
+					4DBE5B301C8356C700C310BC = {
+						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = 4326J8XDF2;
+					};
+				};
+			};
+			buildConfigurationList = 4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "StrongBox" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4DBE5B281C8356C700C310BC;
+			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4DBE5B301C8356C700C310BC /* StrongBox */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4DBE5B2F1C8356C700C310BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
+				4D1757C21C8361D300E6356F /* Images.xcassets in Resources */,
+				4DE932081C8368B600AC925E /* Main_iPad.storyboard in Resources */,
+				4DE932091C8368B600AC925E /* Main_iPhone.storyboard in Resources */,
+				4D1757BC1C8361D300E6356F /* core-model in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		08D71E473DB213EF30B24E44 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		131B4DFA8DC1595D2E236A72 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1CF7F3A29C13C05E089F7C4A /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4DBE5B2D1C8356C700C310BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DD59F6A1D3A5C1C00F864ED /* CoreModel.m in Sources */,
+				4DD59F651D3A5B1F00F864ED /* Group.m in Sources */,
+				4DD59F6F1D3A5C3300F864ED /* Record.m in Sources */,
+				4DD59F6E1D3A5C3300F864ED /* Field.m in Sources */,
+				4DD59F4D1D3A5A1C00F864ED /* SafeDatabase.m in Sources */,
+				4DD59F701D3A5C3300F864ED /* SafeTools.m in Sources */,
+				4DD59F671D3A5B1F00F864ED /* SafeItemViewModel.m in Sources */,
+				4DD59F691D3A5B1F00F864ED /* Utils.m in Sources */,
+				4DD59F601D3A5AAC00F864ED /* crypt_argchk.c in Sources */,
+				4DD59F611D3A5AAC00F864ED /* twofish_tab.c in Sources */,
+				4DD59F621D3A5AAC00F864ED /* twofish.c in Sources */,
+				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
+				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
+				4D1757B81C8361D300E6356F /* AddGoogleDriveSafeTableViewController.m in Sources */,
+				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
+				4D1757CB1C8361D300E6356F /* SafesCollection.m in Sources */,
+				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
+				4D1757C81C8361D300E6356F /* RecordViewController.m in Sources */,
+				4D1757CF1C8361D300E6356F /* SettingsView.m in Sources */,
+				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
+				4D1757C71C8361D300E6356F /* Model.m in Sources */,
+				4D1757C51C8361D300E6356F /* LockScreenViewController.m in Sources */,
+				4D1757CA1C8361D300E6356F /* SafeMetaData.m in Sources */,
+				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
+				4D1757BA1C8361D300E6356F /* AdvancedRecordViewController.m in Sources */,
+				4D1757BE1C8361D300E6356F /* DropboxStorageProvider.m in Sources */,
+				4D1757D41C8363A000E6356F /* SelectSafeLocationViewController.m in Sources */,
+				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
+				4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */,
+				4D1757C91C8361D300E6356F /* SafeDetailsAndSettingsView.m in Sources */,
+				4D1757B91C8361D300E6356F /* AddSafeViewController.m in Sources */,
+				4D1757BD1C8361D300E6356F /* DropBoxSafeTableViewController.m in Sources */,
+				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		4DE932041C8368B600AC925E /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4DE932051C8368B600AC925E /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		4DE932061C8368B600AC925E /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4DE932071C8368B600AC925E /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4DBE5B491C8356C700C310BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4DBE5B4A1C8356C700C310BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4DBE5B4C1C8356C700C310BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B8B934F1843D05DAF0529BFF /* Pods-StrongBox.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+			};
+			name = Debug;
+		};
+		4DBE5B4D1C8356C700C310BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8A48CB913DB01CC3E35E9D8A /* Pods-StrongBox.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "StrongBox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4DBE5B491C8356C700C310BC /* Debug */,
+				4DBE5B4A1C8356C700C310BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "StrongBox" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4DBE5B4C1C8356C700C310BC /* Debug */,
+				4DBE5B4D1C8356C700C310BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4DBE5B291C8356C700C310BC /* Project object */;
+}

@@ -1,0 +1,4 @@
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Private" "${PODS_ROOT}/Headers/Private/BSKeyboardControls" "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/BSKeyboardControls" "${PODS_ROOT}/Headers/Public/Dropbox-iOS-SDK" "${PODS_ROOT}/Headers/Public/Google-API-Client" "${PODS_ROOT}/Headers/Public/JNKeychain" "${PODS_ROOT}/Headers/Public/MBProgressHUD" "${PODS_ROOT}/Headers/Public/Reachability" "${PODS_ROOT}/Headers/Public/UIActionSheet+Blocks" "${PODS_ROOT}/Headers/Public/UIAlertView+Blocks" "${PODS_ROOT}/Headers/Public/gtm-http-fetcher" "${PODS_ROOT}/Headers/Public/gtm-oauth2"
+PODS_ROOT = ${SRCROOT}
+SKIP_INSTALL = YES
