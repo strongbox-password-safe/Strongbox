@@ -1,5 +1,4 @@
-# StrongBox
-
+# StrongBox Password Safe
 A Password Safe Client for iOS that can be found on the Apple App Store here: 
 
 https://itunes.apple.com/us/app/strongbox-password-safe/id897283731
@@ -23,4 +22,4 @@ I use many different libraries in the app here are just a few:
 - UIAlertView+Blocks
 
 # Caveat
-This is my first iOS/Objective C project and as such I'm sure contains many many imperfections. It is showing classic signs of slow and organic development. I hope it is still of some value.
+This is my first iOS/Objective C project and as such I'm sure contains many imperfections. It is showing classic signs of slow and organic development. I hope it is still of some value.
