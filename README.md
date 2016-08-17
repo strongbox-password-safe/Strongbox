@@ -3,6 +3,11 @@ A Password Safe Client for iOS that can be found on the Apple App Store here:
 
 https://itunes.apple.com/us/app/strongbox-password-safe/id897283731
 
+and you can find the home page for the app here:
+
+https://strongboxsafe.com
+
+# Build
 This project will build in XCode as is. You will need Google Drive and Dropbox developer accounts (with keys/secrets) to use the cloud based features.
 
 # Acknowledgements
@@ -20,6 +25,3 @@ I use many different libraries in the app here are just a few:
 - Reachability
 - UIActionSheet+Blocks
 - UIAlertView+Blocks
-
-# Caveat
-This is my first iOS/Objective C project and as such I'm sure contains many imperfections. It is showing classic signs of slow and organic development. I hope it is still of some value.
