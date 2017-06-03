@@ -7,494 +7,367 @@
 //
 
 #import "GoogleDriveManager.h"
-#import "GTLDriveFile.h"
-#import "GTLDriveParentReference.h"
-#import "GTLUploadParameters.h"
-#import "GTLQueryDrive.h"
-#import "GTLServiceDrive.h"
-#import "GTMOAuth2ViewControllerTouch.h"
-#import "GTLDriveConstants.h"
-#import "GTLDriveFileList.h"
-#import "secrets.h"
+#import "Utils.h"
+#import "GTMSessionFetcherService.h"
+#import "SVProgressHUD/SVProgressHUD.h"
 
-static NSString *const kKeychainItemName = @"StrongBox: Google Drive";
-static NSString *const kClientId = GOOGLE_CLIENT_ID;
-static NSString *const kClientSecret = GOOGLE_CLIENT_SECRET;
+static NSString *const kMimeType = @"application/octet-stream";
 
-@implementation GoogleDriveManager
-{
-    BOOL _authSet;
+typedef void (^Authenticationcompletion)(NSError *error);
+
+@implementation GoogleDriveManager {
+    Authenticationcompletion authenticationcompletion;
 }
 
-- (GTLServiceDrive *)driveService
-{
-    static GTLServiceDrive *service = nil;
-    
-    if (!service)
-    {
-        service = [[GTLServiceDrive alloc] init];
++ (instancetype)sharedInstance {
+    static GoogleDriveManager *sharedInstance = nil;
+    static dispatch_once_t onceToken;
 
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[GoogleDriveManager alloc] init];
+        // Do any other initialisation stuff here
+    });
+    return sharedInstance;
+}
+
+- (GTLRDriveService *)driveService {
+    static GTLRDriveService *service = nil;
+
+    if (!service) {
+        service = [[GTLRDriveService alloc] init];
         service.shouldFetchNextPages = YES;
-
         service.retryEnabled = YES;
     }
-    
+
     return service;
 }
 
--(BOOL)isAuthorized
-{
-    if(!_authSet)
-    {
-        GTMOAuth2Authentication *auth = [GTMOAuth2ViewControllerTouch
-                                         authForGoogleFromKeychainForName:kKeychainItemName
-                                         clientID:kClientId
-                                         clientSecret:kClientSecret];
-        
-        if ([auth canAuthorize])
-        {
-            [[self driveService] setAuthorizer:auth];
-            
-            _authSet = YES;
-            
-            return YES;
-        }
-    }
-    else
-    {
-        return YES;
-    }
-    
-    return NO;
+- (void)initialize {
+    // Try to sign in if we have a previous session. This allows us to display the Signout Button
+    // state correctly. No need to popup sign in window at this stage, as user may not be using google drive at all
+
+    GIDSignIn *signIn = [GIDSignIn sharedInstance];
+
+    signIn.delegate = self;
+    signIn.scopes = @[kGTLRAuthScopeDrive];
+
+    authenticationcompletion = nil;
+
+    [signIn signInSilently];
 }
 
--(void)signout
-{
-    if ([self isAuthorized])
-    {
-        [GTMOAuth2ViewControllerTouch removeAuthFromKeychainForName:kKeychainItemName];
-        [[self driveService] setAuthorizer:nil];
-    
-        _authSet = NO;
-    }
+- (BOOL)isAuthorized {
+    return [[GIDSignIn sharedInstance] hasAuthInKeychain];
 }
 
--(void)authenticate:(UIViewController*)viewController completionHandler:(void (^)(NSError *error))completionHandler
-{
-    if (![self isAuthorized])
-    {
-        GTMOAuth2ViewControllerTouch *authViewController =
-        [[GTMOAuth2ViewControllerTouch alloc] initWithScope:kGTLAuthScopeDrive
-                                                   clientID:kClientId
-                                               clientSecret:kClientSecret
-                                           keychainItemName:kKeychainItemName
-                                          completionHandler:^(GTMOAuth2ViewControllerTouch *viewController, GTMOAuth2Authentication *auth, NSError *error)
-         {
-             [viewController dismissViewControllerAnimated:NO completion:nil];
-             
-             [[self driveService] setAuthorizer:auth];
-            
-             _authSet = YES;
-             
-             completionHandler(error);
-         }];
-        
-        [viewController presentViewController:authViewController animated:YES  completion:nil];
+- (void)signout {
+    [[GIDSignIn sharedInstance] signOut];
+    [[GIDSignIn sharedInstance] disconnect];
+}
+
+- (void)authenticate:(id<GIDSignInUIDelegate>)viewController completion:(void (^)(NSError *error))completion {
+    GIDSignIn *signIn = [GIDSignIn sharedInstance];
+
+    signIn.delegate = self;
+    signIn.uiDelegate = viewController;
+    signIn.scopes = @[kGTLRAuthScopeDrive];
+
+    authenticationcompletion = completion;
+    [signIn signIn];
+}
+
+- (void)      signIn:(GIDSignIn *)signIn
+    didSignInForUser:(GIDGoogleUser *)user
+           withError:(NSError *)error {
+    if (error != nil) {
+        self.driveService.authorizer = nil;
+    }
+    else {
+        self.driveService.authorizer = user.authentication.fetcherAuthorizer;
+    }
+
+    if (authenticationcompletion) {
+        authenticationcompletion(error);
+        authenticationcompletion = nil;
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(void)create:(UIViewController*)viewController withTitle:(NSString*)title withData:(NSData*)data parentFolder:(NSString*)parent completionHandler:(void (^)(GTLDriveFile *file, NSError *error))handler
-{
-    if (![self isAuthorized])
+- (void)  create:(id<GIDSignInUIDelegate>)viewController
+       withTitle:(NSString *)title
+        withData:(NSData *)data
+    parentFolder:(NSObject *)parentFolder
+      completion:(void (^)(GTLRDrive_File *file, NSError *error))handler {
+    NSString *parentFolderIdentifier = parentFolder ? ((GTLRDrive_File *)parentFolder).identifier : @"root";
+
+    [self findSafeFile:parentFolderIdentifier
+              fileName:title
+            completion:^(GTLRDrive_File *file, NSError *error)
     {
-        [self authenticate:viewController completionHandler:^(NSError *error) {
-            if(error)
-            {
-                NSLog(@"%@", error);
-                handler(nil, error);
-            }
-            else
-            {
-                [self _create:title withData:data parentFolder:parent completionHandler:handler];
-            }
-        }];
-    }
-    else
-    {
-        [self _create:title withData:data parentFolder:parent completionHandler:handler];
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
--(void)_create:(NSString*)title withData:(NSData*)data parentFolder:(NSString*)parent completionHandler:(void (^)(GTLDriveFile *file, NSError *error))handler
-{
-    GTLQueryDrive *query = [GTLQueryDrive queryForFilesList];
-    
-    query.q = [NSString stringWithFormat:@"title = '%@' and '%@' in parents and trashed=false", title, parent ? parent : @"root" ];
-    
-    [[self driveService]  executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                                 GTLDriveFileList *files,
-                                                                 NSError *error)
-     {
-         NSString *fn = [self checkFilenameIsOk:title error:error files:files];
-         
-         //NSLog(@"%@", fn);
-         
-         // Got a good filename, create the file
-
-         GTLDriveFile *file = [GTLDriveFile object];
-
-         file.title = fn;
-         file.descriptionProperty = @"Strong Box Password Safe";
-         file.mimeType = @"application/octet-stream";
-
-         GTLDriveParentReference *parentRef = [GTLDriveParentReference object];
-         parentRef.identifier = parent; // identifier property of the folder
-         file.parents = @[ parentRef ];
-
-         GTLUploadParameters *uploadParameters =
-         [GTLUploadParameters uploadParametersWithData:data
-                                         MIMEType:@"application/octet-stream"];
-
-         GTLQueryDrive *query = [GTLQueryDrive queryForFilesInsertWithObject:file
-                                                       uploadParameters:uploadParameters];
-
-         [[self driveService] executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                                    GTLDriveFile *updatedFile,
-                                                                    NSError *error)
-          {
-              if(error)
-              {
-                  NSLog(@"%@", error);
-              }
-         
-              handler(updatedFile, error);
-        }];
-     }];
-}
-
--(void)readWithOnlyFileId:(UIViewController*)viewController fileIdentifier:(NSString*)fileIdentifier completionHandler:(void (^)(NSData *data, NSError *error))handler
-{
-    if (![self isAuthorized])
-    {
-        [self authenticate:viewController completionHandler:^(NSError *error) {
-            if(error)
-            {
-                NSLog(@"%@", error);
-                handler(nil, error);
-            }
-            else
-            {
-                [self _readWithOnlyFileId:fileIdentifier completionHandler:handler];
-            }
-        }];
-    }
-    else
-    {
-        [self _readWithOnlyFileId:fileIdentifier completionHandler:handler];
-    }
-}
-
--(void)read:(UIViewController*)viewController parentFileIdentifier:(NSString*)parentFileIdentifier fileName:(NSString*)fileName completionHandler:(void (^)(NSData *data, NSError *error))handler
-{
-    if (![self isAuthorized])
-    {
-        [self authenticate:viewController completionHandler:^(NSError *error) {
-            if(error)
-            {
-                NSLog(@"%@", error);
-                handler(nil, error);
-            }
-            else
-            {
-                [self _read:parentFileIdentifier fileName:fileName completionHandler:handler];
-            }
-        }];
-    }
-    else{
-        [self _read:parentFileIdentifier fileName:fileName completionHandler:handler];
-    }
-}
-
--(void)_read:(NSString*)parentFileIdentifier fileName:(NSString*)fileName completionHandler:(void (^)(NSData *data, NSError *error))handler
-{
-    GTLQueryDrive *query = [GTLQueryDrive queryForFilesList];
-    
-    query.q = [NSString stringWithFormat:@"title = '%@' and '%@' in parents and trashed=false", fileName, parentFileIdentifier ? parentFileIdentifier : @"root" ];
-    
-    [[self driveService]  executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                                 GTLDriveFileList *files,
-                                                                 NSError *error)
-     {
-         if(files.items != nil && files.items.count > 0)
-         {
-             GTLDriveFile *file = [files.items objectAtIndex:0];
-                
-             GTMHTTPFetcher *fetcher =[self.driveService.fetcherService fetcherWithURLString:file.downloadUrl];
-             [fetcher beginFetchWithCompletionHandler:^(NSData *data, NSError *error){
-                 if(error)
-                 {
-                     NSLog(@"%@", error);
-                 }
-                 
-                 handler(data, error);
-             }];
-         }
-         else {
-             // NOTE: Legacy, if the file no longer exists, try to load directly using parentFileIdentifier which was the method used previously
-             // before. We used to store the id of the safe file, but because of shitty auto backup behaviour in the main PWSSafe app, this
-             // ends up pointing at backup files rather than the main file. So now we load by name and parent folder. If that doesn't work we will
-             // try loading the file directly by id, which should maintain compatibility with older safes. When people re-add they'll get moved over
-             // to the new (parent+title) way of identifiying the file.
-             
-             [self _readWithOnlyFileId:parentFileIdentifier completionHandler:handler];
-         }
-     }];
-}
-
--(void) _readWithOnlyFileId:(NSString*)fileIdentifier completionHandler:(void (^)(NSData *data, NSError *error))handler
-{
-    GTLQuery *query = [GTLQueryDrive queryForFilesGetWithFileId:fileIdentifier];
-    
-    [[self driveService] executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                          GTLDriveFile *file,
-                                                          NSError *error)
-    {
-        if(error)
-        {
-            NSLog(@"%@", error);
-        
+        if (error) {
             handler(nil, error);
+            return;
         }
-        else
-        {
-            GTMHTTPFetcher *fetcher =[self.driveService.fetcherService fetcherWithURLString:file.downloadUrl];
-            [fetcher beginFetchWithCompletionHandler:^(NSData *data, NSError *error){
-                if(error)
-                {
-                    NSLog(@"%@", error);
-                }
 
-                handler(data, error);
+        NSString *fileName = title;
+
+        if (file != nil) {
+            NSLog(@"File already exists under this name. Adding a timestampe to make it unique.");
+            fileName = [Utils insertTimestampInFilename:title];
+        }
+
+        // New
+
+        GTLRDrive_File *metadata = [GTLRDrive_File object];
+        metadata.name = fileName;
+        metadata.descriptionProperty = @"StrongBox Password Safe";
+        metadata.mimeType = kMimeType;
+        metadata.parents = @[ parentFolderIdentifier ];
+
+        GTLRUploadParameters *uploadParameters = [GTLRUploadParameters uploadParametersWithData:data
+                                                                                       MIMEType:kMimeType];
+
+        uploadParameters.shouldUploadWithSingleRequest = TRUE;
+        GTLRDriveQuery_FilesCreate *query = [GTLRDriveQuery_FilesCreate queryWithObject:metadata
+                                                                       uploadParameters:uploadParameters];
+        query.fields = @"id, name, mimeType, iconLink, parents, size";
+
+        [[self driveService] executeQuery:query
+                        completionHandler:^(GTLRServiceTicket *ticket,
+                                                      GTLRDrive_File *createdFile,
+                                                      NSError *error)
+        {
+            if (error) {
+                NSLog(@"%@", error);
+            }
+
+            handler(createdFile, error);
+        }];
+    }];
+}
+
+- (void)readWithOnlyFileId:(id<GIDSignInUIDelegate>)viewController
+            fileIdentifier:(NSString *)fileIdentifier
+                completion:(void (^)(NSData *data, NSError *error))handler {
+    [self getFile:fileIdentifier handler:handler];
+}
+
+- (void)            read:(id<GIDSignInUIDelegate>)viewController
+    parentFileIdentifier:(NSString *)parentFileIdentifier
+                fileName:(NSString *)fileName
+              completion:(void (^)(NSData *data, NSError *error))handler {
+    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+
+    [self authenticate:viewController
+            completion:^(NSError *error) {
+                if (error) {
+                NSLog(@"%@", error);
+                handler(nil, error);
+                }
+                else {
+                [self    _read:parentFileIdentifier
+                  fileName:fileName
+                   completion:handler];
+                }
             }];
+}
+
+- (void)_read:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *data, NSError *error))handler {
+    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD show];
+    });
+    
+    [self findSafeFile:parentFileIdentifier
+              fileName:fileName
+            completion:^(GTLRDrive_File *file, NSError *error)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD popActivity];
+        });
+        
+        if (!file) {
+            NSLog(@"Google Drive: No such file found... Trying to use legacy metadata pattern %@", error);
+
+            // NOTE: Legacy, if the file no longer exists, try to load directly using parentFileIdentifier which was the method used previously
+            // before. We used to store the id of the safe file, but because of shitty auto backup behaviour in the main PWSSafe app, this
+            // ends up pointing at backup files rather than the main file. So now we load by name and parent folder. If that doesn't work we will
+            // try loading the file directly by id, which should maintain compatibility with older safes. When people re-add they'll get moved over
+            // to the new (parent+title) way of identifiying the file.
+
+            [self getFile:parentFileIdentifier
+                  handler:handler];
+        }
+        else {
+            [self getFile:file.identifier
+                  handler:handler];
         }
     }];
-    
 }
 
--(void)update:(UIViewController*)viewController
-    parentFileIdentifier:(NSString*)parentFileIdentifier
-     fileName:(NSString*)fileName
-     withData:(NSData*)data
-completionHandler:(void (^)(NSError *error))handler
-{
-    if (![self isAuthorized])
+- (void)update:(NSString *)parentFileIdentifier
+      fileName:(NSString *)fileName
+      withData:(NSData *)data
+    completion:(void (^)(NSError *error))handler {
+    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+
+    [self findSafeFile:parentFileIdentifier
+              fileName:fileName
+            completion:^(GTLRDrive_File *file, NSError *error)
     {
-        [self authenticate:viewController completionHandler:^(NSError *error) {
-            if(error)
-            {
-                NSLog(@"%@", error);
+        if (!error) {
+            if (!file) {
                 handler(error);
             }
-            else
-            {
-                [self _update:parentFileIdentifier fileName:fileName withData:data completionHandler:handler];
+            else {
+                GTLRUploadParameters *uploadParameters = [GTLRUploadParameters
+                                                          uploadParametersWithData:data
+                                                                          MIMEType:kMimeType];
+
+                GTLRDriveQuery_FilesUpdate *query = [GTLRDriveQuery_FilesUpdate
+                                                     queryWithObject:[GTLRDrive_File object]
+                                                                  fileId:file.identifier
+                                                        uploadParameters:uploadParameters];
+
+                [self.driveService executeQuery:query
+                              completionHandler:^(GTLRServiceTicket *callbackTicket,
+                                                                    GTLRDrive_File *uploadedFile,
+                                                                    NSError *callbackError) {
+                                  if (error) {
+                                  NSLog(@"%@", error);
+                                  }
+
+                                  handler(error);
+                              }];
             }
-        }];
-    }
-    else
-    {
-        [self _update:parentFileIdentifier fileName:fileName withData:data completionHandler:handler];
-    }
+        }
+        else {
+            NSLog(@"%@", error);
+            handler(error);
+        }
+    }];
 }
 
--(void)_update:(NSString*)parentFileIdentifier
-      fileName:(NSString*)fileName
-            withData:(NSData*)data
-    completionHandler:(void (^)(NSError *error))handler
-{
-    GTLQueryDrive *query = [GTLQueryDrive queryForFilesList];
-    
-    query.q = [NSString stringWithFormat:@"title = '%@' and '%@' in parents and trashed=false", fileName, parentFileIdentifier ? parentFileIdentifier : @"root" ];
-    
-    [[self driveService]  executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                                 GTLDriveFileList *files,
-                                                                 NSError *error)
-     {
-         if(error)
-         {
-             NSLog(@"%@", error);
-             
-             handler(error);
-         }
-         else
-         {
-             if(files.items != nil && files.items.count > 0)
-             {
-                 GTLDriveFile *file = [files.items objectAtIndex:0];
-                 
-                 GTLUploadParameters *uploadParameters =
-                 [GTLUploadParameters uploadParametersWithData:data
-                                                      MIMEType:@"application/octet-stream"];
-                 
-                 GTLQueryDrive *query = [GTLQueryDrive queryForFilesUpdateWithObject:file
-                                                                              fileId:file.identifier
-                                                                    uploadParameters:uploadParameters];
-                 
-                 [[self driveService] executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                                             GTLDriveFile *updatedFile,
-                                                                             NSError *error)
-                  {
-                      if(error)
-                      {
-                          NSLog(@"%@", error);
-                      }
-                      
-                      handler(error);
-                  }];
-             }
-             else{
-                 handler(error);
-             }
-         }
-     }];
-}
+- (void)getFilesAndFolders:(id<GIDSignInUIDelegate>)viewController
+          withParentFolder:(NSString *)parentFolderIdentifier
+                completion:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler {
+    parentFolderIdentifier = parentFolderIdentifier ? parentFolderIdentifier : @"root";
 
--(void)getFilesAndFolders:(UIViewController*)viewController
-         withParentFolder:(NSString*)parentFolderIdentifier
-        completionHandler:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler
-{
-    if (![self isAuthorized])
-    {
-        [self authenticate:viewController completionHandler:^(NSError *error) {
-            if(error)
-            {
+    [self authenticate:viewController
+            completion:^(NSError *error) {
+                if (error) {
                 NSLog(@"%@", error);
                 handler(nil, nil, error);
-            }
-            else
-            {
-                [self _getFilesAndFolders:parentFolderIdentifier completionHandler:handler];
-            }
-        }];
-    }
-    else
-    {
-        [self _getFilesAndFolders:parentFolderIdentifier completionHandler:handler];
-    }
+                }
+                else {
+                    [self _getFilesAndFolders:parentFolderIdentifier
+                           completion:handler];
+                }
+            }];
 }
 
--(void)_getFilesAndFolders:(NSString*)parentFolderIdentifier
-        completionHandler:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler
-{
-    GTLQueryDrive *query = [GTLQueryDrive queryForFilesList];
-    
-    query.q = [NSString stringWithFormat:@"'%@' in parents and trashed=false", parentFolderIdentifier ? parentFolderIdentifier : @"root" ];
-    
-    [[self driveService]  executeQuery:query completionHandler:^(GTLServiceTicket *ticket,
-                                                                     GTLDriveFileList *files,
-                                                                     NSError *error)
+- (void)_getFilesAndFolders:(NSString *)parentFileIdentifier
+                 completion:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD show];
+    });
+
+    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+
+    GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
+    query.q = [NSString stringWithFormat:@"'%@' in parents and trashed=false", parentFileIdentifier ];
+    query.fields = @"kind,nextPageToken,files(mimeType,id,name,iconLink,parents,size)";
+
+    [[self driveService] executeQuery:query
+                    completionHandler:^(GTLRServiceTicket *ticket,
+                                              GTLRDrive_FileList *fileList,
+                                              NSError *error)
     {
-        if (error == nil)
-        {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD popActivity];
+        });
+        
+        if (error == nil) {
             NSMutableArray *driveFolders = [[NSMutableArray alloc] init];
             NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
-            
-            for(GTLDriveFile *file in files.items)
-            {
-                if([file.mimeType  isEqual: @"application/vnd.google-apps.folder"])
-                {
+
+            for (GTLRDrive_File *file in fileList.files) {
+                if ([file.mimeType isEqual:@"application/vnd.google-apps.folder"]) {
                     [driveFolders addObject:file];
                 }
-                else
-                {
+                else {
                     [driveFiles addObject:file];
                 }
             }
-            
+
             handler(driveFolders, driveFiles, error);
         }
-        else
-        {
+        else {
             NSLog(@"An error occurred: %@", error);
 
-            handler(nil, nil, error);            
+            handler(nil, nil, error);
         }
     }];
 }
 
--(void)fetchUrl:(UIViewController*)viewController withUrl:(NSString*)url completionHandler:(void (^)(NSData *data, NSError *error))handler;
-{
-    if (![self isAuthorized])
+- (void)getFile:(NSString *)fileIdentifier handler:(void (^)(NSData *, NSError *))handler {
+    GTLRDriveQuery_FilesGet *query = [GTLRDriveQuery_FilesGet queryForMediaWithFileId:fileIdentifier];
+
+    [[self driveService] executeQuery:query
+                    completionHandler:^(GTLRServiceTicket *ticket,
+                                              GTLRDataObject *data,
+                                              NSError *error) {
+                        if (error != nil) {
+                        NSLog(@"Could not GET file. An error occurred: %@", error);
+                        }
+
+                        handler(data.data, error);
+                    }];
+}
+
+- (void)findSafeFile:(NSString *)parentFileIdentifier
+            fileName:(NSString *)fileName
+          completion:(void (^)(GTLRDrive_File *file, NSError *error))handler {
+    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+
+    GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
+    query.q = [NSString stringWithFormat:@"name = '%@' and '%@' in parents and trashed=false", fileName, parentFileIdentifier ? parentFileIdentifier : @"root" ];
+
+    [[self driveService] executeQuery:query
+                    completionHandler:^(GTLRServiceTicket *ticket,
+                                              GTLRDrive_FileList *fileList,
+                                              NSError *error)
     {
-        [self authenticate:viewController completionHandler:^(NSError *error) {
-            if(error)
-            {
-                NSLog(@"%@", error);
+        if (!error) {
+            if (fileList.files != nil && fileList.files.count > 0) {
+                GTLRDrive_File *file = fileList.files[0];
+                handler(file, error);
+            }
+            else {
                 handler(nil, error);
             }
-            else
-            {
-                [self _fetchUrl:viewController withUrl:url completionHandler:handler];
-            }
-        }];
-    }
-    else
-    {
-        [self _fetchUrl:viewController withUrl:url completionHandler:handler];
-    }
-}
-
--(void)_fetchUrl:(UIViewController*)viewController withUrl:(NSString*)url completionHandler:(void (^)(NSData *data, NSError *error))handler;
-{
-    GTMHTTPFetcher *fetcher =[[self driveService].fetcherService fetcherWithURLString:url];
-    [fetcher beginFetchWithCompletionHandler:^(NSData *data, NSError *error)
-     {
-         if(error)
-         {
-             NSLog(@"%@", error);
-         }
-         
-         handler(data, error);
-     }];
-}
-
-// TODO: These do not belong here!
-
-- (NSString *)insertTimestampInFilename:(NSString *)title
-{
-    NSString *fn=title;
-    
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setDateFormat:@"yyyyMMdd-HHmmss"];
-    NSDate *date = [[NSDate alloc] init];
-    
-    NSString* extension = [title pathExtension];
-    fn = [NSString stringWithFormat:@"%@-%@.%@",title, [dateFormat stringFromDate:date], extension];
-    
-    return fn;
-}
-
-- (NSString *)checkFilenameIsOk:(NSString *)title error:(NSError *)error files:(GTLDriveFileList *)files
-{
-    NSString *fn = title;
-    
-    if (error == nil)
-    {
-        if(files.items != nil && files.items.count > 0)
-        {
-            fn = [self insertTimestampInFilename:title];
         }
-    }
-    else
+        else {
+            handler(nil, error);
+        }
+    }];
+}
+
+- (void)fetchUrl:(UIViewController *)viewController
+         withUrl:(NSString *)url
+      completion:(void (^)(NSData *data, NSError *error))handler {
+    GTMSessionFetcher *fetcher = [[self driveService].fetcherService fetcherWithURLString:url];
+
+    [fetcher beginFetchWithCompletionHandler:^(NSData *data, NSError *error)
     {
-        NSLog(@"Error checking if file exists: %@", error);
-    }
-    
-    return fn;
+        if (error) {
+            NSLog(@"%@", error);
+        }
+
+        handler(data, error);
+    }];
 }
 
 @end

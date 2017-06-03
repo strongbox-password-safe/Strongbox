@@ -10,9 +10,8 @@
 
 @interface IOsUtils : NSObject
 
-//+ (NSString *)getAppName;
 + (NSURL *)applicationDocumentsDirectory;
-//+ (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode;
-+ (BOOL) isTouchIDAvailable;
+
++ (BOOL)   isTouchIDAvailable;
 
 @end

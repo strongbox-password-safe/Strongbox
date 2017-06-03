@@ -8,17 +8,43 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "core-model/SafeDatabase.h"
+#import "SafeDatabase.h"
 #import "SafeMetaData.h"
+#import "StorageBrowserItem.h"
 
 @protocol SafeStorageProvider <NSObject>
 
--(StorageProvider) getStorageId;
--(BOOL) isCloudBased;
+@property (strong, nonatomic, readonly) NSString *displayName;
+@property (nonatomic, readonly) StorageProvider storageId;
+@property (nonatomic, readonly) BOOL cloudBased;
+@property (nonatomic, readonly) BOOL providesIcons;
+@property (nonatomic, readonly) BOOL browsable;
 
-- (void)create:(NSString*)desiredFilename data:(NSData*)data parentReference:(NSString*)parentReference viewController:(UIViewController*)viewController completionHandler:(void (^)(NSString *fileName, NSString *fileIdentifier, NSError *error))completion;
-- (void)read:(SafeMetaData*)safeMetaData viewController:(UIViewController*)viewController completionHandler:(void (^)(NSData* data, NSError* error))completion;
-- (void)update:(SafeMetaData*)safeMetaData data:(NSData*)data viewController:(UIViewController*)viewController completionHandler:(void (^)(NSError *error))completion;
-- (void)delete:(SafeMetaData*)safeMetaData completionHandler:(void (^)(NSError *error))completion;
+- (void)    create:(NSString *)nickName
+              data:(NSData *)data
+      parentFolder:(NSObject *)parentFolder
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
+
+- (void)      read:(SafeMetaData *)safeMetaData
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(NSData *data, NSError *error))completion;
+
+- (void)update:(SafeMetaData *)safeMetaData
+          data:(NSData *)data
+    completion:(void (^)(NSError *error))completion;
+
+- (void)      list:(NSObject *)parentFolder
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion;
+
+- (void)readWithProviderData:(NSObject *)providerData
+              viewController:(UIViewController *)viewController
+                  completion:(void (^)(NSData *data, NSError *error))completionHandler;
+
+- (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
+      completion:(void (^)(UIImage *image))completionHandler;
+
+- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
 
 @end

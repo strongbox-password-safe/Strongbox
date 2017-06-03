@@ -11,5 +11,11 @@
 #import "GoogleDriveManager.h"
 
 @interface GoogleDriveStorageProvider : NSObject <SafeStorageProvider>
-@property GoogleDriveManager *googleDrive;
+
+@property (strong, nonatomic, readonly) NSString *displayName;
+@property (nonatomic, readonly) StorageProvider storageId;
+@property (nonatomic, readonly) BOOL cloudBased;
+@property (nonatomic, readonly) BOOL providesIcons;
+@property (nonatomic, readonly) BOOL browsable;
+
 @end

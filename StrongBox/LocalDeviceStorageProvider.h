@@ -9,13 +9,29 @@
 #import <Foundation/Foundation.h>
 #import "SafeStorageProvider.h"
 #import "SafeMetaData.h"
-#import "core-model/SafeDatabase.h"
+#import "SafeDatabase.h"
 
 @interface LocalDeviceStorageProvider : NSObject <SafeStorageProvider>
-- (void)readOfflineCachedSafe:(SafeMetaData*)safeMetaData viewController:(UIViewController*)viewController completionHandler:(void (^)(NSData*, NSError* error))completion;
-- (void)updateOfflineCachedSafe:(SafeMetaData*)safeMetaData data:(NSData*)data viewController:(UIViewController*)viewController completionHandler:(void (^)(NSError *error))completion;
-- (void)deleteOfflineCachedSafe:(SafeMetaData*)safeMetaData completionHandler:(void (^)(NSError *error))completion;
 
--(NSDate*)getOfflineCacheFileModificationDate:(SafeMetaData*)safeMetadata;
+@property (strong, nonatomic, readonly) NSString *displayName;
+@property (nonatomic, readonly) StorageProvider storageId;
+@property (nonatomic, readonly) BOOL cloudBased;
+@property (nonatomic, readonly) BOOL providesIcons;
+@property (nonatomic, readonly) BOOL browsable;
+
+- (void)readOfflineCachedSafe:(SafeMetaData *)safeMetaData
+               viewController:(UIViewController *)viewController
+                   completion:(void (^)(NSData *, NSError *error))completion;
+
+- (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData
+                           data:(NSData *)data
+                 viewController:(UIViewController *)viewController
+                     completion:(void (^)(NSError *error))completion;
+
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
+
+- (void)deleteOfflineCachedSafe:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
+
+- (NSDate *)getOfflineCacheFileModificationDate:(SafeMetaData *)safeMetadata;
 
 @end

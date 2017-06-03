@@ -15,7 +15,7 @@
 
 @property (nonatomic) SafesCollection *safes;
 @property (nonatomic) BOOL existing;
-@property (nonatomic) NSString* rootDriveFile;
+@property (nonatomic) NSString *rootDriveFile;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSelectThisFolder;
 - (IBAction)onSelectThisFolder:(id)sender;
 

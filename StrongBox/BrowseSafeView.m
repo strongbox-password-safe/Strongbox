@@ -7,213 +7,168 @@
 //
 
 #import "BrowseSafeView.h"
-#import "core-model/SafeDatabase.h"
-#import "core-model/SafeTools.h"
-#import "core-model/Record.h"
-#import "core-model/Field.h"
-#import "RecordViewController.h"
+#import "SafeDatabase.h"
+#import "SafeTools.h"
+#import "Record.h"
+#import "Field.h"
 #import "SafeDetailsAndSettingsView.h"
-#import "MBProgressHUD.h"
-#import "core-model/SafeItemViewModel.h"
-#import "UIAlertView+Blocks.h"
+#import "SafeItemViewModel.h"
 #import "SelectDestinationGroupController.h"
 #import <MessageUI/MessageUI.h>
+#import "RecordView.h"
+#import "Alerts.h"
+#import <ISMessages/ISMessages.h>
 
-@interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
+@interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
+
+@property (strong, nonatomic) NSMutableArray *searchResults;
+@property (strong, nonatomic) NSMutableArray *items;
+@property (strong, nonatomic) UISearchController *searchController;
+@property (strong, nonatomic) UIBarButtonItem *savedOriginalNavButton;
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+
 @end
 
 @implementation BrowseSafeView
-{
-    NSMutableArray* _items;
-    NSMutableArray *_titleSearchResults;
-    NSMutableArray *_deepSearchResults;
 
-    UIBarButtonItem *savedOriginalNavButton;
-    UILongPressGestureRecognizer *longPressRecognizer;
-    BOOL searchResultsTableViewIsVisible;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
--(void) viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     
-    longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                           initWithTarget:self
-                           action:@selector(handleLongPress:)];
-    longPressRecognizer.minimumPressDuration = 1.5;
-    longPressRecognizer.cancelsTouchesInView = YES;
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                initWithTarget:self
+                                action:@selector(handleLongPress:)];
+    self.longPressRecognizer.minimumPressDuration = 1;
+    self.longPressRecognizer.cancelsTouchesInView = YES;
     
-    [self.tableView addGestureRecognizer:longPressRecognizer];
+    [self.tableView addGestureRecognizer:self.longPressRecognizer];
     
-    if(!self.currentGroup || self.currentGroup.isRootGroup)
-    {
-        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Configure for text only and offset down
-        
-        hud.mode = MBProgressHUDModeText;
-        hud.labelText = @"Fast Password Copy";
-        hud.detailsLabelText = @"Touch and hold entry for fast password copy";
-        hud.yOffset += 100;
-        hud.margin = 10.0f;
-        hud.removeFromSuperViewOnHide = YES;
-        hud.userInteractionEnabled = NO;
-        
-        [hud hide:YES afterDelay:3];
+    if (!self.currentGroup || self.currentGroup.isRootGroup) {
+        [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
+                                   message:@"Touch and hold entry for fast password copy"
+                                  duration:2.5f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeInfo
+                             alertPosition:ISAlertPositionBottom
+                                   didHide:nil];
     }
+    
+    self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+    self.searchController.searchResultsUpdater = self;
+    self.searchController.dimsBackgroundDuringPresentation = NO;
+    self.searchController.searchBar.delegate = self;
+    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
+    
+    self.tableView.tableHeaderView = self.searchController.searchBar;
+    self.definesPresentationContext = YES;
+    [self.searchController.searchBar sizeToFit];
 }
 
--(void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    self.navigationController.toolbar.hidden = NO;
-    self.navigationController.navigationBar.hidden = NO;
-    
-    [self refresh];
+- (NSArray *)getDataSource {
+    return (self.searchController.isActive ? self.searchResults : self.items);
 }
 
-- (void)enableDisableToolbarButtons
-{
-    [self.buttonAddRecord setEnabled:!self.viewModel.isUsingOfflineCache && !self.isEditing];
-    [self.buttonSafeSettings setEnabled:!self.viewModel.isUsingOfflineCache && !self.isEditing];
-    [self.buttonDelete setEnabled:!self.viewModel.isUsingOfflineCache && self.isEditing];
-    [self.buttonMove setEnabled:!self.viewModel.isUsingOfflineCache && self.isEditing];
-    [self.buttonAddGroup setEnabled:!self.viewModel.isUsingOfflineCache && !self.isEditing];
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)refresh
-{
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@",
-                                 (!self.currentGroup || self.currentGroup.isRootGroup) ?
-                                    self.viewModel.metadata.nickName : self.currentGroup.suffixDisplayString,
-                                 self.viewModel.isUsingOfflineCache ?
-                                    @" [Offline]" : @""];
+- (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    NSString *searchString = searchController.searchBar.text;
     
-    NSArray* foo = [self.viewModel getItemsForGroup:self.currentGroup];
-    _items = [[NSMutableArray alloc] initWithArray:foo];
-    
-    // Display
-    
+    [self filterContentForSearchText:searchString scope:searchController.searchBar.selectedScopeButtonIndex];
     [self.tableView reloadData];
+}
+
+- (void)filterContentForSearchText:(NSString *)searchText scope:(NSInteger)scope {
+    [self.searchResults removeAllObjects];
     
-    self.navigationItem.rightBarButtonItem = (!self.viewModel.isUsingOfflineCache && _items.count > 0) ? self.editButtonItem : nil;
-
-    [self enableDisableToolbarButtons];
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Display and normal select logic
-
-- (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    return (tableView == self.searchDisplayController.searchResultsTableView) ? (section == 0 ? @"Title Matches" : @"Deep Search Matches") : nil;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return (tableView == self.searchDisplayController.searchResultsTableView) ? 2 : 1;
-
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    if (tableView == self.searchDisplayController.searchResultsTableView)
-    {
-        return section == 0 ? [_titleSearchResults count] : [_deepSearchResults count];
-    }
-    else
-    {
-        return [_items count];
-    }
-}
-
-- (NSString *)getGroupPathDisplayString:(SafeItemViewModel *)vm
-{
-    return [vm.groupPathPrefix isEqualToString:@""] ? @"" : [NSString stringWithFormat:@"(in %@)", vm.groupPathPrefix];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell;
-    SafeItemViewModel* vm;
+    NSArray *allItems = [self.viewModel getSearchableItems];
     
-    // Check to see whether the normal table or search results table is being displayed and set the Candy object from the appropriate array
+    NSPredicate *predicate;
     
-    BOOL isSearchResults = tableView == self.searchDisplayController.searchResultsTableView;
-    if (isSearchResults)
-    {
-        static NSString *CellIdentifier = @"Cell";
-        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if ( cell == nil ) {
-            cell = [[UITableViewCell alloc] initWithStyle: UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-        }
-        
-        NSUInteger section = [indexPath section];
-       
-        if(section == 0)
-        {
-            vm = [_titleSearchResults objectAtIndex:indexPath.row];
-        }
-        else if(section == 1)
-        {
-            vm = [_deepSearchResults objectAtIndex:indexPath.row];
-        }
-        
-        [cell detailTextLabel].textColor =( vm.isGroup ? [UIColor blackColor] : [UIColor blueColor]);
+    if (scope == 0) {
+        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
     }
-    else
+    else if (scope == 1)
     {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-        vm = [_items objectAtIndex:indexPath.row];
+        predicate = [NSPredicate predicateWithFormat:@"username contains[c] %@", searchText];
     }
+    else if (scope == 2)
+    {
+        predicate = [NSPredicate predicateWithFormat:@"password contains[c] %@", searchText];
+    }
+    else {
+        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR password contains[c] %@  OR username contains[c] %@  OR url contains[c] %@  OR notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
+    }
+    
+    self.searchResults = [NSMutableArray arrayWithArray:[allItems filteredArrayUsingPredicate:predicate]];
+}
+
+- (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
+    [self updateSearchResultsForSearchController:self.searchController];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self getDataSource].count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
+    SafeItemViewModel *vm = [self getDataSource][indexPath.row];
     
     cell.textLabel.text = vm.title;
-    cell.detailTextLabel.text = vm.isGroup ?
-                (isSearchResults ? [self getGroupPathDisplayString: vm] : @"") :
-             vm.username;
-
+    cell.detailTextLabel.text = vm.isGroup ? (self.searchController.isActive ? [self getGroupPathDisplayString:vm] : @"") : vm.username;
     cell.accessoryType = vm.isGroup ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.imageView.image = vm.isGroup ? [UIImage imageNamed:@"folder-80.png"] : [UIImage imageNamed:@"lock-48.png"];
     
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if(![self isEditing])
-    {
-        SafeItemViewModel* item;
-        if (tableView == self.searchDisplayController.searchResultsTableView)
-        {
-            if([indexPath section] == 0)
-            {
-                item = [_titleSearchResults objectAtIndex:indexPath.row];
-            }
-            else
-            {
-                item = [_deepSearchResults objectAtIndex:indexPath.row];
-            }
-           }
-        else
-        {
-            item = [_items objectAtIndex:indexPath.row];
-        }
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (!self.editing) {
+        SafeItemViewModel *item = [self getDataSource][indexPath.row];
         
-        
-        if(!item.isGroup)
-        {
-            [self performSegueWithIdentifier:@"segueToRecordView" sender:item.record];
+        if (!item.isGroup) {
+            [self performSegueWithIdentifier:@"segueToRecord" sender:item.record];
         }
-        else
-        {
+        else {
             [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item.group];
         }
     }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self refresh];
+}
+
+- (void)enableDisableToolbarButtons {
+    (self.buttonAddRecord).enabled = !self.viewModel.isUsingOfflineCache && !self.isEditing;
+    (self.buttonSafeSettings).enabled = !self.viewModel.isUsingOfflineCache && !self.isEditing;
+    (self.buttonDelete).enabled = !self.viewModel.isUsingOfflineCache && self.isEditing;
+    (self.buttonMove).enabled = !self.viewModel.isUsingOfflineCache && self.isEditing;
+    (self.buttonAddGroup).enabled = !self.viewModel.isUsingOfflineCache && !self.isEditing;
+}
+
+- (void)refresh {
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@",
+                                 (!self.currentGroup || self.currentGroup.isRootGroup) ?
+                                 self.viewModel.metadata.
+                                                 nickName : self.currentGroup.suffixDisplayString,
+                                 self.viewModel.isUsingOfflineCache ?
+                                 @" [Offline]" : @""];
+    
+    NSArray *foo = [self.viewModel getItemsForGroup:self.currentGroup];
+    self.items = [[NSMutableArray alloc] initWithArray:foo];
+    
+    // Display
+    
+    [self.tableView reloadData];
+    
+    self.navigationItem.rightBarButtonItem = (!self.viewModel.isUsingOfflineCache && [self getDataSource].count > 0) ? self.editButtonItem : nil;
+    
+    [self enableDisableToolbarButtons];
+}
+
+- (NSString *)getGroupPathDisplayString:(SafeItemViewModel *)vm {
+    return [vm.groupPathPrefix isEqualToString:@""] ? @"" : [NSString stringWithFormat:@"(in %@)", vm.groupPathPrefix];
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
@@ -221,143 +176,123 @@
     return (sender == self || [identifier isEqualToString:@"segueToSafeDetailsView"]);
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([[segue identifier] isEqualToString:@"segueToRecordView"])
-    {
-        Record* record = (Record*)sender;
-        
-        RecordViewController *vc = [segue destinationViewController];
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueToRecord"]) {
+        Record *record = (Record *)sender;
+        RecordView *vc = segue.destinationViewController;
         vc.record = record;
         vc.currentGroup = self.currentGroup;
         vc.viewModel = self.viewModel;
     }
-    else if ([[segue identifier] isEqualToString:@"sequeToSubgroup"])
+    else if ([segue.identifier isEqualToString:@"sequeToSubgroup"])
     {
-        Group *selectedGroup = (Group*)sender;
+        Group *selectedGroup = (Group *)sender;
         
-        BrowseSafeView *vc = [segue destinationViewController];
+        BrowseSafeView *vc = segue.destinationViewController;
         
         vc.currentGroup = selectedGroup;
         vc.viewModel = self.viewModel;
     }
-    else if ([[segue identifier] isEqualToString:@"segueToSelectDestination"])
+    else if ([segue.identifier isEqualToString:@"segueToSelectDestination"])
     {
-        NSArray *itemsToMove = (NSArray*)sender;
+        NSArray *itemsToMove = (NSArray *)sender;
         
-        UINavigationController *nav = [segue destinationViewController];
-        SelectDestinationGroupController *vc = [[nav viewControllers] firstObject];
+        UINavigationController *nav = segue.destinationViewController;
+        SelectDestinationGroupController *vc = nav.viewControllers.firstObject;
         
         vc.currentGroup = nil;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
     }
-    else if ([[segue identifier] isEqualToString:@"segueToSafeDetailsView"])
+    else if ([segue.identifier isEqualToString:@"segueToSafeDetailsView"])
     {
-        SafeDetailsAndSettingsView *vc = [segue destinationViewController];
+        SafeDetailsAndSettingsView *vc = segue.destinationViewController;
         vc.viewModel = self.viewModel;
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction)onAddGroup:(id)sender
-{
-    [UIAlertView showWithTitle:@"Enter Group Name" message:@"Please Enter the New Group Name:" style:UIAlertViewStylePlainTextInput cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"]
-       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-       {
-          if (buttonIndex == 1)
-          {
-              UITextField *groupTextField = [alertView textFieldAtIndex:0];
-              
-              // TODO: What happens if we have a duplicate or it already exists
-              
-              if([self.viewModel.safe addSubgroupWithUIString:self.currentGroup title:groupTextField.text] != nil)
-              {
-                  [self saveChangesToSafeAndRefreshView];
-              }
-          }
-       }];
+- (IBAction)onAddGroup:(id)sender {
+    [Alerts OkCancelWithTextField:self
+             textFieldPlaceHolder:@"Group Name"
+                            title:@"Enter Group Name"
+                          message:@"Please Enter the New Group Name:"
+                       completion:^(NSString *text, BOOL response) {
+                           if (response) {
+                               if ([self.viewModel.safe addSubgroupWithUIString:self.currentGroup
+                                                                          title:text] != nil) {
+                                   [self saveChangesToSafeAndRefreshView];
+                               }
+                           }
+                       }];
 }
 
-- (IBAction)onAddRecord:(id)sender
-{
-    [self performSegueWithIdentifier:@"segueToRecordView" sender:nil];
+- (IBAction)onAddRecord:(id)sender {
+    [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
 }
 
-- (IBAction)onMove:(id)sender
-{
-    NSArray *selectedRows = [self.tableView indexPathsForSelectedRows];
-    if(selectedRows.count > 0)
-    {
-        // We need to segue the root view and ask for selection of destination
-        
-        NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
-        for (NSIndexPath *selectionIndex in selectedRows)
-        {
-            [indicesOfItems addIndex:selectionIndex.row];
-        }
-
-        NSArray *itemsToMove = [_items objectsAtIndexes:indicesOfItems];
+- (IBAction)onMove:(id)sender {
+    NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
+    
+    if (selectedRows.count > 0) {
+        NSArray<SafeItemViewModel *> *itemsToMove = [self getSelectedItems:selectedRows];
         
         [self performSegueWithIdentifier:@"segueToSelectDestination" sender:itemsToMove];
         
-        [self setEditing:NO animated:YES]; 
+        [self setEditing:NO animated:YES];
     }
 }
 
-- (IBAction)onDelete:(id)sender
-{
-    NSArray *selectedRows = [self.tableView indexPathsForSelectedRows];
+- (NSArray<SafeItemViewModel *> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
+    NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
     
-    if(selectedRows.count > 0)
-    {
-        NSString* message = [NSString stringWithFormat:@"Would you like to delete %@", selectedRows.count > 1 ? @"these Items?" : @"this Item"];
+    for (NSIndexPath *selectionIndex in selectedRows) {
+        [indicesOfItems addIndex:selectionIndex.row];
+    }
+    
+    NSArray *itemsToDelete = [[self getDataSource] objectsAtIndexes:indicesOfItems];
+    return itemsToDelete;
+}
+
+- (IBAction)onDelete:(id)sender {
+    NSArray<NSIndexPath *> *selectedRows = (self.tableView).indexPathsForSelectedRows;
+    
+    if (selectedRows.count > 0) {
+        NSString *message = [NSString stringWithFormat:@"Would you like to delete %@", selectedRows.count > 1 ? @"these Items?" : @"this Item"];
         
-        [UIAlertView showWithTitle:@"Are you sure?" message:message cancelButtonTitle:@"No" otherButtonTitles:@[@"Yes"] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-            if(buttonIndex == 1)
-            {
-            NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
-            for (NSIndexPath *selectionIndex in selectedRows)
-            {
-                [indicesOfItems addIndex:selectionIndex.row];
-            }
-            
-            NSArray *itemsToDelete = [_items objectsAtIndexes:indicesOfItems];
-            
-            [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-            [self.viewModel deleteItems:itemsToDelete];
-            
-            [self.viewModel update:self completionHandler:^(NSError *error) {
-                if (error) {
-                    [UIAlertView showWithTitle:@"Error Saving" message:@"An error occured while trying to save changes to this safe." cancelButtonTitle:@"OK" otherButtonTitles:nil
-                                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) { }];
-                }
-                [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-            }];
-            
-            [self setEditing:NO animated:YES];
-            
-            [self refresh];
-            }
-        }];
+        [Alerts yesNo:self
+                title:@"Are you sure?"
+              message:message
+               action:^(BOOL response) {
+                   if (response) {
+                       NSArray<SafeItemViewModel *> *itemsToDelete = [self getSelectedItems:selectedRows];
+                       
+                       [self.viewModel deleteItems:itemsToDelete];
+                       
+                       [self.viewModel update:^(NSError *error) {
+                           if (error) {
+                               [Alerts             error:self
+                                                   title:@"Error Saving"
+                                                   error:error];
+                           }
+                       }];
+                       
+                       [self setEditing:NO
+                               animated:YES];
+                       [self refresh];
+                   }
+               }];
     }
 }
 
--(void)saveChangesToSafeAndRefreshView
-{
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    
-    [self.viewModel update:self completionHandler:^(NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-            
-            if(error != nil)
-            {
-                NSLog(@"%@", error);
-                
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Problem Saving"  message:@"There was a problem saving the safe." delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles: nil  ];
-                [alertView show];
+- (void)saveChangesToSafeAndRefreshView {
+    [self.viewModel update:^(NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if (error != nil) {
+                [Alerts         error:self
+                                title:@"Problem Saving"
+                                error:error];
             }
             
             [self refresh];
@@ -365,143 +300,47 @@
     }];
 }
 
-- (void)setEditing:(BOOL)editing animated:(BOOL)animate
-{
+- (void)setEditing:(BOOL)editing animated:(BOOL)animate {
     [super setEditing:editing animated:animate];
     
     [self enableDisableToolbarButtons];
     
-    if(!editing)
-    {
-        self.navigationItem.leftBarButtonItem = savedOriginalNavButton;
+    if (!editing) {
+        self.navigationItem.leftBarButtonItem = self.savedOriginalNavButton;
     }
-    else
-    {
-        UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self
+    else {
+        UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                                                      target:self
                                                                                       action:@selector(cancelEditing)];
         
-        savedOriginalNavButton = self.navigationItem.leftBarButtonItem;
+        self.savedOriginalNavButton = self.navigationItem.leftBarButtonItem;
         self.navigationItem.leftBarButtonItem = cancelButton;
     }
 }
 
--(void)cancelEditing
-{
+- (void)cancelEditing {
     [self setEditing:false];
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Search
-
--(void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope {
-    [_titleSearchResults removeAllObjects];
-    
-    // Filter the array using NSPredicate
-    
-    NSArray* allItems = [self.viewModel getSearchableItems];
-
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
-    
-    _titleSearchResults = [NSMutableArray arrayWithArray:[allItems filteredArrayUsingPredicate:predicate]];
-    
-    NSPredicate *deepPredicate = [NSPredicate predicateWithFormat:@"isGroup == NO AND (password contains[c] %@  OR username contains[c] %@  OR url contains[c] %@  OR notes contains[c] %@) AND NOT (title contains %@)" , searchText, searchText, searchText, searchText, searchText];
-    
-    _deepSearchResults = [NSMutableArray arrayWithArray:[allItems filteredArrayUsingPredicate:deepPredicate]];
-}
-
--(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {
-    // Tells the table data source to reload when text changes
-    [self filterContentForSearchText:searchString scope:
-     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:[self.searchDisplayController.searchBar selectedScopeButtonIndex]]];
-    // Return YES to cause the search result table view to be reloaded.
-    return YES;
-}
-
--(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchScope:(NSInteger)searchOption {
-    // Tells the table data source to reload when scope bar selection changes
-    [self filterContentForSearchText:self.searchDisplayController.searchBar.text scope:
-     [[self.searchDisplayController.searchBar scopeButtonTitles] objectAtIndex:searchOption]];
-    // Return YES to cause the search result table view to be reloaded.
-    return YES;
-}
-
--(void)searchDisplayController:(UISearchDisplayController *)controller didShowSearchResultsTableView:(UITableView *)tableView
-{
-    searchResultsTableViewIsVisible = YES;
-}
-
--(void)searchDisplayController:(UISearchDisplayController *)controller didHideSearchResultsTableView:(UITableView *)tableView
-{
-    searchResultsTableViewIsVisible = NO;
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Long Press
 
-- (void)handleLongPress:(UILongPressGestureRecognizer*)sender
-{
-    if (sender.state != UIGestureRecognizerStateBegan)
-    {
+- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
+    if (sender.state != UIGestureRecognizerStateBegan) {
         return;
     }
     
-    SafeItemViewModel *item;
-    CGPoint tapLocation;
+    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
     
-    if(searchResultsTableViewIsVisible)
-    {
-        NSLog(@"Long Press on Search Results...");
-        
-        tapLocation = [longPressRecognizer locationInView:self.searchDisplayController.searchResultsTableView];
-        NSIndexPath *indexPath = [self.searchDisplayController.searchResultsTableView indexPathForRowAtPoint:tapLocation];
-        
-        if(!indexPath)
-        {
-            NSLog(@"Not on a cell");
-            return;
-        }
-        
-        if(indexPath.section == 0) // Title
-        {
-            if ([indexPath row] < [_titleSearchResults count])
-            {
-                item = [_titleSearchResults objectAtIndex:[indexPath row]];
-            }
-            else
-            {
-                NSLog(@"Not on a cell");
-                return;
-            }
-        }
-        else // Deep Search
-        {
-            if ([indexPath row] < [_deepSearchResults count])
-            {
-                item = [_deepSearchResults objectAtIndex:[indexPath row]];
-            }
-            else
-            {
-                NSLog(@"Not on a cell");
-            }
-        }
-    }
-    else
-    {
-        tapLocation = [longPressRecognizer locationInView:self.tableView];
-        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
-        
-        if (indexPath && [indexPath row] < [_items count])
-        {
-            item = [_items objectAtIndex:[indexPath row]];
-        }
-        else
-        {
-            NSLog(@"Not on a cell");
-            return;
-        }
+    if (!indexPath || indexPath.row >= [self getDataSource].count) {
+        NSLog(@"Not on a cell");
+        return;
     }
     
-    if(item.isGroup)
-    {
+    SafeItemViewModel *item = [self getDataSource][indexPath.row];
+    
+    if (item.isGroup) {
         NSLog(@"Item is group, cannot Fast PW Copy...");
         return;
     }
@@ -515,75 +354,42 @@
     
     NSLog(@"Long press detected on Record. Copy Featured is [%@]", copyPw ? @"Enabled" : @"Disabled");
     
-    if(!copyPw && !promptedForCopyPw) // If feature is turned off (or never set) and we haven't prompted user about it... prompt
-    {
-        [UIAlertView     showWithTitle:@"Copy Password?"
-                            message:@"By Touching and Holding an entry for 2 seconds you can quickly copy the password to the clipboard. Would you like to enable this feature?" cancelButtonTitle:@"No" otherButtonTitles:@[@"Yes"]
-        tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-        {
-            if (buttonIndex == 1)
-            {
-                NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                
-                [userDefaults setBool:YES forKey:@"copyPasswordOnLongPress"];
-                [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
-            }
-            else
-            {
-                NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                
-                [userDefaults setBool:NO forKey:@"copyPasswordOnLongPress"];
-            }
-        }];
+    if (!copyPw && !promptedForCopyPw) { // If feature is turned off (or never set) and we haven't prompted user about it... prompt
+        [Alerts yesNo:self
+                title:@"Copy Password?"
+              message:@"By Touching and Holding an entry for 2 seconds you can quickly copy the password to the clipboard. Would you like to enable this feature?"
+               action:^(BOOL response) {
+                   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+                   [userDefaults  setBool:response
+                                   forKey:@"copyPasswordOnLongPress"];
+                   
+                   if (response) {
+                       [self copyPasswordOnLongPress:item
+                                     withTapLocation:tapLocation];
+                   }
+               }];
         
         [userDefaults setBool:YES forKey:@"promptedForCopyPasswordGesture"];
     }
-    else if(copyPw)
+    else if (copyPw)
     {
-        [self copyPasswordOnLongPress: item withTapLocation:tapLocation];
+        [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
     }
 }
 
--(void)copyPasswordOnLongPress:(SafeItemViewModel*)item withTapLocation:(CGPoint)tapLocation
-{
+- (void)copyPasswordOnLongPress:(SafeItemViewModel *)item withTapLocation:(CGPoint)tapLocation {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
     pasteboard.string = item.password;
     
-    NSLog(@"Password copied");
-        
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Configure for text only and offset down
-    hud.mode = MBProgressHUDModeText;
-    hud.labelText = @"Password Copied";
-    hud.margin = 10.0f;
-    hud.yOffset = -self.tableView.frame.size.height / 2 + tapLocation.y - 30; // Slightly above users touch
-    hud.removeFromSuperViewOnHide = YES;
-    hud.userInteractionEnabled = NO;
-    
-    [hud hide:YES afterDelay:3];
-}
-
-- (void)showMessage:(NSString*)message rect:(CGRect)rect {
-    UILabel* label = [[UILabel alloc] initWithFrame:rect];
-    label.backgroundColor = [UIColor whiteColor];
-    label.font = [UIFont fontWithName:@"Helvetica-Bold" size:24];  // Or whatever.
-    label.text = message;
-    label.textColor = [UIColor blueColor];  // Or whatever.
-    label.textAlignment = NSTextAlignmentCenter;
-    
-    UITableView *theTableView = searchResultsTableViewIsVisible ? self.searchDisplayController.searchResultsTableView : self.tableView;
-    
-    [theTableView addSubview:label];
-    
-    [UIView animateWithDuration:2.0 delay:0 options:UIViewAnimationOptionCurveEaseIn
-                     animations:^{
-                         label.alpha=0.2f;
-                     } completion:^(BOOL finished){
-                         label.alpha=1.0f;
-                         label.hidden = YES;
-                         [label removeFromSuperview];
-                     }];
+    [ISMessages showCardAlertWithTitle:@"Password Copied"
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
 }
 
 @end

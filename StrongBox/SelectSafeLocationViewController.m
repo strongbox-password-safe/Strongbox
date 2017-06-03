@@ -7,93 +7,132 @@
 //
 
 #import "SelectSafeLocationViewController.h"
-#import "AddGoogleDriveSafeTableViewController.h"
-#import "DropboxSafeTableViewController.h"
-#import "AddSafeViewController.h"
-
-@interface SelectSafeLocationViewController ()
-
-@end
+#import "StorageBrowserTableViewController.h"
+#import "SafeStorageProvider.h"
+#import "AddSafeAlertController.h"
+#import "Alerts.h"
 
 @implementation SelectSafeLocationViewController
 
--(void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    if(self.existing)
-    {
+
+    if (self.existing) {
         self.uiLabelHelp.text = @"Select where your safe is stored";
     }
-    else
-    {
+    else {
         self.uiLabelHelp.text = @"Select where you would like to store your new safe";
     }
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
-    [self.buttonGoogleDrive.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    [self.buttonDropbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    
+    (self.buttonGoogleDrive.imageView).contentMode = UIViewContentModeScaleAspectFit;
+    (self.buttonDropbox.imageView).contentMode = UIViewContentModeScaleAspectFit;
+
     self.buttonLocalDevice.hidden = self.existing;
-    [self.buttonLocalDevice.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    
-    NSString *title = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ) ? @"On this iPad" : @"On this iPhone";
+    (self.buttonLocalDevice.imageView).contentMode = UIViewContentModeScaleAspectFit;
+
+    NSString *title = (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? @"On this iPad" : @"On this iPhone";
     [self.buttonLocalDevice setTitle:title forState:UIControlStateNormal];
     [self.buttonLocalDevice setTitle:title forState:UIControlStateHighlighted];
-    
-    
-    self.buttonLocalDevice.center = CGPointMake(self.view.center.x, self.buttonLocalDevice.center.y);
-    self.buttonGoogleDrive.center = CGPointMake(self.view.center.x, self.buttonGoogleDrive.center.y);
-    self.buttonDropbox.center = CGPointMake(self.view.center.x, self.buttonDropbox.center.y);
-    self.uiLabelHelp.center = CGPointMake(self.view.center.x, self.uiLabelHelp.center.y);
+
+
+//    self.buttonLocalDevice.center = CGPointMake(self.view.center.x, self.buttonLocalDevice.center.y);
+//    self.buttonGoogleDrive.center = CGPointMake(self.view.center.x, self.buttonGoogleDrive.center.y);
+//    self.buttonDropbox.center = CGPointMake(self.view.center.x, self.buttonDropbox.center.y);
+//    self.uiLabelHelp.center = CGPointMake(self.view.center.x, self.uiLabelHelp.center.y);
 }
 
-// In a storyboard-based application, you will often want to do a litt   le preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([[segue identifier] isEqualToString:@"SegueToGoogleDrive"])
+- (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
+    if (provider.browsable) {
+        [self performSegueWithIdentifier:@"SegueToBrowser" sender:provider];
+    }
+    else {
+        AddSafeAlertController *controller = [[AddSafeAlertController alloc] init];
+
+        [controller addNew:self
+                validation:^BOOL (NSString *name, NSString *password) {
+            return [self.safes isValidNickName:name] && password.length;
+        }
+                completion:^(NSString *name, NSString *password, BOOL response) {
+                    if (response) {
+                    NSString *nickName = [self.safes sanitizeSafeNickName:name];
+
+                    [self addNewSafeAndPopToRoot:nickName
+                                    password:password
+                                    provider:provider];
+                    }
+                }];
+    }
+}
+
+- (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password provider:(id<SafeStorageProvider>)provider {
+    SafeDatabase *newSafe = [[SafeDatabase alloc] initNewWithPassword:password];
+    NSData *data = [newSafe getAsData];
+
+    if (data == nil) {
+        [Alerts warn:self
+               title:@"Error Saving Safe"
+             message:@"There was a problem saving the safe."];
+
+        return;
+    }
+
+    [provider create:name
+                data:data
+        parentFolder:nil
+      viewController:self
+          completion:^(SafeMetaData *metadata, NSError *error)
     {
-        AddGoogleDriveSafeTableViewController *vc = [segue destinationViewController];
+        if (error == nil) {
+            [self.safes add:metadata];
+        }
+        else {
+            NSLog(@"An error occurred: %@", error);
+
+            [Alerts error:self
+                    title:@"Error Saving Safe"
+                    error:error];
+        }
+
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    }];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"SegueToBrowser"]) {
+        StorageBrowserTableViewController *vc = segue.destinationViewController;
+
         vc.safes = self.safes;
         vc.existing = self.existing;
-        vc.googleDrive = self.googleStorageProvider.googleDrive;
-        vc.safeStorageProvider = self.googleStorageProvider;
-    }
-    else if ([[segue identifier] isEqualToString:@"SegueToDropbox"])
-    {
-        DropboxSafeTableViewController *vc = [segue destinationViewController];
-        vc.safes = self.safes;
-        vc.existing = self.existing;
-        vc.rootDriveFile = @"/";
-        vc.safeStorageProvider = self.dropboxStorageProvider;
-    }
-    else if([[segue identifier] isEqualToString:@"segueLocalDeviceToAddSafe"])
-    {
-        AddSafeViewController* vc = [segue destinationViewController];
-        
-        vc.safes = self.safes;
-        vc.existing = NO;
-        vc.fileOrFolderObject = nil;
-        vc.safeStorageProvider = self.localDeviceStorageProvider;
+        vc.safeStorageProvider = sender;
+        vc.parentFolder = nil;
     }
 }
 
-- (IBAction)onDropbox:(id)sender
-{   
-    [self performSegueWithIdentifier:@"SegueToDropbox" sender:nil];
+- (IBAction)onDropbox:(id)sender {
+    [self segueToBrowserOrAdd:self.dropboxStorageProvider];
 }
 
-- (IBAction)onGoogledrive:(id)sender
-{
+- (IBAction)onGoogledrive:(id)sender {
+    [self segueToBrowserOrAdd:self.googleStorageProvider];
 }
 
-- (IBAction)onLocalDevice:(id)sender
-{
+- (IBAction)onLocalDevice:(id)sender {
+    [Alerts yesNo:self
+            title:@"Local Device Safe Caveat"
+          message:@"Since a local safe is only stored on this device, any loss of this device will lead to the loss of "
+                    "all passwords stored within this safe. You may want to consider using a cloud storage provider, such as the ones "
+                    "supported by StrongBox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
+                    "a local device safe?"
+           action:^(BOOL response) {
+               if (response) {
+                   [self segueToBrowserOrAdd:self.localDeviceStorageProvider];
+               }
+            }];
 }
 
 @end

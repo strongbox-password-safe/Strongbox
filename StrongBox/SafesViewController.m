@@ -6,50 +6,42 @@
 //  Copyright (c) 2014 Mark McGuill. All rights reserved.
 //
 
-// TODO: See if it's possible to do the directory browsing outside of the google drive thingie - it is - just not worth it right now, but it would be good to unify
-// TODO: Find out if it's really necessary to run the storage providers on the main queue - Believe it might be, but not worth it unless there' very good reason
-// TODO: Don't Allow GUIs to write during Offline!!
-
 #import "SafesViewController.h"
 #import "SafeMetaData.h"
 #import "BrowseSafeView.h"
 #import "GTMOAuth2ViewControllerTouch.h"
 #import "GoogleDriveManager.h"
-#import "GTLQueryDrive.h"
-#import "GTLDriveFile.h"
-#import "GTLServiceDrive.h"
-#import "MBProgressHUD.h"
 #import "SelectSafeLocationViewController.h"
 #import "SettingsView.h"
 #import "IOsUtils.h"
-#import "core-model/Utils.h"
+#import "Utils.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "JNKeychain.h"
-#import "UIAlertView+Blocks.h"
-#import "UIActionSheet+Blocks.h"
 #import "GoogleDriveStorageProvider.h"
-#import "DropboxStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "Reachability.h"
 #import "SafesCollection.h"
 #import <MessageUI/MessageUI.h>
+#import "Alerts.h"
+#import "ISMessages/ISMessages.h"
 
 @interface SafesViewController ()  <MFMailComposeViewControllerDelegate>
+
 @property SafesCollection *safes;
+
 @end
 
-@implementation SafesViewController
-{
+@implementation SafesViewController {
     GoogleDriveStorageProvider *_google;
-    DropboxStorageProvider *_dropbox;
+    DropboxV2StorageProvider *_dropbox;
     LocalDeviceStorageProvider *_local;
     Reachability *_internetReachabilityDetector;
 }
 
 BOOL _isOffline; // Global Online/Offline variable
 
-- (void)refreshView
-{
+- (void)refreshView {
     self.safes = [[SafesCollection alloc] init];
     
     [self.tableView reloadData];
@@ -60,19 +52,40 @@ BOOL _isOffline; // Global Online/Offline variable
     self.navigationItem.leftBarButtonItem = ([self.safes count] > 0) ? self.editButtonItem : nil;
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self refreshView];
+    
+    // TODO: Remove after 1.8 release
+    
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    static NSString* dropboxV1MigrationKey = @"migratedV1Dropbox";
+    NSInteger dropboxV1MigrationStatus = [prefs integerForKey:dropboxV1MigrationKey];
+    
+    if (dropboxV1MigrationStatus == 0) {
+        [Alerts info:self
+               title:@"Version 1.8 Dropbox Upgrade"
+             message:@"Hi there,\n"
+                        "This is quite a significant update due to both Google and Dropbox upgrading their APIs.\n\n"
+                        "If you have Dropbox safes, Strongbox will now attempt to migrate them to version 2.\n\n"
+                        "This should proceed without issue, however if you experience any problems"
+                        ", then please remove and re-add the safe.\n\n"
+                        "Thanks,\n"
+                        "-Mark"
+         completion:^{
+             [self.safes migrateV1Dropbox];
+             
+             [prefs setInteger:1 forKey:dropboxV1MigrationKey];
+         }];
+    }
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     
     _google = [[GoogleDriveStorageProvider alloc] init];
-    _dropbox = [[DropboxStorageProvider alloc] init];
+    _dropbox = [[DropboxV2StorageProvider alloc] init];
     _local = [[LocalDeviceStorageProvider alloc] init];
     
     self.buttonDelete.enabled = NO;
@@ -80,23 +93,21 @@ BOOL _isOffline; // Global Online/Offline variable
     [self startMonitoringConnectivitity];
 }
 
-// Checks if we have an internet connection or not
-- (void)startMonitoringConnectivitity
-{
+- (void)startMonitoringConnectivitity {
     _internetReachabilityDetector = [Reachability reachabilityWithHostname:@"www.google.com"];
     
     // Internet is reachable
-    _internetReachabilityDetector.reachableBlock = ^(Reachability*reach)
+    
+    _internetReachabilityDetector.reachableBlock = ^(Reachability *reach)
     {
         _isOffline = NO;
-        NSLog(@"Yayyy, we have the interwebs!");
     };
     
     // Internet is not reachable
-    _internetReachabilityDetector.unreachableBlock = ^(Reachability*reach)
+    
+    _internetReachabilityDetector.unreachableBlock = ^(Reachability *reach)
     {
         _isOffline = YES;
-        NSLog(@"Someone broke the internet :(");
     };
     
     [_internetReachabilityDetector startNotifier];
@@ -104,29 +115,27 @@ BOOL _isOffline; // Global Online/Offline variable
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.safes.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
-
-    SafeMetaData* safe = [self.safes get:[indexPath row]];
+    
+    SafeMetaData *safe = [self.safes get:indexPath.row];
+    
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
     
-    NSString* icon = safe.storageProvider == kGoogleDrive ?
-                        @"product32" :
-                        safe.storageProvider == kDropbox ?
-                        @"dropbox-blue-32x32-nologo" :
-                        @"phone";
+    NSString *icon = safe.storageProvider == kGoogleDrive ?
+    @"product32" :
+    safe.storageProvider == kDropbox ?
+    @"dropbox-blue-32x32-nologo" :
+    @"phone";
     
     cell.imageView.image = [UIImage imageNamed:icon];
     
@@ -135,235 +144,204 @@ BOOL _isOffline; // Global Online/Offline variable
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if([self isEditing])
-    {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.editing) {
         return;
     }
     
-    SafeMetaData* safe = [self.safes get:[indexPath row]];
+    SafeMetaData *safe = [self.safes get:indexPath.row];
     
-    if(safe.isTouchIdEnabled && [IOsUtils isTouchIDAvailable] && safe.isEnrolledForTouchId)
-    {
+    if (safe.isTouchIdEnabled && [IOsUtils isTouchIDAvailable] && safe.isEnrolledForTouchId) {
         [self showTouchIDAuthentication:safe];
     }
-    else
-    {
+    else {
         [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:YES];
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)openSafeWithTouchIdEnrolPromptIfAppropriate:(BOOL)askAboutTouchIdEnrol
+                                           password:(NSString *)password
+                                               safe:(SafeMetaData *)safe {
+    if (askAboutTouchIdEnrol && safe.isTouchIdEnabled && [IOsUtils isTouchIDAvailable]) {
+        [Alerts yesNo:self
+                title:[NSString stringWithFormat:@"Use Touch Id to Open Safe?"]
+              message:@"Would you like to use Touch Id to open this safe?"
+               action:^(BOOL response) {
+                   if (response) {
+                       [self openSafe:safe
+                        isTouchIdOpen:YES
+                       masterPassword:password];
+                   }
+                   else {
+                       safe.isTouchIdEnabled = NO;
+                       [self.safes save];
+                       [self openSafe:safe
+                        isTouchIdOpen:NO
+                       masterPassword:password];
+                   }
+               }];
+    }
+    else {
+        [self openSafe:safe isTouchIdOpen:NO masterPassword:password];
+    }
+}
 
-- (void)promptForSafePassword:(SafeMetaData *)safe askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrol
-{
-    NSString* title = [NSString stringWithFormat:@"Password for %@", safe.nickName];
-    NSString *text = @"Enter your password:";
-    
-    [UIAlertView showWithTitle:title
-                       message:text
-                         style:UIAlertViewStyleSecureTextInput
-             cancelButtonTitle:@"Cancel"
-             otherButtonTitles:@[@"Ok"]
-                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-    {
-        if (buttonIndex == 1)
-        {
-            UITextField *passwordTextField = [alertView textFieldAtIndex:0];
-            NSString *masterPassword = passwordTextField.text;
-            
-            if(askAboutTouchIdEnrol && safe.isTouchIdEnabled && [IOsUtils isTouchIDAvailable])
-            {
-                NSString* title = [NSString stringWithFormat:@"Use Touch Id to Open Safe?"];
-                [UIAlertView showWithTitle:title
-                                   message:@"Would you like to use Touch Id to open this safe?"
-                         cancelButtonTitle:@"No"
-                         otherButtonTitles:@[@"Yes"]
-                                  tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-                 {
-                     if (buttonIndex == 1)
-                     {
-                         [self openSafe:safe isTouchIdOpen:YES masterPassword:masterPassword];
-                     }
-                     else
-                     {
-                         safe.isTouchIdEnabled = NO;
-                         [self.safes save];
-                         
-                         [self openSafe:safe isTouchIdOpen:NO masterPassword:masterPassword];
-                     }
-                 }];
-            }
-            else
-            {
-                [self openSafe:safe isTouchIdOpen:NO masterPassword:masterPassword];
-            }
-        }
-    }];
+- (void)        promptForSafePassword:(SafeMetaData *)safe
+    askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate {
+    [Alerts OkCancelWithPassword:self
+                           title:[NSString stringWithFormat:@"Password for %@", safe.nickName]
+                         message:@"Enter Master Password"
+                      completion:^(NSString *password, BOOL response) {
+                          if (response) {
+                              [self openSafeWithTouchIdEnrolPromptIfAppropriate:askAboutTouchIdEnrolIfAppropriate
+                                                                       password:password
+                                                                           safe:safe];
+                          }
+                      }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)openSafe:(SafeMetaData *)safe isTouchIdOpen:(BOOL)isTouchIdOpen masterPassword:(NSString *)masterPassword
-{
+- (void)  openSafe:(SafeMetaData *)safe
+     isTouchIdOpen:(BOOL)isTouchIdOpen
+    masterPassword:(NSString *)masterPassword {
     id <SafeStorageProvider> provider;
     
-    if(safe.storageProvider == kGoogleDrive)
-    {
+    if (safe.storageProvider == kGoogleDrive) {
         provider = _google;
     }
-    else if(safe.storageProvider == kDropbox)
+    else if (safe.storageProvider == kDropbox)
     {
         provider = _dropbox;
     }
-    else if(safe.storageProvider == kLocalDevice)
+    else if (safe.storageProvider == kLocalDevice)
     {
         provider = _local;
     }
     
     // Are we offline for cloud based providers?
     
-    if([provider isCloudBased] && _isOffline && safe.offlineCacheEnabled && safe.offlineCacheAvailable)
-    {
-        NSDate* modDate = [_local getOfflineCacheFileModificationDate:safe];
-    
-        NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        [df setDateFormat:@"dd-MMM-yyyy HH:mm:ss"];
-        NSString *modDateStr = [df stringFromDate:modDate];
+    if (provider.cloudBased && _isOffline && safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
+        NSDate *modDate = [_local getOfflineCacheFileModificationDate:safe];
         
-        [UIAlertView showWithTitle:@"No Internet Connectivity"
-                           message:[NSString stringWithFormat:@"It looks like you are offline. Would you like to use a read-only cached version of this safe instead?\n\nLast Cached at: %@", modDateStr]
-                 cancelButtonTitle:@"No" otherButtonTitles:@[@"Yes"]
-                          tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-        {
-            if(buttonIndex == 1)
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-                });
-                
-                NSLog(@"Reading offline cache with file id: %@", safe.offlineCacheFileIdentifier);
-                
-                [_local readOfflineCachedSafe:safe viewController:self completionHandler:^(NSData* data, NSError* error)
-                {
-                    [self onProviderReadDone:provider isTouchIdOpen:isTouchIdOpen safe:safe masterPassword:masterPassword data:data error:error isOfflineCacheMode:YES]; // RO!
-                }];
-            }
-        }];
+        NSDateFormatter *df = [[NSDateFormatter alloc] init];
+        df.dateFormat = @"dd-MMM-yyyy HH:mm:ss";
+        NSString *modDateStr = [df stringFromDate:modDate];
+        NSString *message = [NSString stringWithFormat:@"It looks like you are offline. Would you like to use a read-only cached version of this safe instead?\n\nLast Cached at: %@", modDateStr];
+        
+        [Alerts yesNo:self
+                title:@"No Internet Connectivity"
+              message:message
+               action:^(BOOL response) {
+                   if (response) {
+                       NSLog(@"Reading offline cache with file id: %@", safe.offlineCacheFileIdentifier);
+                       
+                       [_local readOfflineCachedSafe:safe
+                                      viewController:self
+                                          completion:^(NSData *data, NSError *error)
+                        {
+                            [self onProviderReadDone:provider
+                                       isTouchIdOpen:isTouchIdOpen
+                                                safe:safe
+                                      masterPassword:masterPassword
+                                                data:data
+                                               error:error
+                                  isOfflineCacheMode:YES];                                                                                                                               // RO!
+                        }];
+                   }
+               }];
     }
-    else
-    {
-        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-
-        [provider read:safe viewController:self completionHandler:^(NSData* data, NSError* error)
-        {
-            [self onProviderReadDone:provider isTouchIdOpen:isTouchIdOpen safe:safe masterPassword:masterPassword data:data error:error isOfflineCacheMode:NO];
-        }];
+    else {
+        [provider read:safe
+        viewController:self
+            completion:^(NSData *data, NSError *error)
+         {
+             [self onProviderReadDone:provider
+                        isTouchIdOpen:isTouchIdOpen
+                                 safe:safe
+                       masterPassword:masterPassword
+                                 data:data
+                                error:error
+                   isOfflineCacheMode:NO];
+         }];
     }
 }
 
-- (void)onProviderReadDone:(id)provider isTouchIdOpen:(BOOL)isTouchIdOpen safe:(SafeMetaData *)safe masterPassword:(NSString *)masterPassword data:(NSData *)data error:(NSError *)error isOfflineCacheMode:(BOOL)isOfflineCacheMode
-{
+- (void)onProviderReadDone:(id)provider isTouchIdOpen:(BOOL)isTouchIdOpen safe:(SafeMetaData *)safe masterPassword:(NSString *)masterPassword data:(NSData *)data error:(NSError *)error isOfflineCacheMode:(BOOL)isOfflineCacheMode {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-        
-        if(error != nil)
-        {
+        if (error != nil) {
             NSLog(@"Error: %@", error);
-            
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Could not open safe" message:@"There was a problem opening the safe data file." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alertView show];
+            [Alerts error:self
+                    title:@"There was a problem opening the password safe file."
+                    error:error];
         }
-        else
-        {
+        else {
             [self openSafeWithData:data masterPassword:masterPassword safe:safe isTouchIdOpen:isTouchIdOpen provider:provider isOfflineCacheMode:isOfflineCacheMode];
         }
     });
 }
 
-- (void)openSafeWithData:(NSData *)data masterPassword:(NSString *)masterPassword safe:(SafeMetaData *)safe isTouchIdOpen:(BOOL)isTouchIdOpen provider:(id)provider isOfflineCacheMode:(BOOL)isOfflineCacheMode
-{
-    NSError* error;
+- (void)openSafeWithData:(NSData *)data masterPassword:(NSString *)masterPassword safe:(SafeMetaData *)safe isTouchIdOpen:(BOOL)isTouchIdOpen provider:(id)provider isOfflineCacheMode:(BOOL)isOfflineCacheMode {
+    NSError *error;
     SafeDatabase *openedSafe = [[SafeDatabase alloc] initExistingWithData:masterPassword data:data error:&error];
     
-    if(error != nil)
-    {
-        if(error.code == -2 && isTouchIdOpen) // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch Id enrol.
-        {
-            [self saveTouchIdDetailsOnSafeOpened:safe success:NO openedSafe:nil];
+    if (error != nil) {
+        if (error.code == -2 && isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch Id enrol.
+            safe.isEnrolledForTouchId = NO;
+            [JNKeychain deleteValueForKey:safe.nickName];
+            [self.safes save];
+            
+            [Alerts info:self
+                   title:@"Could not open safe"
+                 message:@"The stored password for Touch Id was incorrect for this safe. This safe has been removed from Touch Id."];
         }
-        else
-        {
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Could not open safe" message:error.localizedDescription delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alertView show];
+        else {
+            [Alerts error:self title:@"There was a problem opening the safe." error:error];
         }
     }
-    else
-    {
+    else {
         Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
-                                                          metaData:safe
-                                                   storageProvider:isOfflineCacheMode ? nil : provider // Guarantee nothing can be written!
-                                                              usingOfflineCache:isOfflineCacheMode
-                                                  localStorageProvider:_local
-                                                                 safes:self.safes];
+                                                      metaData:safe
+                                               storageProvider:isOfflineCacheMode ?
+                                                          nil : provider                                                         // Guarantee nothing can be written!
+                                             usingOfflineCache:isOfflineCacheMode
+                                          localStorageProvider:_local
+                                                         safes:self.safes];
         
-        // Update the offline cache
-        
-        if(safe.offlineCacheEnabled)
-        {
+        if (safe.offlineCacheEnabled) {
             [viewModel updateOfflineCacheWithData:data];
         }
         
-        // Update Touch Id settings
-        
-        if(isTouchIdOpen){
-            [self saveTouchIdDetailsOnSafeOpened:safe success:YES openedSafe:openedSafe];
-        }
-        
-        [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:viewModel];
-    }
-}
-
-- (void)saveTouchIdDetailsOnSafeOpened:(SafeMetaData*)safe
-                                 success:(BOOL)success
-                             openedSafe:(SafeDatabase*)openedSafe
-{
-    if(success)
-    {
-        if(!safe.isEnrolledForTouchId)
-        {
-            NSLog(@"Safe just enrolled for touch id!");
-            
+        if (isTouchIdOpen && !safe.isEnrolledForTouchId) {
             safe.isEnrolledForTouchId = YES;
-            [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
+            [JNKeychain saveValue:viewModel.safe.masterPassword forKey:viewModel.metadata.nickName];
             
-            [UIAlertView showWithTitle:@"Touch Id Enrol Successful" message:@"You can now use Touch Id with this safe." cancelButtonTitle:@"Got it" otherButtonTitles:@[] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) { } ];
+            [ISMessages showCardAlertWithTitle:@"Touch Id Enrol Successful"
+                                       message:@"You can now use Touch Id with this safe. Opening..."
+                                      duration:0.75f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeSuccess
+                                 alertPosition:ISAlertPositionTop
+                                       didHide:^(BOOL finished) {
+                                           [self  performSegueWithIdentifier:@"segueToOpenSafeView"
+                                                                      sender:viewModel];
+                                       }];
+            
+            [self.safes save];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:viewModel];
         }
     }
-    else
-    {
-        safe.isEnrolledForTouchId = NO;
-        
-        [JNKeychain deleteValueForKey:safe.nickName];
-        
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Could not open safe" message:@"The stored password for Touch Id was incorrect for this safe. This safe has been removed from Touch Id." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [alertView show];
-        
-        NSLog(@"Removed Safe from Touch Id enrol as stored password was incorrect, or incorrect password was entered on initial attempt");
-    }
-    
-    [self.safes save];
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
-{
-    if ([identifier isEqualToString:@"segueToOpenSafeView"])
-    {
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+    if ([identifier isEqualToString:@"segueToOpenSafeView"]) {
         //ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
         return (sender == self);
     }
@@ -371,39 +349,30 @@ BOOL _isOffline; // Global Online/Offline variable
     return YES;
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([[segue identifier] isEqualToString:@"segueToOpenSafeView"])
-    {
-        BrowseSafeView *vc = [segue destinationViewController];
-
-        vc.currentGroup = nil;
-        vc.viewModel = (Model*)sender;
-    }
-    else if ([[segue identifier] isEqualToString:@"segueToStorageType"])
-    {
-        SelectSafeLocationViewController *vc = [segue destinationViewController];
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
+        BrowseSafeView *vc = segue.destinationViewController;
         
-        NSString* newOrExisting = (NSString*)sender;
+        vc.currentGroup = nil;
+        vc.viewModel = (Model *)sender;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToStorageType"])
+    {
+        SelectSafeLocationViewController *vc = segue.destinationViewController;
+        
+        NSString *newOrExisting = (NSString *)sender;
         vc.existing = [newOrExisting isEqualToString:@"Existing"];
         vc.safes = self.safes;
         vc.googleStorageProvider = _google;
         vc.localDeviceStorageProvider = _local;
         vc.dropboxStorageProvider = _dropbox;
     }
-    else if ([[segue identifier] isEqualToString:@"segueToSettingsView"])
-    {
-        SettingsView *vc = [segue destinationViewController];
-        vc.googleDrive = _google.googleDrive;
-    }
 }
 
-- (void)setEditing:(BOOL)editing animated:(BOOL)animate
-{
+- (void)setEditing:(BOOL)editing animated:(BOOL)animate {
     [super setEditing:editing animated:animate];
     
-    if(!editing)
-    {
+    if (!editing) {
         self.navigationItem.leftBarButtonItem = ([self.safes count] > 0) ? self.editButtonItem : nil;
     }
     
@@ -412,259 +381,227 @@ BOOL _isOffline; // Global Online/Offline variable
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void) showTouchIDAuthentication:(SafeMetaData*)safe
-{
+- (void)showTouchIDAuthentication:(SafeMetaData *)safe {
     LAContext *localAuthContext = [[LAContext alloc] init];
+    
     [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                     localizedReason:@"Identify to login" reply:^(BOOL success, NSError *error) {
-         if(success)
-         {
-             NSString *password = [JNKeychain loadValueForKey:safe.nickName];
-             
-             dispatch_async(dispatch_get_main_queue(), ^{
-                 [self openSafe:safe isTouchIdOpen:YES masterPassword:password];
-             });
-             
-             //show logged in
-             NSLog(@"Successfully authenticated");
-         }
-         else
-         {
-             NSString *failureReason;
-             //depending on error show what exactly has failed
-             switch (error.code)
-             {
-                 case LAErrorAuthenticationFailed:
-                    {failureReason = @"Touch ID authentication failed";
-                      NSLog(@"Authentication failed: %@", failureReason);
-                     
-                     dispatch_async(dispatch_get_main_queue(), ^{
-                         [UIAlertView showWithTitle:@"Touch Id Failed" message:@"Touch Id Authentication Failed. You must now enter your password manually to open the safe." cancelButtonTitle:@"OK" otherButtonTitles:nil
-                                           tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) { [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:NO]; }];
-                     });
-                    }
-                     break;
-                     
-                 case LAErrorUserCancel:
-                     failureReason = @"Touch ID authentication cancelled";
-                     break;
-                     
-                 case LAErrorUserFallback:
-                     {
-                         failureReason =  @"UTouch ID authentication choose password selected";
-                         NSLog(@"Authentication failed: %@", failureReason);
-                         
-                         dispatch_async(dispatch_get_main_queue(), ^{
-                             [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:NO];
-                         });
-                     }
-                     break;
-                     
-                 default:
-                    {
-                     failureReason = @"Touch ID has not been setup or system has cancelled";
-                     NSLog(@"Authentication failed: %@", failureReason);
-                    
-                        
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [UIAlertView showWithTitle:@"Touch Id Failed" message:@"Touch ID has not been setup or system has cancelled. You must now enter your password manually to open the safe." cancelButtonTitle:@"OK" otherButtonTitles:nil
-                                              tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) { [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:NO]; }];
-                        });
-                    }
-                    break;
-             }
-             
-             NSLog(@"Authentication failed: %@", failureReason);
-         }
-     }];
+                     localizedReason:@"Identify to login"
+                               reply:^(BOOL success, NSError *error) {
+                                   [self  onTouchIdDone:success
+                                                  error:error
+                                                   safe:safe];
+                               } ];
 }
 
-- (void)initiateManualImportFromUrl
-{
-    [UIAlertView showWithTitle:@"Enter URL" message:@"Please Enter the URL of the Safe File." style:UIAlertViewStylePlainTextInput cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Download It!"] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-     {
-         if(buttonIndex == 1)
-         {
-             NSURL* url = [NSURL URLWithString:[alertView textFieldAtIndex:0].text];
-             NSLog(@"URL: %@", url);
-             
-             [self importFromURL:url];
-         }
-     }];
+- (void)onTouchIdDone:(BOOL)success error:(NSError *)error safe:(SafeMetaData *)safe {
+    if (success) {
+        NSString *password = [JNKeychain loadValueForKey:safe.nickName];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self openSafe:safe isTouchIdOpen:YES masterPassword:password];
+        });
+    }
+    else {
+        if (error.code == LAErrorAuthenticationFailed) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts   warn:self
+                         title:@"Touch Id Failed"
+                       message:@"Touch Id Authentication Failed. You must now enter your password manually to open the safe."
+                    completion:^{
+                        [self promptForSafePassword:safe
+                  askAboutTouchIdEnrolIfAppropriate:NO];
+                    }];
+            });
+        }
+        else if (error.code == LAErrorUserFallback)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:NO];
+            });
+        }
+        else if (error.code != LAErrorUserCancel)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts   warn:self
+                         title:@"Touch Id Failed"
+                       message:@"Touch ID has not been setup or system has cancelled. You must now enter your password manually to open the safe."
+                    completion:^{
+                        [self promptForSafePassword:safe
+                  askAboutTouchIdEnrolIfAppropriate:NO];
+                    }];
+            });
+        }
+    }
+}
+
+- (void)initiateManualImportFromUrl {
+    [Alerts OkCancelWithTextField:self
+             textFieldPlaceHolder:@"URL"
+                            title:@"Enter URL"
+                          message:@"Please Enter the URL of the Safe File."
+                       completion:^(NSString *text, BOOL response) {
+                           if (response) {
+                               NSURL *url = [NSURL URLWithString:text];
+                               NSLog(@"URL: %@", url);
+                               
+                               [self importFromURL:url];
+                           }
+                       }];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Add / Import
 
-- (IBAction)onAddSafe:(id)sender
-{
-    [UIActionSheet showInView:self.view withTitle:@"Select how to add your safe" cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil
-            otherButtonTitles:@[@"Create New",
-                                @"Open Existing",
-                                @"Import from URL",
-                                @"Import Email Attachment"]
-                     tapBlock:^(UIActionSheet *actionSheet, NSInteger buttonIndex)
-     {
-         switch (buttonIndex) {
-             case 0:
-                 [self createBrandNewSafe];
-                 break;
-             case 1:
-                 [self addExistingSafe];
-                 break;
-             case 2:
-                 [self initiateManualImportFromUrl];
-                 break;
-             case 3:
-                 [UIAlertView showWithTitle:@"Importing an email attachment"
-                                    message:@"This is done through the Mail app. Simply make sure your email attachment has a .dat or .psafe3 extension and open the attachment in Mail. You will then be given the option to open the attachment with StrongBox. Clicking on this will start the import process."
-                          cancelButtonTitle:@"Cool, Got It!" otherButtonTitles:@[] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) { }];
-                 break;
-             default:
-                 break;
-         }
-     }];
+- (IBAction)onAddSafe:(id)sender {
+    [Alerts actionSheet:self
+              barButton:self.buttonAddSafe
+                  title:@"How Would You Like To Add Your Safe?"
+           buttonTitles:@[@"Create New",
+                          @"Open Existing",
+                          @"Import from URL",
+                          @"Import Email Attachment"]
+             completion:^(int response) {
+                 if (response == 1) {
+                     [self performSegueWithIdentifier:@"segueToStorageType" sender:@"New"];
+                 }
+                 else if (response == 2) {
+                     [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];
+                 }
+                 else if (response == 3) {
+                     [self initiateManualImportFromUrl];
+                 }
+                 else if (response == 4) {
+                     [Alerts info:self
+                            title:@"Importing Via Email"
+                          message:  @
+                      "1) Send an email to yourself with your safe file attached\n"
+                      "2) Ensure this file has a 'dat' or 'psafe3' extension\n"
+                      "3) Once the mail has arrived in the Mail app touch the attachment\n"
+                      "4) You will be given an option to 'Copy to StrongBox'\n"
+                      "\n"
+                      "Clicking on this will start the import process."];
+                 }
+             }];
 }
 
--(void) addExistingSafe
-{
-    [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];
-}
-
--(void) createBrandNewSafe
-{
-    [self performSegueWithIdentifier:@"segueToStorageType" sender:@"New"];
-}
-
-- (void)importFromURL:(NSURL *)importURL
-{
+- (void)importFromURL:(NSURL *)importURL {
     [self.navigationController popToRootViewControllerAnimated:YES];
     
     NSData *importedData = [NSData dataWithContentsOfURL:importURL];
-    if(![SafeDatabase isAValidSafe:importedData])
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid Safe" message:@"This is not a valid StrongBox password safe database file."
-                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+    
+    if (![SafeDatabase isAValidSafe:importedData]) {
+        [Alerts warn:self
+               title:@"Invalid Safe"
+             message:@"This is not a valid StrongBox password safe database file."];
         
         return;
     }
     
-    [UIAlertView showWithTitle:@"Import Safe" message:@"You are about to import a safe. What nickname would you like to use for it?" style:UIAlertViewStylePlainTextInput cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Import"] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex)
-    {
-        if(buttonIndex == 1)
-        {
-            UITextField *textField = [alertView textFieldAtIndex:0];
-            NSString* nickName = [_safes sanitizeSafeNickName:textField.text];
-        
-            if(![_safes isValidNickName:nickName])
-            {
-                [UIAlertView showWithTitle:@"Invalid Nickname" message:@"That nickname may already exist, or is invalid, please try a different nickname." cancelButtonTitle:@"OK" otherButtonTitles:@[] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) { [self importFromURL:importURL]; }];
-            }
-            else
-            {
-                [self addImportedSafe:nickName data:importedData];
-                
-                dispatch_async(dispatch_get_main_queue(), ^(void){ [self refreshView]; } );
-            }
-        }
-    }];
-    
-    return;
+    [self promptForImportedSafeNickName:importedData];
 }
 
-- (void)addImportedSafe:(NSString*)nickName data:(NSData*)data
-{
-    if(![_safes isValidNickName:nickName])
-    {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid Nick Name" message:@"This Nick Name already exists in your safes. Please choose another one."
-                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
-        
-        return;
-    }
+- (void)promptForImportedSafeNickName:(NSData *)data {
+    [Alerts OkCancelWithTextField:self
+             textFieldPlaceHolder:@"Nickname"
+                            title:@"You are about to import a safe. What nickname would you like to use for it?"
+                          message:@"Please Enter the URL of the Safe File."
+                       completion:^(NSString *text, BOOL response) {
+                           if (response) {
+                               NSString *nickName = [_safes sanitizeSafeNickName:text];
+                               
+                               if (![_safes isValidNickName:nickName]) {
+                                   [Alerts   info:self
+                                            title:@"Invalid Nickname"
+                                          message:@"That nickname may already exist, or is invalid, please try a different nickname."
+                                       completion:^{
+                                           [self promptForImportedSafeNickName:data];
+                                       }];
+                               }
+                               else {
+                                   [self addImportedSafe:nickName
+                                                    data:data];
+                               }
+                           }
+                       }];
+}
 
-    SafeMetaData *safe = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:kLocalDevice];
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
-    
-    [_local create:desiredFilename data:data parentReference:nil viewController:self completionHandler:
-     ^(NSString *fileName, NSString *fileIdentifier, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            if (error == nil)
-            {
-                safe.fileIdentifier = fileIdentifier;
-                safe.fileName = fileName;
-                
-                [self.safes add:safe];
-            }
-            else
-            {
-                NSLog(@"An error occurred: %@", error);
-                
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Importing Safe" message:@"There was a problem importing the safe."
-                                                               delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                [alert show];
-            }
-        });
-    }];
+- (void)addImportedSafe:(NSString *)nickName data:(NSData *)data {
+    [_local create:nickName
+              data:data
+      parentFolder:nil
+    viewController:self
+        completion:^(SafeMetaData *metadata, NSError *error)
+     {
+         dispatch_async(dispatch_get_main_queue(), ^(void)
+                        {
+                            if (error == nil) {
+                                [self.safes
+                                 add:metadata];
+                                [self refreshView];
+                            }
+                            else {
+                                [Alerts error:self
+                                        title:@"Error Importing Safe"
+                                        error:error];
+                            }
+                        });
+     }];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)deleteSafe:(SafeMetaData *)safe
-{
-    if(safe.storageProvider == kLocalDevice)
-    {
-        [_local delete:safe completionHandler:^(NSError *error) {
-            if(error != nil)
-            {
-                NSLog(@"Error removing local file: %@", error);
-            }
-            else
-            {
-                NSLog(@"Removed Local File Successfully.");
-            }
-        }];
+- (void)deleteSafe:(SafeMetaData *)safe {
+    if (safe.storageProvider == kLocalDevice) {
+        [_local delete:safe
+            completion:^(NSError *error) {
+                if (error != nil) {
+                    NSLog(@"Error removing local file: %@", error);
+                }
+                else {
+                    NSLog(@"Removed Local File Successfully.");
+                }
+            }];
     }
-    else if(safe.offlineCacheEnabled && safe.offlineCacheAvailable){
-        [_local deleteOfflineCachedSafe:safe completionHandler:^(NSError *error){
-            NSLog(@"Delete Offline Cache File. Error = %@", error);
-        }];
+    else if (safe.offlineCacheEnabled && safe.offlineCacheAvailable)
+    {
+        [_local deleteOfflineCachedSafe:safe
+                             completion:^(NSError *error) {
+                                 //NSLog(@"Delete Offline Cache File. Error = %@", error);
+                             }];
     }
 }
 
-- (IBAction)onDelete:(id)sender
-{
-    NSArray *selectedRows = [self.tableView indexPathsForSelectedRows];
+- (IBAction)onDelete:(id)sender {
+    NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
     
-    if(selectedRows.count > 0)
-    {
-        NSString* message = [NSString stringWithFormat:@"Would you like to delete %@", selectedRows.count > 1 ? @"these Safes?" : @"this Safe"];
+    if (selectedRows.count > 0) {
+        NSString *message = [NSString stringWithFormat:@"Would you like to delete %@", selectedRows.count > 1 ? @"these Safes?" : @"this Safe"];
         
-        [UIAlertView showWithTitle:@"Are you sure?" message:message cancelButtonTitle:@"No" otherButtonTitles:@[@"Yes"] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-            if(buttonIndex == 1)
-            {
-                for(NSIndexPath *indexPath in selectedRows)
-                {
-                    SafeMetaData* safe = [_safes get:indexPath.row];
-                    [self deleteSafe:safe];
-                }
-                
-                NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
-                for (NSIndexPath *selectionIndex in selectedRows)
-                {
-                    [indicesOfItems addIndex:selectionIndex.row];
-                }
-
-                [_safes removeSafesAt:indicesOfItems];
-                [_safes save];
-                
-                dispatch_async(dispatch_get_main_queue(), ^(void){
-                    [self setEditing:NO];
-                    [self refreshView];
-                });
-            }
-        }];
+        [Alerts yesNo:self
+                title:@"Are you sure?"
+              message:message
+               action:^(BOOL response) {
+                   if (response) {
+                       for (NSIndexPath *indexPath in selectedRows) {
+                           SafeMetaData *safe = [_safes get:indexPath.row];
+                           [self deleteSafe:safe];
+                       }
+                       
+                       NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
+                       
+                       for (NSIndexPath *selectionIndex in selectedRows) {
+                           [indicesOfItems addIndex:selectionIndex.row];
+                       }
+                       
+                       [_safes removeSafesAt:indicesOfItems];
+                       [_safes save];
+                       
+                       dispatch_async(dispatch_get_main_queue(), ^(void) {
+                           [self setEditing:NO];
+                           [self refreshView];
+                       });
+                   }
+               }];
     }
 }
 

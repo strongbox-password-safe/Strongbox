@@ -11,7 +11,6 @@
 
 @interface SettingsView : UIViewController <UIActionSheetDelegate>
 
-
 - (IBAction)onLongTouchCopy:(id)sender;
 - (IBAction)onSignoutGoogleDrive:(id)sender;
 - (IBAction)onAutoClose:(id)sender;
@@ -22,7 +21,5 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonSignoutGoogleDrive;
 @property (weak, nonatomic) IBOutlet UIButton *buttonUnlinkDropbox;
 @property (weak, nonatomic) IBOutlet UIButton *buttonAbout;
-
-@property (nonatomic) GoogleDriveManager *googleDrive;
 
 @end

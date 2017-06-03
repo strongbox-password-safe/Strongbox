@@ -12,8 +12,9 @@
 
 @interface BrowseSafeView : UITableViewController
 
+
 @property (nonatomic, strong) Model *viewModel;
-@property Group* currentGroup;
+@property Group *currentGroup;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddGroup;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddRecord;
@@ -25,7 +26,5 @@
 - (IBAction)onAddRecord:(id)sender;
 - (IBAction)onMove:(id)sender;
 - (IBAction)onDelete:(id)sender;
-
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 
 @end

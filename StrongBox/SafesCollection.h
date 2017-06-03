@@ -11,15 +11,18 @@
 
 @interface SafesCollection : NSObject
 
--(id)init;
--(NSUInteger)count;
--(SafeMetaData*)get:(NSUInteger)index;
--(void)removeSafesAt:(NSIndexSet*)index;
--(void)removeAt:(NSUInteger)index;
--(void)save;
+- (instancetype)  init;
+@property (NS_NONATOMIC_IOSONLY, readonly) NSUInteger count;
+- (SafeMetaData *)get:(NSUInteger)index;
+- (void)removeSafesAt:(NSIndexSet *)index;
+- (void)removeAt:(NSUInteger)index;
+- (void)          save;
 - (void)add:(SafeMetaData *)newSafe;
 
--(NSString*) sanitizeSafeNickName:(NSString*) string;
--(BOOL)isValidNickName:(NSString*) nickName;
+- (NSString *)sanitizeSafeNickName:(NSString *)string;
+- (BOOL)isValidNickName:(NSString *)nickName;
+
+
+- (void) migrateV1Dropbox; // TODO: Remove after 1.8
 
 @end

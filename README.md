@@ -17,11 +17,9 @@ https://github.com/pwsafe
 
 I use many different libraries in the app here are just a few:
 
-- BSKeyboardControls
 - Dropbox-iOS-SDK
 - Google-API-Client
 - JNKeychain
-- MBProgressHUD
+- SVProgressHUD
 - Reachability
-- UIActionSheet+Blocks
-- UIAlertView+Blocks
+- ISMessages

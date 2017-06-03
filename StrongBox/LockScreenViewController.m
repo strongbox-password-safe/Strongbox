@@ -12,23 +12,19 @@
 
 @end
 
-@implementation LockScreenViewController
-
-{
+@implementation LockScreenViewController {
     BOOL _oldNavBarState;
 }
--(void) viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+
     _oldNavBarState = self.navigationController.navigationBar.hidden;
     self.navigationController.navigationBar.hidden = YES;
 }
 
--(void)viewDidDisappear:(BOOL)animated
-{
+- (void)viewDidDisappear:(BOOL)animated {
     self.navigationController.navigationBar.hidden = _oldNavBarState;
-    
+
     [super viewDidDisappear:animated];
 }
 

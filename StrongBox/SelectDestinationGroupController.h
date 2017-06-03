@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
-#import "core-model/Group.h"
+#import "Group.h"
 
 @interface SelectDestinationGroupController : UITableViewController
 
 @property (nonatomic, strong) Model *viewModel;
-@property Group* currentGroup;
+@property Group *currentGroup;
 @property NSArray *itemsToMove;
-
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonMove;
+
 @end

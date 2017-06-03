@@ -10,28 +10,27 @@
 
 @interface SafeMetaData : NSObject
 
-typedef enum {
+    typedef NS_ENUM (unsigned int, StorageProvider) {
     kGoogleDrive,
     kDropbox,
     kLocalDevice,
-} StorageProvider;
+};
 
--(id)initWithNickName:(NSString*)nickName storageProvider:(StorageProvider)storageProvider;
+- (instancetype)initWithNickName:(NSString *)nickName
+                 storageProvider:(StorageProvider)storageProvider
+             offlineCacheEnabled:(BOOL)offlineCacheEnabled;
 
+@property (nonatomic, strong) NSString *nickName;
+@property (nonatomic, strong) NSString *fileName;
+@property (nonatomic, strong) NSString *fileIdentifier;
+@property (nonatomic) StorageProvider storageProvider;
+@property (nonatomic) BOOL isTouchIdEnabled;
+@property (nonatomic) BOOL isEnrolledForTouchId;
+@property (nonatomic, strong) NSString *offlineCacheFileIdentifier;
+@property (nonatomic) BOOL offlineCacheEnabled;
+@property (nonatomic) BOOL offlineCacheAvailable;
 
-@property NSString* nickName;
-@property NSString* fileName;
-@property NSString* fileIdentifier;
-@property StorageProvider storageProvider;
-
-@property BOOL isTouchIdEnabled;
-@property BOOL isEnrolledForTouchId;
-
-@property NSString* offlineCacheFileIdentifier;
-@property BOOL offlineCacheEnabled;
-@property BOOL offlineCacheAvailable;
-
--(NSDictionary*) toDictionary;
-+(SafeMetaData*) fromDictionary:(NSDictionary*)dictionary;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSDictionary *toDictionary;
++ (SafeMetaData *)fromDictionary:(NSDictionary *)dictionary;
 
 @end

@@ -8,128 +8,150 @@
 
 #import "LocalDeviceStorageProvider.h"
 #import "IOsUtils.h"
+#import "Utils.h"
 
 @implementation LocalDeviceStorageProvider
 
--(StorageProvider) getStorageId
-{
-    return kLocalDevice;
+- (instancetype)init {
+    if (self = [super init]) {
+        _displayName = @"Local Device";
+        _storageId = kLocalDevice;
+        _cloudBased = NO;
+        _providesIcons = NO;
+        _browsable = NO;
+
+        return self;
+    }
+    else {
+        return nil;
+    }
 }
 
--(BOOL)isCloudBased{
-    return NO;
-}
+- (void)    create:(NSString *)nickName
+              data:(NSData *)data
+      parentFolder:(NSObject *)parentFolder
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
 
-- (void)create:(NSString*)desiredFilename data:(NSData*)data parentReference:(NSString*)parentReference viewController:(UIViewController*)viewController completionHandler:(void (^)(NSString *fileName, NSString *fileIdentifier, NSError *error))completion
-{
     NSString *path = [[IOsUtils applicationDocumentsDirectory].path
                       stringByAppendingPathComponent:desiredFilename];
-    
-    if([[NSFileManager defaultManager] fileExistsAtPath:path])
-    {
-        path = [self insertTimestampInFilename:path];
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        path = [Utils insertTimestampInFilename:path];
     }
-    
+
     [data writeToFile:path atomically:YES];
-    
-    completion([path lastPathComponent], [path lastPathComponent], nil);
+
+    SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:self.storageId offlineCacheEnabled:NO];
+
+    metadata.fileIdentifier = path.lastPathComponent;
+    metadata.fileName = path.lastPathComponent;
+
+    completion(metadata, nil);
 }
 
-- (void)read:(SafeMetaData*)safeMetaData viewController:(UIViewController*)viewController completionHandler:(void (^)(NSData*, NSError* error))completion
-{
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
-    
+
     NSLog(@"Local Reading at: %@", path);
-    
+
     NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
-    
+
     completion(data, nil);
 }
 
-- (void)readOfflineCachedSafe:(SafeMetaData*)safeMetaData viewController:(UIViewController*)viewController completionHandler:(void (^)(NSData*, NSError* error))completion
-{
+- (void)readOfflineCachedSafe:(SafeMetaData *)safeMetaData
+               viewController:(UIViewController *)viewController
+                   completion:(void (^)(NSData *, NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
-    
+
     NSLog(@"Local Reading at: %@", path);
-    
+
     NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
-    
+
     completion(data, nil);
 }
 
-- (void)update:(SafeMetaData*)safeMetaData data:(NSData*)data viewController:(UIViewController*)viewController completionHandler:(void (^)(NSError *error))completion
-{
+- (void)update:(SafeMetaData *)safeMetaData
+          data:(NSData *)data
+    completion:(void (^)(NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
-    
+
     [data writeToFile:path atomically:YES ];
-    
+
     completion(nil);
 }
 
-- (void)updateOfflineCachedSafe:(SafeMetaData*)safeMetaData data:(NSData*)data viewController:(UIViewController*)viewController completionHandler:(void (^)(NSError *error))completion
-{
+- (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
-    
+
     [data writeToFile:path atomically:YES ];
-    
+
     completion(nil);
 }
 
-- (void)delete:(SafeMetaData*)safeMetaData completionHandler:(void (^)(NSError *error))completion
-{
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
-    
-    NSError* error;
+
+    NSError *error;
+
     [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
-    
+
     completion(error);
 }
 
-- (void)deleteOfflineCachedSafe:(SafeMetaData*)safeMetaData completionHandler:(void (^)(NSError *error))completion
-{
+- (void)deleteOfflineCachedSafe:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
-    
-    NSError* error;
+
+    NSError *error;
+
     [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
-    
+
     completion(error);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (NSString *)getFilePath:(SafeMetaData *)safeMetaData offlineCache:(BOOL)offlineCache
-{
+- (NSString *)getFilePath:(SafeMetaData *)safeMetaData offlineCache:(BOOL)offlineCache {
     // MMcG: BUGFIX: Bug in older versions saved full path instead of relative, just chop it out and re-append
-    
+
     NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:[
-                            (offlineCache ? safeMetaData.offlineCacheFileIdentifier : safeMetaData.fileIdentifier) lastPathComponent]];
-    
+                      stringByAppendingPathComponent:
+                      (offlineCache ? safeMetaData.offlineCacheFileIdentifier : safeMetaData.fileIdentifier).lastPathComponent];
+
     return path;
 }
 
--(NSDate*)getOfflineCacheFileModificationDate:(SafeMetaData*)safeMetadata
-{
+- (NSDate *)getOfflineCacheFileModificationDate:(SafeMetaData *)safeMetadata {
     NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:[safeMetadata.offlineCacheFileIdentifier lastPathComponent]];
+                      stringByAppendingPathComponent:(safeMetadata.offlineCacheFileIdentifier).lastPathComponent];
 
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-    
+
     return [attributes fileModificationDate];
 }
 
-- (NSString *)insertTimestampInFilename:(NSString *)title
-{
-    NSString *fn=title;
-    
-    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setDateFormat:@"yyyyMMdd-HHmmss"];
-    NSDate *date = [[NSDate alloc] init];
-    
-    NSString* extension = [title pathExtension];
-    fn = [NSString stringWithFormat:@"%@-%@.%@",title, [dateFormat stringFromDate:date], extension];
-    
-    return fn;
+- (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
+      completion:(void (^)(UIImage *image))completionHandler {
+    // NOTIMPL
+}
+
+- (void)      list:(NSObject *)parentFolder
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+    // NOTIMPL
+}
+
+- (void)readWithProviderData:(NSObject *)providerData
+              viewController:(UIViewController *)viewController
+                  completion:(void (^)(NSData *data, NSError *error))completionHandler {
+    // NOTIMPL
+}
+
+- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+    // NOTIMPL
+    return nil;
 }
 
 @end

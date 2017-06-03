@@ -7,67 +7,67 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "core-model/SafeDatabase.h"
-#import "GoogleDriveManager.h"
-#import <DropboxSDK/DropboxSDK.h>
+#import "SafeDatabase.h"
 #import "SafeStorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "SafesCollection.h"
-#import "core-model/CoreModel.h"
+#import "CoreModel.h"
 
 @interface Model : NSObject
 
-@property (readonly)    SafeDatabase *safe;
+@property (readonly) SafeDatabase *safe;
 @property (readonly)    CoreModel *coreModel;
-@property (readonly)    SafeMetaData* metadata;
-@property (nonatomic)   SafesCollection* safes;
+@property (readonly)    SafeMetaData *metadata;
+@property (nonatomic)   SafesCollection *safes;
 @property (readonly)    BOOL isCloudBasedStorage;
 @property (readonly)    BOOL isUsingOfflineCache;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(id) initWithSafeDatabase:(SafeDatabase*)safe
-                  metaData:(SafeMetaData*)metaData
-           storageProvider:(id <SafeStorageProvider>)provider
-         usingOfflineCache:(BOOL)usingOfflineCache
-      localStorageProvider:(LocalDeviceStorageProvider*)local
-                     safes:(SafesCollection*)safes;
+- (instancetype)init NS_UNAVAILABLE;
 
--(void)update:(UIViewController*)viewController completionHandler:(void (^)(NSError* error))handler;
+- (instancetype)initWithSafeDatabase:(SafeDatabase *)safe
+                            metaData:(SafeMetaData *)metaData
+                     storageProvider:(id <SafeStorageProvider>)provider
+                   usingOfflineCache:(BOOL)usingOfflineCache
+                localStorageProvider:(LocalDeviceStorageProvider *)local
+                               safes:(SafesCollection *)safes NS_DESIGNATED_INITIALIZER;
+
+- (void)update:(void (^)(NSError *error))handler;
 
 // Offline Cache Stuff
 
--(void)updateOfflineCacheWithData:(NSData*)data;
+- (void)updateOfflineCacheWithData:(NSData *)data;
 
--(void)updateOfflineCache:(void (^)())handler;
+- (void)updateOfflineCache:(void (^)())handler;
 
--(void)disableAndClearOfflineCache;
+- (void)        disableAndClearOfflineCache;
 
--(void)enableOfflineCache;
+- (void)        enableOfflineCache;
 
 // Search Safe Helpers
 
--(NSArray*)getSearchableItems;
--(NSArray*)getItemsForGroup:(Group*)group;
--(NSArray*)getSubgroupsForGroup:(Group*)group;
+@property (NS_NONATOMIC_IOSONLY, getter = getSearchableItems, readonly, copy) NSArray *searchableItems;
+- (NSArray *)getItemsForGroup:(Group *)group;
+- (NSArray *)getSubgroupsForGroup:(Group *)group;
 
 // Move
 
--(BOOL)validateMoveItems:(NSArray*)items destination:(Group*)group;
--(BOOL)validateMoveItems:(NSArray*)items destination:(Group*)group checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk;
--(void)moveItems:(NSArray*)items destination:(Group*)group;
+- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group;
+- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk;
+- (void)moveItems:(NSArray *)items destination:(Group *)group;
 
 // Delete
 
--(void)deleteItems:(NSArray*)items;
+- (void)deleteItems:(NSArray *)items;
 
 // Auto complete helpers
 
--(NSSet*)getAllExistingUserNames;
--(NSSet*)getAllExistingPasswords;
--(NSString*)getMostPopularUsername;
--(NSString*)getMostPopularPassword;
+@property (NS_NONATOMIC_IOSONLY, getter = getAllExistingUserNames, readonly, copy) NSSet *allExistingUserNames;
+@property (NS_NONATOMIC_IOSONLY, getter = getAllExistingPasswords, readonly, copy) NSSet *allExistingPasswords;
+@property (NS_NONATOMIC_IOSONLY, getter = getMostPopularUsername, readonly, copy) NSString *mostPopularUsername;
+@property (NS_NONATOMIC_IOSONLY, getter = getMostPopularPassword, readonly, copy) NSString *mostPopularPassword;
 
--(NSString*)generatePassword;
+@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *generatePassword;
 
 @end

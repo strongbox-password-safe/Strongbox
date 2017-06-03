@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "GoogleDriveManager.h"
 #import "LocalDeviceStorageProvider.h"
-#import "DropboxStorageProvider.h"
 #import "GoogleDriveStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
 #import "SafesCollection.h"
 
 @interface SelectSafeLocationViewController : UIViewController
@@ -26,7 +26,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonLocalDevice;
 
 @property GoogleDriveStorageProvider *googleStorageProvider;
-@property DropboxStorageProvider *dropboxStorageProvider;
+@property DropboxV2StorageProvider *dropboxStorageProvider;
 @property LocalDeviceStorageProvider *localDeviceStorageProvider;
 
 @property (nonatomic) SafesCollection *safes;

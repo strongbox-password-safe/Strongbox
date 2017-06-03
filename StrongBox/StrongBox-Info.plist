@@ -48,7 +48,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.7</string>
+	<string>1.8</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -58,15 +58,26 @@
 			<array>
 				<string>db-4dq2al3jlwx3u5p</string>
 			</array>
+            <key>CFBundleURLName</key>
+            <string></string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.747097248035-gu998atvo9dat2t6j7b4jkqlseee4543</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.7</string>
+	<string>1.8</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
 		<string>dbapi-2</string>
 		<string>dbapi-3</string>
+        <string>dbapi-8-emm</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

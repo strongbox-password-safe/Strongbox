@@ -11,7 +11,7 @@
 
 @interface SafeDetailsAndSettingsView : UIViewController
 
-@property (nonatomic) Model* viewModel;
+@property (nonatomic) Model *viewModel;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelUpdateUser;
 @property (weak, nonatomic) IBOutlet UILabel *labelUpdateHost;

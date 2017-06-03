@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "core-model/Record.h"
+#import "Record.h"
 
 @interface AdvancedRecordViewController : UITableViewController
 
-@property Record* record;
+@property Record *record;
 
 @end

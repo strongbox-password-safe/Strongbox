@@ -12,4 +12,8 @@
 
 @interface DropboxStorageProvider : NSObject <SafeStorageProvider, DBRestClientDelegate>
 
+@property (strong, nonatomic, readonly) NSString *displayName;
+@property (nonatomic, readonly) StorageProvider storageId;
+@property (nonatomic, readonly) Boolean cloudBased;
+
 @end

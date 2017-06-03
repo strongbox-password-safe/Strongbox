@@ -4,12 +4,32 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>BSKeyboardControls.xcscheme</key>
+		<key>GTMOAuth2.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Google-API-Client.xcscheme</key>
+		<key>GTMSessionFetcher.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>GoogleAPIClientForREST.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>GoogleToolboxForMac.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ISMessages-ISMessages.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ISMessages.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -19,7 +39,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>MBProgressHUD.xcscheme</key>
+		<key>ObjectiveDropboxOfficial.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -34,22 +54,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>UIActionSheet+Blocks.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>UIAlertView+Blocks.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>gtm-http-fetcher.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>gtm-oauth2.xcscheme</key>
+		<key>SVProgressHUD.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -57,52 +62,57 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>00B2E10275A0ED96002AAE8538ED63C9</key>
+		<key>107A9565F9DF88517DFD3E28C05B2B96</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>01B3A0BD211E0C510BC4F7F149C89C5E</key>
+		<key>1F13A9F466F82C2C95A66304D27CD433</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>5126B4AA6D09717492D54A085D490BB5</key>
+		<key>2A1A9CC99D0A075881B2E625E3308DE4</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>5CA6B6EAD3BED5A6CC8478D41BB29C6C</key>
+		<key>3B88D8F553124540C52484DAB5257FC3</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>844287E96B46FEE21F6758263EE7E871</key>
+		<key>42BE0DEE0C9D31D0BAD31C59D0CEC3E3</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>848CE5A3B92106CE3083D766CA50A760</key>
+		<key>4C1E729916BC36CB6C29B79499B89D0E</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>8EEEB80BA60D17183F685BE225B59170</key>
+		<key>4C4B180216960A09E044DCD1340DC2C9</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>A6344627E1EFDD6C9A51E57054714BE4</key>
+		<key>A08902AD8F47A860FFC624677A13D3C2</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>F7571BCEC9BE2B766A5AEFB580A5784B</key>
+		<key>B1C4AAFAF49036C7007633DAA3C806AD</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>FE2F1D7B9D9FCEA148517E4657B243F4</key>
+		<key>CEF3F3FD48F30AE7E6A6674BC46F1068</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E0F7D77396D218B9A370B128FD3A89C0</key>
 		<dict>
 			<key>primary</key>
 			<true/>

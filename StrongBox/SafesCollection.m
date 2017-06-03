@@ -10,64 +10,77 @@
 #import "SafeMetaData.h"
 
 @interface SafesCollection ()
-    @property NSMutableArray* safes;
+@property NSMutableArray *safes;
 @end
 
 @implementation SafesCollection
 
--(id)init
-{
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray *existingSafes = [userDefaults arrayForKey:@"safes"];
-    
-    self.safes = [[NSMutableArray alloc] init];
-    
-    for (NSDictionary* safeDict in existingSafes)
-    {
-        SafeMetaData* safe = [SafeMetaData fromDictionary:safeDict];
+- (instancetype)init {
+    if (self = [super init]) {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSArray *existingSafes = [userDefaults arrayForKey:@"safes"];
         
-        [self.safes addObject:safe];
+        self.safes = [[NSMutableArray alloc] init];
+        
+        for (NSDictionary *safeDict in existingSafes) {
+            SafeMetaData *safe = [SafeMetaData fromDictionary:safeDict];
+            
+            [self.safes addObject:safe];
+        }
+        
+        return self;
     }
-
-    return self;
+    else {
+        return nil;
+    }
 }
 
--(NSUInteger)count
+- (void)migrateV1Dropbox
 {
+    for(SafeMetaData* metaData in self.safes) {
+        if (metaData.storageProvider == kDropbox) {
+            NSString* fileName = [metaData.fileIdentifier lastPathComponent];
+            NSString* path = [metaData.fileIdentifier stringByDeletingLastPathComponent];
+            
+            NSLog(@"Migrating Dropbox V1 [%@] -> [%@-%@]", metaData.fileIdentifier, fileName, path);
+            
+            metaData.fileName = fileName;
+            metaData.fileIdentifier = path;
+        }
+    }
+    
+    [self save];
+}
+
+
+- (NSUInteger)count {
     return self.safes.count;
 }
 
--(SafeMetaData*)get:(NSUInteger)index
-{
-    return [self.safes objectAtIndex:index];
+- (SafeMetaData *)get:(NSUInteger)index {
+    return (self.safes)[index];
 }
 
--(void)removeSafesAt:(NSIndexSet*)index
-{
+- (void)removeSafesAt:(NSIndexSet *)index {
     return [self.safes removeObjectsAtIndexes:index];
 }
 
--(void)removeAt:(NSUInteger)index
-{
+- (void)removeAt:(NSUInteger)index {
     return [self.safes removeObjectAtIndex:index];
 }
 
-- (NSSet*)getAllNickNamesLowerCase
-{
+- (NSSet *)getAllNickNamesLowerCase {
     NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity:self.safes.count];
     
-    for (SafeMetaData* safe in self.safes)
-    {
-        [set addObject:[safe.nickName lowercaseString]];
+    for (SafeMetaData *safe in self.safes) {
+        [set addObject:(safe.nickName).lowercaseString];
     }
     
     return set;
 }
 
-- (void)add:(SafeMetaData *)newSafe
-{
-    if(![self isValidNickName:newSafe.nickName])
-    {
+- (void)add:(SafeMetaData *)newSafe {
+    if (![self isValidNickName:newSafe.nickName]) {
         NSLog(@"Cannot Save Safe, as existing Safe exists with this nick name, or the name is invalid!");
         return;
     }
@@ -79,9 +92,9 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)save
-{
-    NSMutableArray* sfs = [NSMutableArray arrayWithCapacity:[self.safes count] ];
+- (void)save {
+    NSMutableArray *sfs = [NSMutableArray arrayWithCapacity:(self.safes).count ];
+    
     for (SafeMetaData *s in self.safes) {
         [sfs addObject:s.toDictionary];
     }
@@ -95,9 +108,8 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
--(NSString*) sanitizeSafeNickName:(NSString*) string
-{
-    NSString* trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+- (NSString *)sanitizeSafeNickName:(NSString *)string {
+    NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet illegalCharacterSet]] componentsJoinedByString:@""];
@@ -107,13 +119,12 @@
     return trimmed;
 }
 
--(BOOL)isValidNickName:(NSString*) nickName
-{
-    NSString* sanitized = [self sanitizeSafeNickName:nickName];
+- (BOOL)isValidNickName:(NSString *)nickName {
+    NSString *sanitized = [self sanitizeSafeNickName:nickName];
     
     return [sanitized isEqualToString:nickName] &&
-        nickName.length > 0 &&
-        ![[self getAllNickNamesLowerCase] containsObject:[nickName lowercaseString]];
+    nickName.length > 0 &&
+    ![[self getAllNickNamesLowerCase] containsObject:nickName.lowercaseString];
 }
 
 @end

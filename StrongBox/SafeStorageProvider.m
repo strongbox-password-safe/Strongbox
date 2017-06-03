@@ -8,6 +8,6 @@
 
 #import "SafeStorageProvider.h"
 
-@implementation SafeStorageProvider : NSObject 
+@implementation SafeStorageProvider : NSObject
 
 @end
