@@ -12,26 +12,23 @@
 
 @interface Model ()
 
+@property (readonly, strong, nonatomic) CoreModel *coreModel;
+@property (readonly, strong, nonatomic) SafeDatabase *safe;
+
 @end
 
 @implementation Model {
     id <SafeStorageProvider> _storageProvider;
     LocalDeviceStorageProvider *_local;
     BOOL _isUsingOfflineCache;
-}
-
-- (BOOL)isCloudBasedStorage {
-    return _storageProvider.cloudBased;
-}
-
-- (BOOL)isUsingOfflineCache {
-    return _isUsingOfflineCache;
+    BOOL _isReadOnly;
 }
 
 - (instancetype)initWithSafeDatabase:(SafeDatabase *)safe
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
+                          isReadOnly:(BOOL)isReadOnly
                 localStorageProvider:(LocalDeviceStorageProvider *)local
                                safes:(SafesCollection *)safes; {
     if (self = [super init]) {
@@ -40,6 +37,7 @@
         _metadata = metaData;
         _storageProvider = provider;
         _isUsingOfflineCache = usingOfflineCache;
+        _isReadOnly = isReadOnly;
         _local = local;
         _safes = safes;
 
@@ -50,8 +48,20 @@
     }
 }
 
+- (BOOL)isCloudBasedStorage {
+    return _storageProvider.cloudBased;
+}
+
+- (BOOL)isUsingOfflineCache {
+    return _isUsingOfflineCache;
+}
+
+- (BOOL)isReadOnly {
+    return _isReadOnly;
+}
+
 - (void)update:(void (^)(NSError *error))handler {
-    if (!_isUsingOfflineCache) {
+    if (!_isUsingOfflineCache && !_isReadOnly) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
         {
             NSData *updatedSafeData = [self.safe getAsData];
@@ -72,8 +82,12 @@
         });
     }
     else {
-        NSLog(@"Attempt to write a read-only safe!");
-        [NSException raise:@"Attempt to write a read-only safe!" format:@"foo of is invalid", nil];
+        if(_isReadOnly) {
+            handler([Utils createNSError:@"You are in read-only mode. You will need to upgrade StrongBox to write to safes." errorCode:-1]);
+        }
+        else {
+            handler([Utils createNSError:@"You are currently in offline mode. The safe cannot be modified." errorCode:-1]);
+        }
     }
 }
 
@@ -102,7 +116,9 @@
     }
 }
 
-- (void)saveOfflineCacheFile:(NSData *)data safe:(SafeMetaData *)safe localProvider:(LocalDeviceStorageProvider *)localProvider {
+- (void)saveOfflineCacheFile:(NSData *)data
+                        safe:(SafeMetaData *)safe
+               localProvider:(LocalDeviceStorageProvider *)localProvider {
     // Store this safe locally
     // Do we already have a file?
     //      Yes-> Overwrite
@@ -168,7 +184,42 @@
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-// Search
+
+- (Group *)addSubgroupWithUIString:(Group *)parent title:(NSString *)title {
+    return [self.safe addSubgroupWithUIString:parent title:title];
+}
+
+- (NSString *)getMasterPassword {
+    return self.safe.masterPassword;
+}
+
+- (void)setMasterPassword:(NSString *)value {
+    self.safe.masterPassword = value;
+}
+
+-(NSDate*)lastUpdateTime {
+    return self.safe.lastUpdateTime;
+}
+  
+-(NSString*)lastUpdateUser {
+    return self.safe.lastUpdateUser;
+}
+
+-(NSString*)lastUpdateHost {
+    return self.safe.lastUpdateHost;
+}
+  
+-(NSString*)lastUpdateApp {
+    return self.safe.lastUpdateApp;
+}
+    
+-(NSData*)getSafeAsData {
+    return self.safe.asData;
+}
+
+- (void)addRecord:(Record *)newRecord {
+    return [self.safe addRecord:newRecord];
+}
 
 - (NSArray *)getSearchableItems {
     return [self.coreModel getSearchableItems];
@@ -191,7 +242,9 @@
     return [self.coreModel validateMoveItems:items destination:group];
 }
 
-- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk {
+- (BOOL)validateMoveItems:(NSArray *)items
+              destination:(Group *)group
+checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk {
     return [self.coreModel validateMoveItems:items destination:group checkIfMoveIntoSubgroupOfDestinationOk:checkIfMoveIntoSubgroupOfDestinationOk];
 }
 
@@ -201,6 +254,10 @@
 
 - (void)deleteItems:(NSArray *)items {
     return [self.coreModel deleteItems:items];
+}
+
+- (void)deleteItem:(SafeItemViewModel *)item {
+    return [self.coreModel deleteItem:item];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

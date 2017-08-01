@@ -60,7 +60,7 @@
                           message:@"Please Enter the New Group Name"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               [self.viewModel.safe addSubgroupWithUIString:self.currentGroup
+                               [self.viewModel addSubgroupWithUIString:self.currentGroup
                                                                   title:text];
                                [self refresh];
                            }

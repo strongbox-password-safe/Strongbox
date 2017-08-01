@@ -11,13 +11,6 @@
 
 @implementation IOsUtils
 
-+ (NSInteger)getLaunchCount {
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    NSInteger launchCount = [prefs integerForKey:@"launchCount"];
-
-    return launchCount;
-}
-
 + (NSString *)getAppName {
     NSDictionary *info = [NSBundle mainBundle].infoDictionary;
     NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleDisplayName"], info[@"CFBundleVersion"]];

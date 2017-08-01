@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <Google/SignIn.h>
+#import <GoogleSignIn/GoogleSignIn.h>
 #import "GTLRDrive.h"
 
 @interface GoogleDriveManager : NSObject <GIDSignInDelegate, GIDSignInUIDelegate>

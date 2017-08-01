@@ -25,7 +25,6 @@ typedef void (^Authenticationcompletion)(NSError *error);
 
     dispatch_once(&onceToken, ^{
         sharedInstance = [[GoogleDriveManager alloc] init];
-        // Do any other initialisation stuff here
     });
     return sharedInstance;
 }
@@ -73,6 +72,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     signIn.scopes = @[kGTLRAuthScopeDrive];
 
     authenticationcompletion = completion;
+
     [signIn signIn];
 }
 
@@ -162,13 +162,13 @@ typedef void (^Authenticationcompletion)(NSError *error);
     [self authenticate:viewController
             completion:^(NSError *error) {
                 if (error) {
-                NSLog(@"%@", error);
-                handler(nil, error);
+                    NSLog(@"%@", error);
+                    handler(nil, error);
                 }
                 else {
-                [self    _read:parentFileIdentifier
-                  fileName:fileName
-                   completion:handler];
+                    [self    _read:parentFileIdentifier
+                          fileName:fileName
+                        completion:handler];
                 }
             }];
 }
@@ -188,21 +188,22 @@ typedef void (^Authenticationcompletion)(NSError *error);
             [SVProgressHUD popActivity];
         });
         
-        if (!file) {
-            NSLog(@"Google Drive: No such file found... Trying to use legacy metadata pattern %@", error);
-
-            // NOTE: Legacy, if the file no longer exists, try to load directly using parentFileIdentifier which was the method used previously
-            // before. We used to store the id of the safe file, but because of shitty auto backup behaviour in the main PWSSafe app, this
-            // ends up pointing at backup files rather than the main file. So now we load by name and parent folder. If that doesn't work we will
-            // try loading the file directly by id, which should maintain compatibility with older safes. When people re-add they'll get moved over
-            // to the new (parent+title) way of identifiying the file.
-
-            [self getFile:parentFileIdentifier
-                  handler:handler];
+        if(error) {
+            NSLog(@"%@", error);
+            handler(nil, error);
+            return;
         }
         else {
-            [self getFile:file.identifier
-                  handler:handler];
+            if (!file) {
+                NSLog(@"Google Drive: No such file found...");
+                error = [Utils createNSError:@"Your safe file could not be found on Google Drive. Try removing the safe and re-adding it." errorCode:-1];
+                handler(nil, error);
+                return;
+            }
+            else {
+                [self getFile:file.identifier
+                      handler:handler];
+            }
         }
     }];
 }

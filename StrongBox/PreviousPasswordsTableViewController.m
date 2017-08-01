@@ -38,13 +38,6 @@
 
     PasswordHistoryEntry *entry = (self.model.entries)[indexPath.row];
 
-    //NSLocale* currentLocale = [NSLocale currentLocale];
-    //NSString *dateString = [entry.timestamp descriptionWithLocale:currentLocale];
-
-//    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"beginDate" ascending:TRUE];
-//    [myMutableArray sortUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-//    [sortDescriptor release];
-//
     NSString *dateString = [_dateFormatter stringFromDate:entry.timestamp];
 
     cell.textLabel.text = entry.password;

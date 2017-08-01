@@ -72,6 +72,7 @@
     {
         if (error != nil) {
             NSLog(@"%@", error);
+            [[GoogleDriveManager sharedInstance] signout];
         }
 
         completion(data, error);
@@ -88,9 +89,13 @@
                                        withData:data
                                      completion:^(NSError *error) {
                                          dispatch_async(dispatch_get_main_queue(), ^{
-                                         [SVProgressHUD popActivity];
+                                             [SVProgressHUD popActivity];
                                          });
 
+                                         if(error) {
+                                             [[GoogleDriveManager sharedInstance] signout];
+                                         }
+                                         
                                          completion(error);
                                      }];
 }
@@ -129,6 +134,8 @@
             completion([self mapToStorageBrowserItems:driveFiles], nil);
         }
         else {
+            [[GoogleDriveManager sharedInstance] signout];
+            
             completion(nil, error);
         }
     }];
@@ -146,9 +153,13 @@
          fileIdentifier:file.identifier
              completion:^(NSData *data, NSError *error) {
                  dispatch_async(dispatch_get_main_queue(), ^{
-                 [SVProgressHUD popActivity];
+                     [SVProgressHUD popActivity];
                  });
-
+                 
+                 if(error) {
+                     [[GoogleDriveManager sharedInstance] signout];
+                 }
+                 
                  completion(data, error);
              }];
 }

@@ -8,13 +8,13 @@
 
 #import "RecordView.h"
 #import "Field.h"
-#import "AdvancedRecordViewController.h"
 #import "PasswordSettingsTableViewController.h"
 #import "PasswordHistory.h"
 #import "Alerts.h"
 #import "SVProgressHUD/SVProgressHUD.h"
 #import "ISMessages/ISMessages.h"
 #import "TextFieldAutoSuggest.h"
+#import "Settings.h"
 
 @interface RecordView ()
 
@@ -35,9 +35,9 @@
     [self setInitialTextFieldBordersAndColors];
     [self setupAutoComplete];
     
-    self.navigationItem.rightBarButtonItem = self.viewModel.isUsingOfflineCache ? nil : self.editButtonItem;
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
-    _hidePassword = NO;
+    _hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
     [self hideOrShowPassword:_hidePassword];
     
     [self reloadFieldsFromRecord];
@@ -143,7 +143,7 @@
                                action:@selector(textViewDidChange:)
                      forControlEvents:UIControlEventEditingChanged];
     
-    (self.navigationItem).titleView = self.textFieldTitle;
+    self.navigationItem.titleView = self.textFieldTitle;
 }
 
 - (void)reloadFieldsFromRecord {
@@ -156,7 +156,6 @@
         self.textFieldUsername.text = self.record.username;
         self.textViewNotes.text = self.record.notes;
         
-        self.buttonAdvanced.enabled = YES;
         self.buttonSettings.enabled = YES;
     }
     else {
@@ -167,7 +166,6 @@
         self.textFieldUsername.text = [self.viewModel getMostPopularUsername]; 
         self.textViewNotes.text = @"";
         
-        self.buttonAdvanced.enabled = NO;
         self.buttonSettings.enabled = NO;
     }
 }
@@ -179,7 +177,6 @@
         navBack = self.navigationItem.leftBarButtonItem;
         self.editButtonItem.enabled = [self uiIsDirty];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
-        self.buttonAdvanced.enabled = NO;
         self.buttonSettings.enabled = NO;
     }
     else {
@@ -187,10 +184,9 @@
             [self saveChangesToSafe:NO];
         }
         else {
-            self.buttonAdvanced.enabled = (self.record != nil);
             self.buttonSettings.enabled = (self.record != nil);
             self.navigationItem.leftBarButtonItem = navBack;
-            self.editButtonItem.enabled = YES;
+            self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
             navBack = nil;
         }
@@ -261,7 +257,7 @@ NSString * trim(NSString *string) {
             [NSCharacterSet whitespaceCharacterSet]];
 }
 
-- (void)copyToClipboard:(NSString *)value name:(NSString *)name {
+- (void)copyToClipboard:(NSString *)value message:(NSString *)message {
     if (value.length == 0) {
         return;
     }
@@ -269,7 +265,7 @@ NSString * trim(NSString *string) {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     pasteboard.string = value;
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Copied", name]
+    [ISMessages showCardAlertWithTitle:message
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -286,31 +282,35 @@ NSString * trim(NSString *string) {
     }
     else if (self.record)
     {
-        [self copyToClipboard:self.record.password name:@"Password"];
+        [self copyToClipboard:self.record.password message:@"Password Copied"];
     }
 }
 
 - (IBAction)onCopyUrl:(id)sender {
-    [self copyToClipboard:self.record.url name:@"URL"];
+    [self copyToClipboard:self.record.url message:@"URL Copied"];
 }
 
 - (IBAction)onCopyUsername:(id)sender {
-    [self copyToClipboard:self.record.username name:@"Username"];
+    [self copyToClipboard:self.record.username message:@"Username Copied"];
 }
 
 - (IBAction)onCopyAndLaunchUrl:(id)sender {
-    [self copyToClipboard:self.record.password name:@"Password"];
-    
     NSString *urlString = self.record.url;
+
+    if (!urlString.length) {
+        return;
+    }
+
+    [self copyToClipboard:self.record.password message:@"Password Copied. Launching URL..."];
     
     if (![urlString.lowercaseString hasPrefix:@"http://"] &&
         ![urlString.lowercaseString hasPrefix:@"https://"]) {
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
-    if (urlString.length) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-    }
+    });
 }
 
 - (IBAction)onHide:(id)sender {
@@ -345,17 +345,15 @@ NSString * trim(NSString *string) {
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqual:@"segueToAdvanced"]) {
-        AdvancedRecordViewController *vc = segue.destinationViewController;
-        vc.record = self.record;
-    }
-    else if ([segue.identifier isEqual:@"segueToPasswordSettings"] && (self.record != nil))
+    if ([segue.identifier isEqual:@"segueToPasswordSettings"] && (self.record != nil))
     {
         PasswordSettingsTableViewController *vc = segue.destinationViewController;
         vc.model = self.record.passwordHistory;
+        vc.viewModel = self.viewModel;
+        
         vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(NSError *)) {
             self.record.passwordHistory = changed;
-            [self save:onDone];
+            [self save:onDone]; // TODO: This is not handling errors. It should also be done inside the VC
         };
     }
 }
@@ -431,7 +429,7 @@ NSString * trim(NSString *string) {
         self.record = [[Record alloc] init];
         self.record.group = self.currentGroup;
         self.record.created = [[NSDate alloc] init];
-        [self.viewModel.safe addRecord:self.record];
+        [self.viewModel addRecord:self.record];
     }
     
     // Access/Modification Times

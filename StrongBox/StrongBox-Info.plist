@@ -48,7 +48,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.8</string>
+	<string>1.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -58,8 +58,8 @@
 			<array>
 				<string>db-4dq2al3jlwx3u5p</string>
 			</array>
-            <key>CFBundleURLName</key>
-            <string></string>
+			<key>CFBundleURLName</key>
+			<string></string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
@@ -71,13 +71,13 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.8</string>
+	<string>1.9</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
 		<string>dbapi-2</string>
 		<string>dbapi-3</string>
-        <string>dbapi-8-emm</string>
+		<string>dbapi-8-emm</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

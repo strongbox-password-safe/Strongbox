@@ -49,6 +49,7 @@
 // Delete
 
 - (void)deleteItems:(NSArray *)items;
+- (void)deleteItem:(SafeItemViewModel *)item;
 
 // Auto complete helpers
 

@@ -228,14 +228,18 @@
     }
 }
 
-- (void)deleteItems:(NSArray *)items {
+- (void)deleteItems:(NSArray<SafeItemViewModel *> *)items {
     for (SafeItemViewModel *item in items) {
-        if (item.isGroup) {
-            [self.safe deleteGroup:item.group];
-        }
-        else {
-            [self.safe deleteRecord:item.record];
-        }
+        [self deleteItem:item];
+    }
+}
+
+- (void)deleteItem:(SafeItemViewModel *)item {
+    if (item.isGroup) {
+        [self.safe deleteGroup:item.group];
+    }
+    else {
+        [self.safe deleteRecord:item.record];
     }
 }
 

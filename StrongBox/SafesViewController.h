@@ -7,14 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <StoreKit/StoreKit.h>
 
-@interface SafesViewController : UITableViewController
+@interface SafesViewController : UITableViewController<SKProductsRequestDelegate>
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonDelete;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
+@property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
 
 - (IBAction)onAddSafe:(id)sender;
-- (IBAction)onDelete:(id)sender;
-- (void)importFromURL:(NSURL *)importURL;
+- (void)importFromUrlOrEmailAttachment:(NSURL *)importURL;
+- (IBAction)onUpgrade:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonTogglePro;
+- (IBAction)onTogglePro:(id)sender;
 
 @end

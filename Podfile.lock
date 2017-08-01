@@ -1,17 +1,4 @@
 PODS:
-  - FirebaseAnalytics (3.9.0):
-    - FirebaseCore (~> 3.6)
-    - FirebaseInstanceID (~> 1.0)
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
-  - FirebaseCore (3.6.0):
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
-  - FirebaseInstanceID (1.0.10):
-    - FirebaseCore (~> 3.6)
-  - Google/Core (3.1.0):
-    - FirebaseAnalytics (~> 3.2)
-  - Google/SignIn (3.1.0):
-    - Google/Core
-    - GoogleSignIn (~> 4.0)
   - GoogleAPIClientForREST/Core (1.3.0):
     - GTMSessionFetcher (>= 1.1.7)
   - GoogleAPIClientForREST/Drive (1.3.0):
@@ -25,8 +12,6 @@ PODS:
   - GoogleToolboxForMac/DebugUtils (2.1.1):
     - GoogleToolboxForMac/Defines (= 2.1.1)
   - GoogleToolboxForMac/Defines (2.1.1)
-  - GoogleToolboxForMac/NSData+zlib (2.1.1):
-    - GoogleToolboxForMac/Defines (= 2.1.1)
   - GoogleToolboxForMac/NSDictionary+URLArguments (2.1.1):
     - GoogleToolboxForMac/DebugUtils (= 2.1.1)
     - GoogleToolboxForMac/Defines (= 2.1.1)
@@ -46,8 +31,8 @@ PODS:
   - SVProgressHUD (2.1.2)
 
 DEPENDENCIES:
-  - Google/SignIn
   - GoogleAPIClientForREST/Drive
+  - GoogleSignIn
   - ISMessages
   - JNKeychain
   - ObjectiveDropboxOfficial
@@ -55,10 +40,6 @@ DEPENDENCIES:
   - SVProgressHUD
 
 SPEC CHECKSUMS:
-  FirebaseAnalytics: e5fe8486efc01bec33f6bf82e2fa9fce4b124052
-  FirebaseCore: 9691ee2ade70c098d7cf92440f4303f16d83ca75
-  FirebaseInstanceID: b9eedd6846fb5e1f0f7279e1deaa7a7e4cf8392e
-  Google: 98da4b1a60ed0beb80a290387a28333406a1eb90
   GoogleAPIClientForREST: bf724227a6ad1459aab09b73800aad9184a0f64c
   GoogleSignIn: d7ad83f13480e1f30453471d00d19b5293ac46af
   GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
@@ -70,6 +51,6 @@ SPEC CHECKSUMS:
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994
 
-PODFILE CHECKSUM: 75723510084427ee8c62bbd76c39414cd6123359
+PODFILE CHECKSUM: 87d433567f5424a0ef4a8d4ec14c0c1531c9ab1d
 
 COCOAPODS: 1.2.1

@@ -8,10 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "Record.h"
+#import "Model.h"
 
 @interface PasswordSettingsTableViewController : UITableViewController
 
 @property (nonatomic, retain) PasswordHistory *model;
+@property (nonatomic, retain) Model *viewModel;
+
 @property (nonatomic, copy) void (^ saveFunction)(PasswordHistory *changed, void (^onDone)(NSError *));
 
 @property (weak, nonatomic) IBOutlet UISwitch *uiSwitchEnabled;

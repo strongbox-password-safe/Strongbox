@@ -13,20 +13,19 @@
 		4D01653F1EDB2F9C00CCB8CF /* SafeItemViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01652F1EDB2F9C00CCB8CF /* SafeItemViewModel.m */; };
 		4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165311EDB2F9C00CCB8CF /* SafeMetaData.m */; };
 		4D0165421EDB2F9C00CCB8CF /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165351EDB2F9C00CCB8CF /* SafeTools.m */; };
-		4D1757BA1C8361D300E6356F /* AdvancedRecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17578E1C8361D200E6356F /* AdvancedRecordViewController.m */; };
+		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
+		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
 		4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D1757961C8361D200E6356F /* formatV3.txt */; };
 		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
-		4D1757C21C8361D300E6356F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D17579B1C8361D200E6356F /* Images.xcassets */; };
 		4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579D1C8361D200E6356F /* IOsUtils.m */; };
 		4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
-		4D1757C51C8361D300E6356F /* LockScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A11C8361D200E6356F /* LockScreenViewController.m */; };
 		4D1757C91C8361D300E6356F /* SafeDetailsAndSettingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A81C8361D300E6356F /* SafeDetailsAndSettingsView.m */; };
 		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
-		4D1757CF1C8361D300E6356F /* SettingsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B41C8361D300E6356F /* SettingsView.m */; };
 		4D1757D41C8363A000E6356F /* SelectSafeLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */; };
+		4D275E571F1BC97600D79A30 /* UpgradeTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D275E561F1BC97600D79A30 /* UpgradeTableController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
@@ -37,9 +36,9 @@
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
 		4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D93FD761EDB7A520076BBAA /* StoreKit.framework */; };
 		4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBE5B381C8356C700C310BC /* AppDelegate.m */; };
+		4DC7D9FF1F26693C007A2BCF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DC7D9FE1F26693C007A2BCF /* Images.xcassets */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
-		4DE932081C8368B600AC925E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE932041C8368B600AC925E /* Main_iPad.storyboard */; };
 		4DE932091C8368B600AC925E /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE932061C8368B600AC925E /* Main_iPhone.storyboard */; };
 		4DF785F71EDB319E006D4918 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165231EDB2F9C00CCB8CF /* Field.m */; };
 		4DF785F81EDB319E006D4918 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165271EDB2F9C00CCB8CF /* Model.m */; };
@@ -80,8 +79,10 @@
 		4D0165351EDB2F9C00CCB8CF /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeTools.m; sourceTree = "<group>"; };
 		4D0165361EDB2F9C00CCB8CF /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		4D0165371EDB2F9C00CCB8CF /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
-		4D17578D1C8361D200E6356F /* AdvancedRecordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedRecordViewController.h; sourceTree = "<group>"; };
-		4D17578E1C8361D200E6356F /* AdvancedRecordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedRecordViewController.m; sourceTree = "<group>"; };
+		4D0BA7D61F23B844009243C9 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
+		4D0BA7D71F23B844009243C9 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
+		4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesTableViewController.h; sourceTree = "<group>"; };
+		4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowseSafeView.h; sourceTree = "<group>"; };
 		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowseSafeView.m; sourceTree = "<group>"; };
 		4D1757961C8361D200E6356F /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = formatV3.txt; sourceTree = "<group>"; };
@@ -89,13 +90,10 @@
 		4D1757981C8361D200E6356F /* GoogleDriveManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDriveManager.m; sourceTree = "<group>"; };
 		4D1757991C8361D200E6356F /* GoogleDriveStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDriveStorageProvider.h; sourceTree = "<group>"; };
 		4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDriveStorageProvider.m; sourceTree = "<group>"; };
-		4D17579B1C8361D200E6356F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D17579C1C8361D200E6356F /* IOsUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOsUtils.h; sourceTree = "<group>"; };
 		4D17579D1C8361D200E6356F /* IOsUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IOsUtils.m; sourceTree = "<group>"; };
 		4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalDeviceStorageProvider.h; sourceTree = "<group>"; };
 		4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalDeviceStorageProvider.m; sourceTree = "<group>"; };
-		4D1757A01C8361D200E6356F /* LockScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockScreenViewController.h; sourceTree = "<group>"; };
-		4D1757A11C8361D200E6356F /* LockScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockScreenViewController.m; sourceTree = "<group>"; };
 		4D1757A21C8361D200E6356F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4D1757A71C8361D300E6356F /* SafeDetailsAndSettingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeDetailsAndSettingsView.h; sourceTree = "<group>"; };
 		4D1757A81C8361D300E6356F /* SafeDetailsAndSettingsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsAndSettingsView.m; sourceTree = "<group>"; };
@@ -105,11 +103,11 @@
 		4D1757B01C8361D300E6356F /* SafesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesViewController.m; sourceTree = "<group>"; };
 		4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectDestinationGroupController.h; sourceTree = "<group>"; };
 		4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectDestinationGroupController.m; sourceTree = "<group>"; };
-		4D1757B31C8361D300E6356F /* SettingsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsView.h; sourceTree = "<group>"; };
-		4D1757B41C8361D300E6356F /* SettingsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsView.m; sourceTree = "<group>"; };
 		4D1757B51C8361D300E6356F /* StrongBox-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StrongBox-Info.plist"; sourceTree = "<group>"; };
 		4D1757D21C8363A000E6356F /* SelectSafeLocationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectSafeLocationViewController.h; sourceTree = "<group>"; };
 		4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectSafeLocationViewController.m; sourceTree = "<group>"; };
+		4D275E551F1BC97600D79A30 /* UpgradeTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeTableController.h; sourceTree = "<group>"; };
+		4D275E561F1BC97600D79A30 /* UpgradeTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpgradeTableController.m; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserTableViewController.m; sourceTree = "<group>"; };
@@ -130,11 +128,11 @@
 		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DBE5B381C8356C700C310BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		4DC7D9FE1F26693C007A2BCF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4DC8DFF01EE19CE300F1F757 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
-		4DE932051C8368B600AC925E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
 		4DE932071C8368B600AC925E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		4DF785FE1EDB31DB006D4918 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4DF785FF1EDB31DB006D4918 /* tomcrypt_argchk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_argchk.h; path = twofish/tomcrypt_argchk.h; sourceTree = "<group>"; };
@@ -186,12 +184,8 @@
 		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				4D17578D1C8361D200E6356F /* AdvancedRecordViewController.h */,
-				4D17578E1C8361D200E6356F /* AdvancedRecordViewController.m */,
 				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
 				4D1757901C8361D200E6356F /* BrowseSafeView.m */,
-				4D1757A01C8361D200E6356F /* LockScreenViewController.h */,
-				4D1757A11C8361D200E6356F /* LockScreenViewController.m */,
 				4D915D721EDC068D002615F6 /* PasswordSettingsTableViewController.h */,
 				4D915D731EDC068D002615F6 /* PasswordSettingsTableViewController.m */,
 				4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */,
@@ -206,10 +200,12 @@
 				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
 				4D1757D21C8363A000E6356F /* SelectSafeLocationViewController.h */,
 				4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */,
-				4D1757B31C8361D300E6356F /* SettingsView.h */,
-				4D1757B41C8361D300E6356F /* SettingsView.m */,
 				4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */,
 				4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */,
+				4D275E551F1BC97600D79A30 /* UpgradeTableController.h */,
+				4D275E561F1BC97600D79A30 /* UpgradeTableController.m */,
+				4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */,
+				4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -261,6 +257,8 @@
 				4D0165341EDB2F9C00CCB8CF /* SafeTools.h */,
 				4D0165351EDB2F9C00CCB8CF /* SafeTools.m */,
 				4DF785FD1EDB31B8006D4918 /* twofish */,
+				4D0BA7D61F23B844009243C9 /* Settings.h */,
+				4D0BA7D71F23B844009243C9 /* Settings.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -286,8 +284,7 @@
 		4DBE5B331C8356C700C310BC /* StrongBox */ = {
 			isa = PBXGroup;
 			children = (
-				4D17579B1C8361D200E6356F /* Images.xcassets */,
-				4DE932041C8368B600AC925E /* Main_iPad.storyboard */,
+				4DC7D9FE1F26693C007A2BCF /* Images.xcassets */,
 				4DE932061C8368B600AC925E /* Main_iPhone.storyboard */,
 				4D62D6941C85F2B50051E13B /* ViewControllers */,
 				4D62D6961C85F35E0051E13B /* StorageProviders */,
@@ -422,8 +419,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
-				4D1757C21C8361D300E6356F /* Images.xcassets in Resources */,
-				4DE932081C8368B600AC925E /* Main_iPad.storyboard in Resources */,
+				4DC7D9FF1F26693C007A2BCF /* Images.xcassets in Resources */,
 				4DE932091C8368B600AC925E /* Main_iPhone.storyboard in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 			);
@@ -502,19 +498,18 @@
 				4D0165381EDB2F9C00CCB8CF /* CoreModel.m in Sources */,
 				4D0165421EDB2F9C00CCB8CF /* SafeTools.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
-				4D1757CF1C8361D300E6356F /* SettingsView.m in Sources */,
 				4D01653C1EDB2F9C00CCB8CF /* PasswordHistoryEntry.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
-				4D1757C51C8361D300E6356F /* LockScreenViewController.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
 				4D01653A1EDB2F9C00CCB8CF /* Group.m in Sources */,
 				4DF786131EDB3966006D4918 /* PasswordHistory.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
 				4DF7860F1EDB31DB006D4918 /* twofish_tab.c in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
-				4D1757BA1C8361D300E6356F /* AdvancedRecordViewController.m in Sources */,
 				4D1757D41C8363A000E6356F /* SelectSafeLocationViewController.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
+				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
+				4D275E571F1BC97600D79A30 /* UpgradeTableController.m in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */,
 				4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */,
@@ -522,6 +517,7 @@
 				4D1757C91C8361D300E6356F /* SafeDetailsAndSettingsView.m in Sources */,
 				4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
+				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -529,14 +525,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		4DE932041C8368B600AC925E /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4DE932051C8368B600AC925E /* Base */,
-			);
-			name = Main_iPad.storyboard;
-			sourceTree = "<group>";
-		};
 		4DE932061C8368B600AC925E /* Main_iPhone.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

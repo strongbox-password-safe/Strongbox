@@ -28,7 +28,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonCopyUrl;
 @property (weak, nonatomic) IBOutlet UIButton *buttonCopyAndLaunchUrl;
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAdvanced;
 @property (weak, nonatomic) IBOutlet UILabel *labelHidePassword;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSettings;
 

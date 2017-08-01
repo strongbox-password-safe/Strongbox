@@ -39,11 +39,7 @@
     [self.buttonLocalDevice setTitle:title forState:UIControlStateNormal];
     [self.buttonLocalDevice setTitle:title forState:UIControlStateHighlighted];
 
-
-//    self.buttonLocalDevice.center = CGPointMake(self.view.center.x, self.buttonLocalDevice.center.y);
-//    self.buttonGoogleDrive.center = CGPointMake(self.view.center.x, self.buttonGoogleDrive.center.y);
-//    self.buttonDropbox.center = CGPointMake(self.view.center.x, self.buttonDropbox.center.y);
-//    self.uiLabelHelp.center = CGPointMake(self.view.center.x, self.uiLabelHelp.center.y);
+    self.navigationController.toolbar.hidden = NO;
 }
 
 - (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {

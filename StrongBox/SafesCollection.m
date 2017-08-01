@@ -35,24 +35,6 @@
     }
 }
 
-- (void)migrateV1Dropbox
-{
-    for(SafeMetaData* metaData in self.safes) {
-        if (metaData.storageProvider == kDropbox) {
-            NSString* fileName = [metaData.fileIdentifier lastPathComponent];
-            NSString* path = [metaData.fileIdentifier stringByDeletingLastPathComponent];
-            
-            NSLog(@"Migrating Dropbox V1 [%@] -> [%@-%@]", metaData.fileIdentifier, fileName, path);
-            
-            metaData.fileName = fileName;
-            metaData.fileIdentifier = path;
-        }
-    }
-    
-    [self save];
-}
-
-
 - (NSUInteger)count {
     return self.safes.count;
 }

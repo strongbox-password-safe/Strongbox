@@ -25,6 +25,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.navigationController.toolbar.hidden = NO;
+    
     _defaultFolderImage = [UIImage imageNamed:@"folder48"];
     _defaultFileImage = [UIImage imageNamed:@"page_white48"];
     _iconsCache = [[NSMutableDictionary alloc] init];

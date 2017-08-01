@@ -20,6 +20,14 @@
     return error;
 }
 
++ (NSString *)getAppVersion {
+    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
+    
+    NSString *version = [NSString stringWithFormat:@"%@", info[@"CFBundleVersion"]];
+    
+    return version;
+}
+
 + (NSString *)getAppName {
     NSDictionary *info = [NSBundle mainBundle].infoDictionary;
     NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleDisplayName"], info[@"CFBundleVersion"]];

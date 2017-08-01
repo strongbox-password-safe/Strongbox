@@ -7,7 +7,7 @@ use_frameworks!
 
 target 'StrongBox' do
     pod 'GoogleAPIClientForREST/Drive'
-    pod 'Google/SignIn'
+    pod 'GoogleSignIn'
     pod 'JNKeychain'
     pod 'ISMessages'
     pod 'SVProgressHUD'  

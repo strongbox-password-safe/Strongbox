@@ -21,34 +21,29 @@
     NSString *firstPasswordEntry;
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    self.labelUpdateApp.text = self.viewModel.safe.lastUpdateApp;
-    self.labelUpdateHost.text = self.viewModel.safe.lastUpdateHost;
-    self.labelUpdateUser.text = self.viewModel.safe.lastUpdateUser;
-
-    self.labelUpdateTime.text = [self formatDate:self.viewModel.safe.lastUpdateTime];
+    self.labelUpdateApp.text = self.viewModel.lastUpdateApp;
+    self.labelUpdateHost.text = self.viewModel.lastUpdateHost;
+    self.labelUpdateUser.text = self.viewModel.lastUpdateUser;
+    self.labelUpdateTime.text = [self formatDate:self.viewModel.lastUpdateTime];
 
     [self updateTouchIdButtonText];
     [self updateOfflineCacheButtonText];
-
-    self.buttonTouchId.hidden = ![IOsUtils isTouchIDAvailable];
+    
+    self.buttonChangeMasterPassword.hidden = (self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
+    self.buttonTouchId.hidden = ![IOsUtils isTouchIDAvailable] || self.viewModel.isReadOnly;
     self.buttonOfflineCache.hidden = self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage;
 }
 
 - (void)changeMasterPassword:(NSString *)password {
-    self.viewModel.safe.masterPassword = password;
+    self.viewModel.masterPassword = password;
 
     [self.viewModel update:^(NSError *error) {
                         if (error == nil) {
                         if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
-                        [JNKeychain         saveValue:self.viewModel.safe.masterPassword
+                        [JNKeychain         saveValue:self.viewModel.masterPassword
                                        forKey:self.viewModel.metadata.nickName];
                         NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
                         }
@@ -184,8 +179,16 @@
 }
 
 - (IBAction)onExport:(id)sender {
-    NSData *safeData = [self.viewModel.safe getAsData];
+    NSData *safeData = [self.viewModel getSafeAsData];
 
+    if(![MFMailComposeViewController canSendMail]) {
+        [Alerts info:self
+               title:@"Email Not Available"
+             message:@"It looks like email is not setup on this device and so the safe cannot be exported by email."];
+        
+        return;
+    }
+    
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
 
     [picker setSubject:[NSString stringWithFormat:@"StrongBox Safe: '%@'", self.viewModel.metadata.nickName]];

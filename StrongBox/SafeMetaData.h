@@ -10,7 +10,7 @@
 
 @interface SafeMetaData : NSObject
 
-    typedef NS_ENUM (unsigned int, StorageProvider) {
+typedef NS_ENUM (unsigned int, StorageProvider) {
     kGoogleDrive,
     kDropbox,
     kLocalDevice,

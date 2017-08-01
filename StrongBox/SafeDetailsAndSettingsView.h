@@ -20,6 +20,7 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonTouchId;
 @property (weak, nonatomic) IBOutlet UIButton *buttonOfflineCache;
+@property (weak, nonatomic) IBOutlet UIButton *buttonChangeMasterPassword;
 
 - (IBAction)onChangeMasterPassword:(id)sender;
 - (IBAction)onButtonTouchId:(id)sender;

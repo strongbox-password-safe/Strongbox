@@ -15,12 +15,11 @@
 
 @interface Model : NSObject
 
-@property (readonly) SafeDatabase *safe;
-@property (readonly)    CoreModel *coreModel;
 @property (readonly)    SafeMetaData *metadata;
-@property (nonatomic)   SafesCollection *safes;
+@property (nonatomic)   SafesCollection *safes; 
 @property (readonly)    BOOL isCloudBasedStorage;
 @property (readonly)    BOOL isUsingOfflineCache;
+@property (readonly)    BOOL isReadOnly;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +29,7 @@
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
+                          isReadOnly:(BOOL)isReadOnly
                 localStorageProvider:(LocalDeviceStorageProvider *)local
                                safes:(SafesCollection *)safes NS_DESIGNATED_INITIALIZER;
 
@@ -38,16 +38,24 @@
 // Offline Cache Stuff
 
 - (void)updateOfflineCacheWithData:(NSData *)data;
-
 - (void)updateOfflineCache:(void (^)())handler;
+- (void)disableAndClearOfflineCache;
+- (void)enableOfflineCache;
+- (void)addRecord:(Record *)newRecord;
 
-- (void)        disableAndClearOfflineCache;
+- (Group *)addSubgroupWithUIString:(Group *)parent title:(NSString *)title;
 
-- (void)        enableOfflineCache;
+@property (readonly) NSDate *lastUpdateTime;
+@property (readonly) NSString *lastUpdateUser;
+@property (readonly) NSString *lastUpdateHost;
+@property (readonly) NSString *lastUpdateApp;
+@property (NS_NONATOMIC_IOSONLY, getter = getSafeAsData, readonly, copy) NSData *asData;
+@property (NS_NONATOMIC_IOSONLY, getter = getMasterPassword, setter=setMasterPassword:) NSString *masterPassword;
 
 // Search Safe Helpers
 
 @property (NS_NONATOMIC_IOSONLY, getter = getSearchableItems, readonly, copy) NSArray *searchableItems;
+
 - (NSArray *)getItemsForGroup:(Group *)group;
 - (NSArray *)getSubgroupsForGroup:(Group *)group;
 
@@ -60,6 +68,7 @@
 // Delete
 
 - (void)deleteItems:(NSArray *)items;
+- (void)deleteItem:(SafeItemViewModel *)item;
 
 // Auto complete helpers
 

@@ -12,6 +12,7 @@
 
 + (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode;
 + (NSString *)getAppName;
++ (NSString *)getAppVersion;
 + (NSString *)insertTimestampInFilename:(NSString *)title;
 
 @end

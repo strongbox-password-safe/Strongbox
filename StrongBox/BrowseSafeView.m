@@ -18,6 +18,7 @@
 #import "RecordView.h"
 #import "Alerts.h"
 #import <ISMessages/ISMessages.h>
+#import "Settings.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -33,6 +34,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.navigationController.toolbar.hidden = NO;
     
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
                                 initWithTarget:self
@@ -52,6 +55,9 @@
                              alertPosition:ISAlertPositionBottom
                                    didHide:nil];
     }
+   
+    self.extendedLayoutIncludesOpaqueBars = YES;
+    self.definesPresentationContext = YES;
     
     self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
     self.searchController.searchResultsUpdater = self;
@@ -59,12 +65,50 @@
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
     
-    self.tableView.tableHeaderView = self.searchController.searchBar;
-    self.definesPresentationContext = YES;
-    [self.searchController.searchBar sizeToFit];
+    if ([[Settings sharedInstance] isProOrFreeTrial]) {
+        self.tableView.tableHeaderView = self.searchController.searchBar;
+        
+        [self.searchController.searchBar sizeToFit];
+    }
 }
 
-- (NSArray *)getDataSource {
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return !self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+                title:@"Are you sure?"
+              message:@"Are you sure you want to delete this item?"
+               action:^(BOOL response) {
+                   if (response) {
+                       SafeItemViewModel *item = [[self getDataSource] objectAtIndex:indexPath.row];
+                       
+                       [self.viewModel deleteItem:item];
+                       
+                       [self.viewModel update:^(NSError *error) {
+                           if (error) {
+                               [Alerts             error:self
+                                                   title:@"Error Saving"
+                                                   error:error];
+                           }
+                       }];
+                       
+                       [self setEditing:NO animated:YES];
+                       
+                       [self refresh];
+                   }
+               }];
+    }
+}
+
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+    //ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
+    return !self.isEditing && (sender == self || [identifier isEqualToString:@"segueToSafeDetailsView"]);
+}
+
+- (NSArray<SafeItemViewModel *> *)getDataSource {
     return (self.searchController.isActive ? self.searchResults : self.items);
 }
 
@@ -140,40 +184,39 @@
 }
 
 - (void)enableDisableToolbarButtons {
-    (self.buttonAddRecord).enabled = !self.viewModel.isUsingOfflineCache && !self.isEditing;
-    (self.buttonSafeSettings).enabled = !self.viewModel.isUsingOfflineCache && !self.isEditing;
-    (self.buttonDelete).enabled = !self.viewModel.isUsingOfflineCache && self.isEditing;
-    (self.buttonMove).enabled = !self.viewModel.isUsingOfflineCache && self.isEditing;
-    (self.buttonAddGroup).enabled = !self.viewModel.isUsingOfflineCache && !self.isEditing;
+    BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
+    
+    (self.buttonAddRecord).enabled = !ro && !self.isEditing;
+    (self.buttonSafeSettings).enabled = !self.isEditing;
+    (self.buttonMove).enabled = !ro && self.isEditing;      // Only move in edit mode
+    (self.buttonAddGroup).enabled = !ro && !self.isEditing;
 }
 
 - (void)refresh {
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@",
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
                                  (!self.currentGroup || self.currentGroup.isRootGroup) ?
-                                 self.viewModel.metadata.
-                                                 nickName : self.currentGroup.suffixDisplayString,
-                                 self.viewModel.isUsingOfflineCache ?
-                                 @" [Offline]" : @""];
+                                 self.viewModel.metadata.nickName : self.currentGroup.suffixDisplayString,
+                                 self.viewModel.isUsingOfflineCache ? @" [Offline]" : @"",
+                                 self.viewModel.isReadOnly ? @" [Read Only]" : @""];
     
     NSArray *foo = [self.viewModel getItemsForGroup:self.currentGroup];
     self.items = [[NSMutableArray alloc] initWithArray:foo];
     
     // Display
     
+    [self updateSearchResultsForSearchController:self.searchController];
+    
     [self.tableView reloadData];
     
-    self.navigationItem.rightBarButtonItem = (!self.viewModel.isUsingOfflineCache && [self getDataSource].count > 0) ? self.editButtonItem : nil;
+    self.navigationItem.rightBarButtonItem = (!self.viewModel.isUsingOfflineCache &&
+                                              !self.viewModel.isReadOnly &&
+                                              [self getDataSource].count > 0) ? self.editButtonItem : nil;
     
     [self enableDisableToolbarButtons];
 }
 
 - (NSString *)getGroupPathDisplayString:(SafeItemViewModel *)vm {
     return [vm.groupPathPrefix isEqualToString:@""] ? @"" : [NSString stringWithFormat:@"(in %@)", vm.groupPathPrefix];
-}
-
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
-    //ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
-    return (sender == self || [identifier isEqualToString:@"segueToSafeDetailsView"]);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -220,7 +263,7 @@
                           message:@"Please Enter the New Group Name:"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               if ([self.viewModel.safe addSubgroupWithUIString:self.currentGroup
+                               if ([self.viewModel addSubgroupWithUIString:self.currentGroup
                                                                           title:text] != nil) {
                                    [self saveChangesToSafeAndRefreshView];
                                }
@@ -251,48 +294,15 @@
         [indicesOfItems addIndex:selectionIndex.row];
     }
     
-    NSArray *itemsToDelete = [[self getDataSource] objectsAtIndexes:indicesOfItems];
-    return itemsToDelete;
-}
-
-- (IBAction)onDelete:(id)sender {
-    NSArray<NSIndexPath *> *selectedRows = (self.tableView).indexPathsForSelectedRows;
-    
-    if (selectedRows.count > 0) {
-        NSString *message = [NSString stringWithFormat:@"Would you like to delete %@", selectedRows.count > 1 ? @"these Items?" : @"this Item"];
-        
-        [Alerts yesNo:self
-                title:@"Are you sure?"
-              message:message
-               action:^(BOOL response) {
-                   if (response) {
-                       NSArray<SafeItemViewModel *> *itemsToDelete = [self getSelectedItems:selectedRows];
-                       
-                       [self.viewModel deleteItems:itemsToDelete];
-                       
-                       [self.viewModel update:^(NSError *error) {
-                           if (error) {
-                               [Alerts             error:self
-                                                   title:@"Error Saving"
-                                                   error:error];
-                           }
-                       }];
-                       
-                       [self setEditing:NO
-                               animated:YES];
-                       [self refresh];
-                   }
-               }];
-    }
+    NSArray *items = [[self getDataSource] objectsAtIndexes:indicesOfItems];
+    return items;
 }
 
 - (void)saveChangesToSafeAndRefreshView {
     [self.viewModel update:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error != nil) {
-                [Alerts         error:self
-                                title:@"Problem Saving"
-                                error:error];
+                [Alerts error:self title:@"Problem Saving" error:error];
             }
             
             [self refresh];
@@ -347,10 +357,8 @@
     
     NSLog(@"Fast Password Copy on %@", item.title);
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    BOOL promptedForCopyPw = [userDefaults boolForKey:@"promptedForCopyPasswordGesture"];
-    BOOL copyPw = [userDefaults boolForKey:@"copyPasswordOnLongPress"];
+    BOOL promptedForCopyPw = [[Settings sharedInstance] isHasPromptedForCopyPasswordGesture];
+    BOOL copyPw = [[Settings sharedInstance] isCopyPasswordOnLongPress];
     
     NSLog(@"Long press detected on Record. Copy Featured is [%@]", copyPw ? @"Enabled" : @"Disabled");
     
@@ -359,17 +367,14 @@
                 title:@"Copy Password?"
               message:@"By Touching and Holding an entry for 2 seconds you can quickly copy the password to the clipboard. Would you like to enable this feature?"
                action:^(BOOL response) {
-                   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                   [userDefaults  setBool:response
-                                   forKey:@"copyPasswordOnLongPress"];
+                   [[Settings sharedInstance] setCopyPasswordOnLongPress:response];
                    
                    if (response) {
-                       [self copyPasswordOnLongPress:item
-                                     withTapLocation:tapLocation];
+                       [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
                    }
                }];
         
-        [userDefaults setBool:YES forKey:@"promptedForCopyPasswordGesture"];
+        [[Settings sharedInstance] setHasPromptedForCopyPasswordGesture:YES];
     }
     else if (copyPw)
     {

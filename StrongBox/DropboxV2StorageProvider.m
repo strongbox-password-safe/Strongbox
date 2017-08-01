@@ -9,7 +9,7 @@
 #import "DropboxV2StorageProvider.h"
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "Utils.h"
-#import "SVProgressHUD.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @implementation DropboxV2StorageProvider
 

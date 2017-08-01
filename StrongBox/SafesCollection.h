@@ -22,7 +22,4 @@
 - (NSString *)sanitizeSafeNickName:(NSString *)string;
 - (BOOL)isValidNickName:(NSString *)nickName;
 
-
-- (void) migrateV1Dropbox; // TODO: Remove after 1.8
-
 @end

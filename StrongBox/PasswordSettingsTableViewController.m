@@ -9,13 +9,38 @@
 #import "PasswordSettingsTableViewController.h"
 #import "PreviousPasswordsTableViewController.h"
 #import "Alerts.h"
+#import "Settings.h"
+
+@interface PasswordSettingsTableViewController()
+
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+
+@end
 
 @implementation PasswordSettingsTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                initWithTarget:self
+                                action:@selector(handleLongPress:)];
+    self.longPressRecognizer.minimumPressDuration = 20;
+    self.longPressRecognizer.cancelsTouchesInView = YES;
+    
+    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+
     [self bindToModel];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
+    if (sender.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    
+    [[Settings sharedInstance] setPro:YES];
+    
+    [Alerts info:self title:@"Done" message:@"Done and done." completion:nil];
 }
 
 - (IBAction)onMaxEntriesStepper:(id)sender {
@@ -32,15 +57,15 @@
               message:@"Are you sure you want to disable history? This will clear previous passwords."
                action:^(BOOL response) {
                    if (response) {
-                   _model.enabled = NO;
-                   [_model.entries removeAllObjects];
+                       _model.enabled = NO;
+                       [_model.entries removeAllObjects];
 
-                   [self save];
-                   [self bindToModel];
+                       [self save];
+                       [self bindToModel];
                    }
                    else {
-                   _model.enabled = YES;
-                   [self bindToModel];
+                       _model.enabled = YES;
+                       [self bindToModel];
                    }
                }];
     }
@@ -56,13 +81,18 @@
         if (error) {
             [Alerts error:self title:@"Problem Saving Safe" error:error];
         }
+        
+        [self bindToModel];
     });
 }
 
 - (void)bindToModel {
+    BOOL writeable = !self.viewModel.isReadOnly && !self.viewModel.isUsingOfflineCache;
+    
+    [self.uiSwitchEnabled setEnabled:writeable];
     self.uiSwitchEnabled.on = _model.enabled;
 
-    self.uiTableViewCellMaximumEntries.userInteractionEnabled = _model.enabled;
+    self.uiTableViewCellMaximumEntries.userInteractionEnabled = writeable && _model.enabled;
     self.uiTableViewCellMaximumEntries.textLabel.enabled = _model.enabled;
     self.uiTableViewCellMaximumEntries.detailTextLabel.enabled = _model.enabled;
 
@@ -75,7 +105,6 @@
 
     self.uiLabelMaximumEntriesStatic.enabled = _model.enabled;
     self.uiLabelMaximumEntries.enabled = _model.enabled;
-
     (self.uiLabelMaximumEntries).text = [NSString stringWithFormat:@"%lu", (unsigned long)_model.maximumSize];
 
     self.uiLabelPreviousPasswords.enabled = _model.enabled;
