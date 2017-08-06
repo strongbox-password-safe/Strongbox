@@ -79,14 +79,59 @@
         [self.buttonUpgrade2 setAttributedTitle:attString forState:UIControlStateNormal];
         [self.buttonUpgrade2 setEnabled:NO];
     }
+    
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
 }
 
 - (IBAction)onUpgrade:(id)sender {
     _buttonUpgrade2.enabled = NO;
-    [self purchaseMyProduct:self.product];
+    
+    if( self.product == nil) {
+        [Alerts warn:self title:@"Product Error" message:@"Could not access Upgrade Product on App Store. Please try again later."];
+    }
+    else {
+        if ([SKPaymentQueue canMakePayments]) {
+            [SVProgressHUD showWithStatus:@"Purchasing..."];
+            SKPayment *payment = [SKPayment paymentWithProduct:self.product];
+            [[SKPaymentQueue defaultQueue] addPayment:payment];
+        }
+        else{
+            [Alerts warn:self title:@"Purchases Disabled" message:@"Purchases are disabled on your device"];
+        }
+    }
+}
+
+- (IBAction)onRestore:(id)sender {
+    [SVProgressHUD showWithStatus:@"Restoring..."];
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
 #pragma mark StoreKit Delegate
+
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
+    NSLog(@"restoreCompletedTransactionsFailedWithError: %@", error);
+    
+    [Alerts error:self title:@"Issue Restoring Purchase" error:error];
+}
+
+- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
+    NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: %@", queue);
+    
+    [SVProgressHUD popActivity];
+    
+    if(queue.transactions.count == 0) {
+        [Alerts info:self title:@"Restoration Unsuccessful" message:@"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?" completion:nil];
+    }
+    else {
+        // TODO: if multiple IAP - we need to check the product id is in the transactions queue
+        
+        [[Settings sharedInstance] setPro:YES];
+
+        [Alerts info:self title:@"Welcome Back to StrongBox Pro" message:@"Upgrade Restored Successfully. Thank you!" completion:^{
+            [self dismissViewControllerAnimated:NO completion:nil];
+        }];
+    }
+}
 
 -(void)paymentQueue:(SKPaymentQueue *)queue
 updatedTransactions:(NSArray *)transactions {
@@ -96,7 +141,6 @@ updatedTransactions:(NSArray *)transactions {
                 NSLog(@"Purchasing");
                 break;
             case SKPaymentTransactionStatePurchased:
-            case SKPaymentTransactionStateRestored:
             {
                 [[Settings sharedInstance] setPro:YES];
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
@@ -106,6 +150,13 @@ updatedTransactions:(NSArray *)transactions {
                 [Alerts info:self title:@"Welcome to StrongBox Pro" message:@"Upgrade successful" completion:^{
                     [self dismissViewControllerAnimated:NO completion:nil];
                 }];
+
+            }
+                break;
+            case SKPaymentTransactionStateRestored:
+            {
+                NSLog(@"updatedTransactions: Restored");
+                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
             }
                 break;
             case SKPaymentTransactionStateFailed:
@@ -120,29 +171,6 @@ updatedTransactions:(NSArray *)transactions {
                 break;
             default:
                 break;
-        }
-    }
-}
-
-- (BOOL)canMakePurchases
-{
-    return [SKPaymentQueue canMakePayments];
-}
-
-- (void)purchaseMyProduct:(SKProduct*)product{
-    if( product == nil) {
-        [Alerts warn:self title:@"Product Error" message:@"Could not access Upgrade Product on App Store. Please try again later."];
-    }
-    else {
-        if ([self canMakePurchases]) {
-            [SVProgressHUD showWithStatus:@"Purchasing..."];
-
-            SKPayment *payment = [SKPayment paymentWithProduct:product];
-            [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-            [[SKPaymentQueue defaultQueue] addPayment:payment];
-        }
-        else{
-            [Alerts warn:self title:@"Purchases Disabled" message:@"Purchases are disabled on your device"];
         }
     }
 }

@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:SwiftBox/SwiftBox/SwiftBox.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:macbox/MacBox/MacBox.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:StrongBox.xcodeproj">
    </FileRef>
    <FileRef
