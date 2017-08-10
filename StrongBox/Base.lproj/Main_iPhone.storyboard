@@ -86,7 +86,7 @@
                         <outlet property="buttonTogglePro" destination="UR1-FK-uNa" id="lLz-rj-yyu"/>
                         <outlet property="buttonUpgrade" destination="tmo-77-bgs" id="Ll3-sF-2r3"/>
                         <outlet property="navItemHeader" destination="g1g-nh-a5L" id="VqK-HH-5Cu"/>
-                        <segue destination="cYG-Rk-SmU" kind="push" identifier="segueToOpenSafeView" id="aYd-mP-3oX"/>
+                        <segue destination="cYG-Rk-SmU" kind="push" identifier="segueToOpenSafeView" animates="NO" id="aYd-mP-3oX"/>
                         <segue destination="Dsn-WA-Bfz" kind="push" identifier="segueToStorageType" id="7Zf-0n-NYo"/>
                         <segue destination="PKv-Yt-bNW" kind="modal" identifier="segueToUpgrade" id="Hn4-75-OXC"/>
                     </connections>

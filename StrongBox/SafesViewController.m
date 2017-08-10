@@ -24,6 +24,7 @@
 #import "ISMessages/ISMessages.h"
 #import "UpgradeViewController.h"
 #import "Settings.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface SafesViewController ()
 
@@ -319,8 +320,12 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                 provider:(id)provider
       isOfflineCacheMode:(BOOL)isOfflineCacheMode
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
+    [SVProgressHUD showWithStatus:@"Decrypting..."];
+    
     NSError *error;
     SafeDatabase *openedSafe = [[SafeDatabase alloc] initExistingWithData:masterPassword data:data error:&error];
+    
+    [SVProgressHUD popActivity];
     
     if (error != nil) {
         if (error.code == -2) {

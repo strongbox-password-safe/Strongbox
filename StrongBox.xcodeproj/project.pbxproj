@@ -35,7 +35,6 @@
 		4D92C7F21F388D0900341A58 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E01F388D0900341A58 /* Group.m */; };
 		4D92C7F31F388D0900341A58 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E21F388D0900341A58 /* PasswordHistory.m */; };
 		4D92C7F41F388D0900341A58 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */; };
-		4D92C7F51F388D0900341A58 /* PwSafeModel2.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E61F388D0900341A58 /* PwSafeModel2.m */; };
 		4D92C7F61F388D0900341A58 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E81F388D0900341A58 /* Record.m */; };
 		4D92C7F71F388D0900341A58 /* SafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7EA1F388D0900341A58 /* SafeDatabase.m */; };
 		4D92C7F81F388D0900341A58 /* SafeItemViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7EC1F388D0900341A58 /* SafeItemViewModel.m */; };
@@ -119,8 +118,6 @@
 		4D92C7E21F388D0900341A58 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistory.m; path = PwSafeModel/PasswordHistory.m; sourceTree = SOURCE_ROOT; };
 		4D92C7E31F388D0900341A58 /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryEntry.h; path = PwSafeModel/PasswordHistoryEntry.h; sourceTree = SOURCE_ROOT; };
 		4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = PwSafeModel/PasswordHistoryEntry.m; sourceTree = SOURCE_ROOT; };
-		4D92C7E51F388D0900341A58 /* PwSafeModel2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeModel2.h; path = PwSafeModel/PwSafeModel2.h; sourceTree = SOURCE_ROOT; };
-		4D92C7E61F388D0900341A58 /* PwSafeModel2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModel2.m; path = PwSafeModel/PwSafeModel2.m; sourceTree = SOURCE_ROOT; };
 		4D92C7E71F388D0900341A58 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = PwSafeModel/Record.h; sourceTree = SOURCE_ROOT; };
 		4D92C7E81F388D0900341A58 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = PwSafeModel/Record.m; sourceTree = SOURCE_ROOT; };
 		4D92C7E91F388D0900341A58 /* SafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeDatabase.h; path = PwSafeModel/SafeDatabase.h; sourceTree = SOURCE_ROOT; };
@@ -249,8 +246,6 @@
 				4D92C7E21F388D0900341A58 /* PasswordHistory.m */,
 				4D92C7E31F388D0900341A58 /* PasswordHistoryEntry.h */,
 				4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */,
-				4D92C7E51F388D0900341A58 /* PwSafeModel2.h */,
-				4D92C7E61F388D0900341A58 /* PwSafeModel2.m */,
 				4D92C7E71F388D0900341A58 /* Record.h */,
 				4D92C7E81F388D0900341A58 /* Record.m */,
 				4D92C7E91F388D0900341A58 /* SafeDatabase.h */,
@@ -478,7 +473,6 @@
 				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
 				4D92C7F61F388D0900341A58 /* Record.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
-				4D92C7F51F388D0900341A58 /* PwSafeModel2.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,

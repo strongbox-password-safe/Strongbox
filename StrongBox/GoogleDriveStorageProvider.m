@@ -144,7 +144,7 @@
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
                   completion:(void (^)(NSData *data, NSError *error))completion {
-    [SVProgressHUD show];
+    [SVProgressHUD showWithStatus:@"Reading..."];
 
     GTLRDrive_File *file = (GTLRDrive_File *)providerData;
 

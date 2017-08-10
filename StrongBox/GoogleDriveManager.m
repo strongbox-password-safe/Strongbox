@@ -177,7 +177,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD show];
+        [SVProgressHUD showWithStatus:@"Locating..."];
     });
     
     [self findSafeFile:parentFileIdentifier
@@ -316,12 +316,20 @@ typedef void (^Authenticationcompletion)(NSError *error);
 - (void)getFile:(NSString *)fileIdentifier handler:(void (^)(NSData *, NSError *))handler {
     GTLRDriveQuery_FilesGet *query = [GTLRDriveQuery_FilesGet queryForMediaWithFileId:fileIdentifier];
 
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:@"Reading..."];
+    });
+    
     [[self driveService] executeQuery:query
                     completionHandler:^(GTLRServiceTicket *ticket,
                                               GTLRDataObject *data,
                                               NSError *error) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [SVProgressHUD popActivity];
+                        });
+                        
                         if (error != nil) {
-                        NSLog(@"Could not GET file. An error occurred: %@", error);
+                            NSLog(@"Could not GET file. An error occurred: %@", error);
                         }
 
                         handler(data.data, error);
