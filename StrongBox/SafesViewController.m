@@ -22,7 +22,7 @@
 #import "SafesCollection.h"
 #import "Alerts.h"
 #import "ISMessages/ISMessages.h"
-#import "UpgradeTableController.h"
+#import "UpgradeViewController.h"
 #import "Settings.h"
 
 @interface SafesViewController ()
@@ -84,7 +84,7 @@
         date = [cal dateByAddingUnit:NSCalendarUnitDay value:7 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, it looks like you've been using StrongBox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured StrongBox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark" completion:nil];
+             message:@"Hi there, it looks like you've been using StrongBox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured StrongBox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:nil];
     }
     else {
         date = [cal dateByAddingUnit:NSCalendarUnitMonth value:1 toDate:[NSDate date] options:0];
@@ -366,6 +366,13 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                                       [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
                                                   }];
                    }
+                   else{
+                       safe.isTouchIdEnabled = NO;
+                       [JNKeychain saveValue:masterPassword forKey:safe.nickName];
+                       [self.safes save];
+                       
+                       [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
+                   }
             }];
         }
         else {
@@ -415,7 +422,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         vc.dropboxStorageProvider = self.dropbox;
     }
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
-        UpgradeTableController* vc = segue.destinationViewController;
+        UpgradeViewController* vc = segue.destinationViewController;
        
         if(self.validProducts.count > 0) {
             vc.product = [self.validProducts objectAtIndex:0];
@@ -720,6 +727,17 @@ static BOOL shownNagScreenThisSession = NO;
         [self.buttonUpgrade setTintColor: [UIColor redColor]];
         
         [self segueToNagScreenIfAppropriate];
+    
+        NSString *upgradeButtonTitle;
+        if([[Settings sharedInstance] isFreeTrial]) {
+            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Trial Days Left)",
+                           (long)[[Settings sharedInstance] getFreeTrialDaysRemaining]];
+        }
+        else {
+            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info..."];
+        }
+        
+        [self.buttonUpgrade setTitle:upgradeButtonTitle];
     }
     else {
         [self.buttonUpgrade setEnabled:NO];

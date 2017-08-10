@@ -156,11 +156,19 @@
         return;
     }
     
+    NSString* model = [[UIDevice currentDevice] model];
+    NSString* systemName = [[UIDevice currentDevice] systemName];
+    NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
+    NSString* pro = [[Settings sharedInstance] isPro] ? @"P" : @"";
+    NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
+    
+    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with StrongBox Password Safe... <br /><br />Please include as much detail as possible and screenshots if appropriate...<br /><br />Here is some debug information which might help:<br />Model: %@<br />System Name: %@<br />System Version: %@<br />Flags: %@%@", model, systemName, systemVersion, pro, isFreeTrial];
+    
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     
     [picker setSubject:[NSString stringWithFormat:@"Help with StrongBox %@", [Utils getAppVersion]]];
     [picker setToRecipients:[NSArray arrayWithObjects:@"support@strongboxsafe.com", nil]];
-    [picker setMessageBody:@"I'm having some trouble with StrongBox Password Safe... Please include as much detail as possible and screenshots if appropriate..." isHTML:YES];
+    [picker setMessageBody:message isHTML:YES];
      
     picker.mailComposeDelegate = self;
     

@@ -7,12 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D0165381EDB2F9C00CCB8CF /* CoreModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165211EDB2F9C00CCB8CF /* CoreModel.m */; };
-		4D01653A1EDB2F9C00CCB8CF /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165251EDB2F9C00CCB8CF /* Group.m */; };
-		4D01653C1EDB2F9C00CCB8CF /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165291EDB2F9C00CCB8CF /* PasswordHistoryEntry.m */; };
-		4D01653F1EDB2F9C00CCB8CF /* SafeItemViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01652F1EDB2F9C00CCB8CF /* SafeItemViewModel.m */; };
 		4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165311EDB2F9C00CCB8CF /* SafeMetaData.m */; };
-		4D0165421EDB2F9C00CCB8CF /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165351EDB2F9C00CCB8CF /* SafeTools.m */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
@@ -25,7 +20,8 @@
 		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
 		4D1757D41C8363A000E6356F /* SelectSafeLocationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */; };
-		4D275E571F1BC97600D79A30 /* UpgradeTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D275E561F1BC97600D79A30 /* UpgradeTableController.m */; };
+		4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
+		4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D275E561F1BC97600D79A30 /* UpgradeViewController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
@@ -34,49 +30,37 @@
 		4D915D741EDC068D002615F6 /* PasswordSettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordSettingsTableViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
+		4D92C7F01F388D0900341A58 /* CoreModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7DC1F388D0900341A58 /* CoreModel.m */; };
+		4D92C7F11F388D0900341A58 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7DE1F388D0900341A58 /* Field.m */; };
+		4D92C7F21F388D0900341A58 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E01F388D0900341A58 /* Group.m */; };
+		4D92C7F31F388D0900341A58 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E21F388D0900341A58 /* PasswordHistory.m */; };
+		4D92C7F41F388D0900341A58 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */; };
+		4D92C7F51F388D0900341A58 /* PwSafeModel2.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E61F388D0900341A58 /* PwSafeModel2.m */; };
+		4D92C7F61F388D0900341A58 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E81F388D0900341A58 /* Record.m */; };
+		4D92C7F71F388D0900341A58 /* SafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7EA1F388D0900341A58 /* SafeDatabase.m */; };
+		4D92C7F81F388D0900341A58 /* SafeItemViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7EC1F388D0900341A58 /* SafeItemViewModel.m */; };
+		4D92C7F91F388D0900341A58 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7EE1F388D0900341A58 /* SafeTools.m */; };
+		4D92C7FA1F388D0900341A58 /* twofish in Resources */ = {isa = PBXBuildFile; fileRef = 4D92C7EF1F388D0900341A58 /* twofish */; };
+		4D92C7FD1F388DE500341A58 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7FC1F388DE500341A58 /* twofish.c */; };
+		4D92C7FF1F388DFF00341A58 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */; };
 		4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D93FD761EDB7A520076BBAA /* StoreKit.framework */; };
+		4DB99DEA1F3A02020055657E /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DB99DE91F3A02020055657E /* Storyboard.storyboard */; };
 		4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBE5B381C8356C700C310BC /* AppDelegate.m */; };
-		4DC7D9FF1F26693C007A2BCF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DC7D9FE1F26693C007A2BCF /* Images.xcassets */; };
+		4DC2D4141F39D8A90029DBFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DC2D4131F39D8A90029DBFE /* Images.xcassets */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DE932091C8368B600AC925E /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE932061C8368B600AC925E /* Main_iPhone.storyboard */; };
-		4DF785F71EDB319E006D4918 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165231EDB2F9C00CCB8CF /* Field.m */; };
-		4DF785F81EDB319E006D4918 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165271EDB2F9C00CCB8CF /* Model.m */; };
-		4DF785F91EDB319E006D4918 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01652B1EDB2F9C00CCB8CF /* Record.m */; };
-		4DF785FA1EDB319E006D4918 /* SafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01652D1EDB2F9C00CCB8CF /* SafeDatabase.m */; };
 		4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */; };
 		4DF785FC1EDB319E006D4918 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165371EDB2F9C00CCB8CF /* Utils.m */; };
-		4DF7860E1EDB31DB006D4918 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DF785FE1EDB31DB006D4918 /* crypt_argchk.c */; };
-		4DF7860F1EDB31DB006D4918 /* twofish_tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DF7860C1EDB31DB006D4918 /* twofish_tab.c */; };
-		4DF786101EDB31DB006D4918 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DF7860D1EDB31DB006D4918 /* twofish.c */; };
-		4DF786131EDB3966006D4918 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF786121EDB3966006D4918 /* PasswordHistory.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
 		9D5745A0E31C615E45BFF151 /* Pods_StrongBox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4D0165201EDB2F9C00CCB8CF /* CoreModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreModel.h; sourceTree = "<group>"; };
-		4D0165211EDB2F9C00CCB8CF /* CoreModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreModel.m; sourceTree = "<group>"; };
-		4D0165221EDB2F9C00CCB8CF /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Field.h; sourceTree = "<group>"; };
-		4D0165231EDB2F9C00CCB8CF /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Field.m; sourceTree = "<group>"; };
-		4D0165241EDB2F9C00CCB8CF /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Group.h; sourceTree = "<group>"; };
-		4D0165251EDB2F9C00CCB8CF /* Group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Group.m; sourceTree = "<group>"; };
-		4D0165261EDB2F9C00CCB8CF /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
-		4D0165271EDB2F9C00CCB8CF /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
-		4D0165281EDB2F9C00CCB8CF /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryEntry.h; sourceTree = "<group>"; };
-		4D0165291EDB2F9C00CCB8CF /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryEntry.m; sourceTree = "<group>"; };
-		4D01652A1EDB2F9C00CCB8CF /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Record.h; sourceTree = "<group>"; };
-		4D01652B1EDB2F9C00CCB8CF /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Record.m; sourceTree = "<group>"; };
-		4D01652C1EDB2F9C00CCB8CF /* SafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeDatabase.h; sourceTree = "<group>"; };
-		4D01652D1EDB2F9C00CCB8CF /* SafeDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeDatabase.m; sourceTree = "<group>"; };
-		4D01652E1EDB2F9C00CCB8CF /* SafeItemViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeItemViewModel.h; sourceTree = "<group>"; };
-		4D01652F1EDB2F9C00CCB8CF /* SafeItemViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeItemViewModel.m; sourceTree = "<group>"; };
 		4D0165301EDB2F9C00CCB8CF /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeMetaData.h; sourceTree = "<group>"; };
 		4D0165311EDB2F9C00CCB8CF /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeMetaData.m; sourceTree = "<group>"; };
 		4D0165321EDB2F9C00CCB8CF /* SafesCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesCollection.h; sourceTree = "<group>"; };
 		4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesCollection.m; sourceTree = "<group>"; };
-		4D0165341EDB2F9C00CCB8CF /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeTools.h; sourceTree = "<group>"; };
-		4D0165351EDB2F9C00CCB8CF /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeTools.m; sourceTree = "<group>"; };
 		4D0165361EDB2F9C00CCB8CF /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		4D0165371EDB2F9C00CCB8CF /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		4D0BA7D61F23B844009243C9 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
@@ -106,8 +90,10 @@
 		4D1757B51C8361D300E6356F /* StrongBox-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StrongBox-Info.plist"; sourceTree = "<group>"; };
 		4D1757D21C8363A000E6356F /* SelectSafeLocationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectSafeLocationViewController.h; sourceTree = "<group>"; };
 		4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectSafeLocationViewController.m; sourceTree = "<group>"; };
-		4D275E551F1BC97600D79A30 /* UpgradeTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeTableController.h; sourceTree = "<group>"; };
-		4D275E561F1BC97600D79A30 /* UpgradeTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpgradeTableController.m; sourceTree = "<group>"; };
+		4D1D6FD51F38760F00D2B8EC /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		4D1D6FD61F38760F00D2B8EC /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
+		4D275E551F1BC97600D79A30 /* UpgradeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeViewController.h; sourceTree = "<group>"; };
+		4D275E561F1BC97600D79A30 /* UpgradeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpgradeViewController.m; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserTableViewController.m; sourceTree = "<group>"; };
@@ -123,35 +109,41 @@
 		4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviousPasswordsTableViewController.m; sourceTree = "<group>"; };
 		4D915D781EDC4B77002615F6 /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alerts.h; sourceTree = "<group>"; };
 		4D915D791EDC4B77002615F6 /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alerts.m; sourceTree = "<group>"; };
+		4D92C7DB1F388D0900341A58 /* CoreModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreModel.h; path = PwSafeModel/CoreModel.h; sourceTree = SOURCE_ROOT; };
+		4D92C7DC1F388D0900341A58 /* CoreModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreModel.m; path = PwSafeModel/CoreModel.m; sourceTree = SOURCE_ROOT; };
+		4D92C7DD1F388D0900341A58 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = PwSafeModel/Field.h; sourceTree = SOURCE_ROOT; };
+		4D92C7DE1F388D0900341A58 /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Field.m; path = PwSafeModel/Field.m; sourceTree = SOURCE_ROOT; };
+		4D92C7DF1F388D0900341A58 /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Group.h; path = PwSafeModel/Group.h; sourceTree = SOURCE_ROOT; };
+		4D92C7E01F388D0900341A58 /* Group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Group.m; path = PwSafeModel/Group.m; sourceTree = SOURCE_ROOT; };
+		4D92C7E11F388D0900341A58 /* PasswordHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistory.h; path = PwSafeModel/PasswordHistory.h; sourceTree = SOURCE_ROOT; };
+		4D92C7E21F388D0900341A58 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistory.m; path = PwSafeModel/PasswordHistory.m; sourceTree = SOURCE_ROOT; };
+		4D92C7E31F388D0900341A58 /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryEntry.h; path = PwSafeModel/PasswordHistoryEntry.h; sourceTree = SOURCE_ROOT; };
+		4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = PwSafeModel/PasswordHistoryEntry.m; sourceTree = SOURCE_ROOT; };
+		4D92C7E51F388D0900341A58 /* PwSafeModel2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeModel2.h; path = PwSafeModel/PwSafeModel2.h; sourceTree = SOURCE_ROOT; };
+		4D92C7E61F388D0900341A58 /* PwSafeModel2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModel2.m; path = PwSafeModel/PwSafeModel2.m; sourceTree = SOURCE_ROOT; };
+		4D92C7E71F388D0900341A58 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = PwSafeModel/Record.h; sourceTree = SOURCE_ROOT; };
+		4D92C7E81F388D0900341A58 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = PwSafeModel/Record.m; sourceTree = SOURCE_ROOT; };
+		4D92C7E91F388D0900341A58 /* SafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeDatabase.h; path = PwSafeModel/SafeDatabase.h; sourceTree = SOURCE_ROOT; };
+		4D92C7EA1F388D0900341A58 /* SafeDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeDatabase.m; path = PwSafeModel/SafeDatabase.m; sourceTree = SOURCE_ROOT; };
+		4D92C7EB1F388D0900341A58 /* SafeItemViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeItemViewModel.h; path = PwSafeModel/SafeItemViewModel.h; sourceTree = SOURCE_ROOT; };
+		4D92C7EC1F388D0900341A58 /* SafeItemViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeItemViewModel.m; path = PwSafeModel/SafeItemViewModel.m; sourceTree = SOURCE_ROOT; };
+		4D92C7ED1F388D0900341A58 /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = PwSafeModel/SafeTools.h; sourceTree = SOURCE_ROOT; };
+		4D92C7EE1F388D0900341A58 /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = PwSafeModel/SafeTools.m; sourceTree = SOURCE_ROOT; };
+		4D92C7EF1F388D0900341A58 /* twofish */ = {isa = PBXFileReference; lastKnownFileType = folder; name = twofish; path = PwSafeModel/twofish; sourceTree = SOURCE_ROOT; };
+		4D92C7FC1F388DE500341A58 /* twofish.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = PwSafeModel/twofish/twofish.c; sourceTree = "<group>"; };
+		4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = PwSafeModel/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D93FD761EDB7A520076BBAA /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4DB99DE91F3A02020055657E /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		4DBE5B311C8356C700C310BC /* StrongBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StrongBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DBE5B381C8356C700C310BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		4DC7D9FE1F26693C007A2BCF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		4DC2D4131F39D8A90029DBFE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4DC8DFF01EE19CE300F1F757 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
 		4DE932071C8368B600AC925E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		4DF785FE1EDB31DB006D4918 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = twofish/crypt_argchk.c; sourceTree = "<group>"; };
-		4DF785FF1EDB31DB006D4918 /* tomcrypt_argchk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_argchk.h; path = twofish/tomcrypt_argchk.h; sourceTree = "<group>"; };
-		4DF786001EDB31DB006D4918 /* tomcrypt_cfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_cfg.h; path = twofish/tomcrypt_cfg.h; sourceTree = "<group>"; };
-		4DF786011EDB31DB006D4918 /* tomcrypt_cipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_cipher.h; path = twofish/tomcrypt_cipher.h; sourceTree = "<group>"; };
-		4DF786021EDB31DB006D4918 /* tomcrypt_custom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_custom.h; path = twofish/tomcrypt_custom.h; sourceTree = "<group>"; };
-		4DF786031EDB31DB006D4918 /* tomcrypt_hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_hash.h; path = twofish/tomcrypt_hash.h; sourceTree = "<group>"; };
-		4DF786041EDB31DB006D4918 /* tomcrypt_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_mac.h; path = twofish/tomcrypt_mac.h; sourceTree = "<group>"; };
-		4DF786051EDB31DB006D4918 /* tomcrypt_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_macros.h; path = twofish/tomcrypt_macros.h; sourceTree = "<group>"; };
-		4DF786061EDB31DB006D4918 /* tomcrypt_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_math.h; path = twofish/tomcrypt_math.h; sourceTree = "<group>"; };
-		4DF786071EDB31DB006D4918 /* tomcrypt_misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_misc.h; path = twofish/tomcrypt_misc.h; sourceTree = "<group>"; };
-		4DF786081EDB31DB006D4918 /* tomcrypt_pk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_pk.h; path = twofish/tomcrypt_pk.h; sourceTree = "<group>"; };
-		4DF786091EDB31DB006D4918 /* tomcrypt_pkcs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_pkcs.h; path = twofish/tomcrypt_pkcs.h; sourceTree = "<group>"; };
-		4DF7860A1EDB31DB006D4918 /* tomcrypt_prng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt_prng.h; path = twofish/tomcrypt_prng.h; sourceTree = "<group>"; };
-		4DF7860B1EDB31DB006D4918 /* tomcrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt.h; path = twofish/tomcrypt.h; sourceTree = "<group>"; };
-		4DF7860C1EDB31DB006D4918 /* twofish_tab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish_tab.c; path = twofish/twofish_tab.c; sourceTree = "<group>"; };
-		4DF7860D1EDB31DB006D4918 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = twofish/twofish.c; sourceTree = "<group>"; };
-		4DF786111EDB3966006D4918 /* PasswordHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistory.h; sourceTree = "<group>"; };
-		4DF786121EDB3966006D4918 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistory.m; sourceTree = "<group>"; };
 		4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeAlertController.h; sourceTree = "<group>"; };
 		4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeAlertController.m; sourceTree = "<group>"; };
 		9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.release.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.release.xcconfig"; sourceTree = "<group>"; };
@@ -202,8 +194,8 @@
 				4D1757D31C8363A000E6356F /* SelectSafeLocationViewController.m */,
 				4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */,
 				4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */,
-				4D275E551F1BC97600D79A30 /* UpgradeTableController.h */,
-				4D275E561F1BC97600D79A30 /* UpgradeTableController.m */,
+				4D275E551F1BC97600D79A30 /* UpgradeViewController.h */,
+				4D275E561F1BC97600D79A30 /* UpgradeViewController.m */,
 				4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */,
 				4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */,
 			);
@@ -232,40 +224,51 @@
 		4D62D6981C85F3AC0051E13B /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4D0165201EDB2F9C00CCB8CF /* CoreModel.h */,
-				4D0165211EDB2F9C00CCB8CF /* CoreModel.m */,
-				4D0165221EDB2F9C00CCB8CF /* Field.h */,
-				4D0165231EDB2F9C00CCB8CF /* Field.m */,
-				4D0165241EDB2F9C00CCB8CF /* Group.h */,
-				4D0165251EDB2F9C00CCB8CF /* Group.m */,
-				4D0165261EDB2F9C00CCB8CF /* Model.h */,
-				4D0165271EDB2F9C00CCB8CF /* Model.m */,
-				4DF786111EDB3966006D4918 /* PasswordHistory.h */,
-				4DF786121EDB3966006D4918 /* PasswordHistory.m */,
-				4D0165281EDB2F9C00CCB8CF /* PasswordHistoryEntry.h */,
-				4D0165291EDB2F9C00CCB8CF /* PasswordHistoryEntry.m */,
-				4D01652A1EDB2F9C00CCB8CF /* Record.h */,
-				4D01652B1EDB2F9C00CCB8CF /* Record.m */,
-				4D01652C1EDB2F9C00CCB8CF /* SafeDatabase.h */,
-				4D01652D1EDB2F9C00CCB8CF /* SafeDatabase.m */,
-				4D01652E1EDB2F9C00CCB8CF /* SafeItemViewModel.h */,
-				4D01652F1EDB2F9C00CCB8CF /* SafeItemViewModel.m */,
+				4D1D6FD51F38760F00D2B8EC /* Model.h */,
+				4D1D6FD61F38760F00D2B8EC /* Model.m */,
 				4D0165301EDB2F9C00CCB8CF /* SafeMetaData.h */,
 				4D0165311EDB2F9C00CCB8CF /* SafeMetaData.m */,
 				4D0165321EDB2F9C00CCB8CF /* SafesCollection.h */,
 				4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */,
-				4D0165341EDB2F9C00CCB8CF /* SafeTools.h */,
-				4D0165351EDB2F9C00CCB8CF /* SafeTools.m */,
-				4DF785FD1EDB31B8006D4918 /* twofish */,
 				4D0BA7D61F23B844009243C9 /* Settings.h */,
 				4D0BA7D71F23B844009243C9 /* Settings.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
 		};
+		4D92C7DA1F388CF200341A58 /* PwSafeModel */ = {
+			isa = PBXGroup;
+			children = (
+				4D92C7DB1F388D0900341A58 /* CoreModel.h */,
+				4D92C7DC1F388D0900341A58 /* CoreModel.m */,
+				4D92C7DD1F388D0900341A58 /* Field.h */,
+				4D92C7DE1F388D0900341A58 /* Field.m */,
+				4D92C7DF1F388D0900341A58 /* Group.h */,
+				4D92C7E01F388D0900341A58 /* Group.m */,
+				4D92C7E11F388D0900341A58 /* PasswordHistory.h */,
+				4D92C7E21F388D0900341A58 /* PasswordHistory.m */,
+				4D92C7E31F388D0900341A58 /* PasswordHistoryEntry.h */,
+				4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */,
+				4D92C7E51F388D0900341A58 /* PwSafeModel2.h */,
+				4D92C7E61F388D0900341A58 /* PwSafeModel2.m */,
+				4D92C7E71F388D0900341A58 /* Record.h */,
+				4D92C7E81F388D0900341A58 /* Record.m */,
+				4D92C7E91F388D0900341A58 /* SafeDatabase.h */,
+				4D92C7EA1F388D0900341A58 /* SafeDatabase.m */,
+				4D92C7EB1F388D0900341A58 /* SafeItemViewModel.h */,
+				4D92C7EC1F388D0900341A58 /* SafeItemViewModel.m */,
+				4D92C7ED1F388D0900341A58 /* SafeTools.h */,
+				4D92C7EE1F388D0900341A58 /* SafeTools.m */,
+				4D92C7EF1F388D0900341A58 /* twofish */,
+			);
+			name = PwSafeModel;
+			sourceTree = "<group>";
+		};
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */,
+				4D92C7FC1F388DE500341A58 /* twofish.c */,
 				4DBE5B331C8356C700C310BC /* StrongBox */,
 				4DBE5B321C8356C700C310BC /* Products */,
 				278AD75AE9346420015475D7 /* Pods */,
@@ -284,8 +287,10 @@
 		4DBE5B331C8356C700C310BC /* StrongBox */ = {
 			isa = PBXGroup;
 			children = (
-				4DC7D9FE1F26693C007A2BCF /* Images.xcassets */,
+				4DC2D4131F39D8A90029DBFE /* Images.xcassets */,
+				4DB99DE91F3A02020055657E /* Storyboard.storyboard */,
 				4DE932061C8368B600AC925E /* Main_iPhone.storyboard */,
+				4D92C7DA1F388CF200341A58 /* PwSafeModel */,
 				4D62D6941C85F2B50051E13B /* ViewControllers */,
 				4D62D6961C85F35E0051E13B /* StorageProviders */,
 				4D62D6981C85F3AC0051E13B /* Model */,
@@ -318,29 +323,6 @@
 				4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		4DF785FD1EDB31B8006D4918 /* twofish */ = {
-			isa = PBXGroup;
-			children = (
-				4DF785FE1EDB31DB006D4918 /* crypt_argchk.c */,
-				4DF785FF1EDB31DB006D4918 /* tomcrypt_argchk.h */,
-				4DF786001EDB31DB006D4918 /* tomcrypt_cfg.h */,
-				4DF786011EDB31DB006D4918 /* tomcrypt_cipher.h */,
-				4DF786021EDB31DB006D4918 /* tomcrypt_custom.h */,
-				4DF786031EDB31DB006D4918 /* tomcrypt_hash.h */,
-				4DF786041EDB31DB006D4918 /* tomcrypt_mac.h */,
-				4DF786051EDB31DB006D4918 /* tomcrypt_macros.h */,
-				4DF786061EDB31DB006D4918 /* tomcrypt_math.h */,
-				4DF786071EDB31DB006D4918 /* tomcrypt_misc.h */,
-				4DF786081EDB31DB006D4918 /* tomcrypt_pk.h */,
-				4DF786091EDB31DB006D4918 /* tomcrypt_pkcs.h */,
-				4DF7860A1EDB31DB006D4918 /* tomcrypt_prng.h */,
-				4DF7860B1EDB31DB006D4918 /* tomcrypt.h */,
-				4DF7860C1EDB31DB006D4918 /* twofish_tab.c */,
-				4DF7860D1EDB31DB006D4918 /* twofish.c */,
-			);
-			name = twofish;
 			sourceTree = "<group>";
 		};
 		C28E68E855D68D8BECCE3B5B /* Frameworks */ = {
@@ -419,9 +401,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
-				4DC7D9FF1F26693C007A2BCF /* Images.xcassets in Resources */,
+				4DC2D4141F39D8A90029DBFE /* Images.xcassets in Resources */,
+				4D92C7FA1F388D0900341A58 /* twofish in Resources */,
 				4DE932091C8368B600AC925E /* Main_iPhone.storyboard in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
+				4DB99DEA1F3A02020055657E /* Storyboard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,43 +464,43 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DF7860E1EDB31DB006D4918 /* crypt_argchk.c in Sources */,
+				4D92C7FD1F388DE500341A58 /* twofish.c in Sources */,
+				4D92C7FF1F388DFF00341A58 /* crypt_argchk.c in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
-				4DF785F71EDB319E006D4918 /* Field.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordSettingsTableViewController.m in Sources */,
-				4DF785F81EDB319E006D4918 /* Model.m in Sources */,
-				4DF785F91EDB319E006D4918 /* Record.m in Sources */,
-				4DF785FA1EDB319E006D4918 /* SafeDatabase.m in Sources */,
 				4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */,
 				4DF785FC1EDB319E006D4918 /* Utils.m in Sources */,
+				4D92C7F01F388D0900341A58 /* CoreModel.m in Sources */,
+				4D92C7F11F388D0900341A58 /* Field.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
-				4D01653F1EDB2F9C00CCB8CF /* SafeItemViewModel.m in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
-				4DF786101EDB31DB006D4918 /* twofish.c in Sources */,
+				4D92C7F41F388D0900341A58 /* PasswordHistoryEntry.m in Sources */,
 				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
+				4D92C7F61F388D0900341A58 /* Record.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
-				4D0165381EDB2F9C00CCB8CF /* CoreModel.m in Sources */,
-				4D0165421EDB2F9C00CCB8CF /* SafeTools.m in Sources */,
+				4D92C7F51F388D0900341A58 /* PwSafeModel2.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
-				4D01653C1EDB2F9C00CCB8CF /* PasswordHistoryEntry.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
-				4D01653A1EDB2F9C00CCB8CF /* Group.m in Sources */,
-				4DF786131EDB3966006D4918 /* PasswordHistory.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
-				4DF7860F1EDB31DB006D4918 /* twofish_tab.c in Sources */,
+				4D92C7F71F388D0900341A58 /* SafeDatabase.m in Sources */,
+				4D92C7F91F388D0900341A58 /* SafeTools.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D1757D41C8363A000E6356F /* SelectSafeLocationViewController.m in Sources */,
+				4D92C7F81F388D0900341A58 /* SafeItemViewModel.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
-				4D275E571F1BC97600D79A30 /* UpgradeTableController.m in Sources */,
+				4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */,
+				4D92C7F31F388D0900341A58 /* PasswordHistory.m in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */,
 				4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */,
 				4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */,
+				4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */,
 				4D1757C91C8361D300E6356F /* SafeDetailsAndSettingsView.m in Sources */,
 				4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
+				4D92C7F21F388D0900341A58 /* Group.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 			);
@@ -580,6 +564,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = PwSafeModel;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
 			name = Debug;
@@ -622,6 +607,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = PwSafeModel;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 armv7 armv7s";
 			};
@@ -637,13 +623,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -657,13 +646,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

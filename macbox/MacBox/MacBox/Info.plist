@@ -10,21 +10,18 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>dat</string>
+				<string>psafe3</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string></string>
 			<key>CFBundleTypeName</key>
-			<string>Password Safe</string>
+			<string>DocumentType</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.markmcguill.strongbox</string>
-			</array>
 			<key>NSDocumentClass</key>
 			<string>Document</string>
 		</dict>
@@ -45,6 +42,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
@@ -53,55 +52,5 @@
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeDescription</key>
-			<string>StrongBox Password Safe file</string>
-			<key>UTTypeIconFile</key>
-			<string></string>
-			<key>UTTypeIdentifier</key>
-			<string>com.markmcguill.strongbox</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>com.apple.nspboard-type</key>
-				<array>
-					<string>MacBox</string>
-				</array>
-				<key>public.filename-extension</key>
-				<array>
-					<string>dat</string>
-				</array>
-				<key>public.mime-type</key>
-				<array>
-					<string>application/octet-stream</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
-	<key>UTImportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeDescription</key>
-			<string>StrongBox Password Safe file</string>
-			<key>UTTypeIdentifier</key>
-			<string>com.markmcguill.strongbox</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>com.apple.nspboard-type</key>
-				<array>
-					<string>MacBox</string>
-				</array>
-				<key>public.filename-extension</key>
-				<array>
-					<string>dat</string>
-				</array>
-				<key>public.mime-type</key>
-				<array>
-					<string>application/octet-stream</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
 </dict>
 </plist>

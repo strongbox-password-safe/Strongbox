@@ -7,8 +7,6 @@
 //
 
 #import "SelectDestinationGroupController.h"
-#import "SafeItemViewModel.h"
-#import "Model.h"
 #import "Alerts.h"
 
 @implementation SelectDestinationGroupController {

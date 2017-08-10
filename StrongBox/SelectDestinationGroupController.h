@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
-#import "Group.h"
 
 @interface SelectDestinationGroupController : UITableViewController
 

@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Record.h"
 #import "Model.h"
 
 @interface PasswordSettingsTableViewController : UITableViewController
