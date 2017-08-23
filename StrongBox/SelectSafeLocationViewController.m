@@ -11,6 +11,7 @@
 #import "SafeStorageProvider.h"
 #import "AddSafeAlertController.h"
 #import "Alerts.h"
+#import "PasswordDatabase.h"
 
 @implementation SelectSafeLocationViewController
 
@@ -66,14 +67,13 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password provider:(id<SafeStorageProvider>)provider {
-    SafeDatabase *newSafe = [[SafeDatabase alloc] initNewWithPassword:password];
-    NSData *data = [newSafe getAsData];
+    PasswordDatabase *newSafe = [[PasswordDatabase alloc] initNewWithPassword:password];
+    
+    NSError *error;
+    NSData *data = [newSafe getAsData:&error];
 
     if (data == nil) {
-        [Alerts warn:self
-               title:@"Error Saving Safe"
-             message:@"There was a problem saving the safe."];
-
+        [Alerts error:self title:@"Error Saving Safe" error:error];
         return;
     }
 

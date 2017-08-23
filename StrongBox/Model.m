@@ -12,8 +12,7 @@
 
 @interface Model ()
 
-@property (readonly, strong, nonatomic) CoreModel *coreModel;
-@property (readonly, strong, nonatomic) SafeDatabase *safe;
+@property (readonly, strong, nonatomic) PasswordDatabase *passwordDatabase;
 
 @end
 
@@ -24,7 +23,7 @@
     BOOL _isReadOnly;
 }
 
-- (instancetype)initWithSafeDatabase:(SafeDatabase *)safe
+- (instancetype)initWithSafeDatabase:(PasswordDatabase *)passwordDatabase
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
@@ -32,8 +31,7 @@
                 localStorageProvider:(LocalDeviceStorageProvider *)local
                                safes:(SafesCollection *)safes; {
     if (self = [super init]) {
-        _safe = safe;
-        _coreModel = [[CoreModel alloc] initWithSafeDatabase:safe];
+        _passwordDatabase = passwordDatabase;
         _metadata = metaData;
         _storageProvider = provider;
         _isUsingOfflineCache = usingOfflineCache;
@@ -64,11 +62,11 @@
     if (!_isUsingOfflineCache && !_isReadOnly) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
         {
-            NSData *updatedSafeData = [self.safe getAsData];
-
+            NSError *error;
+            NSData *updatedSafeData = [self.passwordDatabase getAsData:&error];
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (updatedSafeData == nil) {
-                    handler([Utils createNSError:@"Could not get safe as data." errorCode:-1]);
+                    handler(error);
                     return;
                 }
 
@@ -95,7 +93,8 @@
     if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
         {
-            NSData *updatedSafeData = [self.safe getAsData];
+            NSError *error;
+            NSData *updatedSafeData = [self.passwordDatabase getAsData:&error];
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (updatedSafeData != nil && _metadata.offlineCacheEnabled) {
@@ -185,102 +184,104 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (Group *)addSubgroupWithUIString:(Group *)parent title:(NSString *)title {
-    return [self.safe addSubgroupWithUIString:parent title:title];
+- (SafeItemViewModel *)createGroupWithTitle:(Group *)parent title:(NSString *)title {
+    return [self.passwordDatabase createGroupWithTitle:parent title:title validateOnly:NO];
 }
 
 - (NSString *)getMasterPassword {
-    return self.safe.masterPassword;
+    return self.passwordDatabase.masterPassword;
 }
 
 - (void)setMasterPassword:(NSString *)value {
-    self.safe.masterPassword = value;
+    self.passwordDatabase.masterPassword = value;
 }
 
 -(NSDate*)lastUpdateTime {
-    return self.safe.lastUpdateTime;
+    return self.passwordDatabase.lastUpdateTime;
 }
   
 -(NSString*)lastUpdateUser {
-    return self.safe.lastUpdateUser;
+    return self.passwordDatabase.lastUpdateUser;
 }
 
 -(NSString*)lastUpdateHost {
-    return self.safe.lastUpdateHost;
+    return self.passwordDatabase.lastUpdateHost;
 }
   
 -(NSString*)lastUpdateApp {
-    return self.safe.lastUpdateApp;
+    return self.passwordDatabase.lastUpdateApp;
 }
     
--(NSData*)getSafeAsData {
-    return self.safe.asData;
+-(NSData*)getSafeAsData:(NSError**)error {
+    NSData *updatedSafeData = [self.passwordDatabase getAsData:error];
+
+    return updatedSafeData;
 }
 
-- (void)addRecord:(Record *)newRecord {
-    return [self.safe addRecord:newRecord];
+- (SafeItemViewModel*)addRecord:(Record *)newRecord {
+    return [self.passwordDatabase addRecord:newRecord];
 }
 
 - (NSArray *)getSearchableItems {
-    return [self.coreModel getSearchableItems];
+    return [self.passwordDatabase getSearchableItems];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Regular Displayable Items
 
 - (NSArray *)getSubgroupsForGroup:(Group *)group {
-    return [self.coreModel getSubgroupsForGroup:group];
+    return [self.passwordDatabase getSubgroupsForGroup:group];
 }
 
 - (NSArray *)getItemsForGroup:(Group *)group {
-    return [self.coreModel getItemsForGroup:group withFilter:nil];
+    return [self.passwordDatabase getItemsForGroup:group withFilter:nil];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group {
-    return [self.coreModel validateMoveItems:items destination:group];
+    return [self.passwordDatabase validateMoveItems:items destination:group];
 }
 
 - (BOOL)validateMoveItems:(NSArray *)items
               destination:(Group *)group
 checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk {
-    return [self.coreModel validateMoveItems:items destination:group checkIfMoveIntoSubgroupOfDestinationOk:checkIfMoveIntoSubgroupOfDestinationOk];
+    return [self.passwordDatabase validateMoveItems:items destination:group checkIfMoveIntoSubgroupOfDestinationOk:checkIfMoveIntoSubgroupOfDestinationOk];
 }
 
 - (void)moveItems:(NSArray *)items destination:(Group *)group {
-    return [self.coreModel moveItems:items destination:group];
+    return [self.passwordDatabase moveItems:items destination:group];
 }
 
 - (void)deleteItems:(NSArray *)items {
-    return [self.coreModel deleteItems:items];
+    return [self.passwordDatabase deleteItems:items];
 }
 
 - (void)deleteItem:(SafeItemViewModel *)item {
-    return [self.coreModel deleteItem:item];
+    return [self.passwordDatabase deleteItem:item];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Auto complete helper
 
 - (NSSet *)getAllExistingUserNames {
-    return self.coreModel.getAllExistingUserNames;
+    return self.passwordDatabase.getAllExistingUserNames;
 }
 
 - (NSSet *)getAllExistingPasswords {
-    return self.coreModel.getAllExistingPasswords;
+    return self.passwordDatabase.getAllExistingPasswords;
 }
 
 - (NSString *)getMostPopularUsername {
-    return self.coreModel.getMostPopularUsername;
+    return self.passwordDatabase.getMostPopularUsername;
 }
 
 - (NSString *)getMostPopularPassword {
-    return self.coreModel.getMostPopularPassword;
+    return self.passwordDatabase.getMostPopularPassword;
 }
 
 - (NSString *)generatePassword {
-    return self.coreModel.generatePassword;
+    return self.passwordDatabase.generatePassword;
 }
 
 @end

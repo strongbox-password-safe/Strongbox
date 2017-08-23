@@ -25,13 +25,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/MacBox/Document.m"
-            timestampString = "523966777.502357"
+            filePath = "macbox/MacBox/MacBox/ViewController.m"
+            timestampString = "525024238.078418"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "60"
-            endingLineNumber = "60"
-            landmarkName = "-readFromData:ofType:error:"
+            startingLineNumber = "572"
+            endingLineNumber = "572"
+            landmarkName = "-expandParentsOfItem:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

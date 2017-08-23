@@ -2,7 +2,6 @@
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonHMAC.h>
 #import "twofish/tomcrypt.h"
-#import "SafeDatabase.h"
 #import "Record.h"
 #import "Field.h"
 
@@ -82,16 +81,24 @@
         length += TWOFISH_BLOCK_SIZE - sub;
     }
 
-    unsigned char buf[length];
-
+    unsigned char *buf = malloc(length);
+    if(!buf)
+    {
+        return nil;
+    }
+    
     if (SecRandomCopyBytes(kSecRandomDefault, length, buf)) {
+        free(buf);
         return nil;
     }
 
     memcpy(buf, &header, FIELD_HEADER_LENGTH);
     [field.data getBytes:&buf[FIELD_HEADER_LENGTH] length:length];
+    NSData *data = [[NSData alloc] initWithBytes:buf length:length];
 
-    return [[NSData alloc] initWithBytes:buf length:length];
+    free(buf);
+        
+    return data;
 }
 
 + (NSData *)encryptCBC:(NSData *)K ptData:(NSData *)ptData iv:(unsigned char *)iv {
@@ -399,7 +406,7 @@
     return YES;
 }
 
-+ (NSMutableData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks {
++ (NSData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks {
     int err;
     symmetric_key skey;
     unsigned char *key = (unsigned char *)K.bytes;
@@ -423,7 +430,7 @@
         ct += TWOFISH_BLOCK_SIZE;
     }
 
-    return decData;
+    return [NSData dataWithData:decData];
 }
 
 + (void)dumpDbHeaderAndRecords:(NSMutableArray *)headerFields records:(NSMutableArray *)records {
@@ -432,11 +439,12 @@
     NSLog(@"-------------------------- HEADER -------------------------------");
 
     for (Field *field in headerFields) {
-        NSData *value = field.data;
+        //NSData *value = field.data;
         NSString *valueStr = field.prettyDataString;
         NSString *keyStr = field.prettyTypeString;
 
-        NSLog(@"%@ => %@ => bytes[%@]", keyStr, valueStr, value);
+        //NSLog(@"%@ => %@ => bytes[%@]", keyStr, valueStr, value);
+        NSLog(@"%@ => %@", keyStr, valueStr);
     }
 
     NSLog(@"----------------------------------------------------------------");
@@ -445,26 +453,30 @@
 
     for (Record *record in records) {
         for (Field *field in [record getAllFields]) {
-            NSData *value = field.data;
+            //NSData *value = field.data;
             NSString *valueStr = field.prettyDataString;
             NSString *keyStr = field.prettyTypeString;
 
-            NSLog(@"%@ => %@ => bytes[%@]", keyStr, valueStr, value);
+            //NSLog(@"%@ => %@ => bytes[%@]", keyStr, valueStr, value);
+            NSLog(@"%@ => %@", keyStr, valueStr);
         }
 
         NSLog(@"----------------------------------------------------------------");
     }
 }
 
-+ (NSData *)extractDbHeaderAndRecords:(NSData *)decData headerFields_p:(NSMutableArray **)headerFields_p records_p:(NSMutableArray **)records_p {
++ (NSData *)extractDbHeaderAndRecords:(NSData *)decData
+                       headerFields_p:(NSMutableArray **)headerFields_p
+                            records_p:(NSMutableArray **)records_p {
     NSMutableData *dataForHmac = [[NSMutableData alloc] init];
 
-    // Parse records
-
-    NSUInteger decryptedDataLength = decData.length;
-    unsigned char raw[decryptedDataLength];
-
-    [decData getBytes:&raw length:decryptedDataLength];
+    unsigned char *raw = malloc(decData.length);
+    if (!raw)
+    {
+        return nil;
+    }
+    
+    [decData getBytes:raw length:decData.length];
 
     //hexdump(raw, [decData length], 16);
 
@@ -479,6 +491,11 @@
     while (currentField < end) {
         FieldHeader *fieldStart = (FieldHeader *)currentField;
 
+        [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone];
+        
+        //NSLog(@"Reading Field %@ (%d)",
+        //      [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone], fieldStart->length);
+        
         [dataForHmac appendBytes:&(fieldStart->data) length:fieldStart->length];
 
         if (hdrDone) {
@@ -488,7 +505,7 @@
 
             if (fieldStart->type == FIELD_TYPE_END) {
                 Record *newRecord = [[Record alloc]initWithFields:fields];
-                //NSLog(@"%@", newRecord.title);
+                //NSLog(@"Got Record: Title = %@", newRecord.title);
                 [*records_p addObject:newRecord];
 
                 fields = [[NSMutableDictionary alloc] init];
@@ -519,6 +536,8 @@
 
         currentField += add;
     }
+
+    free(raw);
 
     return dataForHmac;
 }

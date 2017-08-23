@@ -7,6 +7,7 @@
 //
 
 #import "WindowController.h"
+#import "Document.h"
 
 @interface WindowController ()
 
@@ -18,6 +19,15 @@
     self.shouldCascadeWindows = YES;
     
     [super windowDidLoad];
+}
+
+- (void)setDirty:(BOOL)dirty {
+    [self synchronizeWindowTitleWithDocumentName];
+}
+
+- (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
+    Document* doc = self.document;
+    return [NSString stringWithFormat:@"%@%@", displayName, doc.dirty ? @" [*edited]" : @""];
 }
 
 @end

@@ -9,11 +9,16 @@
 #import "Document.h"
 #import "ViewController.h"
 #import "ViewModel.h"
+#import "Utils.h"
+#import "Alerts.h"
+#import "ChangeMasterPasswordWindowController.h"
+#import "WindowController.h"
 
 @interface Document ()
 
 @property (strong, nonatomic) ViewModel* model;
-@property NSWindowController* windowController;
+@property WindowController* windowController;
+@property (strong, nonatomic) ChangeMasterPasswordWindowController *masterPasswordWindowController;
 
 @end
 
@@ -23,16 +28,12 @@
     self = [super init];
     
     if (self) {
-        // Add your subclass-specific initialization here.
+        self.model = [[ViewModel alloc] initNewWithSampleData:self];
+        self.dirty = YES;
     }
     
     return self;
 }
-
-+ (BOOL)autosavesInPlace {
-    return YES;
-}
-
 
 - (void)makeWindowControllers {
     // Override to return the Storyboard file name of the document.
@@ -44,26 +45,73 @@
     [self setWindowModel:self.model];
 }
 
-
-- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-    // Insert code here to write your document to data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning nil.
+- (IBAction)saveDocument:(id)sender
+{
+    if(self.model.locked) {
+        [Alerts info:@"Cannot save safe while it is locked." window:self.windowController.window];
+        return;
+    }
     
-    // You can also choose to override -fileWrapperOfType:error:, -writeToURL:ofType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-    
-    // [NSException raise:@"UnimplementedMethod" format:@"%@ is unimplemented", NSStringFromSelector(_cmd)];
-    
-    return nil;
+    if(!self.model.masterPasswordIsSet) {
+        self.masterPasswordWindowController = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+        
+        self.masterPasswordWindowController.titleText = @"Set a Master Password for New Safe";
+        
+        [self.windowController.window beginSheet:self.masterPasswordWindowController.window
+                               completionHandler:^(NSModalResponse returnCode) {
+                                   if(returnCode == NSModalResponseOK) {
+                                       [self.model setMasterPassword:self.masterPasswordWindowController.confirmedPassword];
+                                       return [super saveDocument:sender];
+                                   }
+                               }];
+    }
+    else {
+        return [super saveDocument:sender];
+    }
 }
 
+- (BOOL)saveToURL:(NSURL *)absoluteURL
+           ofType:(NSString *)typeName
+ forSaveOperation:(NSSaveOperationType)saveOperation
+            error:(NSError **)outError
+{
+    BOOL success = [super saveToURL:absoluteURL
+                             ofType:typeName
+                   forSaveOperation:saveOperation
+                              error:outError];
+    
+    if (success) {
+        NSLog(@"Saved!");
+        
+        self.dirty = NO;
+        ViewController *vc = (ViewController*)self.windowController.contentViewController;
+        [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
+    }
+    
+    return success;
+}
+
+- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
+    return [self.model getPasswordDatabaseAsData:outError];
+}
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-    self.model = [[ViewModel alloc] initWithData:data];
+    self.model = [[ViewModel alloc] initWithData:data document:self];
+    
+    if(!self.model) {
+        if(outError != nil) {
+            *outError = [Utils createNSError:@"This is not a valid Password Safe Database file." errorCode:-1];
+        }
+        
+        return NO;
+    }
+    
+    self.dirty = NO;
     
     [self setWindowModel:self.model];
     
     return YES;
 }
-
 
 - (void)setWindowModel:(ViewModel*)model {
     ViewController *vc = (ViewController*)self.windowController.contentViewController;
@@ -71,35 +119,25 @@
     [vc setModel:self.model];
 }
 
-- (void)info: (NSString *)info {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:info];
-    
-    [alert addButtonWithTitle:@"Ok"];
-    
-    [alert runModal];
+- (BOOL)isDocumentEdited {
+    return self.dirty;
 }
 
-- (NSString *)input: (NSString *)prompt defaultValue: (NSString *)placeHolder {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:prompt];
-    
-    [alert addButtonWithTitle:@"Ok"];
-    [alert addButtonWithTitle:@"Cancel"];
-    
-    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-    [input setStringValue:placeHolder];
-    
-    [alert setAccessoryView:input];
-    NSInteger button = [alert runModal];
-    
-    if (button == NSAlertFirstButtonReturn) {
-        return [input stringValue];
-    } else if (button == NSAlertSecondButtonReturn) {
-        return nil;
-    }
-    
-    return nil;
+- (BOOL)hasUnautosavedChanges {
+    return self.dirty;
+}
+
+- (BOOL)hasUndoManager {
+    return NO;
+}
+
++ (BOOL)autosavesInPlace {
+    return NO;
+}
+
+- (void)setDirty:(BOOL)dirty {
+    _dirty = dirty;
+    self.windowController.dirty = YES;
 }
 
 @end

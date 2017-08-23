@@ -323,7 +323,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     [SVProgressHUD showWithStatus:@"Decrypting..."];
     
     NSError *error;
-    SafeDatabase *openedSafe = [[SafeDatabase alloc] initExistingWithData:masterPassword data:data error:&error];
+    PasswordDatabase *openedSafe = [[PasswordDatabase alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
     
     [SVProgressHUD popActivity];
     
@@ -388,14 +388,14 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 
 -(void)onSuccessfulSafeOpen:(BOOL)isOfflineCacheMode
                 provider:(id)provider
-               openedSafe:(SafeDatabase *)openedSafe
+               openedSafe:(PasswordDatabase *)openedSafe
                    safe:(SafeMetaData *)safe
                      data:(NSData *)data {
     Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
                                                   metaData:safe
                                            storageProvider:isOfflineCacheMode ? nil : provider // Guarantee nothing can be written!
                                          usingOfflineCache:isOfflineCacheMode
-                                                isReadOnly:![[Settings sharedInstance] isProOrFreeTrial]
+                                                isReadOnly:NO // ![[Settings sharedInstance] isProOrFreeTrial]
                                       localStorageProvider:self.local
                                                      safes:self.safes];
 
@@ -592,7 +592,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         
         NSData *importedData = [NSData dataWithContentsOfURL:importURL];
         
-        if (![SafeDatabase isAValidSafe:importedData]) {
+        if (![PasswordDatabase isAValidSafe:importedData]) {
             [Alerts warn:self
                    title:@"Invalid Safe"
                  message:@"This is not a valid StrongBox password safe database file."];

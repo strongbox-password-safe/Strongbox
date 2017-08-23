@@ -118,25 +118,33 @@
 }
 
 - (IBAction)onUpgrade:(id)sender {
-    _buttonUpgrade2.enabled = NO;
-    
     if( self.product == nil) {
-        [Alerts warn:self title:@"Product Error" message:@"Could not access Upgrade Product on App Store. Please try again later."];
+        [Alerts warn:self
+               title:@"Product Error"
+             message:@"Could not access Upgrade Product on App Store. Please try again later."];
     }
     else {
         if ([SKPaymentQueue canMakePayments]) {
             [SVProgressHUD showWithStatus:@"Purchasing..."];
+            _buttonUpgrade2.enabled = NO;
+            _buttonRestore.enabled = NO;
+            _buttonNope.enabled = NO;
+            
             SKPayment *payment = [SKPayment paymentWithProduct:self.product];
             [[SKPaymentQueue defaultQueue] addPayment:payment];
         }
         else{
-            [Alerts warn:self title:@"Purchases Disabled" message:@"Purchases are disabled on your device"];
+            [Alerts warn:self
+                   title:@"Purchases Disabled"
+                 message:@"Purchases are disabled on your device"];
         }
     }
 }
 
 - (IBAction)onRestore:(id)sender {
-    self.buttonRestore.enabled = NO;
+    _buttonUpgrade2.enabled = NO;
+    _buttonRestore.enabled = NO;
+    _buttonNope.enabled = NO;
     
     [SVProgressHUD showWithStatus:@"Restoring..."];
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
@@ -148,7 +156,10 @@
     NSLog(@"restoreCompletedTransactionsFailedWithError: %@", error);
     
     [SVProgressHUD popActivity];
-    self.buttonRestore.enabled = YES;
+    
+    _buttonUpgrade2.enabled = YES;
+    _buttonRestore.enabled = YES;
+    _buttonNope.enabled = YES;
     
     [Alerts error:self title:@"Issue Restoring Purchase" error:error];
 }
@@ -157,6 +168,10 @@
     NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: %@", queue);
     
     [SVProgressHUD popActivity];
+    _buttonUpgrade2.enabled = YES;
+    _buttonRestore.enabled = YES;
+    _buttonNope.enabled = YES;
+    
     
     if(queue.transactions.count == 0) {
         [Alerts info:self title:@"Restoration Unsuccessful" message:@"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?" completion:nil];
@@ -184,6 +199,10 @@ updatedTransactions:(NSArray *)transactions {
                 [[Settings sharedInstance] setPro:YES];
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 
+                _buttonUpgrade2.enabled = YES;
+                _buttonRestore.enabled = YES;
+                _buttonNope.enabled = YES;
+            
                 [SVProgressHUD popActivity];
                 
                 [Alerts info:self title:@"Welcome to StrongBox Pro" message:@"Upgrade successful" completion:^{
@@ -202,10 +221,13 @@ updatedTransactions:(NSArray *)transactions {
             {
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 NSLog(@"Purchase failed %@", transaction.error);
-                [Alerts error:self title:@"Failed to Upgrade" error:transaction.error];
                 
                 [SVProgressHUD popActivity];
                 _buttonUpgrade2.enabled = YES;
+                _buttonRestore.enabled = YES;
+                _buttonNope.enabled = YES;
+
+                [Alerts error:self title:@"Failed to Upgrade" error:transaction.error];
             }
                 break;
             default:

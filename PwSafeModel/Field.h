@@ -86,4 +86,6 @@ typedef NS_ENUM (NSUInteger, FieldType) {
 @property (readonly) NSString *prettyTypeString;
 @property (readonly) NSString *prettyDataString;
 
++ (NSString *)prettyTypeString:(NSUInteger)type isHeaderField:(BOOL)isHeaderField;
+
 @end

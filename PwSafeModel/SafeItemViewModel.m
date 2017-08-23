@@ -14,67 +14,60 @@
     BOOL _isGroup;
 }
 
-- (instancetype)initWithGroup:(Group *)group {
-    _group = group;
-    _isGroup = YES;
+- (instancetype)initAsRootGroup {
+    return [self initWithGroup:[[Group alloc] initAsRootGroup]];
+}
 
+- (instancetype)initWithGroup:(Group *)group {
+    if(self = [super init]) {
+        _group = group;
+        _isGroup = YES;
+    }
+    
     return self;
 }
 
 - (instancetype)initWithRecord:(Record *)record {
-    _record = record;
-    _isGroup = NO;
-
+    if(self = [super init]) {
+        _record = record;
+        _isGroup = NO;
+    }
+    
     return self;
 }
 
 - (NSString *)title {
-    return _isGroup ? _group.suffixDisplayString : _record.title;
-}
-
-- (void)setTitle:(NSString *)title {
-    if (_isGroup) {
-        //print("Cannot rename group like this, use CoreModel.renameItem!");
-    }
-    else {
-        _record.title = title;
-    }
+    return _isGroup ? _group.title : _record.title;
 }
 
 - (NSString *)password {
     return _record.password;
 }
 
-- (void)setPassword:(NSString *)password {
-    _record.password = password;
-}
-
 - (NSString *)username {
     return _record.username;
-}
-
-- (void)setUsername:(NSString *)username {
-    _record.username = username;
 }
 
 - (NSString *)url {
     return _record.url;
 }
 
-- (void)setUrl:(NSString *)url {
-    _record.url = url;
-}
-
 - (NSString *)notes {
     return _record.notes;
 }
 
-- (void)setNotes:(NSString *)notes {
-    _record.notes = notes;
-}
-
 - (NSString *)groupPathPrefix {
-    return _group.pathPrefixDisplayString;
+    if(!self.isGroup) {
+        return nil;
+    }
+    
+    else if (_group.isRootGroup) {
+        return @"";
+    }
+    
+    NSArray *prefixComponents = [_group.pathComponents subarrayWithRange:NSMakeRange(0, _group.pathComponents.count - 1)];
+
+    return [prefixComponents componentsJoinedByString:@"/"];
 }
 
 - (Group *)group {
@@ -83,6 +76,15 @@
 
 - (Record *)record {
     return _record;
+}
+
+- (BOOL)isRootGroup {
+    return self.isGroup && self.group.isRootGroup;
+}
+
+- (SafeItemViewModel*)getParentGroup {
+    return self.isGroup ? [[SafeItemViewModel alloc] initWithGroup:[self.group getParentGroup]] :
+    [[SafeItemViewModel alloc] initWithGroup:self.record.group];
 }
 
 - (BOOL)isEqualToSafeItemViewModel:(SafeItemViewModel *)item {
@@ -95,14 +97,14 @@
     }
 
     if (item.isGroup) {
-        return [item.group isSameGroupAs:self.group];
+        return [item.group isEqual:self.group];
     }
 
     if (item.record.uuid && self.record.uuid) {
         return [item.record.uuid isEqualToString:self.record.uuid];
     }
-
-    BOOL haveEqualGroups = (!self.record.group && !item.record.group) || [self.record.group isSameGroupAs:item.record.group];
+    
+    BOOL haveEqualGroups = (!self.record.group && !item.record.group) || [self.record.group isEqual:item.record.group];
 
     if (!haveEqualGroups) {
         return NO;
@@ -120,6 +122,10 @@
 #pragma mark - NSObject
 
 - (BOOL)isEqual:(id)object {
+    if(!object) {
+        return NO;
+    }
+        
     if (self == object) {
         return YES;
     }
@@ -133,11 +139,18 @@
 
 - (NSUInteger)hash {
     if (self.isGroup) {
-        return (self.group).fullPath.hash;
+        return self.group.hash;
     }
     else {
-        return (self.title).hash ^ (self.password).hash ^ (self.username).hash ^ (self.url).hash ^ (self.notes).hash;
+        return self.record.uuid ?
+            (self.record.uuid).hash :
+            (self.title).hash ^ (self.password).hash ^ (self.username).hash ^ (self.url).hash ^ (self.notes).hash;
     }
+}
+
+- (NSString*)description {
+    return [NSString stringWithFormat:self.isGroup ? @"[Group] -> [%@]" : @"[Record] -> [%@]",
+            self.isGroup ? (self.isRootGroup ? @"<Root Group>" : self.title) : self.title];
 }
 
 @end

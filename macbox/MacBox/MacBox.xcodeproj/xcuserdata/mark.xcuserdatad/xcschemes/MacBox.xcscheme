@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-               BuildableName = "MacBox.app"
-               BlueprintName = "MacBox"
+               BuildableName = "StrongBox.app"
+               BlueprintName = "StrongBox"
                ReferencedContainer = "container:MacBox.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,13 +28,23 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4DE92B701F49D0AA00282D98"
+               BuildableName = "PwSafeModelTests.xctest"
+               BlueprintName = "PwSafeModelTests"
+               ReferencedContainer = "container:MacBox.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-            BuildableName = "MacBox.app"
-            BlueprintName = "MacBox"
+            BuildableName = "StrongBox.app"
+            BlueprintName = "StrongBox"
             ReferencedContainer = "container:MacBox.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -56,8 +66,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-            BuildableName = "MacBox.app"
-            BlueprintName = "MacBox"
+            BuildableName = "StrongBox.app"
+            BlueprintName = "StrongBox"
             ReferencedContainer = "container:MacBox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -75,8 +85,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-            BuildableName = "MacBox.app"
-            BlueprintName = "MacBox"
+            BuildableName = "StrongBox.app"
+            BlueprintName = "StrongBox"
             ReferencedContainer = "container:MacBox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

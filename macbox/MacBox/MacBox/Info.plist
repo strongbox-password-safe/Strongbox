@@ -13,9 +13,9 @@
 				<string>psafe3</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string></string>
+			<string>AppIcon</string>
 			<key>CFBundleTypeName</key>
-			<string>DocumentType</string>
+			<string>StrongBox Password Safe File</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>

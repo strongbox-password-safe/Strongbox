@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "SafeDatabase.h"
 #import "SafeMetaData.h"
 #import "StorageBrowserItem.h"
 

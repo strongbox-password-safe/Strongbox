@@ -28,6 +28,8 @@
 @property (nonatomic, retain) PasswordHistory *passwordHistory;
 
 - (void)    generateNewUUID;
+
+- (Record*)init;
 - (Record *)initWithFields:(NSDictionary *)fields NS_DESIGNATED_INITIALIZER;
 @property (NS_NONATOMIC_IOSONLY, getter = getAllFields, readonly, copy) NSArray *allFields;
 

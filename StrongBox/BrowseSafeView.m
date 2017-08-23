@@ -7,7 +7,6 @@
 //
 
 #import "BrowseSafeView.h"
-#import "SafeDatabase.h"
 #import "SafeTools.h"
 #import "Record.h"
 #import "Field.h"
@@ -195,7 +194,7 @@
 - (void)refresh {
     self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
                                  (!self.currentGroup || self.currentGroup.isRootGroup) ?
-                                 self.viewModel.metadata.nickName : self.currentGroup.suffixDisplayString,
+                                 self.viewModel.metadata.nickName : self.currentGroup.title,
                                  self.viewModel.isUsingOfflineCache ? @" [Offline]" : @"",
                                  self.viewModel.isReadOnly ? @" [Read Only]" : @""];
     
@@ -263,9 +262,11 @@
                           message:@"Please Enter the New Group Name:"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               if ([self.viewModel addSubgroupWithUIString:self.currentGroup
-                                                                          title:text] != nil) {
+                               if ([self.viewModel createGroupWithTitle:self.currentGroup title:text] != nil) {
                                    [self saveChangesToSafeAndRefreshView];
+                               }
+                               else {
+                                   // TODO: Message... can return nil if group already exists
                                }
                            }
                        }];

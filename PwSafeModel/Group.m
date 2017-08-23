@@ -8,84 +8,67 @@
 
 #import "Group.h"
 
-@implementation Group {
-    NSString *_fullPath;
+@implementation Group
+
+- (instancetype)initAsRootGroup {
+    return [self initWithPathComponents:[NSArray array]];
 }
 
-- (instancetype)init {
-    _fullPath = @"";
-
-    return self;
-}
-
-- (instancetype)init:(NSString *)fullPath {
-    _fullPath = fullPath ? fullPath : @"";
-
-    return self;
-}
-
-- (NSString *)fullPath {
-    return _fullPath;
-}
-
-- (NSString *)fullPathDisplayString {
-    return [Group unescapeGroupName:_fullPath];
-}
-
-- (NSString *)pathPrefixDisplayString {
-    NSArray *pathComponents = [self splitGroup];
-
-    if (pathComponents.count > 0) {
-        NSArray *prefixRawComponents = [pathComponents subarrayWithRange:NSMakeRange(0, pathComponents.count - 1)];
-
-        NSMutableString *path = [[NSMutableString alloc] initWithString:@""];
-
-        for (int i = 0; i < prefixRawComponents.count; i++) {
-            [path appendFormat:@"%@%@", [Group unescapeGroupName:prefixRawComponents[i]], (i == (prefixRawComponents.count - 1)) ? @"" : @"/"];
-        }
-
-        return path;
+- (instancetype)initWithPathComponents:(NSArray<NSString*> *)pathComponents {
+    if( self = [super init]) {
+        _pathComponents = [[NSArray alloc] initWithArray:pathComponents];
     }
-
-    return @"";
+    
+    return self;
 }
 
-- (NSString *)suffixDisplayString {
-    NSString *suffix = [self splitGroup].lastObject;
-
-    return [Group unescapeGroupName:suffix];
+- (instancetype)initWithEscapedPathString:(NSString *)escapedPathString {
+    if( self = [super init]) {
+        _pathComponents = [self splitEscapedPathStringIntoPathComponents:escapedPathString];
+    }
+    
+    return self;
 }
 
-- (BOOL)isRootGroup {
-    return _fullPath == nil || _fullPath.length == 0;
-}
-
-- (NSArray *)splitGroup {
-    NSString *subGroupFullSuffix = _fullPath;
+- (NSArray<NSString*> *)splitEscapedPathStringIntoPathComponents:(NSString*)escapedPathString {
+    NSString *subGroupFullSuffix = escapedPathString;
     NSMutableArray *subgroups = [[NSMutableArray alloc] init];
-
+    
     while (subGroupFullSuffix.length > 0 && ![subGroupFullSuffix isEqualToString:@"."]) {
         // Regex here manages finding the immediate subgroup taking into account escape patterns and only selecting legitimate groups
-
+        
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\.{0,1}(.+?)((?<!\\\\)\\.|$)" options:0 error:Nil];
         NSTextCheckingResult *match = [regex firstMatchInString:subGroupFullSuffix options:0  range:NSMakeRange(0, subGroupFullSuffix.length) ];
-
+        
         if (match && match.numberOfRanges > 0 && [match rangeAtIndex:1].location != NSNotFound) {
             NSRange range = [match rangeAtIndex:1];
-
+            
             NSString *subgroup = [subGroupFullSuffix substringWithRange:range];
-
-            [subgroups addObject:subgroup];
-
+            
+            // Don't add root group(s)... not interesting or useful
+            
+            if(![subgroup isEqualToString:@"."]) {
+                NSString* unescaped = [Group unescapeGroupName:subgroup];
+                [subgroups addObject:unescaped];
+            }
+            
             subGroupFullSuffix = [subGroupFullSuffix substringFromIndex:range.location + range.length];
         }
         else {
-            NSLog(@"Eeeek?");
+            NSLog(@"Eeeek?"); // TODO: Error
             break;
         }
     }
-
+    
     return subgroups;
+}
+
+- (NSString *)title {
+    return _pathComponents.count == 0 ? @"" : _pathComponents.lastObject;
+}
+
+- (BOOL)isRootGroup {
+    return _pathComponents.count == 0;
 }
 
 - (Group *)getParentGroup {
@@ -93,17 +76,9 @@
         return nil;
     }
 
-    NSArray *myComponents = [self splitGroup];
+    NSArray<NSString*> *parentComponents = [_pathComponents subarrayWithRange:NSMakeRange(0, _pathComponents.count - 1)];
 
-    myComponents = [myComponents subarrayWithRange:NSMakeRange(0, myComponents.count - 1)];
-
-    NSString *fp = [[NSString alloc] init];
-
-    for (NSString *comp in myComponents) {
-        fp = [NSString stringWithFormat:@"%@.%@", fp, comp];
-    }
-
-    return [[Group alloc] init:fp];
+    return [[Group alloc] initWithPathComponents:parentComponents];
 }
 
 - (BOOL)isSubgroupOf:(Group *)parentGroup {
@@ -111,104 +86,107 @@
         return !self.isRootGroup;
     }
 
-    NSArray *parentComponents = [parentGroup splitGroup];
-    NSArray *myComponents = [self splitGroup];
-
-    if (myComponents.count <= parentComponents.count) {
+    NSArray *parentComponents = parentGroup.pathComponents;
+   
+    if (_pathComponents.count <= parentComponents.count) {
         return NO;
     }
 
-    NSArray *mySubComponents = [myComponents subarrayWithRange:NSMakeRange(0, parentComponents.count)];
+    NSArray *mySubComponents = [_pathComponents subarrayWithRange:NSMakeRange(0, parentComponents.count)];
     return [parentComponents isEqualToArray:mySubComponents];
 }
 
-- (BOOL)isDirectChildOf:(Group *)testGroup {
-    NSArray *testComponents = [testGroup splitGroup];
-    NSArray *myComponents = [self splitGroup];
-
-    if (myComponents.count > 0) {
-        myComponents = [myComponents subarrayWithRange:NSMakeRange(0, myComponents.count - 1)];
+- (Group *)getDirectAncestorOfParent:(Group *)parentGroup {
+    if ([self isSubgroupOf:parentGroup]) {
+        NSInteger count = parentGroup ? parentGroup.pathComponents.count : 0;
+        
+        NSArray<NSString *> *directAncestorComponents = [_pathComponents subarrayWithRange:NSMakeRange(0, count + 1)];
+        
+        return [[Group alloc] initWithPathComponents:directAncestorComponents];
     }
-
-    return [testComponents isEqualToArray:myComponents];
-}
-
-- (BOOL)isSameGroupAs:(Group *)existing {
-    if (!existing) {
-        return self.isRootGroup;
-    }
-
-    NSArray *existingComponents = [existing splitGroup];
-    NSArray *myComponents = [self splitGroup];
-
-    if (myComponents.count != existingComponents.count) {
-        return NO;
-    }
-
-    return [existingComponents isEqualToArray:myComponents];
-}
-
-- (Group *)getImmediateChildGroupWithParentGroup:(Group *)parentGroup {
-    NSArray *parentComponents = parentGroup ? [parentGroup splitGroup] : [[NSArray alloc] init];
-    NSArray *myComponents = [self splitGroup];
-
-    if (myComponents.count <= parentComponents.count) {
-        return nil;
-    }
-
-    NSArray *mySubComponents = [myComponents subarrayWithRange:NSMakeRange(0, parentComponents.count)];
-
-    if ([parentComponents isEqualToArray:mySubComponents]) {
-        NSString *immediateChild = myComponents[parentComponents.count];
-        NSString *fmt = parentComponents.count > 0 ? [NSString stringWithFormat:@"%@.%@", parentGroup.fullPath, immediateChild] : immediateChild;
-
-        // Definitely a subgroup
-
-        return [[Group alloc] init:fmt];
-    }
-
+    
     return nil;
 }
 
-- (Group *)createChildGroupWithUITitle:(NSString *)title {
+- (Group *)createChildGroupWithTitle:(NSString *)title {
     if (!title) {
         return nil;
     }
-
+    
     NSString *trimmed = [title stringByTrimmingCharactersInSet:
                          [NSCharacterSet whitespaceCharacterSet]];
-
+    
     if (trimmed.length == 0) {
         return nil;
     }
+    
+    NSMutableArray<NSString*> *childGroup = [_pathComponents mutableCopy];
+    [childGroup addObject:trimmed];
+    
+    return [[Group alloc] initWithPathComponents:childGroup];
+}
 
-    NSString *escaped = [Group escapeGroupName:trimmed];
-
-    NSString *fp = self.isRootGroup ? escaped : [NSString stringWithFormat:@"%@.%@", _fullPath, escaped];
-
-    return [[Group alloc] init:fp];
+- (NSString*)escapedPathString {
+    NSString *ret = @"";
+    
+    for(NSString *component in _pathComponents) {
+        NSString *escaped = [Group escapeGroupName:component];
+        
+        ret = [ret stringByAppendingString:[NSString stringWithFormat:@".%@", escaped]];
+    }
+    
+    return ret;
 }
 
 + (NSString *)unescapeGroupName:(NSString *)title {
     NSString *tmp = [title stringByReplacingOccurrencesOfString:@"\\."
                                                      withString:@"."];
-
+    
     tmp = [tmp stringByReplacingOccurrencesOfString:@"\\\\"
                                          withString:@"\\"];
-
+    
     return tmp;
 }
 
 + (NSString *)escapeGroupName:(NSString *)groupName {
     NSString *tmp;
-
+    
     tmp = [groupName stringByReplacingOccurrencesOfString:@"\\"
                                                withString:@"\\\\"];
-
+    
     tmp = [tmp stringByReplacingOccurrencesOfString:@"."
                                          withString:@"\\."];
-
+    
     return tmp;
+}
+
+#pragma mark - NSObject
+
+- (BOOL)isEqual:(id)object {
+    if (!object) {
+        return self.isRootGroup;
+    }
+    
+    if (self == object) {
+        return YES;
+    }
+    
+    if (![object isKindOfClass:[Group class]]) {
+        return NO;
+    }
+    
+    return [((Group*)object).pathComponents isEqualToArray:_pathComponents];
+}
+
+- (NSUInteger)hash {
+    NSUInteger prime = 31;
+    NSUInteger result = 1;
+
+    for (NSString *component in _pathComponents){
+        result = prime * result + component.hash;
+    }
+    
+    return result;
 }
 
 @end

@@ -7,11 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SafeDatabase.h"
 #import "SafeStorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "SafesCollection.h"
-#import "CoreModel.h"
+#import "PasswordDatabase.h"
 
 @interface Model : NSObject
 
@@ -25,7 +24,7 @@
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithSafeDatabase:(SafeDatabase *)safe
+- (instancetype)initWithSafeDatabase:(PasswordDatabase *)passwordDatabase
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
@@ -41,16 +40,17 @@
 - (void)updateOfflineCache:(void (^)())handler;
 - (void)disableAndClearOfflineCache;
 - (void)enableOfflineCache;
-- (void)addRecord:(Record *)newRecord;
-
-- (Group *)addSubgroupWithUIString:(Group *)parent title:(NSString *)title;
+- (SafeItemViewModel*)addRecord:(Record *)newRecord;
+- (SafeItemViewModel *)createGroupWithTitle:(Group *)parent title:(NSString *)title;
 
 @property (readonly) NSDate *lastUpdateTime;
 @property (readonly) NSString *lastUpdateUser;
 @property (readonly) NSString *lastUpdateHost;
 @property (readonly) NSString *lastUpdateApp;
-@property (NS_NONATOMIC_IOSONLY, getter = getSafeAsData, readonly, copy) NSData *asData;
+
 @property (NS_NONATOMIC_IOSONLY, getter = getMasterPassword, setter=setMasterPassword:) NSString *masterPassword;
+
+-(NSData*)getSafeAsData:(NSError**)error;
 
 // Search Safe Helpers
 

@@ -58,8 +58,7 @@
                           message:@"Please Enter the New Group Name"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               [self.viewModel addSubgroupWithUIString:self.currentGroup
-                                                                  title:text];
+                               [self.viewModel createGroupWithTitle:self.currentGroup title:text]; // TODO: Can return nil if group exists
                                [self refresh];
                            }
                        }];

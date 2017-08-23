@@ -1,5 +1,5 @@
 //
-//  CoreModel.m
+//  PasswordDatabase.m
 //
 //
 //  Created by Mark on 01/09/2015.
@@ -7,26 +7,35 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CoreModel.h"
+#import "PasswordDatabase.h"
+#import "PasswordSafe3Database.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Search
 
 
-@interface CoreModel ()
+@interface PasswordDatabase ()
+
+@property (readonly) PasswordSafe3Database *safe;
 
 @end
 
-@implementation CoreModel
+@implementation PasswordDatabase
+
+- (instancetype)initNewWithoutPassword {
+    PasswordSafe3Database* db = [[PasswordSafe3Database alloc] initNewWithoutPassword];
+    
+    return [self initWithSafeDatabase:db];
+}
 
 - (instancetype)initNewWithPassword:(NSString *)password {
-    SafeDatabase* db = [[SafeDatabase alloc] initNewWithPassword:password];
+    PasswordSafe3Database* db = [[PasswordSafe3Database alloc] initNewWithPassword:password];
     
     return [self initWithSafeDatabase:db];
 }
 
 - (instancetype)initExistingWithDataAndPassword:(NSData *)data password:(NSString *)password error:(NSError **)ppError {
-    SafeDatabase* db = [[SafeDatabase alloc] initExistingWithData:password data:data error:ppError];
+    PasswordSafe3Database* db = [[PasswordSafe3Database alloc] initExistingWithData:password data:data error:ppError];
     
     if(db == nil) {
         return nil;
@@ -35,7 +44,7 @@
     return [self initWithSafeDatabase:db];
 }
 
-- (instancetype)initWithSafeDatabase:(SafeDatabase *)safe {
+- (instancetype)initWithSafeDatabase:(PasswordSafe3Database *)safe {
     if (self = [super init]) {
         _safe = safe;
         return self;
@@ -47,8 +56,35 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (SafeItemViewModel *)addSubgroupWithUIString:(Group *)parentGroup title:(NSString *)title {
-    Group *newGroup = [_safe addSubgroupWithUIString:parentGroup title:title];
+- (NSString*)masterPassword {
+    return self.safe.masterPassword;
+}
+
+- (void)setMasterPassword:(NSString*)masterPassword {
+    self.safe.masterPassword = masterPassword;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (SafeItemViewModel*)addRecord:(NSString*)title group:(Group*)group username:(NSString*)username url:(NSString*)url password:(NSString*)password notes:(NSString*)notes {
+    Record* record = [[Record alloc] init];
+    
+    record.title = title;
+    record.username = username;
+    record.password = password;
+    record.url = url;
+    record.notes = notes;
+    record.group = group;
+    
+    return [[SafeItemViewModel alloc] initWithRecord:[self.safe addRecord:record]];
+}
+
+- (SafeItemViewModel*)addRecord:(Record *)newRecord {
+   return [[SafeItemViewModel alloc] initWithRecord:[self.safe addRecord:newRecord]];
+}
+
+- (SafeItemViewModel *)createGroupWithTitle:(Group *)parentGroup title:(NSString *)title validateOnly:(BOOL)validateOnly {
+    Group *newGroup = [_safe createGroupWithTitle:parentGroup title:title validateOnly:validateOnly];
 
     if (newGroup != nil) {
         return [[SafeItemViewModel alloc] initWithGroup:newGroup];
@@ -104,9 +140,9 @@
                                                                      deepSearch:NO]];
 
     [subgroupsForCurrentGroup sortUsingComparator:^(id obj1, id obj2) {
-                                  NSString *s1 = ((Group *)obj1).suffixDisplayString;
-                                  NSString *s2 = ((Group *)obj2).suffixDisplayString;
-                                  return [s1 caseInsensitiveCompare:s2];
+                                  NSString *s1 = ((SafeItemViewModel *)obj1).title;
+                                  NSString *s2 = ((SafeItemViewModel *)obj2).title;
+                                  return [s1 compare:s2];
                               }];
 
     for (Group *grp in subgroupsForCurrentGroup) {
@@ -136,17 +172,17 @@
                                                                      deepSearch:deepSearch]];
 
     [subgroupsForCurrentGroup sortUsingComparator:^(id obj1, id obj2) {
-                                  NSString *s1 = ((Group *)obj1).suffixDisplayString;
-                                  NSString *s2 = ((Group *)obj2).suffixDisplayString;
-                                  return [s1 caseInsensitiveCompare:s2];
+                                  NSString *s1 = ((SafeItemViewModel *)obj1).title;
+                                  NSString *s2 = ((SafeItemViewModel *)obj2).title;
+                                  return [s1 compare:s2];
                               }];
 
     NSMutableArray *recordsForCurrentGroup = [[NSMutableArray alloc] initWithArray:[                                                                                    self.safe getRecordsForGroup:group withFilter:filter deepSearch:deepSearch]];
 
     [recordsForCurrentGroup sortUsingComparator:^(id obj1, id obj2) {
-                                NSString *s1 = ((Record *)obj1).title;
-                                NSString *s2 = ((Record *)obj2).title;
-                                return [s1 caseInsensitiveCompare:s2];
+                                NSString *s1 = ((SafeItemViewModel *)obj1).title;
+                                NSString *s2 = ((SafeItemViewModel *)obj2).title;
+                                return [s1 compare:s2];
                             }];
 
     for (Group *grp in subgroupsForCurrentGroup) {
@@ -162,18 +198,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group {
+- (BOOL)validateMoveItems:(NSArray<SafeItemViewModel*> *)items destination:(Group *)group {
     return [self validateMoveItems:items destination:group checkIfMoveIntoSubgroupOfDestinationOk:NO];
 }
 
-- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk {
-    BOOL directMove = [self moveOrValidateItems:items destination:group validate:YES];
+- (BOOL)validateMoveItems:(NSArray<SafeItemViewModel*> *)items destination:(Group *)group checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk {
+    BOOL directMove = [self moveOrValidateItems:items destination:group validateOnly:YES];
 
     if (!directMove && checkIfMoveIntoSubgroupOfDestinationOk) {
         NSArray *subGroups = [self.safe getSubgroupsForGroup:group withFilter:nil deepSearch:NO];
 
         for (Group *subgroup in subGroups) {
-            if ([self moveOrValidateItems:items destination:subgroup validate:YES]) {
+            if ([self moveOrValidateItems:items destination:subgroup validateOnly:YES]) {
                 return YES;
             }
         }
@@ -182,19 +218,19 @@
     return directMove;
 }
 
-- (void)moveItems:(NSArray *)items destination:(Group *)group {
-    [self moveOrValidateItems:items destination:group validate:NO];
+- (void)moveItems:(NSArray<SafeItemViewModel*> *)items destination:(Group *)group {
+    [self moveOrValidateItems:items destination:group validateOnly:NO];
 }
 
-- (BOOL)moveOrValidateItems:(NSArray *)items destination:(Group *)destination validate:(BOOL)validate {
+- (BOOL)moveOrValidateItems:(NSArray<SafeItemViewModel*> *)items destination:(Group *)destination validateOnly:(BOOL)validateOnly {
     for (SafeItemViewModel *item in items) {
         if (item.isGroup) {
-            if (![self.safe moveGroup:item.group destination:destination validate:validate]) {
+            if (![self.safe moveGroup:item.group destination:destination validateOnly:validateOnly]) {
                 return NO;
             }
         }
         else {
-            if (![self.safe moveRecord:item.record destination:destination validate:validate]) {
+            if (![self.safe moveRecord:item.record destination:destination validateOnly:validateOnly]) {
                 return NO;
             }
         }
@@ -203,16 +239,27 @@
     return YES;
 }
 
-- (SafeItemViewModel *)renameItem:(SafeItemViewModel *)item title:(NSString *)title {
+- (SafeItemViewModel *)setItemTitle:(SafeItemViewModel *)item title:(NSString *)title {
+    if(item == nil) {
+        NSLog(@"WARN: nil sent to setItemTitle!"); // TODO: Raise?
+        return nil;
+    }
+    
     if (item.isGroup) {
         Group *parentGroup = [item.group getParentGroup];
-        Group *newGroup = [_safe addSubgroupWithUIString:parentGroup title:title];
+        Group *newGroup = [_safe createGroupWithTitle:parentGroup title:title validateOnly:YES];
 
         if (newGroup != nil) {
             NSArray *childItems = [self getItemsForGroup:item.group];
 
-            if ([self moveOrValidateItems:childItems destination:newGroup validate:YES]) {
-                if (![self moveOrValidateItems:childItems destination:newGroup validate:NO]) {
+            if ([self moveOrValidateItems:childItems destination:newGroup validateOnly:YES]) {
+                //We could be renaming an empty group so create the empty group now in case it's not created by the move operation.
+                
+                Group *newGroup = [_safe createGroupWithTitle:parentGroup title:title validateOnly:NO];
+
+                if (![self moveOrValidateItems:childItems destination:newGroup validateOnly:NO]) {
+                    NSLog(@"Could move child items into new destination group %@", newGroup.escapedPathString);
+
                     return nil;
                 }
 
@@ -223,17 +270,51 @@
                 return [[SafeItemViewModel alloc] initWithGroup:newGroup];
             }
             else {
+                NSLog(@"Could move child items into new destination group %@", newGroup.escapedPathString);
                 return nil;
             }
         }
         else {
+            NSLog(@"Could not create destination group %@", newGroup.escapedPathString);
             return nil;
         }
     }
     else {
-        item.title = title;
+        item.record.title = title;
         return item;
     }
+}
+
+- (void)setItemUsername:(SafeItemViewModel *)item username:(NSString*)username {
+    if(item.isGroup) {
+        [NSException raise:@"Attempt to alter group like an record invalidly." format:@"Attempt to alter group like an record invalidly"];
+    }
+    
+    item.record.username = username;
+}
+
+- (void)setItemUrl:(SafeItemViewModel *)item url:(NSString*)url {
+    if(item.isGroup) {
+        [NSException raise:@"Attempt to alter group like an record invalidly." format:@"Attempt to alter group like an record invalidly"];
+    }
+
+    item.record.url = url;
+}
+
+- (void)setItemPassword:(SafeItemViewModel *)item password:(NSString*)password {
+    if(item.isGroup) {
+        [NSException raise:@"Attempt to alter group like an record invalidly." format:@"Attempt to alter group like an record invalidly"];
+    }
+    
+    item.record.password = password;
+}
+
+- (void)setItemNotes:(SafeItemViewModel *)item notes:(NSString*)notes {
+    if(item.isGroup) {
+        [NSException raise:@"Attempt to alter group like an record invalidly." format:@"Attempt to alter group like an record invalidly"];
+    }
+  
+    item.record.notes = notes;
 }
 
 - (void)deleteItems:(NSArray<SafeItemViewModel *> *)items {
@@ -329,8 +410,67 @@
     return randomString;
 }
 
-- (NSData *)getAsData {
-    return [self.safe getAsData];
+- (NSData *)getAsData:(NSError**)error {
+    return [self.safe getAsData:error];
+}
+
+- (NSDate *)lastUpdateTime {
+    return self.safe.lastUpdateTime;
+}
+
+- (NSString *)lastUpdateUser {
+    return self.safe.lastUpdateUser;
+}
+
+- (NSString *)lastUpdateHost {
+    return self.safe.lastUpdateHost;
+}
+
+- (NSString *)lastUpdateApp {
+    return self.safe.lastUpdateApp;
+}
+
++ (BOOL)isAValidSafe:(NSData *)candidate {
+    return [PasswordSafe3Database isAValidSafe:candidate];
+}
+
+- (NSString*)getSerializationIdForItem:(SafeItemViewModel*)item {
+    if(item == nil) {
+        return nil;
+    }
+    
+    if(item.isGroup) {
+        return [NSString stringWithFormat:@"G%@", item.group.escapedPathString];
+    }
+    else {
+        return [NSString stringWithFormat:@"R%@", item.record.uuid];
+    }
+}
+
+- (SafeItemViewModel*)getItemFromSerializationId:(NSString*)serializationId {
+    if(serializationId == nil || serializationId.length < 1) {
+        return nil;
+    }
+    
+    NSString *groupOrRecord = [serializationId substringToIndex:1];
+    NSString *identifier = [serializationId substringFromIndex:1];
+
+    if([groupOrRecord isEqualToString:@"R"]) {
+        Record* record = [self.safe getRecordByUuid:identifier];
+        
+        if(record) {
+            return [[SafeItemViewModel alloc] initWithRecord:record];
+        }
+    }
+    else if([groupOrRecord isEqualToString:@"G"]) {
+        Group* group = [self.safe getGroupByEscapedPathString:identifier];
+        
+        if(group) {
+            return [[SafeItemViewModel alloc] initWithGroup:group];
+        }
+    }
+    
+    return nil;
 }
 
 @end

@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "SafeStorageProvider.h"
 #import "SafeMetaData.h"
-#import "SafeDatabase.h"
 
 @interface LocalDeviceStorageProvider : NSObject <SafeStorageProvider>
 

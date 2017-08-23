@@ -185,10 +185,14 @@
 }
 
 - (NSString *)prettyTypeString {
+    return [Field prettyTypeString:self.type isHeaderField:_isHeaderField];
+}
+
++ (NSString *)prettyTypeString:(NSUInteger)type isHeaderField:(BOOL)isHeaderField  {
     NSString *ret;
 
-    if (_isHeaderField) {
-        switch (self->_type) {
+    if (isHeaderField) {
+        switch (type) {
             case HDR_VERSION:
                 ret = @"HDR_VERSION";
                 break;
@@ -274,13 +278,13 @@
                 break;
 
             default:
-                return [[NSString alloc]initWithData:self->_data encoding:NSUTF8StringEncoding];
+                return @"<Unknown>"; //[[NSString alloc]initWithData:self->_data encoding:NSUTF8StringEncoding];
 
                 break;
         }
     }
     else {
-        switch (self->_type) {
+        switch (type) {
             case FIELD_TYPE_START:
                 ret = @"START";
                 break;

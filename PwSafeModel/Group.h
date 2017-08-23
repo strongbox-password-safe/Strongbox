@@ -10,22 +10,20 @@
 
 @interface Group : NSObject
 
-- (Group *)init:(NSString *)fullPath;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initAsRootGroup;
+- (instancetype)initWithPathComponents:(NSArray<NSString*> *)pathComponents NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithEscapedPathString:(NSString *)escapedPathString NS_DESIGNATED_INITIALIZER;
 
-@property (readonly, nonatomic) NSString *fullPath;
-@property (readonly, nonatomic) NSString *fullPathDisplayString;
-@property (readonly, nonatomic) NSString *suffixDisplayString;
-@property (readonly, nonatomic) NSString *pathPrefixDisplayString;
+@property (readonly, nonatomic, copy) NSArray<NSString *> *pathComponents;
+@property (nonatomic, readonly) NSString *title;
 @property (nonatomic, readonly) BOOL isRootGroup;
-
-
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSArray *splitGroup;
-- (BOOL)isSubgroupOf:(Group *)parentGroup;
-- (BOOL)isSameGroupAs:(Group *)existing;
-- (BOOL)isDirectChildOf:(Group *)testGroup;
-
-- (Group *)getImmediateChildGroupWithParentGroup:(Group *)parentGroup;
-- (Group *)createChildGroupWithUITitle:(NSString *)title;
+@property (nonatomic, readonly) NSString *escapedPathString;
 @property (NS_NONATOMIC_IOSONLY, getter = getParentGroup, readonly, strong) Group *parentGroup;
+
+- (BOOL)isSubgroupOf:(Group *)parentGroup;
+- (Group *)getDirectAncestorOfParent:(Group *)parentGroup;
+
+- (Group *)createChildGroupWithTitle:(NSString *)title;
 
 @end

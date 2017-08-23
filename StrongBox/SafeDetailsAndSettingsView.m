@@ -179,8 +179,14 @@
 }
 
 - (IBAction)onExport:(id)sender {
-    NSData *safeData = [self.viewModel getSafeAsData];
+    NSError *error;
+    NSData *safeData = [self.viewModel getSafeAsData:&error];
 
+    if(!safeData) {
+        [Alerts error:self title:@"Could not get safe data" error:error];
+        return;
+    }
+    
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
                title:@"Email Not Available"

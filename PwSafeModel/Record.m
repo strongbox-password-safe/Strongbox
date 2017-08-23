@@ -27,7 +27,12 @@
 
             _fields[type] = field;
         }
-
+        
+        // Give record a UUID if it's not set
+        if (![self getFieldForType:FIELD_TYPE_UUID]) {
+            [self generateNewUUID];
+        }
+        
         return self;
     }
     else {
@@ -171,20 +176,18 @@
     [unique getUUIDBytes:bytes];
     NSData *d = [[NSData alloc] initWithBytes:bytes length:16];
 
-    [self setFieldWithData:FIELD_TYPE_UUID
-                      data:d];
+    [self setFieldWithData:FIELD_TYPE_UUID data:d];
 }
 
 - (Group *)group {
     NSString *g = [self getDataAsStringForField:FIELD_TYPE_GROUP];
 
-    return [[Group alloc] init:g];
+    return [[Group alloc] initWithEscapedPathString:g];
 }
 
 - (void)setGroup:(Group *)group {
-    if (![group isSameGroupAs:self.group]) {
-        [self setField:FIELD_TYPE_GROUP
-                string:group.fullPath];
+    if (![group isEqual:self.group]) {
+        [self setField:FIELD_TYPE_GROUP string:group.escapedPathString];
     }
 }
 
