@@ -80,7 +80,11 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [Alerts info:@"Welcome to StrongBox for Mac"
-     informativeText:@"Hi and welcome to StrongBox for Mac!\n\nI hope you'll really like the app, and find it useful. You can enjoy this fully featured version of StrongBox for the next 2 months hassle free. After that point some features like Search will be disabled.\n\nYou'll always be able to add your entries and have as many safes as you like open. But you might see an annoying popup every now and then asking you if you'd consider supporting continued development of the app. I hope you'll choose to do so.\n\nYou can always find out more by clicking 'Upgrade to Full Version' in the StrongBox menu item.\n\nThanks!\n-Mark"
+     informativeText:@"Hi and welcome to StrongBox for Mac!\n\n"
+         @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of StrongBox for the next couple of months. "
+         @"After that point, you will be transitioned to the regular version of StrongBox.\n\n"
+         @"You can always find out more at any time by clicking 'Upgrade to Pro' in the StrongBox menu item.\n\n"
+         @"Thanks!\n-Mark"
               window:[NSApplication sharedApplication].mainWindow 
           completion:nil];
     });
@@ -205,10 +209,11 @@
     }
 }
 
-//[[Settings sharedInstance] setFullVersion:NO];
+//    [[Settings sharedInstance] setFullVersion:NO];
 //[[Settings sharedInstance] setEndFreeTrialDate:nil];
-//NSCalendar *cal = [NSCalendar currentCalendar];
-//NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-10 toDate:[NSDate date] options:0];
-//[[Settings sharedInstance] setEndFreeTrialDate:date];
+//    NSCalendar *cal = [NSCalendar currentCalendar];
+//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-10 toDate:[NSDate date] options:0];
+//    [[Settings sharedInstance] setEndFreeTrialDate:date];
+//
 
 @end

@@ -25,7 +25,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="81m-Fu-bNX"/>
-                                        <menuItem title="Upgrade to Full Version..." id="gks-42-4nA" userLabel="Upgrade...">
+                                        <menuItem title="Upgrade to Pro..." id="gks-42-4nA" userLabel="Upgrade...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="onUpgradeToFullVersion:" target="Ady-hI-5gd" id="UDN-oX-uJN"/>
@@ -428,7 +428,7 @@ DQ
                                                                     </connections>
                                                                 </searchField>
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u0f-gy-cIT" userLabel="Search Scope">
-                                                                    <rect key="frame" x="40.5" y="398" width="357" height="21"/>
+                                                                    <rect key="frame" x="40" y="398" width="357" height="21"/>
                                                                     <subviews>
                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4A0-nj-hcL">
                                                                             <rect key="frame" x="-2" y="4" width="65" height="17"/>
@@ -531,7 +531,7 @@ DQ
                                                                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                                                         <prototypeCellViews>
                                                                                             <tableCellView identifier="CellIdentifier" id="QF9-4S-pXG">
-                                                                                                <rect key="frame" x="1" y="1" width="391.5" height="17"/>
+                                                                                                <rect key="frame" x="1" y="1" width="391" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                 <subviews>
                                                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="E4R-3x-1YA">
@@ -542,7 +542,7 @@ DQ
                                                                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="jUQ-Ss-oe1"/>
                                                                                                     </imageView>
                                                                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oiG-DQ-Jwu">
-                                                                                                        <rect key="frame" x="25" y="0.0" width="367" height="17"/>
+                                                                                                        <rect key="frame" x="25" y="0.0" width="366" height="17"/>
                                                                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Table View Cell" id="c5y-Fb-dab">
                                                                                                             <font key="font" metaFont="system"/>
                                                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>

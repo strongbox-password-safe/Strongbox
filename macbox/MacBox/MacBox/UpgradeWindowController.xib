@@ -19,7 +19,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Upgrade to Full Version" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
+        <window title="Upgrade to Pro?" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES"/>
             <rect key="contentRect" x="196" y="240" width="542" height="516"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
@@ -41,7 +41,7 @@
                                     <size key="minSize" width="502" height="348"/>
                                     <size key="maxSize" width="528" height="10000000"/>
                                     <attributedString key="textStorage">
-                                        <fragment content="Upgrade? ">
+                                        <fragment content="Pro Upgrade ">
                                             <attributes>
                                                 <color key="NSColor" red="0.0" green="0.26667000000000002" blue="0.99607999999999997" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                 <font key="NSFont" size="36" name="Futura-Bold"/>
@@ -184,7 +184,7 @@ Cg
                                             </attributes>
                                         </fragment>
                                         <fragment>
-                                            <string key="content">Would you like to upgrade and help to support the app?   In addition to contributing to ongoing development, you will also get access to all the features listed below.  I hope you'll choose to contribute.  
+                                            <string key="content">Would you like to upgrade and help to support the app?   In addition to contributing to ongoing development, you will also get access to all the premium professional features listed below.  I hope you'll choose to contribute.  
 Thanks!
 -Mark</string>
                                             <attributes>
@@ -279,7 +279,7 @@ Cgo
                                                 </paragraphStyle>
                                             </attributes>
                                         </fragment>
-                                        <fragment content="Full Version Features">
+                                        <fragment content="Pro Features">
                                             <attributes>
                                                 <color key="NSColor" red="0.0" green="0.26667000000000002" blue="0.99607999999999997" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                 <font key="NSFont" size="24" name="Futura-Medium"/>
@@ -375,7 +375,8 @@ Cg
                                         </fragment>
                                         <fragment>
                                             <string key="content">Search Your Safes
-No More Upgrade Nags</string>
+Support Development
+Instant Karma</string>
                                             <attributes>
                                                 <font key="NSFont" size="16" name="Futura-MediumItalic"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" headIndent="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">

@@ -31,13 +31,13 @@
     
     if(![Settings sharedInstance].fullVersion) {
         if (![Settings sharedInstance].freeTrial) {
-            freeTrialLiteSuffix = @" - LITE Version - Please Upgrade";
+            freeTrialLiteSuffix = @" - (Pro Upgrade Available)";
         }
         else {
             long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
             
             if(daysLeft < 15) {
-                freeTrialLiteSuffix = [NSString stringWithFormat:@" - [Free Trial %ld Days Left]", daysLeft];
+                freeTrialLiteSuffix = [NSString stringWithFormat:@" - [%ld 'Pro' Days Left]", daysLeft];
             }
         }
     }

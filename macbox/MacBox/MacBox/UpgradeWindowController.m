@@ -244,9 +244,9 @@
 
 - (void)onSuccessfulRestore {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [Alerts info:@"Welcome back to StrongBox"
+        [Alerts info:@"Welcome back to StrongBox Pro"
      informativeText:@"Upgrade Restored Successfully. Thank you for your support!\n\n"
-         @"Please restart the Application to enjoy the Full version."
+         @"Please restart the Application to enjoy your Pro features."
               window:self.window
           completion:^{
               [self close:YES];
@@ -266,8 +266,8 @@ updatedTransactions:(NSArray *)transactions {
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [Alerts info:@"Welcome to StrongBox"
-                 informativeText:@"Upgrade to Full version successful! Thank you for your support!\n\nPlease restart the Application to enjoy the Full version."
+                    [Alerts info:@"Welcome to StrongBox Pro"
+                 informativeText:@"Upgrade to Pro version successful! Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features."
                           window:self.window  completion:^{
                         [self close:YES];
                     }];
