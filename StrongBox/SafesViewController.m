@@ -26,6 +26,8 @@
 #import "Settings.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 
+#define kTouchId911Limit 5
+
 @interface SafesViewController ()
 
 @property (nonatomic, strong) SafesCollection *safes;
@@ -34,6 +36,7 @@
 @property (nonatomic, strong) GoogleDriveStorageProvider *google;
 @property (nonatomic, strong) DropboxV2StorageProvider *dropbox;
 @property (nonatomic, strong) LocalDeviceStorageProvider *local;
+@property (nonatomic) BOOL touchId911;
 
 @end
 
@@ -168,7 +171,8 @@
     if (safe.isTouchIdEnabled &&
         [IOsUtils isTouchIDAvailable] &&
         safe.isEnrolledForTouchId &&
-        [[Settings sharedInstance] isProOrFreeTrial]) {
+        ([[Settings sharedInstance] isProOrFreeTrial] || self.touchId911)) {
+        self.touchId911 = NO;
         [self showTouchIDAuthentication:safe];
     }
     else {
@@ -717,6 +721,10 @@ static BOOL shownNagScreenThisSession = NO;
     //[self.buttonTogglePro setTitle:(![[Settings sharedInstance] isProOrFreeTrial] ? @"Go Pro" : @"Go Free")];
     [self.buttonTogglePro setEnabled:NO];
     [self.buttonTogglePro setTintColor: [UIColor clearColor]];
+    
+    [self.buttonTouchID911 setEnabled:NO];
+    [self.buttonTouchID911 setTintColor: [UIColor clearColor]];
+    
     //[self.buttonTogglePro setEnabled:YES];
     //[self.buttonTogglePro setTintColor:nil];
     
@@ -725,6 +733,13 @@ static BOOL shownNagScreenThisSession = NO;
     }
     else {
         [self.navItemHeader setTitle:@"Safes [Lite Version]"];
+        
+        if(([[Settings sharedInstance] getTouchId911Count] < kTouchId911Limit) &&
+           ([IOsUtils isTouchIDAvailable]) &&
+           [self.safes safeWithTouchIdIsAvailable]) {
+            [self.buttonTouchID911 setEnabled:YES];
+            [self.buttonTouchID911 setTintColor:nil];
+        }
     }
     
     if(![[Settings sharedInstance] isPro]) {
@@ -780,6 +795,22 @@ static BOOL shownNagScreenThisSession = NO;
                            }
                        }];
     }
+}
+
+- (IBAction)onTouchID911:(id)sender {
+    NSString *message = [NSString stringWithFormat:@"You can enable Touch ID temporarily up to a maximum of %d times under the free version of StrongBox. This is to allow you to possibly recover from a situation where you've forgotten your master password because you were using Touch ID before. This may allow you access to your safe after you've decided not to upgrade to the Pro version. Once you have access to your safe you can then change your master password. This is an emergency, temporary and convenenience feature only. You SHOULD ALWAYS know your master password. Please upgrade if you'd like to continue using Touch ID.\n\nDo you want to enable emergency Touch ID for your next safe open?", kTouchId911Limit];
+    
+    [Alerts yesNo:self
+            title:@"Emergency Touch ID Activation"
+          message:message
+           action:^(BOOL response) {
+        if(response) {
+            self.touchId911 = YES;
+            [[Settings sharedInstance] incrementTouchId911Count];
+            
+            [Alerts info:self title:@"Emergency Touch ID Enabled" message:@"You can use Touch ID now for your next Safe Open. If you do not know your Master Password you should change it immediately in Settings. You can also export the safe to another application. Otherwise I would ask you to consider supporting the app by upgrading.\n\n-Mark"];
+        }
+    }];
 }
 
 @end

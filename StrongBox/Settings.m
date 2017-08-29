@@ -18,6 +18,7 @@
 #define kCopyPasswordOnLongPress @"copyPasswordOnLongPress"
 #define kShowPasswordByDefaultOnEditScreen @"showPasswordByDefaultOnEditScreen"
 #define kIsHavePromptedAboutFreeTrial @"isHavePromptedAboutFreeTrial"
+#define kTouchId911Count @"kTouchId911Count"
 
 @interface Settings ()
 
@@ -192,6 +193,33 @@
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
+    
+    [userDefaults synchronize];
+}
+
+- (NSInteger)getTouchId911Count {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    NSInteger count = [userDefaults integerForKey:kTouchId911Count];
+    
+    return count;
+}
+
+- (void)incrementTouchId911Count {
+    NSInteger count = [self getTouchId911Count];
+    
+    count++;
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setInteger:count forKey:kTouchId911Count];
+    
+    [userDefaults synchronize];
+}
+
+- (void)resetTouchId911Count {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults removeObjectForKey:kTouchId911Count];
     
     [userDefaults synchronize];
 }

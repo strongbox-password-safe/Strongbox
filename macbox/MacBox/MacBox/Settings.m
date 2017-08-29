@@ -10,6 +10,7 @@
 
 #define kRevealDetailsImmediately @"revealDetailsImmediately"
 #define kFullVersion @"fullVersion"
+#define kEndFreeTrialDate @"endFreeTrialDate"
 
 @implementation Settings
 
@@ -37,6 +38,49 @@
 
 - (void)setFullVersion:(BOOL)value {
     [self setBool:kFullVersion value:value];
+}
+
+- (BOOL)freeTrial {
+    NSDate* date = self.endFreeTrialDate;
+    
+    if(date == nil) {
+        return YES;
+    }
+    
+    return !([date timeIntervalSinceNow] < 0);
+}
+
+- (NSInteger)freeTrialDaysRemaining {
+    NSDate* date = self.endFreeTrialDate;
+    
+    if(date == nil) {
+        return -1;
+    }
+    
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    
+    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
+                                                fromDate:[NSDate date]
+                                                  toDate:date
+                                                 options:0];
+    
+    NSInteger days = [components day];
+    
+    return days;
+}
+
+- (NSDate*)endFreeTrialDate {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    return [userDefaults objectForKey:kEndFreeTrialDate];
+}
+
+- (void)setEndFreeTrialDate:(NSDate *)endFreeTrialDate {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults setObject:endFreeTrialDate forKey:kEndFreeTrialDate];
+    
+    [userDefaults synchronize];
 }
 
 - (BOOL)getBool:(NSString*)key {

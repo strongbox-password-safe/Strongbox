@@ -15,9 +15,7 @@
 -(void)updateDocumentUrl;
 
 @property (weak) IBOutlet NSOutlineView *outlineView;
-@property (weak) IBOutlet NSStackView *stackViewUnlocked;
 @property (weak) IBOutlet NSStackView *stackViewLockControls;
-@property (weak) IBOutlet NSStackView *stackViewRecordView;
 @property (weak) IBOutlet NSStackView *stackViewSummaryView;
 
 @property (weak) IBOutlet NSSecureTextField *textFieldMasterPassword;
@@ -35,7 +33,7 @@
 
 - (IBAction)onSearch:(id)sender;
 - (IBAction)onUnlock:(id)sender;
-- (IBAction)onLock:(id)sender;
+
 - (IBAction)onOutlineViewDoubleClick:(id)sender;
 - (IBAction)onRevealDetails:(id)sender;
 - (IBAction)onConcealDetails:(id)sender;
@@ -48,6 +46,9 @@
 - (IBAction)onCheckboxRevealDetailsImmediately:(id)sender;
 @property (weak) IBOutlet NSButton *buttonShowHidePassword;
 @property (weak) IBOutlet NSTextField *labelLeftStatus;
+
+@property (weak) IBOutlet NSTabView *tabViewLockUnlock;
+@property (weak) IBOutlet NSTabView *tabViewRightPane;
 
 @end
 

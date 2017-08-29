@@ -13,6 +13,8 @@
 #import "Alerts.h"
 #import "ChangeMasterPasswordWindowController.h"
 #import "WindowController.h"
+#import "Settings.h"
+#import "AppDelegate.h"
 
 @interface Document ()
 
@@ -66,7 +68,14 @@
                                }];
     }
     else {
-        return [super saveDocument:sender];
+        [super saveDocument:sender];
+    
+        if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
+            AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
+            [appDelegate showUpgradeModal:5];
+        }
+        
+        return;
     }
 }
 
@@ -81,8 +90,6 @@
                               error:outError];
     
     if (success) {
-        NSLog(@"Saved!");
-        
         self.dirty = NO;
         ViewController *vc = (ViewController*)self.windowController.contentViewController;
         [vc updateDocumentUrl]; // Refresh View to pick up document URL changes

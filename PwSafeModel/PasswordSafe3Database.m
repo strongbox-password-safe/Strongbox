@@ -311,7 +311,7 @@
     Group *retGroup = [parent createChildGroupWithTitle:title];
 
     if([[self getAllGroups] containsObject:retGroup]) {
-        NSLog(@"This group already exists... not re-creating.");
+        //NSLog(@"This group already exists... not re-creating.");
         return nil;
     }
     

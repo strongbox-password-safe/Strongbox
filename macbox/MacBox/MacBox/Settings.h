@@ -15,4 +15,9 @@
 @property (nonatomic) BOOL revealDetailsImmediately;
 @property (nonatomic) BOOL fullVersion;
 
+@property (nonatomic, readonly) BOOL freeTrial;
+@property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
+
+@property (nonatomic, strong) NSDate* endFreeTrialDate;
+
 @end

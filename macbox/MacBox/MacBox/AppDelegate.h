@@ -11,5 +11,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 
+- (void)showUpgradeModal:(NSInteger)delay;
+
 @end
 

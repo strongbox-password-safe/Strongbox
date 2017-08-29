@@ -19,4 +19,31 @@
     return error;
 }
 
++ (NSString *)getAppVersion {
+    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
+    
+    return [NSString stringWithFormat:@"%@", info[@"CFBundleShortVersionString"]];
+}
+
++ (NSString *)getAppName {
+    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
+    NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleDisplayName"], info[@"CFBundleShortVersionString"]];
+    
+    return appName;
+}
+
++ (NSString *)insertTimestampInFilename:(NSString *)title {
+    NSString *fn = title;
+    
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    
+    dateFormat.dateFormat = @"yyyyMMdd-HHmmss";
+    NSDate *date = [[NSDate alloc] init];
+    
+    NSString *extension = title.pathExtension;
+    fn = [NSString stringWithFormat:@"%@-%@.%@", title, [dateFormat stringFromDate:date], extension];
+    
+    return fn;
+}
+
 @end

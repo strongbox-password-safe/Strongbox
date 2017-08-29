@@ -55,7 +55,7 @@
                     </tableView>
                     <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
                     <toolbarItems>
-                        <barButtonItem title="Go Pro" id="UR1-FK-uNa">
+                        <barButtonItem title="Touch ID 911" id="UR1-FK-uNa">
                             <connections>
                                 <action selector="onTogglePro:" destination="9DM-GO-ZGc" id="MSg-wN-NDh"/>
                             </connections>
@@ -67,7 +67,11 @@
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="6Os-iN-oaW"/>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="zCL-Hq-Nfe"/>
+                        <barButtonItem title="Touch ID 911" id="jMj-Ez-C2G" userLabel="TouchID 911">
+                            <connections>
+                                <action selector="onTouchID911:" destination="9DM-GO-ZGc" id="OQh-gj-ib0"/>
+                            </connections>
+                        </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Safes [Lite Version]" id="g1g-nh-a5L">
                         <barButtonItem key="leftBarButtonItem" image="gear_24" id="1nK-Pq-30i">
@@ -84,6 +88,7 @@
                     <connections>
                         <outlet property="buttonAddSafe" destination="zN1-I2-XSj" id="SD8-XN-MaW"/>
                         <outlet property="buttonTogglePro" destination="UR1-FK-uNa" id="lLz-rj-yyu"/>
+                        <outlet property="buttonTouchID911" destination="jMj-Ez-C2G" id="Va7-rp-L6k"/>
                         <outlet property="buttonUpgrade" destination="tmo-77-bgs" id="Ll3-sF-2r3"/>
                         <outlet property="navItemHeader" destination="g1g-nh-a5L" id="VqK-HH-5Cu"/>
                         <segue destination="cYG-Rk-SmU" kind="push" identifier="segueToOpenSafeView" animates="NO" id="aYd-mP-3oX"/>

@@ -22,4 +22,6 @@
 - (NSString *)sanitizeSafeNickName:(NSString *)string;
 - (BOOL)isValidNickName:(NSString *)nickName;
 
+- (BOOL)safeWithTouchIdIsAvailable;
+
 @end

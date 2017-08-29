@@ -8,6 +8,7 @@
 
 #import "WindowController.h"
 #import "Document.h"
+#import "Settings.h"
 
 @interface WindowController ()
 
@@ -26,8 +27,23 @@
 }
 
 - (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
+    NSString* freeTrialLiteSuffix = @"";
+    
+    if(![Settings sharedInstance].fullVersion) {
+        if (![Settings sharedInstance].freeTrial) {
+            freeTrialLiteSuffix = @" - LITE Version - Please Upgrade";
+        }
+        else {
+            long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
+            
+            if(daysLeft < 15) {
+                freeTrialLiteSuffix = [NSString stringWithFormat:@" - [Free Trial %ld Days Left]", daysLeft];
+            }
+        }
+    }
+    
     Document* doc = self.document;
-    return [NSString stringWithFormat:@"%@%@", displayName, doc.dirty ? @" [*edited]" : @""];
+    return [NSString stringWithFormat:@"%@%@%@", displayName, doc.dirty ? @" [*edited]" : @"", freeTrialLiteSuffix];
 }
 
 @end

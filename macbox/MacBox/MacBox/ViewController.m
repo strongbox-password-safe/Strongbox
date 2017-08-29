@@ -10,6 +10,7 @@
 #import "Alerts.h"
 #import "ChangeMasterPasswordWindowController.h"
 #import "Settings.h"
+#import "AppDelegate.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -23,8 +24,6 @@
 @property (nonatomic) BOOL showPassword;
 @property (nonatomic) NSString* hiddenPasswordTemporaryStore;
 
-//@property (strong, nonatomic) NSMutableSet<SafeItemViewModel*> *itemsCache; // TODO: Fix Memory Model so hold references like this is not needed :(
-
 @end
 
 @implementation ViewController
@@ -32,25 +31,57 @@
 - (void)viewDidAppear {
     [super viewDidAppear];
     
+    [self initializeFullOrTrialOrLiteUI];
+    
     [self setInitialFocus];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    //self.itemsCache = [[NSMutableSet alloc] initWithCapacity:512];
-    self.buttonRevealDetails.layer.cornerRadius = 20;
+    [self loadUIImages];
     
+    [self enableDragDrop];
+
+    [self customizeUi];
+
     [self bindToModel];
+}
+
+- (void)customizeUi {
+    self.buttonRevealDetails.layer.cornerRadius = 20;
+    self.checkboxRevealDetailsImmediately.state = [Settings sharedInstance].revealDetailsImmediately;
     
-    self.folderImage = [NSImage imageNamed:@"Places-folder-blue-icon-256-cropped-vertical-logo"];
+    [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
+    [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
+}
+
+- (void)loadUIImages {
+    self.folderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
     self.strongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
     self.smallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
     self.smallLockImage = [NSImage imageNamed:@"lock-48"];
-    
-    self.checkboxRevealDetailsImmediately.state = [Settings sharedInstance].revealDetailsImmediately;
-    
-    [self enableDragDrop];
+}
+
+- (void)disableFeaturesForLiteVersion {
+    [self.searchField setPlaceholderString:@"Search Disabled - Please Upgrade"];
+    self.searchField.enabled = NO;
+    self.searchSegmentedControl.enabled = NO;
+}
+
+- (void)enableFeaturesForFullVersion {
+    [self.searchField setPlaceholderString:@"Search (⌘F)"];
+    self.searchField.enabled = YES;
+    self.searchSegmentedControl.enabled = YES;
+}
+
+- (void)initializeFullOrTrialOrLiteUI {
+    if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial) {
+        [self disableFeaturesForLiteVersion];
+    }
+    else {
+        [self enableFeaturesForFullVersion];
+    }
 }
 
 -(void)setModel:(ViewModel *)model {
@@ -64,21 +95,18 @@
 
 - (void)bindToModel {
     if(self.model == nil) {
-        self.stackViewLockControls.hidden = YES;
-        self.stackViewUnlocked.hidden = NO;
-
+        [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
+        
         [self.outlineView reloadData];
         
         return;
     }
     
     if(self.model.locked) {
-        self.stackViewLockControls.hidden = NO;
-        self.stackViewUnlocked.hidden = YES;
+        [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
     }
     else {        
-        self.stackViewLockControls.hidden = YES;
-        self.stackViewUnlocked.hidden = NO;
+        [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
     }
     
     [self.outlineView reloadData];
@@ -110,12 +138,10 @@
         self.textFieldUrl.stringValue = @"";
         self.textFieldUsername.stringValue = @"";
         self.textViewNotes.string = @"";
-        
         self.imageViewSummary.image = self.strongBox256Image;
         self.textFieldSummaryTitle.stringValue= @"";
         
-        self.stackViewSummaryView.hidden = NO;
-        self.stackViewRecordView.hidden = YES;
+        [self.tabViewRightPane selectTabViewItemAtIndex:1];
         self.stackViewRevealButton.hidden = YES;
     }
     else if (it.isGroup) {
@@ -128,8 +154,8 @@
         self.imageViewSummary.image = self.folderImage;
         self.textFieldSummaryTitle.stringValue = it.title;
         
-        self.stackViewSummaryView.hidden = NO;
-        self.stackViewRecordView.hidden = YES;
+        [self.tabViewRightPane selectTabViewItemAtIndex:1];
+        
         self.stackViewRevealButton.hidden = YES;
     }
     else {
@@ -162,13 +188,11 @@
 }
 
 - (void)revealDetails {
-    self.stackViewSummaryView.hidden = YES;
-    self.stackViewRecordView.hidden = NO;
+        [self.tabViewRightPane selectTabViewItemAtIndex:0];
 }
 
 - (void)concealDetails {
-    self.stackViewSummaryView.hidden = NO;
-    self.stackViewRecordView.hidden = YES;
+    [self.tabViewRightPane selectTabViewItemAtIndex:1];
     self.stackViewRevealButton.hidden = NO;
 }
 
@@ -226,8 +250,6 @@
     }
     
     NSArray<SafeItemViewModel*> *items = [self.model getItemsForGroup:parentGroup];
-
-    //[self.itemsCache addObjectsFromArray:items];
     
     return [items filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [self isSafeItemMatchesSearchCriteria:evaluatedObject];
@@ -465,12 +487,12 @@
 
 - (IBAction)controlTextDidChange:(NSNotification *)obj
 {
-    NSLog(@"controlTextDidChange");
+    //NSLog(@"controlTextDidChange");
     [self onDetailFieldChange:obj.object];
 }
 
 - (void)textDidChange:(NSNotification *)notification {
-    NSLog(@"textDidChange");
+    //NSLog(@"textDidChange");
     
     if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
         return;
@@ -478,7 +500,7 @@
     
     SafeItemViewModel* item = [self getCurrentSelectedItem];
     if(notification.object == self.textViewNotes && ![item.notes isEqualToString:self.textViewNotes.textStorage.string]) {
-        NSLog(@"Notes Changed");
+        //NSLog(@"Notes Changed");
         [self.model setItemNotes:item notes:self.textViewNotes.textStorage.string];
     }
 }
@@ -502,7 +524,7 @@
     
     if(sender == self.textFieldTitle) {
         if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
-            NSLog(@"Title Changed!");
+            //NSLog(@"Title Changed!");
             [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
             
             NSInteger row = [self.outlineView selectedRow];
@@ -512,21 +534,21 @@
     }
     else if(sender == self.textFieldUsername) {
         if(![item.username isEqualToString:trimField(self.textFieldUsername)]) {
-            NSLog(@"Username Changed!");
+            //NSLog(@"Username Changed!");
             [self.model setItemUsername:item username:trimField(self.textFieldUsername)];
             // self.textFieldUsername.stringValue = trimField(self.textFieldUsername);
         }
     }
     else if(sender == self.textFieldUrl) {
         if(![item.url isEqualToString:trimField(self.textFieldUrl)]) {
-            NSLog(@"Url Changed!");
+            //NSLog(@"Url Changed!");
             [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
             // self.textFieldUrl.stringValue = trimField(self.textFieldUrl);
         }
     }
     else if(sender == self.textFieldPw) {
         if(![item.password isEqualToString:trimField(self.textFieldPw)]) {
-            NSLog(@"Password Changed!");
+            //NSLog(@"Password Changed!");
             [self.model setItemPassword:item password:trimField(self.textFieldPw)];
             // self.textFieldPw.stringValue = trimField(self.textFieldPw);
         }
@@ -537,11 +559,7 @@
     SafeItemViewModel *item = [self getCurrentSelectedItem];
     
     if(item == nil) {
-        NSLog(@"onOutlineViewItemEdited: No selected Item?");
         return;
-    }
-    else {
-        NSLog(@"onOutlineViewItemEdited");
     }
     
     NSTextField *textField = (NSTextField*)sender;
@@ -760,17 +778,39 @@ NSString* trim(NSString* str) {
     if (theAction == @selector(onDelete:)) {
         return item != nil;
     }
-    else if(theAction == @selector(onLaunchUrl:) ||
-        theAction == @selector(onCopyTitle:) ||
-        theAction == @selector(onCopyUsername:) ||
-        theAction == @selector(onCopyUrl:) ||
-        theAction == @selector(onCopyPassword:) ||
-        theAction == @selector(onCopyPasswordAndLaunchUrl:) ||
-        theAction == @selector(onCopyNotes:)) {
-        
-        return item && !item.isGroup;
+    else if (theAction == @selector(onChangeMasterPassword:) ||
+             theAction == @selector(onCreateGroup:) ||
+             theAction == @selector(onCreateRecord:) ||
+             theAction == @selector(onLock:)) {
+        return self.model && !self.model.locked;
     }
-
+    else if (theAction == @selector(onFind:)) {
+        return self.model && !self.model.locked &&
+        ([Settings sharedInstance].fullVersion || [Settings sharedInstance].freeTrial);
+    }
+    else if(theAction == @selector(onLaunchUrl:) ||
+            theAction == @selector(onCopyUrl:)) {
+        return item && !item.isGroup && self.textFieldUrl.stringValue.length;
+    }
+    else if (theAction == @selector(onCopyTitle:)) {
+        return item && !item.isGroup && self.textFieldTitle.stringValue.length;
+    }
+    else if (theAction == @selector(onCopyUsername:)) {
+        return item && !item.isGroup && self.textFieldUsername.stringValue.length;
+    }
+    else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
+        NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
+        
+        return item && !item.isGroup && password.length && self.textFieldUrl.stringValue.length;
+    }
+    else if (theAction == @selector(onCopyPassword:)) {
+        NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
+        return item && !item.isGroup && password.length;
+    }
+    else if (theAction == @selector(onCopyNotes:)) {
+        return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
+    }
+    
     return YES;
 }
 

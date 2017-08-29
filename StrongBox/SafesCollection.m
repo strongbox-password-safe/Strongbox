@@ -10,7 +10,7 @@
 #import "SafeMetaData.h"
 
 @interface SafesCollection ()
-@property NSMutableArray *safes;
+@property NSMutableArray<SafeMetaData*> *safes;
 @end
 
 @implementation SafesCollection
@@ -107,6 +107,15 @@
     return [sanitized isEqualToString:nickName] &&
     nickName.length > 0 &&
     ![[self getAllNickNamesLowerCase] containsObject:nickName.lowercaseString];
+}
+
+- (BOOL)safeWithTouchIdIsAvailable {
+    NSArray<SafeMetaData*> *touchIdEnabledSafes = [self.safes filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        SafeMetaData *safe = (SafeMetaData*)evaluatedObject;
+        return safe.isTouchIdEnabled && safe.isEnrolledForTouchId;
+    }]];
+    
+    return [touchIdEnabledSafes count] > 0;
 }
 
 @end

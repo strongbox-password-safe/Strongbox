@@ -11,6 +11,7 @@
 
 @interface SafesViewController : UITableViewController<SKProductsRequestDelegate>
 
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonTouchID911;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;

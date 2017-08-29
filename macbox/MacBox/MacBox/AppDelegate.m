@@ -10,9 +10,11 @@
 #import "DocumentController.h"
 #import "Settings.h"
 #import "UpgradeWindowController.h"
+#import "Alerts.h"
+#import "Utils.h"
 
-#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
-// com.markmcguill.strongbox.mac.pro
+//#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
+#define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
 
 @interface AppDelegate ()
 
@@ -28,8 +30,8 @@
 - (id)init {
     self = [super init];
     
-    // Bizarre but to subclass NSDocumentController you must instantiate your document here, no need to assign it anywhere
-    // it just picks it up by "magic" very strange...
+    // Bizarre but to subclass NSDocumentController you must instantiate your document here, no need to assign
+    // it anywhere it just picks it up by "magic" very strange...
     
     DocumentController *dc = [[DocumentController alloc] init];
     
@@ -39,18 +41,57 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    [[Settings sharedInstance] setFullVersion:NO];
-    
     [self removeUnwantedMenuItems];
     
-    if(![[Settings sharedInstance] fullVersion]) {
+    if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
+
+        if([Settings sharedInstance].endFreeTrialDate == nil) {
+            [self initializeFreeTrialAndShowWelcomeMessage];
+        }
+        else if(![Settings sharedInstance].freeTrial){
+            [self randomlyShowUpgradeMessage];
+        }
     }
     else {
         [self removeUpgradeMenuItem];
+        
+        [self randomlyPromptForAppStoreReview];
     }
     
     self.applicationHasFinishedLaunching = YES;
+}
+
+- (void)randomlyPromptForAppStoreReview {
+    NSUInteger random = arc4random_uniform(100);
+    
+    // TODO: use iRate app?
+    
+    if(random % 5) {
+        // TODO: Show
+    }
+}
+
+- (void)initializeFreeTrialAndShowWelcomeMessage {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
+    
+    [Settings sharedInstance].endFreeTrialDate = date;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [Alerts info:@"Welcome to StrongBox for Mac"
+     informativeText:@"Hi and welcome to StrongBox for Mac!\n\nI hope you'll really like the app, and find it useful. You can enjoy this fully featured version of StrongBox for the next 2 months hassle free. After that point some features like Search will be disabled.\n\nYou'll always be able to add your entries and have as many safes as you like open. But you might see an annoying popup every now and then asking you if you'd consider supporting continued development of the app. I hope you'll choose to do so.\n\nYou can always find out more by clicking 'Upgrade to Full Version' in the StrongBox menu item.\n\nThanks!\n-Mark"
+              window:[NSApplication sharedApplication].mainWindow 
+          completion:nil];
+    });
+}
+
+- (void)randomlyShowUpgradeMessage {
+    NSUInteger random = arc4random_uniform(100);
+    
+    if(random % 3 == 0) {
+        [((AppDelegate*)[[NSApplication sharedApplication] delegate]) showUpgradeModal:3];
+    }
 }
 
 - (void)getValidIapProducts {
@@ -96,7 +137,6 @@
 - (void)removeUpgradeMenuItem {
     NSMenu* strongBox = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"StrongBox"] submenu];
     if([[strongBox itemAtIndex:2] action] == NSSelectorFromString(@"onUpgradeToFullVersion:")) {
-        NSLog(@"Removing Upgrade Menu Item");
         [strongBox removeItemAtIndex:2];
     }
 }
@@ -125,23 +165,50 @@
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {
+    [self showUpgradeModal:0];
+}
+
+- (void)showUpgradeModal:(NSInteger)delay {
     SKProduct* product = [_validProducts objectAtIndex:0];
     
-    if([UpgradeWindowController run:product cancelDelay:0]) {
+    if([UpgradeWindowController run:product cancelDelay:delay]) {
         [[Settings sharedInstance] setFullVersion:YES];
         [self removeUpgradeMenuItem];
     };
 }
 
-- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
-{
-    SEL theAction = [anItem action];
+- (IBAction)onEmailSupport:(id)sender {
+    NSString* subject = [NSString stringWithFormat:@"StrongBox for Mac %@ Support", [Utils getAppVersion]];
+    NSString* emailBody = @"Hi,\n\nI'm having some trouble with StrongBox for Mac.\n\n<Please include as much detail as possible here including screenshots where appropriate.>";
+    NSString* toAddress = @"support@strongboxsafe.com";
     
-    if(theAction == @selector(onUpgradeToFullVersion:)) {
-       return ![[Settings sharedInstance] fullVersion] && [_validProducts count];
+    NSSharingService* emailService = [NSSharingService sharingServiceNamed:NSSharingServiceNameComposeEmail];
+    emailService.recipients = @[toAddress];
+    emailService.subject = subject;
+    
+    if ([emailService canPerformWithItems:@[emailBody]]) {
+        [emailService performWithItems:@[emailBody]];
+    } else {
+        NSString *encodedSubject = [NSString stringWithFormat:@"SUBJECT=%@", [subject stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        NSString *encodedBody = [NSString stringWithFormat:@"BODY=%@", [emailBody stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        NSString *encodedTo = [toAddress stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *encodedURLString = [NSString stringWithFormat:@"mailto:%@?%@&%@", encodedTo, encodedSubject, encodedBody];
+        NSURL *mailtoURL = [NSURL URLWithString:encodedURLString];
+        
+        if(![[NSWorkspace sharedWorkspace] openURL:mailtoURL]) {
+            [Alerts info:@"Email Unavailable"
+         informativeText:@"StrongBox could not initialize an email for you, perhaps because it is not configured on this Mac.\n\n"
+                        @"Please send an email to support@strongboxsafe.com with details of your issue."
+                  window:[NSApplication sharedApplication].mainWindow
+              completion:nil];
+        }
     }
-    
-    return YES;
 }
+
+//[[Settings sharedInstance] setFullVersion:NO];
+//[[Settings sharedInstance] setEndFreeTrialDate:nil];
+//NSCalendar *cal = [NSCalendar currentCalendar];
+//NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-10 toDate:[NSDate date] options:0];
+//[[Settings sharedInstance] setEndFreeTrialDate:date];
 
 @end

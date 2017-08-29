@@ -89,6 +89,7 @@
 		4DA53E761F4C740C0003F682 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4DA595C61F4461B800351BEC /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../PwSafeModel/Utils.h; sourceTree = "<group>"; };
 		4DA595C71F4461B800351BEC /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../../PwSafeModel/Utils.m; sourceTree = "<group>"; };
+		4DC225701F558D47000B0FBB /* StrongBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrongBox.entitlements; sourceTree = "<group>"; };
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
@@ -178,6 +179,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
 				4D92C8231F388EA800341A58 /* twofish.c */,
 				4D92C8211F388E9D00341A58 /* crypt_argchk.c */,
 				4D92C8001F388E5D00341A58 /* PwSafeModel */,
@@ -300,6 +302,9 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.Sandbox = {
 								enabled = 1;
 							};
 						};
@@ -531,6 +536,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
@@ -546,6 +552,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
