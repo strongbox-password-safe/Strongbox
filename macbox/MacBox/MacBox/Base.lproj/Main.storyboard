@@ -271,15 +271,10 @@ CA
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
                                     <items>
-                                        <menuItem title="Email Support (support@strongboxsafe.com)" id="FKE-Sm-Kum">
+                                        <menuItem title="Contact Support" id="FKE-Sm-Kum">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="onEmailSupport:" target="Ady-hI-5gd" id="Rbv-X9-3qK"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="MacBox Help" keyEquivalent="?" id="lrA-T7-vQf">
-                                            <connections>
-                                                <action selector="showHelp:" target="Ady-hI-5gd" id="32e-KA-OHB"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -508,7 +503,7 @@ DQ
                                                                     <rect key="frame" x="20" y="2" width="396.5" height="345"/>
                                                                     <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
                                                                         <rect key="frame" x="1" y="1" width="394.5" height="343"/>
-                                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                        <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="8" autosaveExpandedItems="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="394.5" height="343"/>
@@ -742,7 +737,7 @@ DQ
                                                                                         <rect key="frame" x="10" y="62" width="382" height="145"/>
                                                                                         <clipView key="contentView" id="n6X-39-X3W">
                                                                                             <rect key="frame" x="1" y="1" width="380" height="143"/>
-                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                             <subviews>
                                                                                                 <textView importsGraphics="NO" richText="NO" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
                                                                                                     <rect key="frame" x="0.0" y="0.0" width="380" height="143"/>

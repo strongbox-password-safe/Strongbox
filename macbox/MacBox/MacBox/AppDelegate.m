@@ -79,8 +79,8 @@
     [Settings sharedInstance].endFreeTrialDate = date;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [Alerts info:@"Welcome to StrongBox for Mac"
-     informativeText:@"Hi and welcome to StrongBox for Mac!\n\n"
+        [Alerts info:@"Welcome to StrongBox"
+     informativeText:@"Hi and welcome to StrongBox!\n\n"
          @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of StrongBox for the next couple of months. "
          @"After that point, you will be transitioned to the regular version of StrongBox.\n\n"
          @"You can always find out more at any time by clicking 'Upgrade to Pro' in the StrongBox menu item.\n\n"
@@ -182,8 +182,8 @@
 }
 
 - (IBAction)onEmailSupport:(id)sender {
-    NSString* subject = [NSString stringWithFormat:@"StrongBox for Mac %@ Support", [Utils getAppVersion]];
-    NSString* emailBody = @"Hi,\n\nI'm having some trouble with StrongBox for Mac.\n\n<Please include as much detail as possible here including screenshots where appropriate.>";
+    NSString* subject = [NSString stringWithFormat:@"StrongBox %@ Support", [Utils getAppVersion]];
+    NSString* emailBody = @"Hi,\n\nI'm having some trouble with StrongBox.\n\n<Please include as much detail as possible here including screenshots where appropriate.>";
     NSString* toAddress = @"support@strongboxsafe.com";
     
     NSSharingService* emailService = [NSSharingService sharingServiceNamed:NSSharingServiceNameComposeEmail];
@@ -201,7 +201,7 @@
         
         if(![[NSWorkspace sharedWorkspace] openURL:mailtoURL]) {
             [Alerts info:@"Email Unavailable"
-         informativeText:@"StrongBox could not initialize an email for you, perhaps because it is not configured on this Mac.\n\n"
+         informativeText:@"StrongBox could not initialize an email for you, perhaps because it is not configured.\n\n"
                         @"Please send an email to support@strongboxsafe.com with details of your issue."
                   window:[NSApplication sharedApplication].mainWindow
               completion:nil];
