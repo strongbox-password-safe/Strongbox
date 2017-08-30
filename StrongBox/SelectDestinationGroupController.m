@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)refresh {
-    _items = [self.viewModel getSubgroupsForGroup:self.currentGroup];
+    _items = [self.viewModel getImmediateSubgroupsForParent:self.currentGroup];
 
     self.buttonMove.enabled = [self.viewModel validateMoveItems:self.itemsToMove destination:self.currentGroup];
 
@@ -87,7 +87,7 @@
 
     cell.textLabel.text = vm.title;
 
-    [self.viewModel getSubgroupsForGroup:vm.group];
+    [self.viewModel getImmediateSubgroupsForParent:vm.group];
     BOOL validMove = [self.viewModel validateMoveItems:self.itemsToMove destination:vm.group checkIfMoveIntoSubgroupOfDestinationOk:YES];
 
     cell.accessoryType = validMove ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;

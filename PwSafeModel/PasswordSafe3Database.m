@@ -15,11 +15,16 @@
 
 #define kStrongBoxUser @"StrongBox User"
 
-@implementation PasswordSafe3Database {
-    NSMutableArray *_records;
-    NSMutableArray *_dbHeaderFields;
-    int _keyStretchIterations;
-}
+@interface PasswordSafe3Database ()
+
+@property (nonatomic, strong) NSArray<Group*> *allGroupsCache;  // PERF/MEM
+@property (nonatomic, strong) NSMutableArray<Record*> *records;
+@property (nonatomic, strong) NSMutableArray<Field*> *dbHeaderFields;
+@property (nonatomic) NSInteger keyStretchIterations;
+
+@end
+
+@implementation PasswordSafe3Database
 
 - (instancetype)initNewWithoutPassword {
     return [self initNewWithPassword:nil];
@@ -73,7 +78,7 @@
             NSLog(@"Not a valid safe!");
 
             if (ppError != nil) {
-                *ppError = [self createNSError:@"This is not a valid Password Safe (Invalid Format)." errorCode:-1];
+                *ppError = [Utils createNSError:@"This is not a valid Password Safe (Invalid Format)." errorCode:-1];
             }
 
             return nil;
@@ -85,7 +90,7 @@
             NSLog(@"Invalid password!");
 
             if (ppError != nil) {
-                *ppError = [self createNSError:@"The password is incorrect." errorCode:-2];
+                *ppError = [Utils createNSError:@"The password is incorrect." errorCode:-2];
             }
 
             return nil;
@@ -122,7 +127,7 @@
             NSLog(@"HMAC is no good! Corrupted Safe!");
 
             if (ppError != nil) {
-                *ppError = [self createNSError:@"The data is corrupted (HMAC incorrect)." errorCode:-3];
+                *ppError = [Utils createNSError:@"The data is corrupted (HMAC incorrect)." errorCode:-3];
             }
 
             return nil;
@@ -142,8 +147,11 @@
     }
 }
 
-- (NSData *)getAsData {
-    return [self getAsData:nil];
++ (BOOL)isAValidSafe:(NSData *)candidate {
+    PasswordSafe3Header header;
+    NSUInteger numBlocks;
+    
+    return [SafeTools isAValidSafe:candidate header:&header numBlocks:&numBlocks];
 }
 
 - (NSData *)getAsData:(NSError**)error {
@@ -167,8 +175,8 @@
     //NSLog(@"Key Stretch Iterations: %d", _keyStretchIterations);
     //[SafeTools dumpDbHeaderAndRecords:_dbHeaderFields records:_records];
 
-    PasswordSafe3Header hdr = [SafeTools generateNewHeader:_keyStretchIterations
-                                            masterPassword:_masterPassword
+    PasswordSafe3Header hdr = [SafeTools generateNewHeader:(int)self.keyStretchIterations
+                                            masterPassword:self.masterPassword
                                                          K:&K
                                                          L:&L];
     // Header is done...
@@ -268,83 +276,38 @@
     return ret;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (NSArray *)records {
-    return _records;
-}
-
-- (NSArray *)dbHeaderFields {
-    return _dbHeaderFields;
-}
-
-- (NSString *)masterPassword {
-    return _masterPassword;
+- (NSArray<Record*> *)getAllRecords {
+    return [NSArray arrayWithArray:_records];
 }
 
 - (NSArray<Group *>*)emptyGroups {
     NSMutableSet<Group*> *groups = [[NSMutableSet<Group*> alloc] init];
-
+    
     for (Field *field in _dbHeaderFields) {
         if (field.dbHeaderFieldType == HDR_EMPTYGROUP) {
             NSString *groupName = field.dataAsString;
             [groups addObject:[[Group alloc] initWithEscapedPathString:groupName]];
         }
     }
-
+    
     return groups.allObjects;
 }
 
-- (Group *)createGroupWithTitle:(Group *)parent title:(NSString *)title {
-    return [self createGroupWithTitle:parent title:title validateOnly:NO];
-}
-
-- (Group *)createGroupWithTitle:(Group *)parent title:(NSString *)title validateOnly:(BOOL)validateOnly {
-    if (!title || title.length < 1) {
-        return nil;
-    }
-
-    if (!parent) {
-        parent = [[Group alloc] initAsRootGroup];
-    }
-
-    Group *retGroup = [parent createChildGroupWithTitle:title];
-
-    if([[self getAllGroups] containsObject:retGroup]) {
-        //NSLog(@"This group already exists... not re-creating.");
-        return nil;
+- (NSArray<Group*>*)allGroups {
+    if(self.allGroupsCache == nil) {
+        NSArray<Group*> *empty = [self emptyGroups];
+        
+        NSMutableSet<Group*> *groups = [[NSMutableSet<Group*> alloc] init];
+        [groups addObjectsFromArray:empty];
+        
+        for (Record *r in _records) {
+            [groups addObject:r.group];
+        }
+        
+        self.allGroupsCache = groups.allObjects;
     }
     
-    if (!validateOnly) {
-        // Store our new empty group
-
-        Field *emptyGroupField = [[Field alloc] initNewDbHeaderField:HDR_EMPTYGROUP withString:retGroup.escapedPathString];
-        [_dbHeaderFields addObject:emptyGroupField];
-    }
-
-    return retGroup;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// Search Helpers
-
-- (NSArray *)allGroupsContainingRecordsMatchingFilter:(NSString *)filter
-                                           deepSearch:(BOOL)deepSearch {
-    NSMutableArray *groups = [[NSMutableArray alloc] init];
-
-    for (Record *record in _records) {
-        if ([self recordMatchesFilter:record filter:filter deepSearch:deepSearch]) {
-            [groups addObject:record.group];
-        }
-    }
-
-    if (filter.length == 0) {
-        for (Group *emptyGroup in [self emptyGroups]) {
-            [groups addObject:emptyGroup];
-        }
-    }
-
-    return groups;
+    return self.allGroupsCache;
 }
 
 - (BOOL)recordMatchesFilter:(Record *)record
@@ -363,31 +326,43 @@
     }
 }
 
-- (NSArray<Group*> *)getSubgroupsForGroup:(Group *)parent
+- (NSArray<Group*> *)getAllSubgroupsWithParent:(Group*)parent {
+   return [[self allGroups] filteredArrayUsingPredicate:
+           [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [((Group*)evaluatedObject) isSubgroupOf:parent];
+    }]];
+}
+
+- (NSArray<Group*> *)getImmediateSubgroupsForParent:(Group *)parent
                        withFilter:(NSString *)filter
                        deepSearch:(BOOL)deepSearch {
-    NSArray<Group*> *candidateGroups = [self allGroupsContainingRecordsMatchingFilter:filter deepSearch:deepSearch];
+    NSMutableSet<Group*> *ret = [[NSMutableSet alloc] init];
 
-    NSMutableSet<Group*> *subGroupsSet = [[NSMutableSet alloc] init];
-
-    for (Group *group in candidateGroups) {
-        if ([group isSubgroupOf:parent]) {
-            Group *g = [group getDirectAncestorOfParent:parent];
-            [subGroupsSet addObject:g];
+    for (Group *group in  [self getAllSubgroupsWithParent:parent]) {
+        if (filter.length) {
+            if([self getRecordsForGroup:group withFilter:filter deepSearch:deepSearch].count) {
+                Group *immediateSubGroup = [group getDirectAncestorOfParent:parent];
+                [ret addObject:immediateSubGroup];
+                break;
+            }
+        }
+        else {
+            Group *immediateSubGroup = [group getDirectAncestorOfParent:parent];
+            [ret addObject:immediateSubGroup];
         }
     }
 
-    return subGroupsSet.allObjects;
+    return ret.allObjects;
 }
 
-- (NSArray *)getRecordsForGroup:(Group *)parent
+- (NSArray<Record*> *)getRecordsForGroup:(Group *)parent
                      withFilter:(NSString *)filter
                      deepSearch:(BOOL)deepSearch {
     if (!parent) {
         parent = [[Group alloc] initAsRootGroup];
     }
 
-    NSMutableArray *ret = [[NSMutableArray alloc] init];
+    NSMutableArray<Record*> *ret = [[NSMutableArray alloc] init];
 
     for (Record *record in _records) {
         if ([self recordMatchesFilter:record filter:filter deepSearch:deepSearch] && [record.group isEqual:parent]) {
@@ -398,99 +373,38 @@
     return ret;
 }
 
-///////////////////////////////////////////////////////////////////////////////////
-
-- (NSArray<Record*> *)getAllRecords {
-    return [NSArray arrayWithArray:_records];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-- (Record*)addRecord:(Record *)newRecord {
-    [_records addObject:newRecord];
-
-    NSMutableArray *fieldsToDelete = [[NSMutableArray alloc] init];
-
-    for (Field *field in _dbHeaderFields) {
-        if (field.dbHeaderFieldType == HDR_EMPTYGROUP) {
-            Group *group = [[Group alloc] initWithEscapedPathString:field.dataAsString];
-
-            if ([group isEqual:newRecord.group]) {
-                [fieldsToDelete addObject:field];
-            }
-        }
-    }
-
-    [_dbHeaderFields removeObjectsInArray:fieldsToDelete];
+- (Record*)getRecordByUuid:(NSString*)uuid {
+    NSArray<Record*>* filtered = [_records filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [((Record*)evaluatedObject).uuid isEqualToString:uuid];
+    }]];
     
-    return newRecord;
+    return [filtered firstObject];
 }
 
-- (void)deleteRecord:(Record *)record {
-    [_records removeObject:record];
+- (Group*)getGroupByEscapedPathString:(NSString*)escapedPathString {
+    if(escapedPathString == nil || escapedPathString.length == 0) {
+        return [[Group alloc] initAsRootGroup];
+    }
+    
+    NSArray<Group*> *allGroups = [self allGroups];
+    
+    NSArray<Group*> *filtered = [allGroups filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        Group* group = (Group*)(evaluatedObject);
+        return [group.escapedPathString isEqualToString:escapedPathString]; // TODO: Case Sensitive?
+    }]];
+    
+    return [filtered firstObject];
+}
 
-    // We'd like to keep the empty group around for convenience/display purposes - until user explicitly deletes so we'll put it
-    // in the empty groups list in the DB header if it's not there
-
-    BOOL isEmpty = YES;
-
+- (BOOL)groupContainsAnything:(Group*)group {
     for (Record *r in _records) {
-        if ([r.group isEqual:record.group] || [r.group isSubgroupOf:record.group]) {
-            isEmpty = NO;
+        if ([r.group isEqual:group] || [r.group isSubgroupOf:group]) {
+            return NO;
             break;
         }
     }
-
-    BOOL emptyGroupAlreadyExists = NO;
-
-    if (isEmpty) {
-        for (Field *field in _dbHeaderFields) {
-            if (field.dbHeaderFieldType == HDR_EMPTYGROUP) {
-                Group *group = [[Group alloc] initWithEscapedPathString:field.dataAsString];
-                
-                if ([group isEqual:record.group]) {
-                    emptyGroupAlreadyExists = YES; // HOW?!
-                    break;
-                }
-            }
-        }
-    }
-
-    if (!emptyGroupAlreadyExists) {
-        Field *emptyGroupField = [[Field alloc] initNewDbHeaderField:HDR_EMPTYGROUP withString:record.group.escapedPathString];
-        [_dbHeaderFields addObject:emptyGroupField];
-    }
-}
-
-- (void)deleteGroup:(Group *)group {
-    // We need to find all this empty group + empty groups that are a subgroup of this and delete them
-
-    NSMutableArray *fieldsToBeDeleted = [[NSMutableArray alloc] init];
-
-    for (Field *field in _dbHeaderFields) {
-        if (field.dbHeaderFieldType == HDR_EMPTYGROUP) {
-            NSString *groupName = field.dataAsString;
-            Group *g = [[Group alloc] initWithEscapedPathString:groupName];
-
-            if ([g isEqual:group] || [g isSubgroupOf:group]) {
-                [fieldsToBeDeleted addObject:field];
-            }
-        }
-    }
-
-    [_dbHeaderFields removeObjectsInArray:fieldsToBeDeleted];
-
-    // We need to find all records that are part of this group and delete them!
-
-    NSMutableArray *recordsToBeDeleted = [[NSMutableArray alloc] init];
-
-    for (Record *record in _records) {
-        if ([record.group isEqual:group] || [record.group isSubgroupOf:group]) {
-            [recordsToBeDeleted addObject:record];
-        }
-    }
-
-    [_records removeObjectsInArray:recordsToBeDeleted];
+    
+    return [self getAllSubgroupsWithParent:group].count > 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -519,10 +433,10 @@
     }
 
     if (appField) {
-        [appField setDataWithString:[self getAppName]];
+        [appField setDataWithString:[Utils getAppName]];
     }
     else {
-        appField = [[Field alloc] initNewDbHeaderField:HDR_LASTUPDATEAPPLICATION withString:[self getAppName]];
+        appField = [[Field alloc] initNewDbHeaderField:HDR_LASTUPDATEAPPLICATION withString:[Utils getAppName]];
         [_dbHeaderFields addObject:appField];
     }
 }
@@ -646,14 +560,110 @@
     }
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    PasswordSafe3Header header;
-    NSUInteger numBlocks;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    return [SafeTools isAValidSafe:candidate header:&header numBlocks:&numBlocks];
+- (Group*)createGroupWithTitle:(Group *)parent title:(NSString *)title {
+    return [self createGroupWithTitle:parent title:title validateOnly:NO];
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+- (Group*)createGroupWithTitle:(Group *)parent title:(NSString *)title validateOnly:(BOOL)validateOnly {
+    if (!title || title.length < 1) {
+        return nil;
+    }
+    
+    if (!parent) {
+        parent = [[Group alloc] initAsRootGroup];
+    }
+    
+    Group *retGroup = [parent createChildGroupWithTitle:title];
+    
+    if([[self allGroups] containsObject:retGroup]) {
+        //NSLog(@"This group already exists... not re-creating.");
+        return nil;
+    }
+    
+    if (!validateOnly) {
+        Field *emptyGroupField = [[Field alloc] initNewDbHeaderField:HDR_EMPTYGROUP
+                                                          withString:retGroup.escapedPathString];
+        [_dbHeaderFields addObject:emptyGroupField];
+        
+        [self invalidateCaches];
+    }
+    
+    return retGroup;
+}
+
+- (Record*)addRecord:(Record *)newRecord {
+    [self.records addObject:newRecord];
+    
+    // Remove any Empty Group field if it exists for this record's group
+    
+    NSMutableArray *fieldsToDelete = [[NSMutableArray alloc] init];
+    for (Field *field in _dbHeaderFields) {
+        if (field.dbHeaderFieldType == HDR_EMPTYGROUP) {
+            Group *group = [[Group alloc] initWithEscapedPathString:field.dataAsString];
+            
+            if ([group isEqual:newRecord.group]) {
+                [fieldsToDelete addObject:field];
+            }
+        }
+    }
+    
+    [_dbHeaderFields removeObjectsInArray:fieldsToDelete];
+    
+    [self invalidateCaches];
+    
+    return newRecord;
+}
+
+- (void)deleteRecord:(Record *)record {
+    [_records removeObject:record];
+    
+    // We'd like to keep the empty group around for convenience/display purposes -
+    // until user explicitly deletes so we'll put it
+    // in the empty groups list in the DB header if it's not there
+    
+    if (![self groupContainsAnything:record.group] &&
+        ![[self emptyGroups] containsObject:record.group]) {
+        Field *emptyGroupField = [[Field alloc] initNewDbHeaderField:HDR_EMPTYGROUP withString:record.group.escapedPathString];
+        [_dbHeaderFields addObject:emptyGroupField];
+    }
+    
+    [self invalidateCaches];
+}
+
+- (void)deleteGroup:(Group *)group {
+    // We need to find all this empty group + empty groups that are a subgroup of this and delete them
+    
+    NSMutableArray *fieldsToBeDeleted = [[NSMutableArray alloc] init];
+    
+    for (Field *field in _dbHeaderFields) {
+        if (field.dbHeaderFieldType == HDR_EMPTYGROUP) {
+            NSString *groupName = field.dataAsString;
+            Group *g = [[Group alloc] initWithEscapedPathString:groupName];
+            
+            if ([g isEqual:group] || [g isSubgroupOf:group]) {
+                [fieldsToBeDeleted addObject:field];
+            }
+        }
+    }
+    
+    [_dbHeaderFields removeObjectsInArray:fieldsToBeDeleted];
+    
+    // We need to find all records that are part of this group and delete them!
+    
+    NSMutableArray *recordsToBeDeleted = [[NSMutableArray alloc] init];
+    
+    for (Record *record in _records) {
+        if ([record.group isEqual:group] || [record.group isSubgroupOf:group]) {
+            [recordsToBeDeleted addObject:record];
+        }
+    }
+    
+    [_records removeObjectsInArray:recordsToBeDeleted];
+    
+    [self invalidateCaches];
+}
 
 - (BOOL)moveGroup:(Group *)src destination:(Group *)destination validateOnly:(BOOL)validateOnly {
     if (src == nil || src.isRootGroup) {
@@ -684,7 +694,7 @@
 
         // Direct subgroubs
 
-        NSArray *subgroups = [self getSubgroupsForGroup:src withFilter:nil deepSearch:NO];
+        NSArray *subgroups = [self getImmediateSubgroupsForParent:src withFilter:nil deepSearch:NO];
 
         for (Group *subgroup in subgroups) {
             if (![self moveGroup:subgroup destination:movedGroup validateOnly:validateOnly]) {
@@ -696,6 +706,7 @@
 
         if (!validateOnly) {
             [self deleteGroup:src];
+            [self invalidateCaches];
         }
 
         return YES;
@@ -715,61 +726,14 @@
 
     if (!validateOnly) {
         src.group = destination;
+        [self invalidateCaches];
     }
 
     return YES;
 }
 
-- (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode {
-    NSArray *keys = @[NSLocalizedDescriptionKey];
-    NSArray *values = @[description];
-    NSDictionary *userDict = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-    NSError *error = [[NSError alloc] initWithDomain:@"com.markmcguill.StrongBox.ErrorDomain." code:errorCode userInfo:(userDict)];
-    
-    return error;
-}
-
-- (NSString *)getAppName {
-    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
-    NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleDisplayName"], info[@"CFBundleVersion"]];
-    
-    return appName;
-}
-
-- (Record*)getRecordByUuid:(NSString*)uuid {
-    NSArray<Record*>* filtered = [_records filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return [((Record*)evaluatedObject).uuid isEqualToString:uuid];
-    }]];
-    
-    return [filtered firstObject];
-}
-
-- (NSArray<Group*>*) getAllGroups {
-    NSArray<Group*> *empty = [self emptyGroups];
-
-    NSMutableSet<Group*> *groups = [[NSMutableSet<Group*> alloc] init];
-    [groups addObjectsFromArray:empty];
-    
-    for (Record *r in _records) {
-        [groups addObject:r.group];
-    }
-
-    return groups.allObjects;
-}
-
-- (Group*)getGroupByEscapedPathString:(NSString*)escapedPathString {
-    if(escapedPathString == nil || escapedPathString.length == 0) {
-        return [[Group alloc] initAsRootGroup];
-    }
-    
-    NSArray<Group*> *allGroups = [self getAllGroups];
-    
-    NSArray<Group*> *filtered = [allGroups filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        Group* group = (Group*)(evaluatedObject);
-        return [group.escapedPathString isEqualToString:escapedPathString]; // TODO: Case Sensitive?
-    }]];
-    
-    return [filtered firstObject];
+- (void)invalidateCaches {
+    self.allGroupsCache = nil;
 }
 
 @end

@@ -7,6 +7,8 @@
 
 #include <Security/Security.h>
 
+//#define DEBUG_MEMORY_ALLOCATION_LOGGING
+
 @implementation SafeTools
 
 + (NSData *)calculateRFC2104Hmac:(NSData *)m key:(NSData *)key {
@@ -81,6 +83,9 @@
         length += TWOFISH_BLOCK_SIZE - sub;
     }
 
+#ifdef DEBUG_MEMORY_ALLOCATION_LOGGING
+    NSLog(@"serializeField => Allocating: %lu bytes", (unsigned long)length);
+#endif
     unsigned char *buf = malloc(length);
     if(!buf)
     {
@@ -140,7 +145,10 @@
     return ret;
 }
 
-+ (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations masterPassword:(NSString *)masterPassword K:(NSData **)K L:(NSData **)L {
++ (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations
+                          masterPassword:(NSString *)masterPassword
+                                       K:(NSData **)K
+                                       L:(NSData **)L {
     PasswordSafe3Header hdr;
 
     hdr.tag[0] = 'P';
@@ -470,6 +478,9 @@
                             records_p:(NSMutableArray **)records_p {
     NSMutableData *dataForHmac = [[NSMutableData alloc] init];
 
+#ifdef DEBUG_MEMORY_ALLOCATION_LOGGING
+    NSLog(@"extractDbHeaderAndRecords => Allocating: %lu bytes", (unsigned long)decData.length);
+#endif
     unsigned char *raw = malloc(decData.length);
     if (!raw)
     {
@@ -493,9 +504,11 @@
 
         [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone];
         
-        //NSLog(@"Reading Field %@ (%d)",
-        //      [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone], fieldStart->length);
-        
+#ifdef DEBUG_READING
+        NSLog(@"Reading Field %@ (%d)",
+              [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone], fieldStart->length);
+#endif
+
         [dataForHmac appendBytes:&(fieldStart->data) length:fieldStart->length];
 
         if (hdrDone) {
@@ -505,7 +518,9 @@
 
             if (fieldStart->type == FIELD_TYPE_END) {
                 Record *newRecord = [[Record alloc]initWithFields:fields];
-                //NSLog(@"Got Record: Title = %@", newRecord.title);
+#ifdef DEBUG_READING
+                NSLog(@"Got Record: Title = %@", newRecord.title);
+#endif
                 [*records_p addObject:newRecord];
 
                 fields = [[NSMutableDictionary alloc] init];

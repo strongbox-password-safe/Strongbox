@@ -57,7 +57,7 @@
 @property (NS_NONATOMIC_IOSONLY, getter = getSearchableItems, readonly, copy) NSArray *searchableItems;
 
 - (NSArray *)getItemsForGroup:(Group *)group;
-- (NSArray *)getSubgroupsForGroup:(Group *)group;
+- (NSArray *)getImmediateSubgroupsForParent:(Group *)group;
 
 // Move
 

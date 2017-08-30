@@ -27,7 +27,7 @@
 - (NSArray<SafeItemViewModel*> *)getItemsForGroup:(Group *)group;
 - (NSArray<SafeItemViewModel*> *)getItemsForGroup:(Group *)group withFilter:(NSString *)filter;
 - (NSArray<SafeItemViewModel*> *)getItemsForGroup:(Group *)group withFilter:(NSString *)filter deepSearch:(BOOL)deepSearch;
-- (NSArray<SafeItemViewModel*> *)getSubgroupsForGroup:(Group *)group;
+- (NSArray<SafeItemViewModel*> *)getImmediateSubgroupsForParent:(Group *)group;
 
 // Create / Add
 

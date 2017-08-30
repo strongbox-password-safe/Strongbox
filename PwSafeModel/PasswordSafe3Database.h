@@ -26,11 +26,11 @@
 - (instancetype)initNewWithPassword:(NSString *)masterPassword NS_DESIGNATED_INITIALIZER;
 - (instancetype)initExistingWithData:(NSString *)password data:(NSData *)safeData error:(NSError **)ppError NS_DESIGNATED_INITIALIZER;
 
-- (NSArray *)getSubgroupsForGroup:(Group *)parent
+- (NSArray<Group*> *)getImmediateSubgroupsForParent:(Group *)parent
                        withFilter:(NSString *)filter
                        deepSearch:(BOOL)deepSearch;
 
-- (NSArray *)getRecordsForGroup:(Group *)parent
+- (NSArray<Record*> *)getRecordsForGroup:(Group *)parent
                      withFilter:(NSString *)filter
                      deepSearch:(BOOL)deepSearch;
 

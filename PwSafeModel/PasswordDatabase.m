@@ -117,11 +117,13 @@
 - (NSArray *)getAllDisplayableGroups:(Group *)root {
     NSMutableArray *allDisplayableGroups = [[NSMutableArray alloc] init];
 
-    NSArray *groupsForThisLevel = [self.safe getSubgroupsForGroup:root withFilter:nil deepSearch:NO];
+    //NSLog(@"Getting subgroups for [%@]", root.escapedPathString);
+    NSArray *groupsForThisLevel = [self.safe getImmediateSubgroupsForParent:root withFilter:nil deepSearch:NO];
 
     [allDisplayableGroups addObjectsFromArray:groupsForThisLevel];
 
     for (Group *group in groupsForThisLevel) {
+        //NSLog(@"Recursing into [%@]", group.escapedPathString);
         [allDisplayableGroups addObjectsFromArray:[self getAllDisplayableGroups:group]];
     }
 
@@ -131,11 +133,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Regular Displayable Items
 
-- (NSArray<SafeItemViewModel*> *)getSubgroupsForGroup:(Group *)group {
+- (NSArray<SafeItemViewModel*> *)getImmediateSubgroupsForParent:(Group *)group {
     NSMutableArray *items = [[NSMutableArray alloc] init];
 
     NSMutableArray *subgroupsForCurrentGroup = [[NSMutableArray alloc] initWithArray:
-                                                [self.safe getSubgroupsForGroup:group
+                                                [self.safe getImmediateSubgroupsForParent:group
                                                                      withFilter:nil
                                                                      deepSearch:NO]];
 
@@ -167,7 +169,7 @@
     NSMutableArray *items = [[NSMutableArray alloc] init];
 
     NSMutableArray *subgroupsForCurrentGroup = [[NSMutableArray alloc] initWithArray:
-                                                [self.safe getSubgroupsForGroup:group
+                                                [self.safe getImmediateSubgroupsForParent:group
                                                                      withFilter:filter
                                                                      deepSearch:deepSearch]];
 
@@ -206,7 +208,7 @@
     BOOL directMove = [self moveOrValidateItems:items destination:group validateOnly:YES];
 
     if (!directMove && checkIfMoveIntoSubgroupOfDestinationOk) {
-        NSArray *subGroups = [self.safe getSubgroupsForGroup:group withFilter:nil deepSearch:NO];
+        NSArray *subGroups = [self.safe getImmediateSubgroupsForParent:group withFilter:nil deepSearch:NO];
 
         for (Group *subgroup in subGroups) {
             if ([self moveOrValidateItems:items destination:subgroup validateOnly:YES]) {

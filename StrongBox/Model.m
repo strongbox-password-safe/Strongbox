@@ -229,8 +229,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Regular Displayable Items
 
-- (NSArray *)getSubgroupsForGroup:(Group *)group {
-    return [self.passwordDatabase getSubgroupsForGroup:group];
+- (NSArray *)getImmediateSubgroupsForParent:(Group *)group {
+    return [self.passwordDatabase getImmediateSubgroupsForParent:group];
 }
 
 - (NSArray *)getItemsForGroup:(Group *)group {
