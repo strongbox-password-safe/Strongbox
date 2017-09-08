@@ -14,9 +14,20 @@
     NSMutableDictionary *_iconsByUrl;
 }
 
++ (instancetype)sharedInstance {
+    static GoogleDriveStorageProvider *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[GoogleDriveStorageProvider alloc] init];
+    });
+    return sharedInstance;
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         _displayName = @"Google Drive";
+        _icon = @"product32";
         _storageId = kGoogleDrive;
         _cloudBased = YES;
         _providesIcons = YES;

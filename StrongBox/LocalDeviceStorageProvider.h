@@ -12,7 +12,10 @@
 
 @interface LocalDeviceStorageProvider : NSObject <SafeStorageProvider>
 
++ (instancetype)sharedInstance;
+
 @property (strong, nonatomic, readonly) NSString *displayName;
+@property (strong, nonatomic, readonly) NSString *icon;
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL cloudBased;
 @property (nonatomic, readonly) BOOL providesIcons;

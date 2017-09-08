@@ -65,7 +65,7 @@
 - (void)applicationWillResignActive:(UIApplication *)application {
     UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
 
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
 
     if ([nav.visibleViewController isKindOfClass:[RecordView class]] ||
         [nav.visibleViewController isKindOfClass:[BrowseSafeView class]] ||

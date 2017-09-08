@@ -8,6 +8,7 @@
 
 #import "ViewModel.h"
 #import "LockedSafeInfo.h"
+#import "Utils.h"
 
 #define kNewUntitledGroupTitleBase @"New Untitled Group"
 
@@ -25,9 +26,11 @@
         self.passwordDatabase = [[PasswordDatabase alloc] initNewWithoutPassword];
         self.lockedSafeInfo = nil;
         
-        [self addSampleRecord:nil];
+        [self addSampleRecord:self.rootGroup];
         
-        [self.passwordDatabase createGroupWithTitle:nil title:kNewUntitledGroupTitleBase validateOnly:NO];
+        Node* newGroup = [[Node alloc] initAsGroup:kNewUntitledGroupTitleBase parent:self.rootGroup];
+
+        [self.passwordDatabase.rootGroup addChild:newGroup];
         
         _document = document;
         
@@ -35,6 +38,10 @@
     }
     
     return nil;
+}
+
+-(Node*)rootGroup {
+    return self.passwordDatabase.rootGroup;
 }
 
 - (instancetype)initWithData:(NSData*)data document:(Document*)document {
@@ -86,11 +93,6 @@
     return NO;
 }
 
-- (NSArray<SafeItemViewModel*> *)getItemsForGroup:(Group *)group {
-    return [self.passwordDatabase getItemsForGroup:group];
-}
-
-
 - (BOOL)masterPasswordIsSet {
     if(!self.locked) {
         return self.passwordDatabase.masterPassword != nil;
@@ -116,17 +118,22 @@
     return self.document.dirty;
 }
 
-- (SafeItemViewModel*)addSampleRecord:(Group*)group {
-    NSString* password = [self.passwordDatabase generatePassword];
+- (Node*)addSampleRecord:(Node* _Nonnull)group {
+    NSString* password = [self generatePassword];
     
-    return [self.passwordDatabase addRecord:@"New Untitled Record"
-                                      group:group
-                                   username:@"user123"
-                                        url:@"https://strongboxsafe.com"
-                                   password:password
-                                      notes:@"Sample Database Record. You can have any text here..."];
+    NodeFields* fields = [[NodeFields alloc] initWithUsername:@"user123"
+                                              url:@"https://strongboxsafe.com"
+                                         password:password
+                                            notes:@"Sample Database Record. You can have any text here..."];
+    
+    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:group fields:fields];
+    
+    if([group addChild:record]) {
+        return record;
+    }
+    
+    return nil;
 }
-
 
 - (BOOL)setMasterPassword:(NSString*)password {
     if(self.locked) {
@@ -140,104 +147,118 @@
     return YES;
 }
 
-- (SafeItemViewModel*)setItemTitle:(SafeItemViewModel*)item title:(NSString*)title {
+- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    SafeItemViewModel* newItem = [self.passwordDatabase setItemTitle:item title:title];
+    if([item setTitle:title]) {
+        self.document.dirty = YES;
+        return YES;
+    }
     
-    self.document.dirty = YES;
-    
-    return newItem;
+    return NO;
 }
 
-- (void)setItemUsername:(SafeItemViewModel*)item username:(NSString*)username {
+- (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase setItemUsername:item username:username];
+    item.fields.username = username;
     self.document.dirty = YES;
 }
 
-- (void)setItemUrl:(SafeItemViewModel*)item url:(NSString*)url {
+- (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase setItemUrl:item url: url];
+    item.fields.url = url;
     self.document.dirty = YES;
 }
 
-- (void)setItemPassword:(SafeItemViewModel*)item password:(NSString*)password {
+- (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password
+{
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase setItemPassword:item password:password];
+    item.fields.password = password;
     self.document.dirty = YES;
 }
 
-- (void)setItemNotes:(SafeItemViewModel*)item notes:(NSString*)notes {
+- (void)setItemNotes:(Node*_Nullable)item notes:(NSString*_Nonnull)notes {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase setItemNotes:item notes:notes];
+    item.fields.notes = notes;
     self.document.dirty = YES;
 }
 
-- (SafeItemViewModel*)addNewRecord:(Group *)group {
-    SafeItemViewModel* item = [self addSampleRecord:group];
+- (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
+    Node* item = [self addSampleRecord:parentGroup];
 
     self.document.dirty = (item != nil);
 
     return item;
 }
 
-- (SafeItemViewModel*)addNewGroup:(Group *)parentGroup {
+- (Node*)addNewGroup:(Node *_Nonnull)parentGroup {
     NSString *newGroupName = kNewUntitledGroupTitleBase;
     
     NSInteger i = 0;
-    SafeItemViewModel *item;
-    
-    while(!(item = [self.passwordDatabase createGroupWithTitle:parentGroup title:newGroupName validateOnly:NO])) {
+    BOOL success = NO;
+    Node* newGroup;
+    do {
+        newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup];
+        success =  newGroup && [parentGroup addChild:newGroup];
         i++;
         newGroupName = [NSString stringWithFormat:@"%@ %ld", kNewUntitledGroupTitleBase, i];
-    }
+    }while (!success);
     
-    self.document.dirty = (item != nil);
+    self.document.dirty = YES;
     
-    return item;
+    return newGroup;
 }
 
-- (void)deleteItem:(SafeItemViewModel*)item {
-    [self.passwordDatabase deleteItem:item];
+- (void)deleteItem:(Node *_Nonnull)child {
+    [child.parent removeChild:child];
     
     self.document.dirty = YES;
 }
 
-- (BOOL)validateMoveOfItems:(NSArray<SafeItemViewModel *> *)items group:(SafeItemViewModel*)group {
-    return [self.passwordDatabase moveOrValidateItems:items destination:group.group validateOnly:YES];
+- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
+    return [node validateChangeParent:parent];
 }
 
-- (BOOL)moveItems:(NSArray<SafeItemViewModel *> *)items group:(SafeItemViewModel*)group {
-    self.document.dirty = [self.passwordDatabase moveOrValidateItems:items destination:group.group validateOnly:NO];
+- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
+    if(![node validateChangeParent:parent]) {
+        return NO;
+    }
 
+    self.document.dirty = [node changeParent:parent];
+    
     return self.document.dirty;
 }
 
-- (NSString*)getSerializationIdForItem:(SafeItemViewModel*)item {
-    return [self.passwordDatabase getSerializationIdForItem:item];
-}
-
-- (SafeItemViewModel*)getItemFromSerializationId:(NSString*)serializationId {
-    return [self.passwordDatabase getItemFromSerializationId:serializationId];
+- (Node*)getItemFromSerializationId:(NSString*)serializationId {
+    return [self.rootGroup findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        return [node.serializationId isEqualToString:serializationId];
+    }];
 }
 
 - (NSString*)generatePassword {
-    return [self.passwordDatabase generatePassword];
+    return [Utils generatePassword];
+}
+
+- (NSString*_Nonnull)getDiagnosticDumpString {
+    return [self.passwordDatabase getDiagnosticDumpString:YES];
+}
+
+- (void)defaultLastUpdateFieldsToNow {
+    [self.passwordDatabase defaultLastUpdateFieldsToNow];
 }
 
 @end

@@ -130,7 +130,7 @@
 }
 
 - (void)bindDetailsPane {
-    SafeItemViewModel* it = [self getCurrentSelectedItem];
+    Node* it = [self getCurrentSelectedItem];
     
     if(!it) {
         self.textFieldTitle.stringValue = @"";
@@ -160,10 +160,10 @@
     }
     else {
         self.textFieldTitle.stringValue = it.title;
-        self.textFieldPw.stringValue = it.password;
-        self.textFieldUrl.stringValue = it.url;
-        self.textFieldUsername.stringValue = it.username;
-        self.textViewNotes.string = it.notes;
+        self.textFieldPw.stringValue = it.fields.password;
+        self.textFieldUrl.stringValue = it.fields.url;
+        self.textFieldUsername.stringValue = it.fields.username;
+        self.textViewNotes.string = it.fields.notes;
 
         self.imageViewSummary.image = self.strongBox256Image;
         self.textFieldSummaryTitle.stringValue = it.title;
@@ -203,15 +203,15 @@
     }
     
     if(item == nil) {
-        NSArray<SafeItemViewModel*> *items = [self getSafeItems:nil];
+        NSArray<Node*> *items = [self getSafeItems:self.model.rootGroup];
         
         return items.count > 0;
     }
     else {
-        SafeItemViewModel *it = (SafeItemViewModel*)item;
+        Node *it = (Node*)item;
         
         if(it.isGroup) {
-            NSArray<SafeItemViewModel*> *items = [self getSafeItems:it.group];
+            NSArray<Node*> *items = [self getSafeItems:it];
             
             return items.count > 0;
         }
@@ -227,36 +227,34 @@
         return 0;
     }
     
-    Group* group = (item == nil) ? nil : ((SafeItemViewModel*)item).group;
+    Node* group = (item == nil) ? self.model.rootGroup : ((Node*)item);
     
-    NSArray<SafeItemViewModel*> *items = [self getSafeItems:group];
+    NSArray<Node*> *items = [self getSafeItems:group];
     
     return items.count;
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-    Group* group = (item == nil) ? nil : ((SafeItemViewModel*)item).group;
+    Node* group = (item == nil) ? self.model.rootGroup : ((Node*)item);
     
-    NSArray<SafeItemViewModel*> *items = [self getSafeItems:group];
+    NSArray<Node*> *items = [self getSafeItems:group];
     
     return items[index];
 }
 
-- (NSArray<SafeItemViewModel*> *)getSafeItems:(Group*)parentGroup {
+- (NSArray<Node*> *)getSafeItems:(Node*)parentGroup {
     if(!self.model || self.model.locked) {
         NSLog(@"Request for safe items while model nil or locked!");
         return @[];
     }
     
-    NSArray<SafeItemViewModel*> *items = [self.model getItemsForGroup:parentGroup];
-    
-    return [items filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+    return [parentGroup.children filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [self isSafeItemMatchesSearchCriteria:evaluatedObject];
     }]];
 }
 
-- (BOOL)isSafeItemMatchesSearchCriteria:(SafeItemViewModel*)item {
+- (BOOL)isSafeItemMatchesSearchCriteria:(Node*)item {
     NSString* searchText = self.searchField.stringValue;
     
     if(![searchText length]) {
@@ -271,21 +269,35 @@
     }
     else if (scope == 1)
     {
-        predicate = [NSPredicate predicateWithFormat:@"username contains[c] %@", searchText];
+        predicate = [NSPredicate predicateWithFormat:@"fields.username contains[c] %@", searchText];
     }
     else if (scope == 2)
     {
-        predicate = [NSPredicate predicateWithFormat:@"password contains[c] %@", searchText];
+        predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
     else {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR password contains[c] %@  OR username contains[c] %@  OR url contains[c] %@  OR notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
+        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR fields.password contains[c] %@  "
+                     @"OR fields.username contains[c] %@  "
+                     @"OR fields.url contains[c] %@  "
+                     @"OR fields.notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
     }
 
     if([predicate evaluateWithObject:item]) {
         return YES;
     }
     else if(item.isGroup) {
-        return [[self getSafeItems:item.group] count] > 0;
+        for(Node* child in item.children) {
+            if(child.isGroup) {
+                if([[self getSafeItems:child] count] > 0) {
+                    return YES;
+                }
+            }
+            else {
+                if([self isSafeItemMatchesSearchCriteria:child]) {
+                    return YES;
+                }
+            }
+        }
     }
     
     return NO;
@@ -304,7 +316,7 @@
 - (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
     NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"CellIdentifier" owner:self];
 
-    SafeItemViewModel *it = (SafeItemViewModel*)item;
+    Node *it = (Node*)item;
     
     cell.textField.stringValue = it.title;
     cell.imageView.objectValue = it.isGroup ? self.smallYellowFolderImage : self.smallLockImage;
@@ -314,9 +326,9 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
     //NSLog(@"Selection Change Outline View");
-    SafeItemViewModel* item =  [self getCurrentSelectedItem];
+    Node* item =  [self getCurrentSelectedItem];
     
-    self.hiddenPasswordTemporaryStore = item == nil || item.isGroup ? nil : item.password;
+    self.hiddenPasswordTemporaryStore = item == nil || item.isGroup ? nil : item.fields.password;
     
     [self bindDetailsPane];
 }
@@ -339,7 +351,7 @@
             
             self.textFieldMasterPassword.stringValue = @"";
             
-            SafeItemViewModel* selectedItem = [self.model getItemFromSerializationId:selectedItemId];
+            Node* selectedItem = [self.model getItemFromSerializationId:selectedItemId];
             
             [self selectItem:selectedItem];
             
@@ -365,10 +377,9 @@
         else {
             NSError* error;
             
-            SafeItemViewModel* item = [self getCurrentSelectedItem];
-            NSString *selectedItemId = [self.model getSerializationIdForItem:item];
+            Node* item = [self getCurrentSelectedItem];
             
-            if(![self.model lock:&error selectedItem:selectedItemId]) {
+            if(![self.model lock:&error selectedItem:item.serializationId]) {
                 [Alerts error:error window:self.view.window];
                 return;
             }
@@ -382,7 +393,7 @@
 }
 
 - (IBAction)onOutlineViewDoubleClick:(id)sender {
-    SafeItemViewModel *item = [sender itemAtRow:[sender clickedRow]];
+    Node *item = [sender itemAtRow:[sender clickedRow]];
     
     if ([sender isItemExpanded:item]) {
         [sender collapseItem:item];
@@ -477,7 +488,7 @@
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 }
 
-- (SafeItemViewModel*)getCurrentSelectedItem {
+- (Node*)getCurrentSelectedItem {
     NSInteger selectedRow = [self.outlineView selectedRow];
     
     //NSLog(@"Selected Row: %ld", (long)selectedRow);
@@ -498,8 +509,9 @@
         return;
     }
     
-    SafeItemViewModel* item = [self getCurrentSelectedItem];
-    if(notification.object == self.textViewNotes && ![item.notes isEqualToString:self.textViewNotes.textStorage.string]) {
+    Node* item = [self getCurrentSelectedItem];
+    if(notification.object == self.textViewNotes &&
+       ![item.fields.notes isEqualToString:self.textViewNotes.textStorage.string]) {
         //NSLog(@"Notes Changed");
         [self.model setItemNotes:item notes:self.textViewNotes.textStorage.string];
     }
@@ -520,7 +532,7 @@
         return;
     }
     
-    SafeItemViewModel* item = [self getCurrentSelectedItem];
+    Node* item = [self getCurrentSelectedItem];
     
     if(sender == self.textFieldTitle) {
         if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
@@ -533,21 +545,21 @@
         }
     }
     else if(sender == self.textFieldUsername) {
-        if(![item.username isEqualToString:trimField(self.textFieldUsername)]) {
+        if(![item.fields.username isEqualToString:trimField(self.textFieldUsername)]) {
             //NSLog(@"Username Changed!");
             [self.model setItemUsername:item username:trimField(self.textFieldUsername)];
             // self.textFieldUsername.stringValue = trimField(self.textFieldUsername);
         }
     }
     else if(sender == self.textFieldUrl) {
-        if(![item.url isEqualToString:trimField(self.textFieldUrl)]) {
+        if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
             //NSLog(@"Url Changed!");
             [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
             // self.textFieldUrl.stringValue = trimField(self.textFieldUrl);
         }
     }
     else if(sender == self.textFieldPw) {
-        if(![item.password isEqualToString:trimField(self.textFieldPw)]) {
+        if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
             //NSLog(@"Password Changed!");
             [self.model setItemPassword:item password:trimField(self.textFieldPw)];
             // self.textFieldPw.stringValue = trimField(self.textFieldPw);
@@ -556,7 +568,7 @@
 }
 
 - (IBAction)onOutlineViewItemEdited:(id)sender {
-    SafeItemViewModel *item = [self getCurrentSelectedItem];
+    Node *item = [self getCurrentSelectedItem];
     
     if(item == nil) {
         return;
@@ -564,15 +576,20 @@
     
     NSTextField *textField = (NSTextField*)sender;
 
-    if(![item.title isEqualToString:trimField(textField)]) {
-        SafeItemViewModel *newlyNamedItem = [self.model setItemTitle:item title:trimField(textField)];
+    NSString* newTitle = trimField(textField);
+    if(![item.title isEqualToString:newTitle]) {
+        //SafeItemViewModel *newlyNamedItem =
+        
+        if(![self.model setItemTitle:item title:newTitle]) {
+            [Alerts info:@"You cannot change the title of this item to this value." window:self.view.window];
+        }
 
-        [self reloadDataAndSelectItem:newlyNamedItem];
+        [self reloadDataAndSelectItem:item];
          
         [self bindDetailsPane];
     }
     else {
-        textField.stringValue = trimField(textField);
+        textField.stringValue = newTitle;
     }
 }
 
@@ -584,11 +601,11 @@ NSString* trim(NSString* str) {
     return [str stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
-- (void)expandParentsOfItem:(SafeItemViewModel*)item {
+- (void)expandParentsOfItem:(Node*)item {
     NSMutableArray *stack = [[NSMutableArray alloc] init];
     
-    while (!item.isRootGroup) {
-        item = [item getParentGroup];
+    while (item.parent != nil) {
+        item = item.parent;
         
         //NSLog(@"Got Parent == %@", i.title);
         
@@ -596,7 +613,7 @@ NSString* trim(NSString* str) {
     }
     
     while ([stack count]) {
-        SafeItemViewModel *group = [stack lastObject];
+        Node *group = [stack lastObject];
         
         //NSLog(@"Expanding %@", group.title);
         [self.outlineView expandItem:group];
@@ -621,7 +638,7 @@ NSString* trim(NSString* str) {
     return itemIndex;
 }
 
-- (void)reloadDataAndSelectItem:(SafeItemViewModel*)item {
+- (void)reloadDataAndSelectItem:(Node*)item {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.outlineView reloadData];
         
@@ -629,7 +646,7 @@ NSString* trim(NSString* str) {
     });
 }
                    
-- (void)selectItem:(SafeItemViewModel*)item {
+- (void)selectItem:(Node*)item {
     if(item) {
         NSInteger row = [self findRowForItemExpandIfNecessary:item];
         
@@ -649,10 +666,11 @@ NSString* trim(NSString* str) {
 - (id<NSPasteboardWriting>)outlineView:(NSOutlineView *)outlineView pasteboardWriterForItem:(id)item {
     NSPasteboardItem *paste = [[NSPasteboardItem alloc] init];
     
-    NSString* serializationItem = [self.model getSerializationIdForItem:item];
-    NSLog(@"pasteboardWriterForItem %@ => [%@]", ((SafeItemViewModel*)item).title, serializationItem);
+    Node* it = ((Node*)item);
     
-    [paste setString:serializationItem forType:kDragAndDropUti];
+    NSLog(@"pasteboardWriterForItem %@ => [%@]", it.title, it.serializationId);
+    
+    [paste setString:it.serializationId forType:kDragAndDropUti];
 
     return paste;
 }
@@ -663,15 +681,14 @@ NSString* trim(NSString* str) {
 {
     NSString* itemId = [info.draggingPasteboard stringForType:kDragAndDropUti];
 
-    SafeItemViewModel* sourceItem = [self.model getItemFromSerializationId:itemId];
-    SafeItemViewModel* destinationItem = (item == nil) ? [[SafeItemViewModel alloc] initAsRootGroup] : item;
+    Node* sourceItem = [self.model getItemFromSerializationId:itemId];
+    Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
     
     //NSLog(@"validate Move [%@] [%@] -> [%@]", itemId, sourceItem, destinationItem);
     
-    NSArray<SafeItemViewModel*>* sourceItems = [NSArray arrayWithObject:sourceItem];
     BOOL valid = !destinationItem ||
-        (destinationItem.isGroup && [self.model validateMoveOfItems:sourceItems group:destinationItem]);
-    
+                (destinationItem.isGroup && [self.model validateChangeParent:destinationItem node:sourceItem]);
+
     return valid ? NSDragOperationMove : NSDragOperationNone;
 }
 
@@ -679,14 +696,12 @@ NSString* trim(NSString* str) {
               item:(id)item
         childIndex:(NSInteger)index {
     NSString* itemId = [info.draggingPasteboard stringForType:kDragAndDropUti];
-    SafeItemViewModel* sourceItem = [self.model getItemFromSerializationId:itemId];
-    SafeItemViewModel* destinationItem = (item == nil) ? [[SafeItemViewModel alloc] initAsRootGroup] : item;
+    Node* sourceItem = [self.model getItemFromSerializationId:itemId];
+    Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
     
     NSLog(@"acceptDrop Move [%@] -> [%@]", sourceItem, destinationItem);
     
-    NSArray<SafeItemViewModel*>* sourceItems = [NSArray arrayWithObject:sourceItem];
-    
-    if([self.model moveItems:sourceItems group:destinationItem]) {
+    if([self.model changeParent:destinationItem node:sourceItem]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.outlineView reloadData];
         });
@@ -698,8 +713,10 @@ NSString* trim(NSString* str) {
 }
 
 - (IBAction)onCreateRecord:(id)sender {
-    SafeItemViewModel *item = [self getCurrentSelectedItem];
-    SafeItemViewModel *newItem = [self.model addNewRecord:item.isGroup ? item.group : item.record.group];
+    Node *item = [self getCurrentSelectedItem];
+    Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
+
+    Node *newItem = [self.model addNewRecord:parent];
     
     [self.outlineView reloadData];
     
@@ -718,8 +735,10 @@ NSString* trim(NSString* str) {
 }
 
 - (IBAction)onCreateGroup:(id)sender {
-    SafeItemViewModel *item = [self getCurrentSelectedItem];
-    SafeItemViewModel *newItem = [self.model addNewGroup:item.isGroup ? item.group : item.record.group];
+    Node *item = [self getCurrentSelectedItem];
+    Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
+
+    Node *newItem = [self.model addNewGroup:parent];
     
     [self.outlineView reloadData];
     
@@ -739,7 +758,7 @@ NSString* trim(NSString* str) {
 }
 
 - (IBAction)onDelete:(id)sender {
-    SafeItemViewModel *item = [self getCurrentSelectedItem];
+    Node *item = [self getCurrentSelectedItem];
     
     if(!item) {
         return;
@@ -769,11 +788,19 @@ NSString* trim(NSString* str) {
     [self onLaunchUrl:sender];
 }
 
+- (IBAction)onCopyDiagnosticDump:(id)sender {
+    [[NSPasteboard generalPasteboard] clearContents];
+    
+    NSString *dump = [self.model getDiagnosticDumpString];
+    
+    [[NSPasteboard generalPasteboard] setString:dump forType:NSStringPboardType];
+}
+
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
 {
     SEL theAction = [anItem action];
     
-    SafeItemViewModel* item = [self getCurrentSelectedItem];
+    Node* item = [self getCurrentSelectedItem];
     
     if (theAction == @selector(onDelete:)) {
         return item != nil;

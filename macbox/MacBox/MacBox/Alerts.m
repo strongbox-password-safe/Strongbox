@@ -23,7 +23,7 @@
 + (void)info:(NSString *)message
     informativeText:(NSString*)informativeText
             window:(NSWindow*)window
-        completion:(void (^)())completion; {
+  completion:(void (^)(void))completion; {
     NSAlert *alert = [[NSAlert alloc] init];
     
     [alert setMessageText:message];
@@ -70,7 +70,7 @@
     [Alerts error:message error:error window:window completion:nil];
 }
 
-+ (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window completion:(void (^)())completion {
++ (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion {
     NSAlert *alert = [[NSAlert alloc] init];
 
     [alert setMessageText:message];

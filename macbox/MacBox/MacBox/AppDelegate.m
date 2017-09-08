@@ -43,6 +43,8 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self removeUnwantedMenuItems];
     
+    [self removeCopyDiagnosticDumpItem];
+    
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
 
@@ -135,6 +137,13 @@
     
     if ([[edit itemAtIndex: [edit numberOfItems] - 1] isSeparatorItem]) {
         [edit removeItemAtIndex: [edit numberOfItems] - 1];
+    }
+}
+
+- (void)removeCopyDiagnosticDumpItem {
+    NSMenu* safe = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Safe"] submenu];
+    if([[safe itemAtIndex:[safe numberOfItems] - 1] action] == NSSelectorFromString(@"onCopyDiagnosticDump:")) {
+        [safe removeItemAtIndex:[safe numberOfItems] - 1];
     }
 }
 

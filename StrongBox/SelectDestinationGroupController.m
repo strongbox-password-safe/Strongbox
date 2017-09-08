@@ -10,7 +10,7 @@
 #import "Alerts.h"
 
 @implementation SelectDestinationGroupController {
-    NSArray *_items;
+    NSArray<Node*> *_items;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -25,11 +25,40 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)refresh {
-    _items = [self.viewModel getImmediateSubgroupsForParent:self.currentGroup];
+    _items = [self.currentGroup filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
+        return node.isGroup;
+    }];
 
-    self.buttonMove.enabled = [self.viewModel validateMoveItems:self.itemsToMove destination:self.currentGroup];
-
+    self.buttonMove.enabled = [self moveOfItemsIsValid:self.currentGroup subgroupsValid:NO];
+    
     [self.tableView reloadData];
+}
+
+- (BOOL)moveOfItemsIsValid:(Node*)group subgroupsValid:(BOOL)subgroupsValid  {
+    BOOL ret = YES;
+    for(Node* itemToMove in self.itemsToMove) {
+        if(![itemToMove validateChangeParent:group]) {
+            ret = NO;
+            break;
+        }
+    }
+    
+    if(ret) {
+        return YES;
+    }
+    else if(subgroupsValid) {
+        NSArray<Node*> *subgroups = [group filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
+            return group.isGroup;
+        }];
+        
+        for(Node* subgroup in subgroups) {
+            if([self moveOfItemsIsValid:subgroup subgroupsValid:YES]) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -37,18 +66,17 @@
 }
 
 - (IBAction)onMoveHere:(id)sender {
-    [self.viewModel moveItems:self.itemsToMove destination:self.currentGroup];
+    for(Node* itemToMove in self.itemsToMove) {
+        [itemToMove changeParent:self.currentGroup];
+    }
 
     [self.viewModel update:^(NSError *error) {
-                        if (error) {
-                        [Alerts             error:self
-                                title:@"Error Saving"
-                                error:error];
-                        }
+        if (error) {
+            [Alerts error:self title:@"Error Saving" error:error];
+        }
 
-                        [self.navigationController                 dismissViewControllerAnimated:YES
-                                                                      completion:^{  }];
-                    }];
+        [self.navigationController dismissViewControllerAnimated:YES completion:^{  }];
+    }];
 }
 
 - (IBAction)onAddGroup:(id)sender {
@@ -58,10 +86,13 @@
                           message:@"Please Enter the New Group Name"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               [self.viewModel createGroupWithTitle:self.currentGroup title:text]; // TODO: Can return nil if group exists
-                               [self refresh];
-                           }
-                       }];
+                               if(![self.viewModel addNewGroup:self.currentGroup title:text]) {
+                                   [Alerts warn:self title:@"Could not create group" message:@"Could not create group with that title here."];
+                               }
+                               else {
+                                   [self refresh];
+                               }
+                           }}];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,18 +108,15 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SafeItemViewModel *vm;
-
     // Check to see whether the normal table or search results table is being displayed and set the Candy object from the appropriate array
 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
 
-    vm = _items[indexPath.row];
+    Node* vm = _items[indexPath.row];
 
     cell.textLabel.text = vm.title;
 
-    [self.viewModel getImmediateSubgroupsForParent:vm.group];
-    BOOL validMove = [self.viewModel validateMoveItems:self.itemsToMove destination:vm.group checkIfMoveIntoSubgroupOfDestinationOk:YES];
+    BOOL validMove = [self moveOfItemsIsValid:vm subgroupsValid:YES];
 
     cell.accessoryType = validMove ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.selectionStyle = validMove ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
@@ -102,11 +130,11 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueRecurse"]) {
-        SafeItemViewModel *item = _items[self.tableView.indexPathForSelectedRow.row];
+        Node *item = _items[self.tableView.indexPathForSelectedRow.row];
 
         SelectDestinationGroupController *vc = segue.destinationViewController;
 
-        vc.currentGroup = item.group;
+        vc.currentGroup = item;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = self.itemsToMove;
     }

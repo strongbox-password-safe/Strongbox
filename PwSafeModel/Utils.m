@@ -27,7 +27,7 @@
 
 + (NSString *)getAppName {
     NSDictionary *info = [NSBundle mainBundle].infoDictionary;
-    NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleDisplayName"], info[@"CFBundleShortVersionString"]];
+    NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleName"], info[@"CFBundleShortVersionString"]];
     
     return appName;
 }
@@ -44,6 +44,43 @@
     fn = [NSString stringWithFormat:@"%@-%@.%@", title, [dateFormat stringFromDate:date], extension];
     
     return fn;
+}
+
+
++ (NSString *)hostname {
+    char baseHostName[256];
+    int success = gethostname(baseHostName, 255);
+    
+    if (success != 0) return nil;
+    
+    baseHostName[255] = '\0';
+    
+#if !TARGET_IPHONE_SIMULATOR
+    return [NSString stringWithFormat:@"%s.local", baseHostName];
+    
+#else
+    return [NSString stringWithFormat:@"%s", baseHostName];    
+#endif
+}
+
++ (NSString *)generatePassword {
+    NSString *letters = @"!@#$%*[];?()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    
+    NSUInteger len = 16;
+    NSMutableString *randomString = [NSMutableString stringWithCapacity:len];
+    
+    for (int i = 0; i < len; i++) {
+        [randomString appendFormat:@"%C", [letters characterAtIndex:arc4random_uniform((u_int32_t)letters.length)]];
+    }
+    
+    return randomString;
+}
+
+
+//#define kStrongBoxUser @"StrongBox User"
+
++ (NSString*)getUsername {
+    return NSFullUserName();
 }
 
 @end

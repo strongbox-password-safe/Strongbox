@@ -23,6 +23,16 @@
     NSMutableDictionary<NSValue *, UIImage *> *_iconsCache;
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self.navigationItem setPrompt:nil];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController.toolbar setHidden:self.existing];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -45,7 +55,7 @@
         [self setToolbarItems:toolbarButtons animated:YES];
     }
 
-    self.navigationItem.title = self.existing ? @"Please Select Safe File" : @"Select Folder For New Safe";
+    self.navigationItem.prompt = self.existing ? @"Please Select Safe File" : @"Select Folder For New Safe";
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
         [self.safeStorageProvider list:self.parentFolder

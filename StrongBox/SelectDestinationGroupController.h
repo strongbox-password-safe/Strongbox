@@ -11,9 +11,9 @@
 
 @interface SelectDestinationGroupController : UITableViewController
 
-@property (nonatomic, strong) Model *viewModel;
-@property Group *currentGroup;
-@property NSArray *itemsToMove;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonMove;
+@property (nonatomic, strong, nonnull) Model *viewModel;
+@property Node * _Nonnull currentGroup;
+@property NSArray<Node*> * _Nonnull itemsToMove;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonMove;
 
 @end

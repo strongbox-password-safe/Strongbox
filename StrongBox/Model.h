@@ -14,69 +14,58 @@
 
 @interface Model : NSObject
 
-@property (readonly)    SafeMetaData *metadata;
-@property (nonatomic)   SafesCollection *safes; 
-@property (readonly)    BOOL isCloudBasedStorage;
-@property (readonly)    BOOL isUsingOfflineCache;
-@property (readonly)    BOOL isReadOnly;
+@property (nonatomic, readonly, nonnull)    SafeMetaData *metadata;
+@property (nonatomic, nonnull)              SafesCollection *safes;
+@property (nonatomic, readonly)             BOOL isCloudBasedStorage;
+@property (nonatomic, readonly)             BOOL isUsingOfflineCache;
+@property (nonatomic, readonly)             BOOL isReadOnly;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype _Nullable )init NS_UNAVAILABLE;
 
-- (instancetype)initWithSafeDatabase:(PasswordDatabase *)passwordDatabase
-                            metaData:(SafeMetaData *)metaData
-                     storageProvider:(id <SafeStorageProvider>)provider
+- (instancetype _Nullable )initWithSafeDatabase:(PasswordDatabase *_Nonnull)passwordDatabase
+                            metaData:(SafeMetaData *_Nonnull)metaData
+                     storageProvider:(id <SafeStorageProvider>_Nonnull)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
                           isReadOnly:(BOOL)isReadOnly
-                localStorageProvider:(LocalDeviceStorageProvider *)local
-                               safes:(SafesCollection *)safes NS_DESIGNATED_INITIALIZER;
+                               safes:(SafesCollection *_Nonnull)safes NS_DESIGNATED_INITIALIZER;
 
-- (void)update:(void (^)(NSError *error))handler;
+- (void)update:(void (^_Nonnull)(NSError * _Nullable error))handler;
 
 // Offline Cache Stuff
 
-- (void)updateOfflineCacheWithData:(NSData *)data;
-- (void)updateOfflineCache:(void (^)())handler;
+- (void)updateOfflineCacheWithData:(NSData *_Nonnull)data;
+- (void)updateOfflineCache:(void (^_Nonnull)(void))handler;
 - (void)disableAndClearOfflineCache;
 - (void)enableOfflineCache;
-- (SafeItemViewModel*)addRecord:(Record *)newRecord;
-- (SafeItemViewModel *)createGroupWithTitle:(Group *)parent title:(NSString *)title;
 
-@property (readonly) NSDate *lastUpdateTime;
-@property (readonly) NSString *lastUpdateUser;
-@property (readonly) NSString *lastUpdateHost;
-@property (readonly) NSString *lastUpdateApp;
+// Operations
 
-@property (NS_NONATOMIC_IOSONLY, getter = getMasterPassword, setter=setMasterPassword:) NSString *masterPassword;
+- (Node* _Nullable)addNewRecord:(Node *_Nonnull)parentGroup;
+- (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
+- (void)deleteItem:(Node *_Nonnull)child;
+- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node;
+- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node;
+- (void)defaultLastUpdateFieldsToNow;
 
--(NSData*)getSafeAsData:(NSError**)error;
+// Get/Query
 
-// Search Safe Helpers
+@property (nonatomic, readonly, nonnull) Node * rootGroup;
+@property (nonatomic, readonly) NSDate * _Nullable lastUpdateTime;
+@property (nonatomic, readonly) NSString * _Nullable lastUpdateUser;
+@property (nonatomic, readonly) NSString * _Nullable lastUpdateHost;
+@property (nonatomic, readonly) NSString * _Nullable lastUpdateApp;
+@property (nonatomic) NSString * _Nonnull masterPassword;
 
-@property (NS_NONATOMIC_IOSONLY, getter = getSearchableItems, readonly, copy) NSArray *searchableItems;
+- (NSData*_Nullable)getSafeAsData:(NSError*_Nonnull*_Nonnull)error;
 
-- (NSArray *)getItemsForGroup:(Group *)group;
-- (NSArray *)getImmediateSubgroupsForParent:(Group *)group;
+// Convenience  / Helpers
 
-// Move
-
-- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group;
-- (BOOL)validateMoveItems:(NSArray *)items destination:(Group *)group checkIfMoveIntoSubgroupOfDestinationOk:(BOOL)checkIfMoveIntoSubgroupOfDestinationOk;
-- (void)moveItems:(NSArray *)items destination:(Group *)group;
-
-// Delete
-
-- (void)deleteItems:(NSArray *)items;
-- (void)deleteItem:(SafeItemViewModel *)item;
-
-// Auto complete helpers
-
-@property (NS_NONATOMIC_IOSONLY, getter = getAllExistingUserNames, readonly, copy) NSSet *allExistingUserNames;
-@property (NS_NONATOMIC_IOSONLY, getter = getAllExistingPasswords, readonly, copy) NSSet *allExistingPasswords;
-@property (NS_NONATOMIC_IOSONLY, getter = getMostPopularUsername, readonly, copy) NSString *mostPopularUsername;
-@property (NS_NONATOMIC_IOSONLY, getter = getMostPopularPassword, readonly, copy) NSString *mostPopularPassword;
-
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSString *generatePassword;
+@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull passwordSet;
+@property (nonatomic, readonly, copy) NSString *_Nonnull mostPopularUsername;
+@property (nonatomic, readonly, copy) NSString *_Nonnull mostPopularPassword;
+@property (nonatomic, readonly, copy) NSString * _Nonnull generatePassword;
 
 @end

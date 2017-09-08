@@ -82,11 +82,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
-	<string>Main_iPhone</string>
+	<string>Main</string>
 	<key>UIMainStoryboardFile</key>
-	<string>Main_iPhone</string>
+	<string>Main</string>
 	<key>UIMainStoryboardFile~ipad</key>
-	<string>Main_iPhone</string>
+	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

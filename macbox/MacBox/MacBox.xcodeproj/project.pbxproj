@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -19,8 +19,6 @@
 		4D92C8191F388E6E00341A58 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8081F388E6E00341A58 /* PasswordHistory.m */; };
 		4D92C81A1F388E6E00341A58 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C80A1F388E6E00341A58 /* PasswordHistoryEntry.m */; };
 		4D92C81C1F388E6E00341A58 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C80E1F388E6E00341A58 /* Record.m */; };
-		4D92C81D1F388E6E00341A58 /* PasswordSafe3Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8101F388E6E00341A58 /* PasswordSafe3Database.m */; };
-		4D92C81E1F388E6E00341A58 /* SafeItemViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8121F388E6E00341A58 /* SafeItemViewModel.m */; };
 		4D92C81F1F388E6E00341A58 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8141F388E6E00341A58 /* SafeTools.m */; };
 		4D92C8201F388E6E00341A58 /* twofish in Resources */ = {isa = PBXBuildFile; fileRef = 4D92C8151F388E6E00341A58 /* twofish */; };
 		4D92C8221F388E9D00341A58 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8211F388E9D00341A58 /* crypt_argchk.c */; };
@@ -30,6 +28,8 @@
 		4DA595C81F4461B800351BEC /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA595C71F4461B800351BEC /* Utils.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
+		4DE419BB1F588B2F00158ED5 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE419BA1F588B2F00158ED5 /* Node.m */; };
+		4DE419BE1F588C4800158ED5 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE419BD1F588C4800158ED5 /* NodeFields.m */; };
 		4DE92B741F49D0AA00282D98 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */; };
 		4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */; };
@@ -75,10 +75,6 @@
 		4D92C80A1F388E6E00341A58 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = ../../PwSafeModel/PasswordHistoryEntry.m; sourceTree = "<group>"; };
 		4D92C80D1F388E6E00341A58 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = ../../PwSafeModel/Record.h; sourceTree = "<group>"; };
 		4D92C80E1F388E6E00341A58 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = ../../PwSafeModel/Record.m; sourceTree = "<group>"; };
-		4D92C80F1F388E6E00341A58 /* PasswordSafe3Database.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordSafe3Database.h; path = ../../PwSafeModel/PasswordSafe3Database.h; sourceTree = "<group>"; };
-		4D92C8101F388E6E00341A58 /* PasswordSafe3Database.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordSafe3Database.m; path = ../../PwSafeModel/PasswordSafe3Database.m; sourceTree = "<group>"; };
-		4D92C8111F388E6E00341A58 /* SafeItemViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeItemViewModel.h; path = ../../PwSafeModel/SafeItemViewModel.h; sourceTree = "<group>"; };
-		4D92C8121F388E6E00341A58 /* SafeItemViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeItemViewModel.m; path = ../../PwSafeModel/SafeItemViewModel.m; sourceTree = "<group>"; };
 		4D92C8131F388E6E00341A58 /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = ../../PwSafeModel/SafeTools.h; sourceTree = "<group>"; };
 		4D92C8141F388E6E00341A58 /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = ../../PwSafeModel/SafeTools.m; sourceTree = "<group>"; };
 		4D92C8151F388E6E00341A58 /* twofish */ = {isa = PBXFileReference; lastKnownFileType = folder; name = twofish; path = ../../PwSafeModel/twofish; sourceTree = "<group>"; };
@@ -93,6 +89,10 @@
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
+		4DE419B91F588B2F00158ED5 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../PwSafeModel/Node.h; sourceTree = "<group>"; };
+		4DE419BA1F588B2F00158ED5 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../../PwSafeModel/Node.m; sourceTree = "<group>"; };
+		4DE419BC1F588C4800158ED5 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = ../../PwSafeModel/NodeFields.h; sourceTree = "<group>"; };
+		4DE419BD1F588C4800158ED5 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = ../../PwSafeModel/NodeFields.m; sourceTree = "<group>"; };
 		4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PwSafeModelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PwSafeModelTests.m; sourceTree = "<group>"; };
 		4DE92B751F49D0AA00282D98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -142,25 +142,25 @@
 		4D92C8001F388E5D00341A58 /* PwSafeModel */ = {
 			isa = PBXGroup;
 			children = (
+				4D92C8151F388E6E00341A58 /* twofish */,
 				4D92C8011F388E6E00341A58 /* PasswordDatabase.h */,
 				4D92C8021F388E6E00341A58 /* PasswordDatabase.m */,
-				4D92C8031F388E6E00341A58 /* Field.h */,
-				4D92C8041F388E6E00341A58 /* Field.m */,
-				4D92C8051F388E6E00341A58 /* Group.h */,
-				4D92C8061F388E6E00341A58 /* Group.m */,
+				4DE419B91F588B2F00158ED5 /* Node.h */,
+				4DE419BA1F588B2F00158ED5 /* Node.m */,
+				4DE419BC1F588C4800158ED5 /* NodeFields.h */,
+				4DE419BD1F588C4800158ED5 /* NodeFields.m */,
 				4D92C8071F388E6E00341A58 /* PasswordHistory.h */,
 				4D92C8081F388E6E00341A58 /* PasswordHistory.m */,
 				4D92C8091F388E6E00341A58 /* PasswordHistoryEntry.h */,
 				4D92C80A1F388E6E00341A58 /* PasswordHistoryEntry.m */,
+				4D92C8031F388E6E00341A58 /* Field.h */,
+				4D92C8041F388E6E00341A58 /* Field.m */,
+				4D92C8051F388E6E00341A58 /* Group.h */,
+				4D92C8061F388E6E00341A58 /* Group.m */,
 				4D92C80D1F388E6E00341A58 /* Record.h */,
 				4D92C80E1F388E6E00341A58 /* Record.m */,
-				4D92C80F1F388E6E00341A58 /* PasswordSafe3Database.h */,
-				4D92C8101F388E6E00341A58 /* PasswordSafe3Database.m */,
-				4D92C8111F388E6E00341A58 /* SafeItemViewModel.h */,
-				4D92C8121F388E6E00341A58 /* SafeItemViewModel.m */,
 				4D92C8131F388E6E00341A58 /* SafeTools.h */,
 				4D92C8141F388E6E00341A58 /* SafeTools.m */,
-				4D92C8151F388E6E00341A58 /* twofish */,
 				4DA595C61F4461B800351BEC /* Utils.h */,
 				4DA595C71F4461B800351BEC /* Utils.m */,
 			);
@@ -287,7 +287,7 @@
 		4DF59F491F30DB7A00D68BFE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
 					4DE92B701F49D0AA00282D98 = {
@@ -312,7 +312,7 @@
 				};
 			};
 			buildConfigurationList = 4DF59F4C1F30DB7A00D68BFE /* Build configuration list for PBXProject "MacBox" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -376,7 +376,7 @@
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
-				4D92C81D1F388E6E00341A58 /* PasswordSafe3Database.m in Sources */,
+				4DE419BE1F588C4800158ED5 /* NodeFields.m in Sources */,
 				4D92C8181F388E6E00341A58 /* Group.m in Sources */,
 				4D92C81C1F388E6E00341A58 /* Record.m in Sources */,
 				4D92C81F1F388E6E00341A58 /* SafeTools.m in Sources */,
@@ -386,10 +386,10 @@
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
-				4D92C81E1F388E6E00341A58 /* SafeItemViewModel.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4D92C8161F388E6E00341A58 /* PasswordDatabase.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
+				4DE419BB1F588B2F00158ED5 /* Node.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -453,7 +453,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -461,7 +463,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -484,7 +490,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -501,7 +507,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -509,7 +517,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -526,7 +538,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};

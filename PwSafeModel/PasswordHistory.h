@@ -29,8 +29,7 @@
 //                in the past and has then been disabled but the history hasn't been cleared.
 //
 
-
-    typedef struct _Header {
+typedef struct _Header {
     char enabled;
     char maximumSize[2];
     char currentSize[2];
@@ -45,9 +44,10 @@ typedef struct _EntryHeader {
 
 @property (nonatomic) BOOL enabled;
 @property (nonatomic, assign) NSUInteger maximumSize;
-@property (nonatomic, retain) NSMutableArray<PasswordHistoryEntry *> *entries;
+@property (nonatomic, retain, nonnull) NSMutableArray<PasswordHistoryEntry *> *entries;
 
-- (instancetype)initWithData:(NSData *)data;
-@property (NS_NONATOMIC_IOSONLY, getter = getAsData, readonly, copy) NSData *asData;
+- (instancetype _Nullable )initWithData:(NSData *_Nonnull)data;
+
+@property (NS_NONATOMIC_IOSONLY, getter = getAsData, readonly, copy) NSData * _Nonnull asData;
 
 @end

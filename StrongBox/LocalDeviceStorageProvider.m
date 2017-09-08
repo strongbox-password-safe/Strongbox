@@ -12,9 +12,20 @@
 
 @implementation LocalDeviceStorageProvider
 
++ (instancetype)sharedInstance {
+    static LocalDeviceStorageProvider *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[LocalDeviceStorageProvider alloc] init];
+    });
+    return sharedInstance;
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         _displayName = @"Local Device";
+        _icon = @"phone";
         _storageId = kLocalDevice;
         _cloudBased = NO;
         _providesIcons = NO;

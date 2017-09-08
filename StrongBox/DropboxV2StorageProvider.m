@@ -13,9 +13,20 @@
 
 @implementation DropboxV2StorageProvider
 
++ (instancetype)sharedInstance {
+    static DropboxV2StorageProvider *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[DropboxV2StorageProvider alloc] init];
+    });
+    return sharedInstance;
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         _displayName = @"Dropbox";
+        _icon = @"dropbox-blue-32x32-nologo";
         _storageId = kDropbox;
         _cloudBased = YES;
         _providesIcons = NO;

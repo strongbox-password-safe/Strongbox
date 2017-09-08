@@ -8,10 +8,7 @@
 
 #import "BrowseSafeView.h"
 #import "SafeTools.h"
-#import "Record.h"
-#import "Field.h"
 #import "SafeDetailsAndSettingsView.h"
-#import "SafeItemViewModel.h"
 #import "SelectDestinationGroupController.h"
 #import <MessageUI/MessageUI.h>
 #import "RecordView.h"
@@ -21,8 +18,8 @@
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
-@property (strong, nonatomic) NSMutableArray *searchResults;
-@property (strong, nonatomic) NSMutableArray *items;
+@property (strong, nonatomic) NSArray<Node*> *searchResults;
+@property (strong, nonatomic) NSArray<Node*> *items;
 @property (strong, nonatomic) UISearchController *searchController;
 @property (strong, nonatomic) UIBarButtonItem *savedOriginalNavButton;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
@@ -30,6 +27,26 @@
 @end
 
 @implementation BrowseSafeView
+
+static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
+    Node* n1 = (Node*)obj1;
+    Node* n2 = (Node*)obj2;
+    
+    if(n1.isGroup && !n2.isGroup) {
+        return NSOrderedDescending;
+    }
+    else if(!n1.isGroup && n2.isGroup) {
+        return NSOrderedAscending;
+    }
+    
+    NSComparisonResult result = [n1.title compare:n2.title options:NSCaseInsensitiveSearch];
+    
+    if(result == NSOrderedSame) {
+        return [n1.title compare:n2.title];
+    }
+    
+    return result;
+};
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -44,7 +61,7 @@
     
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
     
-    if (!self.currentGroup || self.currentGroup.isRootGroup) {
+    if (!self.currentGroup || self.currentGroup.parent == nil) {
         [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
                                    message:@"Touch and hold entry for fast password copy"
                                   duration:2.5f
@@ -82,7 +99,7 @@
               message:@"Are you sure you want to delete this item?"
                action:^(BOOL response) {
                    if (response) {
-                       SafeItemViewModel *item = [[self getDataSource] objectAtIndex:indexPath.row];
+                       Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
                        
                        [self.viewModel deleteItem:item];
                        
@@ -107,7 +124,7 @@
     return !self.isEditing && (sender == self || [identifier isEqualToString:@"segueToSafeDetailsView"]);
 }
 
-- (NSArray<SafeItemViewModel *> *)getDataSource {
+- (NSArray<Node *> *)getDataSource {
     return (self.searchController.isActive ? self.searchResults : self.items);
 }
 
@@ -119,10 +136,6 @@
 }
 
 - (void)filterContentForSearchText:(NSString *)searchText scope:(NSInteger)scope {
-    [self.searchResults removeAllObjects];
-    
-    NSArray *allItems = [self.viewModel getSearchableItems];
-    
     NSPredicate *predicate;
     
     if (scope == 0) {
@@ -130,17 +143,21 @@
     }
     else if (scope == 1)
     {
-        predicate = [NSPredicate predicateWithFormat:@"username contains[c] %@", searchText];
+        predicate = [NSPredicate predicateWithFormat:@"fields.username contains[c] %@", searchText];
     }
     else if (scope == 2)
     {
-        predicate = [NSPredicate predicateWithFormat:@"password contains[c] %@", searchText];
+        predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
     else {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR password contains[c] %@  OR username contains[c] %@  OR url contains[c] %@  OR notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
+        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR fields.password contains[c] %@  OR fields.username contains[c] %@  OR fields.url contains[c] %@  OR fields.notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
     }
     
-    self.searchResults = [NSMutableArray arrayWithArray:[allItems filteredArrayUsingPredicate:predicate]];
+    NSArray<Node*> *foo = [self.viewModel.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return [predicate evaluateWithObject:node];
+    }];
+    
+    self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -153,10 +170,15 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-    SafeItemViewModel *vm = [self getDataSource][indexPath.row];
+    Node *vm = [self getDataSource][indexPath.row];
     
-    cell.textLabel.text = vm.title;
-    cell.detailTextLabel.text = vm.isGroup ? (self.searchController.isActive ? [self getGroupPathDisplayString:vm] : @"") : vm.username;
+    NSString *groupLocation = (self.searchController.isActive ? [self getGroupPathDisplayString:vm] : vm.isGroup ? @"" : vm.fields.username);
+    
+    cell.textLabel.text = vm.isGroup ? vm.title :
+        (self.searchController.isActive ? [NSString stringWithFormat:@"%@ [%@]", vm.title, vm.fields.username] :
+         vm.title);
+    
+    cell.detailTextLabel.text = groupLocation;
     cell.accessoryType = vm.isGroup ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.imageView.image = vm.isGroup ? [UIImage imageNamed:@"folder-80.png"] : [UIImage imageNamed:@"lock-48.png"];
     
@@ -165,14 +187,17 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (!self.editing) {
-        SafeItemViewModel *item = [self getDataSource][indexPath.row];
+        Node *item = [self getDataSource][indexPath.row];
         
         if (!item.isGroup) {
-            [self performSegueWithIdentifier:@"segueToRecord" sender:item.record];
+            [self performSegueWithIdentifier:@"segueToRecord" sender:item];
         }
         else {
-            [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item.group];
+            [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
         }
+    }
+    else {
+        [self enableDisableToolbarButtons];
     }
 }
 
@@ -187,19 +212,18 @@
     
     (self.buttonAddRecord).enabled = !ro && !self.isEditing;
     (self.buttonSafeSettings).enabled = !self.isEditing;
-    (self.buttonMove).enabled = !ro && self.isEditing;      // Only move in edit mode
+    (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
     (self.buttonAddGroup).enabled = !ro && !self.isEditing;
 }
 
 - (void)refresh {
     self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
-                                 (!self.currentGroup || self.currentGroup.isRootGroup) ?
+                                 (self.currentGroup.parent == nil) ?
                                  self.viewModel.metadata.nickName : self.currentGroup.title,
                                  self.viewModel.isUsingOfflineCache ? @" [Offline]" : @"",
                                  self.viewModel.isReadOnly ? @" [Read Only]" : @""];
     
-    NSArray *foo = [self.viewModel getItemsForGroup:self.currentGroup];
-    self.items = [[NSMutableArray alloc] initWithArray:foo];
+    self.items = [[NSMutableArray alloc] initWithArray:self.currentGroup.children];
     
     // Display
     
@@ -214,25 +238,27 @@
     [self enableDisableToolbarButtons];
 }
 
-- (NSString *)getGroupPathDisplayString:(SafeItemViewModel *)vm {
-    return [vm.groupPathPrefix isEqualToString:@""] ? @"" : [NSString stringWithFormat:@"(in %@)", vm.groupPathPrefix];
+- (NSString *)getGroupPathDisplayString:(Node *)vm {
+    NSArray<NSString*> *hierarchy = [vm getTitleHierarchy];
+    
+    NSString *path = [[hierarchy subarrayWithRange:NSMakeRange(0, hierarchy.count - 1)] componentsJoinedByString:@"/"];
+    
+    return hierarchy.count == 1 ? @"(in /)" : [NSString stringWithFormat:@"(in /%@)", path];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToRecord"]) {
-        Record *record = (Record *)sender;
+        Node *record = (Node *)sender;
         RecordView *vc = segue.destinationViewController;
         vc.record = record;
-        vc.currentGroup = self.currentGroup;
+        vc.parentGroup = self.currentGroup;
         vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"sequeToSubgroup"])
     {
-        Group *selectedGroup = (Group *)sender;
-        
         BrowseSafeView *vc = segue.destinationViewController;
         
-        vc.currentGroup = selectedGroup;
+        vc.currentGroup = (Node *)sender;
         vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToSelectDestination"])
@@ -242,7 +268,7 @@
         UINavigationController *nav = segue.destinationViewController;
         SelectDestinationGroupController *vc = nav.viewControllers.firstObject;
         
-        vc.currentGroup = nil;
+        vc.currentGroup = self.viewModel.rootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
     }
@@ -262,11 +288,11 @@
                           message:@"Please Enter the New Group Name:"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               if ([self.viewModel createGroupWithTitle:self.currentGroup title:text] != nil) {
+                               if ([self.viewModel addNewGroup:self.currentGroup title:text] != nil) {
                                    [self saveChangesToSafeAndRefreshView];
                                }
                                else {
-                                   // TODO: Message... can return nil if group already exists
+                                   [Alerts warn:self title:@"Cannot create group" message:@"Could not create a group with this name here."];
                                }
                            }
                        }];
@@ -280,7 +306,7 @@
     NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
     
     if (selectedRows.count > 0) {
-        NSArray<SafeItemViewModel *> *itemsToMove = [self getSelectedItems:selectedRows];
+        NSArray<Node *> *itemsToMove = [self getSelectedItems:selectedRows];
         
         [self performSegueWithIdentifier:@"segueToSelectDestination" sender:itemsToMove];
         
@@ -288,7 +314,7 @@
     }
 }
 
-- (NSArray<SafeItemViewModel *> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
+- (NSArray<Node*> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
     NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
     
     for (NSIndexPath *selectionIndex in selectedRows) {
@@ -349,7 +375,7 @@
         return;
     }
     
-    SafeItemViewModel *item = [self getDataSource][indexPath.row];
+    Node *item = [self getDataSource][indexPath.row];
     
     if (item.isGroup) {
         NSLog(@"Item is group, cannot Fast PW Copy...");
@@ -383,10 +409,10 @@
     }
 }
 
-- (void)copyPasswordOnLongPress:(SafeItemViewModel *)item withTapLocation:(CGPoint)tapLocation {
+- (void)copyPasswordOnLongPress:(Node *)item withTapLocation:(CGPoint)tapLocation {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    pasteboard.string = item.password;
+    pasteboard.string = item.fields.password;
     
     [ISMessages showCardAlertWithTitle:@"Password Copied"
                                message:nil

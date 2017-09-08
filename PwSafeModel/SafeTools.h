@@ -38,7 +38,10 @@ typedef struct _FieldHeader {
 
 @interface SafeTools : NSObject
 
-+ (BOOL)isAValidSafe:(NSData *)candidate header:(PasswordSafe3Header *)pHeader numBlocks:(NSUInteger *)pNumBlocks;
++ (BOOL)isAValidSafe:(NSData *)candidate;
++ (PasswordSafe3Header)getHeader:(NSData*)data;
++ (NSInteger)getKeyStretchIterations:(NSData*)data;
++ (NSInteger)getNumberOfBlocks:(NSData*)candidate;
 + (int)littleEndian4BytesToInteger:(unsigned char *)bytes;
 + (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations masterPassword:(NSString *)masterPassword K:(NSData **)K L:(NSData **)L;
 + (NSData *)serializeField:(Field *)field;

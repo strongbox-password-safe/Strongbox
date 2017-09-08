@@ -249,44 +249,43 @@
     return hdr;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate
-              header:(PasswordSafe3Header *)pHeader
-           numBlocks:(NSUInteger *)pNumBlocks {
-    //hexdump(candidate.bytes, [candidate length], 2);
++ (PasswordSafe3Header)getHeader:(NSData*)data {
+    PasswordSafe3Header ret;
+    
+    [data getBytes:&ret length:SIZE_OF_PASSWORD_SAFE_3_HEADER];
+    
+    return ret;
+}
 
-    [candidate getBytes:pHeader length:SIZE_OF_PASSWORD_SAFE_3_HEADER];
-
-    if (pHeader->tag[0] != 'P' ||
-        pHeader->tag[1] != 'W' ||
-        pHeader->tag[2] != 'S' ||
-        pHeader->tag[3] != '3') {
++ (BOOL)isAValidSafe:(NSData *)candidate {
+    // TODO: Calculate minimum size of a PasswordSafe DB and verify length
+    
+    PasswordSafe3Header header = [SafeTools getHeader:candidate];
+    
+    if (header.tag[0] != 'P' ||
+        header.tag[1] != 'W' ||
+        header.tag[2] != 'S' ||
+        header.tag[3] != '3') {
         NSLog(@"No PWS3 magic");
         return NO;
     }
 
-    // Check for end of file marker
-
-    NSData *endMarker = [EOF_MARKER dataUsingEncoding:NSUTF8StringEncoding];
-    NSRange endRange = [candidate rangeOfData:endMarker options:NSDataSearchBackwards range:NSMakeRange(0, candidate.length)];
-
-    if (endRange.location == NSNotFound) {
+    NSUInteger endOfData = [SafeTools getEofFileOffset:candidate];
+    
+    if (endOfData == NSNotFound) {
         NSLog(@"No End of File marker magic");
         return NO;
     }
 
-    NSUInteger eofMarkerOffset = endRange.location;
-
-    NSUInteger recordsLength;
-    recordsLength = eofMarkerOffset - SIZE_OF_PASSWORD_SAFE_3_HEADER;
-
+    NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
     if (recordsLength <= 0) {
-        NSLog(@"Non zero remainder in blocks?! Eeek");
+        NSLog(@"Negative or zero record length");
         return NO;
     }
 
-    *pNumBlocks = recordsLength / TWOFISH_BLOCK_SIZE;
+    NSInteger numBlocks = recordsLength / TWOFISH_BLOCK_SIZE;
 
-    if ((*pNumBlocks) <= 0) {
+    if (numBlocks <= 0) {
         NSLog(@"Zero blocks?! Eeek");
         return NO;
     }
@@ -299,6 +298,37 @@
     }
 
     return YES;
+}
+
++ (NSInteger)getNumberOfBlocks:(NSData*)candidate {
+    NSUInteger endOfData = [SafeTools getEofFileOffset:candidate];
+    
+    if (endOfData == NSNotFound) {
+        NSLog(@"No End of File marker magic");
+        return NO;
+    }
+    
+    NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
+    if (recordsLength <= 0) {
+        NSLog(@"Negative or zero record length");
+        return NO;
+    }
+    
+    return recordsLength / TWOFISH_BLOCK_SIZE;
+}
+
++ (NSInteger)getKeyStretchIterations:(NSData *)data {
+    PasswordSafe3Header header = [SafeTools getHeader:data];
+    return [SafeTools littleEndian4BytesToInteger:header.iter];
+}
+
++ (NSUInteger)getEofFileOffset:(NSData*)data {
+    // TODO: Out of bounds checking
+    
+    NSData *endMarker = [EOF_MARKER dataUsingEncoding:NSUTF8StringEncoding];
+    NSRange endRange = [data rangeOfData:endMarker options:NSDataSearchBackwards range:NSMakeRange(0, data.length)];
+    
+    return endRange.location;
 }
 
 + (void)doStretchKeyCompution:(int)iter header:(PasswordSafe3Header *)pHeader pBar_p:(NSData **)ppBar hPBar_p:(NSData **)hPBar_p password:(NSString *)password {

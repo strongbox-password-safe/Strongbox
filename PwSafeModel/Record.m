@@ -57,7 +57,12 @@
 }
 
 - (void)setPasswordHistory:(PasswordHistory *)passwordHistory {
-    [self setFieldWithData:FIELD_TYPE_PWHIST data:[passwordHistory getAsData]];
+    if(!passwordHistory) {
+        [_fields removeObjectForKey:[NSNumber numberWithInt:FIELD_TYPE_PWHIST]];
+    }
+    else {
+        [self setFieldWithData:FIELD_TYPE_PWHIST data:[passwordHistory getAsData]];
+    }
 }
 
 - (NSDate *)accessed {
@@ -102,23 +107,6 @@
     }
 
     [self setField:FIELD_TYPE_PASSWORD string:password];
-
-    self.passwordModified = [NSDate date];
-
-    PasswordHistory *pwHistory = self.passwordHistory;
-
-    if (pwHistory.enabled && pwHistory.maximumSize > 0) {
-        [pwHistory.entries addObject:[[PasswordHistoryEntry alloc] initWithPassword:password]];
-
-        if ((pwHistory.entries).count > pwHistory.maximumSize) {
-            NSUInteger count = (pwHistory.entries).count;
-            NSArray *slice = [pwHistory.entries subarrayWithRange:(NSRange) {count - pwHistory.maximumSize, pwHistory.maximumSize }];
-            [pwHistory.entries removeAllObjects];
-            [pwHistory.entries addObjectsFromArray:slice];
-        }
-
-        self.passwordHistory = pwHistory;
-    }
 }
 
 - (NSString *)title {

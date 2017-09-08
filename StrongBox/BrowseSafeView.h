@@ -12,17 +12,16 @@
 
 @interface BrowseSafeView : UITableViewController
 
+@property (nonatomic, strong, nonnull) Model *viewModel;
+@property (nonatomic, strong, nonnull) Node *currentGroup;
 
-@property (nonatomic, strong) Model *viewModel;
-@property Group *currentGroup;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonAddGroup;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonAddRecord;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonSafeSettings;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonMove;
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddGroup;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddRecord;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSafeSettings;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonMove;
-
-- (IBAction)onAddGroup:(id)sender;
-- (IBAction)onAddRecord:(id)sender;
-- (IBAction)onMove:(id)sender;
+- (IBAction)onAddGroup:(id _Nullable )sender;
+- (IBAction)onAddRecord:(id _Nullable )sender;
+- (IBAction)onMove:(id _Nullable)sender;
 
 @end

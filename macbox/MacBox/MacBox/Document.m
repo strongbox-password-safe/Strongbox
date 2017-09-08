@@ -84,6 +84,10 @@
  forSaveOperation:(NSSaveOperationType)saveOperation
             error:(NSError **)outError
 {
+    // Update the Last Update Fields
+    
+    [self.model defaultLastUpdateFieldsToNow];
+    
     BOOL success = [super saveToURL:absoluteURL
                              ofType:typeName
                    forSaveOperation:saveOperation
