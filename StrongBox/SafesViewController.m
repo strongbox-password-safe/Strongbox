@@ -60,10 +60,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [[Settings sharedInstance] setPro:NO];
-    
-    
-    
     [[Settings sharedInstance] startMonitoringConnectivitity];
     
     if(![[Settings sharedInstance] isPro]) {
