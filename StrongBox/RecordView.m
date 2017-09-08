@@ -237,6 +237,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    self.navigationController.toolbar.hidden = YES;
     self.navigationController.navigationBar.hidden = NO;
 }
 
@@ -381,7 +382,7 @@ NSString * trim(NSString *string) {
         int toolBarHeight = self.navigationController.toolbar.frame.size.height;
         int navBarHeight = self.navigationController.navigationBar.frame.size.height;
         
-        int totalVisibleHeight = self.tableView.bounds.size.height - statusBarHeight - toolBarHeight - navBarHeight;
+        int totalVisibleHeight = self.tableView.bounds.size.height - statusBarHeight - navBarHeight - toolBarHeight;
         
         int availableHeight = totalVisibleHeight - otherCellsHeight;
         
