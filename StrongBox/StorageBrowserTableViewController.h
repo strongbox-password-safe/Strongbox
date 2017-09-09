@@ -16,9 +16,6 @@
 @property (nonatomic) BOOL existing;
 @property (nonatomic) id<SafeStorageProvider> safeStorageProvider;
 
-// FUTURE: Remove need for this... Segue Back with Data and Have caller add the safe...
-@property (nonatomic) SafesCollection *safes;
-
 - (IBAction)onSelectThisFolder:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSelectThis;

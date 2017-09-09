@@ -30,7 +30,7 @@ typedef NS_ENUM (unsigned int, StorageProvider) {
 @property (nonatomic) BOOL offlineCacheEnabled;
 @property (nonatomic) BOOL offlineCacheAvailable;
 
-@property (NS_NONATOMIC_IOSONLY, readonly, copy) NSDictionary *toDictionary;
+@property (nonatomic, readonly, copy) NSDictionary *toDictionary;
 + (SafeMetaData *)fromDictionary:(NSDictionary *)dictionary;
 
 @end

@@ -12,6 +12,5 @@
 @interface SelectStorageProviderController : UITableViewController
 
 @property (nonatomic) BOOL existing;
-@property (nonatomic) SafesCollection *safes;
 
 @end

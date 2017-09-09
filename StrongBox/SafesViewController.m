@@ -30,7 +30,6 @@
 
 @interface SafesViewController ()
 
-@property (nonatomic, strong) SafesCollection *safes;
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (nonatomic) BOOL touchId911;
@@ -40,8 +39,6 @@
 @implementation SafesViewController
 
 - (void)refreshView {
-    self.safes = [[SafesCollection alloc] init];
-    
     [self.tableView reloadData];
     
     self.navigationController.navigationBar.hidden = NO;
@@ -106,13 +103,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.safes.count;
+    return [SafesCollection sharedInstance].safes.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
     
-    SafeMetaData *safe = [self.safes get:indexPath.row];
+    SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
     
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
@@ -149,7 +146,7 @@
 }
 
 - (void)deleteSafe:(NSIndexPath * _Nonnull)indexPath {
-    SafeMetaData *safe = [self.safes get:indexPath.row];
+    SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
     
     NSString *message = [NSString stringWithFormat:@"Are you sure you want to remove this safe from StrongBox?%@",
                          safe.storageProvider == kLocalDevice ? @"" : @" (NB: The underlying safe data file will not be deleted)"];
@@ -159,11 +156,11 @@
           message:message
            action:^(BOOL response) {
                if (response) {
-                   SafeMetaData *safe = [self.safes get:indexPath.row];
+                   SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
                    
                    [self cleanupSafeForRemoval:safe];
-                   [self.safes removeSafesAt:[NSIndexSet indexSetWithIndex:indexPath.row]];
-                   [self.safes save];
+                   [[SafesCollection sharedInstance] removeSafesAt:[NSIndexSet indexSetWithIndex:indexPath.row]];
+                   [[SafesCollection sharedInstance] save];
                    
                    dispatch_async(dispatch_get_main_queue(), ^(void) {
                        [self setEditing:NO];
@@ -178,7 +175,7 @@
         return;
     }
     
-    SafeMetaData *safe = [self.safes get:indexPath.row];
+    SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
     
     if (safe.isTouchIdEnabled &&
         [IOsUtils isTouchIDAvailable] &&
@@ -348,7 +345,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
             if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch Id enrol.
                 safe.isEnrolledForTouchId = NO;
                 [JNKeychain deleteValueForKey:safe.nickName];
-                [self.safes save];
+                [[SafesCollection sharedInstance] save];
                 
                 [Alerts info:self
                        title:@"Could not open safe"
@@ -374,7 +371,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
                        [JNKeychain saveValue:masterPassword forKey:safe.nickName];
-                       [self.safes save];
+                       [[SafesCollection sharedInstance] save];
                        
                        [ISMessages showCardAlertWithTitle:@"Touch Id Enrol Successful"
                                                   message:@"You can now use Touch Id with this safe. Opening..."
@@ -390,7 +387,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    else{
                        safe.isTouchIdEnabled = NO;
                        [JNKeychain saveValue:masterPassword forKey:safe.nickName];
-                       [self.safes save];
+                       [[SafesCollection sharedInstance] save];
                        
                        [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
                    }
@@ -412,7 +409,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                            storageProvider:isOfflineCacheMode ? nil : provider // Guarantee nothing can be written!
                                          usingOfflineCache:isOfflineCacheMode
                                                 isReadOnly:NO // ![[Settings sharedInstance] isProOrFreeTrial]
-                                                     safes:self.safes];
+                                                     safes:[SafesCollection sharedInstance]];
 
     if (safe.offlineCacheEnabled) {
         [viewModel updateOfflineCacheWithData:data];
@@ -435,7 +432,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         
         NSString *newOrExisting = (NSString *)sender;
         vc.existing = [newOrExisting isEqualToString:@"Existing"];
-        vc.safes = self.safes;
     }
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UpgradeViewController* vc = segue.destinationViewController;
@@ -594,7 +590,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 }
 
 - (BOOL)isAddExistingSafeAllowed {
-    return [[Settings sharedInstance] isProOrFreeTrial] || self.safes.count < 1;
+    return [[Settings sharedInstance] isProOrFreeTrial] || [SafesCollection sharedInstance].safes.count < 1;
 }
 
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL {
@@ -625,9 +621,9 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                           message:@"Please Enter the URL of the Safe File."
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               NSString *nickName = [self.safes sanitizeSafeNickName:text];
+                               NSString *nickName = [SafesCollection sanitizeSafeNickName:text];
                                
-                               if (![self.safes isValidNickName:nickName]) {
+                               if (![[SafesCollection sharedInstance] isValidNickName:nickName]) {
                                    [Alerts   info:self
                                             title:@"Invalid Nickname"
                                           message:@"That nickname may already exist, or is invalid, please try a different nickname."
@@ -653,7 +649,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
          dispatch_async(dispatch_get_main_queue(), ^(void)
                         {
                             if (error == nil) {
-                                [self.safes
+                                [[SafesCollection sharedInstance]
                                  add:metadata];
                                 [self refreshView];
                             }
@@ -743,7 +739,7 @@ static BOOL shownNagScreenThisSession = NO;
         
         if(([[Settings sharedInstance] getTouchId911Count] < kTouchId911Limit) &&
            ([IOsUtils isTouchIDAvailable]) &&
-           [self.safes safeWithTouchIdIsAvailable]) {
+           [[SafesCollection sharedInstance] safeWithTouchIdIsAvailable]) {
             [self.buttonTouchID911 setEnabled:YES];
             [self.buttonTouchID911 setTintColor:nil];
         }

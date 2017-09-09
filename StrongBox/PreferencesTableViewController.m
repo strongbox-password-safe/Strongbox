@@ -13,6 +13,7 @@
 #import "Utils.h"
 #import "Settings.h"
 #import <MessageUI/MessageUI.h>
+#import "SafesCollection.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -156,13 +157,37 @@
         return;
     }
     
+    int i=0;
+    NSString *safesMessage = @"Safes Collection<br />----------------<br />";
+    for(SafeMetaData *safe in [SafesCollection sharedInstance].safes) {
+        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%d%d%d%d%d]<br />", i++,
+                              safe.nickName,
+                              safe.fileName,
+                              safe.fileIdentifier,
+                              safe.storageProvider,
+                              safe.isTouchIdEnabled,
+                              safe.isEnrolledForTouchId,
+                              safe.offlineCacheEnabled,
+                              safe.offlineCacheAvailable];
+        
+        safesMessage = [safesMessage stringByAppendingString:thisSafe];
+    }
+    safesMessage = [safesMessage stringByAppendingString:@"----------------"];
+
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
     NSString* pro = [[Settings sharedInstance] isPro] ? @"P" : @"";
     NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
     
-    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with StrongBox Password Safe... <br /><br />Please include as much detail as possible and screenshots if appropriate...<br /><br />Here is some debug information which might help:<br />Model: %@<br />System Name: %@<br />System Version: %@<br />Flags: %@%@", model, systemName, systemVersion, pro, isFreeTrial];
+    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with StrongBox Password Safe... <br /><br />"
+                         @"Please include as much detail as possible and screenshots if appropriate...<br /><br />"
+                         @"Here is some debug information which might help:<br />"
+                         @"%@<br />"
+                         @"Model: %@<br />"
+                         @"System Name: %@<br />"
+                         @"System Version: %@<br />"
+                         @"Flags: %@%@", safesMessage, model, systemName, systemVersion, pro, isFreeTrial];
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     

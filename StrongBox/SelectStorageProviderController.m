@@ -26,6 +26,8 @@
 @implementation SelectStorageProviderController
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
     if(self.existing) {
         [self.navigationItem setPrompt:@"Select where your safe is stored"];
     }
@@ -33,6 +35,7 @@
         [self.navigationItem setPrompt:@"Select where you would like to store your new safe"];
     }
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -121,11 +124,11 @@
         
         [controller addNew:self
                 validation:^BOOL (NSString *name, NSString *password) {
-                    return [self.safes isValidNickName:name] && password.length;
+                    return [[SafesCollection sharedInstance] isValidNickName:name] && password.length;
                 }
                 completion:^(NSString *name, NSString *password, BOOL response) {
                     if (response) {
-                        NSString *nickName = [self.safes sanitizeSafeNickName:name];
+                        NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
                         
                         [self addNewSafeAndPopToRoot:nickName
                                             password:password
@@ -153,7 +156,7 @@
           completion:^(SafeMetaData *metadata, NSError *error)
      {
          if (error == nil) {
-             [self.safes add:metadata];
+             [[SafesCollection sharedInstance] add:metadata];
          }
          else {
              NSLog(@"An error occurred: %@", error);
@@ -171,7 +174,6 @@
     if ([segue.identifier isEqualToString:@"SegueToBrowser"]) {
         StorageBrowserTableViewController *vc = segue.destinationViewController;
         
-        vc.safes = self.safes;
         vc.existing = self.existing;
         vc.safeStorageProvider = sender;
         vc.parentFolder = nil;

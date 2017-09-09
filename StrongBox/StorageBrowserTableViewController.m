@@ -139,11 +139,11 @@
 
     [controller addNew:self
             validation:^BOOL (NSString *name, NSString *password) {
-        return [self.safes isValidNickName:name] && password.length;
+        return [[SafesCollection sharedInstance] isValidNickName:name] && password.length;
     }
             completion:^(NSString *name, NSString *password, BOOL response) {
                 if (response) {
-                NSString *nickName = [self.safes sanitizeSafeNickName:name];
+                NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
 
                 [self addNewSafeAndPopToRoot:nickName
                                 password:password];
@@ -168,11 +168,11 @@
 
             [controller addExisting:self
                          validation:^BOOL (NSString *name) {
-                return [self.safes isValidNickName:name];
+                return [[SafesCollection sharedInstance] isValidNickName:name];
             }
                          completion:^(NSString *name, BOOL response) {
                              if (response) {
-                             NSString *nickName = [self.safes sanitizeSafeNickName:name];
+                             NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
 
                              [self addExistingSafeAndPopToRoot:file
                                                  name:nickName];
@@ -214,7 +214,7 @@
         StorageBrowserItem *file = _items[ip.row];
 
         StorageBrowserTableViewController *vc = segue.destinationViewController;
-        vc.safes = self.safes;
+    
         vc.parentFolder = file.providerData;
         vc.existing = self.existing;
         vc.safeStorageProvider = self.safeStorageProvider;
@@ -224,7 +224,7 @@
 - (void)addExistingSafeAndPopToRoot:(StorageBrowserItem *)item name:(NSString *)name {
     SafeMetaData *safe = [self.safeStorageProvider getSafeMetaData:name providerData:item.providerData];
 
-    [self.safes add:safe];
+    [[SafesCollection sharedInstance] add:safe];
 
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
@@ -259,7 +259,7 @@
     {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error == nil) {
-                [self.safes add:metadata];
+                [[SafesCollection sharedInstance] add:metadata];
             }
             else {
                 NSLog(@"An error occurred: %@", error);

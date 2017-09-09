@@ -10,22 +10,34 @@
 #import "SafeMetaData.h"
 
 @interface SafesCollection ()
-@property NSMutableArray<SafeMetaData*> *safes;
+
+@property (nonatomic, nonnull) NSMutableArray<SafeMetaData*> *mutableSafes;
+
 @end
 
 @implementation SafesCollection
+
++ (instancetype)sharedInstance {
+    static SafesCollection *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[SafesCollection alloc] init];
+    });
+    return sharedInstance;
+}
 
 - (instancetype)init {
     if (self = [super init]) {
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         NSArray *existingSafes = [userDefaults arrayForKey:@"safes"];
         
-        self.safes = [[NSMutableArray alloc] init];
+        self.mutableSafes = [[NSMutableArray alloc] init];
         
         for (NSDictionary *safeDict in existingSafes) {
             SafeMetaData *safe = [SafeMetaData fromDictionary:safeDict];
             
-            [self.safes addObject:safe];
+            [self.mutableSafes addObject:safe];
         }
         
         return self;
@@ -35,26 +47,22 @@
     }
 }
 
-- (NSUInteger)count {
-    return self.safes.count;
-}
-
-- (SafeMetaData *)get:(NSUInteger)index {
-    return (self.safes)[index];
+- (NSArray<SafeMetaData*>*)safes {
+    return self.mutableSafes;
 }
 
 - (void)removeSafesAt:(NSIndexSet *)index {
-    return [self.safes removeObjectsAtIndexes:index];
+    return [self.mutableSafes removeObjectsAtIndexes:index];
 }
 
 - (void)removeAt:(NSUInteger)index {
-    return [self.safes removeObjectAtIndex:index];
+    return [self.mutableSafes removeObjectAtIndex:index];
 }
 
 - (NSSet *)getAllNickNamesLowerCase {
-    NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity:self.safes.count];
+    NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity:self.mutableSafes.count];
     
-    for (SafeMetaData *safe in self.safes) {
+    for (SafeMetaData *safe in self.mutableSafes) {
         [set addObject:(safe.nickName).lowercaseString];
     }
     
@@ -67,7 +75,7 @@
         return;
     }
     
-    [self.safes addObject:newSafe];
+    [self.mutableSafes addObject:newSafe];
     
     [self save];
 }
@@ -75,9 +83,9 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)save {
-    NSMutableArray *sfs = [NSMutableArray arrayWithCapacity:(self.safes).count ];
+    NSMutableArray *sfs = [NSMutableArray arrayWithCapacity:(self.mutableSafes).count ];
     
-    for (SafeMetaData *s in self.safes) {
+    for (SafeMetaData *s in self.mutableSafes) {
         [sfs addObject:s.toDictionary];
     }
     
@@ -90,7 +98,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-- (NSString *)sanitizeSafeNickName:(NSString *)string {
++ (NSString *)sanitizeSafeNickName:(NSString *)string {
     NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
@@ -102,15 +110,13 @@
 }
 
 - (BOOL)isValidNickName:(NSString *)nickName {
-    NSString *sanitized = [self sanitizeSafeNickName:nickName];
+    NSString *sanitized = [SafesCollection sanitizeSafeNickName:nickName];
     
-    return [sanitized isEqualToString:nickName] &&
-    nickName.length > 0 &&
-    ![[self getAllNickNamesLowerCase] containsObject:nickName.lowercaseString];
+    return [sanitized isEqualToString:nickName] && nickName.length > 0 && ![[self getAllNickNamesLowerCase] containsObject:nickName.lowercaseString];
 }
 
 - (BOOL)safeWithTouchIdIsAvailable {
-    NSArray<SafeMetaData*> *touchIdEnabledSafes = [self.safes filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+    NSArray<SafeMetaData*> *touchIdEnabledSafes = [self.mutableSafes filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         SafeMetaData *safe = (SafeMetaData*)evaluatedObject;
         return safe.isTouchIdEnabled && safe.isEnrolledForTouchId;
     }]];

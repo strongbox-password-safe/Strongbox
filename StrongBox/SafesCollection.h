@@ -11,17 +11,21 @@
 
 @interface SafesCollection : NSObject
 
-- (instancetype)  init;
-@property (NS_NONATOMIC_IOSONLY, readonly) NSUInteger count;
-- (SafeMetaData *)get:(NSUInteger)index;
-- (void)removeSafesAt:(NSIndexSet *)index;
++ (instancetype _Nullable)sharedInstance;
+
+- (instancetype _Nullable)  init;
+
+@property (nonatomic, nonnull, readonly, copy) NSArray<SafeMetaData*> *safes;
+
+- (void)add:(SafeMetaData *_Nonnull)newSafe;
+- (void)removeSafesAt:(NSIndexSet *_Nonnull)index;
 - (void)removeAt:(NSUInteger)index;
-- (void)          save;
-- (void)add:(SafeMetaData *)newSafe;
 
-- (NSString *)sanitizeSafeNickName:(NSString *)string;
-- (BOOL)isValidNickName:(NSString *)nickName;
+- (void)save;
 
++ (NSString * _Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
+
+- (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
 - (BOOL)safeWithTouchIdIsAvailable;
 
 @end
