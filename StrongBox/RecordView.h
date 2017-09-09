@@ -26,7 +26,7 @@
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyUrl;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyAndLaunchUrl;
 @property (weak, nonatomic, nullable) IBOutlet UILabel *labelHidePassword;
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonSettings;
+@property (weak, nonatomic, nullable) IBOutlet UIButton *buttonSettings;
 
 - (IBAction)onGeneratePassword:(id _Nullable )sender;
 - (IBAction)onCopyUsername:(id _Nullable)sender;

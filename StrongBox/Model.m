@@ -25,15 +25,13 @@
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
-                          isReadOnly:(BOOL)isReadOnly
-                               safes:(SafesCollection *)safes; {
+                          isReadOnly:(BOOL)isReadOnly {
     if (self = [super init]) {
         _passwordDatabase = passwordDatabase;
         _metadata = metaData;
         _storageProvider = provider;
         _isUsingOfflineCache = usingOfflineCache;
         _isReadOnly = isReadOnly;
-        _safes = safes;
 
         return self;
     }
@@ -132,18 +130,11 @@
                                     }];
     }
     else {
-        // Create File Identifer
-
         safe.offlineCacheFileIdentifier = [[NSUUID alloc] init].UUIDString;
 
-        [[LocalDeviceStorageProvider sharedInstance] create:safe.offlineCacheFileIdentifier
-                         data:data
-                 parentFolder:nil
-               viewController:nil
-                   completion:^(SafeMetaData *metadata, NSError *error) {
-                       [self  onStoredOfflineCacheFile:safe
-                                      error:error];
-                   }];
+        [[LocalDeviceStorageProvider sharedInstance] createOfflineCacheFile:safe.offlineCacheFileIdentifier data:data completion:^(NSError *error) {
+            [self  onStoredOfflineCacheFile:safe error:error];
+        }];
     }
 }
 
@@ -159,7 +150,7 @@
         safe.offlineCacheAvailable = YES;
     }
 
-    [self.safes save];
+    [[SafesCollection sharedInstance] save];
 }
 
 - (void)disableAndClearOfflineCache {
@@ -169,7 +160,7 @@
                              _metadata.offlineCacheAvailable = NO;
                              _metadata.offlineCacheFileIdentifier = @"";
 
-                             [self.safes save];
+                             [[SafesCollection sharedInstance] save];
                          }];
 }
 
@@ -178,7 +169,7 @@
     _metadata.offlineCacheEnabled = YES;
     _metadata.offlineCacheFileIdentifier = @"";
 
-    [self.safes save];
+    [[SafesCollection sharedInstance] save];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,6 +268,21 @@
 
 - (NSString *)generatePassword {
     return [Utils generatePassword];
+}
+
+- (NSInteger) numberOfRecords {
+    return self.passwordDatabase.numberOfRecords;
+}
+
+- (NSInteger) numberOfGroups {
+    return self.passwordDatabase.numberOfGroups;
+}
+- (NSInteger) keyStretchIterations {
+    return self.passwordDatabase.keyStretchIterations;
+}
+
+- (NSString*)version {
+    return self.passwordDatabase.version;
 }
 
 @end

@@ -41,6 +41,10 @@
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
 
+@property (nonatomic, readonly) NSInteger numberOfRecords;
+@property (nonatomic, readonly) NSInteger numberOfGroups;
+@property (nonatomic, readonly) NSString * _Nonnull version;
+
 @end
 
 #endif // ifndef _PasswordDatabase_h

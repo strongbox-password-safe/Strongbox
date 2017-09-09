@@ -1,54 +1,88 @@
 //
-//  SafeDetailsAndSettingsView.m
+//  SafeDetailsView.m
 //  StrongBox
 //
-//  Created by Mark McGuill on 04/07/2014.
-//  Copyright (c) 2014 Mark McGuill. All rights reserved.
+//  Created by Mark on 09/09/2017.
+//  Copyright © 2017 Mark McGuill. All rights reserved.
 //
 
-#import "SafeDetailsAndSettingsView.h"
+#import "SafeDetailsView.h"
 #import "JNKeychain.h"
 #import "IOsUtils.h"
 #import <MessageUI/MessageUI.h>
 #import "Alerts.h"
 #import "ISMessages/ISMessages.h"
 
-@interface SafeDetailsAndSettingsView () <MFMailComposeViewControllerDelegate>
+@interface SafeDetailsView () <MFMailComposeViewControllerDelegate>
 
 @end
 
-@implementation SafeDetailsAndSettingsView {
-    NSString *firstPasswordEntry;
-}
+@implementation SafeDetailsView
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
-    self.labelUpdateApp.text = self.viewModel.lastUpdateApp;
-    self.labelUpdateHost.text = self.viewModel.lastUpdateHost;
-    self.labelUpdateUser.text = self.viewModel.lastUpdateUser;
-    self.labelUpdateTime.text = [self formatDate:self.viewModel.lastUpdateTime];
-
+    
     [self updateTouchIdButtonText];
     [self updateOfflineCacheButtonText];
     
-    self.buttonChangeMasterPassword.hidden = (self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
-    self.buttonTouchId.hidden = ![IOsUtils isTouchIDAvailable] || self.viewModel.isReadOnly;
-    self.buttonOfflineCache.hidden = self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage;
+    self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
+    self.labelToggleTouchId.enabled = [self canToggleTouchId];
+    self.labelToggleOfflineCache.enabled = [self canToggleOfflineCache];
+    
+    self.labelLastUpdateTime.text = [self formatDate:self.viewModel.lastUpdateTime];
+    self.labelVersion.text = self.viewModel.version;
+    self.labelLastUser.text = self.viewModel.lastUpdateUser;
+    self.labelLastHost.text = self.viewModel.lastUpdateHost;
+    self.labelLastApp.text = self.viewModel.lastUpdateApp;
+    self.labelMostPopularUsername.text = self.viewModel.mostPopularUsername ? self.viewModel.mostPopularUsername : @"<None>";
+    self.labelKeyStretchIterations.text = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.keyStretchIterations];
+    self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.usernameSet count]];
+    self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.passwordSet count]];
+    self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.numberOfGroups];
+    self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.numberOfRecords];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(indexPath.section == 0) {
+        if(indexPath.row == 0 && [self canChangeMasterPassword]) { // Change Master Password {
+            [self onChangeMasterPassword];
+        }
+        else if (indexPath.row == 1 && [self canToggleOfflineCache]) { // Offline Cache
+            [self onToggleOfflineCache];
+        }
+        else if (indexPath.row == 2) { // Export Safe
+            [self onExport];
+        }
+        else if (indexPath.row == 3  && [self canToggleTouchId]) { // Toggle Touch ID
+            [self onToggleTouchId];
+        }
+    }
+}
+
+- (BOOL)canChangeMasterPassword {
+    return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
+}
+
+- (BOOL)canToggleTouchId {
+    return [IOsUtils isTouchIDAvailable] && !self.viewModel.isReadOnly;
+}
+
+- (BOOL)canToggleOfflineCache {
+    return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
 }
 
 - (void)changeMasterPassword:(NSString *)password {
     self.viewModel.masterPassword = password;
-
+    
     [self.viewModel update:^(NSError *error) {
-                        if (error == nil) {
-                        if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
-                        [JNKeychain         saveValue:self.viewModel.masterPassword
+        if (error == nil) {
+            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
+                [JNKeychain         saveValue:self.viewModel.masterPassword
                                        forKey:self.viewModel.metadata.nickName];
-                        NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
-                        }
-
-                        [ISMessages             showCardAlertWithTitle:@"Master Password Changed"
+                NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
+            }
+            
+            [ISMessages             showCardAlertWithTitle:@"Master Password Changed"
                                                    message:nil
                                                   duration:3.f
                                                hideOnSwipe:YES
@@ -56,68 +90,62 @@
                                                  alertType:ISAlertTypeSuccess
                                              alertPosition:ISAlertPositionTop
                                                    didHide:nil];
-                        }
-                        else {
-                        [Alerts             error:self
+        }
+        else {
+            [Alerts             error:self
                                 title:@"Master Password NOT Changed!"
                                 error:error];
-                        }
-                    }];
+        }
+    }];
 }
 
-- (IBAction)onChangeMasterPassword:(id)sender {
+- (void)onChangeMasterPassword {
     Alerts *alerts = [[Alerts alloc] initWithTitle:@"Change Master Password"
                                            message:@"Enter the new password:"];
-
+    
     [alerts OkCancelWithPasswordAndConfirm:self
                                 completion:^(NSString *password, BOOL response) {
                                     if (response) {
-                                    [self changeMasterPassword:password];
+                                        [self changeMasterPassword:password];
                                     }
                                 }];
 }
 
 - (void)updateTouchIdButtonText {
-    NSString *title = self.viewModel.metadata.isTouchIdEnabled ? @"Disable Touch Id" : @"Enable Touch Id";
-
-    [self.buttonTouchId setTitle:title forState:UIControlStateNormal];
-    [self.buttonTouchId setTitle:title forState:UIControlStateHighlighted];
+    self.labelToggleTouchId.text = self.viewModel.metadata.isTouchIdEnabled ? @"Disable Touch Id" : @"Enable Touch Id";
 }
 
 - (void)updateOfflineCacheButtonText {
-    NSString *title = self.viewModel.metadata.offlineCacheEnabled ? @"Disable Offline Cache" : @"Enable Offline Cache";
-
-    [self.buttonOfflineCache setTitle:title forState:UIControlStateNormal];
-    [self.buttonOfflineCache setTitle:title forState:UIControlStateHighlighted];
+    self.labelToggleOfflineCache.text = self.viewModel.metadata.offlineCacheEnabled ? @"Disable Offline Cache" : @"Enable Offline Cache";
 }
 
-- (IBAction)onButtonTouchId:(id)sender {
+- (void)onToggleTouchId {
     if (self.viewModel.metadata.isTouchIdEnabled) {
         NSString *message = self.viewModel.metadata.isEnrolledForTouchId ?
-            @"Disabling Touch Id for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-            @"Are you sure you want to disable Touch Id for this safe?";
-
+        @"Disabling Touch Id for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+        @"Are you sure you want to disable Touch Id for this safe?";
+        
         [Alerts yesNo:self
                 title:@"Disable Touch Id?"
               message:message
                action:^(BOOL response) {
                    if (response) {
-                   self.viewModel.metadata.isTouchIdEnabled = NO;
-                   self.viewModel.metadata.isEnrolledForTouchId = NO;
-
-                   [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
-
-                   [self.viewModel.safes save];
-                   [self updateTouchIdButtonText];
-
-                   [ISMessages showCardAlertWithTitle:@"Touch Id Disabled"
-                                           message:@"Touch Id for this safe has been disabled."
-                                          duration:3.f
-                                       hideOnSwipe:YES
-                                         hideOnTap:YES
-                                         alertType:ISAlertTypeSuccess
-                                     alertPosition:ISAlertPositionTop
-                                           didHide:nil];
+                       self.viewModel.metadata.isTouchIdEnabled = NO;
+                       self.viewModel.metadata.isEnrolledForTouchId = NO;
+                       
+                       [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
+                       
+                       [[SafesCollection sharedInstance] save];
+                       [self updateTouchIdButtonText];
+                       
+                       [ISMessages showCardAlertWithTitle:@"Touch Id Disabled"
+                                                  message:@"Touch Id for this safe has been disabled."
+                                                 duration:3.f
+                                              hideOnSwipe:YES
+                                                hideOnTap:YES
+                                                alertType:ISAlertTypeSuccess
+                                            alertPosition:ISAlertPositionTop
+                                                  didHide:nil];
                    }
                }];
     }
@@ -125,7 +153,7 @@
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForTouchId = NO;
         [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
-
+        
         [ISMessages showCardAlertWithTitle:@"Touch Id Enabled"
                                    message:@"Touch Id has been enabled for this safe. You will be asked to enrol the next time you open it."
                                   duration:3.f
@@ -135,38 +163,38 @@
                              alertPosition:ISAlertPositionTop
                                    didHide:nil];
     }
-
+    
     [self updateTouchIdButtonText];
-    [self.viewModel.safes save];
+    [[SafesCollection sharedInstance] save];
 }
 
-- (IBAction)onToggleOfflineCache:(id)sender {
+- (void)onToggleOfflineCache {
     if (self.viewModel.metadata.offlineCacheEnabled) {
         [Alerts yesNo:self
                 title:@"Disable Offline Cache?"
               message:@"Disabling Offline Cache for this safe will remove the offline cache and you will not be able to access the safe when offline. Are you sure you want to do this?"
                action:^(BOOL response) {
                    if (response) {
-                   [self.viewModel disableAndClearOfflineCache];
-                   [self updateOfflineCacheButtonText];
-
-                   [ISMessages showCardAlertWithTitle:@"Offline Cache Disabled"
-                                           message:nil
-                                          duration:3.f
-                                       hideOnSwipe:YES
-                                         hideOnTap:YES
-                                         alertType:ISAlertTypeSuccess
-                                     alertPosition:ISAlertPositionTop
-                                           didHide:nil];
+                       [self.viewModel disableAndClearOfflineCache];
+                       [self updateOfflineCacheButtonText];
+                       
+                       [ISMessages showCardAlertWithTitle:@"Offline Cache Disabled"
+                                                  message:nil
+                                                 duration:3.f
+                                              hideOnSwipe:YES
+                                                hideOnTap:YES
+                                                alertType:ISAlertTypeSuccess
+                                            alertPosition:ISAlertPositionTop
+                                                  didHide:nil];
                    }
                }];
     }
     else {
         [self.viewModel enableOfflineCache];
         [self.viewModel updateOfflineCache:^{
-                            [self updateOfflineCacheButtonText];
-
-                            [ISMessages                 showCardAlertWithTitle:@"Offline Cache Enabled"
+            [self updateOfflineCacheButtonText];
+            
+            [ISMessages                 showCardAlertWithTitle:@"Offline Cache Enabled"
                                                        message:nil
                                                       duration:3.f
                                                    hideOnSwipe:YES
@@ -174,14 +202,14 @@
                                                      alertType:ISAlertTypeSuccess
                                                  alertPosition:ISAlertPositionTop
                                                        didHide:nil];
-                        }];
+        }];
     }
 }
 
-- (IBAction)onExport:(id)sender {
+- (void)onExport {
     NSError *error;
     NSData *safeData = [self.viewModel getSafeAsData:&error];
-
+    
     if(!safeData) {
         [Alerts error:self title:@"Could not get safe data" error:error];
         return;
@@ -196,18 +224,18 @@
     }
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
-
+    
     [picker setSubject:[NSString stringWithFormat:@"StrongBox Safe: '%@'", self.viewModel.metadata.nickName]];
-
+    
     NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName,
                                 ([self.viewModel.metadata.fileName hasSuffix:@".dat"] || [self.viewModel.metadata.fileName hasSuffix:@"psafe3"]) ? @"" : @".dat"];
-
+    
     [picker addAttachmentData:safeData mimeType:@"application/octet-stream" fileName:attachmentName];
-
+    
     [picker setToRecipients:[NSArray array]];
     [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' StrongBox password safe.", self.viewModel.metadata.nickName] isHTML:NO];
     picker.mailComposeDelegate = self;
-
+    
     [self presentViewController:picker animated:YES completion:^{ }];
 }
 
@@ -219,18 +247,19 @@
 
 - (NSString *)formatDate:(NSDate *)date {
     if (!date) {
-        return @"[Unknown]";
+        return @"<Unknown>";
     }
-
+    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-
+    
     dateFormatter.dateStyle = NSDateFormatterMediumStyle;
     dateFormatter.timeStyle = NSDateFormatterShortStyle;
     dateFormatter.locale = [NSLocale currentLocale];
-
+    
     NSString *dateString = [dateFormatter stringFromDate:date];
-
+    
     return dateString;
 }
 
 @end
+

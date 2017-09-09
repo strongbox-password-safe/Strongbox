@@ -96,7 +96,7 @@
             case HDR_VERSION: {
                 unsigned char v[2];
                 [_data getBytes:v length:2];
-                return [NSString stringWithFormat:@"0x%02x%02x", v[1], v[0]];
+                return [NSString stringWithFormat:@"%d.%d", v[1], v[0]];
             }
 
             case HDR_UUID:

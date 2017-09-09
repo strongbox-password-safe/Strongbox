@@ -15,7 +15,7 @@
 
 - (instancetype _Nullable)  init;
 
-@property (nonatomic, nonnull, readonly, copy) NSArray<SafeMetaData*> *safes;
+@property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *safes;
 
 - (void)add:(SafeMetaData *_Nonnull)newSafe;
 - (void)removeSafesAt:(NSIndexSet *_Nonnull)index;

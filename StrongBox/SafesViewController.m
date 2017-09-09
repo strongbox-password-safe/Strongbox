@@ -408,8 +408,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                                   metaData:safe
                                            storageProvider:isOfflineCacheMode ? nil : provider // Guarantee nothing can be written!
                                          usingOfflineCache:isOfflineCacheMode
-                                                isReadOnly:NO // ![[Settings sharedInstance] isProOrFreeTrial]
-                                                     safes:[SafesCollection sharedInstance]];
+                                                isReadOnly:NO]; // ![[Settings sharedInstance] isProOrFreeTrial]
 
     if (safe.offlineCacheEnabled) {
         [viewModel updateOfflineCacheWithData:data];

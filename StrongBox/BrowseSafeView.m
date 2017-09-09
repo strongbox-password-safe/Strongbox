@@ -8,13 +8,13 @@
 
 #import "BrowseSafeView.h"
 #import "SafeTools.h"
-#import "SafeDetailsAndSettingsView.h"
 #import "SelectDestinationGroupController.h"
 #import <MessageUI/MessageUI.h>
 #import "RecordView.h"
 #import "Alerts.h"
 #import <ISMessages/ISMessages.h>
 #import "Settings.h"
+#import "SafeDetailsView.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -48,10 +48,16 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     return result;
 };
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
     self.navigationController.toolbar.hidden = NO;
+
+    [self refresh];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
     
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
                                 initWithTarget:self
@@ -121,7 +127,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
     //ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
-    return !self.isEditing && (sender == self || [identifier isEqualToString:@"segueToSafeDetailsView"]);
+    return !self.isEditing && (sender == self || [identifier isEqualToString:@"segueToSafeSettings"]);
 }
 
 - (NSArray<Node *> *)getDataSource {
@@ -201,12 +207,6 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [self refresh];
-}
-
 - (void)enableDisableToolbarButtons {
     BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
     
@@ -272,9 +272,9 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
     }
-    else if ([segue.identifier isEqualToString:@"segueToSafeDetailsView"])
+    else if ([segue.identifier isEqualToString:@"segueToSafeSettings"])
     {
-        SafeDetailsAndSettingsView *vc = segue.destinationViewController;
+        SafeDetailsView *vc = segue.destinationViewController;
         vc.viewModel = self.viewModel;
     }
 }

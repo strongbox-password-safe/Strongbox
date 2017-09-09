@@ -537,6 +537,12 @@
     }];
 }
 
+- (NSArray<Node*>*)getAllGroups {
+    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return node.isGroup;
+    }];
+}
+
 - (NSSet<NSString*> *)usernameSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
 
@@ -577,6 +583,24 @@
     }
 
     return [self mostFrequentInCountedSet:bag];
+}
+
+-(NSInteger)numberOfRecords {
+    return [self getAllRecords].count;
+}
+
+-(NSInteger)numberOfGroups {
+    return [self getAllGroups].count;
+}
+
+-(NSString*)version {
+    Field *version = [self getFirstHeaderFieldOfType:HDR_VERSION];
+    if(!version) {
+        return @"<Not Set>";
+    }
+    else {
+        return [version prettyDataString];
+    }
 }
 
 - (NSString*)mostFrequentInCountedSet:(NSCountedSet<NSString*>*)bag {

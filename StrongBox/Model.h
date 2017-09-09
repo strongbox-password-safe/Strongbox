@@ -15,7 +15,6 @@
 @interface Model : NSObject
 
 @property (nonatomic, readonly, nonnull)    SafeMetaData *metadata;
-@property (nonatomic, nonnull)              SafesCollection *safes;
 @property (nonatomic, readonly)             BOOL isCloudBasedStorage;
 @property (nonatomic, readonly)             BOOL isUsingOfflineCache;
 @property (nonatomic, readonly)             BOOL isReadOnly;
@@ -28,8 +27,7 @@
                             metaData:(SafeMetaData *_Nonnull)metaData
                      storageProvider:(id <SafeStorageProvider>_Nonnull)provider
                    usingOfflineCache:(BOOL)usingOfflineCache
-                          isReadOnly:(BOOL)isReadOnly
-                               safes:(SafesCollection *_Nonnull)safes NS_DESIGNATED_INITIALIZER;
+                          isReadOnly:(BOOL)isReadOnly NS_DESIGNATED_INITIALIZER;
 
 - (void)update:(void (^_Nonnull)(NSError * _Nullable error))handler;
 
@@ -67,5 +65,10 @@
 @property (nonatomic, readonly, copy) NSString *_Nonnull mostPopularUsername;
 @property (nonatomic, readonly, copy) NSString *_Nonnull mostPopularPassword;
 @property (nonatomic, readonly, copy) NSString * _Nonnull generatePassword;
+
+@property (nonatomic, readonly) NSInteger numberOfRecords;
+@property (nonatomic, readonly) NSInteger numberOfGroups;
+@property (nonatomic, readonly) NSInteger keyStretchIterations;
+@property (nonatomic, readonly) NSString * _Nonnull version;
 
 @end

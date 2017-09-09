@@ -62,6 +62,17 @@
     completion(metadata, nil);
 }
 
+- (void)createOfflineCacheFile:(NSString *)uniqueIdentifier
+                          data:(NSData *)data
+                    completion:(void (^)(NSError *error))completion {
+    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
+                      stringByAppendingPathComponent:uniqueIdentifier];
+    
+    [data writeToFile:path atomically:YES];
+    
+    completion(nil);
+}
+
 - (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
 
