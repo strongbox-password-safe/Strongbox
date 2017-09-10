@@ -333,8 +333,9 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                 provider:(id)provider
       isOfflineCacheMode:(BOOL)isOfflineCacheMode
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
+    [SVProgressHUD popActivity];
     [SVProgressHUD showWithStatus:@"Decrypting..."];
-    
+
     NSError *error;
     PasswordDatabase *openedSafe = [[PasswordDatabase alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
     
