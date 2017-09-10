@@ -143,6 +143,10 @@ static NSComparator compareNodes = ^(id obj1, id obj2) {
 }
 
 - (BOOL)validateAddChild:(Node* _Nonnull)node {
+    if(!node) {
+        return NO;
+    }
+    
     if(node.isGroup) {
         for (Node* child in self.children) {
             if (child.isGroup && [child.title isEqualToString:node.title]) {

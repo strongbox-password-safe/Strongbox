@@ -8,6 +8,7 @@
 
 #import "Model.h"
 #import "Utils.h"
+#import "SVProgressHUD.h"
 
 @interface Model ()
 
@@ -43,6 +44,7 @@
 - (Node*)rootGroup {
     return self.passwordDatabase.rootGroup;
 }
+
 - (BOOL)isCloudBasedStorage {
     return _storageProvider.cloudBased;
 }
@@ -60,8 +62,10 @@
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
         {
             [self.passwordDatabase defaultLastUpdateFieldsToNow];
+            
             NSError *error;
-            NSData *updatedSafeData = [self.passwordDatabase getAsData:&error];
+            NSData *updatedSafeData = [self getSafeAsData:&error];
+            
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (updatedSafeData == nil) {
                     handler(error);
@@ -244,7 +248,13 @@
 }
     
 -(NSData*)getSafeAsData:(NSError**)error {
-    return [self.passwordDatabase getAsData:error];
+    [SVProgressHUD showWithStatus:@"Encrypting"];
+
+    NSData* ret = [self.passwordDatabase getAsData:error];
+    
+    [SVProgressHUD popActivity];
+    
+    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,6 +287,7 @@
 - (NSInteger) numberOfGroups {
     return self.passwordDatabase.numberOfGroups;
 }
+
 - (NSInteger) keyStretchIterations {
     return self.passwordDatabase.keyStretchIterations;
 }

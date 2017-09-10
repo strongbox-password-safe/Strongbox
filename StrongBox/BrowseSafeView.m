@@ -292,7 +292,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                                    [self saveChangesToSafeAndRefreshView];
                                }
                                else {
-                                   [Alerts warn:self title:@"Cannot create group" message:@"Could not create a group with this name here."];
+                                   [Alerts warn:self title:@"Cannot create group" message:@"Could not create a group with this name here, possibly because one with this name already exists."];
                                }
                            }
                        }];
