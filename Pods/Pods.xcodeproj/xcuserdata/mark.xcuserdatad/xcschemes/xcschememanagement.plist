@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>DZNEmptyDataSet.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>GTMOAuth2.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -61,62 +66,6 @@
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
-	<dict>
-		<key>1F13A9F466F82C2C95A66304D27CD433</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>2A1A9CC99D0A075881B2E625E3308DE4</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>3B88D8F553124540C52484DAB5257FC3</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>42BE0DEE0C9D31D0BAD31C59D0CEC3E3</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>4C4B180216960A09E044DCD1340DC2C9</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>850CC224F586D7217ED594C8775855D9</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>A08902AD8F47A860FFC624677A13D3C2</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>B1C4AAFAF49036C7007633DAA3C806AD</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>CEF3F3FD48F30AE7E6A6674BC46F1068</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>E0F7D77396D218B9A370B128FD3A89C0</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>F05BBF0ABCBAB1D55C2FE0C052A8CF62</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-	</dict>
+	<dict/>
 </dict>
 </plist>

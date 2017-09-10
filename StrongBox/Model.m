@@ -252,7 +252,7 @@
 
     NSData* ret = [self.passwordDatabase getAsData:error];
     
-    [SVProgressHUD popActivity];
+    [SVProgressHUD dismiss];
     
     return ret;
 }

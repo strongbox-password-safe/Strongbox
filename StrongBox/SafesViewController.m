@@ -54,8 +54,21 @@
     [self refreshView];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
+        self.tableView.contentOffset = CGPointZero;
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    // A little trick for removing the cell separators
+    self.tableView.tableFooterView = [UIView new];
     
     [[Settings sharedInstance] startMonitoringConnectivitity];
     
@@ -70,6 +83,93 @@
         }
     }
 }
+
+//- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView
+//{
+//    return [UIImage imageNamed:@"AppIcon"];
+//}
+
+//- (void)emptyDataSetWillAppear:(UIScrollView *)scrollView {
+//    scrollView.contentOffset = CGPointZero;
+//}
+//
+//- (CGFloat)verticalOffsetForEmptyDataSet:(UIScrollView *)scrollView {
+//    UIEdgeInsets insets = self.tableView.contentInset;
+//    return (insets.top == 0.0f) ? -64.0f : 0.0f;
+//}
+
+//-(CGFloat)verticalOffsetForEmptyDataSet:(UIScrollView *)scrollView {
+//    return -20.0f;
+//}
+
+//- (void)viewDidLayoutSubviews {
+//    [super viewDidLayoutSubviews];
+//
+//    if (!self.tableView.emptyDataSetSource) {
+//        self.tableView.emptyDataSetSource = self;
+//        self.tableView.emptyDataSetDelegate = self;
+//        [self.tableView reloadEmptyDataSet];
+//    }
+//}
+
+//- (CGPoint)offsetForEmptyDataSet:(UIScrollView *)scrollView {
+//    CGFloat top = scrollView.contentInset.top / 2;
+//    CGFloat bottom = scrollView.contentInset.bottom / 2;
+//    return CGPointMake(0, top-bottom);
+//}
+
+//- (CGFloat)verticalOffsetForEmptyDataSet:(UIScrollView *)scrollView {
+//    UIEdgeInsets insets = self.tableView.contentInset;
+// 
+//    NSLog(@"%f", insets.top);
+//    return (insets.top == 0.0f) ? -64.0f : 0.0f;
+//}
+
+//- (void)emptyDataSetWillAppear:(UIScrollView *)scrollView {
+//    scrollView.contentOffset = CGPointZero;
+//}
+
+//- (void)didMoveToSuperview
+//{
+//    self.frame = self.superview.frame;
+//
+//    [UIView animateWithDuration:0.25
+//                     animations:^{_contentView.alpha = 1.0;}
+//                     completion:NULL];
+//}
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = @"No Safes Here Yet";
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
+                                 NSForegroundColorAttributeName: [UIColor darkGrayColor]};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = @"Tap the + button in the top right corner to get started!";
+    
+    NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
+    paragraph.lineBreakMode = NSLineBreakByWordWrapping;
+    paragraph.alignment = NSTextAlignmentCenter;
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14.0f],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor],
+                                 NSParagraphStyleAttributeName: paragraph};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+//- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state
+//{
+//    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:17.0f],
+//                                 NSForegroundColorAttributeName: [UIColor blueColor] };
+//
+//    return [[NSAttributedString alloc] initWithString:@"Add My First Safe" attributes:attributes];
+//}
 
 - (void)initializeFreeTrial {
     NSCalendar *cal = [NSCalendar currentCalendar];
@@ -333,13 +433,13 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                 provider:(id)provider
       isOfflineCacheMode:(BOOL)isOfflineCacheMode
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
-    [SVProgressHUD popActivity];
+    [SVProgressHUD dismiss];
     [SVProgressHUD showWithStatus:@"Decrypting..."];
 
     NSError *error;
     PasswordDatabase *openedSafe = [[PasswordDatabase alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
     
-    [SVProgressHUD popActivity];
+    [SVProgressHUD dismiss];
     
     if (error != nil) {
         if (error.code == -2) {

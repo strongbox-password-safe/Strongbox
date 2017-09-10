@@ -185,7 +185,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
             completion:^(GTLRDrive_File *file, NSError *error)
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD popActivity];
+            [SVProgressHUD dismiss];
         });
         
         if(error) {
@@ -287,7 +287,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
                                               NSError *error)
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD popActivity];
+            [SVProgressHUD dismiss];
         });
         
         if (error == nil) {
@@ -325,7 +325,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
                                               GTLRDataObject *data,
                                               NSError *error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [SVProgressHUD popActivity];
+                            [SVProgressHUD dismiss];
                         });
                         
                         if (error != nil) {

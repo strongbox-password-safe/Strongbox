@@ -58,7 +58,7 @@
                                      completion:^(GTLRDrive_File *file, NSError *error)
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD popActivity];
+            [SVProgressHUD dismiss];
         });
 
         if (error == nil) {
@@ -100,7 +100,7 @@
                                        withData:data
                                      completion:^(NSError *error) {
                                          dispatch_async(dispatch_get_main_queue(), ^{
-                                             [SVProgressHUD popActivity];
+                                             [SVProgressHUD dismiss];
                                          });
 
                                          if(error) {
@@ -164,7 +164,7 @@
          fileIdentifier:file.identifier
              completion:^(NSData *data, NSError *error) {
                  dispatch_async(dispatch_get_main_queue(), ^{
-                     [SVProgressHUD popActivity];
+                     [SVProgressHUD dismiss];
                  });
                  
                  if(error) {

@@ -57,7 +57,7 @@
                     data:data
               completion:^(NSError *error) {
                   dispatch_async(dispatch_get_main_queue(), ^{
-                  [SVProgressHUD popActivity];
+                  [SVProgressHUD dismiss];
                   });
 
                   if (error == nil) {
@@ -108,7 +108,7 @@
                          NSData *fileContents)
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD popActivity];
+            [SVProgressHUD dismiss];
         });
 
         if (result) {
@@ -150,7 +150,7 @@
                            inputData:data]
       setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
           dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD popActivity];
+            [SVProgressHUD dismiss];
           });
 
           if (result) {
@@ -244,7 +244,7 @@
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD popActivity];
+                    [SVProgressHUD dismiss];
                 });
 
                 completion(items, nil);
@@ -254,7 +254,7 @@
             NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD popActivity];
+                [SVProgressHUD dismiss];
             });
 
             completion(nil, [Utils createNSError:message
@@ -285,7 +285,7 @@
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD popActivity];
+                    [SVProgressHUD dismiss];
                 });
 
                 completion(items, nil);
@@ -294,7 +294,7 @@
          else {
             NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD popActivity];
+                [SVProgressHUD dismiss];
             });
 
             completion(nil, [Utils createNSError:message

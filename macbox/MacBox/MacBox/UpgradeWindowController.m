@@ -225,8 +225,6 @@
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
     NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: %@", queue);
     
-    //[SVProgressHUD popActivity];
-    
     if(queue.transactions.count == 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [Alerts info:@"Restoration Unsuccessful"

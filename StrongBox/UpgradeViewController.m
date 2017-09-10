@@ -155,7 +155,7 @@
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
     NSLog(@"restoreCompletedTransactionsFailedWithError: %@", error);
     
-    [SVProgressHUD popActivity];
+    [SVProgressHUD dismiss];
     
     _buttonUpgrade2.enabled = YES;
     _buttonRestore.enabled = YES;
@@ -167,7 +167,7 @@
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
     NSLog(@"paymentQueueRestoreCompletedTransactionsFinished: %@", queue);
     
-    [SVProgressHUD popActivity];
+    [SVProgressHUD dismiss];
     _buttonUpgrade2.enabled = YES;
     _buttonRestore.enabled = YES;
     _buttonNope.enabled = YES;
@@ -203,7 +203,7 @@ updatedTransactions:(NSArray *)transactions {
                 _buttonRestore.enabled = YES;
                 _buttonNope.enabled = YES;
             
-                [SVProgressHUD popActivity];
+                [SVProgressHUD dismiss];
                 
                 [Alerts info:self title:@"Welcome to StrongBox Pro" message:@"Upgrade successful" completion:^{
                     [self dismissViewControllerAnimated:NO completion:nil];
@@ -222,7 +222,7 @@ updatedTransactions:(NSArray *)transactions {
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 NSLog(@"Purchase failed %@", transaction.error);
                 
-                [SVProgressHUD popActivity];
+                [SVProgressHUD dismiss];
                 _buttonUpgrade2.enabled = YES;
                 _buttonRestore.enabled = YES;
                 _buttonNope.enabled = YES;

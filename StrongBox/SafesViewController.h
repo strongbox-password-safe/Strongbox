@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import <StoreKit/StoreKit.h>
+#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
-@interface SafesViewController : UITableViewController<SKProductsRequestDelegate>
+@interface SafesViewController : UITableViewController<SKProductsRequestDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonTouchID911;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
