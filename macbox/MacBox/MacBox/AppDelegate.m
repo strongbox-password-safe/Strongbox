@@ -85,7 +85,7 @@
      informativeText:@"Hi and welcome to StrongBox!\n\n"
          @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of StrongBox for the next couple of months. "
          @"After that point, you will be transitioned to the regular version of StrongBox.\n\n"
-         @"You can always find out more at any time by clicking 'Upgrade to Pro' in the StrongBox menu item.\n\n"
+         @"You can always find out more at any time by tapping 'Upgrade to Pro' in the StrongBox menu item.\n\n"
          @"Thanks!\n-Mark"
               window:[NSApplication sharedApplication].mainWindow 
           completion:nil];

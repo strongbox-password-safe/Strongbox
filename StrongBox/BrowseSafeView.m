@@ -69,7 +69,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     if (!self.currentGroup || self.currentGroup.parent == nil) {
         [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
-                                   message:@"Touch and hold entry for fast password copy"
+                                   message:@"Tap and hold entry for fast password copy"
                                   duration:2.5f
                                hideOnSwipe:YES
                                  hideOnTap:YES

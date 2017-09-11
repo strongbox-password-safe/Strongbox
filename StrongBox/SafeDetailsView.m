@@ -112,7 +112,7 @@
 }
 
 - (void)updateTouchIdButtonText {
-    self.labelToggleTouchId.text = self.viewModel.metadata.isTouchIdEnabled ? @"Disable Touch Id" : @"Enable Touch Id";
+    self.labelToggleTouchId.text = self.viewModel.metadata.isTouchIdEnabled ? @"Disable Touch ID" : @"Enable Touch ID";
 }
 
 - (void)updateOfflineCacheButtonText {
@@ -122,11 +122,11 @@
 - (void)onToggleTouchId {
     if (self.viewModel.metadata.isTouchIdEnabled) {
         NSString *message = self.viewModel.metadata.isEnrolledForTouchId ?
-        @"Disabling Touch Id for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-        @"Are you sure you want to disable Touch Id for this safe?";
+        @"Disabling Touch ID for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+        @"Are you sure you want to disable Touch ID for this safe?";
         
         [Alerts yesNo:self
-                title:@"Disable Touch Id?"
+                title:@"Disable Touch ID?"
               message:message
                action:^(BOOL response) {
                    if (response) {
@@ -138,8 +138,8 @@
                        [[SafesCollection sharedInstance] save];
                        [self updateTouchIdButtonText];
                        
-                       [ISMessages showCardAlertWithTitle:@"Touch Id Disabled"
-                                                  message:@"Touch Id for this safe has been disabled."
+                       [ISMessages showCardAlertWithTitle:@"Touch ID Disabled"
+                                                  message:@"Touch ID for this safe has been disabled."
                                                  duration:3.f
                                               hideOnSwipe:YES
                                                 hideOnTap:YES
@@ -154,8 +154,8 @@
         self.viewModel.metadata.isEnrolledForTouchId = NO;
         [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
         
-        [ISMessages showCardAlertWithTitle:@"Touch Id Enabled"
-                                   message:@"Touch Id has been enabled for this safe. You will be asked to enrol the next time you open it."
+        [ISMessages showCardAlertWithTitle:@"Touch ID Enabled"
+                                   message:@"Touch ID has been enabled for this safe. You will be asked to enrol the next time you open it."
                                   duration:3.f
                                hideOnSwipe:YES
                                  hideOnTap:YES

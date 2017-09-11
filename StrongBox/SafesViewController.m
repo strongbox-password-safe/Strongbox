@@ -84,60 +84,6 @@
     }
 }
 
-//- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView
-//{
-//    return [UIImage imageNamed:@"AppIcon"];
-//}
-
-//- (void)emptyDataSetWillAppear:(UIScrollView *)scrollView {
-//    scrollView.contentOffset = CGPointZero;
-//}
-//
-//- (CGFloat)verticalOffsetForEmptyDataSet:(UIScrollView *)scrollView {
-//    UIEdgeInsets insets = self.tableView.contentInset;
-//    return (insets.top == 0.0f) ? -64.0f : 0.0f;
-//}
-
-//-(CGFloat)verticalOffsetForEmptyDataSet:(UIScrollView *)scrollView {
-//    return -20.0f;
-//}
-
-//- (void)viewDidLayoutSubviews {
-//    [super viewDidLayoutSubviews];
-//
-//    if (!self.tableView.emptyDataSetSource) {
-//        self.tableView.emptyDataSetSource = self;
-//        self.tableView.emptyDataSetDelegate = self;
-//        [self.tableView reloadEmptyDataSet];
-//    }
-//}
-
-//- (CGPoint)offsetForEmptyDataSet:(UIScrollView *)scrollView {
-//    CGFloat top = scrollView.contentInset.top / 2;
-//    CGFloat bottom = scrollView.contentInset.bottom / 2;
-//    return CGPointMake(0, top-bottom);
-//}
-
-//- (CGFloat)verticalOffsetForEmptyDataSet:(UIScrollView *)scrollView {
-//    UIEdgeInsets insets = self.tableView.contentInset;
-// 
-//    NSLog(@"%f", insets.top);
-//    return (insets.top == 0.0f) ? -64.0f : 0.0f;
-//}
-
-//- (void)emptyDataSetWillAppear:(UIScrollView *)scrollView {
-//    scrollView.contentOffset = CGPointZero;
-//}
-
-//- (void)didMoveToSuperview
-//{
-//    self.frame = self.superview.frame;
-//
-//    [UIView animateWithDuration:0.25
-//                     animations:^{_contentView.alpha = 1.0;}
-//                     completion:NULL];
-//}
-
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
     NSString *text = @"No Safes Here Yet";
@@ -162,14 +108,6 @@
     
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
-
-//- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state
-//{
-//    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:17.0f],
-//                                 NSForegroundColorAttributeName: [UIColor blueColor] };
-//
-//    return [[NSAttributedString alloc] initWithString:@"Add My First Safe" attributes:attributes];
-//}
 
 - (void)initializeFreeTrial {
     NSCalendar *cal = [NSCalendar currentCalendar];
@@ -443,14 +381,14 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     
     if (error != nil) {
         if (error.code == -2) {
-            if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch Id enrol.
+            if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 safe.isEnrolledForTouchId = NO;
                 [JNKeychain deleteValueForKey:safe.nickName];
                 [[SafesCollection sharedInstance] save];
                 
                 [Alerts info:self
                        title:@"Could not open safe"
-                     message:@"The stored password for Touch Id was incorrect for this safe. This safe has been removed from Touch Id."];
+                     message:@"The stored password for Touch ID was incorrect for this safe. This safe has been removed from Touch ID."];
             }
             else {
                 [Alerts info:self
@@ -466,16 +404,16 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         if (askAboutTouchIdEnrol && safe.isTouchIdEnabled && !safe.isEnrolledForTouchId &&
             [IOsUtils isTouchIDAvailable] && [[Settings sharedInstance] isProOrFreeTrial]) {
             [Alerts yesNo:self
-                    title:[NSString stringWithFormat:@"Use Touch Id to Open Safe?"]
-                  message:@"Would you like to use Touch Id to open this safe?"
+                    title:[NSString stringWithFormat:@"Use Touch ID to Open Safe?"]
+                  message:@"Would you like to use Touch ID to open this safe?"
                    action:^(BOOL response) {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
                        [JNKeychain saveValue:masterPassword forKey:safe.nickName];
                        [[SafesCollection sharedInstance] save];
                        
-                       [ISMessages showCardAlertWithTitle:@"Touch Id Enrol Successful"
-                                                  message:@"You can now use Touch Id with this safe. Opening..."
+                       [ISMessages showCardAlertWithTitle:@"Touch ID Enrol Successful"
+                                                  message:@"You can now use Touch ID with this safe. Opening..."
                                                  duration:0.75f
                                               hideOnSwipe:YES
                                                 hideOnTap:YES
@@ -568,8 +506,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         if (error.code == LAErrorAuthenticationFailed) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self
-                         title:@"Touch Id Failed"
-                       message:@"Touch Id Authentication Failed. You must now enter your password manually to open the safe."
+                         title:@"Touch ID Failed"
+                       message:@"Touch ID Authentication Failed. You must now enter your password manually to open the safe."
                     completion:^{
                         [self promptForSafePassword:safe
                   askAboutTouchIdEnrolIfAppropriate:NO];
@@ -586,7 +524,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self
-                         title:@"Touch Id Failed"
+                         title:@"Touch ID Failed"
                        message:@"Touch ID has not been setup or system has cancelled. You must now enter your password manually to open the safe."
                     completion:^{
                         [self promptForSafePassword:safe
@@ -682,10 +620,10 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
              message:  @
          "1) Send an email to yourself with your safe file attached\n"
          "2) Ensure this file has a 'dat' or 'psafe3' extension\n"
-         "3) Once the mail has arrived in the Mail app touch the attachment\n"
+         "3) Once the mail has arrived in the Mail app, Tap on the attachment\n"
          "4) You will be given an option to 'Copy to StrongBox'\n"
          "\n"
-         "Clicking on this will start the import process."];
+         "Tapping on this will start the import process."];
     }
 }
 
