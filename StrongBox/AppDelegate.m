@@ -27,6 +27,8 @@
 
     [self initializeDropbox];
 
+    [[Settings sharedInstance] startMonitoringConnectivitity];
+    
     [[Settings sharedInstance] incrementLaunchCount];
 
     return YES;

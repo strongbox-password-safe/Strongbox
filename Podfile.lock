@@ -28,6 +28,7 @@ PODS:
   - ISMessages (1.2)
   - JNKeychain (0.1.4)
   - ObjectiveDropboxOfficial (3.2.0)
+  - PopupDialog (0.5.4)
   - Reachability (3.2)
   - SVProgressHUD (2.2)
 
@@ -38,6 +39,7 @@ DEPENDENCIES:
   - ISMessages
   - JNKeychain
   - ObjectiveDropboxOfficial
+  - PopupDialog
   - Reachability
   - SVProgressHUD
 
@@ -51,9 +53,10 @@ SPEC CHECKSUMS:
   ISMessages: d39098b48672813d69d30f44da06260b9920fed4
   JNKeychain: fb6cc9ec95959ba46cd95d0ee6f7a05e41da9f42
   ObjectiveDropboxOfficial: 5f690e26ee7f8ec247c7259cd011d1ae41780285
+  PopupDialog: 75cf955693590b0cb2fdde00223fb65d99c57247
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SVProgressHUD: 3f37f3409ddb15f35c99315ae7dc33c474aa3256
 
-PODFILE CHECKSUM: b71554f24876f18de6530d3907af202680f01419
+PODFILE CHECKSUM: 66933dc4f66c703af1e1685867a1b5e03b02662c
 
 COCOAPODS: 1.3.1

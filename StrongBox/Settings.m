@@ -9,16 +9,17 @@
 #import "Settings.h"
 #import "Reachability.h"
 
-#define kLaunchCountKey @"launchCount"
-#define kAutoLockTimeSeconds @"autoLockTimeSeconds"
-#define kPromptedForReview @"promptedForReview"
-#define kIsProKey @"isPro"
-#define kEndFreeTrialDate @"endFreeTrialDate"
-#define kPromptedForCopyPasswordGesture @"promptedForCopyPasswordGesture"
-#define kCopyPasswordOnLongPress @"copyPasswordOnLongPress"
-#define kShowPasswordByDefaultOnEditScreen @"showPasswordByDefaultOnEditScreen"
-#define kIsHavePromptedAboutFreeTrial @"isHavePromptedAboutFreeTrial"
-#define kTouchId911Count @"kTouchId911Count"
+static NSString* kLaunchCountKey = @"launchCount";
+static NSString* kAutoLockTimeSeconds = @"autoLockTimeSeconds";
+static NSString* kPromptedForReview = @"promptedForReview";
+static NSString* kIsProKey = @"isPro";
+static NSString* kEndFreeTrialDate = @"endFreeTrialDate";
+static NSString* kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGesture";
+static NSString* kCopyPasswordOnLongPress = @"copyPasswordOnLongPress";
+static NSString* kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
+static NSString* kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
+static NSString* kTouchId911Count = @"kTouchId911Count";
+static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 
 @interface Settings ()
 
@@ -285,6 +286,16 @@
     [userDefaults setBool:value forKey:kCopyPasswordOnLongPress];
     
     [userDefaults synchronize];
+}
+
+- (void)setNeverShowForMacAppMessage:(BOOL)neverShowForMacAppMessage {
+    [[NSUserDefaults standardUserDefaults] setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)neverShowForMacAppMessage {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kNeverShowForMacAppMessage];
 }
 
 @end

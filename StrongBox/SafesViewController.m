@@ -25,6 +25,7 @@
 #import "Settings.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "SelectStorageProviderController.h"
+#import <PopupDialog/PopupDialog-Swift.h>
 
 #define kTouchId911Limit 5
 
@@ -65,12 +66,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
-    // A little trick for removing the cell separators
-    self.tableView.tableFooterView = [UIView new];
-    
-    [[Settings sharedInstance] startMonitoringConnectivitity];
+    [self customizeUi];
     
     if(![[Settings sharedInstance] isPro]) {
         [self getValidIapProducts];
@@ -79,9 +75,19 @@
             [self initializeFreeTrial];
         }
         else {
-            [self promptToReviewAppIfAppropriate];
+            [self showStartupMessaging];
         }
     }
+    else {
+        [self showStartupMessaging];
+    }
+}
+
+- (void)customizeUi {
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    // A little trick for removing the cell separators
+    self.tableView.tableFooterView = [UIView new];
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
@@ -815,27 +821,78 @@ static BOOL shownNagScreenThisSession = NO;
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url ]];
 }
 
-- (void)promptToReviewAppIfAppropriate {
+- (void)showStartupMessaging {
+    [self showMacAppMessage];
+    //    NSUInteger random = arc4random_uniform(2);
+//
+//    if(random == 0) {
+//        [self maybeMessageAboutMacApp];
+//    }
+//    else {
+//        [self maybeAskForReview];
+//    }
+}
+
+- (void)maybeAskForReview {
     NSInteger promptedForReview = [[Settings sharedInstance] isUserHasBeenPromptedForReview];
     NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
     
-    if ((launchCount % 3 == 0) && promptedForReview == 0) {
-        [Alerts  threeOptions:self
-                        title:@"Review StrongBox?"
-                      message:@"Hi, I'm Mark. I'm the developer of StrongBox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
-            defaultButtonText:@"Sure, take me there!"
-             secondButtonText:@"Naah"
-              thirdButtonText:@"Like, maybe later!"
-                       action:^(int response) {
-                           if (response == 0) {
-                               [self openAppStoreForReview];
-                               [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                           }
-                           else if (response == 1) {
-                               [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                           }
-                       }];
+    if (launchCount > 20 && (launchCount % 3 == 0) && promptedForReview == 0) {
+        [self askForReview];
     }
+}
+
+- (void)maybeMessageAboutMacApp {
+    NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
+    BOOL neverShow = [Settings sharedInstance].neverShowForMacAppMessage;
+
+    if (launchCount > 20 && (launchCount % 5 == 0) && !neverShow) {
+        [self showMacAppMessage];
+    }
+}
+
+- (void)askForReview {
+    [Alerts  threeOptions:self
+                    title:@"Review StrongBox?"
+                  message:@"Hi, I'm Mark. I'm the developer of StrongBox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
+        defaultButtonText:@"Sure, take me there!"
+         secondButtonText:@"Naah"
+          thirdButtonText:@"Like, maybe later!"
+                   action:^(int response) {
+                       if (response == 0) {
+                           [self openAppStoreForReview];
+                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
+                       }
+                       else if (response == 1) {
+                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
+                       }
+                   }];
+}
+
+- (void) showMacAppMessage {
+    PopupDialog *popup = [[PopupDialog alloc] initWithTitle:@"Available Now"
+                                                    message:@"StrongBox is now available in the Mac App Store. I hope you'll find it just as useful there!\n\nSearch 'StrongBox Password Safe' on the Mac App Store."
+                                                      image:[UIImage imageNamed:@"strongbox-for-mac-promo"]
+                                            buttonAlignment:UILayoutConstraintAxisVertical
+                                            transitionStyle:PopupDialogTransitionStyleBounceUp
+                                           gestureDismissal:YES
+                                                 completion:nil];
+    
+    DefaultButton *ok = [[DefaultButton alloc] initWithTitle:@"Cool" height:50 dismissOnTap:YES action:^{
+        // Ok action
+    }];
+    
+    DefaultButton *never = [[DefaultButton alloc] initWithTitle:@"Never Remind Me Again" height:50 dismissOnTap:YES action:^{
+        // Ok action
+    }];
+    
+    CancelButton *later = [[CancelButton alloc] initWithTitle:@"Remind Me Later!" height:50 dismissOnTap:YES action:^{
+        // Ok action
+    }];
+    
+    [popup addButtons: @[ok, never, later]];
+    
+    [self presentViewController:popup animated:YES completion:nil];
 }
 
 - (IBAction)onTouchID911:(id)sender {

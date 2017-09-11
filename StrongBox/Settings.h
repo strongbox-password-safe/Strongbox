@@ -49,4 +49,6 @@
 - (BOOL)isCopyPasswordOnLongPress;
 - (void)setCopyPasswordOnLongPress:(BOOL)value;
 
+@property (nonatomic) BOOL neverShowForMacAppMessage;
+
 @end

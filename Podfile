@@ -14,5 +14,6 @@ target 'StrongBox' do
     pod 'Reachability'
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
+    pod 'PopupDialog'
 end
 
