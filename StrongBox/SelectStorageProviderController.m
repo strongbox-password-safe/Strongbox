@@ -99,7 +99,7 @@
                 title:@"Local Device Safe Caveat"
               message:@"Since a local safe is only stored on this device, any loss of this device will lead to the loss of "
          "all passwords stored within this safe. You may want to consider using a cloud storage provider, such as the ones "
-         "supported by StrongBox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
+         "supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
          "a local device safe?"
                action:^(BOOL response) {
                    if (response) {

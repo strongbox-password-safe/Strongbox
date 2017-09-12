@@ -10,7 +10,7 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>StrongBox Password Safe</string>
+			<string>Strongbox Password Safe</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -22,7 +22,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>StrongBox Password Safe</string>
+			<string>Strongbox Password Safe</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -113,7 +113,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>StrongBox Password Safe</string>
+			<string>Strongbox Password Safe</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.dat</string>
 			<key>UTTypeTagSpecification</key>
@@ -130,7 +130,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>StrongBox Password Safe</string>
+			<string>Strongbox Password Safe</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.psafe3</string>
 			<key>UTTypeTagSpecification</key>

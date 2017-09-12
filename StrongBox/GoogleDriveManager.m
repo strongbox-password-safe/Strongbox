@@ -121,7 +121,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
 
         GTLRDrive_File *metadata = [GTLRDrive_File object];
         metadata.name = fileName;
-        metadata.descriptionProperty = @"StrongBox Password Safe";
+        metadata.descriptionProperty = @"Strongbox Password Safe";
         metadata.mimeType = kMimeType;
         metadata.parents = @[ parentFolderIdentifier ];
 

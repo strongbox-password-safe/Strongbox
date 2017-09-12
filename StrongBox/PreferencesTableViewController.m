@@ -116,7 +116,7 @@
     if (DBClientsManager.authorizedClient) {
         [Alerts yesNo:self
                 title:@"Unlink Dropbox?"
-              message:@"Are you sure you want to unlink StrongBox from Dropbox?"
+              message:@"Are you sure you want to unlink Strongbox from Dropbox?"
                action:^(BOOL response) {
                    if (response) {
                        [DBClientsManager unlinkAndResetClients];
@@ -124,7 +124,7 @@
                        
                        [Alerts info:self
                               title:@"Unlink Successful"
-                            message:@"You have successfully unlinked StrongBox from Dropbox."];
+                            message:@"You have successfully unlinked Strongbox from Dropbox."];
                    }
                }];
     }
@@ -180,7 +180,7 @@
     NSString* pro = [[Settings sharedInstance] isPro] ? @"P" : @"";
     NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
     
-    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with StrongBox Password Safe... <br /><br />"
+    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox Password Safe... <br /><br />"
                          @"Please include as much detail as possible and screenshots if appropriate...<br /><br />"
                          @"Here is some debug information which might help:<br />"
                          @"%@<br />"
@@ -191,7 +191,7 @@
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     
-    [picker setSubject:[NSString stringWithFormat:@"Help with StrongBox %@", [Utils getAppVersion]]];
+    [picker setSubject:[NSString stringWithFormat:@"Help with Strongbox %@", [Utils getAppVersion]]];
     [picker setToRecipients:[NSArray arrayWithObjects:@"support@strongboxsafe.com", nil]];
     [picker setMessageBody:message isHTML:YES];
      

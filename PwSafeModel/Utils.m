@@ -76,9 +76,6 @@
     return randomString;
 }
 
-
-//#define kStrongBoxUser @"StrongBox User"
-
 + (NSString*)getUsername {
     return NSFullUserName();
 }

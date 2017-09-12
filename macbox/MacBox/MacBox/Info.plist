@@ -15,7 +15,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>AppIcon</string>
 			<key>CFBundleTypeName</key>
-			<string>StrongBox Password Safe File</string>
+			<string>Strongbox Password Safe File</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>

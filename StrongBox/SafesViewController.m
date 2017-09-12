@@ -123,13 +123,13 @@
         date = [cal dateByAddingUnit:NSCalendarUnitDay value:7 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, it looks like you've been using StrongBox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured StrongBox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:nil];
+             message:@"Hi there, it looks like you've been using Strongbox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured Strongbox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:nil];
     }
     else {
         date = [cal dateByAddingUnit:NSCalendarUnitMonth value:1 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, welcome to StrongBox! You will be able to use the fully featured App for one month. At that point you will be transitioned to a more limited version. To find out more you can hit the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:nil];
+             message:@"Hi there, welcome to Strongbox! You will be able to use the fully featured App for one month. At that point you will be transitioned to a more limited version. To find out more you can hit the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:nil];
     }
     
     [[Settings sharedInstance] setEndFreeTrialDate:date];
@@ -192,7 +192,7 @@
 - (void)deleteSafe:(NSIndexPath * _Nonnull)indexPath {
     SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
     
-    NSString *message = [NSString stringWithFormat:@"Are you sure you want to remove this safe from StrongBox?%@",
+    NSString *message = [NSString stringWithFormat:@"Are you sure you want to remove this safe from Strongbox?%@",
                          safe.storageProvider == kLocalDevice ? @"" : @" (NB: The underlying safe data file will not be deleted)"];
     
     [Alerts yesNo:self
@@ -627,7 +627,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
          "1) Send an email to yourself with your safe file attached\n"
          "2) Ensure this file has a 'dat' or 'psafe3' extension\n"
          "3) Once the mail has arrived in the Mail app, Tap on the attachment\n"
-         "4) You will be given an option to 'Copy to StrongBox'\n"
+         "4) You will be given an option to 'Copy to Strongbox'\n"
          "\n"
          "Tapping on this will start the import process."];
     }
@@ -646,7 +646,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         if (![PasswordDatabase isAValidSafe:importedData]) {
             [Alerts warn:self
                    title:@"Invalid Safe"
-                 message:@"This is not a valid StrongBox password safe database file."];
+                 message:@"This is not a valid Strongbox password safe database file."];
             
             return;
         }
@@ -654,7 +654,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         [self promptForImportedSafeNickName:importedData];
     }
     else {
-        [Alerts info:self title:@"Safe cannot be added" message:@"This safe could not be added because you are using the Lite version of StrongBox. Please upgrade to enjoy full benefits."];
+        [Alerts info:self title:@"Safe cannot be added" message:@"This safe could not be added because you are using the Lite version of Strongbox. Please upgrade to enjoy full benefits."];
     }
 }
 
@@ -822,22 +822,21 @@ static BOOL shownNagScreenThisSession = NO;
 }
 
 - (void)showStartupMessaging {
-    [self showMacAppMessage];
-    //    NSUInteger random = arc4random_uniform(2);
-//
-//    if(random == 0) {
-//        [self maybeMessageAboutMacApp];
-//    }
-//    else {
-//        [self maybeAskForReview];
-//    }
+    NSUInteger random = arc4random_uniform(2);
+
+    if(random == 0) {
+        [self maybeMessageAboutMacApp];
+    }
+    else {
+        [self maybeAskForReview];
+    }
 }
 
 - (void)maybeAskForReview {
     NSInteger promptedForReview = [[Settings sharedInstance] isUserHasBeenPromptedForReview];
     NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
     
-    if (launchCount > 20 && (launchCount % 3 == 0) && promptedForReview == 0) {
+    if (launchCount > 20 && (launchCount % 10 == 0) && promptedForReview == 0) {
         [self askForReview];
     }
 }
@@ -846,15 +845,15 @@ static BOOL shownNagScreenThisSession = NO;
     NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
     BOOL neverShow = [Settings sharedInstance].neverShowForMacAppMessage;
 
-    if (launchCount > 20 && (launchCount % 5 == 0) && !neverShow) {
+    if (launchCount > 20 && (launchCount % 10 == 0) && !neverShow) {
         [self showMacAppMessage];
     }
 }
 
 - (void)askForReview {
     [Alerts  threeOptions:self
-                    title:@"Review StrongBox?"
-                  message:@"Hi, I'm Mark. I'm the developer of StrongBox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
+                    title:@"Review Strongbox?"
+                  message:@"Hi, I'm Mark. I'm the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
         defaultButtonText:@"Sure, take me there!"
          secondButtonText:@"Naah"
           thirdButtonText:@"Like, maybe later!"
@@ -871,32 +870,26 @@ static BOOL shownNagScreenThisSession = NO;
 
 - (void) showMacAppMessage {
     PopupDialog *popup = [[PopupDialog alloc] initWithTitle:@"Available Now"
-                                                    message:@"StrongBox is now available in the Mac App Store. I hope you'll find it just as useful there!\n\nSearch 'StrongBox Password Safe' on the Mac App Store."
+                                                    message:@"Strongbox is now available in the Mac App Store. I hope you'll find it just as useful there!\n\nSearch 'Strongbox Password Safe' on the Mac App Store."
                                                       image:[UIImage imageNamed:@"strongbox-for-mac-promo"]
                                             buttonAlignment:UILayoutConstraintAxisVertical
                                             transitionStyle:PopupDialogTransitionStyleBounceUp
                                            gestureDismissal:YES
                                                  completion:nil];
     
-    DefaultButton *ok = [[DefaultButton alloc] initWithTitle:@"Cool" height:50 dismissOnTap:YES action:^{
-        // Ok action
+    DefaultButton *ok = [[DefaultButton alloc] initWithTitle:@"Cool!" height:50 dismissOnTap:YES action:nil];
+    
+    CancelButton *later = [[CancelButton alloc] initWithTitle:@"Got It! Never Remind Me Again!" height:50 dismissOnTap:YES action:^{
+        [[Settings sharedInstance] setNeverShowForMacAppMessage:YES];
     }];
     
-    DefaultButton *never = [[DefaultButton alloc] initWithTitle:@"Never Remind Me Again" height:50 dismissOnTap:YES action:^{
-        // Ok action
-    }];
-    
-    CancelButton *later = [[CancelButton alloc] initWithTitle:@"Remind Me Later!" height:50 dismissOnTap:YES action:^{
-        // Ok action
-    }];
-    
-    [popup addButtons: @[ok, never, later]];
+    [popup addButtons: @[ok, later]];
     
     [self presentViewController:popup animated:YES completion:nil];
 }
 
 - (IBAction)onTouchID911:(id)sender {
-    NSString *message = [NSString stringWithFormat:@"You can enable Touch ID temporarily up to a maximum of %d times under the free version of StrongBox. This is to allow you to possibly recover from a situation where you've forgotten your master password because you were using Touch ID before. This may allow you access to your safe after you've decided not to upgrade to the Pro version. Once you have access to your safe you can then change your master password. This is an emergency, temporary and convenenience feature only. You SHOULD ALWAYS know your master password. Please upgrade if you'd like to continue using Touch ID.\n\nDo you want to enable emergency Touch ID for your next safe open?", kTouchId911Limit];
+    NSString *message = [NSString stringWithFormat:@"You can enable Touch ID temporarily up to a maximum of %d times under the free version of Strongbox. This is to allow you to possibly recover from a situation where you've forgotten your master password because you were using Touch ID before. This may allow you access to your safe after you've decided not to upgrade to the Pro version. Once you have access to your safe you can then change your master password. This is an emergency, temporary and convenenience feature only. You SHOULD ALWAYS know your master password. Please upgrade if you'd like to continue using Touch ID.\n\nDo you want to enable emergency Touch ID for your next safe open?", kTouchId911Limit];
     
     [Alerts yesNo:self
             title:@"Emergency Touch ID Activation"

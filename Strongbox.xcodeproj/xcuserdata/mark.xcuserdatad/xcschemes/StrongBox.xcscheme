@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4DBE5B301C8356C700C310BC"
-               BuildableName = "StrongBox.app"
-               BlueprintName = "StrongBox"
-               ReferencedContainer = "container:StrongBox.xcodeproj">
+               BuildableName = "Strongbox.app"
+               BlueprintName = "Strongbox"
+               ReferencedContainer = "container:Strongbox.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -34,9 +34,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DBE5B301C8356C700C310BC"
-            BuildableName = "StrongBox.app"
-            BlueprintName = "StrongBox"
-            ReferencedContainer = "container:StrongBox.xcodeproj">
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox"
+            ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -58,9 +58,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DBE5B301C8356C700C310BC"
-            BuildableName = "StrongBox.app"
-            BlueprintName = "StrongBox"
-            ReferencedContainer = "container:StrongBox.xcodeproj">
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox"
+            ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -77,9 +77,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DBE5B301C8356C700C310BC"
-            BuildableName = "StrongBox.app"
-            BlueprintName = "StrongBox"
-            ReferencedContainer = "container:StrongBox.xcodeproj">
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox"
+            ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

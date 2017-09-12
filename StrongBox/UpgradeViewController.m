@@ -181,7 +181,7 @@
         
         [[Settings sharedInstance] setPro:YES];
 
-        [Alerts info:self title:@"Welcome Back to StrongBox Pro" message:@"Upgrade Restored Successfully. Thank you!" completion:^{
+        [Alerts info:self title:@"Welcome Back to Strongbox Pro" message:@"Upgrade Restored Successfully. Thank you!" completion:^{
             [self dismissViewControllerAnimated:NO completion:nil];
         }];
     }
@@ -205,7 +205,7 @@ updatedTransactions:(NSArray *)transactions {
             
                 [SVProgressHUD dismiss];
                 
-                [Alerts info:self title:@"Welcome to StrongBox Pro" message:@"Upgrade successful" completion:^{
+                [Alerts info:self title:@"Welcome to Strongbox Pro" message:@"Upgrade successful" completion:^{
                     [self dismissViewControllerAnimated:NO completion:nil];
                 }];
 

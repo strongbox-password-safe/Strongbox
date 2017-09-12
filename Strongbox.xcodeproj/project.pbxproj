@@ -64,10 +64,10 @@
 		4D0BA7D71F23B844009243C9 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesTableViewController.h; sourceTree = "<group>"; };
 		4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesTableViewController.m; sourceTree = "<group>"; };
-		4D13989F1F5F0B66002608E4 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = macbox/MacBox/../../PwSafeModel/Node.h; sourceTree = SOURCE_ROOT; };
-		4D1398A01F5F0B66002608E4 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = macbox/MacBox/../../PwSafeModel/Node.m; sourceTree = SOURCE_ROOT; };
-		4D1398A11F5F0B66002608E4 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = macbox/MacBox/../../PwSafeModel/NodeFields.h; sourceTree = SOURCE_ROOT; };
-		4D1398A21F5F0B66002608E4 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = macbox/MacBox/../../PwSafeModel/NodeFields.m; sourceTree = SOURCE_ROOT; };
+		4D13989F1F5F0B66002608E4 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = PwSafeModel/Node.h; sourceTree = SOURCE_ROOT; };
+		4D1398A01F5F0B66002608E4 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = PwSafeModel/Node.m; sourceTree = SOURCE_ROOT; };
+		4D1398A11F5F0B66002608E4 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = PwSafeModel/NodeFields.h; sourceTree = SOURCE_ROOT; };
+		4D1398A21F5F0B66002608E4 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = PwSafeModel/NodeFields.m; sourceTree = SOURCE_ROOT; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowseSafeView.h; sourceTree = "<group>"; };
 		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowseSafeView.m; sourceTree = "<group>"; };
 		4D1757961C8361D200E6356F /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = formatV3.txt; sourceTree = "<group>"; };
@@ -94,8 +94,8 @@
 		4D2E35671F62C9CB0064B5D5 /* SelectStorageProviderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectStorageProviderController.h; sourceTree = "<group>"; };
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectStorageProviderController.m; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4D3694DC1F54547100A82811 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = macbox/MacBox/../../PwSafeModel/Utils.h; sourceTree = SOURCE_ROOT; };
-		4D3694DD1F54547100A82811 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = macbox/MacBox/../../PwSafeModel/Utils.m; sourceTree = SOURCE_ROOT; };
+		4D3694DC1F54547100A82811 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = PwSafeModel/Utils.h; sourceTree = SOURCE_ROOT; };
+		4D3694DD1F54547100A82811 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = PwSafeModel/Utils.m; sourceTree = SOURCE_ROOT; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserTableViewController.m; sourceTree = "<group>"; };
 		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserItem.h; sourceTree = "<group>"; };
@@ -104,8 +104,8 @@
 		4D4C49031EDEC0B900EB857D /* RecordView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordView.m; sourceTree = "<group>"; };
 		4D55F0D61EE2BFF400C43B26 /* TextFieldAutoSuggest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldAutoSuggest.h; sourceTree = "<group>"; };
 		4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAutoSuggest.m; sourceTree = "<group>"; };
-		4D68DBB11F430ECB00A8A148 /* PasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordDatabase.h; path = macbox/MacBox/../../PwSafeModel/PasswordDatabase.h; sourceTree = SOURCE_ROOT; };
-		4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordDatabase.m; path = macbox/MacBox/../../PwSafeModel/PasswordDatabase.m; sourceTree = SOURCE_ROOT; };
+		4D68DBB11F430ECB00A8A148 /* PasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordDatabase.h; path = PwSafeModel/PasswordDatabase.h; sourceTree = SOURCE_ROOT; };
+		4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordDatabase.m; path = PwSafeModel/PasswordDatabase.m; sourceTree = SOURCE_ROOT; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsView.m; sourceTree = "<group>"; };
 		4D915D721EDC068D002615F6 /* PasswordSettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordSettingsTableViewController.h; sourceTree = "<group>"; };
@@ -133,7 +133,7 @@
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DA6335E1F62EAE1000A0E9D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		4DBE5B311C8356C700C310BC /* StrongBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StrongBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DBE5B311C8356C700C310BC /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DBE5B381C8356C700C310BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -277,7 +277,7 @@
 		4DBE5B321C8356C700C310BC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4DBE5B311C8356C700C310BC /* StrongBox.app */,
+				4DBE5B311C8356C700C310BC /* Strongbox.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -334,9 +334,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4DBE5B301C8356C700C310BC /* StrongBox */ = {
+		4DBE5B301C8356C700C310BC /* Strongbox */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "StrongBox" */;
+			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox" */;
 			buildPhases = (
 				4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */,
 				4DBE5B2D1C8356C700C310BC /* Sources */,
@@ -349,9 +349,9 @@
 			);
 			dependencies = (
 			);
-			name = StrongBox;
+			name = Strongbox;
 			productName = StrongBox;
-			productReference = 4DBE5B311C8356C700C310BC /* StrongBox.app */;
+			productReference = 4DBE5B311C8356C700C310BC /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -374,7 +374,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "StrongBox" */;
+			buildConfigurationList = 4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "Strongbox" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -387,7 +387,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4DBE5B301C8356C700C310BC /* StrongBox */,
+				4DBE5B301C8356C700C310BC /* Strongbox */,
 			);
 		};
 /* End PBXProject section */
@@ -703,7 +703,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "StrongBox" */ = {
+		4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "Strongbox" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DBE5B491C8356C700C310BC /* Debug */,
@@ -712,7 +712,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "StrongBox" */ = {
+		4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DBE5B4C1C8356C700C310BC /* Debug */,

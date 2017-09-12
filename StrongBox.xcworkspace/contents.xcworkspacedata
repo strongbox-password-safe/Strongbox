@@ -5,7 +5,7 @@
       location = "group:macbox/MacBox/MacBox.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:StrongBox.xcodeproj">
+      location = "group:/Users/mark/dev/strongbox/Strongbox.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
