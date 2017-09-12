@@ -8,7 +8,7 @@
 
 #import "RecordView.h"
 #import "Field.h"
-#import "PasswordSettingsTableViewController.h"
+#import "PasswordHistoryViewController.h"
 #import "PasswordHistory.h"
 #import "Alerts.h"
 #import "SVProgressHUD/SVProgressHUD.h"
@@ -157,6 +157,7 @@
         self.textViewNotes.text = self.record.fields.notes;
         
         self.buttonSettings.enabled = YES;
+        self.buttonHistory.enabled = YES;
     }
     else {
         self.textFieldPassword.text = [self.viewModel generatePassword];
@@ -167,6 +168,7 @@
         self.textViewNotes.text = @"";
         
         self.buttonSettings.enabled = NO;
+        self.buttonHistory.enabled = NO;
     }
 }
 
@@ -178,6 +180,7 @@
         self.editButtonItem.enabled = [self uiIsDirty];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
         self.buttonSettings.enabled = NO;
+        self.buttonHistory.enabled = NO;
     }
     else {
         if ([self uiIsDirty]) { // Any other changes? Change the record and save the safe
@@ -185,6 +188,7 @@
         }
         else {
             self.buttonSettings.enabled = (self.record != nil);
+            self.buttonHistory.enabled = (self.record != nil);
             self.navigationItem.leftBarButtonItem = navBack;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
@@ -276,6 +280,9 @@ NSString * trim(NSString *string) {
                                didHide:nil];
 }
 
+- (IBAction)onSettings:(id)sender {
+}
+
 - (IBAction)onGeneratePassword:(id)sender {
     if (self.editing) {
         self.textFieldPassword.text = [self.viewModel generatePassword];
@@ -322,14 +329,14 @@ NSString * trim(NSString *string) {
 
 - (void)hideOrShowPassword:(BOOL)hide {
     if (hide) {
-        [self.textFieldPassword setTextColor:[UIColor clearColor]];
+        [self.textFieldPassword setTextColor:[UIColor lightGrayColor]];
+        self.textFieldPassword.text = @"****************";
         [self.buttonHidePassword setTitle:@"Show" forState:UIControlStateNormal];
-        [self.labelHidePassword setHidden:NO];
     }
     else {
         [self.textFieldPassword setTextColor:[UIColor purpleColor]];
+        self.textFieldPassword.text = self.record.fields.password;
         [self.buttonHidePassword setTitle:@"Hide" forState:UIControlStateNormal];
-        [self.labelHidePassword setHidden:YES];
     }
 }
 
@@ -346,9 +353,9 @@ NSString * trim(NSString *string) {
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqual:@"segueToPasswordSettings"] && (self.record != nil))
+    if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil))
     {
-        PasswordSettingsTableViewController *vc = segue.destinationViewController;
+        PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.record.fields.passwordHistory;
         vc.viewModel = self.viewModel;
         
@@ -359,7 +366,8 @@ NSString * trim(NSString *string) {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // Hide Delete Buttons and Indentation during editing and autosize last row to fill available space
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -456,6 +464,9 @@ NSString * trim(NSString *string) {
             completion(error);
         });
     }];
+}
+
+- (IBAction)onHistory:(id)sender {
 }
 
 @end

@@ -31,7 +31,7 @@
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
 		4D68DBB31F430ECB00A8A148 /* PasswordDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
-		4D915D741EDC068D002615F6 /* PasswordSettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordSettingsTableViewController.m */; };
+		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
 		4D92C7F11F388D0900341A58 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7DE1F388D0900341A58 /* Field.m */; };
@@ -108,8 +108,8 @@
 		4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordDatabase.m; path = PwSafeModel/PasswordDatabase.m; sourceTree = SOURCE_ROOT; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsView.m; sourceTree = "<group>"; };
-		4D915D721EDC068D002615F6 /* PasswordSettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordSettingsTableViewController.h; sourceTree = "<group>"; };
-		4D915D731EDC068D002615F6 /* PasswordSettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordSettingsTableViewController.m; sourceTree = "<group>"; };
+		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryViewController.h; sourceTree = "<group>"; };
+		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
 		4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviousPasswordsTableViewController.m; sourceTree = "<group>"; };
 		4D915D781EDC4B77002615F6 /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alerts.h; sourceTree = "<group>"; };
@@ -178,8 +178,8 @@
 				4D1757B01C8361D300E6356F /* SafesViewController.m */,
 				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
 				4D1757901C8361D200E6356F /* BrowseSafeView.m */,
-				4D915D721EDC068D002615F6 /* PasswordSettingsTableViewController.h */,
-				4D915D731EDC068D002615F6 /* PasswordSettingsTableViewController.m */,
+				4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */,
+				4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */,
 				4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */,
 				4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */,
 				4D4C49021EDEC0B900EB857D /* RecordView.h */,
@@ -492,7 +492,7 @@
 				4D92C7FD1F388DE500341A58 /* twofish.c in Sources */,
 				4D92C7FF1F388DFF00341A58 /* crypt_argchk.c in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
-				4D915D741EDC068D002615F6 /* PasswordSettingsTableViewController.m in Sources */,
+				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
 				4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */,
 				4D1398A41F5F0B66002608E4 /* NodeFields.m in Sources */,
 				4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */,

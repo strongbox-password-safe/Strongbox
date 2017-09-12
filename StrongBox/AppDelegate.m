@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 #import "RecordView.h"
 #import "BrowseSafeView.h"
-#import "PasswordSettingsTableViewController.h"
+#import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
 #import "SafesViewController.h"
 #import "real-secrets.h"
@@ -71,7 +71,7 @@
 
     if ([nav.visibleViewController isKindOfClass:[RecordView class]] ||
         [nav.visibleViewController isKindOfClass:[BrowseSafeView class]] ||
-        [nav.visibleViewController isKindOfClass:[PasswordSettingsTableViewController class]] ||
+        [nav.visibleViewController isKindOfClass:[PasswordHistoryViewController class]] ||
         [nav.visibleViewController isKindOfClass:[PreviousPasswordsTableViewController class]]) {
         enterBackgroundTime = [[NSDate alloc] init];
         lockView = [mainStoryboard instantiateViewControllerWithIdentifier:@"LockScreen"];
