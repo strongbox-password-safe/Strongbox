@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/SafesViewController.m"
-            timestampString = "526909288.469898"
+            timestampString = "526910108.627813"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "803"
-            endingLineNumber = "803"
+            startingLineNumber = "792"
+            endingLineNumber = "792"
             landmarkName = "-bindProOrFreeTrialUi"
             landmarkType = "7">
          </BreakpointContent>

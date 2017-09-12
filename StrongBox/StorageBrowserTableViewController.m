@@ -42,15 +42,13 @@
     _defaultFileImage = [UIImage imageNamed:@"page_white48"];
     _iconsCache = [[NSMutableDictionary alloc] init];
 
-    // Get the reference to the current toolbar buttons
-
     NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
 
     if (self.existing) {
         [toolbarButtons removeObject:self.buttonSelectThis];
         [self setToolbarItems:toolbarButtons animated:YES];
     }
-    else {
+    else if(![toolbarButtons containsObject:self.buttonSelectThis]) {
         [toolbarButtons addObject:self.buttonSelectThis];
         [self setToolbarItems:toolbarButtons animated:YES];
     }
