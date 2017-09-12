@@ -174,6 +174,8 @@
 		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
+				4D1757B01C8361D300E6356F /* SafesViewController.m */,
 				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
 				4D1757901C8361D200E6356F /* BrowseSafeView.m */,
 				4D915D721EDC068D002615F6 /* PasswordSettingsTableViewController.h */,
@@ -182,8 +184,6 @@
 				4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */,
 				4D4C49021EDEC0B900EB857D /* RecordView.h */,
 				4D4C49031EDEC0B900EB857D /* RecordView.m */,
-				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
-				4D1757B01C8361D300E6356F /* SafesViewController.m */,
 				4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */,
 				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
 				4D275E551F1BC97600D79A30 /* UpgradeViewController.h */,

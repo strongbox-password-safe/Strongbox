@@ -12,7 +12,8 @@
 
 @interface SafesViewController : UITableViewController<SKProductsRequestDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonTouchID911;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *barButtonFlexibleSpace;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonTouchID911;  // strong outlet because we remove/add from toolbar
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
@@ -21,7 +22,7 @@
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL;
 - (IBAction)onUpgrade:(id)sender;
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonTogglePro;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonTogglePro; // strong outlet because we remove/add from toolbar
 - (IBAction)onTogglePro:(id)sender;
 
 @end

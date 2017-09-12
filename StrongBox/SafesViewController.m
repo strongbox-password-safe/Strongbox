@@ -66,6 +66,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [[Settings sharedInstance] setPro:NO];
+    [[Settings sharedInstance] setEndFreeTrialDate:nil];
+    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:NO];
+    [[Settings sharedInstance] resetLaunchCount];
+    
+//    NSCalendar *cal = [NSCalendar currentCalendar];
+//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:9 toDate:[NSDate date] options:0];
+//    [[Settings sharedInstance] setEndFreeTrialDate:date];
+
+
+    
     [self customizeUi];
     
     if(![[Settings sharedInstance] isPro]) {
@@ -126,10 +137,10 @@
              message:@"Hi there, it looks like you've been using Strongbox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured Strongbox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:nil];
     }
     else {
-        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:1 toDate:[NSDate date] options:0];
+        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, welcome to Strongbox! You will be able to use the fully featured App for one month. At that point you will be transitioned to a more limited version. To find out more you can hit the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:nil];
+             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for two months. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:nil];
     }
     
     [[Settings sharedInstance] setEndFreeTrialDate:date];
@@ -762,18 +773,35 @@ static BOOL shownNagScreenThisSession = NO;
     [self bindProOrFreeTrialUi];
 }
 
+-(void)addToolbarButton:(UIBarButtonItem*)button {
+    NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
+
+    if (![toolbarButtons containsObject:button]) {
+        [toolbarButtons addObject:button];
+        [self setToolbarItems:toolbarButtons animated:NO];
+    }
+}
+
+-(void)removeToolbarButton:(UIBarButtonItem*)button {
+    NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
+    [toolbarButtons removeObject:button];
+    [self setToolbarItems:toolbarButtons animated:NO];
+}
+
 -(void)bindProOrFreeTrialUi {
     self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
     
     //[self.buttonTogglePro setTitle:(![[Settings sharedInstance] isProOrFreeTrial] ? @"Go Pro" : @"Go Free")];
-    [self.buttonTogglePro setEnabled:NO];
-    [self.buttonTogglePro setTintColor: [UIColor clearColor]];
-    
-    [self.buttonTouchID911 setEnabled:NO];
-    [self.buttonTouchID911 setTintColor: [UIColor clearColor]];
-    
+    //[self.buttonTogglePro setEnabled:NO];
+    //[self.buttonTogglePro setTintColor: [UIColor clearColor]];
     //[self.buttonTogglePro setEnabled:YES];
     //[self.buttonTogglePro setTintColor:nil];
+    [self removeToolbarButton:self.buttonTogglePro];
+    
+    //    [self.buttonTouchID911 setEnabled:NO];
+    //    [self.buttonTouchID911 setTintColor: [UIColor clearColor]];
+    
+    [self removeToolbarButton:self.buttonTouchID911];
     
     if([[Settings sharedInstance] isProOrFreeTrial]) {
         [self.navItemHeader setTitle:@"Safes"];
@@ -784,24 +812,34 @@ static BOOL shownNagScreenThisSession = NO;
         if(([[Settings sharedInstance] getTouchId911Count] < kTouchId911Limit) &&
            ([IOsUtils isTouchIDAvailable]) &&
            [[SafesCollection sharedInstance] safeWithTouchIdIsAvailable]) {
-            [self.buttonTouchID911 setEnabled:YES];
-            [self.buttonTouchID911 setTintColor:nil];
+//            [self.buttonTouchID911 setEnabled:YES];
+//            [self.buttonTouchID911 setTintColor:nil];
+            [self addToolbarButton:self.buttonTouchID911];
+            [self removeToolbarButton:self.barButtonFlexibleSpace];
         }
     }
     
     if(![[Settings sharedInstance] isPro]) {
         [self.buttonUpgrade setEnabled:YES];
-        [self.buttonUpgrade setTintColor: [UIColor redColor]];
         
         [self segueToNagScreenIfAppropriate];
     
         NSString *upgradeButtonTitle;
         if([[Settings sharedInstance] isFreeTrial]) {
-            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Trial Days Left)",
-                           (long)[[Settings sharedInstance] getFreeTrialDaysRemaining]];
+            NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
+            
+            if(daysLeft < 10) {
+                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Trial Days Left)",
+                               (long)daysLeft];
+                [self.buttonUpgrade setTintColor: [UIColor redColor]];
+            }
+            else {
+                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info..."];
+            }
         }
         else {
             upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info..."];
+            [self.buttonUpgrade setTintColor: [UIColor redColor]];
         }
         
         [self.buttonUpgrade setTitle:upgradeButtonTitle];

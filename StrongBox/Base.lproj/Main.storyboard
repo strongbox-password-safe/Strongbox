@@ -66,15 +66,15 @@
                         </connections>
                     </tableView>
                     <toolbarItems>
-                        <barButtonItem title="Touch ID 911" id="UR1-FK-uNa">
-                            <connections>
-                                <action selector="onTogglePro:" destination="9DM-GO-ZGc" id="MSg-wN-NDh"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="a9W-k3-0mD"/>
                         <barButtonItem title="Upgrade Info..." id="tmo-77-bgs">
                             <connections>
                                 <action selector="onUpgrade:" destination="9DM-GO-ZGc" id="BBR-VZ-dsa"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" id="a9W-k3-0mD"/>
+                        <barButtonItem title="Toggle IAP" id="UR1-FK-uNa">
+                            <connections>
+                                <action selector="onTogglePro:" destination="9DM-GO-ZGc" id="MSg-wN-NDh"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="6Os-iN-oaW"/>
@@ -96,10 +96,12 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="barButtonFlexibleSpace" destination="a9W-k3-0mD" id="dGw-Gu-IOV"/>
                         <outlet property="buttonAddSafe" destination="zN1-I2-XSj" id="SD8-XN-MaW"/>
                         <outlet property="buttonTogglePro" destination="UR1-FK-uNa" id="lLz-rj-yyu"/>
-                        <outlet property="buttonTouchID911" destination="jMj-Ez-C2G" id="Va7-rp-L6k"/>
+                        <outlet property="buttonTouchID911" destination="jMj-Ez-C2G" id="xfK-Hl-MOe"/>
                         <outlet property="buttonUpgrade" destination="tmo-77-bgs" id="Ll3-sF-2r3"/>
                         <outlet property="navItemHeader" destination="g1g-nh-a5L" id="VqK-HH-5Cu"/>
                         <segue destination="cYG-Rk-SmU" kind="show" identifier="segueToOpenSafeView" animates="NO" id="aYd-mP-3oX"/>
