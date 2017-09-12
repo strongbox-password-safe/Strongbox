@@ -185,7 +185,6 @@
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="[Subgroup]" id="XgN-hT-NXM"/>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="buttonAddGroup" destination="VeE-gV-vxI" id="9dW-BG-ef8"/>
                         <outlet property="buttonAddRecord" destination="Yxa-oY-T8H" id="AIL-Zg-7t8"/>
