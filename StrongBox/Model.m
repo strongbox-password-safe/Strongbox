@@ -59,27 +59,21 @@
 
 - (void)update:(void (^)(NSError *error))handler {
     if (!_isUsingOfflineCache && !_isReadOnly) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
-        {
-            [self.passwordDatabase defaultLastUpdateFieldsToNow];
-            
-            NSError *error;
-            NSData *updatedSafeData = [self getSafeAsData:&error];
-            
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                if (updatedSafeData == nil) {
-                    handler(error);
-                    return;
-                }
+        [self.passwordDatabase defaultLastUpdateFieldsToNow];
+        
+        [self encrypt:^(NSData * _Nullable updatedSafeData, NSError * _Nullable error) {
+            if (updatedSafeData == nil) {
+                handler(error);
+                return;
+            }
 
-                [_storageProvider update:self.metadata
-                                    data:updatedSafeData
-                              completion:^(NSError *error) {
-                                  [self updateOfflineCacheWithData:updatedSafeData];
-                                  handler(error);
-                              }];
-            });
-        });
+            [_storageProvider update:self.metadata
+                                data:updatedSafeData
+                          completion:^(NSError *error) {
+                              [self updateOfflineCacheWithData:updatedSafeData];
+                              handler(error);
+                          }];
+        }];
     }
     else {
         if(_isReadOnly) {
@@ -247,14 +241,19 @@
     return self.passwordDatabase.lastUpdateApp;
 }
     
--(NSData*)getSafeAsData:(NSError**)error {
+-(void)encrypt:(void (^)(NSData* data, NSError* error))completion {
     [SVProgressHUD showWithStatus:@"Encrypting"];
+    
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSError* error;
+        NSData* ret = [self.passwordDatabase getAsData:&error];
 
-    NSData* ret = [self.passwordDatabase getAsData:error];
-    
-    [SVProgressHUD dismiss];
-    
-    return ret;
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            [SVProgressHUD dismiss];
+
+            completion(ret, error);
+        });
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

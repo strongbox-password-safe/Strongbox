@@ -207,36 +207,35 @@
 }
 
 - (void)onExport {
-    NSError *error;
-    NSData *safeData = [self.viewModel getSafeAsData:&error];
-    
-    if(!safeData) {
-        [Alerts error:self title:@"Could not get safe data" error:error];
-        return;
-    }
-    
-    if(![MFMailComposeViewController canSendMail]) {
-        [Alerts info:self
-               title:@"Email Not Available"
-             message:@"It looks like email is not setup on this device and so the safe cannot be exported by email."];
+    [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
+        if(!safeData) {
+            [Alerts error:self title:@"Could not get safe data" error:error];
+            return;
+        }
         
-        return;
-    }
-    
-    MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
-    
-    [picker setSubject:[NSString stringWithFormat:@"Strongbox Safe: '%@'", self.viewModel.metadata.nickName]];
-    
-    NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName,
-                                ([self.viewModel.metadata.fileName hasSuffix:@".dat"] || [self.viewModel.metadata.fileName hasSuffix:@"psafe3"]) ? @"" : @".dat"];
-    
-    [picker addAttachmentData:safeData mimeType:@"application/octet-stream" fileName:attachmentName];
-    
-    [picker setToRecipients:[NSArray array]];
-    [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox password safe.", self.viewModel.metadata.nickName] isHTML:NO];
-    picker.mailComposeDelegate = self;
-    
-    [self presentViewController:picker animated:YES completion:^{ }];
+        if(![MFMailComposeViewController canSendMail]) {
+            [Alerts info:self
+                   title:@"Email Not Available"
+                 message:@"It looks like email is not setup on this device and so the safe cannot be exported by email."];
+            
+            return;
+        }
+        
+        MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
+        
+        [picker setSubject:[NSString stringWithFormat:@"Strongbox Safe: '%@'", self.viewModel.metadata.nickName]];
+        
+        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName,
+                                    ([self.viewModel.metadata.fileName hasSuffix:@".dat"] || [self.viewModel.metadata.fileName hasSuffix:@"psafe3"]) ? @"" : @".dat"];
+        
+        [picker addAttachmentData:safeData mimeType:@"application/octet-stream" fileName:attachmentName];
+        
+        [picker setToRecipients:[NSArray array]];
+        [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox password safe.", self.viewModel.metadata.nickName] isHTML:NO];
+        picker.mailComposeDelegate = self;
+        
+        [self presentViewController:picker animated:YES completion:^{ }];
+    }];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller

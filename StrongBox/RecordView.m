@@ -156,7 +156,7 @@
         self.textFieldUsername.text = self.record.fields.username;
         self.textViewNotes.text = self.record.fields.notes;
         
-        self.buttonSettings.enabled = YES;
+        self.buttonPasswordGenerationSettings.enabled = NO;
         self.buttonHistory.enabled = YES;
     }
     else {
@@ -167,7 +167,7 @@
         self.textFieldUsername.text = self.viewModel.mostPopularUsername;
         self.textViewNotes.text = @"";
         
-        self.buttonSettings.enabled = NO;
+        self.buttonPasswordGenerationSettings.enabled = NO;
         self.buttonHistory.enabled = NO;
     }
 }
@@ -179,7 +179,7 @@
         navBack = self.navigationItem.leftBarButtonItem;
         self.editButtonItem.enabled = [self uiIsDirty];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
-        self.buttonSettings.enabled = NO;
+        self.buttonPasswordGenerationSettings.enabled = YES;
         self.buttonHistory.enabled = NO;
     }
     else {
@@ -187,7 +187,7 @@
             [self saveChangesToSafe:NO];
         }
         else {
-            self.buttonSettings.enabled = (self.record != nil);
+            self.buttonPasswordGenerationSettings.enabled = NO; //(self.record != nil);
             self.buttonHistory.enabled = (self.record != nil);
             self.navigationItem.leftBarButtonItem = navBack;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);

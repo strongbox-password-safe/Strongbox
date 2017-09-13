@@ -56,7 +56,7 @@
 @property (nonatomic, readonly) NSString * _Nullable lastUpdateApp;
 @property (nonatomic) NSString * _Nonnull masterPassword;
 
-- (NSData*_Nullable)getSafeAsData:(NSError*_Nonnull*_Nonnull)error;
+-(void)encrypt:(void (^_Nullable)(NSData* _Nullable data, NSError* _Nullable error))completion;
 
 // Convenience  / Helpers
 

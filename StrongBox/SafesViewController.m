@@ -377,12 +377,34 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                 provider:(id)provider
       isOfflineCacheMode:(BOOL)isOfflineCacheMode
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
-    [SVProgressHUD dismiss];
     [SVProgressHUD showWithStatus:@"Decrypting..."];
 
-    NSError *error;
-    PasswordDatabase *openedSafe = [[PasswordDatabase alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
-    
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSError *error;
+        PasswordDatabase *openedSafe = [[PasswordDatabase alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
+
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            [self openSafeWithDataDone:error
+                            openedSafe:openedSafe
+                         isTouchIdOpen:isTouchIdOpen
+                                  safe:safe
+                    isOfflineCacheMode:isOfflineCacheMode
+                  askAboutTouchIdEnrol:askAboutTouchIdEnrol
+                              provider:provider
+                                  data:data];
+             
+        });
+    });
+}
+
+- (void)openSafeWithDataDone:(NSError*)error
+                  openedSafe:(PasswordDatabase*)openedSafe
+               isTouchIdOpen:(BOOL)isTouchIdOpen
+                        safe:(SafeMetaData *)safe
+          isOfflineCacheMode:(BOOL)isOfflineCacheMode
+        askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
+                    provider:(id)provider
+                        data:(NSData *)data {
     [SVProgressHUD dismiss];
     
     if (error != nil) {
@@ -415,7 +437,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    action:^(BOOL response) {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
-                       [JNKeychain saveValue:masterPassword forKey:safe.nickName];
+                       [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
                        [[SafesCollection sharedInstance] save];
                        
                        [ISMessages showCardAlertWithTitle:@"Touch ID Enrol Successful"
@@ -431,7 +453,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    }
                    else{
                        safe.isTouchIdEnabled = NO;
-                       [JNKeychain saveValue:masterPassword forKey:safe.nickName];
+                       [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
                        [[SafesCollection sharedInstance] save];
                        
                        [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];

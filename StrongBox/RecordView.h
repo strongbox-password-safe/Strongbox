@@ -29,7 +29,7 @@
 @property (strong, nonatomic) IBOutlet UIButton * _Nullable buttonHistory;
 - (IBAction)onHistory:(id _Nullable )sender;
 
-@property (weak, nonatomic, nullable) IBOutlet UIButton *buttonSettings;
+@property (weak, nonatomic, nullable) IBOutlet UIButton *buttonPasswordGenerationSettings;
 - (IBAction)onSettings:(id _Nullable )sender;
 
 - (IBAction)onGeneratePassword:(id _Nullable )sender;
