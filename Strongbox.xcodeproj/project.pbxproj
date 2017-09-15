@@ -50,6 +50,8 @@
 		4DC2D4141F39D8A90029DBFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DC2D4131F39D8A90029DBFE /* Images.xcassets */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
+		4DF631A01F69571B006C8F2C /* PasswordGenerationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */; };
+		4DF631A31F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
 		9D5745A0E31C615E45BFF151 /* Pods_StrongBox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */; };
@@ -142,6 +144,10 @@
 		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
+		4DF6319E1F69571B006C8F2C /* PasswordGenerationSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordGenerationSettings.h; sourceTree = "<group>"; };
+		4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordGenerationSettings.m; sourceTree = "<group>"; };
+		4DF631A11F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordSafe3PasswordGenerationParameters.h; sourceTree = "<group>"; };
+		4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordSafe3PasswordGenerationParameters.m; sourceTree = "<group>"; };
 		4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeAlertController.h; sourceTree = "<group>"; };
 		4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeAlertController.m; sourceTree = "<group>"; };
 		9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.release.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.release.xcconfig"; sourceTree = "<group>"; };
@@ -196,6 +202,8 @@
 				4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */,
 				4D6C51961F6407580035640E /* SafeDetailsView.h */,
 				4D6C51971F6407580035640E /* SafeDetailsView.m */,
+				4DF6319E1F69571B006C8F2C /* PasswordGenerationSettings.h */,
+				4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -258,6 +266,8 @@
 				4D92C7ED1F388D0900341A58 /* SafeTools.h */,
 				4D92C7EE1F388D0900341A58 /* SafeTools.m */,
 				4D92C7EF1F388D0900341A58 /* twofish */,
+				4DF631A11F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.h */,
+				4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */,
 			);
 			name = PwSafeModel;
 			sourceTree = "<group>";
@@ -496,6 +506,7 @@
 				4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */,
 				4D1398A41F5F0B66002608E4 /* NodeFields.m in Sources */,
 				4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */,
+				4DF631A01F69571B006C8F2C /* PasswordGenerationSettings.m in Sources */,
 				4D92C7F11F388D0900341A58 /* Field.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
@@ -504,6 +515,7 @@
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				4D92C7F61F388D0900341A58 /* Record.m in Sources */,
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
+				4DF631A31F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
 				4D3694DE1F54547100A82811 /* Utils.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
@@ -654,7 +666,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AE37F0D1999147E7A4993521 /* Pods-StrongBox.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -679,7 +691,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";

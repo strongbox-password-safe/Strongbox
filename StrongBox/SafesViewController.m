@@ -258,7 +258,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)        promptForSafePassword:(SafeMetaData *)safe
+- (void)promptForSafePassword:(SafeMetaData *)safe
     askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate {
     [Alerts OkCancelWithPassword:self
                            title:[NSString stringWithFormat:@"Password for %@", safe.nickName]
@@ -894,7 +894,7 @@ static BOOL shownNagScreenThisSession = NO;
     NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
     BOOL neverShow = [Settings sharedInstance].neverShowForMacAppMessage;
 
-    if (launchCount > 20 && (launchCount % 10 == 0) && !neverShow) {
+    if (launchCount > 20 && (launchCount % 5 == 0) && !neverShow) {
         [self showMacAppMessage];
     }
 }
