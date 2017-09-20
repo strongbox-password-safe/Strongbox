@@ -284,8 +284,9 @@ updatedTransactions:(NSArray *)transactions {
                 break;
             case SKPaymentTransactionStateFailed:
             {
-                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 NSLog(@"Purchase failed %@", transaction.error);
+                
+                [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [Alerts error:@"Failed to Upgrade" error:transaction.error window:self.window completion:^{
@@ -295,6 +296,7 @@ updatedTransactions:(NSArray *)transactions {
              }
                 break;
             default:
+                NSLog(@"Purchase State %ld", (long)transaction.transactionState);
                 break;
         }
     }

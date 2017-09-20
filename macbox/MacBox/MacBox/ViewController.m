@@ -11,6 +11,7 @@
 #import "ChangeMasterPasswordWindowController.h"
 #import "Settings.h"
 #import "AppDelegate.h"
+#import "Utils.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -49,11 +50,13 @@
 }
 
 - (void)customizeUi {
-    self.buttonRevealDetails.layer.cornerRadius = 20;
+    self.buttonRevealDetail.layer.cornerRadius = 20;
     self.checkboxRevealDetailsImmediately.state = [Settings sharedInstance].revealDetailsImmediately;
     
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
+    
+    [self.comboboxUsername setDataSource:self];
 }
 
 - (void)loadUIImages {
@@ -90,15 +93,19 @@
 }
 
 -(void)updateDocumentUrl {
-    self.labelLeftStatus.stringValue = [NSString stringWithFormat:@"%@", self.model.fileUrl ? self.model.fileUrl : @"[Not Saved]"];
+    [self bindStatusPane];
+    
+    [self bindDetailsPane];
+}
+
+- (NSString * _Nonnull)bindStatusPane {
+    return self.labelLeftStatus.stringValue = [NSString stringWithFormat:@"%@", self.model.fileUrl ? self.model.fileUrl.path : @"[Not Saved]"];
 }
 
 - (void)bindToModel {
     if(self.model == nil) {
-        [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
-        
+        [self.tabViewLockUnlock selectTabViewItemAtIndex:2];
         [self.outlineView reloadData];
-        
         return;
     }
     
@@ -110,14 +117,10 @@
     }
     
     [self.outlineView reloadData];
-
-    if([self.outlineView numberOfRows] > 0) {
-        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-    }
     
     [self bindDetailsPane];
-
-    [self updateDocumentUrl];
+    
+    [self bindStatusPane];
 }
 
 - (void)setInitialFocus {
@@ -132,42 +135,22 @@
 - (void)bindDetailsPane {
     Node* it = [self getCurrentSelectedItem];
     
-    if(!it) {
-        self.textFieldTitle.stringValue = @"";
-        self.textFieldPw.stringValue = @"";
-        self.textFieldUrl.stringValue = @"";
-        self.textFieldUsername.stringValue = @"";
-        self.textViewNotes.string = @"";
-        self.imageViewSummary.image = self.strongBox256Image;
-        self.textFieldSummaryTitle.stringValue= @"";
-        
-        [self.tabViewRightPane selectTabViewItemAtIndex:1];
-        self.stackViewRevealButton.hidden = YES;
+    if(!it) {        
+        [self.tabViewRightPane selectTabViewItemAtIndex:2];
+        [self updateSafeSummaryFields];
     }
     else if (it.isGroup) {
-        self.textFieldTitle.stringValue = @"";
-        self.textFieldPw.stringValue = @"";
-        self.textFieldUrl.stringValue = @"";
-        self.textFieldUsername.stringValue = @"";
-        self.textViewNotes.string = @"";
-        
-        self.imageViewSummary.image = self.folderImage;
-        self.textFieldSummaryTitle.stringValue = it.title;
-        
         [self.tabViewRightPane selectTabViewItemAtIndex:1];
-        
-        self.stackViewRevealButton.hidden = YES;
+        self.textFieldSummaryTitle.stringValue = it.title;
     }
     else {
         self.textFieldTitle.stringValue = it.title;
         self.textFieldPw.stringValue = it.fields.password;
         self.textFieldUrl.stringValue = it.fields.url;
-        self.textFieldUsername.stringValue = it.fields.username;
+        self.comboboxUsername.stringValue = it.fields.username;
         self.textViewNotes.string = it.fields.notes;
-
-        self.imageViewSummary.image = self.strongBox256Image;
         self.textFieldSummaryTitle.stringValue = it.title;
-        
+
         if([Settings sharedInstance].revealDetailsImmediately) {
             [self revealDetails];
         }
@@ -188,12 +171,11 @@
 }
 
 - (void)revealDetails {
-        [self.tabViewRightPane selectTabViewItemAtIndex:0];
+    [self.tabViewRightPane selectTabViewItemAtIndex:0];
 }
 
 - (void)concealDetails {
-    [self.tabViewRightPane selectTabViewItemAtIndex:1];
-    self.stackViewRevealButton.hidden = NO;
+    [self.tabViewRightPane selectTabViewItemAtIndex:3];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
@@ -250,11 +232,11 @@
     }
     
     return [parentGroup.children filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return [self isSafeItemMatchesSearchCriteria:evaluatedObject];
+        return [self isSafeItemMatchesSearchCriteria:evaluatedObject recurse:YES];
     }]];
 }
 
-- (BOOL)isSafeItemMatchesSearchCriteria:(Node*)item {
+- (BOOL)isSafeItemMatchesSearchCriteria:(Node*)item recurse:(BOOL)recurse {
     NSString* searchText = self.searchField.stringValue;
     
     if(![searchText length]) {
@@ -285,7 +267,7 @@
     if([predicate evaluateWithObject:item]) {
         return YES;
     }
-    else if(item.isGroup) {
+    else if(item.isGroup && recurse) {
         for(Node* child in item.children) {
             if(child.isGroup) {
                 if([[self getSafeItems:child] count] > 0) {
@@ -293,7 +275,7 @@
                 }
             }
             else {
-                if([self isSafeItemMatchesSearchCriteria:child]) {
+                if([self isSafeItemMatchesSearchCriteria:child recurse:YES]) {
                     return YES;
                 }
             }
@@ -325,7 +307,7 @@
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
-    //NSLog(@"Selection Change Outline View");
+    NSLog(@"Selection Change Outline View");
     Node* item =  [self getCurrentSelectedItem];
     
     self.hiddenPasswordTemporaryStore = item == nil || item.isGroup ? nil : item.fields.password;
@@ -428,13 +410,28 @@
     [self.outlineView reloadData];
     
     if( self.searchField.stringValue.length > 0) {
+        self.buttonCreateGroup.enabled = NO;
+        self.buttonCreateRecord.enabled = NO;
         [self.outlineView expandItem:nil expandChildren:YES];
     }
     else {
+        self.buttonCreateGroup.enabled = YES;
+        self.buttonCreateRecord.enabled = YES;
         [self.outlineView collapseItem:nil collapseChildren:YES];
     }
     
-    [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
+    for(int i=0;i < [self.outlineView numberOfRows];i++) {
+        //NSLog(@"Searching: %d", i);
+        Node* node = [self.outlineView itemAtRow:i];
+        
+        if([self isSafeItemMatchesSearchCriteria:node recurse:NO]) {
+            //NSLog(@"Found: %@", node.title);
+            [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: i] byExtendingSelection: NO];
+            break;
+        }
+    }
+    
+    [self bindDetailsPane];
 }
 
 - (IBAction)onCheckboxRevealDetailsImmediately:(id)sender {
@@ -468,7 +465,7 @@
 
 - (IBAction)onCopyUsername:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:self.textFieldUsername.stringValue forType:NSStringPboardType];
+    [[NSPasteboard generalPasteboard] setString:self.comboboxUsername.stringValue forType:NSStringPboardType];
 }
 
 - (IBAction)onCopyUrl:(id)sender {
@@ -496,15 +493,42 @@
     return [self.outlineView itemAtRow:selectedRow];
 }
 
-- (IBAction)controlTextDidChange:(NSNotification *)obj
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-    //NSLog(@"controlTextDidChange");
-    [self onDetailFieldChange:obj.object];
+    return [self getUsernameAutocompletes].count;
+}
+
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
+{
+    return [[self getUsernameAutocompletes] objectAtIndex:index];
+}
+
+- (NSArray<NSString*>*)getUsernameAutocompletes {
+    return [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator];
+}
+
+- (void)comboBoxSelectionDidChange:(NSNotification *)notification{
+    if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
+        return;
+    }
+    
+    //NSLog(@"comboBoxSelectionDidChange");
+
+    if(notification.object == self.comboboxUsername) {
+        NSString *strValue = [[self getUsernameAutocompletes] objectAtIndex:[notification.object indexOfSelectedItem]];
+        strValue = [Utils trim:strValue];
+        
+        Node* item = [self getCurrentSelectedItem];
+
+        if(![item.fields.username isEqualToString:strValue]) {
+            [self.model setItemUsername:item username:strValue];
+            item.fields.accessed = [[NSDate alloc] init];
+            item.fields.modified = [[NSDate alloc] init];
+        }
+    }
 }
 
 - (void)textDidChange:(NSNotification *)notification {
-    //NSLog(@"textDidChange");
-    
     if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
         return;
     }
@@ -512,20 +536,17 @@
     Node* item = [self getCurrentSelectedItem];
     if(notification.object == self.textViewNotes &&
        ![item.fields.notes isEqualToString:self.textViewNotes.textStorage.string]) {
-        //NSLog(@"Notes Changed");
         [self.model setItemNotes:item notes:self.textViewNotes.textStorage.string];
+        item.fields.accessed = [[NSDate alloc] init];
+        item.fields.modified = [[NSDate alloc] init];
     }
 }
 
-// Old code for when edit ends and user tabs out
-//- (IBAction)onTextEdited:(id)sender {
-//    //NSLog(@"onTextEdited");
-//    //[self onDetailFieldChange:sender];
-//}
-//
-//- (void)textDidEndEditing:(NSNotification *)notification {
-//
-//}
+- (IBAction)controlTextDidChange:(NSNotification *)obj
+{
+    //NSLog(@"controlTextDidChange");
+    [self onDetailFieldChange:obj.object];
+}
 
 - (IBAction)onDetailFieldChange:(id)sender {
     if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
@@ -533,37 +554,43 @@
     }
     
     Node* item = [self getCurrentSelectedItem];
+    BOOL recordChanged = NO;
     
     if(sender == self.textFieldTitle) {
         if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
-            //NSLog(@"Title Changed!");
             [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
             
             NSInteger row = [self.outlineView selectedRow];
             [self.outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
-            // self.textFieldTitle.stringValue = trimField(self.textFieldTitle);
+        
+            recordChanged = YES;
         }
     }
-    else if(sender == self.textFieldUsername) {
-        if(![item.fields.username isEqualToString:trimField(self.textFieldUsername)]) {
-            //NSLog(@"Username Changed!");
-            [self.model setItemUsername:item username:trimField(self.textFieldUsername)];
-            // self.textFieldUsername.stringValue = trimField(self.textFieldUsername);
+    else if(sender == self.comboboxUsername) {
+        if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
+            [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
+
+            recordChanged = YES;
         }
     }
     else if(sender == self.textFieldUrl) {
         if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
-            //NSLog(@"Url Changed!");
             [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
-            // self.textFieldUrl.stringValue = trimField(self.textFieldUrl);
+        
+            recordChanged = YES;
         }
     }
     else if(sender == self.textFieldPw) {
         if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
-            //NSLog(@"Password Changed!");
             [self.model setItemPassword:item password:trimField(self.textFieldPw)];
-            // self.textFieldPw.stringValue = trimField(self.textFieldPw);
+        
+            recordChanged = YES;
         }
+    }
+    
+    if(recordChanged) {
+        item.fields.accessed = [[NSDate alloc] init];
+        item.fields.modified = [[NSDate alloc] init];
     }
 }
 
@@ -594,11 +621,7 @@
 }
 
 NSString* trimField(NSTextField* textField) {
-    return trim(textField.stringValue);
-}
-
-NSString* trim(NSString* str) {
-    return [str stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    return [Utils trim:textField.stringValue];
 }
 
 - (void)expandParentsOfItem:(Node*)item {
@@ -776,7 +799,18 @@ NSString* trim(NSString* str) {
 }
 
 - (IBAction)onLaunchUrl:(id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:self.textFieldUrl.stringValue]];
+    NSString *urlString = self.textFieldUrl.stringValue;
+    
+    if (!urlString.length) {
+        return;
+    }
+    
+    if (![urlString.lowercaseString hasPrefix:@"http://"] &&
+        ![urlString.lowercaseString hasPrefix:@"https://"]) {
+        urlString = [NSString stringWithFormat:@"http://%@", urlString];
+    }
+    
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
 }
 
 - (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
@@ -805,9 +839,11 @@ NSString* trim(NSString* str) {
     if (theAction == @selector(onDelete:)) {
         return item != nil;
     }
+    else if(theAction == @selector(onCreateGroup:) ||
+            theAction == @selector(onCreateRecord:)) {
+        return self.model && !self.model.locked && self.searchField.stringValue.length == 0;
+    }
     else if (theAction == @selector(onChangeMasterPassword:) ||
-             theAction == @selector(onCreateGroup:) ||
-             theAction == @selector(onCreateRecord:) ||
              theAction == @selector(onLock:)) {
         return self.model && !self.model.locked;
     }
@@ -823,7 +859,7 @@ NSString* trim(NSString* str) {
         return item && !item.isGroup && self.textFieldTitle.stringValue.length;
     }
     else if (theAction == @selector(onCopyUsername:)) {
-        return item && !item.isGroup && self.textFieldUsername.stringValue.length;
+        return item && !item.isGroup && self.comboboxUsername.stringValue.length;
     }
     else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
         NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
@@ -849,5 +885,57 @@ NSString* trim(NSString* str) {
     
     [self onDetailFieldChange:self.textFieldPw];
 }
+
+- (void)updateSafeSummaryFields {
+    self.textFieldSafeSummaryPath.stringValue = self.model.fileUrl ? self.model.fileUrl.path : @"<Not Saved>";
+    self.testFieldSafeSummaryUniqueUsernames.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.usernameSet.count];
+    self.textFieldSafeSummaryUniquePasswords.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.passwordSet.count];
+    self.textFieldSafeSummaryMostPopularUsername.stringValue = self.model.mostPopularUsername ? self.model.mostPopularUsername : @"<None>";
+    self.textFieldSafeSummaryRecords.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.numberOfRecords];
+    self.textFieldSafeSummaryGroups.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.numberOfGroups];
+    self.textFieldSafeSummaryKeyStretchIterations.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.keyStretchIterations];
+    self.textFieldSafeSummaryVersion.stringValue = self.model.version ? self.model.version : @"<Unknown>";
+    
+    self.textFieldSafeSummaryLastUpdateUser.stringValue = self.model.lastUpdateUser ? self.model.lastUpdateUser : @"<Unknown>";
+    self.textFieldSafeSummaryLastUpdateHost.stringValue = self.model.lastUpdateHost ? self.model.lastUpdateHost : @"<Unknown>";
+    self.textFieldSafeSummaryLastUpdateApp.stringValue = self.model.lastUpdateApp ? self.model.lastUpdateApp : @"<Unknown>";
+    self.textFieldSafeSummaryLastUpdateTime.stringValue = [self formatDate:self.model.lastUpdateTime];
+}
+
+- (NSString *)formatDate:(NSDate *)date {
+    if (!date) {
+        return @"<Unknown>";
+    }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    
+    dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+    dateFormatter.timeStyle = NSDateFormatterShortStyle;
+    dateFormatter.locale = [NSLocale currentLocale];
+    
+    NSString *dateString = [dateFormatter stringFromDate:date];
+    
+    return dateString;
+}
+
+static NSComparator finderStringComparator = ^(id obj1, id obj2)
+{
+    NSString* string1 = obj1;
+    NSString* string2 = obj2;
+    
+    // Finder Like String Sort
+    // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Strings/Articles/SearchingStrings.html#//apple_ref/doc/uid/20000149-SW1
+    
+    static NSStringCompareOptions comparisonOptions =
+    NSCaseInsensitiveSearch | NSNumericSearch |
+    NSWidthInsensitiveSearch | NSForcedOrderingSearch;
+    
+    NSRange string1Range = NSMakeRange(0, [string1 length]);
+    
+    return [string1 compare:string2
+                    options:comparisonOptions
+                      range:string1Range
+                     locale:[NSLocale currentLocale]];
+};
 
 @end

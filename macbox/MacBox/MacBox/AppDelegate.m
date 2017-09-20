@@ -42,7 +42,6 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self removeUnwantedMenuItems];
-    
     [self removeCopyDiagnosticDumpItem];
     
     if(![Settings sharedInstance].fullVersion) {

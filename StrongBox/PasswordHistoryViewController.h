@@ -12,7 +12,6 @@
 @interface PasswordHistoryViewController : UITableViewController
 
 @property (nonatomic, retain) PasswordHistory *model;
-@property (nonatomic, retain) Model *viewModel;
 
 @property (nonatomic, copy) void (^ saveFunction)(PasswordHistory *changed, void (^onDone)(NSError *));
 
@@ -27,4 +26,6 @@
 - (IBAction)onTogglePasswordHistoryEnabled:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UILabel *uiLabelMaximumEntriesStatic;
+@property (nonatomic) BOOL readOnly;
+
 @end

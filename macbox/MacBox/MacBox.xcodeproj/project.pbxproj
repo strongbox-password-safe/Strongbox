@@ -33,6 +33,7 @@
 		4DE92B741F49D0AA00282D98 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */; };
 		4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */; };
+		4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
 		4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F551F30DB7A00D68BFE /* AppDelegate.m */; };
 		4DF59F591F30DB7A00D68BFE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F581F30DB7A00D68BFE /* main.m */; };
 		4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5B1F30DB7A00D68BFE /* ViewController.m */; };
@@ -99,7 +100,9 @@
 		4DEAEC261F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeMasterPasswordWindowController.h; sourceTree = "<group>"; };
 		4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeMasterPasswordWindowController.m; sourceTree = "<group>"; };
 		4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChangeMasterPasswordWindowController.xib; sourceTree = "<group>"; };
-		4DF59F511F30DB7A00D68BFE /* StrongBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StrongBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSAdvancedTextField.h; sourceTree = "<group>"; };
+		4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSAdvancedTextField.m; sourceTree = "<group>"; };
+		4DF59F511F30DB7A00D68BFE /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DF59F541F30DB7A00D68BFE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DF59F551F30DB7A00D68BFE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4DF59F581F30DB7A00D68BFE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -193,7 +196,7 @@
 		4DF59F521F30DB7A00D68BFE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4DF59F511F30DB7A00D68BFE /* StrongBox.app */,
+				4DF59F511F30DB7A00D68BFE /* Strongbox.app */,
 				4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */,
 			);
 			name = Products;
@@ -230,6 +233,8 @@
 				4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */,
 				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
 				4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */,
+				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
+				4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */,
 			);
 			path = MacBox;
 			sourceTree = "<group>";
@@ -264,9 +269,9 @@
 			productReference = 4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		4DF59F501F30DB7A00D68BFE /* StrongBox */ = {
+		4DF59F501F30DB7A00D68BFE /* Strongbox */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "StrongBox" */;
+			buildConfigurationList = 4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Strongbox" */;
 			buildPhases = (
 				4DF59F4D1F30DB7A00D68BFE /* Sources */,
 				4DF59F4E1F30DB7A00D68BFE /* Frameworks */,
@@ -276,9 +281,9 @@
 			);
 			dependencies = (
 			);
-			name = StrongBox;
+			name = Strongbox;
 			productName = MacBox;
-			productReference = 4DF59F511F30DB7A00D68BFE /* StrongBox.app */;
+			productReference = 4DF59F511F30DB7A00D68BFE /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -324,7 +329,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4DF59F501F30DB7A00D68BFE /* StrongBox */,
+				4DF59F501F30DB7A00D68BFE /* Strongbox */,
 				4DE92B701F49D0AA00282D98 /* PwSafeModelTests */,
 			);
 		};
@@ -384,6 +389,7 @@
 				4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
+				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
@@ -398,7 +404,7 @@
 /* Begin PBXTargetDependency section */
 		4DE92B771F49D0AA00282D98 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4DF59F501F30DB7A00D68BFE /* StrongBox */;
+			target = 4DF59F501F30DB7A00D68BFE /* Strongbox */;
 			targetProxy = 4DE92B761F49D0AA00282D98 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -490,7 +496,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -538,7 +544,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -597,7 +603,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "StrongBox" */ = {
+		4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Strongbox" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF59F691F30DB7A00D68BFE /* Debug */,

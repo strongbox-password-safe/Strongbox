@@ -187,7 +187,27 @@
     }
     else {
         if ([self uiIsDirty]) { // Any other changes? Change the record and save the safe
-            [self saveChangesToSafe:NO];
+            [self saveAfterEdit:^(NSError *error) {
+                self.navigationItem.leftBarButtonItem = navBack;
+                self.editButtonItem.enabled = YES;
+                navBack = nil;
+                
+                if (error != nil) {
+                    [Alerts   error:self
+                              title:@"Problem Saving"
+                              error:error];
+                    
+                    NSLog(@"%@", error);
+                    
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
+                else {
+                    [self reloadFieldsFromRecord];
+                    [self updateFieldsForEditable];
+                    
+                    //[self.navigationController popViewControllerAnimated:YES];
+                }
+            }];
         }
         else {
             self.buttonPasswordGenerationSettings.enabled = NO; //(self.record != nil);
@@ -360,11 +380,18 @@ NSString * trim(NSString *string) {
     {
         PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.record.fields.passwordHistory;
-        vc.viewModel = self.viewModel;
+        vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
         
         vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(NSError *)) {
             self.record.fields.passwordHistory = changed;
-            [self save:onDone]; // TODO: This is not handling errors. It should also be done inside the VC
+            self.record.fields.accessed = [[NSDate alloc] init];
+            self.record.fields.modified = [[NSDate alloc] init];
+
+            [self.viewModel update:^(NSError *error) {
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    onDone(error);
+                });
+            }];
         };
     }
 }
@@ -408,33 +435,7 @@ NSString * trim(NSString *string) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)saveChangesToSafe:(BOOL)popToRoot {
-    [self save:^(NSError *error) {
-        self.navigationItem.leftBarButtonItem = navBack;
-        self.editButtonItem.enabled = YES;
-        navBack = nil;
-        
-        if (error != nil) {
-            [Alerts   error:self
-                      title:@"Problem Saving"
-                      error:error];
-            
-            NSLog(@"%@", error);
-            
-            [self.navigationController popViewControllerAnimated:YES];
-        }
-        else {
-            [self reloadFieldsFromRecord];
-            [self updateFieldsForEditable];
-            
-            if (popToRoot) {
-                [self.navigationController popViewControllerAnimated:YES];
-            }
-        }
-    }];
-}
-
-- (void)save:(void (^)(NSError *))completion {
+- (void)saveAfterEdit:(void (^)(NSError *))completion {
     BOOL recordNeedsToBeAddedToSafe = (self.record == nil);
     
     if (recordNeedsToBeAddedToSafe) {
@@ -467,9 +468,6 @@ NSString * trim(NSString *string) {
             completion(error);
         });
     }];
-}
-
-- (IBAction)onHistory:(id)sender {
 }
 
 @end

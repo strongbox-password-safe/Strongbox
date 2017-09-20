@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13165.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
@@ -384,7 +384,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nTK-Ud-dLG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1791" y="742"/>
+            <point key="canvasLocation" x="1846" y="722"/>
         </scene>
         <!--Preferences-->
         <scene sceneID="1nk-SD-liu">
@@ -1108,7 +1108,6 @@
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
                                                     <state key="normal" image="clock_64"/>
                                                     <connections>
-                                                        <action selector="onHistory:" destination="PDC-ZT-MAP" eventType="touchUpInside" id="l96-Wh-ZNk"/>
                                                         <segue destination="nJM-pW-a0b" kind="push" identifier="segueToPasswordHistory" id="xDO-1B-qrv"/>
                                                     </connections>
                                                 </button>
@@ -1302,7 +1301,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4SM-sK-9Sq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="863.20000000000005" y="739.88005997001505"/>
+            <point key="canvasLocation" x="1007" y="723"/>
         </scene>
         <!--Previous Passwords-->
         <scene sceneID="vAL-RU-LOd">
@@ -1348,7 +1347,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GOY-DL-Y5y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2622" y="740"/>
+            <point key="canvasLocation" x="2629" y="722"/>
         </scene>
         <!--Select Storage Provider Controller-->
         <scene sceneID="Mbn-nO-Ibv">

@@ -17,5 +17,6 @@
 + (NSString *)hostname;
 + (NSString *)generatePassword;
 + (NSString *)getUsername;
++ (NSString *)trim:(NSString*)string;
 
 @end

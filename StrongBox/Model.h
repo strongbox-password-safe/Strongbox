@@ -62,9 +62,9 @@
 
 @property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull passwordSet;
-@property (nonatomic, readonly, copy) NSString *_Nonnull mostPopularUsername;
-@property (nonatomic, readonly, copy) NSString *_Nonnull mostPopularPassword;
-@property (nonatomic, readonly, copy) NSString * _Nonnull generatePassword;
+@property (nonatomic, readonly) NSString *_Nonnull mostPopularUsername;
+@property (nonatomic, readonly) NSString *_Nonnull mostPopularPassword;
+@property (nonatomic, readonly) NSString * _Nonnull generatePassword;
 
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;

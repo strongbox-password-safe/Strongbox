@@ -268,11 +268,11 @@
 }
 
 - (NSString *)mostPopularUsername {
-    return self.passwordDatabase.mostPopularUsername;
+    return self.passwordDatabase.mostPopularUsername ? self.passwordDatabase.mostPopularUsername : @"";
 }
 
 - (NSString *)mostPopularPassword {
-    return self.passwordDatabase.mostPopularPassword;
+    return self.passwordDatabase.mostPopularPassword ? self.passwordDatabase.mostPopularPassword : @"";
 }
 
 - (NSString *)generatePassword {

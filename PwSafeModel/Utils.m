@@ -14,7 +14,7 @@
     NSArray *keys = @[NSLocalizedDescriptionKey];
     NSArray *values = @[description];
     NSDictionary *userDict = [NSDictionary dictionaryWithObjects:values forKeys:keys];
-    NSError *error = [[NSError alloc] initWithDomain:@"com.markmcguill.StrongBox.ErrorDomain." code:errorCode userInfo:(userDict)];
+    NSError *error = [[NSError alloc] initWithDomain:@"com.markmcguill.strongbox." code:errorCode userInfo:(userDict)];
     
     return error;
 }
@@ -48,20 +48,27 @@
 
 
 + (NSString *)hostname {
+#if TARGET_OS_IPHONE
     char baseHostName[256];
     int success = gethostname(baseHostName, 255);
-    
-    if (success != 0) return nil;
-    
+    if (success != 0) {
+        return nil;
+    }
     baseHostName[255] = '\0';
-    
-#if !TARGET_IPHONE_SIMULATOR
-    return [NSString stringWithFormat:@"%s.local", baseHostName];
-    
+    return [NSString stringWithFormat:@"%s", baseHostName];
 #else
-    return [NSString stringWithFormat:@"%s", baseHostName];    
+    return [[NSHost currentHost] localizedName];
 #endif
 }
+//    char baseHostName[256];
+//    int success = gethostname(baseHostName, 255);
+//
+//    if (success != 0) return nil;
+//
+//    baseHostName[255] = '\0';
+//
+//    return [NSString stringWithFormat:@"%s.local", baseHostName];
+//}
 
 + (NSString *)generatePassword {
     NSString *letters = @"!@#$%*[];?()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -78,6 +85,10 @@
 
 + (NSString*)getUsername {
     return NSFullUserName();
+}
+
++(NSString *)trim:(NSString*)string {
+    return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
 @end

@@ -50,4 +50,19 @@
 
 - (void)defaultLastUpdateFieldsToNow;
 
+// Convenience / Summary
+
+@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull passwordSet;
+@property (nonatomic, readonly) NSString *_Nonnull mostPopularUsername;
+@property (nonatomic, readonly) NSString *_Nonnull mostPopularPassword;
+@property (nonatomic, readonly) NSInteger numberOfRecords;
+@property (nonatomic, readonly) NSInteger numberOfGroups;
+@property (nonatomic, readonly) NSInteger keyStretchIterations;
+@property (nonatomic, readonly) NSString * _Nonnull version;
+@property (nonatomic, readonly) NSDate * _Nullable lastUpdateTime;
+@property (nonatomic, readonly) NSString * _Nullable lastUpdateUser;
+@property (nonatomic, readonly) NSString * _Nullable lastUpdateHost;
+@property (nonatomic, readonly) NSString * _Nullable lastUpdateApp;
+
 @end

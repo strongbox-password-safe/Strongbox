@@ -94,6 +94,18 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     }
 }
 
+// BUGBUG: TODO: Apple iOS 11 Bug:
+// https://www.raywenderlich.com/157864/uisearchcontroller-tutorial-getting-started
+// https://openradar.appspot.com/radar?id=4941731439050752
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (self.searchController.active) {
+        return 44; // with scope
+    } else {
+        return 0; // no scope
+    }
+}
+
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     return !self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly;
 }

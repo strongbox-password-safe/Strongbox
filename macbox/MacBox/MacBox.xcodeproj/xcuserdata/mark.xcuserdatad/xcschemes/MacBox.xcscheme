@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-               BuildableName = "StrongBox.app"
-               BlueprintName = "StrongBox"
+               BuildableName = "Strongbox.app"
+               BlueprintName = "Strongbox"
                ReferencedContainer = "container:MacBox.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -44,8 +44,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-            BuildableName = "StrongBox.app"
-            BlueprintName = "StrongBox"
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox"
             ReferencedContainer = "container:MacBox.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -68,8 +68,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-            BuildableName = "StrongBox.app"
-            BlueprintName = "StrongBox"
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox"
             ReferencedContainer = "container:MacBox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -87,8 +87,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DF59F501F30DB7A00D68BFE"
-            BuildableName = "StrongBox.app"
-            BlueprintName = "StrongBox"
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox"
             ReferencedContainer = "container:MacBox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

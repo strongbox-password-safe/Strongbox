@@ -25,13 +25,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/RecordView.m"
-            timestampString = "527181051.832981"
+            filePath = "StrongBox/SafesViewController.m"
+            timestampString = "527001250.993722"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "344"
-            endingLineNumber = "344"
-            landmarkName = "-hideOrShowPassword:"
+            startingLineNumber = "362"
+            endingLineNumber = "362"
+            landmarkName = "-onProviderReadDone:isTouchIdOpen:safe:masterPassword:data:error:isOfflineCacheMode:askAboutTouchIdEnrol:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -41,13 +41,29 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/SafesViewController.m"
-            timestampString = "527001250.993722"
+            filePath = "macbox/MacBox/MacBox/ViewController.m"
+            timestampString = "527534873.069971"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "362"
-            endingLineNumber = "362"
-            landmarkName = "-onProviderReadDone:isTouchIdOpen:safe:masterPassword:data:error:isOfflineCacheMode:askAboutTouchIdEnrol:"
+            startingLineNumber = "890"
+            endingLineNumber = "890"
+            landmarkName = "-updateSafeSummaryFields"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "macbox/MacBox/MacBox/ViewController.m"
+            timestampString = "527534873.070059"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "570"
+            endingLineNumber = "570"
+            landmarkName = "-onDetailFieldChange:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

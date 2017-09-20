@@ -86,13 +86,11 @@
     });
 }
 
-- (void)bindToModel {
-    BOOL writeable = !self.viewModel.isReadOnly && !self.viewModel.isUsingOfflineCache;
-    
-    [self.uiSwitchEnabled setEnabled:writeable];
+- (void)bindToModel {    
+    [self.uiSwitchEnabled setEnabled:!self.readOnly];
     self.uiSwitchEnabled.on = _model.enabled;
 
-    self.uiTableViewCellMaximumEntries.userInteractionEnabled = writeable && _model.enabled;
+    self.uiTableViewCellMaximumEntries.userInteractionEnabled = !self.readOnly && _model.enabled;
     self.uiTableViewCellMaximumEntries.textLabel.enabled = _model.enabled;
     self.uiTableViewCellMaximumEntries.detailTextLabel.enabled = _model.enabled;
 

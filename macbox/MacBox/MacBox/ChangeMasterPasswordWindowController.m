@@ -7,6 +7,8 @@
 //
 
 #import "ChangeMasterPasswordWindowController.h"
+#import "Settings.h"
+#import "Alerts.h"
 
 @interface ChangeMasterPasswordWindowController ()
 
@@ -54,6 +56,14 @@
         self.labelPasswordsMatch.stringValue = @"*Passwords don't match";
         self.buttonOk.enabled = NO;
     }
+    
+    // Remove in App Store Release
+    self.labelPasswordsMatch.multipleClickHandler = ^(NSInteger clickCount) {
+        if(clickCount == 3 && [self.textFieldNew.stringValue isEqualToString:@"241280"]) {
+            [[Settings sharedInstance] setFullVersion:![[Settings sharedInstance] fullVersion]];
+            [Alerts info:[[Settings sharedInstance] fullVersion] ? @"ON" : @"OFF" window:self.window];
+        }
+    };
 }
 
 @end

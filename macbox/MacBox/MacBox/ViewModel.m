@@ -1,3 +1,4 @@
+
 //
 //  ViewModel.m
 //  MacBox
@@ -127,6 +128,11 @@
                                             notes:@"Sample Database Record. You can have any text here..."];
     
     Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:group fields:fields];
+    
+    NSDate* date = [NSDate date];
+    record.fields.created = date;
+    record.fields.accessed = date;
+    record.fields.modified = date;
     
     if([group addChild:record]) {
         return record;
@@ -259,6 +265,54 @@
 
 - (void)defaultLastUpdateFieldsToNow {
     [self.passwordDatabase defaultLastUpdateFieldsToNow];
+}
+
+- (NSSet<NSString*> *)usernameSet {
+    return self.passwordDatabase.usernameSet;
+}
+
+- (NSSet<NSString*> *)passwordSet {
+    return self.passwordDatabase.passwordSet;
+}
+
+- (NSString *)mostPopularUsername {
+    return self.passwordDatabase.mostPopularUsername;
+}
+
+- (NSString *)mostPopularPassword {
+    return self.passwordDatabase.mostPopularPassword;
+}
+
+- (NSInteger)numberOfRecords {
+    return self.passwordDatabase.numberOfRecords;
+}
+
+- (NSInteger)numberOfGroups {
+    return self.passwordDatabase.numberOfGroups;
+}
+
+- (NSInteger)keyStretchIterations {
+    return self.passwordDatabase.keyStretchIterations;
+}
+
+- (NSString *)version {
+    return self.passwordDatabase.version;
+}
+
+-(NSDate*)lastUpdateTime {
+    return self.passwordDatabase.lastUpdateTime;
+}
+
+-(NSString*)lastUpdateUser {
+    return self.passwordDatabase.lastUpdateUser;
+}
+
+-(NSString*)lastUpdateHost {
+    return self.passwordDatabase.lastUpdateHost;
+}
+
+-(NSString*)lastUpdateApp {
+    return self.passwordDatabase.lastUpdateApp;
 }
 
 @end

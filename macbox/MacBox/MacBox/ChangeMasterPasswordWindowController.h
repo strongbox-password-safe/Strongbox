@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "NSAdvancedTextField.h"
 
 @interface ChangeMasterPasswordWindowController : NSWindowController
 
@@ -14,7 +15,7 @@
 @property (weak) IBOutlet NSSecureTextField *textFieldConfirm;
 @property (weak) IBOutlet NSButton *buttonOk;
 
-@property (weak) IBOutlet NSTextField *labelPasswordsMatch;
+@property (weak) IBOutlet NSAdvancedTextField *labelPasswordsMatch;
 @property (weak) IBOutlet NSTextField *textFieldTitle;
 
 @property (nonatomic, readonly) NSString* confirmedPassword;
