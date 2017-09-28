@@ -109,4 +109,12 @@
                      locale:[NSLocale currentLocale]];
 };
 
+//    [[Settings sharedInstance] setPro:NO];
+//    [[Settings sharedInstance] setEndFreeTrialDate:nil];
+//    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:NO];
+//    [[Settings sharedInstance] resetLaunchCount];
+//    NSCalendar *cal = [NSCalendar currentCalendar];
+//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:9 toDate:[NSDate date] options:0];
+//    [[Settings sharedInstance] setEndFreeTrialDate:date];
+
 @end

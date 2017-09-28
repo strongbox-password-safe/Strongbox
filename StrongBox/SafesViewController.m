@@ -165,12 +165,12 @@
                 BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
                 
                 NSString *message = existingLocalDeviceSafes ?
-                    (hasOtherCloudSafes ? @"Should your current local safes be migrated to iCloud and available on all your devices? (NB: Your existing cloud safes will not be affected)" :
-                                          @"Should your current local safes be migrated to iCloud and available on all your devices?") :
-                    (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud safes will not be affected)" : @"Would you like to use iCloud in Strongbox?");
+                    (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local safes be migrated to iCloud and available on all your devices? (NB: Your existing cloud safes will not be affected)" :
+                                          @"You can now use iCloud with Strongbox. Should your current local safes be migrated to iCloud and available on all your devices?") :
+                    (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud safes will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your safes available on all your devices?");
                 
                 [Alerts twoOptions:self
-                             title:@"iCloud is Available"
+                             title:@"iCloud is Now Available"
                            message:message
                  defaultButtonText:@"Use iCloud" secondButtonText:@"Local Only" action:^(BOOL response) {
                      if(response) {
