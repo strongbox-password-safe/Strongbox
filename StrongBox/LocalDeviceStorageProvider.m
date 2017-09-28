@@ -54,10 +54,9 @@
 
     [data writeToFile:path atomically:YES];
 
-    SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:self.storageId offlineCacheEnabled:NO];
+    SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:self.storageId fileName:path.lastPathComponent fileIdentifier:path.lastPathComponent];
 
-    metadata.fileIdentifier = path.lastPathComponent;
-    metadata.fileName = path.lastPathComponent;
+    metadata.offlineCacheEnabled = NO;
 
     completion(metadata, nil);
 }
@@ -65,8 +64,10 @@
 - (void)createOfflineCacheFile:(NSString *)uniqueIdentifier
                           data:(NSData *)data
                     completion:(void (^)(NSError *error))completion {
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox-offline-cache.dat", uniqueIdentifier];
+
     NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:uniqueIdentifier];
+                      stringByAppendingPathComponent:desiredFilename];
     
     [data writeToFile:path atomically:YES];
     
@@ -134,6 +135,11 @@
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (NSURL*)getFileUrl:(SafeMetaData*)safeMetaData {
+    NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
+    return [NSURL fileURLWithPath:path];
+}
 
 - (NSString *)getFilePath:(SafeMetaData *)safeMetaData offlineCache:(BOOL)offlineCache {
     // MMcG: BUGFIX: Bug in older versions saved full path instead of relative, just chop it out and re-append

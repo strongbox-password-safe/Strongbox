@@ -13,19 +13,20 @@
 
 + (instancetype _Nullable)sharedInstance;
 
-- (instancetype _Nullable)  init;
+@property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *sortedSafes;
 
-@property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *safes;
-
-- (void)add:(SafeMetaData *_Nonnull)newSafe;
-- (void)removeSafesAt:(NSIndexSet *_Nonnull)index;
-- (void)removeAt:(NSUInteger)index;
-
-- (void)save;
+- (BOOL)add:(SafeMetaData *_Nonnull)safe;
+- (void)removeSafe:(NSString *_Nonnull)nickName;
 
 + (NSString * _Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
 
 - (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
 - (BOOL)safeWithTouchIdIsAvailable;
+
+- (void)save;
+
+- (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
+
+- (BOOL)changeNickName:(NSString*_Nonnull)nickName newNickName:(NSString*_Nonnull)newNickName;
 
 @end

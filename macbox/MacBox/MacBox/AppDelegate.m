@@ -12,6 +12,7 @@
 #import "UpgradeWindowController.h"
 #import "Alerts.h"
 #import "Utils.h"
+#import "Strongbox.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -60,7 +61,35 @@
         [self randomlyPromptForAppStoreReview];
     }
     
+    [self initializeiCloudAccessWithCompletion:^(BOOL available) {
+        ;
+    }];
+    
     self.applicationHasFinishedLaunching = YES;
+}
+
+
+// TODO: Add new private instance variable
+NSURL * _iCloudRoot;
+BOOL _iCloudAvailable;
+
+- (void)initializeiCloudAccessWithCompletion:(void (^)(BOOL available)) completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        _iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:kStrongboxICloudContainerIdentifier];
+        
+        if (_iCloudRoot != nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"iCloud available at: %@", _iCloudRoot);
+                completion(TRUE);
+            });
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"iCloud not available");
+                completion(FALSE);
+            });
+        }
+    });
 }
 
 - (void)randomlyPromptForAppStoreReview {
@@ -201,9 +230,9 @@
     if ([emailService canPerformWithItems:@[emailBody]]) {
         [emailService performWithItems:@[emailBody]];
     } else {
-        NSString *encodedSubject = [NSString stringWithFormat:@"SUBJECT=%@", [subject stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-        NSString *encodedBody = [NSString stringWithFormat:@"BODY=%@", [emailBody stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-        NSString *encodedTo = [toAddress stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *encodedSubject = [NSString stringWithFormat:@"SUBJECT=%@", [subject stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]];
+        NSString *encodedBody = [NSString stringWithFormat:@"BODY=%@", [emailBody stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]];
+        NSString *encodedTo = [toAddress stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
         NSString *encodedURLString = [NSString stringWithFormat:@"mailto:%@?%@&%@", encodedTo, encodedSubject, encodedBody];
         NSURL *mailtoURL = [NSURL URLWithString:encodedURLString];
         

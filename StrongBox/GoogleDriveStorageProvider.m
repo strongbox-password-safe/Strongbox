@@ -219,19 +219,18 @@
 }
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
-    SafeMetaData *safe = [[SafeMetaData alloc] initWithNickName:nickName
-                                                storageProvider:self.storageId
-                                            offlineCacheEnabled:YES];
-
     GTLRDrive_File *file = (GTLRDrive_File *)providerData;
-
-    safe.fileName = file.name;
-
     NSString *parent = (file.parents)[0];
 
-    safe.fileIdentifier = parent;
-
-    return safe;
+    return [[SafeMetaData alloc] initWithNickName:nickName
+                                  storageProvider:self.storageId
+                                         fileName:file.name
+                                   fileIdentifier:parent];
 }
+
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+    // NOTIMPL;
+}
+
 
 @end

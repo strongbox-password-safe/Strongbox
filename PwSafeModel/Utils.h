@@ -18,5 +18,6 @@
 + (NSString *)generatePassword;
 + (NSString *)getUsername;
 + (NSString *)trim:(NSString*)string;
++ (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2;
 
 @end

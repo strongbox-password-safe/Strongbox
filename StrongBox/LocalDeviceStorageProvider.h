@@ -40,4 +40,6 @@
 
 - (NSDate *)getOfflineCacheFileModificationDate:(SafeMetaData *)safeMetadata;
 
+- (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData;
+
 @end

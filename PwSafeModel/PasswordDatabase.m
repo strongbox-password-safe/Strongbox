@@ -513,8 +513,8 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
             if(field.type == FIELD_TYPE_PASSWORD && !plaintextPasswords) {
                 dump = [dump stringByAppendingFormat:@"   [%@]=[<HIDDEN>]\n", field.prettyTypeString];
             }
-            else if(field.type == FIELD_TYPE_NOTES) {
-                NSString *singleLine = [field.prettyDataString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            else if(field.type == FIELD_TYPE_NOTES) {                
+                NSString * singleLine = [field.prettyDataString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
                 dump = [dump stringByAppendingFormat:@"   [%-17s]=[%@]\n", [field.prettyTypeString UTF8String], singleLine];
             }
             else {

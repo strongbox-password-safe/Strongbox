@@ -26,6 +26,11 @@
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "SelectStorageProviderController.h"
 #import <PopupDialog/PopupDialog-Swift.h>
+#import "AppleICloudProvider.h"
+#import "Strongbox.h"
+#import "SafeItemTableCell.h"
+#import "VersionConflictController.h"
+#import "iCloudSafesCoordinator.h"
 
 #define kTouchId911Limit 5
 
@@ -34,26 +39,11 @@
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (nonatomic) BOOL touchId911;
+@property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
 
 @end
 
 @implementation SafesViewController
-
-- (void)refreshView {
-    [self.tableView reloadData];
-    
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationItem.hidesBackButton = YES;
-    [self.navigationItem setPrompt:nil];
-    
-    [self bindProOrFreeTrialUi];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [self refreshView];
-}
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -63,10 +53,39 @@
     }
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    [self checkICloudAvailability];
+    
+    [self refreshView];
+}
+
+- (void)didBecomeActive:(NSNotification *)notification {
+    [self checkICloudAvailability];
+}
+
+- (void)refreshView {
+    self.collection = SafesCollection.sharedInstance.sortedSafes;
+    [self.tableView reloadData];
+    
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationItem.hidesBackButton = YES;
+    [self.navigationItem setPrompt:nil];
+    
+    [self bindProOrFreeTrialUi];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    self.collection = [NSArray array];
+
     [self customizeUi];
+    
+    [iCloudSafesCoordinator sharedInstance].onSafesCollectionUpdated = ^{
+        [self onSafesCollectionUpdated];
+    };
     
     if(![[Settings sharedInstance] isPro]) {
         [self getValidIapProducts];
@@ -81,6 +100,144 @@
     else {
         [self showStartupMessaging];
     }
+    
+    // User may have just switched to our app after updating iCloud settings...
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)onSafesCollectionUpdated {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self refreshView];
+    });
+}
+
+- (BOOL)hasSafesOtherThanLocalAndiCloud {
+    return SafesCollection.sharedInstance.sortedSafes.count - ([self getICloudSafes].count + [self getLocalDeviceSafes].count) > 0;
+}
+
+- (NSArray<SafeMetaData*>*)getLocalDeviceSafes {
+    return [SafesCollection.sharedInstance getSafesOfProvider:kLocalDevice];
+}
+
+- (NSArray<SafeMetaData*>*)getICloudSafes {
+    return [SafesCollection.sharedInstance getSafesOfProvider:kiCloud];
+}
+
+- (void)removeAllICloudSafes {
+    NSArray<SafeMetaData*> *icloudSafesToRemove = [self getICloudSafes];
+    
+    for (SafeMetaData *item in icloudSafesToRemove) {
+        [SafesCollection.sharedInstance removeSafe:item.nickName];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self refreshView];
+    });
+}
+
+- (void)checkICloudAvailability {
+    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
+        Settings.sharedInstance.iCloudAvailable = available;
+        
+        if (!Settings.sharedInstance.iCloudAvailable) {
+            // If iCloud isn't available, set promoted to no (so we can ask them next time it becomes available)
+            [Settings sharedInstance].iCloudPrompted = NO;
+            
+            if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
+                [Alerts warn:self
+                       title:@"iCloud no longer available"
+                     message:@"Some safes were removed from this device because iCloud has become unavailable, but they remain stored in iCloud."];
+                
+                [self removeAllICloudSafes];
+            }
+            
+            // No matter what, iCloud isn't available so switch it to off.???
+            [Settings sharedInstance].iCloudOn = NO;
+            [Settings sharedInstance].iCloudWasOn = NO;
+        }
+        else {
+            // Ask user if want to turn on iCloud if it's available and we haven't asked already and we're not already presenting a view controller
+            if (![Settings sharedInstance].iCloudOn && ![Settings sharedInstance].iCloudPrompted && self.presentedViewController == nil) {
+                [Settings sharedInstance].iCloudPrompted = YES;
+                
+                BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
+                BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
+                
+                NSString *message = existingLocalDeviceSafes ?
+                    (hasOtherCloudSafes ? @"Should your current local safes be migrated to iCloud and available on all your devices? (NB: Your existing cloud safes will not be affected)" :
+                                          @"Should your current local safes be migrated to iCloud and available on all your devices?") :
+                    (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud safes will not be affected)" : @"Would you like to use iCloud in Strongbox?");
+                
+                [Alerts twoOptions:self
+                             title:@"iCloud is Available"
+                           message:message
+                 defaultButtonText:@"Use iCloud" secondButtonText:@"Local Only" action:^(BOOL response) {
+                     if(response) {
+                         [Settings sharedInstance].iCloudOn = YES;
+                     }
+                     [self continueICloudAvailableProcedure];
+                 }];
+            }
+            else {
+                [self continueICloudAvailableProcedure];
+            }
+        }
+    }];
+}
+
+- (void)showiCloudMigrationUi:(BOOL)show {
+    if(show) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Migrating..."];
+        });
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+    }
+}
+
+- (void)continueICloudAvailableProcedure {
+    // If iCloud newly switched on, move local docs to iCloud
+    if ([Settings sharedInstance].iCloudOn && ![Settings sharedInstance].iCloudWasOn && [self getLocalDeviceSafes].count) {
+        [Alerts info:self title:@"iCloud Available" message:@"Your previously local only safes are now being migrated to iCloud safes."];
+        [[iCloudSafesCoordinator sharedInstance] migrateLocalToiCloud:^(BOOL show) {
+            [self showiCloudMigrationUi:show];
+        }];
+    }
+
+    // If iCloud newly switched off, move iCloud docs to local
+    if (![Settings sharedInstance].iCloudOn && [Settings sharedInstance].iCloudWasOn && [self getICloudSafes].count) {
+        [Alerts threeOptions:self
+                       title:@"iCloud Unavailable"
+                     message:@"What would you like to do with the safes currently on this device?"
+           defaultButtonText:@"Remove them, Keep on iCloud Only"
+            secondButtonText:@"Make Local Copies"
+             thirdButtonText:@"Switch iCloud Back On"
+                      action:^(int response) {
+                        if(response == 2) {           // @"Switch iCloud Back On"
+                            [Settings sharedInstance].iCloudOn = YES;
+                            [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
+                            
+                            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                                [self refreshView];
+                            });
+                        }
+                        else if(response == 1) {      // @"Keep a Local Copy"
+                            [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
+                                [self showiCloudMigrationUi:show];
+                            }];
+                        }
+                        else if(response == 0) {
+                            [self removeAllICloudSafes];
+                        }
+                      }];
+    }
+
+    [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
+    [[iCloudSafesCoordinator sharedInstance] startQuery];
 }
 
 - (void)customizeUi {
@@ -123,13 +280,17 @@
         date = [cal dateByAddingUnit:NSCalendarUnitDay value:7 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, it looks like you've been using Strongbox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured Strongbox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:nil];
+             message:@"Hi there, it looks like you've been using Strongbox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured Strongbox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:^{
+                 [self checkICloudAvailability];
+             }];
     }
     else {
         date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for two months. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:nil];
+             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for two months. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:^{
+                 [self checkICloudAvailability];
+             }];
     }
     
     [[Settings sharedInstance] setEndFreeTrialDate:date];
@@ -147,71 +308,46 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [SafesCollection sharedInstance].safes.count;
+    return self.collection.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
+    SafeItemTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
     
-    SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
     
-    NSString *icon = safe.storageProvider == kGoogleDrive ? @"product32" : safe.storageProvider == kDropbox ? @"dropbox-blue-32x32-nologo" : @"phone";
-    
+    id<SafeStorageProvider> provider = [self getStorageProviderFromProviderId:safe.storageProvider];
+    NSString *icon = provider.icon;
     cell.imageView.image = [UIImage imageNamed:icon];
+    cell.imageViewWarningIndicator.hidden = !safe.hasUnresolvedConflicts;
     
     return cell;
 }
 
+- (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
+    if (providerId == kGoogleDrive) {
+        return [GoogleDriveStorageProvider sharedInstance];
+    }
+    else if (providerId == kDropbox)
+    {
+        return [DropboxV2StorageProvider sharedInstance];
+    }
+    else if (providerId == kiCloud) {
+        return [AppleICloudProvider sharedInstance];
+    }
+    else if (providerId == kLocalDevice)
+    {
+        return [LocalDeviceStorageProvider sharedInstance];
+    }
+    
+    return nil;
+}
+
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
-}
-
-- (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-//    UITableViewRowAction *exportAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Export" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-//        ;
-//    }];
-//    
-//    exportAction.backgroundColor = [UIColor yellowColor]; //colorWithRed:0.298 green:0.851 blue:0.3922 alpha:1.0];
-//    
-    UITableViewRowAction *deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self deleteSafe:indexPath];
-    }];
-//
-//    UITableViewRowAction *migrateAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Migrate" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-//        ;
-//    }];
-//    
-//    migrateAction.backgroundColor = [UIColor darkGrayColor]; //colorWithRed:0.298 green:0.851 blue:0.3922 alpha:1.0];
-    
-    return @[deleteAction]; //, migrateAction, exportAction];
-}
-
-- (void)deleteSafe:(NSIndexPath * _Nonnull)indexPath {
-    SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
-    
-    NSString *message = [NSString stringWithFormat:@"Are you sure you want to remove this safe from Strongbox?%@",
-                         safe.storageProvider == kLocalDevice ? @"" : @" (NB: The underlying safe data file will not be deleted)"];
-    
-    [Alerts yesNo:self
-            title:@"Are you sure?"
-          message:message
-           action:^(BOOL response) {
-               if (response) {
-                   SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
-                   
-                   [self cleanupSafeForRemoval:safe];
-                   [[SafesCollection sharedInstance] removeSafesAt:[NSIndexSet indexSetWithIndex:indexPath.row]];
-                   [[SafesCollection sharedInstance] save];
-                   
-                   dispatch_async(dispatch_get_main_queue(), ^(void) {
-                       [self setEditing:NO];
-                       [self refreshView];
-                   });
-               }
-           }];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -219,9 +355,12 @@
         return;
     }
     
-    SafeMetaData *safe = [[SafesCollection sharedInstance].safes objectAtIndex:indexPath.row];
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
-    if (safe.isTouchIdEnabled &&
+    if(safe.hasUnresolvedConflicts) {
+        [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
+    }
+    else if (safe.isTouchIdEnabled &&
         [IOsUtils isTouchIDAvailable] &&
         safe.isEnrolledForTouchId &&
         ([[Settings sharedInstance] isProOrFreeTrial] || self.touchId911)) {
@@ -235,7 +374,39 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)cleanupSafeForRemoval:(SafeMetaData *)safe {
+- (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self removeSafe:indexPath];
+    }];
+
+    return @[removeAction];
+}
+
+- (void)removeSafe:(NSIndexPath * _Nonnull)indexPath {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    
+    NSString *message;
+    
+    if(safe.storageProvider == kiCloud && [Settings sharedInstance].iCloudOn) {
+        message = @"This will remove the safe from all your iCloud enabled devices.\n\n"
+                    @"Are you sure you want to remove this safe from Strongbox and iCloud?";
+    }
+    else {
+        message = [NSString stringWithFormat:@"Are you sure you want to remove this safe from Strongbox?%@",
+                         (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : @" (NB: The underlying safe data file will not be deleted)"];
+    }
+    
+    [Alerts yesNo:self
+            title:@"Are you sure?"
+          message:message
+           action:^(BOOL response) {
+               if (response) {
+                   [self removeAndCleanupSafe:safe];
+               }
+           }];
+}
+
+- (void)removeAndCleanupSafe:(SafeMetaData *)safe {
     if (safe.storageProvider == kLocalDevice) {
         [[LocalDeviceStorageProvider sharedInstance] delete:safe
                 completion:^(NSError *error) {
@@ -247,13 +418,33 @@
                     }
                 }];
     }
-    else if (safe.offlineCacheEnabled && safe.offlineCacheAvailable)
+    else if (safe.storageProvider == kiCloud) {
+        [[AppleICloudProvider sharedInstance] delete:safe completion:^(NSError *error) {
+            if(error) {
+                NSLog(@"%@", error);
+                [Alerts error:self title:@"Error Deleting iCloud Safe" error:error];
+                return;
+            }
+            else {
+                NSLog(@"iCloud file removed");
+            }
+        }];
+    }
+         
+    if (safe.offlineCacheEnabled && safe.offlineCacheAvailable)
     {
         [[LocalDeviceStorageProvider sharedInstance] deleteOfflineCachedSafe:safe
-                                 completion:^(NSError *error) {
-                                     //NSLog(@"Delete Offline Cache File. Error = %@", error);
-                                 }];
+                                                                  completion:^(NSError *error) {
+                                                                      NSLog(@"Delete Offline Cache File. Error = %@", error);
+                                                                  }];
     }
+         
+    [[SafesCollection sharedInstance] removeSafe:safe.nickName];
+
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self setEditing:NO];
+        [self refreshView];
+    });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,23 +468,14 @@
      isTouchIdOpen:(BOOL)isTouchIdOpen
     masterPassword:(NSString *)masterPassword
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
-    id <SafeStorageProvider> provider;
-    
-    if (safe.storageProvider == kGoogleDrive) {
-        provider = [GoogleDriveStorageProvider sharedInstance];
-    }
-    else if (safe.storageProvider == kDropbox)
-    {
-        provider = [DropboxV2StorageProvider sharedInstance];
-    }
-    else if (safe.storageProvider == kLocalDevice)
-    {
-        provider = [LocalDeviceStorageProvider sharedInstance];
-    }
+    id <SafeStorageProvider> provider = [self getStorageProviderFromProviderId:safe.storageProvider];
     
     // Are we offline for cloud based providers?
     
     if (provider.cloudBased &&
+        
+        !(provider.storageId == kiCloud && [Settings sharedInstance].iCloudOn) &&
+        
         [[Settings sharedInstance] isOffline] &&
         safe.offlineCacheEnabled &&
         safe.offlineCacheAvailable) {
@@ -506,6 +688,10 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
             vc.product = [self.validProducts objectAtIndex:0];
         }
     }
+    else if ([segue.identifier isEqualToString:@"segueToVersionConflictResolution"]) {
+        VersionConflictController* vc = (VersionConflictController*)segue.destinationViewController;
+        vc.url = (NSString*)sender;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -656,7 +842,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 }
 
 - (BOOL)isAddExistingSafeAllowed {
-    return [[Settings sharedInstance] isProOrFreeTrial] || [SafesCollection sharedInstance].safes.count < 1;
+    return [[Settings sharedInstance] isProOrFreeTrial] || self.collection.count < 1;
 }
 
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL {
@@ -706,7 +892,16 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 }
 
 - (void)addImportedSafe:(NSString *)nickName data:(NSData *)data {
-    [[LocalDeviceStorageProvider sharedInstance] create:nickName
+    id<SafeStorageProvider> provider;
+    
+    if(Settings.sharedInstance.iCloudOn) {
+        provider = AppleICloudProvider.sharedInstance;
+    }
+    else {
+        provider = LocalDeviceStorageProvider.sharedInstance;
+    }
+    
+    [provider create:nickName
               data:data
       parentFolder:nil
     viewController:self
@@ -715,8 +910,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
          dispatch_async(dispatch_get_main_queue(), ^(void)
                         {
                             if (error == nil) {
-                                [[SafesCollection sharedInstance]
-                                 add:metadata];
+                                [[SafesCollection sharedInstance] add:metadata];
                                 [self refreshView];
                             }
                             else {
@@ -743,12 +937,12 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     NSUInteger count = [response.products count];
     if (count > 0) {
         self.validProducts = response.products;
-        for (SKProduct *validProduct in self.validProducts) {
-            NSLog(@"%@", validProduct.productIdentifier);
-            NSLog(@"%@", validProduct.localizedTitle);
-            NSLog(@"%@", validProduct.localizedDescription);
-            NSLog(@"%@", validProduct.price);
-        }
+//        for (SKProduct *validProduct in self.validProducts) {
+//            NSLog(@"%@", validProduct.productIdentifier);
+//            NSLog(@"%@", validProduct.localizedTitle);
+//            NSLog(@"%@", validProduct.localizedDescription);
+//            NSLog(@"%@", validProduct.price);
+//        }
         
         [self refreshView];
     }
@@ -800,7 +994,9 @@ static BOOL shownNagScreenThisSession = NO;
 }
 
 -(void)bindProOrFreeTrialUi {
-    self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
+    if(self.navigationController.visibleViewController == self) {
+        self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
+    }
     
     //[self.buttonTogglePro setTitle:(![[Settings sharedInstance] isProOrFreeTrial] ? @"Go Pro" : @"Go Free")];
     //[self.buttonTogglePro setEnabled:NO];

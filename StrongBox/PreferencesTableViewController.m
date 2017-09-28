@@ -39,6 +39,7 @@
     [self.buttonSignoutGoogleDrive setTitle:@"(No Current Google Drive Session)" forState:UIControlStateDisabled];
     [self.buttonSignoutGoogleDrive setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
 
+    [self bindUseICloud];
     [self bindAboutButton];
     [self bindLongTouchCopy];
     [self bindShowPasswordOnDetails];
@@ -69,6 +70,14 @@
     
     [self.buttonAbout setTitle:aboutString forState:UIControlStateNormal];
     [self.buttonAbout setTitle:aboutString forState:UIControlStateHighlighted];
+}
+
+- (void)bindUseICloud {
+    self.switchUseICloud.on = [[Settings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
+    self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
+    
+    self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ? @"Use iCloud" : @"Use iCloud (Unavailable)";
+    self.labelUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
 }
 
 - (void)bindLongTouchCopy {
@@ -130,6 +139,38 @@
     }
 }
 
+
+- (BOOL)hasLocalOrICloudSafes {
+    return ([SafesCollection.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesCollection.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
+}
+
+- (IBAction)onUseICloud:(id)sender {
+    NSLog(@"Setting iCloudOn to %d", self.switchUseICloud.on);
+    
+    if([self hasLocalOrICloudSafes]) {
+        [Alerts yesNo:self title:@"Master Password Warning"
+             message:@"It is very important that you know your master password for your safes, and that you are not relying entirely on Touch ID.\n"
+                     @"The migration and importation process makes every effort to maintain Touch ID data but it is not guaranteed. "
+                     @"In any case it is important that you always know your master passwords.\n\n"
+                     @"Do you want to continue changing iCloud usage settings?"
+              action:^(BOOL response) {
+            if(response) {
+                [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
+                
+                [self bindUseICloud];
+            }
+            else {
+                self.switchUseICloud.on = !self.switchUseICloud.on;
+            }
+        }];
+    }
+    else {
+        [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
+        
+        [self bindUseICloud];
+    }
+}
+
 - (IBAction)onSignoutGoogleDrive:(id)sender {
     if ([[GoogleDriveManager sharedInstance] isAuthorized]) {
         [Alerts yesNo:self
@@ -159,7 +200,7 @@
     
     int i=0;
     NSString *safesMessage = @"Safes Collection<br />----------------<br />";
-    for(SafeMetaData *safe in [SafesCollection sharedInstance].safes) {
+    for(SafeMetaData *safe in [SafesCollection sharedInstance].sortedSafes) {
         NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%d%d%d%d%d]<br />", i++,
                               safe.nickName,
                               safe.fileName,
@@ -187,7 +228,7 @@
                          @"Model: %@<br />"
                          @"System Name: %@<br />"
                          @"System Version: %@<br />"
-                         @"Flags: %@%@", safesMessage, model, systemName, systemVersion, pro, isFreeTrial];
+                         @"Flags: %@%@%@", safesMessage, model, systemName, systemVersion, pro, isFreeTrial, [Settings.sharedInstance getFlagsStringForDiagnostics]];
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     

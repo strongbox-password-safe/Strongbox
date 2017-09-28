@@ -34,6 +34,8 @@
           data:(NSData *)data
     completion:(void (^)(NSError *error))completion;
 
+- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *error))completion;
+
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion;

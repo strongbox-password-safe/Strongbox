@@ -91,4 +91,22 @@
     return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
+
++ (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2
+{
+    // Finder Like String Sort
+    // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Strings/Articles/SearchingStrings.html#//apple_ref/doc/uid/20000149-SW1
+    
+    static NSStringCompareOptions comparisonOptions =
+    NSCaseInsensitiveSearch | NSNumericSearch |
+    NSWidthInsensitiveSearch | NSForcedOrderingSearch;
+    
+    NSRange string1Range = NSMakeRange(0, [string1 length]);
+    
+    return [string1 compare:string2
+                    options:comparisonOptions
+                      range:string1Range
+                     locale:[NSLocale currentLocale]];
+};
+
 @end

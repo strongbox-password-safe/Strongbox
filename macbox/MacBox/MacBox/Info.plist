@@ -9,8 +9,8 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>dat</string>
 				<string>psafe3</string>
+				<string>dat</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>AppIcon</string>
@@ -41,7 +41,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.4</string>
 	<key>CFBundleVersion</key>
-	<string>2604</string>
+	<string>2605</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -52,5 +52,17 @@
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.com.strongbox</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>Strongbox</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>None</string>
+		</dict>
+	</dict>
 </dict>
 </plist>

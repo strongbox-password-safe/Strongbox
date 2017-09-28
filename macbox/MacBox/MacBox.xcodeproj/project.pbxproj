@@ -24,7 +24,7 @@
 		4D92C8221F388E9D00341A58 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8211F388E9D00341A58 /* crypt_argchk.c */; };
 		4D92C8241F388EA800341A58 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8231F388EA800341A58 /* twofish.c */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
-		4DA53E771F4C740C0003F682 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA53E761F4C740C0003F682 /* StoreKit.framework */; };
+		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
 		4DA595C81F4461B800351BEC /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA595C71F4461B800351BEC /* Utils.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
@@ -83,7 +83,8 @@
 		4D92C8231F388EA800341A58 /* twofish.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = ../../PwSafeModel/twofish/twofish.c; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
-		4DA53E761F4C740C0003F682 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4DA2038F1F76599200113A6B /* Strongbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = ../../PwSafeModel/Strongbox.h; sourceTree = "<group>"; };
+		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4DA595C61F4461B800351BEC /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../PwSafeModel/Utils.h; sourceTree = "<group>"; };
 		4DA595C71F4461B800351BEC /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../../PwSafeModel/Utils.m; sourceTree = "<group>"; };
 		4DC225701F558D47000B0FBB /* StrongBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrongBox.entitlements; sourceTree = "<group>"; };
@@ -127,7 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DA53E771F4C740C0003F682 /* StoreKit.framework in Frameworks */,
+				4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,7 +138,7 @@
 		4D1D6F3A1F386CB700D2B8EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4DA53E761F4C740C0003F682 /* StoreKit.framework */,
+				4DA203911F7662D000113A6B /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -166,6 +167,7 @@
 				4D92C8141F388E6E00341A58 /* SafeTools.m */,
 				4DA595C61F4461B800351BEC /* Utils.h */,
 				4DA595C71F4461B800351BEC /* Utils.m */,
+				4DA2038F1F76599200113A6B /* Strongbox.h */,
 			);
 			name = PwSafeModel;
 			sourceTree = "<group>";
@@ -303,13 +305,15 @@
 					};
 					4DF59F501F30DB7A00D68BFE = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 4326J8XDF2;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
 							com.apple.Sandbox = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};
@@ -556,6 +560,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -572,6 +577,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				INFOPLIST_FILE = MacBox/Info.plist;

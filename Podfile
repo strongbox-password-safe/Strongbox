@@ -5,7 +5,7 @@ platform :ios, '9.2'
 # Uncomment this line if you're using Swift
 use_frameworks!
 
-target 'StrongBox' do
+target 'Strongbox' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'JNKeychain'

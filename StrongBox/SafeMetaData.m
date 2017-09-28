@@ -12,14 +12,25 @@
 
 - (instancetype)initWithNickName:(NSString *)nickName
                  storageProvider:(StorageProvider)storageProvider
-             offlineCacheEnabled:(BOOL)offlineCacheEnabled {
-    self.nickName = nickName;
-    self.storageProvider = storageProvider;
-    self.isTouchIdEnabled = YES;
-    self.offlineCacheEnabled = offlineCacheEnabled;
-
+                        fileName:(NSString*)fileName
+                  fileIdentifier:(NSString*)fileIdentifier {
+    if(self = [super init]) {
+        _nickName = nickName;
+        self.storageProvider = storageProvider;
+        self.fileName = fileName;
+        self.fileIdentifier = fileIdentifier;
+    
+        self.isTouchIdEnabled = YES;
+        self.offlineCacheEnabled = YES;
+    }
+    
     return self;
 }
+
+- (void)changeNickName:(NSString*)newNickName {
+    _nickName = newNickName;
+}
+
 
 - (NSDictionary *)toDictionary {
     NSMutableDictionary *dictionary =
@@ -50,11 +61,7 @@
 }
 
 + (SafeMetaData *)fromDictionary:(NSDictionary *)dictionary {
-    SafeMetaData *ret = [[SafeMetaData alloc] init];
-
-    ret.nickName = dictionary[@"nickName"];
-    ret.fileIdentifier = dictionary[@"fileIdentifier"];
-    ret.fileName = dictionary[@"fileName"];
+    SafeMetaData *ret = [[SafeMetaData alloc] initWithNickName:dictionary[@"nickName"] storageProvider:-1 fileName:dictionary[@"fileName"] fileIdentifier:dictionary[@"fileIdentifier"]];
 
     NSNumber *sp = [dictionary valueForKey:@"storageProvider"];
     ret.storageProvider = sp ? sp.intValue : kGoogleDrive;
@@ -75,6 +82,10 @@
     ret.offlineCacheAvailable = offlineCacheAvailable ? offlineCacheAvailable.boolValue : NO;
 
     return ret;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@ [%u] - [%@-%@]", self.nickName, self.storageProvider, self.fileName, self.fileIdentifier];
 }
 
 @end

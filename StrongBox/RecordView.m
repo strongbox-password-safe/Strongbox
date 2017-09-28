@@ -34,7 +34,6 @@
     
     self.buttonPasswordGenerationSettings.hidden = YES;
     
-    
     [self setInitialTextFieldBordersAndColors];
     [self setupAutoComplete];
     
@@ -152,8 +151,6 @@
 - (void)reloadFieldsFromRecord {
     if (self.record) {
         self.textFieldPassword.text = self.record.fields.password;
-        self.textFieldPassword.text = self.record.fields.password;
-        
         self.textFieldTitle.text = self.record.title;
         self.textFieldUrl.text = self.record.fields.url;
         self.textFieldUsername.text = self.record.fields.username;
@@ -358,7 +355,7 @@ NSString * trim(NSString *string) {
     }
     else {
         [self.textFieldPassword setTextColor:[UIColor purpleColor]];
-        self.textFieldPassword.text = self.record.fields.password;
+        self.textFieldPassword.text = self.record ? self.record.fields.password : [self.viewModel generatePassword];
         [self.buttonHidePassword setTitle:@"Hide" forState:UIControlStateNormal];
     }
 }

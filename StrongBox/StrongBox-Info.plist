@@ -71,7 +71,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2602</string>
+	<string>2603</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -81,6 +81,18 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.com.strongbox</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>Strongbox</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>None</string>
+		</dict>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>Main</string>
 	<key>UIMainStoryboardFile</key>

@@ -20,15 +20,20 @@
 		4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
 		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
+		4D1A5BFC1F7923FF0036684C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
+		4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */; };
+		4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5C011F7927D60036684C /* VersionConflictController.m */; };
 		4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
 		4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D275E561F1BC97600D79A30 /* UpgradeViewController.m */; };
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D3694DE1F54547100A82811 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3694DD1F54547100A82811 /* Utils.m */; };
+		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
+		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		4D68DBB31F430ECB00A8A148 /* PasswordDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
@@ -47,14 +52,15 @@
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6335D1F62EAE1000A0E9D /* Main.storyboard */; };
 		4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBE5B381C8356C700C310BC /* AppDelegate.m */; };
-		4DC2D4141F39D8A90029DBFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DC2D4131F39D8A90029DBFE /* Images.xcassets */; };
+		4DCF5FBC1F7294A800011756 /* PasswordSafeUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */; };
+		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DF631A01F69571B006C8F2C /* PasswordGenerationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */; };
 		4DF631A31F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
-		9D5745A0E31C615E45BFF151 /* Pods_StrongBox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */; };
+		D52AF5C43235C242731E1270 /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,15 +95,23 @@
 		4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectDestinationGroupController.h; sourceTree = "<group>"; };
 		4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectDestinationGroupController.m; sourceTree = "<group>"; };
 		4D1757B51C8361D300E6356F /* StrongBox-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StrongBox-Info.plist"; sourceTree = "<group>"; };
+		4D1A5BFB1F7923FF0036684C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		4D1A5BFD1F7924C30036684C /* SafeItemTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeItemTableCell.h; sourceTree = "<group>"; };
+		4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeItemTableCell.m; sourceTree = "<group>"; };
+		4D1A5C001F7927D60036684C /* VersionConflictController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VersionConflictController.h; sourceTree = "<group>"; };
+		4D1A5C011F7927D60036684C /* VersionConflictController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VersionConflictController.m; sourceTree = "<group>"; };
 		4D1D6FD51F38760F00D2B8EC /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		4D1D6FD61F38760F00D2B8EC /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
 		4D275E551F1BC97600D79A30 /* UpgradeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeViewController.h; sourceTree = "<group>"; };
 		4D275E561F1BC97600D79A30 /* UpgradeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpgradeViewController.m; sourceTree = "<group>"; };
 		4D2E35671F62C9CB0064B5D5 /* SelectStorageProviderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectStorageProviderController.h; sourceTree = "<group>"; };
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectStorageProviderController.m; sourceTree = "<group>"; };
+		4D2F82331F754FB0001688C9 /* Strongbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox.entitlements; path = Strongbox/Strongbox.entitlements; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D3694DC1F54547100A82811 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = PwSafeModel/Utils.h; sourceTree = SOURCE_ROOT; };
 		4D3694DD1F54547100A82811 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = PwSafeModel/Utils.m; sourceTree = SOURCE_ROOT; };
+		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
+		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserTableViewController.m; sourceTree = "<group>"; };
 		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserItem.h; sourceTree = "<group>"; };
@@ -106,6 +120,8 @@
 		4D4C49031EDEC0B900EB857D /* RecordView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordView.m; sourceTree = "<group>"; };
 		4D55F0D61EE2BFF400C43B26 /* TextFieldAutoSuggest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldAutoSuggest.h; sourceTree = "<group>"; };
 		4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAutoSuggest.m; sourceTree = "<group>"; };
+		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iCloudSafesCoordinator.h; sourceTree = "<group>"; };
+		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iCloudSafesCoordinator.m; sourceTree = "<group>"; };
 		4D68DBB11F430ECB00A8A148 /* PasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordDatabase.h; path = PwSafeModel/PasswordDatabase.h; sourceTree = SOURCE_ROOT; };
 		4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordDatabase.m; path = PwSafeModel/PasswordDatabase.m; sourceTree = SOURCE_ROOT; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
@@ -132,6 +148,7 @@
 		4D92C7FC1F388DE500341A58 /* twofish.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = PwSafeModel/twofish/twofish.c; sourceTree = "<group>"; };
 		4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = PwSafeModel/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D93FD761EDB7A520076BBAA /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4DA203901F765CF000113A6B /* Strongbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = PwSafeModel/Strongbox.h; sourceTree = SOURCE_ROOT; };
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DA6335E1F62EAE1000A0E9D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -139,8 +156,11 @@
 		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DBE5B381C8356C700C310BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		4DC2D4131F39D8A90029DBFE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4DC8DFF01EE19CE300F1F757 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		4DCF5FBA1F7294A800011756 /* PasswordSafeUIDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordSafeUIDocument.h; sourceTree = "<group>"; };
+		4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordSafeUIDocument.m; sourceTree = "<group>"; };
+		4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudProvider.h; sourceTree = "<group>"; };
+		4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleICloudProvider.m; sourceTree = "<group>"; };
 		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
@@ -150,9 +170,12 @@
 		4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordSafe3PasswordGenerationParameters.m; sourceTree = "<group>"; };
 		4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeAlertController.h; sourceTree = "<group>"; };
 		4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeAlertController.m; sourceTree = "<group>"; };
+		63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.release.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.release.xcconfig"; sourceTree = "<group>"; };
 		A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StrongBox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE37F0D1999147E7A4993521 /* Pods-StrongBox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.debug.xcconfig"; sourceTree = "<group>"; };
+		CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,7 +184,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
-				9D5745A0E31C615E45BFF151 /* Pods_StrongBox.framework in Frameworks */,
+				D52AF5C43235C242731E1270 /* Pods_Strongbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +196,8 @@
 			children = (
 				AE37F0D1999147E7A4993521 /* Pods-StrongBox.debug.xcconfig */,
 				9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */,
+				63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */,
+				CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -204,6 +229,10 @@
 				4D6C51971F6407580035640E /* SafeDetailsView.m */,
 				4DF6319E1F69571B006C8F2C /* PasswordGenerationSettings.h */,
 				4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */,
+				4D1A5BFD1F7924C30036684C /* SafeItemTableCell.h */,
+				4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */,
+				4D1A5C001F7927D60036684C /* VersionConflictController.h */,
+				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -223,6 +252,10 @@
 				4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */,
 				4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */,
 				4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */,
+				4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */,
+				4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */,
+				4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */,
+				4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */,
 			);
 			name = StorageProviders;
 			sourceTree = "<group>";
@@ -238,6 +271,8 @@
 				4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */,
 				4D0BA7D61F23B844009243C9 /* Settings.h */,
 				4D0BA7D71F23B844009243C9 /* Settings.m */,
+				4DCF5FBA1F7294A800011756 /* PasswordSafeUIDocument.h */,
+				4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -245,6 +280,7 @@
 		4D92C7DA1F388CF200341A58 /* PwSafeModel */ = {
 			isa = PBXGroup;
 			children = (
+				4DA203901F765CF000113A6B /* Strongbox.h */,
 				4D13989F1F5F0B66002608E4 /* Node.h */,
 				4D1398A01F5F0B66002608E4 /* Node.m */,
 				4D1398A11F5F0B66002608E4 /* NodeFields.h */,
@@ -275,6 +311,7 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
 				4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */,
 				4D92C7FC1F388DE500341A58 /* twofish.c */,
 				4DBE5B331C8356C700C310BC /* StrongBox */,
@@ -295,7 +332,7 @@
 		4DBE5B331C8356C700C310BC /* StrongBox */ = {
 			isa = PBXGroup;
 			children = (
-				4DC2D4131F39D8A90029DBFE /* Images.xcassets */,
+				4D1A5BFB1F7923FF0036684C /* Images.xcassets */,
 				4DA6335D1F62EAE1000A0E9D /* Main.storyboard */,
 				4D92C7DA1F388CF200341A58 /* PwSafeModel */,
 				4D62D6941C85F2B50051E13B /* ViewControllers */,
@@ -328,6 +365,8 @@
 				4D1757A21C8361D200E6356F /* main.m */,
 				4D55F0D61EE2BFF400C43B26 /* TextFieldAutoSuggest.h */,
 				4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */,
+				4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */,
+				4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -337,6 +376,7 @@
 			children = (
 				4D93FD761EDB7A520076BBAA /* StoreKit.framework */,
 				A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */,
+				AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -376,8 +416,12 @@
 					4DBE5B301C8356C700C310BC = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 4326J8XDF2;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};
@@ -408,7 +452,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
-				4DC2D4141F39D8A90029DBFE /* Images.xcassets in Resources */,
+				4D1A5BFC1F7923FF0036684C /* Images.xcassets in Resources */,
 				4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */,
 				4D92C7FA1F388D0900341A58 /* twofish in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
@@ -429,7 +473,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-StrongBox-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Strongbox-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -442,7 +486,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
@@ -471,7 +515,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */ = {
@@ -480,7 +524,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox-resources.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-resources.sh",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -489,7 +533,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -503,6 +547,7 @@
 				4D92C7FF1F388DFF00341A58 /* crypt_argchk.c in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
+				4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */,
 				4D1398A41F5F0B66002608E4 /* NodeFields.m in Sources */,
 				4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */,
@@ -519,9 +564,11 @@
 				4D3694DE1F54547100A82811 /* Utils.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
+				4DCF5FBC1F7294A800011756 /* PasswordSafeUIDocument.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
+				4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */,
 				4D92C7F91F388D0900341A58 /* SafeTools.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
@@ -538,7 +585,10 @@
 				4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
 				4D92C7F21F388D0900341A58 /* Group.m in Sources */,
+				4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */,
+				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
+				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -664,14 +714,17 @@
 		};
 		4DBE5B4C1C8356C700C310BC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AE37F0D1999147E7A4993521 /* Pods-StrongBox.debug.xcconfig */;
+			baseConfigurationReference = 63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.11.2;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
@@ -681,6 +734,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -689,14 +743,17 @@
 		};
 		4DBE5B4D1C8356C700C310BC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */;
+			baseConfigurationReference = CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.11.2;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
@@ -706,6 +763,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				USER_HEADER_SEARCH_PATHS = "";
 				VERSIONING_SYSTEM = "apple-generic";

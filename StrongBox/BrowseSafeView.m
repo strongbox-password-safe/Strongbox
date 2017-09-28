@@ -92,6 +92,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         
         [self.searchController.searchBar sizeToFit];
     }
+    
+    self.navigationController.toolbar.hidden = NO;
 }
 
 // BUGBUG: TODO: Apple iOS 11 Bug:
@@ -248,6 +250,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                                               [self getDataSource].count > 0) ? self.editButtonItem : nil;
     
     [self enableDisableToolbarButtons];
+    
+    self.navigationController.toolbar.hidden = NO;
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {

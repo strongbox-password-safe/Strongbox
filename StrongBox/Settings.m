@@ -20,7 +20,10 @@ static NSString* kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnE
 static NSString* kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
 static NSString* kTouchId911Count = @"kTouchId911Count";
 static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
-
+static NSString* kiCloudOn = @"iCloudOn";
+static NSString* kiCloudWasOn = @"iCloudWasOn";
+static NSString* kiCloudPrompted = @"iCloudPrompted";
+            
 @interface Settings ()
 
 @property (nonatomic, strong) Reachability *internetReachabilityDetector;
@@ -296,6 +299,56 @@ static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 
 - (BOOL)neverShowForMacAppMessage {
     return [[NSUserDefaults standardUserDefaults] boolForKey:kNeverShowForMacAppMessage];
+}
+
+
+- (BOOL)iCloudOn {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kiCloudOn];
+}
+
+- (void)setICloudOn:(BOOL)iCloudOn {
+    [[NSUserDefaults standardUserDefaults] setBool:iCloudOn forKey:kiCloudOn];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)iCloudWasOn {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kiCloudWasOn];
+}
+
+-(void)setICloudWasOn:(BOOL)iCloudWasOn {
+    [[NSUserDefaults standardUserDefaults] setBool:iCloudWasOn forKey:kiCloudWasOn];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)iCloudPrompted {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kiCloudPrompted];
+}
+
+- (void)setICloudPrompted:(BOOL)iCloudPrompted {
+    [[NSUserDefaults standardUserDefaults] setBool:iCloudPrompted forKey:kiCloudPrompted];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+
+- (NSString*)getFlagsStringForDiagnostics {
+    return [NSString stringWithFormat:@"[%d%d%d%d[%ld]%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
+    self.isOffline,
+    self.isShowPasswordByDefaultOnEditScreen,
+    self.isHavePromptedAboutFreeTrial,
+    self.isProOrFreeTrial,
+    (long)self.getTouchId911Count,
+    self.isPro,
+    self.isFreeTrial,
+    (long)self.getLaunchCount,
+    self.getAutoLockTimeoutSeconds,
+    (long)self.isUserHasBeenPromptedForReview,
+    self.isHasPromptedForCopyPasswordGesture,
+    self.isCopyPasswordOnLongPress,
+    self.neverShowForMacAppMessage,
+    self.iCloudOn,
+    self.iCloudWasOn,
+    self.iCloudPrompted,
+    self.iCloudAvailable];
 }
 
 @end
