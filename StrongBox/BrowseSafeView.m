@@ -193,7 +193,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     NSString *groupLocation = (self.searchController.isActive ? [self getGroupPathDisplayString:vm] : vm.isGroup ? @"" : vm.fields.username);
     
     cell.textLabel.text = vm.isGroup ? vm.title :
-        (self.searchController.isActive ? [NSString stringWithFormat:@"%@ [%@]", vm.title, vm.fields.username] :
+    (self.searchController.isActive ? [NSString stringWithFormat:@"%@%@", vm.title, vm.fields.username.length ? [NSString stringWithFormat:@" [%@]" ,vm.fields.username] : @""] :
          vm.title);
     
     cell.detailTextLabel.text = groupLocation;

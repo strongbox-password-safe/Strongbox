@@ -173,11 +173,11 @@
     
     NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
 
-    NSLog(@"*********************************************************************************************************");
-    for(NSString *existing in nicknamesLowerCase) {
-        NSLog(@"SafesCollection: [%@] checked against [%@] == %d", existing, nickName, [nickName.lowercaseString isEqualToString:existing]);
-    }
-    NSLog(@"*********************************************************************************************************");
+//    NSLog(@"*********************************************************************************************************");
+//    for(NSString *existing in nicknamesLowerCase) {
+//        NSLog(@"SafesCollection: [%@] checked against [%@] == %d", existing, nickName, [nickName.lowercaseString isEqualToString:existing]);
+//    }
+//    NSLog(@"*********************************************************************************************************");
 
     return [sanitized isEqualToString:nickName] && nickName.length > 0 && ![nicknamesLowerCase containsObject:nickName.lowercaseString];
 }

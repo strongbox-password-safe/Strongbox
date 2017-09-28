@@ -17,6 +17,8 @@
 
 @implementation VersionConflictController
 
+NSDateFormatter* _dateFormatter;
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
@@ -46,6 +48,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    _dateFormatter = [[NSDateFormatter alloc] init];
+    [_dateFormatter setDateStyle:NSDateFormatterFullStyle];
+    [_dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
+    
     self.versions = [NSMutableArray array];
 }
 
@@ -70,7 +76,8 @@
     NSFileVersion * fileVersion = [self.versions objectAtIndex:indexPath.row];
     
     cell.textLabel.text = [NSString stringWithFormat:@"Modified on %@", fileVersion.localizedNameOfSavingComputer];
-    cell.detailTextLabel.text = fileVersion.modificationDate.description;
+    
+    cell.detailTextLabel.text = [_dateFormatter stringFromDate:fileVersion.modificationDate];
     
     return cell;
 }

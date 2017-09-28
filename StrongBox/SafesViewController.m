@@ -172,7 +172,8 @@
                 [Alerts twoOptions:self
                              title:@"iCloud is Now Available"
                            message:message
-                 defaultButtonText:@"Use iCloud" secondButtonText:@"Local Only" action:^(BOOL response) {
+                 defaultButtonText:@"Use iCloud"
+                  secondButtonText:@"Local Only" action:^(BOOL response) {
                      if(response) {
                          [Settings sharedInstance].iCloudOn = YES;
                      }

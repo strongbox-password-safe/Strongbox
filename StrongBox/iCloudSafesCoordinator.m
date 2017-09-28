@@ -48,13 +48,13 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         _iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:kStrongboxICloudContainerIdentifier];
         if (_iCloudRoot != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"iCloud available at: %@", _iCloudRoot);
+                //NSLog(@"iCloud available at: %@", _iCloudRoot);
                 completion(TRUE);
             });
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"iCloud not available");
+                //NSLog(@"iCloud not available");
                 completion(FALSE);
             });
         }
@@ -207,7 +207,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 
 - (void)stopQuery {
     if (_query) {
-        NSLog(@"No longer watching iCloud dir...");
+        //NSLog(@"No longer watching iCloud dir...");
         
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidFinishGatheringNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidUpdateNotification object:nil];
@@ -222,7 +222,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     _iCloudURLsReady = NO;
     [_iCloudFiles removeAllObjects];
     
-    NSLog(@"Starting to watch iCloud dir...");
+    //NSLog(@"Starting to watch iCloud dir...");
     
     _query = [self documentQuery];
     
@@ -269,7 +269,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
             
             AppleICloudOrLocalSafeFile* iCloudFile = [[AppleICloudOrLocalSafeFile alloc] initWithDisplayName:dn fileUrl:fileURL hasUnresolvedConflicts:huc];
             
-            NSLog(@"Found on iCloud: %@", iCloudFile);
+            //NSLog(@"Found on iCloud: %@", iCloudFile);
             
             [_iCloudFiles addObject:iCloudFile];
         }
