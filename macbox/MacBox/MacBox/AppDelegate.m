@@ -218,11 +218,4 @@
     }
 }
 
-//    [[Settings sharedInstance] setFullVersion:NO];
-//[[Settings sharedInstance] setEndFreeTrialDate:nil];
-//    NSCalendar *cal = [NSCalendar currentCalendar];
-//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-10 toDate:[NSDate date] options:0];
-//    [[Settings sharedInstance] setEndFreeTrialDate:date];
-//
-
 @end
