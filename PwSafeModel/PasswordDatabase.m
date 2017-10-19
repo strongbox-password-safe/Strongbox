@@ -106,7 +106,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
 - (Node*)buildModel:(NSArray<Record*>*)records headers:(NSArray<Field*>*)headers  {
     Node* root = [[Node alloc] initAsRoot];
     
-    // Group Records into by their group
+    // Group Records by their group
     
     NSMutableDictionary<NSArray<NSString*>*, NSMutableArray<Record*>*> *groupedByGroup =
         [[NSMutableDictionary<NSArray<NSString*>*, NSMutableArray<Record*>*> alloc] init];

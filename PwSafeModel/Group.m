@@ -45,9 +45,10 @@
             
             NSString *subgroup = [subGroupFullSuffix substringWithRange:range];
             
-            // Don't add root group(s)... not interesting or useful
+            // Don't add root/null group(s)... not interesting or useful
             
             if(![subgroup isEqualToString:@"."]) {
+                //NSLog(@"subgroup = [%@]", subgroup);
                 NSString* unescaped = [Group unescapeGroupName:subgroup];
                 [subgroups addObject:unescaped];
             }
@@ -129,10 +130,17 @@
 - (NSString*)escapedPathString {
     NSString *ret = @"";
     
+    BOOL first = YES;
     for(NSString *component in _pathComponents) {
         NSString *escaped = [Group escapeGroupName:component];
         
-        ret = [ret stringByAppendingString:[NSString stringWithFormat:@".%@", escaped]];
+        if(!first) {
+            ret = [ret stringByAppendingString:[NSString stringWithFormat:@".%@", escaped]];
+        }
+        else {
+            ret = [ret stringByAppendingString:escaped];
+            first = NO;
+        }
     }
     
     return ret;

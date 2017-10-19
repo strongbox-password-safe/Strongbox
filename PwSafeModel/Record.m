@@ -174,9 +174,7 @@
 }
 
 - (void)setGroup:(Group *)group {
-    if (![group isEqual:self.group]) {
-        [self setField:FIELD_TYPE_GROUP string:group.escapedPathString];
-    }
+    [self setField:FIELD_TYPE_GROUP string:group.escapedPathString];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
