@@ -23,7 +23,6 @@
 @property (strong, nonatomic) NSImage *smallYellowFolderImage;
 @property (strong, nonatomic) NSImage *smallLockImage;
 @property (nonatomic) BOOL showPassword;
-@property (nonatomic) NSString* hiddenPasswordTemporaryStore;
 
 @end
 
@@ -311,10 +310,6 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
     //NSLog(@"Selection Change Outline View");
-    Node* item =  [self getCurrentSelectedItem];
-    
-    self.hiddenPasswordTemporaryStore = item == nil || item.isGroup ? nil : item.fields.password;
-    
     [self bindDetailsPane];
 }
 
@@ -448,13 +443,13 @@
 }
 
 - (void)showOrHidePassword {
+    Node* item = [self getCurrentSelectedItem];
     if(self.showPassword) {
         self.textFieldPw.enabled = YES;
-        self.textFieldPw.stringValue = self.hiddenPasswordTemporaryStore;
+        self.textFieldPw.stringValue = item.fields.password;
         self.buttonShowHidePassword.title = @"Hide Password (⌘P)";
     }
     else {
-        self.hiddenPasswordTemporaryStore = self.textFieldPw.stringValue;
         self.textFieldPw.enabled = NO;
         self.textFieldPw.stringValue = @"***********************";
         self.buttonShowHidePassword.title = @"Show Password (⌘P)";
@@ -484,7 +479,9 @@
 - (IBAction)onCopyPassword:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     
-    NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
+    Node* item = [self getCurrentSelectedItem];
+    
+    NSString *password = item.fields.password;
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 }
 
@@ -824,7 +821,8 @@ NSString* trimField(NSTextField* textField) {
 - (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     
-    NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
+    Node* item = [self getCurrentSelectedItem];
+    NSString *password = item.fields.password;
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 
     [self onLaunchUrl:sender];
@@ -870,13 +868,10 @@ NSString* trimField(NSTextField* textField) {
         return item && !item.isGroup && self.comboboxUsername.stringValue.length;
     }
     else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
-        NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
-        
-        return item && !item.isGroup && password.length && self.textFieldUrl.stringValue.length;
+        return item && !item.isGroup && item.fields.password.length && self.textFieldUrl.stringValue.length;
     }
     else if (theAction == @selector(onCopyPassword:)) {
-        NSString *password = self.showPassword ? self.textFieldPw.stringValue : self.hiddenPasswordTemporaryStore;
-        return item && !item.isGroup && password.length;
+        return item && !item.isGroup && item.fields.password.length;
     }
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
