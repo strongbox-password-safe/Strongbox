@@ -310,7 +310,7 @@
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
-    NSLog(@"Selection Change Outline View");
+    //NSLog(@"Selection Change Outline View");
     Node* item =  [self getCurrentSelectedItem];
     
     self.hiddenPasswordTemporaryStore = item == nil || item.isGroup ? nil : item.fields.password;
@@ -536,12 +536,17 @@
         return;
     }
     
-    Node* item = [self getCurrentSelectedItem];
-    if(notification.object == self.textViewNotes &&
-       ![item.fields.notes isEqualToString:self.textViewNotes.textStorage.string]) {
-        [self.model setItemNotes:item notes:self.textViewNotes.textStorage.string];
-        item.fields.accessed = [[NSDate alloc] init];
-        item.fields.modified = [[NSDate alloc] init];
+    if(notification.object == self.textViewNotes) {
+        Node* item = [self getCurrentSelectedItem];
+        
+        NSString *current = item.fields.notes;
+        NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
+        
+        if(![current isEqualToString:updated]) {
+            [self.model setItemNotes:item notes:updated];
+            item.fields.accessed = [[NSDate alloc] init];
+            item.fields.modified = [[NSDate alloc] init];
+        }
     }
 }
 

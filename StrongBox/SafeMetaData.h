@@ -39,3 +39,4 @@ typedef NS_ENUM (unsigned int, StorageProvider) {
 + (SafeMetaData *)fromDictionary:(NSDictionary *)dictionary;
 
 @end
+
