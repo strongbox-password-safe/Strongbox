@@ -145,6 +145,7 @@
 		4D78AC431FB1E29500A68A92 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = pwsafe/Record.m; sourceTree = SOURCE_ROOT; };
 		4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = pwsafe/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D78AC4C1FB1E2F100A68A92 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
+		4D78AC591FB2281600A68A92 /* AbstractPasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractPasswordDatabase.h; path = model/AbstractPasswordDatabase.h; sourceTree = SOURCE_ROOT; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
@@ -281,6 +282,7 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D78AC591FB2281600A68A92 /* AbstractPasswordDatabase.h */,
 				4D78AC261FB1E27700A68A92 /* DatabaseModel.h */,
 				4D78AC271FB1E27700A68A92 /* DatabaseModel.m */,
 				4D78AC2D1FB1E27700A68A92 /* Node.h */,

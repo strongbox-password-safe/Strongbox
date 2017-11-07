@@ -546,74 +546,6 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     return dump;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// Convenience
-
-- (NSArray<Node*>*)getAllRecords {
-    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup;
-    }];
-}
-
-- (NSArray<Node*>*)getAllGroups {
-    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return node.isGroup;
-    }];
-}
-
-- (NSSet<NSString*> *)usernameSet {
-    NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
-
-    for (Node *recordNode in [self getAllRecords]) {
-        if ([Utils trim:recordNode.fields.username].length > 0) {
-            [bag addObject:recordNode.fields.username];
-        }
-    }
-
-    return bag;
-}
-
-- (NSSet<NSString*> *)passwordSet {
-    NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
-
-    for (Node *record in [self getAllRecords]) {
-        if ([Utils trim:record.fields.password].length > 0) {
-            [bag addObject:record.fields.password];
-        }
-    }
-
-    return bag;
-}
-
-- (NSString *)mostPopularUsername {
-    NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
-
-    for (Node *record in [self getAllRecords]) {
-        if(record.fields.username.length) {
-            [bag addObject:record.fields.username];
-        }
-    }
-    
-    return [self mostFrequentInCountedSet:bag];
-}
-
-- (NSString *)mostPopularPassword {
-    NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
-
-    for (Node *record in [self getAllRecords]) {
-        [bag addObject:record.fields.password];
-    }
-
-    return [self mostFrequentInCountedSet:bag];
-}
-
--(NSInteger)numberOfRecords {
-    return [self getAllRecords].count;
-}
-
--(NSInteger)numberOfGroups {
-    return [self getAllGroups].count;
-}
 
 -(NSString*)version {
     Field *version = [self getFirstHeaderFieldOfType:HDR_VERSION];
@@ -623,20 +555,6 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     else {
         return [version prettyDataString];
     }
-}
-
-- (NSString*)mostFrequentInCountedSet:(NSCountedSet<NSString*>*)bag {
-    NSString *mostOccurring = nil;
-    NSUInteger highest = 0;
-
-    for (NSString *s in bag) {
-        if ([bag countForObject:s] > highest) {
-            highest = [bag countForObject:s];
-            mostOccurring = s;
-        }
-    }
-
-    return mostOccurring;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,12 +1,15 @@
-
-#ifndef _PwSafeDatabase_h
-#define _PwSafeDatabase_h
+//
+//  AbstractPasswordDatabase.h
+//  Strongbox
+//
+//  Created by Mark on 07/11/2017.
+//  Copyright © 2017 Mark McGuill. All rights reserved.
+//
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "AbstractPasswordDatabase.h"
 
-@interface PwSafeDatabase : NSObject <AbstractPasswordDatabase>
+@protocol AbstractPasswordDatabase <NSObject>
 
 + (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
 
@@ -40,5 +43,3 @@
 @property (nonatomic, readonly) NSString * _Nonnull version;
 
 @end
-
-#endif // ifndef _PwSafeDatabase_h

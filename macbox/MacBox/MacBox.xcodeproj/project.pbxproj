@@ -90,6 +90,7 @@
 		4D78AC1E1FB1E1DB00A68A92 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../../../model/Node.m; sourceTree = "<group>"; };
 		4D78AC521FB1E58200A68A92 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = ../../../pwsafe/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D78AC531FB1E58200A68A92 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = ../../../pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
+		4D78AC5C1FB2282700A68A92 /* AbstractPasswordDatabase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AbstractPasswordDatabase.h; path = ../../../model/AbstractPasswordDatabase.h; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -173,6 +174,7 @@
 		4D78AC151FB1E1C000A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D78AC5C1FB2282700A68A92 /* AbstractPasswordDatabase.h */,
 				4D78AC161FB1E1DB00A68A92 /* DatabaseModel.h */,
 				4D78AC171FB1E1DB00A68A92 /* DatabaseModel.m */,
 				4D78AC1D1FB1E1DB00A68A92 /* Node.h */,
