@@ -1,13 +1,5 @@
-//
-//  PasswordDatabase.m
-//
-//
-//  Created by Mark on 01/09/2015.
-//
-//
-
 #import <Foundation/Foundation.h>
-#import "PasswordDatabase.h"
+#import "PwSafeDatabase.h"
 #import "Utils.h"
 #import "SafeTools.h"
 #import <CommonCrypto/CommonHMAC.h>
@@ -15,13 +7,13 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@interface PasswordDatabase ()
+@interface PwSafeDatabase ()
 
 @property (nonatomic, strong) NSMutableArray<Field*> *dbHeaderFields;
 
 @end
 
-@implementation PasswordDatabase
+@implementation PwSafeDatabase
 
 static const NSInteger kDefaultVersionMajor = 0x03;
 static const NSInteger kDefaultVersionMinor = 0x0D;
@@ -53,7 +45,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
                                        password:(NSString *)password
                                           error:(NSError **)ppError {
     if (self = [super init]) {
-        if (![PasswordDatabase isAValidSafe:safeData]) {
+        if (![PwSafeDatabase isAValidSafe:safeData]) {
             NSLog(@"Not a valid safe!");
             
             if (ppError != nil) {

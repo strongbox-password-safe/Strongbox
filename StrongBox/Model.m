@@ -12,7 +12,7 @@
 
 @interface Model ()
 
-@property (readonly, strong, nonatomic) PasswordDatabase *passwordDatabase;
+@property (readonly, strong, nonatomic) DatabaseModel *passwordDatabase;
 
 @end
 
@@ -22,7 +22,7 @@
     BOOL _isReadOnly;
 }
 
-- (instancetype)initWithSafeDatabase:(PasswordDatabase *)passwordDatabase
+- (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                    usingOfflineCache:(BOOL)usingOfflineCache

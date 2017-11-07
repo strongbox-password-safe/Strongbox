@@ -13,23 +13,23 @@
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
-		4D92C8161F388E6E00341A58 /* PasswordDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8021F388E6E00341A58 /* PasswordDatabase.m */; };
-		4D92C8171F388E6E00341A58 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8041F388E6E00341A58 /* Field.m */; };
-		4D92C8181F388E6E00341A58 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8061F388E6E00341A58 /* Group.m */; };
-		4D92C8191F388E6E00341A58 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8081F388E6E00341A58 /* PasswordHistory.m */; };
-		4D92C81A1F388E6E00341A58 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C80A1F388E6E00341A58 /* PasswordHistoryEntry.m */; };
-		4D92C81C1F388E6E00341A58 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C80E1F388E6E00341A58 /* Record.m */; };
-		4D92C81F1F388E6E00341A58 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8141F388E6E00341A58 /* SafeTools.m */; };
-		4D92C8201F388E6E00341A58 /* twofish in Resources */ = {isa = PBXBuildFile; fileRef = 4D92C8151F388E6E00341A58 /* twofish */; };
-		4D92C8221F388E9D00341A58 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8211F388E9D00341A58 /* crypt_argchk.c */; };
-		4D92C8241F388EA800341A58 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8231F388EA800341A58 /* twofish.c */; };
+		4D78AC0E1FB1E1B700A68A92 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC021FB1E1B600A68A92 /* PwSafeDatabase.m */; };
+		4D78AC0F1FB1E1B700A68A92 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC031FB1E1B600A68A92 /* Group.m */; };
+		4D78AC101FB1E1B700A68A92 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC051FB1E1B600A68A92 /* Field.m */; };
+		4D78AC111FB1E1B700A68A92 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC091FB1E1B600A68A92 /* PasswordHistory.m */; };
+		4D78AC121FB1E1B700A68A92 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC0A1FB1E1B600A68A92 /* PasswordHistoryEntry.m */; };
+		4D78AC131FB1E1B700A68A92 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC0B1FB1E1B600A68A92 /* SafeTools.m */; };
+		4D78AC141FB1E1B700A68A92 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC0D1FB1E1B600A68A92 /* Record.m */; };
+		4D78AC1F1FB1E1DB00A68A92 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC171FB1E1DB00A68A92 /* DatabaseModel.m */; };
+		4D78AC201FB1E1DB00A68A92 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC1A1FB1E1DB00A68A92 /* NodeFields.m */; };
+		4D78AC211FB1E1DB00A68A92 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC1C1FB1E1DB00A68A92 /* Utils.m */; };
+		4D78AC221FB1E1DB00A68A92 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC1E1FB1E1DB00A68A92 /* Node.m */; };
+		4D78AC541FB1E58200A68A92 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC521FB1E58200A68A92 /* crypt_argchk.c */; };
+		4D78AC551FB1E58200A68A92 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC531FB1E58200A68A92 /* twofish.c */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
-		4DA595C81F4461B800351BEC /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA595C71F4461B800351BEC /* Utils.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
-		4DE419BB1F588B2F00158ED5 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE419BA1F588B2F00158ED5 /* Node.m */; };
-		4DE419BE1F588C4800158ED5 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE419BD1F588C4800158ED5 /* NodeFields.m */; };
 		4DE92B741F49D0AA00282D98 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */; };
 		4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */; };
@@ -65,37 +65,38 @@
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UpgradeWindowController.xib; sourceTree = "<group>"; };
-		4D92C8011F388E6E00341A58 /* PasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordDatabase.h; path = ../../PwSafeModel/PasswordDatabase.h; sourceTree = "<group>"; };
-		4D92C8021F388E6E00341A58 /* PasswordDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordDatabase.m; path = ../../PwSafeModel/PasswordDatabase.m; sourceTree = "<group>"; };
-		4D92C8031F388E6E00341A58 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = ../../PwSafeModel/Field.h; sourceTree = "<group>"; };
-		4D92C8041F388E6E00341A58 /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Field.m; path = ../../PwSafeModel/Field.m; sourceTree = "<group>"; };
-		4D92C8051F388E6E00341A58 /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Group.h; path = ../../PwSafeModel/Group.h; sourceTree = "<group>"; };
-		4D92C8061F388E6E00341A58 /* Group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Group.m; path = ../../PwSafeModel/Group.m; sourceTree = "<group>"; };
-		4D92C8071F388E6E00341A58 /* PasswordHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistory.h; path = ../../PwSafeModel/PasswordHistory.h; sourceTree = "<group>"; };
-		4D92C8081F388E6E00341A58 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistory.m; path = ../../PwSafeModel/PasswordHistory.m; sourceTree = "<group>"; };
-		4D92C8091F388E6E00341A58 /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryEntry.h; path = ../../PwSafeModel/PasswordHistoryEntry.h; sourceTree = "<group>"; };
-		4D92C80A1F388E6E00341A58 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = ../../PwSafeModel/PasswordHistoryEntry.m; sourceTree = "<group>"; };
-		4D92C80D1F388E6E00341A58 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = ../../PwSafeModel/Record.h; sourceTree = "<group>"; };
-		4D92C80E1F388E6E00341A58 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = ../../PwSafeModel/Record.m; sourceTree = "<group>"; };
-		4D92C8131F388E6E00341A58 /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = ../../PwSafeModel/SafeTools.h; sourceTree = "<group>"; };
-		4D92C8141F388E6E00341A58 /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = ../../PwSafeModel/SafeTools.m; sourceTree = "<group>"; };
-		4D92C8151F388E6E00341A58 /* twofish */ = {isa = PBXFileReference; lastKnownFileType = folder; name = twofish; path = ../../PwSafeModel/twofish; sourceTree = "<group>"; };
-		4D92C8211F388E9D00341A58 /* crypt_argchk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = ../../PwSafeModel/twofish/crypt_argchk.c; sourceTree = "<group>"; };
-		4D92C8231F388EA800341A58 /* twofish.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = ../../PwSafeModel/twofish/twofish.c; sourceTree = "<group>"; };
+		4D78AC001FB1E1B600A68A92 /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = ../../../pwsafe/SafeTools.h; sourceTree = "<group>"; };
+		4D78AC011FB1E1B600A68A92 /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Group.h; path = ../../../pwsafe/Group.h; sourceTree = "<group>"; };
+		4D78AC021FB1E1B600A68A92 /* PwSafeDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeDatabase.m; path = ../../../pwsafe/PwSafeDatabase.m; sourceTree = "<group>"; };
+		4D78AC031FB1E1B600A68A92 /* Group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Group.m; path = ../../../pwsafe/Group.m; sourceTree = "<group>"; };
+		4D78AC041FB1E1B600A68A92 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = ../../../pwsafe/Record.h; sourceTree = "<group>"; };
+		4D78AC051FB1E1B600A68A92 /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Field.m; path = ../../../pwsafe/Field.m; sourceTree = "<group>"; };
+		4D78AC061FB1E1B600A68A92 /* PwSafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeDatabase.h; path = ../../../pwsafe/PwSafeDatabase.h; sourceTree = "<group>"; };
+		4D78AC071FB1E1B600A68A92 /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryEntry.h; path = ../../../pwsafe/PasswordHistoryEntry.h; sourceTree = "<group>"; };
+		4D78AC081FB1E1B600A68A92 /* PasswordHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistory.h; path = ../../../pwsafe/PasswordHistory.h; sourceTree = "<group>"; };
+		4D78AC091FB1E1B600A68A92 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistory.m; path = ../../../pwsafe/PasswordHistory.m; sourceTree = "<group>"; };
+		4D78AC0A1FB1E1B600A68A92 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = ../../../pwsafe/PasswordHistoryEntry.m; sourceTree = "<group>"; };
+		4D78AC0B1FB1E1B600A68A92 /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = ../../../pwsafe/SafeTools.m; sourceTree = "<group>"; };
+		4D78AC0C1FB1E1B600A68A92 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = ../../../pwsafe/Field.h; sourceTree = "<group>"; };
+		4D78AC0D1FB1E1B600A68A92 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = ../../../pwsafe/Record.m; sourceTree = "<group>"; };
+		4D78AC161FB1E1DB00A68A92 /* DatabaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModel.h; path = ../../../model/DatabaseModel.h; sourceTree = "<group>"; };
+		4D78AC171FB1E1DB00A68A92 /* DatabaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModel.m; path = ../../../model/DatabaseModel.m; sourceTree = "<group>"; };
+		4D78AC181FB1E1DB00A68A92 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = ../../../model/NodeFields.h; sourceTree = "<group>"; };
+		4D78AC191FB1E1DB00A68A92 /* Strongbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = ../../../model/Strongbox.h; sourceTree = "<group>"; };
+		4D78AC1A1FB1E1DB00A68A92 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = ../../../model/NodeFields.m; sourceTree = "<group>"; };
+		4D78AC1B1FB1E1DB00A68A92 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../../model/Utils.h; sourceTree = "<group>"; };
+		4D78AC1C1FB1E1DB00A68A92 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../../../model/Utils.m; sourceTree = "<group>"; };
+		4D78AC1D1FB1E1DB00A68A92 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../../model/Node.h; sourceTree = "<group>"; };
+		4D78AC1E1FB1E1DB00A68A92 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../../../model/Node.m; sourceTree = "<group>"; };
+		4D78AC521FB1E58200A68A92 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = ../../../pwsafe/twofish/crypt_argchk.c; sourceTree = "<group>"; };
+		4D78AC531FB1E58200A68A92 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = ../../../pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
-		4DA2038F1F76599200113A6B /* Strongbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = ../../PwSafeModel/Strongbox.h; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		4DA595C61F4461B800351BEC /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../../PwSafeModel/Utils.h; sourceTree = "<group>"; };
-		4DA595C71F4461B800351BEC /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../../PwSafeModel/Utils.m; sourceTree = "<group>"; };
 		4DC225701F558D47000B0FBB /* StrongBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrongBox.entitlements; sourceTree = "<group>"; };
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
-		4DE419B91F588B2F00158ED5 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../PwSafeModel/Node.h; sourceTree = "<group>"; };
-		4DE419BA1F588B2F00158ED5 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../../PwSafeModel/Node.m; sourceTree = "<group>"; };
-		4DE419BC1F588C4800158ED5 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = ../../PwSafeModel/NodeFields.h; sourceTree = "<group>"; };
-		4DE419BD1F588C4800158ED5 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = ../../PwSafeModel/NodeFields.m; sourceTree = "<group>"; };
 		4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PwSafeModelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PwSafeModelTests.m; sourceTree = "<group>"; };
 		4DE92B751F49D0AA00282D98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -146,33 +147,43 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4D92C8001F388E5D00341A58 /* PwSafeModel */ = {
+		4D78ABFF1FB1E19E00A68A92 /* PwSafe */ = {
 			isa = PBXGroup;
 			children = (
-				4D92C8151F388E6E00341A58 /* twofish */,
-				4D92C8011F388E6E00341A58 /* PasswordDatabase.h */,
-				4D92C8021F388E6E00341A58 /* PasswordDatabase.m */,
-				4DE419B91F588B2F00158ED5 /* Node.h */,
-				4DE419BA1F588B2F00158ED5 /* Node.m */,
-				4DE419BC1F588C4800158ED5 /* NodeFields.h */,
-				4DE419BD1F588C4800158ED5 /* NodeFields.m */,
-				4D92C8071F388E6E00341A58 /* PasswordHistory.h */,
-				4D92C8081F388E6E00341A58 /* PasswordHistory.m */,
-				4D92C8091F388E6E00341A58 /* PasswordHistoryEntry.h */,
-				4D92C80A1F388E6E00341A58 /* PasswordHistoryEntry.m */,
-				4D92C8031F388E6E00341A58 /* Field.h */,
-				4D92C8041F388E6E00341A58 /* Field.m */,
-				4D92C8051F388E6E00341A58 /* Group.h */,
-				4D92C8061F388E6E00341A58 /* Group.m */,
-				4D92C80D1F388E6E00341A58 /* Record.h */,
-				4D92C80E1F388E6E00341A58 /* Record.m */,
-				4D92C8131F388E6E00341A58 /* SafeTools.h */,
-				4D92C8141F388E6E00341A58 /* SafeTools.m */,
-				4DA595C61F4461B800351BEC /* Utils.h */,
-				4DA595C71F4461B800351BEC /* Utils.m */,
-				4DA2038F1F76599200113A6B /* Strongbox.h */,
+				4D78AC521FB1E58200A68A92 /* crypt_argchk.c */,
+				4D78AC531FB1E58200A68A92 /* twofish.c */,
+				4D78AC0C1FB1E1B600A68A92 /* Field.h */,
+				4D78AC051FB1E1B600A68A92 /* Field.m */,
+				4D78AC011FB1E1B600A68A92 /* Group.h */,
+				4D78AC031FB1E1B600A68A92 /* Group.m */,
+				4D78AC081FB1E1B600A68A92 /* PasswordHistory.h */,
+				4D78AC091FB1E1B600A68A92 /* PasswordHistory.m */,
+				4D78AC071FB1E1B600A68A92 /* PasswordHistoryEntry.h */,
+				4D78AC0A1FB1E1B600A68A92 /* PasswordHistoryEntry.m */,
+				4D78AC061FB1E1B600A68A92 /* PwSafeDatabase.h */,
+				4D78AC021FB1E1B600A68A92 /* PwSafeDatabase.m */,
+				4D78AC041FB1E1B600A68A92 /* Record.h */,
+				4D78AC0D1FB1E1B600A68A92 /* Record.m */,
+				4D78AC001FB1E1B600A68A92 /* SafeTools.h */,
+				4D78AC0B1FB1E1B600A68A92 /* SafeTools.m */,
 			);
-			name = PwSafeModel;
+			path = PwSafe;
+			sourceTree = "<group>";
+		};
+		4D78AC151FB1E1C000A68A92 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4D78AC161FB1E1DB00A68A92 /* DatabaseModel.h */,
+				4D78AC171FB1E1DB00A68A92 /* DatabaseModel.m */,
+				4D78AC1D1FB1E1DB00A68A92 /* Node.h */,
+				4D78AC1E1FB1E1DB00A68A92 /* Node.m */,
+				4D78AC181FB1E1DB00A68A92 /* NodeFields.h */,
+				4D78AC1A1FB1E1DB00A68A92 /* NodeFields.m */,
+				4D78AC191FB1E1DB00A68A92 /* Strongbox.h */,
+				4D78AC1B1FB1E1DB00A68A92 /* Utils.h */,
+				4D78AC1C1FB1E1DB00A68A92 /* Utils.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		4DE92B721F49D0AA00282D98 /* PwSafeModelTests */ = {
@@ -187,15 +198,14 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D78AC151FB1E1C000A68A92 /* Model */,
+				4D78ABFF1FB1E19E00A68A92 /* PwSafe */,
 				4DFB92F71FB1D441008D092F /* Keypass */,
-				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
-				4D92C8231F388EA800341A58 /* twofish.c */,
-				4D92C8211F388E9D00341A58 /* crypt_argchk.c */,
-				4D92C8001F388E5D00341A58 /* PwSafeModel */,
 				4DF59F531F30DB7A00D68BFE /* MacBox */,
 				4DE92B721F49D0AA00282D98 /* PwSafeModelTests */,
 				4DF59F521F30DB7A00D68BFE /* Products */,
 				4D1D6F3A1F386CB700D2B8EC /* Frameworks */,
+				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -365,7 +375,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
-				4D92C8201F388E6E00341A58 /* twofish in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
@@ -388,32 +397,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D92C8221F388E9D00341A58 /* crypt_argchk.c in Sources */,
-				4DA595C81F4461B800351BEC /* Utils.m in Sources */,
-				4D92C8241F388EA800341A58 /* twofish.c in Sources */,
 				4DFB92FA1FB1D44A008D092F /* KeypassDatabase.m in Sources */,
-				4D92C8171F388E6E00341A58 /* Field.m in Sources */,
-				4D92C8191F388E6E00341A58 /* PasswordHistory.m in Sources */,
-				4D92C81A1F388E6E00341A58 /* PasswordHistoryEntry.m in Sources */,
+				4D78AC101FB1E1B700A68A92 /* Field.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
+				4D78AC541FB1E58200A68A92 /* crypt_argchk.c in Sources */,
+				4D78AC551FB1E58200A68A92 /* twofish.c in Sources */,
+				4D78AC1F1FB1E1DB00A68A92 /* DatabaseModel.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
+				4D78AC201FB1E1DB00A68A92 /* NodeFields.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
-				4DE419BE1F588C4800158ED5 /* NodeFields.m in Sources */,
-				4D92C8181F388E6E00341A58 /* Group.m in Sources */,
-				4D92C81C1F388E6E00341A58 /* Record.m in Sources */,
-				4D92C81F1F388E6E00341A58 /* SafeTools.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
+				4D78AC121FB1E1B700A68A92 /* PasswordHistoryEntry.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */,
+				4D78AC111FB1E1B700A68A92 /* PasswordHistory.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
+				4D78AC131FB1E1B700A68A92 /* SafeTools.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
+				4D78AC211FB1E1DB00A68A92 /* Utils.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
-				4D92C8161F388E6E00341A58 /* PasswordDatabase.m in Sources */,
+				4D78AC221FB1E1DB00A68A92 /* Node.m in Sources */,
+				4D78AC0F1FB1E1B700A68A92 /* Group.m in Sources */,
+				4D78AC141FB1E1B700A68A92 /* Record.m in Sources */,
+				4D78AC0E1FB1E1B700A68A92 /* PwSafeDatabase.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
-				4DE419BB1F588B2F00158ED5 /* Node.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

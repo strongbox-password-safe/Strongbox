@@ -9,7 +9,7 @@
 #import "StorageBrowserTableViewController.h"
 #import "AddSafeAlertController.h"
 #import "Alerts.h"
-#import "PasswordDatabase.h"
+#import "DatabaseModel.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -161,7 +161,7 @@
 
 - (void)readForValidationDone:(StorageBrowserItem *)file data:(NSData *)data error:(NSError *)error {
     if (error == nil) {
-        if ([PasswordDatabase isAValidSafe:data]) {
+        if ([DatabaseModel isAValidSafe:data]) {
             AddSafeAlertController *controller = [[AddSafeAlertController alloc] init];
 
             [controller addExisting:self
@@ -228,7 +228,7 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password {
-    PasswordDatabase *newSafe = [[PasswordDatabase alloc] initNewWithPassword:password];
+    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password];
     [newSafe defaultLastUpdateFieldsToNow];
     
     NSError *error;

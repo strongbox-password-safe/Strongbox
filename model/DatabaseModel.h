@@ -1,18 +1,17 @@
-//
-//  PasswordDatabase.h
-//
-//
-//  Created by Mark on 01/09/2015.
-//
-//
-
-#ifndef _PasswordDatabase_h
-#define _PasswordDatabase_h
+#ifndef _DatabaseModel_h
+#define _DatabaseModel_h
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
 
-@interface PasswordDatabase : NSObject
+@interface DatabaseModel : NSObject
+
+typedef enum {
+    kPasswordSafe,
+    kKeypass,
+} DatabaseFormat;
+
+@property (nonatomic, readonly) DatabaseFormat format;
 
 + (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
 
@@ -47,4 +46,4 @@
 
 @end
 
-#endif // ifndef _PasswordDatabase_h
+#endif // ifndef _DatabaseModel_h

@@ -564,7 +564,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSError *error;
-        PasswordDatabase *openedSafe = [[PasswordDatabase alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
+        DatabaseModel *openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
 
         dispatch_async(dispatch_get_main_queue(), ^(void){
             [self openSafeWithDataDone:error
@@ -581,7 +581,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 }
 
 - (void)openSafeWithDataDone:(NSError*)error
-                  openedSafe:(PasswordDatabase*)openedSafe
+                  openedSafe:(DatabaseModel*)openedSafe
                isTouchIdOpen:(BOOL)isTouchIdOpen
                         safe:(SafeMetaData *)safe
           isOfflineCacheMode:(BOOL)isOfflineCacheMode
@@ -651,7 +651,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 
 -(void)onSuccessfulSafeOpen:(BOOL)isOfflineCacheMode
                 provider:(id)provider
-               openedSafe:(PasswordDatabase *)openedSafe
+               openedSafe:(DatabaseModel *)openedSafe
                    safe:(SafeMetaData *)safe
                      data:(NSData *)data {
     Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
@@ -852,7 +852,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         
         NSData *importedData = [NSData dataWithContentsOfURL:importURL];
         
-        if (![PasswordDatabase isAValidSafe:importedData]) {
+        if (![DatabaseModel isAValidSafe:importedData]) {
             [Alerts warn:self
                    title:@"Invalid Safe"
                  message:@"This is not a valid Strongbox password safe database file."];

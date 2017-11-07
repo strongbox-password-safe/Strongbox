@@ -13,7 +13,7 @@
 #import "DropboxV2StorageProvider.h"
 #import "CustomStorageProviderTableViewCell.h"
 #import "AddSafeAlertController.h"
-#import "PasswordDatabase.h"
+#import "DatabaseModel.h"
 #import "Alerts.h"
 #import "StorageBrowserTableViewController.h"
 #import "AppleICloudProvider.h"
@@ -147,7 +147,7 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password provider:(id<SafeStorageProvider>)provider {
-    PasswordDatabase *newSafe = [[PasswordDatabase alloc] initNewWithPassword:password];
+    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password];
     [newSafe defaultLastUpdateFieldsToNow];
     
     NSError *error;

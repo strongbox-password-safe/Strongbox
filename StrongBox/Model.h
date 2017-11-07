@@ -10,7 +10,7 @@
 #import "SafeStorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "SafesCollection.h"
-#import "PasswordDatabase.h"
+#import "DatabaseModel.h"
 
 @interface Model : NSObject
 
@@ -23,7 +23,7 @@
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
-- (instancetype _Nullable )initWithSafeDatabase:(PasswordDatabase *_Nonnull)passwordDatabase
+- (instancetype _Nullable )initWithSafeDatabase:(DatabaseModel *_Nonnull)passwordDatabase
                             metaData:(SafeMetaData *_Nonnull)metaData
                      storageProvider:(id <SafeStorageProvider>_Nonnull)provider
                    usingOfflineCache:(BOOL)usingOfflineCache

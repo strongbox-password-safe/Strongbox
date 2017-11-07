@@ -10,8 +10,6 @@
 		4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165311EDB2F9C00CCB8CF /* SafeMetaData.m */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
-		4D1398A31F5F0B66002608E4 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1398A01F5F0B66002608E4 /* Node.m */; };
-		4D1398A41F5F0B66002608E4 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1398A21F5F0B66002608E4 /* NodeFields.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
 		4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D1757961C8361D200E6356F /* formatV3.txt */; };
 		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
@@ -27,27 +25,30 @@
 		4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D275E561F1BC97600D79A30 /* UpgradeViewController.m */; };
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
-		4D3694DE1F54547100A82811 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3694DD1F54547100A82811 /* Utils.m */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
-		4D68DBB31F430ECB00A8A148 /* PasswordDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
+		4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
+		4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2A1FB1E27700A68A92 /* NodeFields.m */; };
+		4D78AC311FB1E27700A68A92 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2C1FB1E27700A68A92 /* Utils.m */; };
+		4D78AC321FB1E27700A68A92 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2E1FB1E27700A68A92 /* Node.m */; };
+		4D78AC351FB1E28200A68A92 /* KeypassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC331FB1E28200A68A92 /* KeypassDatabase.m */; };
+		4D78AC441FB1E29500A68A92 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC381FB1E29400A68A92 /* PwSafeDatabase.m */; };
+		4D78AC451FB1E29500A68A92 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC391FB1E29400A68A92 /* Group.m */; };
+		4D78AC461FB1E29500A68A92 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC3B1FB1E29400A68A92 /* Field.m */; };
+		4D78AC471FB1E29500A68A92 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC3F1FB1E29500A68A92 /* PasswordHistory.m */; };
+		4D78AC481FB1E29500A68A92 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC401FB1E29500A68A92 /* PasswordHistoryEntry.m */; };
+		4D78AC491FB1E29500A68A92 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC411FB1E29500A68A92 /* SafeTools.m */; };
+		4D78AC4A1FB1E29500A68A92 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC431FB1E29500A68A92 /* Record.m */; };
+		4D78AC4D1FB1E2F200A68A92 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */; };
+		4D78AC4E1FB1E2F200A68A92 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC4C1FB1E2F100A68A92 /* twofish.c */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
-		4D92C7F11F388D0900341A58 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7DE1F388D0900341A58 /* Field.m */; };
-		4D92C7F21F388D0900341A58 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E01F388D0900341A58 /* Group.m */; };
-		4D92C7F31F388D0900341A58 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E21F388D0900341A58 /* PasswordHistory.m */; };
-		4D92C7F41F388D0900341A58 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */; };
-		4D92C7F61F388D0900341A58 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7E81F388D0900341A58 /* Record.m */; };
-		4D92C7F91F388D0900341A58 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7EE1F388D0900341A58 /* SafeTools.m */; };
-		4D92C7FA1F388D0900341A58 /* twofish in Resources */ = {isa = PBXBuildFile; fileRef = 4D92C7EF1F388D0900341A58 /* twofish */; };
-		4D92C7FD1F388DE500341A58 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7FC1F388DE500341A58 /* twofish.c */; };
-		4D92C7FF1F388DFF00341A58 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */; };
 		4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D93FD761EDB7A520076BBAA /* StoreKit.framework */; };
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6335D1F62EAE1000A0E9D /* Main.storyboard */; };
@@ -57,7 +58,6 @@
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DF631A01F69571B006C8F2C /* PasswordGenerationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */; };
-		4DF631A31F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165331EDB2F9C00CCB8CF /* SafesCollection.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
 		D52AF5C43235C242731E1270 /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */; };
@@ -72,10 +72,6 @@
 		4D0BA7D71F23B844009243C9 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesTableViewController.h; sourceTree = "<group>"; };
 		4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesTableViewController.m; sourceTree = "<group>"; };
-		4D13989F1F5F0B66002608E4 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = PwSafeModel/Node.h; sourceTree = SOURCE_ROOT; };
-		4D1398A01F5F0B66002608E4 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = PwSafeModel/Node.m; sourceTree = SOURCE_ROOT; };
-		4D1398A11F5F0B66002608E4 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = PwSafeModel/NodeFields.h; sourceTree = SOURCE_ROOT; };
-		4D1398A21F5F0B66002608E4 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = PwSafeModel/NodeFields.m; sourceTree = SOURCE_ROOT; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowseSafeView.h; sourceTree = "<group>"; };
 		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowseSafeView.m; sourceTree = "<group>"; };
 		4D1757961C8361D200E6356F /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = formatV3.txt; sourceTree = "<group>"; };
@@ -108,8 +104,6 @@
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectStorageProviderController.m; sourceTree = "<group>"; };
 		4D2F82331F754FB0001688C9 /* Strongbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox.entitlements; path = Strongbox/Strongbox.entitlements; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
-		4D3694DC1F54547100A82811 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = PwSafeModel/Utils.h; sourceTree = SOURCE_ROOT; };
-		4D3694DD1F54547100A82811 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = PwSafeModel/Utils.m; sourceTree = SOURCE_ROOT; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserTableViewController.h; sourceTree = "<group>"; };
@@ -122,33 +116,42 @@
 		4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAutoSuggest.m; sourceTree = "<group>"; };
 		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iCloudSafesCoordinator.h; sourceTree = "<group>"; };
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iCloudSafesCoordinator.m; sourceTree = "<group>"; };
-		4D68DBB11F430ECB00A8A148 /* PasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordDatabase.h; path = PwSafeModel/PasswordDatabase.h; sourceTree = SOURCE_ROOT; };
-		4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordDatabase.m; path = PwSafeModel/PasswordDatabase.m; sourceTree = SOURCE_ROOT; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsView.m; sourceTree = "<group>"; };
+		4D78AC261FB1E27700A68A92 /* DatabaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModel.h; path = model/DatabaseModel.h; sourceTree = SOURCE_ROOT; };
+		4D78AC271FB1E27700A68A92 /* DatabaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModel.m; path = model/DatabaseModel.m; sourceTree = SOURCE_ROOT; };
+		4D78AC281FB1E27700A68A92 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = model/NodeFields.h; sourceTree = SOURCE_ROOT; };
+		4D78AC291FB1E27700A68A92 /* Strongbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = model/Strongbox.h; sourceTree = SOURCE_ROOT; };
+		4D78AC2A1FB1E27700A68A92 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = model/NodeFields.m; sourceTree = SOURCE_ROOT; };
+		4D78AC2B1FB1E27700A68A92 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = model/Utils.h; sourceTree = SOURCE_ROOT; };
+		4D78AC2C1FB1E27700A68A92 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = model/Utils.m; sourceTree = SOURCE_ROOT; };
+		4D78AC2D1FB1E27700A68A92 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = model/Node.h; sourceTree = SOURCE_ROOT; };
+		4D78AC2E1FB1E27700A68A92 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = model/Node.m; sourceTree = SOURCE_ROOT; };
+		4D78AC331FB1E28200A68A92 /* KeypassDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeypassDatabase.m; path = keypass/KeypassDatabase.m; sourceTree = SOURCE_ROOT; };
+		4D78AC341FB1E28200A68A92 /* KeypassDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeypassDatabase.h; path = keypass/KeypassDatabase.h; sourceTree = SOURCE_ROOT; };
+		4D78AC361FB1E29400A68A92 /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = pwsafe/SafeTools.h; sourceTree = SOURCE_ROOT; };
+		4D78AC371FB1E29400A68A92 /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Group.h; path = pwsafe/Group.h; sourceTree = SOURCE_ROOT; };
+		4D78AC381FB1E29400A68A92 /* PwSafeDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeDatabase.m; path = pwsafe/PwSafeDatabase.m; sourceTree = SOURCE_ROOT; };
+		4D78AC391FB1E29400A68A92 /* Group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Group.m; path = pwsafe/Group.m; sourceTree = SOURCE_ROOT; };
+		4D78AC3A1FB1E29400A68A92 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = pwsafe/Record.h; sourceTree = SOURCE_ROOT; };
+		4D78AC3B1FB1E29400A68A92 /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Field.m; path = pwsafe/Field.m; sourceTree = SOURCE_ROOT; };
+		4D78AC3C1FB1E29500A68A92 /* PwSafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeDatabase.h; path = pwsafe/PwSafeDatabase.h; sourceTree = SOURCE_ROOT; };
+		4D78AC3D1FB1E29500A68A92 /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryEntry.h; path = pwsafe/PasswordHistoryEntry.h; sourceTree = SOURCE_ROOT; };
+		4D78AC3E1FB1E29500A68A92 /* PasswordHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistory.h; path = pwsafe/PasswordHistory.h; sourceTree = SOURCE_ROOT; };
+		4D78AC3F1FB1E29500A68A92 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistory.m; path = pwsafe/PasswordHistory.m; sourceTree = SOURCE_ROOT; };
+		4D78AC401FB1E29500A68A92 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = pwsafe/PasswordHistoryEntry.m; sourceTree = SOURCE_ROOT; };
+		4D78AC411FB1E29500A68A92 /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = pwsafe/SafeTools.m; sourceTree = SOURCE_ROOT; };
+		4D78AC421FB1E29500A68A92 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = pwsafe/Field.h; sourceTree = SOURCE_ROOT; };
+		4D78AC431FB1E29500A68A92 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = pwsafe/Record.m; sourceTree = SOURCE_ROOT; };
+		4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = pwsafe/twofish/crypt_argchk.c; sourceTree = "<group>"; };
+		4D78AC4C1FB1E2F100A68A92 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
 		4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviousPasswordsTableViewController.m; sourceTree = "<group>"; };
 		4D915D781EDC4B77002615F6 /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alerts.h; sourceTree = "<group>"; };
 		4D915D791EDC4B77002615F6 /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alerts.m; sourceTree = "<group>"; };
-		4D92C7DD1F388D0900341A58 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = PwSafeModel/Field.h; sourceTree = SOURCE_ROOT; };
-		4D92C7DE1F388D0900341A58 /* Field.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Field.m; path = PwSafeModel/Field.m; sourceTree = SOURCE_ROOT; };
-		4D92C7DF1F388D0900341A58 /* Group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Group.h; path = PwSafeModel/Group.h; sourceTree = SOURCE_ROOT; };
-		4D92C7E01F388D0900341A58 /* Group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Group.m; path = PwSafeModel/Group.m; sourceTree = SOURCE_ROOT; };
-		4D92C7E11F388D0900341A58 /* PasswordHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistory.h; path = PwSafeModel/PasswordHistory.h; sourceTree = SOURCE_ROOT; };
-		4D92C7E21F388D0900341A58 /* PasswordHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistory.m; path = PwSafeModel/PasswordHistory.m; sourceTree = SOURCE_ROOT; };
-		4D92C7E31F388D0900341A58 /* PasswordHistoryEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryEntry.h; path = PwSafeModel/PasswordHistoryEntry.h; sourceTree = SOURCE_ROOT; };
-		4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = PwSafeModel/PasswordHistoryEntry.m; sourceTree = SOURCE_ROOT; };
-		4D92C7E71F388D0900341A58 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = PwSafeModel/Record.h; sourceTree = SOURCE_ROOT; };
-		4D92C7E81F388D0900341A58 /* Record.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Record.m; path = PwSafeModel/Record.m; sourceTree = SOURCE_ROOT; };
-		4D92C7ED1F388D0900341A58 /* SafeTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeTools.h; path = PwSafeModel/SafeTools.h; sourceTree = SOURCE_ROOT; };
-		4D92C7EE1F388D0900341A58 /* SafeTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeTools.m; path = PwSafeModel/SafeTools.m; sourceTree = SOURCE_ROOT; };
-		4D92C7EF1F388D0900341A58 /* twofish */ = {isa = PBXFileReference; lastKnownFileType = folder; name = twofish; path = PwSafeModel/twofish; sourceTree = SOURCE_ROOT; };
-		4D92C7FC1F388DE500341A58 /* twofish.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = PwSafeModel/twofish/twofish.c; sourceTree = "<group>"; };
-		4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = PwSafeModel/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D93FD761EDB7A520076BBAA /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		4DA203901F765CF000113A6B /* Strongbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = PwSafeModel/Strongbox.h; sourceTree = SOURCE_ROOT; };
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DA6335E1F62EAE1000A0E9D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -166,8 +169,6 @@
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
 		4DF6319E1F69571B006C8F2C /* PasswordGenerationSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordGenerationSettings.h; sourceTree = "<group>"; };
 		4DF6319F1F69571B006C8F2C /* PasswordGenerationSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordGenerationSettings.m; sourceTree = "<group>"; };
-		4DF631A11F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PasswordSafe3PasswordGenerationParameters.h; sourceTree = "<group>"; };
-		4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordSafe3PasswordGenerationParameters.m; sourceTree = "<group>"; };
 		4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeAlertController.h; sourceTree = "<group>"; };
 		4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeAlertController.m; sourceTree = "<group>"; };
 		63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
@@ -277,43 +278,64 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
-		4D92C7DA1F388CF200341A58 /* PwSafeModel */ = {
+		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4DA203901F765CF000113A6B /* Strongbox.h */,
-				4D13989F1F5F0B66002608E4 /* Node.h */,
-				4D1398A01F5F0B66002608E4 /* Node.m */,
-				4D1398A11F5F0B66002608E4 /* NodeFields.h */,
-				4D1398A21F5F0B66002608E4 /* NodeFields.m */,
-				4D3694DC1F54547100A82811 /* Utils.h */,
-				4D3694DD1F54547100A82811 /* Utils.m */,
-				4D68DBB11F430ECB00A8A148 /* PasswordDatabase.h */,
-				4D68DBB21F430ECB00A8A148 /* PasswordDatabase.m */,
-				4D92C7DD1F388D0900341A58 /* Field.h */,
-				4D92C7DE1F388D0900341A58 /* Field.m */,
-				4D92C7DF1F388D0900341A58 /* Group.h */,
-				4D92C7E01F388D0900341A58 /* Group.m */,
-				4D92C7E11F388D0900341A58 /* PasswordHistory.h */,
-				4D92C7E21F388D0900341A58 /* PasswordHistory.m */,
-				4D92C7E31F388D0900341A58 /* PasswordHistoryEntry.h */,
-				4D92C7E41F388D0900341A58 /* PasswordHistoryEntry.m */,
-				4D92C7E71F388D0900341A58 /* Record.h */,
-				4D92C7E81F388D0900341A58 /* Record.m */,
-				4D92C7ED1F388D0900341A58 /* SafeTools.h */,
-				4D92C7EE1F388D0900341A58 /* SafeTools.m */,
-				4D92C7EF1F388D0900341A58 /* twofish */,
-				4DF631A11F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.h */,
-				4DF631A21F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m */,
+				4D78AC261FB1E27700A68A92 /* DatabaseModel.h */,
+				4D78AC271FB1E27700A68A92 /* DatabaseModel.m */,
+				4D78AC2D1FB1E27700A68A92 /* Node.h */,
+				4D78AC2E1FB1E27700A68A92 /* Node.m */,
+				4D78AC281FB1E27700A68A92 /* NodeFields.h */,
+				4D78AC2A1FB1E27700A68A92 /* NodeFields.m */,
+				4D78AC291FB1E27700A68A92 /* Strongbox.h */,
+				4D78AC2B1FB1E27700A68A92 /* Utils.h */,
+				4D78AC2C1FB1E27700A68A92 /* Utils.m */,
 			);
-			name = PwSafeModel;
+			name = Model;
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		4D78AC241FB1E23B00A68A92 /* PwSafe */ = {
+			isa = PBXGroup;
+			children = (
+				4D78AC421FB1E29500A68A92 /* Field.h */,
+				4D78AC3B1FB1E29400A68A92 /* Field.m */,
+				4D78AC371FB1E29400A68A92 /* Group.h */,
+				4D78AC391FB1E29400A68A92 /* Group.m */,
+				4D78AC3E1FB1E29500A68A92 /* PasswordHistory.h */,
+				4D78AC3F1FB1E29500A68A92 /* PasswordHistory.m */,
+				4D78AC3D1FB1E29500A68A92 /* PasswordHistoryEntry.h */,
+				4D78AC401FB1E29500A68A92 /* PasswordHistoryEntry.m */,
+				4D78AC3C1FB1E29500A68A92 /* PwSafeDatabase.h */,
+				4D78AC381FB1E29400A68A92 /* PwSafeDatabase.m */,
+				4D78AC3A1FB1E29400A68A92 /* Record.h */,
+				4D78AC431FB1E29500A68A92 /* Record.m */,
+				4D78AC361FB1E29400A68A92 /* SafeTools.h */,
+				4D78AC411FB1E29500A68A92 /* SafeTools.m */,
+			);
+			name = PwSafe;
+			path = "New Group1";
+			sourceTree = "<group>";
+		};
+		4D78AC251FB1E24D00A68A92 /* Keypass */ = {
+			isa = PBXGroup;
+			children = (
+				4D78AC341FB1E28200A68A92 /* KeypassDatabase.h */,
+				4D78AC331FB1E28200A68A92 /* KeypassDatabase.m */,
+			);
+			name = Keypass;
+			path = "New Group2";
 			sourceTree = "<group>";
 		};
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D78AC251FB1E24D00A68A92 /* Keypass */,
+				4D78AC241FB1E23B00A68A92 /* PwSafe */,
+				4D78AC231FB1E22C00A68A92 /* Model */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
-				4D92C7FE1F388DFF00341A58 /* crypt_argchk.c */,
-				4D92C7FC1F388DE500341A58 /* twofish.c */,
+				4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */,
+				4D78AC4C1FB1E2F100A68A92 /* twofish.c */,
 				4DBE5B331C8356C700C310BC /* StrongBox */,
 				4DBE5B321C8356C700C310BC /* Products */,
 				278AD75AE9346420015475D7 /* Pods */,
@@ -334,7 +356,6 @@
 			children = (
 				4D1A5BFB1F7923FF0036684C /* Images.xcassets */,
 				4DA6335D1F62EAE1000A0E9D /* Main.storyboard */,
-				4D92C7DA1F388CF200341A58 /* PwSafeModel */,
 				4D62D6941C85F2B50051E13B /* ViewControllers */,
 				4D62D6961C85F35E0051E13B /* StorageProviders */,
 				4D62D6981C85F3AC0051E13B /* Model */,
@@ -454,7 +475,6 @@
 				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
 				4D1A5BFC1F7923FF0036684C /* Images.xcassets in Resources */,
 				4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */,
-				4D92C7FA1F388D0900341A58 /* twofish in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -543,50 +563,51 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D92C7FD1F388DE500341A58 /* twofish.c in Sources */,
-				4D92C7FF1F388DFF00341A58 /* crypt_argchk.c in Sources */,
+				4D78AC471FB1E29500A68A92 /* PasswordHistory.m in Sources */,
+				4D78AC4A1FB1E29500A68A92 /* Record.m in Sources */,
+				4D78AC481FB1E29500A68A92 /* PasswordHistoryEntry.m in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
 				4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */,
-				4D1398A41F5F0B66002608E4 /* NodeFields.m in Sources */,
 				4DF785FB1EDB319E006D4918 /* SafesCollection.m in Sources */,
 				4DF631A01F69571B006C8F2C /* PasswordGenerationSettings.m in Sources */,
-				4D92C7F11F388D0900341A58 /* Field.m in Sources */,
+				4D78AC451FB1E29500A68A92 /* Group.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
+				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
-				4D92C7F41F388D0900341A58 /* PasswordHistoryEntry.m in Sources */,
+				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
 				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
-				4D92C7F61F388D0900341A58 /* Record.m in Sources */,
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
-				4DF631A31F6968C9006C8F2C /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
-				4D3694DE1F54547100A82811 /* Utils.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
+				4D78AC461FB1E29500A68A92 /* Field.m in Sources */,
 				4DCF5FBC1F7294A800011756 /* PasswordSafeUIDocument.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
+				4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
 				4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */,
-				4D92C7F91F388D0900341A58 /* SafeTools.m in Sources */,
+				4D78AC351FB1E28200A68A92 /* KeypassDatabase.m in Sources */,
+				4D78AC4E1FB1E2F200A68A92 /* twofish.c in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
-				4D68DBB31F430ECB00A8A148 /* PasswordDatabase.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */,
-				4D92C7F31F388D0900341A58 /* PasswordHistory.m in Sources */,
+				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */,
+				4D78AC491FB1E29500A68A92 /* SafeTools.m in Sources */,
 				4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */,
 				4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */,
-				4D1398A31F5F0B66002608E4 /* Node.m in Sources */,
+				4D78AC4D1FB1E2F200A68A92 /* crypt_argchk.c in Sources */,
 				4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */,
 				4D0165401EDB2F9C00CCB8CF /* SafeMetaData.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
-				4D92C7F21F388D0900341A58 /* Group.m in Sources */,
 				4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */,
 				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
+				4D78AC441FB1E29500A68A92 /* PwSafeDatabase.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,

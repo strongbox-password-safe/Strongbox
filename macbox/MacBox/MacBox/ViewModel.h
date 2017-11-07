@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PasswordDatabase.h"
 #import "Document.h"
+#import "Node.h"
 
 @interface ViewModel : NSObject
 

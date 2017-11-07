@@ -10,12 +10,13 @@
 #import "ViewModel.h"
 #import "LockedSafeInfo.h"
 #import "Utils.h"
+#import "DatabaseModel.h"
 
 #define kNewUntitledGroupTitleBase @"New Untitled Group"
 
 @interface ViewModel ()
 
-@property (strong, nonatomic) PasswordDatabase* passwordDatabase;
+@property (strong, nonatomic) DatabaseModel* passwordDatabase;
 @property (strong, nonatomic) LockedSafeInfo* lockedSafeInfo;
 
 @end
@@ -24,7 +25,7 @@
 
 - (instancetype)initNewWithSampleData:(Document*)document; {
     if (self = [super init]) {
-        self.passwordDatabase = [[PasswordDatabase alloc] initNewWithoutPassword];
+        self.passwordDatabase = [[DatabaseModel alloc] initNewWithoutPassword];
         self.lockedSafeInfo = nil;
         
         [self addSampleRecord:self.rootGroup];
@@ -47,7 +48,7 @@
 
 - (instancetype)initWithData:(NSData*)data document:(Document*)document {
     if (self = [super init]) {
-        if([PasswordDatabase isAValidSafe:data]) {
+        if([DatabaseModel isAValidSafe:data]) {
             self.lockedSafeInfo = [[LockedSafeInfo alloc] initWithEncryptedData:data selectedItem:nil];
             _document = document;
             return self;
@@ -82,7 +83,7 @@
         return YES;
     }
     
-    PasswordDatabase *model = [[PasswordDatabase alloc] initExistingWithDataAndPassword:self.lockedSafeInfo.encryptedData password:password error:error];
+    DatabaseModel *model = [[DatabaseModel alloc] initExistingWithDataAndPassword:self.lockedSafeInfo.encryptedData password:password error:error];
     *selectedItem = self.lockedSafeInfo.selectedItem;
     
     if(model != nil) {

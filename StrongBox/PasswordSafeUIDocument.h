@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PasswordDatabase.h"
 
 @interface PasswordSafeUIDocument : UIDocument
 

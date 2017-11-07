@@ -111,7 +111,7 @@
     
     if(!self.model) {
         if(outError != nil) {
-            *outError = [Utils createNSError:@"This is not a valid Password Safe Database file." errorCode:-1];
+            *outError = [Utils createNSError:@"This is not a valid file." errorCode:-1];
         }
         
         return NO;
