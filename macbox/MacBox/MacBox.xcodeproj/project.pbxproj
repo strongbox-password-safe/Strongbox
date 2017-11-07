@@ -40,6 +40,7 @@
 		4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5E1F30DB7A00D68BFE /* Document.m */; };
 		4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F601F30DB7A00D68BFE /* Assets.xcassets */; };
 		4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F621F30DB7A00D68BFE /* Main.storyboard */; };
+		4DFB92FA1FB1D44A008D092F /* KeypassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB92F81FB1D44A008D092F /* KeypassDatabase.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,6 +115,8 @@
 		4DF59F601F30DB7A00D68BFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4DF59F631F30DB7A00D68BFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4DF59F651F30DB7A00D68BFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4DFB92F81FB1D44A008D092F /* KeypassDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeypassDatabase.m; path = ../../../keypass/KeypassDatabase.m; sourceTree = "<group>"; };
+		4DFB92F91FB1D44A008D092F /* KeypassDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeypassDatabase.h; path = ../../../keypass/KeypassDatabase.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +187,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4DFB92F71FB1D441008D092F /* Keypass */,
 				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
 				4D92C8231F388EA800341A58 /* twofish.c */,
 				4D92C8211F388E9D00341A58 /* crypt_argchk.c */,
@@ -248,6 +252,15 @@
 				4DF59F581F30DB7A00D68BFE /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4DFB92F71FB1D441008D092F /* Keypass */ = {
+			isa = PBXGroup;
+			children = (
+				4DFB92F91FB1D44A008D092F /* KeypassDatabase.h */,
+				4DFB92F81FB1D44A008D092F /* KeypassDatabase.m */,
+			);
+			path = Keypass;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -378,6 +391,7 @@
 				4D92C8221F388E9D00341A58 /* crypt_argchk.c in Sources */,
 				4DA595C81F4461B800351BEC /* Utils.m in Sources */,
 				4D92C8241F388EA800341A58 /* twofish.c in Sources */,
+				4DFB92FA1FB1D44A008D092F /* KeypassDatabase.m in Sources */,
 				4D92C8171F388E6E00341A58 /* Field.m in Sources */,
 				4D92C8191F388E6E00341A58 /* PasswordHistory.m in Sources */,
 				4D92C81A1F388E6E00341A58 /* PasswordHistoryEntry.m in Sources */,

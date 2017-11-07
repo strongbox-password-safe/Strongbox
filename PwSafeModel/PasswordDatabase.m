@@ -11,6 +11,7 @@
 #import "Utils.h"
 #import "SafeTools.h"
 #import <CommonCrypto/CommonHMAC.h>
+#import "Record.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +53,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
                                        password:(NSString *)password
                                           error:(NSError **)ppError {
     if (self = [super init]) {
-        if (![SafeTools isAValidSafe:safeData]) {
+        if (![PasswordDatabase isAValidSafe:safeData]) {
             NSLog(@"Not a valid safe!");
             
             if (ppError != nil) {
@@ -130,7 +131,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
         NSMutableArray<Record*>* recordsForThisGroup = [groupedByGroup objectForKey:groupComponents];
 
         for(Record* record in recordsForThisGroup) {
-            Node* recordNode = [[Node alloc] initWithExistingPasswordSafe3Record:record parent:group];
+            Node* recordNode = [self createNodeFromExistingRecord:record parent:group];
             [group addChild:recordNode];
         }
     }
@@ -142,6 +143,28 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     }
     
     return root;
+}
+
+- (Node*)createNodeFromExistingRecord:(Record*)record parent:(Node*)group {
+    NodeFields* fields = [[NodeFields alloc] init];
+    
+    fields.username = record.username;
+    fields.password = record.password;
+    fields.url = record.url;
+    fields.notes = record.notes;
+    fields.passwordHistory = record.passwordHistory;
+    
+    fields.accessed = record.accessed;
+    fields.modified = record.modified;
+    fields.created = record.created;
+    fields.passwordModified = record.passwordModified;
+    
+    NSString* uniqueId = record.uuid && record.uuid.length ? record.uuid : [Utils generateUniqueId];
+    Node* ret = [[Node alloc] initAsRecord:record.title parent:group fields:fields uniqueRecordId:uniqueId];
+    
+    ret.linkedData = record;
+    
+    return ret;
 }
 
 - (NSSet<Group*>*)getEmptyGroupsFromHeaders:(NSArray<Field*>*)headers {
@@ -313,7 +336,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
 }
 
 - (Record* _Nonnull)createOrUpdateSerializationRecordWithNode:(Node* _Nonnull)recordNode {
-    Record *record = recordNode.originalLinkedRecord ? recordNode.originalLinkedRecord : [[Record alloc] init];
+    Record *record = recordNode.linkedData ? ( (Record*)recordNode.linkedData) : [[Record alloc] init];
  
     record.title = recordNode.title;
     record.username = recordNode.fields.username;

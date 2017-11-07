@@ -75,7 +75,7 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         _title = title;
         _isGroup = NO;
         _mutableChildren = nil;
-        _uniqueRecordId = [Node generateUniqueId];
+        _uniqueRecordId = [Utils generateUniqueId];
         _fields = fields;
 
         return self;
@@ -84,28 +84,17 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     return self;
 }
 
-- (instancetype _Nullable )initWithExistingPasswordSafe3Record:(Record*_Nonnull)record
-                                                        parent:(Node* _Nonnull)parent {
+- (instancetype _Nullable )initAsRecord:(NSString *_Nonnull)title
+                                 parent:(Node* _Nonnull)parent
+                                 fields:(NodeFields*_Nonnull)fields
+                         uniqueRecordId:(NSString*)uniqueRecordId {
     if(self = [super init]) {
+        _parent = parent;
+        _title = title;
         _isGroup = NO;
         _mutableChildren = nil;
-        _fields = [[NodeFields alloc] init];
-        _parent = parent;
-        _title = record.title;
-        
-        self.fields.username = record.username;
-        self.fields.password = record.password;
-        self.fields.url = record.url;
-        self.fields.notes = record.notes;
-        self.fields.passwordHistory = record.passwordHistory;
-        
-        self.fields.accessed = record.accessed;
-        self.fields.modified = record.modified;
-        self.fields.created = record.created;
-        self.fields.passwordModified = record.passwordModified;
-        
-        _uniqueRecordId = record.uuid && record.uuid.length ? record.uuid : [Node generateUniqueId];
-        _originalLinkedRecord = record;
+        _uniqueRecordId = uniqueRecordId;
+        _fields = fields;
         
         return self;
     }
@@ -284,12 +273,6 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     }
     
     return ret;
-}
-
-+ (NSString*)generateUniqueId {
-    NSUUID *unique = [[NSUUID alloc] init];
-    
-    return unique.UUIDString;
 }
 
 - (NSArray<NSString*>*)getTitleHierarchy {

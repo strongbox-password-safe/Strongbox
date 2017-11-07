@@ -109,6 +109,12 @@
                      locale:[NSLocale currentLocale]];
 };
 
++ (NSString*)generateUniqueId {
+    NSUUID *unique = [[NSUUID alloc] init];
+    
+    return unique.UUIDString;
+}
+
 //    [[Settings sharedInstance] setPro:NO];
 //    [[Settings sharedInstance] setEndFreeTrialDate:nil];
 //    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:NO];
