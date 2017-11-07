@@ -3,8 +3,19 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
+#import "AbstractPasswordDatabase.h"
+#import <stdint.h>
 
-@interface KeypassDatabase : NSObject
+typedef struct _KeepassHeader {
+    uint8_t signature1[4];
+    uint8_t signature2[4];
+    uint16_t minor;
+    uint16_t major;
+} KeepassHeader;
+
+#define SIZE_OF_KEEPASS_HEADER      12
+
+@interface KeypassDatabase : NSObject<AbstractPasswordDatabase>
 
 + (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
 
@@ -22,21 +33,15 @@
 
 // Helpers
 
-//- (void)defaultLastUpdateFieldsToNow;
-//@property (nonatomic) NSInteger keyStretchIterations;
-//@property (nonatomic, nullable) NSDate *lastUpdateTime;
-//@property (nonatomic, nullable) NSString *lastUpdateUser;
-//@property (nonatomic, nullable) NSString *lastUpdateHost;
-//@property (nonatomic, nullable) NSString *lastUpdateApp;
+- (void)defaultLastUpdateFieldsToNow;
 
-//@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
-//@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
-//@property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
-//@property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
-//
-//@property (nonatomic, readonly) NSInteger numberOfRecords;
-//@property (nonatomic, readonly) NSInteger numberOfGroups;
-//@property (nonatomic, readonly) NSString * _Nonnull version;
+@property (nonatomic) NSInteger keyStretchIterations;
+@property (nonatomic, nullable) NSDate *lastUpdateTime;
+@property (nonatomic, nullable) NSString *lastUpdateUser;
+@property (nonatomic, nullable) NSString *lastUpdateHost;
+@property (nonatomic, nullable) NSString *lastUpdateApp;
+
+@property (nonatomic, readonly) NSString * _Nonnull version;
 
 @end
 

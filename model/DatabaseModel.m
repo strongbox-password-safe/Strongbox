@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "DatabaseModel.h"
 #import "PwSafeDatabase.h"
+#import "KeypassDatabase.h"
 #import "AbstractPasswordDatabase.h"
 #import "Utils.h"
 
@@ -15,7 +16,7 @@
 @implementation DatabaseModel
 
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return [PwSafeDatabase isAValidSafe:candidate];
+    return [PwSafeDatabase isAValidSafe:candidate] || [KeypassDatabase isAValidSafe:candidate];
 }
 
 - (instancetype)initNewWithoutPassword {
@@ -38,7 +39,14 @@
                                        password:(NSString *)password
                                           error:(NSError **)ppError {
     if(self = [super init]) {
-        self.theSafe = [[PwSafeDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+        if([PwSafeDatabase isAValidSafe:safeData]) {
+            self.theSafe = [[PwSafeDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+            _format = kPasswordSafe;
+        }
+        else {
+            self.theSafe = [[KeypassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+            _format = kKeypass;
+        }
     }
     
     return self;

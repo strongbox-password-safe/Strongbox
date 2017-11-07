@@ -6,8 +6,30 @@
 
 @implementation KeypassDatabase
 
++ (KeepassHeader)getHeader:(NSData*)data {
+    KeepassHeader ret;
+    
+    [data getBytes:&ret length:SIZE_OF_KEEPASS_HEADER];
+    
+    return ret;
+}
+
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return NO;
+    KeepassHeader header = [KeypassDatabase getHeader:candidate];
+    
+    // https://gist.github.com/msmuenchen/9318327
+    
+    //[0x03,0xD9,0xA2,0x9A];
+    
+    if (header.signature1[0] != 0x03 ||
+        header.signature1[1] != 0xD9 ||
+        header.signature1[2] != 0xA2 ||
+        header.signature1[3] != 0x9A) {
+        NSLog(@"No Keepass magic");
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (instancetype)initNewWithoutPassword {
@@ -34,7 +56,7 @@
             NSLog(@"Not a valid safe!");
             
             if (ppError != nil) {
-                *ppError = [Utils createNSError:@"This is not a valid Keypass File (Invalid Format)." errorCode:-1];
+                *ppError = [Utils createNSError:@"This is not a valid file (Invalid Format)." errorCode:-1];
             }
             
             return nil;
@@ -182,6 +204,10 @@
 //    dump = [dump stringByAppendingString:@"\n---------------------------------------------------------------------------"];
 
     return dump;
+}
+
+-(void)defaultLastUpdateFieldsToNow {
+    
 }
 
 @end
