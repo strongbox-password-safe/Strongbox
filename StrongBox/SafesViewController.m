@@ -90,6 +90,10 @@
     if(![[Settings sharedInstance] isPro]) {
         [self getValidIapProducts];
         
+        if([self isFirstRun]) {
+            //[self createFirstSimpleSafeForUser];
+        }
+        
         if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
             [self initializeFreeTrial];
         }
@@ -105,6 +109,13 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
+
+- (BOOL)isFirstRun {
+    return NO;
+}
+
+
+
 
 - (void)onSafesCollectionUpdated {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -286,10 +297,10 @@
              }];
     }
     else {
-        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
+        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:1 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for two months. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:^{
+             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for a month. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:^{
                  [self checkICloudAvailability];
              }];
     }
@@ -1064,7 +1075,7 @@ static BOOL shownNagScreenThisSession = NO;
     NSString *appId = @"897283731";
     NSString *url = [NSString stringWithFormat:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=1&type=Purple+Software&mt=8", appId];
     
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url ]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
 }
 
 - (void)showStartupMessaging {
@@ -1099,7 +1110,7 @@ static BOOL shownNagScreenThisSession = NO;
 - (void)askForReview {
     [Alerts  threeOptions:self
                     title:@"Review Strongbox?"
-                  message:@"Hi, I'm Mark. I'm the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
+                  message:@"Hi, I'm Mark, the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
         defaultButtonText:@"Sure, take me there!"
          secondButtonText:@"Naah"
           thirdButtonText:@"Like, maybe later!"

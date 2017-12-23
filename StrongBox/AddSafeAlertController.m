@@ -7,6 +7,8 @@
 //
 
 #import "AddSafeAlertController.h"
+#import "IOsUtils.h"
+#import "SafesCollection.h"
 
 @implementation AddSafeAlertController {
     UIAlertAction *_defaultAction;
@@ -15,6 +17,23 @@
     NewValidation _newValidation;
 }
 
+- (NSString*)getSuggestedSafeName {
+    NSString* name = [IOsUtils nameFromDeviceName];
+    
+    if(name.length > 0) {
+        NSString *suggestion = [NSString stringWithFormat:@"%@'s Safe", name];
+        
+        int attempt = 2;
+  
+        while(![[SafesCollection sharedInstance] isValidNickName:suggestion] && attempt < 50) {
+            suggestion = [NSString stringWithFormat:@"%@'s Safe %d", name, attempt++];
+        }
+        
+        return [[SafesCollection sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
+    }
+    
+    return nil;
+}
 
 - (void)addNew:(UIViewController *)viewController
     validation:(BOOL (^) (NSString *name, NSString *password))validation
@@ -26,10 +45,15 @@
 
     __weak typeof(self) weakSelf = self;
     [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField                   addTarget:weakSelf
-                                        action:@selector(validateAddNewFieldNotEmpty:)
-                              forControlEvents:UIControlEventEditingChanged];
-                          textField.placeholder = @"Safe Name";
+                          [textField addTarget:weakSelf  action:@selector(validateAddNewFieldNotEmpty:)
+                                forControlEvents:UIControlEventEditingChanged];
+                            NSString *suggestedName = [weakSelf getSuggestedSafeName];
+                            if(suggestedName) {
+                                textField.text = suggestedName;
+                            }
+                            else {
+                                textField.placeholder = @"Safe Name";
+                            }
                       }];
 
     [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
@@ -67,20 +91,27 @@
                                                            message:@"Enter a title or name for this safe"
                                                     preferredStyle:UIAlertControllerStyleAlert];
 
-    __weak typeof(self) weakSelf = self;
-    [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField                   addTarget:weakSelf
-                                        action:@selector(validateAddExisting:)
-                              forControlEvents:UIControlEventEditingChanged];
-                          textField.placeholder = @"Safe Name";
-                      }];
-
+    NSString *suggestedName = [self getSuggestedSafeName];
+    
     _defaultAction = [UIAlertAction actionWithTitle:@"Add Safe"
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *a) {
                                                 completion((_alertController.textFields[0]).text, true);
                                             }];
-    [_defaultAction setEnabled:NO];
+    [_defaultAction setEnabled:suggestedName != nil];
+    
+    __weak typeof(self) weakSelf = self;
+    [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+                          [textField                   addTarget:weakSelf
+                                        action:@selector(validateAddExisting:)
+                              forControlEvents:UIControlEventEditingChanged];
+                            if(suggestedName) {
+                                textField.text = suggestedName;
+                            }
+                            else {
+                                textField.placeholder = @"Safe Name";
+                            }
+                      }];
 
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel

@@ -16,7 +16,7 @@
 @implementation DatabaseModel
 
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return [PwSafeDatabase isAValidSafe:candidate] || [KeypassDatabase isAValidSafe:candidate];
+    return [PwSafeDatabase isAValidSafe:candidate]; // TODO: || [KeypassDatabase isAValidSafe:candidate];
 }
 
 - (instancetype)initNewWithoutPassword {
@@ -44,8 +44,10 @@
             _format = kPasswordSafe;
         }
         else {
-            self.theSafe = [[KeypassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
-            _format = kKeypass;
+            self = nil;
+           
+            //self.theSafe = [[KeypassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+            //_format = kKeypass;
         }
     }
     
@@ -181,9 +183,7 @@
     return [self getAllGroups].count;
 }
 
-
-// TODO
-
+// TODO: This isn't appropriate for Keypass
 -(NSInteger)keyStretchIterations {
     return self.theSafe.keyStretchIterations;
 }

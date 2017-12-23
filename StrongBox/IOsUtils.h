@@ -14,4 +14,6 @@
 
 + (BOOL)   isTouchIDAvailable;
 
++ (NSString*)nameFromDeviceName;
+
 @end
