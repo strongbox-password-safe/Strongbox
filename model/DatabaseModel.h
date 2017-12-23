@@ -36,8 +36,10 @@ typedef enum {
 // Helpers
 
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
+@property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
 
 @property (nonatomic, readonly) NSInteger numberOfRecords;

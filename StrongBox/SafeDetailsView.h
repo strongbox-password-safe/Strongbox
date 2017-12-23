@@ -31,4 +31,7 @@
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelToggleTouchId;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelChangeMasterPassword;
 
+@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfUniqueEmails;
+@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelMostPopularEmail;
+
 @end

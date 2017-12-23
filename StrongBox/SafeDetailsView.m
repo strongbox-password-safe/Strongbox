@@ -35,8 +35,10 @@
     self.labelLastHost.text = self.viewModel.lastUpdateHost;
     self.labelLastApp.text = self.viewModel.lastUpdateApp;
     self.labelMostPopularUsername.text = self.viewModel.mostPopularUsername ? self.viewModel.mostPopularUsername : @"<None>";
+    self.labelMostPopularEmail.text = self.viewModel.mostPopularEmail ? self.viewModel.mostPopularEmail : @"<None>";
     self.labelKeyStretchIterations.text = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.keyStretchIterations];
     self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.usernameSet count]];
+    self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.emailSet count]];
     self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.passwordSet count]];
     self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.numberOfGroups];
     self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.numberOfRecords];

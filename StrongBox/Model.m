@@ -179,7 +179,8 @@
     NodeFields* fields = [[NodeFields alloc] initWithUsername:@"user123"
                                                           url:@"https://strongboxsafe.com"
                                                      password:password
-                                                        notes:@"Sample Database Record. You can have any text here..."];
+                                                        notes:@"Sample Database Record. You can have any text here..."
+                                                        email:@"user@gmail.com"];
     
     Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:parentGroup fields:fields];
     
@@ -265,6 +266,14 @@
 
 - (NSSet<NSString*> *)passwordSet {
     return self.passwordDatabase.passwordSet;
+}
+
+- (NSSet<NSString*> *)emailSet {
+    return self.passwordDatabase.emailSet;
+}
+
+- (NSString *)mostPopularEmail {
+    return self.passwordDatabase.mostPopularEmail ? self.passwordDatabase.mostPopularEmail : @"";
 }
 
 - (NSString *)mostPopularUsername {

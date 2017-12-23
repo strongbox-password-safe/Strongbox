@@ -145,6 +145,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     fields.url = record.url;
     fields.notes = record.notes;
     fields.passwordHistory = record.passwordHistory;
+    fields.email = record.email;
     
     fields.accessed = record.accessed;
     fields.modified = record.modified;
@@ -335,6 +336,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     record.password = recordNode.fields.password;
     record.url = recordNode.fields.url;
     record.notes = recordNode.fields.notes;
+    record.email = recordNode.fields.email;
     record.group = [[Group alloc] initWithPathComponents:[recordNode.parent getTitleHierarchy]];
     
     if(!(recordNode.fields.passwordHistory.enabled == NO &&

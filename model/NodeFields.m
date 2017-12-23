@@ -14,18 +14,21 @@
     return [self initWithUsername:@""
                               url:@""
                          password:@""
-                            notes:@""];
+                            notes:@""
+                            email:@""];
 }
 
 - (instancetype _Nullable)initWithUsername:(NSString*_Nonnull)username
                                        url:(NSString*_Nonnull)url
                                   password:(NSString*_Nonnull)password
-                                     notes:(NSString*_Nonnull)notes {
+                                     notes:(NSString*_Nonnull)notes
+                                     email:(NSString*_Nonnull)email {
     if (self = [super init]) {
         self.username = username;
         self.url = url;
         self.password = password;
         self.notes = notes;
+        self.email = email;
         self.passwordHistory = [[PasswordHistory alloc] init];
         self.created = [NSDate date];
     }

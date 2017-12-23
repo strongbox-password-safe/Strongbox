@@ -16,6 +16,7 @@
 @property (nonatomic, strong, nullable) Node *parentGroup;
 @property (nonatomic, strong, nonnull) Model *viewModel;
 
+@property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldEmail;
 @property (weak, nonatomic, nullable) IBOutlet UITextView *textViewNotes;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldPassword;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldUsername;
@@ -25,6 +26,7 @@
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyUsername;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyUrl;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyAndLaunchUrl;
+@property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyEmail;
 
 @property (strong, nonatomic) IBOutlet UIButton * _Nullable buttonHistory;
 
@@ -36,5 +38,6 @@
 - (IBAction)onCopyUrl:(id _Nullable)sender;
 - (IBAction)onHide:(id _Nullable)sender;
 - (IBAction)onCopyAndLaunchUrl:(id _Nullable)sender;
+- (IBAction)onCopyEmail:(id _Nullable)sender;
 
 @end

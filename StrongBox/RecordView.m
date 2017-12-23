@@ -20,6 +20,7 @@
 
 @property (nonatomic, strong) TextFieldAutoSuggest *passwordAutoSuggest;
 @property (nonatomic, strong) TextFieldAutoSuggest *usernameAutoSuggest;
+@property (nonatomic, strong) TextFieldAutoSuggest *emailAutoSuggest;
 @property (nonatomic, strong) UITextField *textFieldTitle;
 
 @end
@@ -86,6 +87,19 @@
                                 
                                     return [filtered sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
                                 }];
+    
+    self.emailAutoSuggest = [[TextFieldAutoSuggest alloc]
+                                initForTextField:self.textFieldEmail
+                                viewController:self
+                                suggestionsProvider:^NSArray<NSString *> *(NSString *text) {
+                                    NSSet<NSString*> *allEmails = self.viewModel.emailSet;
+                                    
+                                    NSArray* filtered = [[allEmails allObjects]
+                                                         filteredArrayUsingPredicate:[NSPredicate
+                                                                                      predicateWithFormat:@"SELF BEGINSWITH[c] %@", text]];
+                                    
+                                    return [filtered sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+                                }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,12 +107,14 @@
 - (void)setInitialTextFieldBordersAndColors {
     self.textFieldPassword.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
+    self.textFieldEmail.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldUrl.borderStyle = UITextBorderStyleRoundedRect;
     
     self.textViewNotes.layer.borderWidth = 1.0f;
     self.textFieldPassword.layer.borderWidth = 1.0f;
     self.textFieldUrl.layer.borderWidth = 1.0f;
     self.textFieldUsername.layer.borderWidth = 1.0f;
+    self.textFieldEmail.layer.borderWidth = 1.0f;
     
     [self.buttonCopyAndLaunchUrl setTitle:@"" forState:UIControlStateNormal];
     
@@ -106,11 +122,13 @@
     self.textFieldPassword.layer.cornerRadius = 5;
     self.textFieldUrl.layer.cornerRadius = 5;
     self.textFieldUsername.layer.cornerRadius = 5;
+    self.textFieldEmail.layer.cornerRadius = 5;
     
     self.textViewNotes.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldPassword.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldUrl.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldUsername.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.textFieldEmail.layer.borderColor = [UIColor lightGrayColor].CGColor;
     
     self.textViewNotes.delegate = self;
     
@@ -141,6 +159,10 @@
                         action:@selector(textViewDidChange:)
               forControlEvents:UIControlEventEditingChanged];
 
+    [self.textFieldEmail addTarget:self
+                               action:@selector(textViewDidChange:)
+                     forControlEvents:UIControlEventEditingChanged];
+    
     [self.textFieldUrl addTarget:self
                                action:@selector(textViewDidChange:)
                      forControlEvents:UIControlEventEditingChanged];
@@ -154,6 +176,7 @@
         self.textFieldTitle.text = self.record.title;
         self.textFieldUrl.text = self.record.fields.url;
         self.textFieldUsername.text = self.record.fields.username;
+        self.textFieldEmail.text = self.record.fields.email;
         self.textViewNotes.text = self.record.fields.notes;
         
         self.buttonPasswordGenerationSettings.enabled = NO;
@@ -165,6 +188,7 @@
         self.textFieldTitle.text = @"Untitled";
         self.textFieldUrl.text = @"";
         self.textFieldUsername.text = self.viewModel.mostPopularUsername;
+        self.textFieldEmail.text = self.viewModel.mostPopularEmail;
         self.textViewNotes.text = @"";
         
         self.buttonPasswordGenerationSettings.enabled = NO;
@@ -236,6 +260,11 @@
     self.textFieldUsername.layer.borderColor = self.editing ? [UIColor blackColor].CGColor : [UIColor lightGrayColor].CGColor;
     self.textFieldUsername.backgroundColor = [UIColor whiteColor];
     
+    self.textFieldEmail.enabled = self.editing;
+    self.textFieldEmail.textColor = self.editing ? [UIColor blackColor] : [UIColor darkGrayColor];
+    self.textFieldEmail.layer.borderColor = self.editing ? [UIColor blackColor].CGColor : [UIColor lightGrayColor].CGColor;
+    self.textFieldEmail.backgroundColor = [UIColor whiteColor];
+    
     self.textFieldUrl.enabled = self.editing;
     self.textFieldUrl.textColor = self.editing ? [UIColor blackColor] : [UIColor blueColor];
     self.textFieldUrl.layer.borderColor = self.editing ? [UIColor darkGrayColor].CGColor : [UIColor lightGrayColor].CGColor;
@@ -254,6 +283,7 @@
     (self.buttonHidePassword).enabled = !self.isEditing;
     
     (self.buttonCopyUsername).enabled = !self.isEditing && (self.record != nil && (self.record.fields.username).length);
+    (self.buttonCopyEmail).enabled = !self.isEditing && (self.record != nil && (self.record.fields.email).length);
     (self.buttonCopyUrl).enabled = !self.isEditing && (self.record != nil && (self.record.fields.url).length);
     (self.buttonCopyAndLaunchUrl).enabled = !self.isEditing;
 }
@@ -274,6 +304,7 @@
              &&   [trim(self.textFieldPassword.text) isEqualToString:self.record.fields.password]
              &&   [trim(self.textFieldTitle.text) isEqualToString:self.record.title]
              &&   [trim(self.textFieldUrl.text) isEqualToString:self.record.fields.url]
+             &&   [trim(self.textFieldEmail.text) isEqualToString:self.record.fields.email]
              &&   [trim(self.textFieldUsername.text) isEqualToString:self.record.fields.username]);
 }
 
@@ -341,6 +372,10 @@ NSString * trim(NSString *string) {
     });
 }
 
+- (IBAction)onCopyEmail:(id)sender {
+    [self copyToClipboard:self.record.fields.email message:@"Email Copied"];
+}
+
 - (IBAction)onHide:(id)sender {
     _hidePassword = !_hidePassword;
     
@@ -406,12 +441,13 @@ NSString * trim(NSString *string) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 3 && indexPath.row == 0) {
+    if (indexPath.section == 4 && indexPath.row == 0) {
         int cell1 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         int cell2 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
         int cell3 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]];
+        int cell4 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
         
-        int otherCellsHeight = cell1 + cell2 + cell3;
+        int otherCellsHeight = cell1 + cell2 + cell3 + cell4;
         
         int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int toolBarHeight = self.navigationController.toolbar.frame.size.height;
@@ -439,7 +475,8 @@ NSString * trim(NSString *string) {
         NodeFields *nodeFields = [[NodeFields alloc] initWithUsername:trim(self.textFieldUsername.text)
                                                                   url:trim(self.textFieldUrl.text)
                                                              password:trim(self.textFieldPassword.text)
-                                                                notes:self.textViewNotes.text];
+                                                                notes:self.textViewNotes.text
+                                                                email:trim(self.textFieldEmail.text)];
         
         self.record = [[Node alloc] initAsRecord:trim(self.textFieldTitle.text)
                                           parent:self.parentGroup
@@ -458,6 +495,7 @@ NSString * trim(NSString *string) {
         self.record.title = trim(self.textFieldTitle.text);
         self.record.fields.url = trim(self.textFieldUrl.text);
         self.record.fields.username = trim(self.textFieldUsername.text);
+        self.record.fields.email = trim(self.textFieldEmail.text);
     }
     
     [self.viewModel update:^(NSError *error) {

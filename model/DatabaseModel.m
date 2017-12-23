@@ -141,6 +141,18 @@
     return bag;
 }
 
+- (NSSet<NSString*> *)emailSet {
+    NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
+    
+    for (Node *record in [self getAllRecords]) {
+        if ([Utils trim:record.fields.email].length > 0) {
+            [bag addObject:record.fields.email];
+        }
+    }
+    
+    return bag;
+}
+
 - (NSSet<NSString*> *)passwordSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
@@ -151,6 +163,18 @@
     }
     
     return bag;
+}
+
+- (NSString *)mostPopularEmail {
+    NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
+    
+    for (Node *record in [self getAllRecords]) {
+        if(record.fields.email.length) {
+            [bag addObject:record.fields.email];
+        }
+    }
+    
+    return [self mostFrequentInCountedSet:bag];
 }
 
 - (NSString *)mostPopularUsername {

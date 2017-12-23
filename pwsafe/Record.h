@@ -16,6 +16,7 @@
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) NSString *password;
 @property (nonatomic, retain) NSString *username;
+@property (nonatomic, retain) NSString *email;
 @property (nonatomic, retain) NSString *url;
 @property (nonatomic, retain) NSString *notes;
 @property (nonatomic, retain) Group *group;

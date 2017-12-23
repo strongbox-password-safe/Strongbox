@@ -131,6 +131,16 @@
     }
 }
 
+- (NSString *)email {
+    return [self getPrettyStringForField:FIELD_TYPE_EMAIL];
+}
+
+- (void)setEmail:(NSString *)email {
+    if (![email isEqualToString:self.email]) {
+        [self setField:FIELD_TYPE_EMAIL string:email];
+    }
+}
+
 - (NSString *)url {
     return [self getPrettyStringForField:FIELD_TYPE_URL];
 }
