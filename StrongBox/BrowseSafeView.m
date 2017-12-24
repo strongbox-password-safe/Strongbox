@@ -88,21 +88,12 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
     
     if ([[Settings sharedInstance] isProOrFreeTrial]) {
-        self.tableView.tableHeaderView = self.searchController.searchBar;
-        
-        [self.searchController.searchBar sizeToFit];
-    }
-}
-
-// BUGBUG: TODO: Apple iOS 11 Bug:
-// https://www.raywenderlich.com/157864/uisearchcontroller-tutorial-getting-started
-// https://openradar.appspot.com/radar?id=4941731439050752
-
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (self.searchController.active) {
-        return 44; // with scope
-    } else {
-        return 0; // no scope
+        if (@available(iOS 11.0, *)) {
+            self.navigationItem.searchController = self.searchController;
+        } else {
+            self.tableView.tableHeaderView = self.searchController.searchBar;
+            [self.searchController.searchBar sizeToFit];
+        }
     }
 }
 
@@ -168,7 +159,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
     else {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR fields.password contains[c] %@  OR fields.username contains[c] %@  OR fields.url contains[c] %@  OR fields.notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
+        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ "
+                     @"OR fields.password contains[c] %@  "
+                     @"OR fields.username contains[c] %@  "
+                     @"OR fields.email contains[c] %@  "
+                     @"OR fields.url contains[c] %@ "
+                     @"OR fields.notes contains[c] %@",
+                     searchText, searchText, searchText, searchText, searchText, searchText];
     }
     
     NSArray<Node*> *foo = [self.viewModel.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {

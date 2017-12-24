@@ -297,10 +297,10 @@
              }];
     }
     else {
-        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:1 toDate:[NSDate date] options:0];
+        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
         
         [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for a month. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:^{
+             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for two months. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:^{
                  [self checkICloudAvailability];
              }];
     }
