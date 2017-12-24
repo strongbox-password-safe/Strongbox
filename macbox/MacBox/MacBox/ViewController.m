@@ -56,6 +56,7 @@
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
     [self.comboboxUsername setDataSource:self];
+    [self.comboBoxEmail setDataSource:self];
 }
 
 - (void)loadUIImages {
@@ -150,6 +151,7 @@
         self.textFieldPw.stringValue = it.fields.password;
         self.textFieldUrl.stringValue = it.fields.url;
         self.comboboxUsername.stringValue = it.fields.username;
+        self.comboBoxEmail.stringValue = it.fields.email;
         self.textViewNotes.string = it.fields.notes;
         self.textFieldSummaryTitle.stringValue = it.title;
 
@@ -260,10 +262,12 @@
         predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
     else {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ OR fields.password contains[c] %@  "
+        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@  "
+                     @"OR fields.password contains[c] %@  "
                      @"OR fields.username contains[c] %@  "
+                     @"OR fields.email contains[c] %@  "
                      @"OR fields.url contains[c] %@  "
-                     @"OR fields.notes contains[c] %@", searchText, searchText, searchText, searchText, searchText];
+                     @"OR fields.notes contains[c] %@", searchText, searchText, searchText, searchText, searchText, searchText];
     }
 
     if([predicate evaluateWithObject:item]) {
@@ -466,6 +470,11 @@
     [[NSPasteboard generalPasteboard] setString:self.comboboxUsername.stringValue forType:NSStringPboardType];
 }
 
+- (IBAction)onCopyEmail:(id)sender {
+    [[NSPasteboard generalPasteboard] clearContents];
+    [[NSPasteboard generalPasteboard] setString:self.comboBoxEmail.stringValue forType:NSStringPboardType];
+}
+
 - (IBAction)onCopyUrl:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     [[NSPasteboard generalPasteboard] setString:self.textFieldUrl.stringValue forType:NSStringPboardType];
@@ -495,12 +504,19 @@
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-    return [self getUsernameAutocompletes].count;
+    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? [self getUsernameAutocompletes] : [self getEmailAutocompletes];
+
+    return src.count;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
 {
-    return [[self getUsernameAutocompletes] objectAtIndex:index];
+    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? [self getUsernameAutocompletes] : [self getEmailAutocompletes];
+    return [src objectAtIndex:index];
+}
+
+- (NSArray<NSString*>*)getEmailAutocompletes {
+    return [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator];
 }
 
 - (NSArray<NSString*>*)getUsernameAutocompletes {
@@ -522,6 +538,18 @@
 
         if(![item.fields.username isEqualToString:strValue]) {
             [self.model setItemUsername:item username:strValue];
+            item.fields.accessed = [[NSDate alloc] init];
+            item.fields.modified = [[NSDate alloc] init];
+        }
+    }
+    else if(notification.object == self.comboBoxEmail) {
+        NSString *strValue = [[self getEmailAutocompletes] objectAtIndex:[notification.object indexOfSelectedItem]];
+        strValue = [Utils trim:strValue];
+        
+        Node* item = [self getCurrentSelectedItem];
+        
+        if(![item.fields.email isEqualToString:strValue]) {
+            [self.model setItemEmail:item email:strValue];
             item.fields.accessed = [[NSDate alloc] init];
             item.fields.modified = [[NSDate alloc] init];
         }
@@ -575,6 +603,13 @@
         if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
             [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
 
+            recordChanged = YES;
+        }
+    }
+    else if(sender == self.comboBoxEmail) {
+        if(![item.fields.email isEqualToString:trimField(self.comboBoxEmail)]) {
+            [self.model setItemEmail:item email:trimField(self.comboBoxEmail)];
+            
             recordChanged = YES;
         }
     }
@@ -866,6 +901,9 @@ NSString* trimField(NSTextField* textField) {
     }
     else if (theAction == @selector(onCopyUsername:)) {
         return item && !item.isGroup && self.comboboxUsername.stringValue.length;
+    }
+    else if (theAction == @selector(onCopyEmail:)) {
+        return item && !item.isGroup && self.comboBoxEmail.stringValue.length;
     }
     else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
         return item && !item.isGroup && item.fields.password.length && self.textFieldUrl.stringValue.length;

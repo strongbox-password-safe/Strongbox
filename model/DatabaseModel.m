@@ -41,6 +41,10 @@
     if(self = [super init]) {
         if([PwSafeDatabase isAValidSafe:safeData]) {
             self.theSafe = [[PwSafeDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+            if (self.theSafe == nil) {
+                return nil;
+            }
+            
             _format = kPasswordSafe;
         }
         else {

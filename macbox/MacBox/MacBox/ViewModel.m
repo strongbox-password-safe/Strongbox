@@ -126,7 +126,8 @@
     NodeFields* fields = [[NodeFields alloc] initWithUsername:@"user123"
                                               url:@"https://strongboxsafe.com"
                                          password:password
-                                            notes:@"Sample Database Record. You can have any text here..."];
+                                            notes:@"Sample Database Record. You can have any text here..."
+                                            email:@"user@gmail.com"];
     
     Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:group fields:fields];
     
@@ -165,6 +166,15 @@
     }
     
     return NO;
+}
+
+- (void)setItemEmail:(Node*_Nonnull)item email:(NSString*_Nonnull)email {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    item.fields.email = email;
+    self.document.dirty = YES;
 }
 
 - (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username {
@@ -266,6 +276,10 @@
 
 - (void)defaultLastUpdateFieldsToNow {
     [self.passwordDatabase defaultLastUpdateFieldsToNow];
+}
+
+- (NSSet<NSString*> *)emailSet {
+    return self.passwordDatabase.emailSet;
 }
 
 - (NSSet<NSString*> *)usernameSet {

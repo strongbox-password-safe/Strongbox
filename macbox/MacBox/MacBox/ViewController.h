@@ -40,6 +40,7 @@
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
 @property (weak) IBOutlet NSTextField *textFieldPw;
 @property (weak) IBOutlet NSComboBox *comboboxUsername;
+@property (weak) IBOutlet NSComboBox *comboBoxEmail;
 
 - (IBAction)onSearch:(id)sender;
 - (IBAction)onUnlock:(id)sender;

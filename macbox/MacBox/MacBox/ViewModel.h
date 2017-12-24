@@ -30,6 +30,7 @@
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title;
 - (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username;
+- (void)setItemEmail:(Node*_Nonnull)item email:(NSString*_Nonnull)email;
 - (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url;
 - (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password;
 - (void)setItemNotes:(Node*_Nullable)item notes:(NSString*_Nonnull)notes;
@@ -53,6 +54,7 @@
 // Convenience / Summary
 
 @property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull passwordSet;
 @property (nonatomic, readonly) NSString *_Nonnull mostPopularUsername;
 @property (nonatomic, readonly) NSString *_Nonnull mostPopularPassword;
