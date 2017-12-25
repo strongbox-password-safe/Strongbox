@@ -46,6 +46,7 @@
 		4D78AC4A1FB1E29500A68A92 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC431FB1E29500A68A92 /* Record.m */; };
 		4D78AC4D1FB1E2F200A68A92 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */; };
 		4D78AC4E1FB1E2F200A68A92 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC4C1FB1E2F100A68A92 /* twofish.c */; };
+		4D890EED1FF138D400A80934 /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D890EEC1FF138D400A80934 /* CHCSVParser.m */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -146,6 +147,8 @@
 		4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = pwsafe/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D78AC4C1FB1E2F100A68A92 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
 		4D78AC591FB2281600A68A92 /* AbstractPasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractPasswordDatabase.h; path = model/AbstractPasswordDatabase.h; sourceTree = SOURCE_ROOT; };
+		4D890EEB1FF138D400A80934 /* CHCSVParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHCSVParser.h; path = chcsv/CHCSVParser.h; sourceTree = SOURCE_ROOT; };
+		4D890EEC1FF138D400A80934 /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = chcsv/CHCSVParser.m; sourceTree = SOURCE_ROOT; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
@@ -282,6 +285,8 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D890EEB1FF138D400A80934 /* CHCSVParser.h */,
+				4D890EEC1FF138D400A80934 /* CHCSVParser.m */,
 				4D78AC591FB2281600A68A92 /* AbstractPasswordDatabase.h */,
 				4D78AC261FB1E27700A68A92 /* DatabaseModel.h */,
 				4D78AC271FB1E27700A68A92 /* DatabaseModel.m */,
@@ -593,6 +598,7 @@
 				4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */,
 				4D78AC351FB1E28200A68A92 /* KeypassDatabase.m in Sources */,
 				4D78AC4E1FB1E2F200A68A92 /* twofish.c in Sources */,
+				4D890EED1FF138D400A80934 /* CHCSVParser.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,

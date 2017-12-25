@@ -12,6 +12,12 @@
 #import <MessageUI/MessageUI.h>
 #import "Alerts.h"
 #import "ISMessages/ISMessages.h"
+#import "ISMessages/ISMessages.h"
+#import "CHCSVParser.h"
+
+@interface Delegate : NSObject <CHCSVParserDelegate>
+    @property (readonly) NSArray *lines;
+@end
 
 @interface SafeDetailsView () <MFMailComposeViewControllerDelegate>
 
@@ -209,35 +215,95 @@
 }
 
 - (void)onExport {
+    [Alerts threeOptions:self title:@"How would you like to export your safe?"
+                 message:@"You can export your encrypted safe by email, or you can copy your safe in plaintext format (CSV) to the clipboard."
+       defaultButtonText:@"Export (Encrypted) by Email"
+        secondButtonText:@"Export as CSV by Email"
+         thirdButtonText:@"Copy CSV to Clipboard"
+                  action:^(int response) {
+        if(response == 0) {
+            [self exportEncryptedSafeByEmail];
+        }
+        else if(response == 1){
+            NSData *newStr = [self getSafeAsCsv];
+
+            NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
+            [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
+        }
+        else if(response == 2){
+            NSString *newStr = [[NSString alloc] initWithData:[self getSafeAsCsv] encoding:NSUTF8StringEncoding];
+
+            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+            pasteboard.string = newStr;
+            
+            [ISMessages showCardAlertWithTitle:@"Safe Copied to Clipboard"
+                                       message:nil
+                                      duration:3.f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeSuccess
+                                 alertPosition:ISAlertPositionTop
+                                       didHide:nil];
+        }
+    }];
+}
+
+- (NSData*)getSafeAsCsv {
+    NSArray<Node*>* nodes = [[self.viewModel rootGroup] filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup;
+    }];
+
+    NSOutputStream *output = [NSOutputStream outputStreamToMemory];
+    CHCSVWriter *writer = [[CHCSVWriter alloc] initWithOutputStream:output encoding:NSUTF8StringEncoding delimiter:','];
+
+    [writer writeLineOfFields:@[@"Title", @"Username", @"Email", @"Password", @"Url", @"Notes"]];
+    
+    for(Node* node in nodes) {
+        [writer writeLineOfFields:@[node.title, node.fields.username, node.fields.email, node.fields.password, node.fields.url, node.fields.notes]];
+    }
+    
+    [writer closeStream];
+    
+    NSData *contents = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+    [output close];
+    
+    return contents;
+}
+
+- (void)exportEncryptedSafeByEmail {
     [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
         if(!safeData) {
             [Alerts error:self title:@"Could not get safe data" error:error];
             return;
         }
-        
-        if(![MFMailComposeViewController canSendMail]) {
-            [Alerts info:self
-                   title:@"Email Not Available"
-                 message:@"It looks like email is not setup on this device and so the safe cannot be exported by email."];
-            
-            return;
-        }
-        
-        MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
-        
-        [picker setSubject:[NSString stringWithFormat:@"Strongbox Safe: '%@'", self.viewModel.metadata.nickName]];
-        
+      
         NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName,
                                     ([self.viewModel.metadata.fileName hasSuffix:@".dat"] || [self.viewModel.metadata.fileName hasSuffix:@"psafe3"]) ? @"" : @".dat"];
         
-        [picker addAttachmentData:safeData mimeType:@"application/octet-stream" fileName:attachmentName];
-        
-        [picker setToRecipients:[NSArray array]];
-        [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox password safe.", self.viewModel.metadata.nickName] isHTML:NO];
-        picker.mailComposeDelegate = self;
-        
-        [self presentViewController:picker animated:YES completion:^{ }];
+        [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:safeData];
     }];
+}
+
+- (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data {
+    if(![MFMailComposeViewController canSendMail]) {
+        [Alerts info:self
+               title:@"Email Not Available"
+             message:@"It looks like email is not setup on this device and so the safe cannot be exported by email."];
+        
+        return;
+    }
+    
+    MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
+    
+    [picker setSubject:[NSString stringWithFormat:@"Strongbox Safe: '%@'", self.viewModel.metadata.nickName]];
+    
+    [picker addAttachmentData:data mimeType:mimeType fileName:attachmentName];
+    
+    [picker setToRecipients:[NSArray array]];
+    [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox password safe.", self.viewModel.metadata.nickName] isHTML:NO];
+    picker.mailComposeDelegate = self;
+    
+    [self presentViewController:picker animated:YES completion:^{ }];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller

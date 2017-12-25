@@ -31,6 +31,7 @@
 #import "SafeItemTableCell.h"
 #import "VersionConflictController.h"
 #import "iCloudSafesCoordinator.h"
+#import "CHCSVParser.h"
 
 #define kTouchId911Limit 5
 
