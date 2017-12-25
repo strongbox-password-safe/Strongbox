@@ -33,14 +33,12 @@
 #import "iCloudSafesCoordinator.h"
 #import "CHCSVParser.h"
 
-#define kTouchId911Limit 5
-
 @interface SafesViewController ()
 
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
-@property (nonatomic) BOOL touchId911;
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
+@property (nonatomic, strong) NSString* biometricIdName;
 
 @end
 
@@ -258,6 +256,8 @@
     self.tableView.emptyDataSetDelegate = self;
     // A little trick for removing the cell separators
     self.tableView.tableFooterView = [UIView new];
+    
+    self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
@@ -376,8 +376,7 @@
     else if (safe.isTouchIdEnabled &&
         [IOsUtils isTouchIDAvailable] &&
         safe.isEnrolledForTouchId &&
-        ([[Settings sharedInstance] isProOrFreeTrial] || self.touchId911)) {
-        self.touchId911 = NO;
+        ([[Settings sharedInstance] isProOrFreeTrial])) {
         [self showTouchIDAuthentication:safe];
     }
     else {
@@ -610,8 +609,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                 [[SafesCollection sharedInstance] save];
                 
                 [Alerts info:self
-                       title:@"Could not open safe"
-                     message:@"The stored password for Touch ID was incorrect for this safe. This safe has been removed from Touch ID."];
+                        title:@"Could not open safe"
+                      message:[NSString stringWithFormat:@"The linked password was incorrect for this safe. This safe has been unlinked from %@.", self.biometricIdName]] ;
             }
             else {
                 [Alerts info:self
@@ -627,16 +626,16 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         if (askAboutTouchIdEnrol && safe.isTouchIdEnabled && !safe.isEnrolledForTouchId &&
             [IOsUtils isTouchIDAvailable] && [[Settings sharedInstance] isProOrFreeTrial]) {
             [Alerts yesNo:self
-                    title:[NSString stringWithFormat:@"Use Touch ID to Open Safe?"]
-                  message:@"Would you like to use Touch ID to open this safe?"
+                    title:[NSString stringWithFormat:@"Use %@ to Open Safe?", self.biometricIdName]
+                  message:[NSString stringWithFormat:@"Would you like to use %@ to open this safe?", self.biometricIdName]
                    action:^(BOOL response) {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
                        [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
                        [[SafesCollection sharedInstance] save];
                        
-                       [ISMessages showCardAlertWithTitle:@"Touch ID Enrol Successful"
-                                                  message:@"You can now use Touch ID with this safe. Opening..."
+                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enrol Successful", self.biometricIdName]
+                                                  message:[NSString stringWithFormat:@"You can now use %@ with this safe. Opening...", self.biometricIdName]
                                                  duration:0.75f
                                               hideOnSwipe:YES
                                                 hideOnTap:YES
@@ -733,8 +732,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         if (error.code == LAErrorAuthenticationFailed) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self
-                         title:@"Touch ID Failed"
-                       message:@"Touch ID Authentication Failed. You must now enter your password manually to open the safe."
+                         title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
+                       message:[NSString stringWithFormat:@"%@ Authentication Failed. You must now enter your password manually to open the safe.", self.biometricIdName]
                     completion:^{
                         [self promptForSafePassword:safe
                   askAboutTouchIdEnrolIfAppropriate:NO];
@@ -751,8 +750,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self
-                         title:@"Touch ID Failed"
-                       message:@"Touch ID has not been setup or system has cancelled. You must now enter your password manually to open the safe."
+                         title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
+                       message:[NSString stringWithFormat:@"%@ has not been setup or system has cancelled. You must now enter your password manually to open the safe.", self.biometricIdName]
                     completion:^{
                         [self promptForSafePassword:safe
                   askAboutTouchIdEnrolIfAppropriate:NO];
@@ -1018,25 +1017,11 @@ static BOOL shownNagScreenThisSession = NO;
     //[self.buttonTogglePro setTintColor:nil];
     [self removeToolbarButton:self.buttonTogglePro];
     
-    //    [self.buttonTouchID911 setEnabled:NO];
-    //    [self.buttonTouchID911 setTintColor: [UIColor clearColor]];
-    
-    [self removeToolbarButton:self.buttonTouchID911];
-    
     if([[Settings sharedInstance] isProOrFreeTrial]) {
         [self.navItemHeader setTitle:@"Safes"];
     }
     else {
         [self.navItemHeader setTitle:@"Safes [Lite Version]"];
-        
-        if(([[Settings sharedInstance] getTouchId911Count] < kTouchId911Limit) &&
-           ([IOsUtils isTouchIDAvailable]) &&
-           [[SafesCollection sharedInstance] safeWithTouchIdIsAvailable]) {
-//            [self.buttonTouchID911 setEnabled:YES];
-//            [self.buttonTouchID911 setTintColor:nil];
-            [self addToolbarButton:self.buttonTouchID911];
-            [self removeToolbarButton:self.barButtonFlexibleSpace];
-        }
     }
     
     if(![[Settings sharedInstance] isPro]) {
@@ -1144,22 +1129,6 @@ static BOOL shownNagScreenThisSession = NO;
     [popup addButtons: @[ok, later]];
     
     [self presentViewController:popup animated:YES completion:nil];
-}
-
-- (IBAction)onTouchID911:(id)sender {
-    NSString *message = [NSString stringWithFormat:@"You can enable Touch ID temporarily up to a maximum of %d times under the free version of Strongbox. This is to allow you to possibly recover from a situation where you've forgotten your master password because you were using Touch ID before. This may allow you access to your safe after you've decided not to upgrade to the Pro version. Once you have access to your safe you can then change your master password. This is an emergency, temporary and convenenience feature only. You SHOULD ALWAYS know your master password. Please upgrade if you'd like to continue using Touch ID.\n\nDo you want to enable emergency Touch ID for your next safe open?", kTouchId911Limit];
-    
-    [Alerts yesNo:self
-            title:@"Emergency Touch ID Activation"
-          message:message
-           action:^(BOOL response) {
-        if(response) {
-            self.touchId911 = YES;
-            [[Settings sharedInstance] incrementTouchId911Count];
-            
-            [Alerts info:self title:@"Emergency Touch ID Enabled" message:@"You can use Touch ID now for your next Safe Open. If you do not know your Master Password you should change it immediately in Settings. You can also export the safe to another application. Otherwise I would ask you to consider supporting the app by upgrading.\n\n-Mark"];
-        }
-    }];
 }
 
 @end

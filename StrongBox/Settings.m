@@ -8,6 +8,7 @@
 
 #import "Settings.h"
 #import "Reachability.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 
 static NSString* kLaunchCountKey = @"launchCount";
 static NSString* kAutoLockTimeSeconds = @"autoLockTimeSeconds";
@@ -18,7 +19,6 @@ static NSString* kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGest
 static NSString* kCopyPasswordOnLongPress = @"copyPasswordOnLongPress";
 static NSString* kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
 static NSString* kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
-static NSString* kTouchId911Count = @"kTouchId911Count";
 static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 static NSString* kiCloudOn = @"iCloudOn";
 static NSString* kiCloudWasOn = @"iCloudWasOn";
@@ -201,33 +201,6 @@ static NSString* kiCloudPrompted = @"iCloudPrompted";
     [userDefaults synchronize];
 }
 
-- (NSInteger)getTouchId911Count {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    NSInteger count = [userDefaults integerForKey:kTouchId911Count];
-    
-    return count;
-}
-
-- (void)incrementTouchId911Count {
-    NSInteger count = [self getTouchId911Count];
-    
-    count++;
-    
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setInteger:count forKey:kTouchId911Count];
-    
-    [userDefaults synchronize];
-}
-
-- (void)resetTouchId911Count {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    [userDefaults removeObjectForKey:kTouchId911Count];
-    
-    [userDefaults synchronize];
-}
-
 -(NSNumber*)getAutoLockTimeoutSeconds
 {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -331,12 +304,11 @@ static NSString* kiCloudPrompted = @"iCloudPrompted";
 
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d%d%d%d[%ld]%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
+    return [NSString stringWithFormat:@"[%d%d%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
     self.isOffline,
     self.isShowPasswordByDefaultOnEditScreen,
     self.isHavePromptedAboutFreeTrial,
     self.isProOrFreeTrial,
-    (long)self.getTouchId911Count,
     self.isPro,
     self.isFreeTrial,
     (long)self.getLaunchCount,
@@ -349,6 +321,23 @@ static NSString* kiCloudPrompted = @"iCloudPrompted";
     self.iCloudWasOn,
     self.iCloudPrompted,
     self.iCloudAvailable];
+}
+
+- (NSString*)getBiometricIdName {
+    NSString* biometricIdName = @"Touch ID";
+    
+    if (@available(iOS 11.0, *)) {
+        NSError* error;
+        LAContext *localAuthContext = [[LAContext alloc] init];
+        
+        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
+            if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
+                biometricIdName = @"Face ID";
+            }
+        }
+    }
+    
+    return biometricIdName;
 }
 
 @end

@@ -22,10 +22,6 @@
 - (BOOL)isHavePromptedAboutFreeTrial;
 - (BOOL)isProOrFreeTrial;
 
-- (NSInteger)getTouchId911Count;
-- (void)incrementTouchId911Count;
-- (void)resetTouchId911Count;
-
 - (BOOL)isPro;
 - (void)setPro:(BOOL)value;
 
@@ -56,5 +52,6 @@
 @property (nonatomic) BOOL iCloudAvailable;
 
 - (NSString*)getFlagsStringForDiagnostics;
+- (NSString*)getBiometricIdName;
 
 @end

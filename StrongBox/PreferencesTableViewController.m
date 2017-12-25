@@ -147,12 +147,13 @@
 - (IBAction)onUseICloud:(id)sender {
     NSLog(@"Setting iCloudOn to %d", self.switchUseICloud.on);
     
+    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
     if([self hasLocalOrICloudSafes]) {
         [Alerts yesNo:self title:@"Master Password Warning"
-             message:@"It is very important that you know your master password for your safes, and that you are not relying entirely on Touch ID.\n"
-                     @"The migration and importation process makes every effort to maintain Touch ID data but it is not guaranteed. "
+              message:[NSString stringWithFormat:@"It is very important that you know your master password for your safes, and that you are not relying entirely on %@.\n"
+                     @"The migration and importation process makes every effort to maintain %@ data but it is not guaranteed. "
                      @"In any case it is important that you always know your master passwords.\n\n"
-                     @"Do you want to continue changing iCloud usage settings?"
+                     @"Do you want to continue changing iCloud usage settings?", biometricIdName, biometricIdName]
               action:^(BOOL response) {
             if(response) {
                 [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];

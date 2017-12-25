@@ -20,5 +20,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonUpgrade2;
 @property (weak, nonatomic) IBOutlet UIButton *buttonNope;
 @property (weak, nonatomic) IBOutlet UIButton *buttonRestore;
+@property (weak, nonatomic) IBOutlet UILabel *labelBiometricIdFeature;
 
 @end

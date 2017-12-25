@@ -28,6 +28,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.labelBiometricIdFeature.text = [NSString stringWithFormat:@"Open with %@", [[Settings sharedInstance] getBiometricIdName]];
+    
     self.buttonUpgrade2.layer.cornerRadius = 25;
     [self.buttonNope setHidden:YES];
     [self.buttonNope setEnabled:NO];

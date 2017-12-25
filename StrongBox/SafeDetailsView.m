@@ -14,6 +14,7 @@
 #import "ISMessages/ISMessages.h"
 #import "ISMessages/ISMessages.h"
 #import "CHCSVParser.h"
+#import "Settings.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
     @property (readonly) NSArray *lines;
@@ -120,7 +121,8 @@
 }
 
 - (void)updateTouchIdButtonText {
-    self.labelToggleTouchId.text = self.viewModel.metadata.isTouchIdEnabled ? @"Disable Touch ID" : @"Enable Touch ID";
+    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
+    self.labelToggleTouchId.text = [NSString stringWithFormat:@"%@ %@", self.viewModel.metadata.isTouchIdEnabled ? @"Disable" : @"Enable", biometricIdName];
 }
 
 - (void)updateOfflineCacheButtonText {
@@ -128,14 +130,17 @@
 }
 
 - (void)onToggleTouchId {
+    NSString* bIdName = [[Settings sharedInstance] getBiometricIdName];
+    
     if (self.viewModel.metadata.isTouchIdEnabled) {
         NSString *message = self.viewModel.metadata.isEnrolledForTouchId ?
-        @"Disabling Touch ID for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-        @"Are you sure you want to disable Touch ID for this safe?";
+        @"Disabling %@ for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+        @"Are you sure you want to disable %@ for this safe?";
         
+
         [Alerts yesNo:self
-                title:@"Disable Touch ID?"
-              message:message
+                title:[NSString stringWithFormat:@"Disable %@?", bIdName]
+              message:[NSString stringWithFormat:message, bIdName]
                action:^(BOOL response) {
                    if (response) {
                        self.viewModel.metadata.isTouchIdEnabled = NO;
@@ -146,8 +151,8 @@
                        [[SafesCollection sharedInstance] save];
                        [self updateTouchIdButtonText];
                        
-                       [ISMessages showCardAlertWithTitle:@"Touch ID Disabled"
-                                                  message:@"Touch ID for this safe has been disabled."
+                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
+                                                  message:[NSString stringWithFormat:@"%@ for this safe has been disabled.", bIdName]
                                                  duration:3.f
                                               hideOnSwipe:YES
                                                 hideOnTap:YES
@@ -162,8 +167,8 @@
         self.viewModel.metadata.isEnrolledForTouchId = NO;
         [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
         
-        [ISMessages showCardAlertWithTitle:@"Touch ID Enabled"
-                                   message:@"Touch ID has been enabled for this safe. You will be asked to enrol the next time you open it."
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
+                                   message:[NSString stringWithFormat:@"%@ has been enabled for this safe. You will be asked to enrol the next time you open it.", bIdName]
                                   duration:3.f
                                hideOnSwipe:YES
                                  hideOnTap:YES

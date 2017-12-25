@@ -117,6 +117,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Strongbox can use Face ID to open your safes. Would you like to do this?</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>

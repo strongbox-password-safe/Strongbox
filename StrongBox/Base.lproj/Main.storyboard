@@ -85,12 +85,6 @@
                                 <action selector="onTogglePro:" destination="9DM-GO-ZGc" id="MSg-wN-NDh"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="6Os-iN-oaW"/>
-                        <barButtonItem title="Touch ID 911" id="jMj-Ez-C2G" userLabel="TouchID 911">
-                            <connections>
-                                <action selector="onTouchID911:" destination="9DM-GO-ZGc" id="OQh-gj-ib0"/>
-                            </connections>
-                        </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Safes [Lite Version]" id="g1g-nh-a5L">
                         <barButtonItem key="leftBarButtonItem" image="gear_24" id="1nK-Pq-30i">
@@ -109,7 +103,6 @@
                         <outlet property="barButtonFlexibleSpace" destination="a9W-k3-0mD" id="dGw-Gu-IOV"/>
                         <outlet property="buttonAddSafe" destination="zN1-I2-XSj" id="SD8-XN-MaW"/>
                         <outlet property="buttonTogglePro" destination="UR1-FK-uNa" id="lLz-rj-yyu"/>
-                        <outlet property="buttonTouchID911" destination="jMj-Ez-C2G" id="xfK-Hl-MOe"/>
                         <outlet property="buttonUpgrade" destination="tmo-77-bgs" id="Ll3-sF-2r3"/>
                         <outlet property="navItemHeader" destination="g1g-nh-a5L" id="VqK-HH-5Cu"/>
                         <segue destination="cYG-Rk-SmU" kind="show" identifier="segueToOpenSafeView" animates="NO" id="aYd-mP-3oX"/>
@@ -1796,6 +1789,7 @@
                         <outlet property="buttonNope" destination="2d3-g4-SCX" id="XwQ-OY-afk"/>
                         <outlet property="buttonRestore" destination="pVl-59-Um3" id="0uo-F3-uvW"/>
                         <outlet property="buttonUpgrade2" destination="7h4-mE-wDZ" id="m5m-cz-odk"/>
+                        <outlet property="labelBiometricIdFeature" destination="7LV-RY-Anr" id="IyE-pK-IiW"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rNc-h9-hcB" userLabel="First Responder" sceneMemberID="firstResponder"/>
