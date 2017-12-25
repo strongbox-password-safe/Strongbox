@@ -26,6 +26,7 @@
 		4D78AC221FB1E1DB00A68A92 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC1E1FB1E1DB00A68A92 /* Node.m */; };
 		4D78AC541FB1E58200A68A92 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC521FB1E58200A68A92 /* crypt_argchk.c */; };
 		4D78AC551FB1E58200A68A92 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC531FB1E58200A68A92 /* twofish.c */; };
+		4D890EF01FF14AC100A80934 /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D890EEF1FF14AC100A80934 /* CHCSVParser.m */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
@@ -91,6 +92,8 @@
 		4D78AC521FB1E58200A68A92 /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = ../../../pwsafe/twofish/crypt_argchk.c; sourceTree = "<group>"; };
 		4D78AC531FB1E58200A68A92 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = ../../../pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
 		4D78AC5C1FB2282700A68A92 /* AbstractPasswordDatabase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AbstractPasswordDatabase.h; path = ../../../model/AbstractPasswordDatabase.h; sourceTree = "<group>"; };
+		4D890EEE1FF14AC100A80934 /* CHCSVParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHCSVParser.h; path = ../../../chcsv/CHCSVParser.h; sourceTree = "<group>"; };
+		4D890EEF1FF14AC100A80934 /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = ../../../chcsv/CHCSVParser.m; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -174,6 +177,8 @@
 		4D78AC151FB1E1C000A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D890EEE1FF14AC100A80934 /* CHCSVParser.h */,
+				4D890EEF1FF14AC100A80934 /* CHCSVParser.m */,
 				4D78AC5C1FB2282700A68A92 /* AbstractPasswordDatabase.h */,
 				4D78AC161FB1E1DB00A68A92 /* DatabaseModel.h */,
 				4D78AC171FB1E1DB00A68A92 /* DatabaseModel.m */,
@@ -399,6 +404,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D890EF01FF14AC100A80934 /* CHCSVParser.m in Sources */,
 				4DFB92FA1FB1D44A008D092F /* KeypassDatabase.m in Sources */,
 				4D78AC101FB1E1B700A68A92 /* Field.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,

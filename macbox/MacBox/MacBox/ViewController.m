@@ -12,6 +12,7 @@
 #import "Settings.h"
 #import "AppDelegate.h"
 #import "Utils.h"
+#import "CHCSVParser.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -871,6 +872,36 @@ NSString* trimField(NSTextField* textField) {
     [[NSPasteboard generalPasteboard] setString:dump forType:NSStringPboardType];
 }
 
+- (IBAction)onCopyAsCsv:(id)sender {
+    [[NSPasteboard generalPasteboard] clearContents];
+    
+    NSString *newStr = [[NSString alloc] initWithData:[self getSafeAsCsv] encoding:NSUTF8StringEncoding];
+    
+    [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
+}
+
+- (NSData*)getSafeAsCsv {
+    NSArray<Node*>* nodes = [[self.model rootGroup] filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup;
+    }];
+    
+    NSOutputStream *output = [NSOutputStream outputStreamToMemory];
+    CHCSVWriter *writer = [[CHCSVWriter alloc] initWithOutputStream:output encoding:NSUTF8StringEncoding delimiter:','];
+    
+    [writer writeLineOfFields:@[@"Title", @"Username", @"Email", @"Password", @"Url", @"Notes"]];
+    
+    for(Node* node in nodes) {
+        [writer writeLineOfFields:@[node.title, node.fields.username, node.fields.email, node.fields.password, node.fields.url, node.fields.notes]];
+    }
+    
+    [writer closeStream];
+    
+    NSData *contents = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+    [output close];
+    
+    return contents;
+}
+
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
 {
     SEL theAction = [anItem action];
@@ -885,6 +916,7 @@ NSString* trimField(NSTextField* textField) {
         return self.model && !self.model.locked && self.searchField.stringValue.length == 0;
     }
     else if (theAction == @selector(onChangeMasterPassword:) ||
+             theAction == @selector(onCopyAsCsv:) ||
              theAction == @selector(onLock:)) {
         return self.model && !self.model.locked;
     }

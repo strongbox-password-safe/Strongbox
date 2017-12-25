@@ -112,6 +112,13 @@
                                                 <action selector="revertDocumentToSaved:" target="Ady-hI-5gd" id="iJ3-Pv-kwq"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="HR3-B1-mg4"/>
+                                        <menuItem title="Export as CSV to Clipboard" id="AYY-x4-SiO">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onCopyAsCsv:" target="Ady-hI-5gd" id="hW3-wo-4ig"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
