@@ -94,13 +94,26 @@ typedef void (^Authenticationcompletion)(NSError *error);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
++ (NSString *)sanitizeNickNameForNewFileName:(NSString *)string {
+    NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet illegalCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet nonBaseCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"'±|/\\`~@<>:;£$%^&()=+{}[]!\"|?*"]] componentsJoinedByString:@""];
+    
+    return trimmed;
+}
+
 - (void)  create:(id<GIDSignInUIDelegate>)viewController
-       withTitle:(NSString *)title
+       withTitle:(NSString *)titleNick
         withData:(NSData *)data
     parentFolder:(NSObject *)parentFolder
       completion:(void (^)(GTLRDrive_File *file, NSError *error))handler {
     NSString *parentFolderIdentifier = parentFolder ? ((GTLRDrive_File *)parentFolder).identifier : @"root";
 
+    NSString* title = [GoogleDriveManager sanitizeNickNameForNewFileName:titleNick];
+    
     [self findSafeFile:parentFolderIdentifier
               fileName:title
             completion:^(GTLRDrive_File *file, NSError *error)

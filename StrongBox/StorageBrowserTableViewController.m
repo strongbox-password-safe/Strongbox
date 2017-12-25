@@ -141,10 +141,8 @@
     }
             completion:^(NSString *name, NSString *password, BOOL response) {
                 if (response) {
-                NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
-
-                [self addNewSafeAndPopToRoot:nickName
-                                password:password];
+                    NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
+                    [self addNewSafeAndPopToRoot:nickName password:password];
                 }
             }];
 }
