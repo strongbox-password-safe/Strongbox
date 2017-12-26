@@ -89,10 +89,6 @@
     if(![[Settings sharedInstance] isPro]) {
         [self getValidIapProducts];
         
-        if([self isFirstRun]) {
-            //[self createFirstSimpleSafeForUser];
-        }
-        
         if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
             [self initializeFreeTrial];
         }
@@ -108,13 +104,6 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
-
-- (BOOL)isFirstRun {
-    return NO;
-}
-
-
-
 
 - (void)onSafesCollectionUpdated {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
