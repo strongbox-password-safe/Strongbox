@@ -48,7 +48,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.12.0</string>
+	<string>1.12.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -71,7 +71,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1729</string>
+	<string>2600</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -81,6 +81,8 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Strongbox can use Face ID to open your safes. Would you like to do this?</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.com.strongbox</key>
@@ -117,8 +119,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Strongbox can use Face ID to open your safes. Would you like to do this?</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
