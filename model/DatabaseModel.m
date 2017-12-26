@@ -30,6 +30,16 @@
 - (instancetype)initNewWithPassword:(NSString *)password {
     if(self = [super init]) {
         self.theSafe = [[PwSafeDatabase alloc] initNewWithPassword:password];
+        
+        [[self.theSafe rootGroup] addChild:[[Node alloc] initAsGroup:@"New Group" parent:[self.theSafe rootGroup]]];
+        
+        [[self.theSafe rootGroup] addChild:[[Node alloc] initAsRecord:@"New Entry"
+                                                               parent:[self.theSafe rootGroup]
+                                                               fields:[[NodeFields alloc] initWithUsername:@"username"
+                                                                                                       url:@"https://www.google.com"
+                                                                                                  password:@"password"
+                                                                                                     notes:@""
+                                                                                                     email:@"user@gmail.com"]]];
     }
     
     return self;

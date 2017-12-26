@@ -141,12 +141,12 @@
 
     DBUserClient *client = DBClientsManager.authorizedClient;
 
-
     [[[client.filesRoutes uploadData:path
                                 mode:[[DBFILESWriteMode alloc] initWithOverwrite]
                           autorename:@(NO)
                       clientModified:nil
                                 mute:@(NO)
+                      propertyGroups:nil
                            inputData:data]
       setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
           dispatch_async(dispatch_get_main_queue(), ^{

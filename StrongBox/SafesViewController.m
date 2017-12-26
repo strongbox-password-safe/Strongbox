@@ -1117,9 +1117,11 @@ static BOOL shownNagScreenThisSession = NO;
                                                       image:[UIImage imageNamed:@"strongbox-for-mac-promo"]
                                             buttonAlignment:UILayoutConstraintAxisVertical
                                             transitionStyle:PopupDialogTransitionStyleBounceUp
+                                             preferredWidth:340
                                            gestureDismissal:YES
+                                              hideStatusBar:NO
                                                  completion:nil];
-    
+
     DefaultButton *ok = [[DefaultButton alloc] initWithTitle:@"Cool!" height:50 dismissOnTap:YES action:nil];
     
     CancelButton *later = [[CancelButton alloc] initWithTitle:@"Got It! Never Remind Me Again!" height:50 dismissOnTap:YES action:^{
