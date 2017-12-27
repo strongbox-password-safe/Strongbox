@@ -11,6 +11,7 @@
 #define kRevealDetailsImmediately @"revealDetailsImmediately"
 #define kFullVersion @"fullVersion"
 #define kEndFreeTrialDate @"endFreeTrialDate"
+#define kAutoLockTimeout @"autoLockTimeout"
 
 @implementation Settings
 
@@ -93,6 +94,19 @@
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
     [userDefaults setBool:value forKey:key];
+    
+    [userDefaults synchronize];
+}
+
+- (NSInteger)autoLockTimeoutSeconds {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    return [userDefaults integerForKey:kAutoLockTimeout];
+}
+
+- (void)setAutoLockTimeoutSeconds:(NSInteger)autoLockTimeoutSeconds {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults setInteger:autoLockTimeoutSeconds forKey:kAutoLockTimeout];
     
     [userDefaults synchronize];
 }

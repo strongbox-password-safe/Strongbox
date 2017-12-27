@@ -23,6 +23,7 @@
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
+@property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 
 @end
 
@@ -61,7 +62,46 @@
         [self randomlyPromptForAppStoreReview];
     }
     
+    [self bindAutoLockUi];
+    
     self.applicationHasFinishedLaunching = YES;
+}
+
+- (IBAction)onSetAutoLockTimeout:(id)sender {
+    [[Settings sharedInstance] setAutoLockTimeoutSeconds:[sender tag]];
+
+    [self bindAutoLockUi];
+}
+
+- (void)bindAutoLockUi {
+    NSMenu* menu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Autolock"] submenu];
+    NSInteger alt = [[Settings sharedInstance] autoLockTimeoutSeconds];
+
+    [[menu itemAtIndex:0] setState:alt == 0 ? NSOnState : NSOffState ];
+    [[menu itemAtIndex:1] setState:alt == 60 ? NSOnState : NSOffState ];
+    [[menu itemAtIndex:2] setState:alt == 120 ? NSOnState : NSOffState ];
+    [[menu itemAtIndex:3] setState:alt == 300 ? NSOnState : NSOffState ];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if(self.autoLockWorkBlock) {
+        dispatch_block_cancel(self.autoLockWorkBlock);
+        self.autoLockWorkBlock = nil;
+    }
+}
+
+- (void)applicationDidResignActive:(NSNotification *)notification {
+    NSInteger timeout = [[Settings sharedInstance] autoLockTimeoutSeconds];
+    
+    if(timeout != 0) {
+        self.autoLockWorkBlock = dispatch_block_create(0, ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kAutoLockTime object:nil];
+            
+            self.autoLockWorkBlock = nil;
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), self.autoLockWorkBlock);
+    }
 }
 
 - (void)randomlyPromptForAppStoreReview {

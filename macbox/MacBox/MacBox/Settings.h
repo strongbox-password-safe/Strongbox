@@ -17,7 +17,7 @@
 
 @property (nonatomic, readonly) BOOL freeTrial;
 @property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
-
 @property (nonatomic, strong) NSDate* endFreeTrialDate;
+@property (nonatomic) NSInteger autoLockTimeoutSeconds;
 
 @end

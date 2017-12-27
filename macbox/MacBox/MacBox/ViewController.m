@@ -13,6 +13,7 @@
 #import "AppDelegate.h"
 #import "Utils.h"
 #import "CHCSVParser.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -47,6 +48,8 @@
     [self customizeUi];
 
     [self bindToModel];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
 }
 
 - (void)customizeUi {
@@ -323,6 +326,23 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
+    //    if ( @available (macOS 10.12.1, *)) {
+    //        LAContext *localAuthContext = [[LAContext alloc] init];
+    //        
+    //        NSError *authError;
+    //        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
+    //            [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+    //                             localizedReason:@"Identify to login"
+    //                                       reply:^(BOOL success, NSError *error) {
+    //                                           NSLog(@"%hhd - %@", success, error);
+    //                                       } ];
+    //
+    //        }
+    //        else {
+    //            NSLog(@"Not Avail! ");
+    //        }
+    //    }
+    
     [self unlock];
 }
 
@@ -345,6 +365,12 @@
         else {
             [Alerts error:@"Could not open safe" error:error window:self.view.window];
         }
+    }
+}
+
+- (void)onAutoLock:(NSNotification*)notification {
+    if(self.model && !self.model.locked && !self.model.dirty) {
+        [self onLock:nil];
     }
 }
 
