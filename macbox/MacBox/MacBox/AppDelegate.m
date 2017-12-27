@@ -194,10 +194,6 @@
     }
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
-}
-
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
     if(!self.applicationHasFinishedLaunching) {
         // Get the recent documents
