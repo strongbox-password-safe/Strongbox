@@ -370,7 +370,9 @@
 
 - (void)onAutoLock:(NSNotification*)notification {
     if(self.model && !self.model.locked && !self.model.dirty) {
-        [self onLock:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onLock:nil];
+        });
     }
 }
 
@@ -399,6 +401,8 @@
             
             self.textFieldMasterPassword.stringValue = @"";
             [self setInitialFocus];
+            
+            [self.view setNeedsDisplay:YES];
         }
     }
 }
