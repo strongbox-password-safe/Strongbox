@@ -12,7 +12,7 @@
 
 static NSString* kLaunchCountKey = @"launchCount";
 static NSString* kAutoLockTimeSeconds = @"autoLockTimeSeconds";
-static NSString* kPromptedForReview = @"promptedForReview";
+static NSString* kPromptedForReview = @"newPromptedForReview";
 static NSString* kIsProKey = @"isPro";
 static NSString* kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGesture";

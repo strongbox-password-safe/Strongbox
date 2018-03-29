@@ -1045,12 +1045,24 @@ static BOOL shownNagScreenThisSession = NO;
 }
 
 - (void)openAppStoreForReview {
-    // https://itunes.apple.com/us/app/strongbox-password-safe/id897283731
+    int appId = 897283731;
     
-    NSString *appId = @"897283731";
-    NSString *url = [NSString stringWithFormat:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=1&type=Purple+Software&mt=8", appId];
+    static NSString *const iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%d?action=write-review";
+    static NSString *const iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%d&action=write-review";
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]];
     
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        if (@available(iOS 10.0, *)) {
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }
+        else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }
+    else {
+        [Alerts info:self title:@"Cannot open App Store" message:@"Please find Strongbox in the App Store and you can write a review there. Much appreciated! -Mark"];
+    }
 }
 
 - (void)showStartupMessaging {
@@ -1068,7 +1080,9 @@ static BOOL shownNagScreenThisSession = NO;
     NSInteger promptedForReview = [[Settings sharedInstance] isUserHasBeenPromptedForReview];
     NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
     
-    if (launchCount > 20 && (launchCount % 10 == 0) && promptedForReview == 0) {
+    if (launchCount > 20 &&
+        launchCount % 10 == 0 &&
+        promptedForReview == 0) {
         [self askForReview];
     }
 }
@@ -1083,21 +1097,26 @@ static BOOL shownNagScreenThisSession = NO;
 }
 
 - (void)askForReview {
-    [Alerts  threeOptions:self
-                    title:@"Review Strongbox?"
-                  message:@"Hi, I'm Mark, the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
-        defaultButtonText:@"Sure, take me there!"
-         secondButtonText:@"Naah"
-          thirdButtonText:@"Like, maybe later!"
-                   action:^(int response) {
-                       if (response == 0) {
-                           [self openAppStoreForReview];
-                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                       }
-                       else if (response == 1) {
-                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                       }
-                   }];
+    if (@available( iOS 10.3,*)) {
+        [SKStoreReviewController requestReview];
+    }
+    else {
+        [Alerts  threeOptions:self
+                        title:@"Review Strongbox?"
+                      message:@"Hi, I'm Mark, the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
+            defaultButtonText:@"Sure, take me there!"
+             secondButtonText:@"Naah"
+              thirdButtonText:@"Like, maybe later!"
+                       action:^(int response) {
+                           if (response == 0) {
+                               [self openAppStoreForReview];
+                               [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
+                           }
+                           else if (response == 1) {
+                               [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
+                           }
+                       }];
+    }
 }
 
 - (void) showMacAppMessage {
