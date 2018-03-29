@@ -75,6 +75,8 @@
         [nav.visibleViewController isKindOfClass:[PreviousPasswordsTableViewController class]]) {
         enterBackgroundTime = [[NSDate alloc] init];
         lockView = [mainStoryboard instantiateViewControllerWithIdentifier:@"LockScreen"];
+        
+        [lockView.view layoutIfNeeded];
         [self.window.rootViewController presentViewController:lockView animated:NO completion:nil];
     }
     else {
