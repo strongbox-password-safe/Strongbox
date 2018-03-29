@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "PasswordGenerationParameters.h"
 
 @interface Settings : NSObject
 
@@ -53,5 +54,7 @@
 
 - (NSString*)getFlagsStringForDiagnostics;
 - (NSString*)getBiometricIdName;
+
+@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 
 @end

@@ -70,19 +70,6 @@
 //    return [NSString stringWithFormat:@"%s.local", baseHostName];
 //}
 
-+ (NSString *)generatePassword {
-    NSString *letters = @"!@#$%*[];?()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    
-    NSUInteger len = 16;
-    NSMutableString *randomString = [NSMutableString stringWithCapacity:len];
-    
-    for (int i = 0; i < len; i++) {
-        [randomString appendFormat:@"%C", [letters characterAtIndex:arc4random_uniform((u_int32_t)letters.length)]];
-    }
-    
-    return randomString;
-}
-
 + (NSString*)getUsername {
     return NSFullUserName();
 }

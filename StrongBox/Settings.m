@@ -23,7 +23,8 @@ static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 static NSString* kiCloudOn = @"iCloudOn";
 static NSString* kiCloudWasOn = @"iCloudWasOn";
 static NSString* kiCloudPrompted = @"iCloudPrompted";
-            
+static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
+
 @interface Settings ()
 
 @property (nonatomic, strong) Reachability *internetReachabilityDetector;
@@ -302,6 +303,24 @@ static NSString* kiCloudPrompted = @"iCloudPrompted";
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (PasswordGenerationParameters *)passwordGenerationParameters {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
+    
+    if(encodedObject == nil) {
+        return [[PasswordGenerationParameters alloc] initWithDefaults];
+    }
+    
+    PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    return object;
+}
+
+-(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
+    [defaults synchronize];
+}
 
 - (NSString*)getFlagsStringForDiagnostics {
     return [NSString stringWithFormat:@"[%d%d%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",

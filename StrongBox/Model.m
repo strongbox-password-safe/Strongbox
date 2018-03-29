@@ -9,6 +9,8 @@
 #import "Model.h"
 #import "Utils.h"
 #import "SVProgressHUD.h"
+#import "PasswordGenerator.h"
+#import "Settings.h"
 
 @interface Model ()
 
@@ -285,7 +287,8 @@
 }
 
 - (NSString *)generatePassword {
-    return [Utils generatePassword];
+    PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
+    return [PasswordGenerator generatePassword:params];
 }
 
 - (NSInteger) numberOfRecords {

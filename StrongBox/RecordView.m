@@ -33,7 +33,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.buttonPasswordGenerationSettings.hidden = YES;
+    //self.buttonPasswordGenerationSettings.hidden = YES;
     
     [self setInitialTextFieldBordersAndColors];
     [self setupAutoComplete];
