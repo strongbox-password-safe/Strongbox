@@ -33,8 +33,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //self.buttonPasswordGenerationSettings.hidden = YES;
-    
     [self setInitialTextFieldBordersAndColors];
     [self setupAutoComplete];
     
@@ -179,7 +177,6 @@
         self.textFieldEmail.text = self.record.fields.email;
         self.textViewNotes.text = self.record.fields.notes;
         
-        self.buttonPasswordGenerationSettings.enabled = NO;
         self.buttonHistory.enabled = YES;
     }
     else {
@@ -191,7 +188,6 @@
         self.textFieldEmail.text = self.viewModel.mostPopularEmail;
         self.textViewNotes.text = @"";
         
-        self.buttonPasswordGenerationSettings.enabled = NO;
         self.buttonHistory.enabled = NO;
     }
 }
@@ -203,7 +199,6 @@
         navBack = self.navigationItem.leftBarButtonItem;
         self.editButtonItem.enabled = [self uiIsDirty];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
-        self.buttonPasswordGenerationSettings.enabled = YES;
         self.buttonHistory.enabled = NO;
     }
     else {
@@ -231,7 +226,6 @@
             }];
         }
         else {
-            self.buttonPasswordGenerationSettings.enabled = NO; //(self.record != nil);
             self.buttonHistory.enabled = (self.record != nil);
             self.navigationItem.leftBarButtonItem = navBack;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);

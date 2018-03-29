@@ -52,6 +52,10 @@ static NSString* kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
         pool = [[characterPool componentsSeparatedByCharactersInSet:trim] componentsJoinedByString:@""];
     }
     
+    if(![pool length]) {
+        return @"";
+    }
+    
     NSUInteger len = parameters.minimumLength + arc4random_uniform(parameters.maximumLength - parameters.minimumLength);
     
     NSMutableString *randomString = [NSMutableString stringWithCapacity:len];
