@@ -249,11 +249,11 @@ typedef void (^Authenticationcompletion)(NSError *error);
                               completionHandler:^(GTLRServiceTicket *callbackTicket,
                                                                     GTLRDrive_File *uploadedFile,
                                                                     NSError *callbackError) {
-                                  if (error) {
-                                  NSLog(@"%@", error);
+                                  if (callbackError) {
+                                      NSLog(@"%@", callbackError);
                                   }
 
-                                  handler(error);
+                                  handler(callbackError);
                               }];
             }
         }
@@ -288,10 +288,18 @@ typedef void (^Authenticationcompletion)(NSError *error);
         [SVProgressHUD show];
     });
 
+    GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
+    
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
-    GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
-    query.q = [NSString stringWithFormat:@"'%@' in parents and trashed=false", parentFileIdentifier ];
+    if(![parentFileIdentifier isEqualToString:@"root"]) {
+        query.q = [NSString stringWithFormat:@"('%@' in parents) and trashed=false", parentFileIdentifier];
+    }
+    else {
+        query.q = [NSString stringWithFormat:@"(sharedWithMe or ('root' in parents)) and trashed=false"];
+        
+    }
+    
     query.fields = @"kind,nextPageToken,files(mimeType,id,name,iconLink,parents,size)";
 
     [[self driveService] executeQuery:query
@@ -307,6 +315,8 @@ typedef void (^Authenticationcompletion)(NSError *error);
             NSMutableArray *driveFolders = [[NSMutableArray alloc] init];
             NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
 
+            NSLog(@"%@", fileList.files);
+            
             for (GTLRDrive_File *file in fileList.files) {
                 if ([file.mimeType isEqual:@"application/vnd.google-apps.folder"]) {
                     [driveFolders addObject:file];

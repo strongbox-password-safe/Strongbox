@@ -214,13 +214,13 @@
                 navBack = nil;
                 
                 if (error != nil) {
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                    
                     [Alerts   error:self
                               title:@"Problem Saving"
                               error:error];
                     
                     NSLog(@"%@", error);
-                    
-                    [self.navigationController popViewControllerAnimated:YES];
                 }
                 else {
                     [self reloadFieldsFromRecord];
