@@ -16,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonToggleEdit;
 
 - (IBAction)onAddSafe:(id)sender;
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL;
@@ -23,5 +24,7 @@
 
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonTogglePro; // strong outlet because we remove/add from toolbar
 - (IBAction)onTogglePro:(id)sender;
+- (IBAction)onToggleEdit:(id)sender;
+
 
 @end

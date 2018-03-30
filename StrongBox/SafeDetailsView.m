@@ -13,7 +13,6 @@
 #import "ISMessages/ISMessages.h"
 #import "CHCSVParser.h"
 #import "Settings.h"
-#import "JNKeychain.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
     @property (readonly) NSArray *lines;
@@ -85,8 +84,7 @@
     [self.viewModel update:^(NSError *error) {
         if (error == nil) {
             if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
-                [JNKeychain         saveValue:self.viewModel.masterPassword
-                                       forKey:self.viewModel.metadata.nickName];
+                [self.viewModel.metadata setTouchIdPassword:self.viewModel.masterPassword];
                 NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
             }
             
@@ -145,7 +143,7 @@
                        self.viewModel.metadata.isTouchIdEnabled = NO;
                        self.viewModel.metadata.isEnrolledForTouchId = NO;
                        
-                       [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
+                       [self.viewModel.metadata removeTouchIdPassword];
                        
                        [[SafesList sharedInstance] save];
                        [self updateTouchIdButtonText];
@@ -164,8 +162,9 @@
     else {
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForTouchId = NO;
-        [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
-        
+
+        [self.viewModel.metadata removeTouchIdPassword];
+
         [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
                                    message:[NSString stringWithFormat:@"%@ has been enabled for this safe. You will be asked to enrol the next time you open it.", bIdName]
                                   duration:3.f

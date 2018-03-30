@@ -25,8 +25,6 @@
 }
 
 - (IBAction)onChangeSettings:(id)sender {
-    NSLog(@"Change");
-
     PasswordGenerationParameters *params = [[PasswordGenerationParameters alloc] init];
     
     params.useDigits = self.switchUseDigits.on;

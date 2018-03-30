@@ -15,18 +15,4 @@
 
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *sortedSafes;
 
-- (BOOL)add:(SafeMetaData *_Nonnull)safe;
-- (void)removeSafe:(NSString *_Nonnull)nickName;
-
-+ (NSString * _Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
-
-- (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
-- (BOOL)safeWithTouchIdIsAvailable;
-
-- (void)save;
-
-- (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
-
-- (BOOL)changeNickName:(NSString*_Nonnull)nickName newNickName:(NSString*_Nonnull)newNickName;
-
 @end

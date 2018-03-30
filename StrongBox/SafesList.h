@@ -17,12 +17,9 @@
 
 - (void)add:(SafeMetaData *_Nonnull)safe;
 - (void)remove:(NSString*_Nonnull)uuid;
-- (void)insert:(SafeMetaData*_Nonnull)safe atIndex:(NSUInteger)atIndex;
+- (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 
 - (void)save;
-
-//- (BOOL)safeWithTouchIdIsAvailable;
-//- (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
 
 + (NSString *_Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
 - (BOOL)isValidNickName:(NSString *_Nonnull)nickName;

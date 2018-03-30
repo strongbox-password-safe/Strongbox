@@ -22,7 +22,9 @@ typedef NS_ENUM (unsigned int, StorageProvider) {
                         fileName:(NSString*)fileName
                   fileIdentifier:(NSString*)fileIdentifier;
 
-- (void)changeNickName:(NSString*)newNickName;
+- (void)removeTouchIdPassword;
+@property (nonatomic, strong) NSString* touchIdPassword;
+
 
 @property (nonatomic, strong) NSString *uuid;
 @property (nonatomic, strong) NSString *nickName;

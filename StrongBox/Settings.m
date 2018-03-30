@@ -23,6 +23,7 @@ static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 static NSString* kiCloudOn = @"iCloudOn";
 static NSString* kiCloudWasOn = @"iCloudWasOn";
 static NSString* kiCloudPrompted = @"iCloudPrompted";
+static NSString* kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
 static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
 
 @interface Settings ()
@@ -357,6 +358,15 @@ static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
     }
     
     return biometricIdName;
+}
+
+- (BOOL)safesMigratedToNewSystem {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kSafesMigratedToNewSystem];
+}
+
+- (void)setSafesMigratedToNewSystem:(BOOL)safesMigratedToNewSystem {
+    [[NSUserDefaults standardUserDefaults] setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end

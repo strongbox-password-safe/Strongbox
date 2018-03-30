@@ -56,5 +56,6 @@
 - (NSString*)getBiometricIdName;
 
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
+@property (nonatomic) BOOL safesMigratedToNewSystem;
 
 @end

@@ -14,7 +14,6 @@
 #import "IOsUtils.h"
 #import "Utils.h"
 #import <LocalAuthentication/LocalAuthentication.h>
-#import "JNKeychain.h"
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
@@ -32,6 +31,10 @@
 #import "VersionConflictController.h"
 #import "iCloudSafesCoordinator.h"
 #import "CHCSVParser.h"
+
+// TODO: Remove and Delete - Can tidy up 2 serialization methods from SafeMetaData also - NEXT RELEASE
+#import "SafesCollectionOld.h"
+#import "JNKeychain.h"
 
 @interface SafesViewController ()
 
@@ -78,6 +81,25 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // TODO: Remove me in Next Release!
+    
+    if(!Settings.sharedInstance.safesMigratedToNewSystem) {
+        for(SafeMetaData* safe in [SafesCollectionOld.sharedInstance sortedSafes]) {
+            NSLog(@"Migrating Old Safe %@", safe);
+            
+            [SafesList.sharedInstance add:safe];
+            
+            if(safe.isTouchIdEnabled) {
+                NSString *touchIdPassword = [JNKeychain loadValueForKey:safe.nickName];
+                if(touchIdPassword != nil) {
+                    [safe setTouchIdPassword:touchIdPassword];
+                }
+            }
+        }
+        
+        Settings.sharedInstance.safesMigratedToNewSystem = YES;
+    }
+    
     self.collection = [NSArray array];
 
     [self customizeUi];
@@ -305,6 +327,37 @@
 
 #pragma mark - Table view data source
 
+-(void)onToggleEdit:(id)sender {
+    [self.tableView setEditing:!self.tableView.editing animated:YES];
+    
+    if (self.tableView.editing)
+    {
+        [self.buttonToggleEdit setTitle:@"Done"];
+        [self.buttonToggleEdit setStyle:UIBarButtonItemStyleDone];
+    }
+    else
+    {
+        [self.buttonToggleEdit setTitle:@"Edit"];
+        [self.buttonToggleEdit setStyle:UIBarButtonItemStylePlain];
+    }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+    if(![sourceIndexPath isEqual:destinationIndexPath]) {
+        NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
+        
+        [SafesList.sharedInstance move:sourceIndexPath.row to:destinationIndexPath.row];
+        [SafesList.sharedInstance save];
+        [self refreshView];
+    }
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
@@ -380,7 +433,31 @@
         [self removeSafe:indexPath];
     }];
 
-    return @[removeAction];
+    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Rename" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self renameSafe:indexPath];
+    }];
+
+    return @[removeAction, renameAction];
+}
+
+- (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    
+    [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Safe Name"
+                            title:@"Rename Safe"
+                          message:@"Please enter a new name for this safe"
+                       completion:^(NSString *text, BOOL response) {
+        if(response) {
+            if([SafesList.sharedInstance isValidNickName:text]) {
+                safe.nickName = text;
+                [SafesList.sharedInstance save];
+                [self refreshView];
+            }
+            else {
+                [Alerts warn:self title:@"Invalid Name" message:@"That is an invalid name, possibly because one with that name already exists, or because it contains invalid characters. Please try again."];
+            }
+        }
+    }];
 }
 
 - (void)removeSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -441,13 +518,10 @@
     }
          
     [[SafesList sharedInstance] remove:safe.uuid];
+    [[SafesList sharedInstance] save];
 
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self setEditing:NO];
-        [self refreshView];
-    });
+    [self refreshView];
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)promptForSafePassword:(SafeMetaData *)safe
@@ -594,7 +668,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         if (error.code == -2) {
             if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 safe.isEnrolledForTouchId = NO;
-                [JNKeychain deleteValueForKey:safe.nickName];
+                [safe removeTouchIdPassword];
                 [[SafesList sharedInstance] save];
                 
                 [Alerts info:self
@@ -620,7 +694,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    action:^(BOOL response) {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
-                       [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
+                       [safe setTouchIdPassword:openedSafe.masterPassword];
                        [[SafesList sharedInstance] save];
                        
                        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enrol Successful", self.biometricIdName]
@@ -636,7 +710,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    }
                    else{
                        safe.isTouchIdEnabled = NO;
-                       [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
+                       [safe setTouchIdPassword:openedSafe.masterPassword];
                        [[SafesList sharedInstance] save];
                        
                        [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
@@ -711,10 +785,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 
 - (void)onTouchIdDone:(BOOL)success error:(NSError *)error safe:(SafeMetaData *)safe {
     if (success) {
-        NSString *password = [JNKeychain loadValueForKey:safe.nickName];
-        
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self openSafe:safe isTouchIdOpen:YES masterPassword:password askAboutTouchIdEnrol:NO];
+            [self openSafe:safe isTouchIdOpen:YES masterPassword:safe.touchIdPassword askAboutTouchIdEnrol:NO];
         });
     }
     else {

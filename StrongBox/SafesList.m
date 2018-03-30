@@ -75,9 +75,13 @@ static NSString* kSafesList = @"safesList";
     });
 }
 
-- (void)insert:(SafeMetaData*)safe atIndex:(NSUInteger)atIndex  {
+- (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex {
     dispatch_barrier_async(self.dataQueue, ^{
-        [self.data insertObject:safe atIndex:atIndex];
+        SafeMetaData* item = [self.data objectAtIndex:sourceIndex];
+        
+        [self.data removeObjectAtIndex:sourceIndex];
+        
+        [self.data insertObject:item atIndex:destinationIndex];
     });
 }
 

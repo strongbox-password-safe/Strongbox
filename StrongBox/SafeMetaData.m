@@ -7,6 +7,7 @@
 //
 
 #import "SafeMetaData.h"
+#import "JNKeychain.h"
 
 @implementation SafeMetaData
 
@@ -27,11 +28,6 @@
     
     return self;
 }
-
-- (void)changeNickName:(NSString*)newNickName {
-    _nickName = newNickName;
-}
-
 
 - (NSDictionary *)toDictionary {
     NSMutableDictionary *dictionary =
@@ -124,6 +120,18 @@
     }
     
     return self;
+}
+
+- (void)removeTouchIdPassword {
+    [JNKeychain deleteValueForKey:self.uuid];
+}
+
+- (NSString*)touchIdPassword {
+    return [JNKeychain loadValueForKey:self.uuid];
+}
+
+- (void)setTouchIdPassword:(NSString *)touchIdPassword {
+    [JNKeychain saveValue:touchIdPassword forKey:self.uuid];
 }
 
 @end

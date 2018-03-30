@@ -12,7 +12,6 @@
 #import "LocalDeviceStorageProvider.h"
 #import "Strongbox.h"
 #import "SafesList.h"
-#import "JNKeychain.h"
 
 @implementation iCloudSafesCoordinator
 
@@ -138,18 +137,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         NSString* newNickName = [self displayNameFromUrl:destURL];
         NSLog(@"New Nickname = [%@] Moved %@ to %@", newNickName, fileURL, destURL);
 
-        // Migrate any touch ID entry for this safe
-        
-        NSString *password = [JNKeychain loadValueForKey:displayName];
-        if(password) {
-            [JNKeychain saveValue:password forKey:newNickName];
-        }
-        
-        if(![safe.nickName isEqualToString:newNickName]) {
-            safe.nickName = newNickName;
-            [SafesList.sharedInstance save];
-        }
-        
+        safe.nickName = newNickName;
         safe.storageProvider = kiCloud;
         safe.fileIdentifier = destURL.absoluteString;
         safe.fileName = [destURL lastPathComponent];
@@ -172,13 +160,6 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
          {
              if (error == nil) {
                  NSLog(@"Copied %@ to %@ (%d)", newURL, metadata.fileIdentifier, [Settings sharedInstance].iCloudOn);
-                 
-                 // Migrate any touch ID entry for this safe
-                 
-                 NSString *password = [JNKeychain loadValueForKey:safe.nickName];
-                 if(password) {
-                     [JNKeychain saveValue:password forKey:metadata.nickName];
-                 }
                  
                  safe.nickName = metadata.nickName;
                  safe.storageProvider = kLocalDevice;

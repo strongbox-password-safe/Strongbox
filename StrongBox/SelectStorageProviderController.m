@@ -166,7 +166,22 @@
           completion:^(SafeMetaData *metadata, NSError *error)
      {
          if (error == nil) {
-             [[SafesList sharedInstance] add:metadata];
+             if(metadata.storageProvider == kiCloud) {
+                 NSUInteger existing = [SafesList.sharedInstance.snapshot indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                     return obj.storageProvider == kiCloud && [obj.fileName isEqualToString:metadata.fileName];
+                 }];
+
+                 if(existing == NSNotFound) { // May have already been added by our iCloud watch thread.
+                     NSLog(@"Adding as this iCloud filename is not already present.");
+                     [[SafesList sharedInstance] add:metadata];
+                 }
+                 else {
+                     NSLog(@"Not Adding as this iCloud filename is already present. Probably picked up by Watch Thread.");
+                 }
+             }
+             else {
+                 [[SafesList sharedInstance] add:metadata];
+             }
          }
          else {
              NSLog(@"An error occurred: %@", error);
