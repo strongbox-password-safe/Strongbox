@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SafeMetaData.h"
 
-@interface SafesCollection : NSObject
+@interface SafesCollectionOld : NSObject
 
 + (instancetype _Nullable)sharedInstance;
 

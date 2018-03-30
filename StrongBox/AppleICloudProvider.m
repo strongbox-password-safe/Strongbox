@@ -10,7 +10,7 @@
 #import "PasswordSafeUIDocument.h"
 #import "Strongbox.h"
 #import "Utils.h"
-#import "SafesCollection.h"
+#import "SafesList.h"
 #import "Settings.h"
 #import "iCloudSafesCoordinator.h"
 #import "SVProgressHUD/SVProgressHUD.h"

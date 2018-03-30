@@ -13,7 +13,7 @@
 #import "Utils.h"
 #import "Settings.h"
 #import <MessageUI/MessageUI.h>
-#import "SafesCollection.h"
+#import "SafesList.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -141,7 +141,7 @@
 
 
 - (BOOL)hasLocalOrICloudSafes {
-    return ([SafesCollection.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesCollection.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
+    return ([SafesList.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesList.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
 }
 
 - (IBAction)onUseICloud:(id)sender {
@@ -201,7 +201,7 @@
     
     int i=0;
     NSString *safesMessage = @"Safes Collection<br />----------------<br />";
-    for(SafeMetaData *safe in [SafesCollection sharedInstance].sortedSafes) {
+    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%d%d%d%d%d]<br />", i++,
                               safe.nickName,
                               safe.fileName,

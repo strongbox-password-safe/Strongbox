@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "SafeStorageProvider.h"
-#import "SafesCollection.h"
 
 @interface StorageBrowserTableViewController : UITableViewController
 

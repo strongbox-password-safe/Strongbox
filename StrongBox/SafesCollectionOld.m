@@ -6,25 +6,25 @@
 //  Copyright (c) 2014 Mark McGuill. All rights reserved.
 //
 
-#import "SafesCollection.h"
+#import "SafesCollectionOld.h"
 #import "SafeMetaData.h"
 #import "Utils.h"
 
-@interface SafesCollection ()
+@interface SafesCollectionOld ()
 
 @property (nonatomic, nonnull) NSMutableDictionary<NSString*, SafeMetaData*> *theCollection;
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *snapshot;
 
 @end
 
-@implementation SafesCollection
+@implementation SafesCollectionOld
 
 + (instancetype)sharedInstance {
-    static SafesCollection *sharedInstance = nil;
+    static SafesCollectionOld *sharedInstance = nil;
     static dispatch_once_t onceToken;
     
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[SafesCollection alloc] init];
+        sharedInstance = [[SafesCollectionOld alloc] init];
     });
     return sharedInstance;
 }
@@ -169,7 +169,7 @@
 }
 
 - (BOOL)isValidNickName:(NSString *)nickName {
-    NSString *sanitized = [SafesCollection sanitizeSafeNickName:nickName];
+    NSString *sanitized = [SafesCollectionOld sanitizeSafeNickName:nickName];
     
     NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
 

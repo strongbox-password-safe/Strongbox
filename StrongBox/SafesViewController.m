@@ -18,7 +18,7 @@
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
-#import "SafesCollection.h"
+#import "SafesList.h"
 #import "Alerts.h"
 #import "ISMessages/ISMessages.h"
 #import "UpgradeViewController.h"
@@ -65,7 +65,7 @@
 }
 
 - (void)refreshView {
-    self.collection = SafesCollection.sharedInstance.sortedSafes;
+    self.collection = SafesList.sharedInstance.snapshot;
     [self.tableView reloadData];
     
     self.navigationController.navigationBar.hidden = NO;
@@ -83,7 +83,7 @@
     [self customizeUi];
     
     [iCloudSafesCoordinator sharedInstance].onSafesCollectionUpdated = ^{
-        [self onSafesCollectionUpdated];
+        [self onSafesListUpdated];
     };
     
     if(![[Settings sharedInstance] isPro]) {
@@ -105,29 +105,29 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
-- (void)onSafesCollectionUpdated {
+- (void)onSafesListUpdated {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self refreshView];
     });
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
-    return SafesCollection.sharedInstance.sortedSafes.count - ([self getICloudSafes].count + [self getLocalDeviceSafes].count) > 0;
+    return SafesList.sharedInstance.snapshot.count - ([self getICloudSafes].count + [self getLocalDeviceSafes].count) > 0;
 }
 
 - (NSArray<SafeMetaData*>*)getLocalDeviceSafes {
-    return [SafesCollection.sharedInstance getSafesOfProvider:kLocalDevice];
+    return [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
 }
 
 - (NSArray<SafeMetaData*>*)getICloudSafes {
-    return [SafesCollection.sharedInstance getSafesOfProvider:kiCloud];
+    return [SafesList.sharedInstance getSafesOfProvider:kiCloud];
 }
 
 - (void)removeAllICloudSafes {
     NSArray<SafeMetaData*> *icloudSafesToRemove = [self getICloudSafes];
     
     for (SafeMetaData *item in icloudSafesToRemove) {
-        [SafesCollection.sharedInstance removeSafe:item.nickName];
+        [SafesList.sharedInstance remove:item.uuid];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -440,7 +440,7 @@
                                                                   }];
     }
          
-    [[SafesCollection sharedInstance] removeSafe:safe.nickName];
+    [[SafesList sharedInstance] remove:safe.uuid];
 
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self setEditing:NO];
@@ -595,7 +595,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
             if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 safe.isEnrolledForTouchId = NO;
                 [JNKeychain deleteValueForKey:safe.nickName];
-                [[SafesCollection sharedInstance] save];
+                [[SafesList sharedInstance] save];
                 
                 [Alerts info:self
                         title:@"Could not open safe"
@@ -621,7 +621,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
                        [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
-                       [[SafesCollection sharedInstance] save];
+                       [[SafesList sharedInstance] save];
                        
                        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enrol Successful", self.biometricIdName]
                                                   message:[NSString stringWithFormat:@"You can now use %@ with this safe. Opening...", self.biometricIdName]
@@ -637,7 +637,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    else{
                        safe.isTouchIdEnabled = NO;
                        [JNKeychain saveValue:openedSafe.masterPassword forKey:safe.nickName];
-                       [[SafesCollection sharedInstance] save];
+                       [[SafesList sharedInstance] save];
                        
                        [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
                    }
@@ -874,9 +874,9 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                           message:@"Please Enter the URL of the Safe File."
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               NSString *nickName = [SafesCollection sanitizeSafeNickName:text];
+                               NSString *nickName = [SafesList sanitizeSafeNickName:text];
                                
-                               if (![[SafesCollection sharedInstance] isValidNickName:nickName]) {
+                               if (![[SafesList sharedInstance] isValidNickName:nickName]) {
                                    [Alerts   info:self
                                             title:@"Invalid Nickname"
                                           message:@"That nickname may already exist, or is invalid, please try a different nickname."
@@ -911,7 +911,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
          dispatch_async(dispatch_get_main_queue(), ^(void)
                         {
                             if (error == nil) {
-                                [[SafesCollection sharedInstance] add:metadata];
+                                [[SafesList sharedInstance] add:metadata];
                                 [self refreshView];
                             }
                             else {

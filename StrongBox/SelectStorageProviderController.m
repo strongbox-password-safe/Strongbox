@@ -18,6 +18,7 @@
 #import "StorageBrowserTableViewController.h"
 #import "AppleICloudProvider.h"
 #import "Settings.h"
+#import "SafesList.h"
 
 @interface SelectStorageProviderController ()
 
@@ -132,11 +133,11 @@
         
         [controller addNew:self
                 validation:^BOOL (NSString *name, NSString *password) {
-                    return [[SafesCollection sharedInstance] isValidNickName:name] && password.length;
+                    return [[SafesList sharedInstance] isValidNickName:name] && password.length;
                 }
                 completion:^(NSString *name, NSString *password, BOOL response) {
                     if (response) {
-                        NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
+                        NSString *nickName = [SafesList sanitizeSafeNickName:name];
                         
                         [self addNewSafeAndPopToRoot:nickName
                                             password:password
@@ -165,7 +166,7 @@
           completion:^(SafeMetaData *metadata, NSError *error)
      {
          if (error == nil) {
-             [[SafesCollection sharedInstance] add:metadata];
+             [[SafesList sharedInstance] add:metadata];
          }
          else {
              NSLog(@"An error occurred: %@", error);

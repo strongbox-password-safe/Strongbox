@@ -10,6 +10,7 @@
 #import "AddSafeAlertController.h"
 #import "Alerts.h"
 #import "DatabaseModel.h"
+#import "SafesList.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -137,11 +138,11 @@
 
     [controller addNew:self
             validation:^BOOL (NSString *name, NSString *password) {
-        return [[SafesCollection sharedInstance] isValidNickName:name] && password.length;
+        return [[SafesList sharedInstance] isValidNickName:name] && password.length;
     }
             completion:^(NSString *name, NSString *password, BOOL response) {
                 if (response) {
-                    NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
+                    NSString *nickName = [SafesList sanitizeSafeNickName:name];
                     [self addNewSafeAndPopToRoot:nickName password:password];
                 }
             }];
@@ -164,11 +165,11 @@
 
             [controller addExisting:self
                          validation:^BOOL (NSString *name) {
-                return [[SafesCollection sharedInstance] isValidNickName:name];
+                return [[SafesList sharedInstance] isValidNickName:name];
             }
                          completion:^(NSString *name, BOOL response) {
                              if (response) {
-                             NSString *nickName = [SafesCollection sanitizeSafeNickName:name];
+                             NSString *nickName = [SafesList sanitizeSafeNickName:name];
 
                              [self addExistingSafeAndPopToRoot:file
                                                  name:nickName];
@@ -220,7 +221,7 @@
 - (void)addExistingSafeAndPopToRoot:(StorageBrowserItem *)item name:(NSString *)name {
     SafeMetaData *safe = [self.safeStorageProvider getSafeMetaData:name providerData:item.providerData];
 
-    [[SafesCollection sharedInstance] add:safe];
+    [[SafesList sharedInstance] add:safe];
 
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
@@ -256,7 +257,7 @@
     {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error == nil) {
-                [[SafesCollection sharedInstance] add:metadata];
+                [[SafesList sharedInstance] add:metadata];
             }
             else {
                 NSLog(@"An error occurred: %@", error);

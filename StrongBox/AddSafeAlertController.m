@@ -8,7 +8,7 @@
 
 #import "AddSafeAlertController.h"
 #import "IOsUtils.h"
-#import "SafesCollection.h"
+#import "SafesList.h"
 
 @implementation AddSafeAlertController {
     UIAlertAction *_defaultAction;
@@ -25,11 +25,11 @@
         
         int attempt = 2;
   
-        while(![[SafesCollection sharedInstance] isValidNickName:suggestion] && attempt < 50) {
+        while(![[SafesList sharedInstance] isValidNickName:suggestion] && attempt < 50) {
             suggestion = [NSString stringWithFormat:@"%@'s Safe %d", name, attempt++];
         }
         
-        return [[SafesCollection sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
+        return [[SafesList sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
     }
     
     return nil;

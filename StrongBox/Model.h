@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SafeStorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
-#import "SafesCollection.h"
+#import "SafesList.h"
 #import "DatabaseModel.h"
 
 @interface Model : NSObject

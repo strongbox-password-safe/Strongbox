@@ -147,7 +147,7 @@
                        
                        [JNKeychain deleteValueForKey:self.viewModel.metadata.nickName];
                        
-                       [[SafesCollection sharedInstance] save];
+                       [[SafesList sharedInstance] save];
                        [self updateTouchIdButtonText];
                        
                        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
@@ -177,7 +177,7 @@
     }
     
     [self updateTouchIdButtonText];
-    [[SafesCollection sharedInstance] save];
+    [[SafesList sharedInstance] save];
 }
 
 - (void)onToggleOfflineCache {

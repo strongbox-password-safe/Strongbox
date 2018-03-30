@@ -11,7 +11,7 @@
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "Strongbox.h"
-#import "SafesCollection.h"
+#import "SafesList.h"
 #import "JNKeychain.h"
 
 @implementation iCloudSafesCoordinator
@@ -91,14 +91,14 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     self.showMigrationUi(YES);
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        NSArray<SafeMetaData*> *localSafes = [SafesCollection.sharedInstance getSafesOfProvider:kLocalDevice];
+        NSArray<SafeMetaData*> *localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
         
         for(SafeMetaData *safe in localSafes) {
             [self migrateLocalSafeToICloud:safe];
         }
         
         self.showMigrationUi(NO);
-        [SafesCollection.sharedInstance save];
+        [SafesList.sharedInstance save];
         self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
@@ -111,14 +111,14 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     self.showMigrationUi(YES);
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        NSArray<SafeMetaData*> *iCloudSafes = [SafesCollection.sharedInstance getSafesOfProvider:kiCloud];
+        NSArray<SafeMetaData*> *iCloudSafes = [SafesList.sharedInstance getSafesOfProvider:kiCloud];
         
         for(SafeMetaData *safe in iCloudSafes) {
             [self migrateICloudSafeToLocal:safe];
         }
         
         self.showMigrationUi(NO);
-        [SafesCollection.sharedInstance save];
+        [SafesList.sharedInstance save];
         self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
@@ -146,7 +146,8 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         }
         
         if(![safe.nickName isEqualToString:newNickName]) {
-            [SafesCollection.sharedInstance changeNickName:safe.nickName newNickName:newNickName];
+            safe.nickName = newNickName;
+            [SafesList.sharedInstance save];
         }
         
         safe.storageProvider = kiCloud;
@@ -179,8 +180,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
                      [JNKeychain saveValue:password forKey:metadata.nickName];
                  }
                  
-                 [SafesCollection.sharedInstance changeNickName:safe.nickName newNickName:metadata.nickName];
-                 
+                 safe.nickName = metadata.nickName;
                  safe.storageProvider = kLocalDevice;
                  safe.fileIdentifier = metadata.fileIdentifier;
                  safe.fileName = metadata.fileName;
@@ -365,7 +365,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     }
     
     if(updated) {
-        [[SafesCollection sharedInstance] save];
+        [[SafesList sharedInstance] save];
     }
     
     return updated;
@@ -391,7 +391,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
         
-        [[SafesCollection sharedInstance] add:newSafe];
+        [[SafesList sharedInstance] add:newSafe];
         
         added = YES;
     }
@@ -412,7 +412,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     for(SafeMetaData* safe in safeFileNamesToBeRemoved.allValues) {
         NSLog(@"iCloud Safe Removed: %@", safe);
         
-        [SafesCollection.sharedInstance removeSafe:safe.nickName];
+        [SafesList.sharedInstance remove:safe.uuid];
         removed = YES;
     }
     
@@ -422,7 +422,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 -(NSMutableDictionary<NSString*, SafeMetaData*>*)getICloudSafesDictionary {
     NSMutableDictionary<NSString*, SafeMetaData*>* ret = [NSMutableDictionary dictionary];
     
-    for(SafeMetaData *safe in [[SafesCollection sharedInstance] getSafesOfProvider:kiCloud]) {
+    for(SafeMetaData *safe in [[SafesList sharedInstance] getSafesOfProvider:kiCloud]) {
         [ret setValue:safe forKey:safe.fileName];
     }
     

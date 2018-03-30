@@ -14,6 +14,8 @@
 @implementation PasswordGenerationSettingsTableView
 
 - (void)viewDidLoad {
+    [super viewDidLoad];
+    
     // A little trick for removing the cell separators
     self.tableView.tableFooterView = [UIView new];
     
