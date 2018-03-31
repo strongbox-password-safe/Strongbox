@@ -200,13 +200,13 @@
                                               withUrl:file.iconLink
                                            completion:^(NSData *data, NSError *error) {
                                                if (error == nil && data) {
-                                               UIImage *image = [UIImage imageWithData:data];
+                                                   UIImage *image = [UIImage imageWithData:data];
 
-                                               if (image) {
-                                               _iconsByUrl[file.iconLink] = image;
+                                                   if (image) {
+                                                       self->_iconsByUrl[file.iconLink] = image;
 
-                                               completionHandler(image);
-                                               }
+                                                       completionHandler(image);
+                                                    }
                                                }
                                                else {
                                                NSLog(@"An error occurred downloading icon: %@", error);

@@ -20,6 +20,19 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelMinimumLength;
 @property (weak, nonatomic) IBOutlet UILabel *labelMaximumLength;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPassword;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAlgorithm;
+@property (weak, nonatomic) IBOutlet UIStepper *stepperXkcdWordCount;
+@property (weak, nonatomic) IBOutlet UILabel *labelXkcdWordCount;
+
+// Static labels - outlets added just for enabling/disabling
+@property (weak, nonatomic) IBOutlet UILabel *labelLower;
+@property (weak, nonatomic) IBOutlet UILabel *labelUpper;
+@property (weak, nonatomic) IBOutlet UILabel *labelDigits;
+@property (weak, nonatomic) IBOutlet UILabel *labelSymbols;
+@property (weak, nonatomic) IBOutlet UILabel *labelEasyRead;
+@property (weak, nonatomic) IBOutlet UILabel *labelMinLen;
+@property (weak, nonatomic) IBOutlet UILabel *labelMaxLen;
+@property (weak, nonatomic) IBOutlet UILabel *labelXkcdWc;
 
 - (IBAction)onChangeSettings:(id)sender;
 - (IBAction)onGenerate:(id)sender;

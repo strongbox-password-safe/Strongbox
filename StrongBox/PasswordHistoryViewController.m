@@ -57,20 +57,20 @@
               message:@"Are you sure you want to disable history? This will clear previous passwords."
                action:^(BOOL response) {
                    if (response) {
-                       _model.enabled = NO;
-                       [_model.entries removeAllObjects];
+                       self.model.enabled = NO;
+                       [self.model.entries removeAllObjects];
 
                        [self save];
                        [self bindToModel];
                    }
                    else {
-                       _model.enabled = YES;
+                       self.model.enabled = YES;
                        [self bindToModel];
                    }
                }];
     }
     else {
-        _model.enabled = self.uiSwitchEnabled.on;
+        self.model.enabled = self.uiSwitchEnabled.on;
         [self save];
         [self bindToModel];
     }

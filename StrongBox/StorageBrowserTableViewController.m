@@ -110,14 +110,14 @@
                             viewController:self
                                 completion:^(UIImage *image) {
                                     dispatch_async(dispatch_get_main_queue(), ^(void) {
-                                    _iconsCache[myKey] = image;
+                                        self->_iconsCache[myKey] = image;
 
-                                    cell.imageView.image = image;
+                                        cell.imageView.image = image;
 
-                                    NSArray *rowsToReload = @[indexPath];
-                                    [self.tableView reloadRowsAtIndexPaths:rowsToReload
-                                          withRowAnimation:UITableViewRowAnimationNone];
-                                    });
+                                        NSArray *rowsToReload = @[indexPath];
+                                        [self.tableView reloadRowsAtIndexPaths:rowsToReload
+                                              withRowAnimation:UITableViewRowAnimationNone];
+                                        });
                                 }];
         }
         else {

@@ -51,6 +51,7 @@
 		4D78AC4D1FB1E2F200A68A92 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC4B1FB1E2F100A68A92 /* crypt_argchk.c */; };
 		4D78AC4E1FB1E2F200A68A92 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC4C1FB1E2F100A68A92 /* twofish.c */; };
 		4D890EED1FF138D400A80934 /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D890EEC1FF138D400A80934 /* CHCSVParser.m */; };
+		4D90843E206FEF21008659A9 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D90843D206FEF21008659A9 /* google-10000-english-usa-no-swears-medium.txt */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -160,6 +161,7 @@
 		4D78AC591FB2281600A68A92 /* AbstractPasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractPasswordDatabase.h; path = model/AbstractPasswordDatabase.h; sourceTree = SOURCE_ROOT; };
 		4D890EEB1FF138D400A80934 /* CHCSVParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHCSVParser.h; path = chcsv/CHCSVParser.h; sourceTree = SOURCE_ROOT; };
 		4D890EEC1FF138D400A80934 /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = chcsv/CHCSVParser.m; sourceTree = SOURCE_ROOT; };
+		4D90843D206FEF21008659A9 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "google-10000-english-usa-no-swears-medium.txt"; sourceTree = SOURCE_ROOT; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 		4DBE5B341C8356C700C310BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4D90843D206FEF21008659A9 /* google-10000-english-usa-no-swears-medium.txt */,
 				4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */,
 				4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */,
 				4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */,
@@ -453,7 +456,7 @@
 		4DBE5B291C8356C700C310BC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
 					4DBE5B301C8356C700C310BC = {
@@ -495,6 +498,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
+				4D90843E206FEF21008659A9 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D1A5BFC1F7923FF0036684C /* Images.xcassets in Resources */,
 				4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
@@ -668,12 +672,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -723,12 +729,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

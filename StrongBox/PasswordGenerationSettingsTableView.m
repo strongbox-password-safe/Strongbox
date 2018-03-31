@@ -27,6 +27,13 @@
 - (IBAction)onChangeSettings:(id)sender {
     PasswordGenerationParameters *params = [[PasswordGenerationParameters alloc] init];
     
+    params.algorithm = self.segmentAlgorithm.selectedSegmentIndex == 0 ? kBasic : kXkcd;
+    params.xkcdWordCount = self.stepperXkcdWordCount.value;
+    
+    if(params.xkcdWordCount <= 0) {
+        params.xkcdWordCount = 1;
+    }
+    
     params.useDigits = self.switchUseDigits.on;
     params.useSymbols = self.switchUseSymbols.on;
     params.useLower = self.switchUseLowercase.on;
@@ -59,6 +66,8 @@
     [[Settings sharedInstance] setPasswordGenerationParameters:params];
     
     [self bindUiToSettings];
+    
+    [self onGenerate:nil];
 }
 
 -(void)bindUiToSettings {
@@ -73,6 +82,34 @@
     self.labelMaximumLength.text = [NSString stringWithFormat:@"%d", params.maximumLength];
     self.stepperMinimumLength.value = params.minimumLength;
     self.stepperMaximumLength.value = params.maximumLength;
+    
+    self.segmentAlgorithm.selectedSegmentIndex = params.algorithm == kBasic ? 0 : 1;
+    self.stepperXkcdWordCount.value = params.xkcdWordCount;
+    self.labelXkcdWordCount.text = [NSString stringWithFormat:@"%d", params.xkcdWordCount];
+
+    
+    self.switchUseDigits.enabled = params.algorithm == kBasic;
+    self.switchUseSymbols.enabled = params.algorithm == kBasic;
+    self.switchUseLowercase.enabled = params.algorithm == kBasic;
+    self.switchUseUppercase.enabled = params.algorithm == kBasic;
+    self.switchMakeEasyRead.enabled = params.algorithm == kBasic;
+    self.labelMinimumLength.enabled = params.algorithm == kBasic;
+    self.labelMaximumLength.enabled = params.algorithm == kBasic;
+    self.stepperMinimumLength.enabled = params.algorithm == kBasic;
+    self.stepperMaximumLength.enabled = params.algorithm == kBasic;
+    
+    self.stepperXkcdWordCount.enabled = params.algorithm == kXkcd;
+    self.labelXkcdWordCount.enabled = params.algorithm == kXkcd;
+    
+    self.labelLower.enabled = params.algorithm == kBasic;
+    self.labelUpper.enabled = params.algorithm == kBasic;
+    self.labelDigits.enabled = params.algorithm == kBasic;
+    self.labelSymbols.enabled = params.algorithm == kBasic;
+    self.labelEasyRead.enabled = params.algorithm == kBasic;
+    self.labelMinLen.enabled = params.algorithm == kBasic;
+    self.labelMaxLen.enabled = params.algorithm == kBasic;
+    
+    self.labelXkcdWc.enabled = params.algorithm == kXkcd;
 }
 
 - (IBAction)onGenerate:(id)sender {

@@ -20,6 +20,9 @@ static NSString* kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
     if(parameters.algorithm == kBasic) {
         return [PasswordGenerator generateBasicPassword:parameters];
     }
+    if(parameters.algorithm == kXkcd) {
+        return [PasswordGenerator generateXkcdPassword:parameters];
+    }
     else {
         NSLog(@"Ruh roh... don't know how to generate this kind of password.");
         return @"Ruh roh...";
@@ -62,6 +65,32 @@ static NSString* kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
     
     for (int i = 0; i < len; i++) {
         [randomString appendFormat:@"%C", [pool characterAtIndex:arc4random_uniform((u_int32_t)pool.length)]];
+    }
+    
+    return randomString;
+}
+
++ (NSArray *)wordList
+{
+    static NSArray *_wordList;
+    static dispatch_once_t onceToken;
+   
+    dispatch_once(&onceToken, ^{
+        NSString* fileRoot = [[NSBundle mainBundle] pathForResource:@"google-10000-english-usa-no-swears-medium" ofType:@"txt"];
+        NSString* fileContents = [NSString stringWithContentsOfFile:fileRoot encoding:NSUTF8StringEncoding error:nil];
+        _wordList = [fileContents componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    });
+    
+    return _wordList;
+}
+
++ (NSString*)generateXkcdPassword:(PasswordGenerationParameters*)parameters {
+    NSMutableString *randomString = [NSMutableString string];
+    
+    for(int i=0;i<parameters.xkcdWordCount;i++) {
+        NSUInteger index = arc4random_uniform((u_int32_t)PasswordGenerator.wordList.count);
+    
+        [randomString appendString:[[PasswordGenerator.wordList objectAtIndex:index] capitalizedString]];
     }
     
     return randomString;

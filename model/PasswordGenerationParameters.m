@@ -20,6 +20,7 @@
         self.easyReadOnly = YES;
         self.minimumLength = 14;
         self.maximumLength = 24;
+        self.xkcdWordCount = 4;
         
         return self;
     }
@@ -36,6 +37,7 @@
     [encoder encodeBool:self.easyReadOnly forKey:@"easyReadOnly"];
     [encoder encodeInteger:self.minimumLength forKey:@"minimumLength"];
     [encoder encodeInteger:self.maximumLength forKey:@"maximumLength"];
+    [encoder encodeInteger:self.xkcdWordCount forKey:@"xkcdWordCount"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -48,6 +50,9 @@
         self.easyReadOnly = [decoder decodeBoolForKey:@"easyReadOnly"];
         self.minimumLength = (int)[decoder decodeIntegerForKey:@"minimumLength"];
         self.maximumLength = (int)[decoder decodeIntegerForKey:@"maximumLength"];
+        self.xkcdWordCount = (int)[decoder decodeIntegerForKey:@"xkcdWordCount"];
+    
+        self.xkcdWordCount = self.xkcdWordCount == 0 ? 4 : self.xkcdWordCount; // TODO: Remove?
     }
 
     return self;

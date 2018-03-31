@@ -204,9 +204,9 @@
     else {
         if ([self uiIsDirty]) { // Any other changes? Change the record and save the safe
             [self saveAfterEdit:^(NSError *error) {
-                self.navigationItem.leftBarButtonItem = navBack;
+                self.navigationItem.leftBarButtonItem = self->navBack;
                 self.editButtonItem.enabled = YES;
-                navBack = nil;
+                self->navBack = nil;
                 
                 if (error != nil) {
                     [self.navigationController popToRootViewControllerAnimated:YES];

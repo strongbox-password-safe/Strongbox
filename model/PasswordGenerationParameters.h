@@ -10,11 +10,11 @@
 
 typedef enum {
     kBasic,
+    kXkcd,
 } PasswordGenerationAlgorithm;
 
 @interface PasswordGenerationParameters : NSObject
 
-//- (instancetype _Nullable)init;
 - (instancetype _Nullable)initWithDefaults;
 
 @property (nonatomic) PasswordGenerationAlgorithm algorithm;
@@ -25,5 +25,7 @@ typedef enum {
 @property (nonatomic) BOOL easyReadOnly;
 @property (nonatomic) int minimumLength;
 @property (nonatomic) int maximumLength;
+
+@property (nonatomic) int xkcdWordCount;
 
 @end

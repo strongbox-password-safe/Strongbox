@@ -67,7 +67,7 @@
     _defaultAction = [UIAlertAction actionWithTitle:@"Add Safe"
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *a) {
-                                                completion((_alertController.textFields[0]).text, (_alertController.textFields[1]).text, true);
+                                                completion((self->_alertController.textFields[0]).text, (self->_alertController.textFields[1]).text, true);
                                             }];
     [_defaultAction setEnabled:NO];
 
@@ -96,7 +96,7 @@
     _defaultAction = [UIAlertAction actionWithTitle:@"Add Safe"
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *a) {
-                                                completion((_alertController.textFields[0]).text, true);
+                                                completion((self->_alertController.textFields[0]).text, true);
                                             }];
     [_defaultAction setEnabled:suggestedName != nil];
     

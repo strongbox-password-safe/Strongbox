@@ -69,7 +69,7 @@
                 return;
             }
 
-            [_storageProvider update:self.metadata
+            [self->_storageProvider update:self.metadata
                                 data:updatedSafeData
                           completion:^(NSError *error) {
                               [self updateOfflineCacheWithData:updatedSafeData];
@@ -95,9 +95,9 @@
             NSData *updatedSafeData = [self.passwordDatabase getAsData:&error];
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                if (updatedSafeData != nil && _metadata.offlineCacheEnabled) {
+                if (updatedSafeData != nil && self->_metadata.offlineCacheEnabled) {
                     NSLog(@"Updating offline cache for safe.");
-                    [self saveOfflineCacheFile:updatedSafeData safe:_metadata];
+                    [self saveOfflineCacheFile:updatedSafeData safe:self->_metadata];
                 }
 
                 handler();
@@ -156,9 +156,9 @@
 - (void)disableAndClearOfflineCache {
     [[LocalDeviceStorageProvider sharedInstance] deleteOfflineCachedSafe:_metadata
                          completion:^(NSError *error) {
-                             _metadata.offlineCacheEnabled = NO;
-                             _metadata.offlineCacheAvailable = NO;
-                             _metadata.offlineCacheFileIdentifier = @"";
+                             self->_metadata.offlineCacheEnabled = NO;
+                             self->_metadata.offlineCacheAvailable = NO;
+                             self->_metadata.offlineCacheFileIdentifier = @"";
 
                              [[SafesList sharedInstance] save];
                          }];
