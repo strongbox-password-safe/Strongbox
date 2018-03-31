@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Futura.ttc">
-            <string>Futura-Bold</string>
-            <string>Futura-Medium</string>
-        </array>
-        <array key="HelveticaNeue.ttc">
-            <string>HelveticaNeue</string>
-            <string>HelveticaNeue-Bold</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--Safes [Lite Version]-->
         <scene sceneID="JvJ-3L-1tN">
@@ -122,7 +112,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aFA-j3-EVC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-692" y="741.67916041979015"/>
+            <point key="canvasLocation" x="-962" y="740"/>
         </scene>
         <!--Browse-->
         <scene sceneID="c46-7i-tlg">
@@ -380,7 +370,9 @@
                             <outlet property="delegate" destination="nJM-pW-a0b" id="ZYP-Dx-1Sv"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Password History" id="v4O-wj-lOx"/>
+                    <navigationItem key="navigationItem" title="Password History" id="v4O-wj-lOx">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="ZhO-d7-8d0"/>
+                    </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <connections>
                         <outlet property="uiLabelMaximumEntries" destination="IuL-ne-iUf" id="bTD-Q4-FAH"/>
@@ -634,7 +626,9 @@
                             <outlet property="delegate" destination="gAY-yV-Xd6" id="I4x-eg-v1i"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Preferences" id="Vsu-pc-KkX"/>
+                    <navigationItem key="navigationItem" title="Preferences" id="Vsu-pc-KkX">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="FLi-bi-w5S"/>
+                    </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
@@ -649,7 +643,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BV1-YR-Th3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1075.3623188405797" y="1469.8369565217392"/>
+            <point key="canvasLocation" x="-1341" y="1825"/>
         </scene>
         <!--Safe Settings & Details-->
         <scene sceneID="APk-bQ-zgs">
@@ -1010,7 +1004,7 @@
                                         <rect key="frame" x="0.0" y="672" width="414" height="39"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="zXr-zW-vf3" id="OZP-Tj-iEP">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="39"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="38.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Unique Passwords" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="mYA-gd-DS4">
@@ -1034,7 +1028,7 @@
                                         <rect key="frame" x="0.0" y="711" width="414" height="39"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="haz-ge-5Wt" id="yR5-Ag-hNo">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="39"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="38.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Most Used Username" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="6w7-Uw-uKB">
@@ -1058,7 +1052,7 @@
                                         <rect key="frame" x="0.0" y="750" width="414" height="39"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2RJ-va-rzz" id="fVT-FK-GrC">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="39"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="38.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Most Used Email" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Vag-wQ-Kyg">
@@ -1082,7 +1076,7 @@
                                         <rect key="frame" x="0.0" y="789" width="414" height="39"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="c5r-Sy-ttq" id="H7W-h4-0n9">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="39"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="38.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Key Stretch Iterations" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="hNQ-sC-CAj">
@@ -1106,7 +1100,7 @@
                                         <rect key="frame" x="0.0" y="828" width="414" height="39"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Pkx-We-Yvt" id="ZP2-mU-r9i">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="39"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="38.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Password Safe File Version" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1VV-Qm-WYT">
@@ -1164,7 +1158,7 @@
         <!--Record-->
         <scene sceneID="5LP-c7-9F7">
             <objects>
-                <tableViewController extendedLayoutIncludesOpaqueBars="YES" id="PDC-ZT-MAP" userLabel="Record" customClass="RecordView" sceneMemberID="viewController">
+                <tableViewController title="View Record" extendedLayoutIncludesOpaqueBars="YES" id="PDC-ZT-MAP" userLabel="Record" customClass="RecordView" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="static" style="plain" separatorStyle="none" rowHeight="44" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="0er-gf-mGP">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="672"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1201,7 +1195,7 @@
                                                     <state key="normal" image="gear_64"/>
                                                     <connections>
                                                         <action selector="onSettings:" destination="PDC-ZT-MAP" eventType="touchUpInside" id="GSk-Cn-94i"/>
-                                                        <segue destination="2Or-2d-vYA" kind="show" id="B0D-Y9-Jhh"/>
+                                                        <segue destination="2Or-2d-vYA" kind="show" identifier="segueToPwSettings" id="B0D-Y9-Jhh"/>
                                                     </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vHg-a6-03L" userLabel="History">
@@ -1429,7 +1423,9 @@
                     <toolbarItems>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="Tff-Bw-ckb"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="Record Title" id="YpU-RQ-SS6"/>
+                    <navigationItem key="navigationItem" title="View Record" id="YpU-RQ-SS6">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="fFi-du-Qce"/>
+                    </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
@@ -1556,7 +1552,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="um3-WA-UOS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-155.20000000000002" y="1522.9385307346329"/>
+            <point key="canvasLocation" x="-474" y="1522"/>
         </scene>
         <!--Splash & Lock Screen-->
         <scene sceneID="JiB-Dt-SJh">
@@ -1822,7 +1818,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rNc-h9-hcB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-692" y="38"/>
+            <point key="canvasLocation" x="-729" y="-122"/>
         </scene>
         <!--About-->
         <scene sceneID="BMA-yx-CBv">
@@ -2599,7 +2595,7 @@ Cg
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="k7a-hR-PUh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1494.4000000000001" y="740.32983508245889"/>
+            <point key="canvasLocation" x="-1495" y="879"/>
         </scene>
         <!--Search For Group Destination Nav-->
         <scene sceneID="IdF-tS-cFn">
@@ -2679,7 +2675,7 @@ Cg
         <!--Password Generation Settings-->
         <scene sceneID="mCx-TP-j9x">
             <objects>
-                <tableViewController title="Password Generation Settings" extendedLayoutIncludesOpaqueBars="YES" id="2Or-2d-vYA" customClass="PasswordGenerationSettingsTableView" sceneMemberID="viewController">
+                <tableViewController title="Password Generation Settings" hidesBottomBarWhenPushed="YES" id="2Or-2d-vYA" customClass="PasswordGenerationSettingsTableView" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="OqJ-iZ-MfS">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3029,6 +3025,6 @@ Cg
         <image name="warning-32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Yf0-U4-iru"/>
+        <segue reference="B0D-Y9-Jhh"/>
     </inferredMetricsTieBreakers>
 </document>
