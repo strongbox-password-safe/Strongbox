@@ -217,11 +217,58 @@
 }
 
 - (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
-    Node* item = [self addSampleRecord:parentGroup];
+    NSString* actualTitle = @"New Untitled Record";
+    NSString *actualNotes = @"";
+    NSString *actualUrl = @"";
+    NSString *actualUsername = @"";
+    NSString *actualEmail = @"";
+    
+    if(!Settings.sharedInstance.doNotAutoFillFromClipboard) {
+        NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+        NSString* notesOrUrlFromClipboard = [myPasteboard  stringForType:NSPasteboardTypeString];
+        
+        // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
 
-    self.document.dirty = (item != nil);
+        NSURL *url = [NSURL URLWithString:notesOrUrlFromClipboard];
+        if (url && url.scheme && url.host)
+        {
+            actualUrl = notesOrUrlFromClipboard;
+            actualTitle = url.host;
+        }
+        else {
+            actualNotes = notesOrUrlFromClipboard;
+        }
+    }
 
-    return item;
+    if(!Settings.sharedInstance.doNotAutoFillFromMostPopularFields) {
+        actualUsername = self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
+        actualEmail = self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
+    }
+    
+    NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
+                                                          url:actualUrl
+                                                     password:[self generatePassword]
+                                                        notes:actualNotes
+                                                        email:actualEmail];
+    
+
+    Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields];
+    
+    NSDate* date = [NSDate date];
+    record.fields.created = date;
+    record.fields.accessed = date;
+    record.fields.modified = date;
+    
+    if(![parentGroup addChild:record]) {
+        // Message not necessary for record but log here in case change in future
+        
+        NSLog(@"addNewRecord: addChild() Failed");
+        return nil;
+    }
+
+    self.document.dirty = YES;
+
+    return record;
 }
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup {

@@ -13,6 +13,8 @@
 #define kEndFreeTrialDate @"endFreeTrialDate"
 #define kAutoLockTimeout @"autoLockTimeout"
 #define kPasswordGenerationParameters @"passwordGenerationParameters"
+#define kDoNotAutoFillFromClipboard @"doNotAutoFillFromClipboard"
+#define kDoNotAutoFillFromMostPopularFields @"doNotAutoFillFromMostPopularFields"
 
 @implementation Settings
 
@@ -40,6 +42,22 @@
 
 - (void)setFullVersion:(BOOL)value {
     [self setBool:kFullVersion value:value];
+}
+
+- (BOOL)doNotAutoFillFromClipboard {
+    return [self getBool:kDoNotAutoFillFromClipboard];
+}
+
+-(BOOL)doNotAutoFillFromMostPopularFields {
+    return [self getBool:kDoNotAutoFillFromMostPopularFields];
+}
+
+- (void)setDoNotAutoFillFromClipboard:(BOOL)doNotAutoFillFromClipboard {
+    [self setBool:kDoNotAutoFillFromClipboard value:doNotAutoFillFromClipboard];
+}
+
+- (void)setDoNotAutoFillFromMostPopularFields:(BOOL)doNotAutoFillFromMostPopularFields {
+    [self setBool:kDoNotAutoFillFromMostPopularFields value:doNotAutoFillFromMostPopularFields];
 }
 
 - (BOOL)freeTrial {

@@ -65,8 +65,32 @@
     }
     
     [self bindAutoLockUi];
+    [self bindAutoFillUi];
     
     self.applicationHasFinishedLaunching = YES;
+}
+
+- (IBAction)onSetAutoFillUserOrEmail:(id)sender {
+    Settings.sharedInstance.doNotAutoFillFromMostPopularFields = ((NSMenuItem*)sender).state;
+    
+    [self bindAutoFillUi];
+}
+
+- (IBAction)onSetAutoFillUrlOrNotes:(id)sender {
+    Settings.sharedInstance.doNotAutoFillFromClipboard = ((NSMenuItem*)sender).state;
+    
+    [self bindAutoFillUi];
+}
+
+- (void)bindAutoFillUi {
+    NSMenu* menu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Auto Fill"] submenu];
+    
+    BOOL foo = Settings.sharedInstance.doNotAutoFillFromMostPopularFields;
+    NSMenuItem* blah = [menu itemAtIndex:0];
+    
+    [blah setState:!foo ? NSOnState : NSOffState ];
+    
+    [[menu itemAtIndex:1] setState:!Settings.sharedInstance.doNotAutoFillFromClipboard ? NSOnState : NSOffState ];
 }
 
 - (IBAction)onSetAutoLockTimeout:(id)sender {
@@ -76,7 +100,7 @@
 }
 
 - (void)bindAutoLockUi {
-    NSMenu* menu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Autolock"] submenu];
+    NSMenu* menu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Auto Lock"] submenu];
     NSInteger alt = [[Settings sharedInstance] autoLockTimeoutSeconds];
 
     [[menu itemAtIndex:0] setState:alt == 0 ? NSOnState : NSOffState ];
@@ -221,9 +245,6 @@
     NSWindow *window = [NSApplication sharedApplication].mainWindow;
     
     [window beginSheet:self.preferencesWindowController.window completionHandler:nil];
-    
-//    if([PreferencesWindowController runModal]) {
-//    };
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {

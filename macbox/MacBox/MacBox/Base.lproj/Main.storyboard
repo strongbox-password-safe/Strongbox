@@ -266,11 +266,11 @@ CA
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Autolock" id="8Sd-C8-9Qq" userLabel="Autolock">
+                            <menuItem title="Auto Lock" id="8Sd-C8-9Qq" userLabel="Autolock">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Autolock" id="qZz-Vd-jlc">
+                                <menu key="submenu" title="Auto Lock" id="qZz-Vd-jlc">
                                     <items>
-                                        <menuItem title="Never Autolock" state="on" id="K3n-Ua-8iV">
+                                        <menuItem title="Never Auto Lock" state="on" id="K3n-Ua-8iV">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4Cb-1q-i9w"/>
@@ -292,6 +292,25 @@ CA
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="66m-uj-7Uz"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Auto Fill" id="Jwh-Te-dZC" userLabel="Autofill">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Auto Fill" id="ftP-7i-0nV">
+                                    <items>
+                                        <menuItem title="Auto Fill Most Popular Username and Email" state="on" id="V5o-oq-xft">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onSetAutoFillUserOrEmail:" target="Ady-hI-5gd" id="OI5-5E-dhw"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Auto Fill URL or Notes from Clipboard" state="on" id="1tF-kr-pGc">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onSetAutoFillUrlOrNotes:" target="Ady-hI-5gd" id="exE-PY-aSE"/>
                                             </connections>
                                         </menuItem>
                                     </items>
