@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "PasswordGenerationParameters.h"
 
 @interface Settings : NSObject
 
@@ -19,5 +20,6 @@
 @property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
 @property (nonatomic, strong) NSDate* endFreeTrialDate;
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
+@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 
 @end

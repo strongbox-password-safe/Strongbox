@@ -13,6 +13,7 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "Strongbox.h"
+#import "PreferencesWindowController.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -211,6 +212,13 @@
     }
     
     return YES;
+}
+
+- (IBAction)onPreferences:(id)sender {
+    if([PreferencesWindowController runModal]) {
+        [[Settings sharedInstance] setFullVersion:YES];
+        [self removeUpgradeMenuItem];
+    };
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {

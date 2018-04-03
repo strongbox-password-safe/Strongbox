@@ -79,28 +79,50 @@
     }
 }
 
-- (BOOL)saveToURL:(NSURL *)absoluteURL
+- (void)saveToURL:(NSURL *)url
            ofType:(NSString *)typeName
  forSaveOperation:(NSSaveOperationType)saveOperation
-            error:(NSError **)outError
-{
+completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
     // Update the Last Update Fields
     
     [self.model defaultLastUpdateFieldsToNow];
     
-    BOOL success = [super saveToURL:absoluteURL
-                             ofType:typeName
-                   forSaveOperation:saveOperation
-                              error:outError];
-    
-    if (success) {
-        self.dirty = NO;
-        ViewController *vc = (ViewController*)self.windowController.contentViewController;
-        [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
-    }
-    
-    return success;
+    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {
+        if (!errorOrNil) {
+            self.dirty = NO;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                ViewController *vc = (ViewController*)self.windowController.contentViewController;
+                [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
+            });
+        }
+        else {
+            NSLog(@"Error during saveToURL: %@", errorOrNil);
+        }
+    }];
 }
+
+//- (BOOL)saveToURL:(NSURL *)absoluteURL
+//           ofType:(NSString *)typeName
+// forSaveOperation:(NSSaveOperationType)saveOperation
+//            error:(NSError **)outError
+//{
+//    // Update the Last Update Fields
+//
+//    [self.model defaultLastUpdateFieldsToNow];
+//
+//    BOOL success = [super saveToURL:absoluteURL
+//                             ofType:typeName
+//                   forSaveOperation:saveOperation
+//                              error:outError];
+//
+//    if (success) {
+//        self.dirty = NO;
+//        ViewController *vc = (ViewController*)self.windowController.contentViewController;
+//        [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
+//    }
+//
+//    return success;
+//}
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
     return [self.model getPasswordDatabaseAsData:outError];

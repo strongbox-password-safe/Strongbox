@@ -288,6 +288,7 @@
 
 - (NSString *)generatePassword {
     PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
+    
     return [PasswordGenerator generatePassword:params];
 }
 

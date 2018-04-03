@@ -10,6 +10,10 @@
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
 		4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
+		4D58A455207363D00061E046 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A451207363D00061E046 /* PasswordGenerator.m */; };
+		4D58A456207363D00061E046 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A454207363D00061E046 /* PasswordGenerationParameters.m */; };
+		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
+		4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D58A45B207368B10061E046 /* PreferencesWindowController.xib */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
@@ -61,6 +65,13 @@
 		4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockedSafeInfo.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
 		4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewModel.m; sourceTree = "<group>"; };
+		4D58A451207363D00061E046 /* PasswordGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerator.m; path = ../../../model/PasswordGenerator.m; sourceTree = "<group>"; };
+		4D58A452207363D00061E046 /* PasswordGenerationParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationParameters.h; path = ../../../model/PasswordGenerationParameters.h; sourceTree = "<group>"; };
+		4D58A453207363D00061E046 /* PasswordGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerator.h; path = ../../../model/PasswordGenerator.h; sourceTree = "<group>"; };
+		4D58A454207363D00061E046 /* PasswordGenerationParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationParameters.m; path = ../../../model/PasswordGenerationParameters.m; sourceTree = "<group>"; };
+		4D58A459207368B10061E046 /* PreferencesWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
+		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
+		4D58A45B207368B10061E046 /* PreferencesWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesWindowController.xib; sourceTree = "<group>"; };
 		4D5AE1E81F432BBC000A34D7 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		4D5AE1E91F432BBC000A34D7 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeWindowController.h; sourceTree = "<group>"; };
@@ -177,6 +188,10 @@
 		4D78AC151FB1E1C000A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D58A452207363D00061E046 /* PasswordGenerationParameters.h */,
+				4D58A454207363D00061E046 /* PasswordGenerationParameters.m */,
+				4D58A453207363D00061E046 /* PasswordGenerator.h */,
+				4D58A451207363D00061E046 /* PasswordGenerator.m */,
 				4D890EEE1FF14AC100A80934 /* CHCSVParser.h */,
 				4D890EEF1FF14AC100A80934 /* CHCSVParser.m */,
 				4D78AC5C1FB2282700A68A92 /* AbstractPasswordDatabase.h */,
@@ -258,6 +273,9 @@
 				4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */,
 				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
 				4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */,
+				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
+				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
+				4D58A45B207368B10061E046 /* PreferencesWindowController.xib */,
 			);
 			path = MacBox;
 			sourceTree = "<group>";
@@ -381,6 +399,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */,
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
@@ -407,10 +426,12 @@
 				4D890EF01FF14AC100A80934 /* CHCSVParser.m in Sources */,
 				4DFB92FA1FB1D44A008D092F /* KeypassDatabase.m in Sources */,
 				4D78AC101FB1E1B700A68A92 /* Field.m in Sources */,
+				4D58A455207363D00061E046 /* PasswordGenerator.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				4D78AC541FB1E58200A68A92 /* crypt_argchk.c in Sources */,
 				4D78AC551FB1E58200A68A92 /* twofish.c in Sources */,
+				4D58A456207363D00061E046 /* PasswordGenerationParameters.m in Sources */,
 				4D78AC1F1FB1E1DB00A68A92 /* DatabaseModel.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
 				4D78AC201FB1E1DB00A68A92 /* NodeFields.m in Sources */,
@@ -427,6 +448,7 @@
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
 				4D78AC211FB1E1DB00A68A92 /* Utils.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
+				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
 				4D78AC221FB1E1DB00A68A92 /* Node.m in Sources */,
 				4D78AC0F1FB1E1B700A68A92 /* Group.m in Sources */,
 				4D78AC141FB1E1B700A68A92 /* Record.m in Sources */,

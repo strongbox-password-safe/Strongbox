@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
@@ -29,6 +29,12 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="onUpgradeToFullVersion:" target="Ady-hI-5gd" id="UDN-oX-uJN"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="9Sn-lP-pm7"/>
+                                        <menuItem title="Preferences..." keyEquivalent="," id="Ocv-5L-Nac" userLabel="Upgrade...">
+                                            <connections>
+                                                <action selector="onPreferences:" target="Ady-hI-5gd" id="p1f-mH-fZh"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
@@ -375,11 +381,11 @@ CA
                                 <tabViewItems>
                                     <tabViewItem label="Locked" identifier="1" id="xow-Ku-u1Q" userLabel="Locked">
                                         <view key="view" id="ep8-tM-6ey">
-                                            <rect key="frame" x="10" y="33" width="1228" height="646"/>
+                                            <rect key="frame" x="10" y="33" width="910" height="646"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="25" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aN5-Vl-vvB" userLabel="Locked Stack">
-                                                    <rect key="frame" x="486" y="157" width="256" height="332"/>
+                                                    <rect key="frame" x="327" y="157" width="256" height="332"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FOh-K8-UzN">
                                                             <rect key="frame" x="0.0" y="76" width="256" height="256"/>
@@ -836,14 +842,14 @@ DQ
                                                                                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nwU-ra-Y09">
                                                                                         <rect key="frame" x="10" y="62" width="415" height="262"/>
                                                                                         <clipView key="contentView" id="n6X-39-X3W">
-                                                                                            <rect key="frame" x="1" y="1" width="413" height="260"/>
+                                                                                            <rect key="frame" x="1" y="1" width="398" height="260"/>
                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                             <subviews>
                                                                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
-                                                                                                    <rect key="frame" x="0.0" y="0.0" width="413" height="260"/>
+                                                                                                    <rect key="frame" x="0.0" y="0.0" width="398" height="260"/>
                                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                                                                    <size key="minSize" width="413" height="260"/>
+                                                                                                    <size key="minSize" width="398" height="260"/>
                                                                                                     <size key="maxSize" width="571" height="10000000"/>
                                                                                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                     <connections>
@@ -858,7 +864,7 @@ DQ
                                                                                             <autoresizingMask key="autoresizingMask"/>
                                                                                         </scroller>
                                                                                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="LLQ-pY-V30">
-                                                                                            <rect key="frame" x="398" y="1" width="16" height="260"/>
+                                                                                            <rect key="frame" x="399" y="1" width="15" height="260"/>
                                                                                             <autoresizingMask key="autoresizingMask"/>
                                                                                         </scroller>
                                                                                     </scrollView>

@@ -12,6 +12,7 @@
 #define kFullVersion @"fullVersion"
 #define kEndFreeTrialDate @"endFreeTrialDate"
 #define kAutoLockTimeout @"autoLockTimeout"
+#define kPasswordGenerationParameters @"passwordGenerationParameters"
 
 @implementation Settings
 
@@ -109,6 +110,25 @@
     [userDefaults setInteger:autoLockTimeoutSeconds forKey:kAutoLockTimeout];
     
     [userDefaults synchronize];
+}
+
+- (PasswordGenerationParameters *)passwordGenerationParameters {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
+    
+    if(encodedObject == nil) {
+        return [[PasswordGenerationParameters alloc] initWithDefaults];
+    }
+    
+    PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    return object;
+}
+
+-(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
+    [defaults synchronize];
 }
 
 @end
