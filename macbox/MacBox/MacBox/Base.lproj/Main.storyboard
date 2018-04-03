@@ -31,12 +31,6 @@
                                                 <action selector="onUpgradeToFullVersion:" target="Ady-hI-5gd" id="UDN-oX-uJN"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="9Sn-lP-pm7"/>
-                                        <menuItem title="Preferences..." keyEquivalent="," id="Ocv-5L-Nac" userLabel="Upgrade...">
-                                            <connections>
-                                                <action selector="onPreferences:" target="Ady-hI-5gd" id="p1f-mH-fZh"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -266,52 +260,65 @@ CA
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Auto Lock" id="8Sd-C8-9Qq" userLabel="Autolock">
+                            <menuItem title="Preferences" id="Jel-iL-tXW" userLabel="Preferences">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Auto Lock" id="qZz-Vd-jlc">
+                                <menu key="submenu" title="Preferences" id="9O4-A1-KRf">
                                     <items>
-                                        <menuItem title="Never Auto Lock" state="on" id="K3n-Ua-8iV">
+                                        <menuItem title="Password Generation..." id="Ocv-5L-Nac" userLabel="Password Generation">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4Cb-1q-i9w"/>
+                                                <action selector="onPasswordGenerationPreferences:" target="Ady-hI-5gd" id="D77-BK-TIE"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="After 1 Minute" tag="60" id="5xY-0Q-3RE">
+                                        <menuItem title="Auto Lock" id="8Sd-C8-9Qq" userLabel="Autolock">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4gI-Ze-9tU"/>
-                                            </connections>
+                                            <menu key="submenu" title="Auto Lock" id="qZz-Vd-jlc">
+                                                <items>
+                                                    <menuItem title="Never Auto Lock" state="on" id="K3n-Ua-8iV">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4Cb-1q-i9w"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="After 1 Minute" tag="60" id="5xY-0Q-3RE">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4gI-Ze-9tU"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="After 2 Minutes" tag="120" id="rLC-w7-qJQ">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="9ws-Bq-Htj"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="After 5 Minutes" tag="300" id="YLv-WT-VfH">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="66m-uj-7Uz"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
-                                        <menuItem title="After 2 Minutes" tag="120" id="rLC-w7-qJQ">
+                                        <menuItem title="Auto Fill New Record" id="Jwh-Te-dZC" userLabel="Autofill">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="9ws-Bq-Htj"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="After 5 Minutes" tag="300" id="YLv-WT-VfH">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="66m-uj-7Uz"/>
-                                            </connections>
-                                        </menuItem>
-                                    </items>
-                                </menu>
-                            </menuItem>
-                            <menuItem title="Auto Fill" id="Jwh-Te-dZC" userLabel="Autofill">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Auto Fill" id="ftP-7i-0nV">
-                                    <items>
-                                        <menuItem title="Auto Fill Most Popular Username and Email" state="on" id="V5o-oq-xft">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onSetAutoFillUserOrEmail:" target="Ady-hI-5gd" id="OI5-5E-dhw"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Auto Fill URL or Notes from Clipboard" state="on" id="1tF-kr-pGc">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onSetAutoFillUrlOrNotes:" target="Ady-hI-5gd" id="exE-PY-aSE"/>
-                                            </connections>
+                                            <menu key="submenu" title="Auto Fill New Record" id="ftP-7i-0nV">
+                                                <items>
+                                                    <menuItem title="Auto Fill Most Popular Username and Email" state="on" id="V5o-oq-xft">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="onSetAutoFillUserOrEmail:" target="Ady-hI-5gd" id="OI5-5E-dhw"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Auto Fill URL or Notes from Clipboard" state="on" id="1tF-kr-pGc">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="onSetAutoFillUrlOrNotes:" target="Ady-hI-5gd" id="exE-PY-aSE"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
                                         </menuItem>
                                     </items>
                                 </menu>
@@ -580,7 +587,7 @@ DQ
                                                                     <rect key="frame" x="20" y="2" width="430" height="499"/>
                                                                     <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
                                                                         <rect key="frame" x="1" y="1" width="428" height="497"/>
-                                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                        <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="8" autosaveExpandedItems="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="428" height="497"/>
@@ -862,7 +869,7 @@ DQ
                                                                                         <rect key="frame" x="10" y="62" width="415" height="262"/>
                                                                                         <clipView key="contentView" id="n6X-39-X3W">
                                                                                             <rect key="frame" x="1" y="1" width="398" height="260"/>
-                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                             <subviews>
                                                                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
                                                                                                     <rect key="frame" x="0.0" y="0.0" width="398" height="260"/>

@@ -1116,7 +1116,7 @@ static BOOL shownNagScreenThisSession = NO;
     }
 }
 
-- (void)openAppStoreForReview {
+- (void)openAppStoreForOldReview {
     int appId = 897283731;
     
     static NSString *const iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%d?action=write-review";
@@ -1152,10 +1152,13 @@ static BOOL shownNagScreenThisSession = NO;
     NSInteger promptedForReview = [[Settings sharedInstance] isUserHasBeenPromptedForReview];
     NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
     
-    if (launchCount > 20 &&
-        launchCount % 10 == 0 &&
-        promptedForReview == 0) {
-        [self askForReview];
+    if (launchCount > 20) {
+        if (@available( iOS 10.3,*)) {
+            [SKStoreReviewController requestReview];
+        }
+        else if(launchCount % 10 == 0 && promptedForReview == 0) {
+            [self oldAskForReview];
+        }
     }
 }
 
@@ -1168,27 +1171,22 @@ static BOOL shownNagScreenThisSession = NO;
     }
 }
 
-- (void)askForReview {
-    if (@available( iOS 10.3,*)) {
-        [SKStoreReviewController requestReview];
-    }
-    else {
-        [Alerts  threeOptions:self
-                        title:@"Review Strongbox?"
-                      message:@"Hi, I'm Mark, the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
-            defaultButtonText:@"Sure, take me there!"
-             secondButtonText:@"Naah"
-              thirdButtonText:@"Like, maybe later!"
-                       action:^(int response) {
-                           if (response == 0) {
-                               [self openAppStoreForReview];
-                               [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                           }
-                           else if (response == 1) {
-                               [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                           }
-                       }];
-    }
+- (void)oldAskForReview {
+    [Alerts  threeOptions:self
+                    title:@"Review Strongbox?"
+                  message:@"Hi, I'm Mark, the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
+        defaultButtonText:@"Sure, take me there!"
+         secondButtonText:@"Naah"
+          thirdButtonText:@"Like, maybe later!"
+                   action:^(int response) {
+                       if (response == 0) {
+                           [self openAppStoreForOldReview];
+                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
+                       }
+                       else if (response == 1) {
+                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
+                       }
+                   }];
 }
 
 - (void) showMacAppMessage {

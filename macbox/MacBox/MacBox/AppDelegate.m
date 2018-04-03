@@ -83,14 +83,11 @@
 }
 
 - (void)bindAutoFillUi {
-    NSMenu* menu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Auto Fill"] submenu];
-    
-    BOOL foo = Settings.sharedInstance.doNotAutoFillFromMostPopularFields;
-    NSMenuItem* blah = [menu itemAtIndex:0];
-    
-    [blah setState:!foo ? NSOnState : NSOffState ];
-    
-    [[menu itemAtIndex:1] setState:!Settings.sharedInstance.doNotAutoFillFromClipboard ? NSOnState : NSOffState ];
+    NSMenu* rootMenu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Preferences"] submenu];
+    NSMenu* menu = [[rootMenu itemWithTitle: @"Auto Fill New Record"] submenu];
+
+    [[menu itemAtIndex:0] setState:!Settings.sharedInstance.doNotAutoFillFromMostPopularFields ? NSOnState : NSOffState ];
+    [[menu itemAtIndex:1] setState:!Settings.sharedInstance.doNotAutoFillFromClipboard ? NSOnState : NSOffState];
 }
 
 - (IBAction)onSetAutoLockTimeout:(id)sender {
@@ -100,7 +97,9 @@
 }
 
 - (void)bindAutoLockUi {
-    NSMenu* menu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Auto Lock"] submenu];
+    NSMenu* rootMenu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Preferences"] submenu];
+    NSMenu* menu = [[rootMenu itemWithTitle: @"Auto Lock"] submenu];
+    
     NSInteger alt = [[Settings sharedInstance] autoLockTimeoutSeconds];
 
     [[menu itemAtIndex:0] setState:alt == 0 ? NSOnState : NSOffState ];
@@ -239,7 +238,7 @@
     return YES;
 }
 
-- (IBAction)onPreferences:(id)sender {
+- (IBAction)onPasswordGenerationPreferences:(id)sender {
     self.preferencesWindowController = [[PreferencesWindowController alloc] initWithWindowNibName:@"PreferencesWindowController"];
    
     NSWindow *window = [NSApplication sharedApplication].mainWindow;
