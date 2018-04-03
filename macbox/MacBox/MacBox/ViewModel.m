@@ -259,13 +259,8 @@
     record.fields.accessed = date;
     record.fields.modified = date;
     
-    if(![parentGroup addChild:record]) {
-        // Message not necessary for record but log here in case change in future
-        
-        NSLog(@"addNewRecord: addChild() Failed");
-        return nil;
-    }
-
+    [parentGroup addChild:record];
+    
     self.document.dirty = YES;
 
     return record;
