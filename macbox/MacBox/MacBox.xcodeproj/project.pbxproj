@@ -14,6 +14,7 @@
 		4D58A456207363D00061E046 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A454207363D00061E046 /* PasswordGenerationParameters.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
 		4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D58A45B207368B10061E046 /* PreferencesWindowController.xib */; };
+		4D58A45F2073BCC40061E046 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D58A45E2073BCC40061E046 /* google-10000-english-usa-no-swears-medium.txt */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
@@ -72,6 +73,7 @@
 		4D58A459207368B10061E046 /* PreferencesWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
 		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		4D58A45B207368B10061E046 /* PreferencesWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesWindowController.xib; sourceTree = "<group>"; };
+		4D58A45E2073BCC40061E046 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "../../../google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
 		4D5AE1E81F432BBC000A34D7 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		4D5AE1E91F432BBC000A34D7 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeWindowController.h; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				4DCA65B01F4B4A000078B962 /* Credits.rtf */,
+				4D58A45E2073BCC40061E046 /* google-10000-english-usa-no-swears-medium.txt */,
 				4DF59F581F30DB7A00D68BFE /* main.m */,
 			);
 			name = "Supporting Files";
@@ -405,6 +408,7 @@
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
+				4D58A45F2073BCC40061E046 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

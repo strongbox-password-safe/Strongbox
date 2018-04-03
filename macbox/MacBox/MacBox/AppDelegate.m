@@ -24,6 +24,7 @@
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
+@property (strong, nonatomic) PreferencesWindowController *preferencesWindowController;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 
 @end
@@ -215,10 +216,14 @@
 }
 
 - (IBAction)onPreferences:(id)sender {
-    if([PreferencesWindowController runModal]) {
-        [[Settings sharedInstance] setFullVersion:YES];
-        [self removeUpgradeMenuItem];
-    };
+    self.preferencesWindowController = [[PreferencesWindowController alloc] initWithWindowNibName:@"PreferencesWindowController"];
+   
+    NSWindow *window = [NSApplication sharedApplication].mainWindow;
+    
+    [window beginSheet:self.preferencesWindowController.window completionHandler:nil];
+    
+//    if([PreferencesWindowController runModal]) {
+//    };
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {

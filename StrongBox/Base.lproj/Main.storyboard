@@ -3036,7 +3036,7 @@ Cg
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minimumValue="1" maximumValue="20" translatesAutoresizingMaskIntoConstraints="NO" id="fUT-PJ-Fmr">
+                                                        <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minimumValue="1" maximumValue="50" translatesAutoresizingMaskIntoConstraints="NO" id="fUT-PJ-Fmr">
                                                             <rect key="frame" x="280" y="0.0" width="94" height="29"/>
                                                             <connections>
                                                                 <action selector="onChangeSettings:" destination="2Or-2d-vYA" eventType="valueChanged" id="44Y-Do-8Er"/>

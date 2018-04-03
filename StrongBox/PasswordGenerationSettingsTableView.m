@@ -53,11 +53,15 @@
     if(params.maximumLength > 512){
         params.maximumLength = 512;
     }
-    
+
     if(params.maximumLength < params.minimumLength) {
         params.maximumLength = params.minimumLength;
     }
 
+    if(params.xkcdWordCount > 50){
+        params.xkcdWordCount = 50;
+    }
+    
     if(!params.useLower && !params.useUpper && !params.useDigits && !params.useSymbols) {
         params.useLower = YES;
         [Alerts info:self title:@"Invalid Settings" message:@"You must use at least one of the character pools."];

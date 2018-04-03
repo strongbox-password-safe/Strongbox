@@ -519,18 +519,18 @@ DQ
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E1U-MF-Iy6" userLabel="Toolbar">
                                                                     <rect key="frame" x="367" y="505" width="83" height="32"/>
                                                                     <subviews>
-                                                                        <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Pg7-GN-psF">
+                                                                        <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3CR-yA-5lZ">
                                                                             <rect key="frame" x="-6" y="-7" width="52" height="43"/>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="width" constant="40" id="Bfn-x3-RpU"/>
-                                                                                <constraint firstAttribute="height" constant="32" id="evL-7d-tAy"/>
+                                                                                <constraint firstAttribute="width" constant="40" id="X9w-Nh-K7I"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="up0-B2-3rd"/>
                                                                             </constraints>
-                                                                            <buttonCell key="cell" type="push" alternateTitle="Create Group" bezelStyle="rounded" image="folder-blue-plus" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ky1-qJ-dIH">
+                                                                            <buttonCell key="cell" type="push" alternateTitle="Create Group" bezelStyle="rounded" image="folder-blue-plus" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xcj-Eh-97H">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                             <connections>
-                                                                                <action selector="onCreateGroup:" target="2Tp-Fl-jBw" id="oKR-pM-k9R"/>
+                                                                                <action selector="onCreateGroup:" target="2Tp-Fl-jBw" id="gJg-pR-RYI"/>
                                                                             </connections>
                                                                         </button>
                                                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2aS-iE-9qr">
@@ -879,6 +879,16 @@ DQ
                                                                                             <outlet property="delegate" destination="5gI-5U-AMq" id="UFz-QX-gXk"/>
                                                                                         </connections>
                                                                                     </comboBox>
+                                                                                    <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="LiX-Kn-Eoz">
+                                                                                        <rect key="frame" x="143" y="354" width="152" height="32"/>
+                                                                                        <buttonCell key="cell" type="push" title="Password Settings" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Xvu-h2-msv">
+                                                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                            <font key="font" metaFont="system"/>
+                                                                                        </buttonCell>
+                                                                                        <connections>
+                                                                                            <action selector="onPreferences:" target="2Tp-Fl-jBw" id="tZW-2d-9gx"/>
+                                                                                        </connections>
+                                                                                    </button>
                                                                                 </subviews>
                                                                                 <constraints>
                                                                                     <constraint firstItem="6Th-DT-vbL" firstAttribute="leading" secondItem="Lce-Qc-DOm" secondAttribute="leading" id="046-Pa-bnk"/>
@@ -888,9 +898,11 @@ DQ
                                                                                     <constraint firstItem="vgA-Bj-Esc" firstAttribute="top" secondItem="OYc-uL-jAE" secondAttribute="top" constant="20" symbolic="YES" id="3UV-xJ-zeI"/>
                                                                                     <constraint firstItem="6Th-DT-vbL" firstAttribute="bottom" secondItem="lEE-iT-7ZW" secondAttribute="bottom" id="4N9-KY-mbC"/>
                                                                                     <constraint firstItem="LJc-Iz-DyC" firstAttribute="trailing" secondItem="eSx-uM-hGi" secondAttribute="trailing" id="5NY-A8-j2y"/>
+                                                                                    <constraint firstItem="LiX-Kn-Eoz" firstAttribute="top" secondItem="eSx-uM-hGi" secondAttribute="bottom" constant="3" id="5n9-m8-7yF"/>
                                                                                     <constraint firstItem="xOJ-qD-vsy" firstAttribute="baseline" secondItem="XMG-gg-AIl" secondAttribute="baseline" id="ASJ-OE-up2"/>
                                                                                     <constraint firstItem="lEE-iT-7ZW" firstAttribute="leading" secondItem="6Th-DT-vbL" secondAttribute="trailing" constant="4" id="D7q-GX-j0s"/>
                                                                                     <constraint firstAttribute="trailing" secondItem="nwU-ra-Y09" secondAttribute="trailing" constant="20" symbolic="YES" id="DFc-be-fU7"/>
+                                                                                    <constraint firstItem="LJc-Iz-DyC" firstAttribute="leading" secondItem="LiX-Kn-Eoz" secondAttribute="trailing" constant="3" id="EVq-Vl-g4B"/>
                                                                                     <constraint firstItem="sgy-hr-agE" firstAttribute="leading" secondItem="OYc-uL-jAE" secondAttribute="leading" constant="10" id="FmL-sQ-bEd"/>
                                                                                     <constraint firstItem="hBo-2T-hBd" firstAttribute="leading" secondItem="XMG-gg-AIl" secondAttribute="trailing" constant="4" id="Hf7-cw-Gkf"/>
                                                                                     <constraint firstAttribute="trailing" secondItem="sgy-hr-agE" secondAttribute="trailing" constant="20" symbolic="YES" id="J1O-VC-IiR"/>
@@ -988,21 +1000,21 @@ DQ
                                                                         </tabViewItem>
                                                                         <tabViewItem label="Safe Summary" identifier="3" id="3o7-5V-rY7" userLabel="Safe Summary View">
                                                                             <view key="view" id="lFR-f9-a5u">
-                                                                                <rect key="frame" x="10" y="33" width="481" height="593"/>
+                                                                                <rect key="frame" x="10" y="33" width="445" height="593"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                 <subviews>
                                                                                     <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="13" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GTb-48-nGc" userLabel="Summary View">
-                                                                                        <rect key="frame" x="8" y="33" width="465" height="527"/>
+                                                                                        <rect key="frame" x="8" y="33" width="429" height="527"/>
                                                                                         <subviews>
                                                                                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Rpe-2X-T7l">
-                                                                                                <rect key="frame" x="105" y="271" width="256" height="256"/>
+                                                                                                <rect key="frame" x="87" y="271" width="256" height="256"/>
                                                                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="StrongBox-256x256" id="KJP-ou-01y"/>
                                                                                             </imageView>
                                                                                             <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ytf-FD-YEl">
-                                                                                                <rect key="frame" x="0.0" y="0.0" width="465" height="258"/>
+                                                                                                <rect key="frame" x="0.0" y="0.0" width="429" height="258"/>
                                                                                                 <subviews>
                                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cAp-Wc-cv8">
-                                                                                                        <rect key="frame" x="181" y="231" width="103" height="27"/>
+                                                                                                        <rect key="frame" x="163" y="231" width="103" height="27"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Summary" id="E5j-le-H3Y">
                                                                                                             <font key="font" metaFont="systemBold" size="22"/>
                                                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1010,7 +1022,7 @@ DQ
                                                                                                         </textFieldCell>
                                                                                                     </textField>
                                                                                                     <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KhL-r7-PGL">
-                                                                                                        <rect key="frame" x="20" y="0.0" width="426" height="226"/>
+                                                                                                        <rect key="frame" x="2" y="0.0" width="426" height="226"/>
                                                                                                         <subviews>
                                                                                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="751" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="En1-DU-GJa">
                                                                                                                 <rect key="frame" x="0.0" y="0.0" width="160" height="226"/>
@@ -1513,7 +1525,6 @@ DQ
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="buttonCreateGroup" destination="Pg7-GN-psF" id="PnU-pc-EGg"/>
                         <outlet property="buttonCreateRecord" destination="2aS-iE-9qr" id="WfG-do-P2M"/>
                         <outlet property="buttonRevealDetail" destination="Qog-rh-kdt" id="9fG-YT-c4P"/>
                         <outlet property="buttonShowHidePassword" destination="51L-Cu-Tku" id="aXN-vV-Oue"/>
