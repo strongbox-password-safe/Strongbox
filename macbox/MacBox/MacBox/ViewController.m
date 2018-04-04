@@ -326,22 +326,32 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
-    //    if ( @available (macOS 10.12.1, *)) {
-    //        LAContext *localAuthContext = [[LAContext alloc] init];
-    //        
-    //        NSError *authError;
-    //        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
-    //            [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-    //                             localizedReason:@"Identify to login"
-    //                                       reply:^(BOOL success, NSError *error) {
-    //                                           NSLog(@"%hhd - %@", success, error);
-    //                                       } ];
-    //
-    //        }
-    //        else {
-    //            NSLog(@"Not Avail! ");
-    //        }
-    //    }
+    if ( YES ) { // @available (macOS 10.12.1, *)) {
+        NSLog(@"Biometric ID is available on Device.");
+    
+//        SafesCollection
+//
+//        self.model.fileUrl
+        LAContext *localAuthContext = [[LAContext alloc] init];
+        
+        NSError *authError;
+        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
+            [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+                             localizedReason:@"Identify to login"
+                                       reply:^(BOOL success, NSError *error) {
+                                            if (success) {
+                                                // User authenticated successfully, take appropriate action
+                                            }
+                                            else {
+                                                // User did not authenticate successfully, look at error and take appropriate action
+                                            }
+                                            NSLog(@"%hhd - %@", success, error);
+                                        }];
+        }
+        else {
+            NSLog(@"Not Avail! ");
+        }
+    }
     
     [self unlock];
 }

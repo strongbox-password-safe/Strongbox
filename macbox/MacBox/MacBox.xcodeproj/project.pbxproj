@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
+		4D402D762074EB4800F7BC70 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D752074EB4800F7BC70 /* SafesList.m */; };
+		4D402D792074EB6400F7BC70 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D782074EB6400F7BC70 /* SafeMetaData.m */; };
 		4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
 		4D58A455207363D00061E046 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A451207363D00061E046 /* PasswordGenerator.m */; };
@@ -62,6 +64,11 @@
 /* Begin PBXFileReference section */
 		4D00B1F61F3DB03300D7560B /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alerts.h; sourceTree = "<group>"; };
 		4D00B1F71F3DB03300D7560B /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alerts.m; sourceTree = "<group>"; };
+		4D402D742074EB4800F7BC70 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = MacBox/SafesList.h; sourceTree = SOURCE_ROOT; };
+		4D402D752074EB4800F7BC70 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = MacBox/SafesList.m; sourceTree = SOURCE_ROOT; };
+		4D402D772074EB6400F7BC70 /* SafeMetaData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = MacBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
+		4D402D782074EB6400F7BC70 /* SafeMetaData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = MacBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
+		4D402D7C2074EC5500F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = ../../../model/StorageProvider.h; sourceTree = "<group>"; };
 		4D48C3591F4AECBF0041A47E /* LockedSafeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockedSafeInfo.h; sourceTree = "<group>"; };
 		4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockedSafeInfo.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
@@ -190,6 +197,9 @@
 		4D78AC151FB1E1C000A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D402D7C2074EC5500F7BC70 /* StorageProvider.h */,
+				4D402D742074EB4800F7BC70 /* SafesList.h */,
+				4D402D752074EB4800F7BC70 /* SafesList.m */,
 				4D58A452207363D00061E046 /* PasswordGenerationParameters.h */,
 				4D58A454207363D00061E046 /* PasswordGenerationParameters.m */,
 				4D58A453207363D00061E046 /* PasswordGenerator.h */,
@@ -206,6 +216,8 @@
 				4D78AC191FB1E1DB00A68A92 /* Strongbox.h */,
 				4D78AC1B1FB1E1DB00A68A92 /* Utils.h */,
 				4D78AC1C1FB1E1DB00A68A92 /* Utils.m */,
+				4D402D772074EB6400F7BC70 /* SafeMetaData.h */,
+				4D402D782074EB6400F7BC70 /* SafeMetaData.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -443,10 +455,12 @@
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
 				4D78AC121FB1E1B700A68A92 /* PasswordHistoryEntry.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */,
+				4D402D792074EB6400F7BC70 /* SafeMetaData.m in Sources */,
 				4D78AC111FB1E1B700A68A92 /* PasswordHistory.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
+				4D402D762074EB4800F7BC70 /* SafesList.m in Sources */,
 				4D78AC131FB1E1B700A68A92 /* SafeTools.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,

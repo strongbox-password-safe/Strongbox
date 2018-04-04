@@ -1,11 +1,14 @@
-# Uncomment this line to define a global platform for your project
+target :osx do
+    platform :osx, '10.9'
+    use_frameworks!
 
-platform :ios, '9.2'
-
-# Uncomment this line if you're using Swift
-use_frameworks!
+    pod 'SSKeychain'
+end
 
 target 'Strongbox' do
+    platform :ios, '9.2'
+    use_frameworks!
+
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'JNKeychain'

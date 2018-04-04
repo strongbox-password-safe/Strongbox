@@ -95,7 +95,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "551"
             endingLineNumber = "551"
-            landmarkName = "-getEmailAutocompletes"
+            landmarkName = "-numberOfItemsInComboBox:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -127,7 +127,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "565"
             endingLineNumber = "565"
-            landmarkName = "-comboBoxSelectionDidChange:"
+            landmarkName = "-getUsernameAutocompletes"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
