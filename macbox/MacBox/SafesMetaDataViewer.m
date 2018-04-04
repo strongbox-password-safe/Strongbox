@@ -20,9 +20,9 @@
 - (void)windowDidLoad {
     [super windowDidLoad];
 
-    SafeMetaData* safe = [[SafeMetaData alloc] initWithNickName:@"Blah" storageProvider:kLocalDevice fileName:@"filename" fileIdentifier:@"fileId"];
-    [SafesList.sharedInstance add:safe];
-    
+//    SafeMetaData* safe = [[SafeMetaData alloc] initWithNickName:@"Blah" storageProvider:kLocalDevice fileName:@"filename" fileIdentifier:@"fileId"];
+//    [SafesList.sharedInstance add:safe];
+//    
     self.safes = SafesList.sharedInstance.snapshot;
     
     self.tableView.dataSource = self;
@@ -31,6 +31,16 @@
 
 - (IBAction)onOk:(id)sender {
     [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+}
+
+- (IBAction)onRemoveCurrent:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        SafeMetaData *safe = [self.safes objectAtIndex:self.tableView.selectedRow];
+        [SafesList.sharedInstance remove:safe.uuid];
+        
+        self.safes = SafesList.sharedInstance.snapshot;
+        [self.tableView reloadData];
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
@@ -43,7 +53,7 @@
     SafeMetaData* safe = [self.safes objectAtIndex:row];
     
     NSObject *obj = [safe valueForKey:tableColumn.identifier];
-    result.textField.stringValue = [obj description];
+    result.textField.stringValue = obj == nil ? @"(nil)" : [obj description];
     
     return result;
 }

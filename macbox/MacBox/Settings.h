@@ -25,6 +25,4 @@
 @property (nonatomic) BOOL doNotAutoFillFromClipboard;
 @property (nonatomic) BOOL doNotAutoFillFromMostPopularFields;
 
-- (NSString*)getBiometricIdName;
-    
 @end

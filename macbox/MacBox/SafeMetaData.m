@@ -7,6 +7,9 @@
 //
 
 #import "SafeMetaData.h"
+#import <SAMKeychain/SAMKeychain.h>
+
+static NSString* kKeychainService = @"Strongbox";
 
 @implementation SafeMetaData
 
@@ -27,16 +30,20 @@
 }
 
 - (void)removeTouchIdPassword {
-//    [JNKeychain deleteValueForKey:self.uuid];
+    [SAMKeychain deletePasswordForService:kKeychainService account:self.uuid];
 }
 
 - (NSString*)touchIdPassword {
-//    return [JNKeychain loadValueForKey:self.uuid];
-    return @"";
+    NSError *error;
+    NSString * ret = [SAMKeychain passwordForService:kKeychainService account:self.uuid error:&error];
+    
+    NSLog(@"Error: %@", error);
+    
+    return ret;
 }
 
 - (void)setTouchIdPassword:(NSString *)touchIdPassword {
-//    [JNKeychain saveValue:touchIdPassword forKey:self.uuid];
+    [SAMKeychain setPassword:touchIdPassword forService:kKeychainService account:self.uuid];
 }
 
 
@@ -50,7 +57,6 @@
     [encoder encodeObject:self.fileName forKey:@"fileName"];
     [encoder encodeObject:self.fileIdentifier forKey:@"fileIdentifier"];
     [encoder encodeInteger:self.storageProvider forKey:@"storageProvider"];
-    
     [encoder encodeBool:self.isTouchIdEnabled forKey:@"isTouchIdEnabled"];
 }
 
@@ -61,7 +67,6 @@
         self.fileName = [decoder decodeObjectForKey:@"fileName"];
         self.fileIdentifier = [decoder decodeObjectForKey:@"fileIdentifier"];
         self.storageProvider = (int)[decoder decodeIntegerForKey:@"storageProvider"];
-        
         self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
     }
     
