@@ -8,6 +8,7 @@
 
 #import "BiometricIdHelper.h"
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "Utils.h"
 
 @interface BiometricIdHelper ()
 
@@ -59,21 +60,30 @@
     return biometricIdName;
 }
 
+- (void)authorize:(void (^)(BOOL success, NSError *error))completion {
+    completion(YES, nil); // TODO
+    return;
+    
+    if ( @available (macOS 10.12.1, *)) {
+        LAContext *localAuthContext = [[LAContext alloc] init];
 
-//            LAContext *localAuthContext = [[LAContext alloc] init];
-//
-//            NSError *authError;
-//            if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
-//                [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-//                                 localizedReason:@"Identify to login"
-//                                           reply:^(BOOL success, NSError *error) {
-//                                               if (success) {
-//                                                   // User authenticated successfully, take appropriate action
-//                                               }
-//                                               else {
-//                                                   // User did not authenticate successfully, look at error and take appropriate action
-//                                               }
-//                                               NSLog(@"%hhd - %@", success, error);
-//                                           }];
+        NSError *authError;
+        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
+            [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+                             localizedReason:@"Identify to Open Safe"
+                                       reply:^(BOOL success, NSError *error) {
+                                           completion(success, error);
+                                       }];
+        }
+        else {
+            NSLog(@"Biometrics is not available on this device");
+            completion(NO, [Utils createNSError:@"Biometrics is not available on this device!" errorCode:24321]);
+        }
+    }
+    else {
+        NSLog(@"Biometrics is not available on this device");
+        completion(NO, [Utils createNSError:@"Biometrics is not available on this device!" errorCode:24321]);
+    }
+}
 
 @end

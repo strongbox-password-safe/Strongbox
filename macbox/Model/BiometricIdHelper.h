@@ -12,6 +12,8 @@
 
 + (instancetype)sharedInstance;
 
+- (void)authorize:(void (^)(BOOL success, NSError *error))completion;
+
 @property (nonatomic, strong) NSString* biometricIdName;
 @property (nonatomic) BOOL biometricIdAvailable;
 

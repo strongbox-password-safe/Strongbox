@@ -417,17 +417,17 @@ CA
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="25" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aN5-Vl-vvB" userLabel="Locked Stack">
-                                                    <rect key="frame" x="327" y="157" width="256" height="332"/>
+                                                    <rect key="frame" x="327" y="143" width="256" height="361"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FOh-K8-UzN">
-                                                            <rect key="frame" x="0.0" y="76" width="256" height="256"/>
+                                                            <rect key="frame" x="0.0" y="105" width="256" height="256"/>
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="StrongBox-256x256" id="Tdy-4b-1bL"/>
                                                         </imageView>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pg6-wD-6Hl">
-                                                            <rect key="frame" x="0.0" y="0.0" width="256" height="51"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="256" height="80"/>
                                                             <subviews>
                                                                 <secureTextField verticalHuggingPriority="750" tag="-1" translatesAutoresizingMaskIntoConstraints="NO" id="CUM-mY-GEP">
-                                                                    <rect key="frame" x="8" y="29" width="240" height="22"/>
+                                                                    <rect key="frame" x="8" y="58" width="240" height="22"/>
                                                                     <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Master Password" drawsBackground="YES" usesSingleLineMode="YES" id="no3-X4-OwN">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -441,7 +441,7 @@ CA
                                                                     </connections>
                                                                 </secureTextField>
                                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mbW-RI-K5e">
-                                                                    <rect key="frame" x="2" y="-7" width="252" height="32"/>
+                                                                    <rect key="frame" x="2" y="22" width="252" height="32"/>
                                                                     <buttonCell key="cell" type="push" title="Unlock" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="b6U-Io-p40">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
@@ -450,7 +450,20 @@ DQ
 </string>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="onUnlock:" target="5gI-5U-AMq" id="Z38-65-4pe"/>
+                                                                        <action selector="onEnterMasterPassword:" target="5gI-5U-AMq" id="YwY-nv-fyw"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MZ9-No-YKr">
+                                                                    <rect key="frame" x="2" y="-7" width="252" height="32"/>
+                                                                    <buttonCell key="cell" type="push" title="Unlock with Touch ID" bezelStyle="rounded" image="NSUser" imagePosition="leading" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="e57-SF-04F">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="onUnlockWithTouchId:" target="5gI-5U-AMq" id="v3U-e5-8c8"/>
                                                                     </connections>
                                                                 </button>
                                                             </subviews>
@@ -458,13 +471,17 @@ DQ
                                                                 <constraint firstItem="CUM-mY-GEP" firstAttribute="leading" secondItem="pg6-wD-6Hl" secondAttribute="leading" constant="8" id="LFj-WR-yI2"/>
                                                                 <constraint firstItem="mbW-RI-K5e" firstAttribute="leading" secondItem="pg6-wD-6Hl" secondAttribute="leading" constant="8" id="MX4-uS-05h"/>
                                                                 <constraint firstAttribute="trailing" secondItem="CUM-mY-GEP" secondAttribute="trailing" constant="8" id="T7W-0w-gw4"/>
+                                                                <constraint firstAttribute="trailing" secondItem="MZ9-No-YKr" secondAttribute="trailing" constant="8" id="Z8q-Sz-scf"/>
                                                                 <constraint firstAttribute="trailing" secondItem="mbW-RI-K5e" secondAttribute="trailing" constant="8" id="xIz-r3-bLc"/>
+                                                                <constraint firstItem="MZ9-No-YKr" firstAttribute="leading" secondItem="pg6-wD-6Hl" secondAttribute="leading" constant="8" id="xPa-qF-5h5"/>
                                                             </constraints>
                                                             <visibilityPriorities>
                                                                 <integer value="1000"/>
                                                                 <integer value="1000"/>
+                                                                <integer value="1000"/>
                                                             </visibilityPriorities>
                                                             <customSpacing>
+                                                                <real value="3.4028234663852886e+38"/>
                                                                 <real value="3.4028234663852886e+38"/>
                                                                 <real value="3.4028234663852886e+38"/>
                                                             </customSpacing>
@@ -1598,6 +1615,7 @@ DQ
                         <outlet property="buttonCreateRecord" destination="2aS-iE-9qr" id="WfG-do-P2M"/>
                         <outlet property="buttonRevealDetail" destination="Qog-rh-kdt" id="9fG-YT-c4P"/>
                         <outlet property="buttonShowHidePassword" destination="51L-Cu-Tku" id="aXN-vV-Oue"/>
+                        <outlet property="buttonUnlockWithTouchId" destination="MZ9-No-YKr" id="Sgd-0u-6Uf"/>
                         <outlet property="checkboxRevealDetailsImmediately" destination="hqH-vk-VIo" id="8TO-OF-6fH"/>
                         <outlet property="comboBoxEmail" destination="6Th-DT-vbL" id="Hyh-uW-XIn"/>
                         <outlet property="comboboxUsername" destination="Lce-Qc-DOm" id="Prs-c9-MWq"/>
@@ -1636,6 +1654,7 @@ DQ
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSRevealFreestandingTemplate" width="14" height="14"/>
+        <image name="NSUser" width="32" height="32"/>
         <image name="StrongBox-256x256" width="256" height="256"/>
         <image name="blue-folder-cropped-256" width="256" height="208"/>
         <image name="copy_64" width="64" height="64"/>

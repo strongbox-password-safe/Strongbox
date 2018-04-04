@@ -41,6 +41,7 @@
 @property (weak) IBOutlet NSTextField *textFieldPw;
 @property (weak) IBOutlet NSComboBox *comboboxUsername;
 @property (weak) IBOutlet NSComboBox *comboBoxEmail;
+@property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
 
 - (IBAction)onSearch:(id)sender;
 - (IBAction)onUnlock:(id)sender;

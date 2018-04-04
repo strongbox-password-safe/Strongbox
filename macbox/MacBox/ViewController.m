@@ -120,6 +120,9 @@
     
     if(self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
+        
+        SafeMetaData* metaData = [self getMetaDataForModel];
+        self.buttonUnlockWithTouchId.hidden = metaData == nil || !metaData.isTouchIdEnabled || !metaData.touchIdPassword || !BiometricIdHelper.sharedInstance.biometricIdAvailable;
     }
     else {        
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
@@ -324,24 +327,64 @@
 }
 
 - (IBAction)onEnterMasterPassword:(id)sender {
-    [self unlock];
+    NSError* error = [self unlock:self.textFieldMasterPassword.stringValue];
+    
+    if(error) {
+        [Alerts error:@"Could not open safe" error:error window:self.view.window];
+    }
 }
 
-- (IBAction)onUnlock:(id)sender {
-    [self unlock];
+- (IBAction)onUnlockWithTouchId:(id)sender {
+    if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
+        SafeMetaData *safe = [self getMetaDataForModel];
+        
+        if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
+            [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
+                if(success) {
+                    NSError* error = [self unlock:safe.touchIdPassword];
+                    
+                    if(error) {
+                        [safe removeTouchIdPassword];
+                        [SafesList.sharedInstance remove:safe.uuid];
+                        
+                        [Alerts error:@"Could not open safe with stored Touch ID Password. The stored password will now be removed from secure storage. You will need to enter the correct password to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self bindToModel];
+                        });
+                    }
+                }
+                else {
+                    NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
+                    [Alerts error:error window:self.view.window];
+                }
+            }];
+        }
+        else {
+            NSLog(@"Touch ID button pressed but no Touch ID Stored?");
+        }
+    }
+}
+
+- (SafeMetaData*)getMetaDataForModel {
+    NSArray<SafeMetaData*>* matches = [SafesList.sharedInstance.snapshot filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [((SafeMetaData*)evaluatedObject).fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
+    }]];
+    
+    return [matches firstObject];
 }
 
 - (void)onSuccessfulUnlock:(NSString *)selectedItemId {
     if ( BiometricIdHelper.sharedInstance.biometricIdAvailable ) {
         NSLog(@"Biometric ID is available on Device. Should we enrol?");
         
-        NSArray<SafeMetaData*>* matches = [SafesList.sharedInstance.snapshot filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-            return [((SafeMetaData*)evaluatedObject).fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
-        }]];
+        SafeMetaData* metaData = [self getMetaDataForModel];
         
-        if(matches.count == 0) {
+        if(!metaData) {
             NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this safe in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
+            
             [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
+                
                 NSURL* url = self.model.fileUrl;
                 SafeMetaData* safeMetaData = [[SafeMetaData alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
                                                                     storageProvider:kLocalDevice
@@ -383,18 +426,21 @@
     [self setInitialFocus];
 }
 
-- (void)unlock {
+- (NSError*)unlock:(NSString*)password {
     if(self.model && self.model.locked) {
         NSError *error;
         NSString *selectedItemId;
         
-        if([self.model unlock:self.textFieldMasterPassword.stringValue selectedItem:&selectedItemId error:&error]) {
+        if([self.model unlock:password selectedItem:&selectedItemId error:&error]) {
             [self onSuccessfulUnlock:selectedItemId];
+            return nil;
         }
         else {
-            [Alerts error:@"Could not open safe" error:error window:self.view.window];
+            return error;
         }
     }
+    
+    return nil;
 }
 
 - (void)onAutoLock:(NSNotification*)notification {
