@@ -10,9 +10,9 @@
 #import "IOsUtils.h"
 #import <MessageUI/MessageUI.h>
 #import "Alerts.h"
-#import "ISMessages/ISMessages.h"
 #import "CHCSVParser.h"
 #import "Settings.h"
+#import "ISMessages.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
     @property (readonly) NSArray *lines;

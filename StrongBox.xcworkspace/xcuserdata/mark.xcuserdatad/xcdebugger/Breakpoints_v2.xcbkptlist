@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/SafeDetailsView.m"
-            timestampString = "544114876.60144"
+            timestampString = "544539809.933448"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "257"
-            endingLineNumber = "257"
+            startingLineNumber = "258"
+            endingLineNumber = "258"
             landmarkName = "-getSafeAsCsv"
             landmarkType = "7">
             <Locations>
@@ -574,6 +574,22 @@
             startingLineNumber = "243"
             endingLineNumber = "243"
             landmarkName = "-addNewRecord:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "544539847.452143"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "325"
+            endingLineNumber = "325"
+            landmarkName = "-onEnterMasterPassword:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

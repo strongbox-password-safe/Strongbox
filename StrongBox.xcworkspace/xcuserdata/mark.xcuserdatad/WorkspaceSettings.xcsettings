@@ -8,6 +8,8 @@
 	<string>RelativeToDerivedData</string>
 	<key>DerivedDataLocationStyle</key>
 	<string>Default</string>
+	<key>EnabledFullIndexStoreVisibility</key>
+	<false/>
 	<key>IssueFilterStyle</key>
 	<string>ShowActiveSchemeOnly</string>
 	<key>LiveSourceIssuesEnabled</key>

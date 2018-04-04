@@ -2,10 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/mark/dev/strongbox/Strongbox.xcodeproj">
+      location = "group:macbox/MacBox.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:macbox/MacBox/MacBox.xcodeproj">
+      location = "group:Strongbox.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
