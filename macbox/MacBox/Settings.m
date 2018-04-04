@@ -7,6 +7,7 @@
 //
 
 #import "Settings.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 
 #define kRevealDetailsImmediately @"revealDetailsImmediately"
 #define kFullVersion @"fullVersion"
@@ -147,6 +148,27 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
     [defaults synchronize];
+}
+
+- (NSString*)getBiometricIdName {
+    NSString* biometricIdName = @"Touch ID";
+//
+//    if ( @available (macOS 10.12.1, *)) {
+//        LAContext *localAuthContext = [[LAContext alloc] init];
+//
+//        NSError *authError;
+//        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
+//            if (@available(macOS 10.13.2, *)) {
+//                if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
+//                    biometricIdName = @"Face ID";
+//                }
+//            } else {
+//                // Fallback on earlier versions
+//            }
+//        }
+//    }
+    
+    return biometricIdName;
 }
 
 @end

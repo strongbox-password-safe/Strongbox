@@ -10,6 +10,10 @@
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
 		4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
+		4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */; };
+		4D559F9F20750C2C009856E3 /* SafesMetaDataViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */; };
+		4D559FA420750D1D009856E3 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA120750D1D009856E3 /* SafesList.m */; };
+		4D559FA520750D1D009856E3 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* SafeMetaData.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
 		4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D58A45B207368B10061E046 /* PreferencesWindowController.xib */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
@@ -69,6 +73,13 @@
 		4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockedSafeInfo.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
 		4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewModel.m; sourceTree = "<group>"; };
+		4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafesMetaDataViewer.h; sourceTree = "<group>"; };
+		4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafesMetaDataViewer.m; sourceTree = "<group>"; };
+		4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SafesMetaDataViewer.xib; sourceTree = "<group>"; };
+		4D559FA020750D1D009856E3 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = MacBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
+		4D559FA120750D1D009856E3 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = MacBox/SafesList.m; sourceTree = SOURCE_ROOT; };
+		4D559FA220750D1D009856E3 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = MacBox/SafesList.h; sourceTree = SOURCE_ROOT; };
+		4D559FA320750D1D009856E3 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = MacBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
 		4D58A459207368B10061E046 /* PreferencesWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
 		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
 		4D58A45B207368B10061E046 /* PreferencesWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferencesWindowController.xib; sourceTree = "<group>"; };
@@ -209,6 +220,10 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D559FA020750D1D009856E3 /* SafeMetaData.h */,
+				4D559FA320750D1D009856E3 /* SafeMetaData.m */,
+				4D559FA220750D1D009856E3 /* SafesList.h */,
+				4D559FA120750D1D009856E3 /* SafesList.m */,
 				4DF347FF2074FA6C00148741 /* AbstractPasswordDatabase.h */,
 				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
 				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
@@ -309,6 +324,9 @@
 				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
 				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
 				4D58A45B207368B10061E046 /* PreferencesWindowController.xib */,
+				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
+				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
+				4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */,
 			);
 			path = MacBox;
 			sourceTree = "<group>";
@@ -441,6 +459,7 @@
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
+				4D559F9F20750C2C009856E3 /* SafesMetaDataViewer.xib in Resources */,
 				4DF348112074FAB400148741 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
 			);
@@ -515,6 +534,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D559FA420750D1D009856E3 /* SafesList.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
 				4DF347EA2074FA3500148741 /* Record.m in Sources */,
 				4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */,
@@ -525,6 +545,7 @@
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
+				4D559FA520750D1D009856E3 /* SafeMetaData.m in Sources */,
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
 				4DF3480F2074FA9700148741 /* CHCSVParser.m in Sources */,
@@ -535,6 +556,7 @@
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
 				4DF347EE2074FA3F00148741 /* twofish.c in Sources */,
+				4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
 				4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,

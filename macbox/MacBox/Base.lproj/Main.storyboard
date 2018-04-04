@@ -171,6 +171,13 @@
                                                 <action selector="toggleSourceList:" target="Ady-hI-5gd" id="rB2-xs-Ygq"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="u02-kh-LCu"/>
+                                        <menuItem title="Show Safes Meta Data" id="gIA-xp-Clh" userLabel="View Safes Meta Data">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onViewSafesMetaData:" target="Ady-hI-5gd" id="sVh-vd-kkP"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -587,7 +594,7 @@ DQ
                                                                     <rect key="frame" x="20" y="2" width="430" height="499"/>
                                                                     <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
                                                                         <rect key="frame" x="1" y="1" width="428" height="497"/>
-                                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                        <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="8" autosaveExpandedItems="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="428" height="497"/>
@@ -869,7 +876,7 @@ DQ
                                                                                         <rect key="frame" x="10" y="62" width="415" height="262"/>
                                                                                         <clipView key="contentView" id="n6X-39-X3W">
                                                                                             <rect key="frame" x="1" y="1" width="398" height="260"/>
-                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                             <subviews>
                                                                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
                                                                                                     <rect key="frame" x="0.0" y="0.0" width="398" height="260"/>

@@ -42,6 +42,11 @@ static NSString* kSafesList = @"safesList";
     dispatch_barrier_async(self.dataQueue, ^{
         safe.uuid = [[NSUUID UUID] UUIDString];
         [self.data addObject:safe];
+        
+        NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:encodedObject forKey:kSafesList];
+        [defaults synchronize];
     });
 }
 
@@ -50,18 +55,6 @@ static NSString* kSafesList = @"safesList";
     dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.data]; });
     return result;
 }
-
-//- (void)update:(SafeMetaData *_Nonnull)safe {
-//    dispatch_barrier_async(self.dataQueue, ^{
-//        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//            return [obj.uuid isEqualToString:safe.uuid];
-//        }];
-//        
-//        if(index != NSNotFound) {
-//            [self.data replaceObjectAtIndex:index withObject:safe];
-//        }
-//    });
-//}
 
 - (void)remove:(NSString*_Nonnull)uuid {
     dispatch_barrier_async(self.dataQueue, ^{
@@ -72,6 +65,11 @@ static NSString* kSafesList = @"safesList";
         if(index != NSNotFound) {
             [self.data removeObjectAtIndex:index];
         }
+        
+        NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:encodedObject forKey:kSafesList];
+        [defaults synchronize];
     });
 }
 
@@ -82,6 +80,11 @@ static NSString* kSafesList = @"safesList";
         [self.data removeObjectAtIndex:sourceIndex];
         
         [self.data insertObject:item atIndex:destinationIndex];
+        
+        NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:encodedObject forKey:kSafesList];
+        [defaults synchronize];
     });
 }
 
@@ -95,13 +98,6 @@ static NSString* kSafesList = @"safesList";
     
     NSArray<SafeMetaData*> *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
     return [[NSMutableArray<SafeMetaData*> alloc]initWithArray:object];
-}
-
-- (void)save {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.snapshot];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:encodedObject forKey:kSafesList];
-    [defaults synchronize];
 }
 
 + (NSString *)sanitizeSafeNickName:(NSString *)string {

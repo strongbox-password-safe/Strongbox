@@ -14,6 +14,7 @@
 #import "Utils.h"
 #import "CHCSVParser.h"
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "SafesList.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -325,7 +326,7 @@
     [self unlock];
 }
 
-- (IBAction)onUnlock:(id)sender {    
+- (IBAction)onUnlock:(id)sender {
     [self unlock];
 }
 
@@ -335,6 +336,55 @@
         NSString *selectedItemId;
         
         if([self.model unlock:self.textFieldMasterPassword.stringValue selectedItem:&selectedItemId error:&error]) {
+            if ( YES ) { // @available (macOS 10.12.1, *)) { // TODO:
+                LAContext *localAuthContext = [[LAContext alloc] init];
+
+                NSError *authError;
+                if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
+                    NSLog(@"Biometric ID is available on Device. Should we enrol?");
+                   
+                    NSArray<SafeMetaData*>* matches = [SafesList.sharedInstance.snapshot filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+                        return ((SafeMetaData*)evaluatedObject).fileIdentifier == self.model.fileUrl.absoluteString;
+                    }]];
+                    
+                    if(matches.count == 0) {
+                        NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this safe in the future?", [Settings.sharedInstance getBiometricIdName]];
+                        [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
+                            if(yesNo) {
+                                NSURL* url = self.model.fileUrl;
+                                SafeMetaData* safeMetaData = [[SafeMetaData alloc] initWithNickName:url.lastPathComponent
+                                                                                    storageProvider:kLocalDevice
+                                                                                           fileName:url.lastPathComponent
+                                                                                     fileIdentifier:url.absoluteString];
+                                
+                                safeMetaData.touchIdPassword = self.textFieldMasterPassword.stringValue;
+                                [SafesList.sharedInstance add:safeMetaData];
+                            }
+                        }];
+                    }
+                }
+            }
+            else {
+                NSLog(@"Not Avail! "); // TODO:
+            }
+            
+//            LAContext *localAuthContext = [[LAContext alloc] init];
+//
+//            NSError *authError;
+//            if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
+//                [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+//                                 localizedReason:@"Identify to login"
+//                                           reply:^(BOOL success, NSError *error) {
+//                                               if (success) {
+//                                                   // User authenticated successfully, take appropriate action
+//                                               }
+//                                               else {
+//                                                   // User did not authenticate successfully, look at error and take appropriate action
+//                                               }
+//                                               NSLog(@"%hhd - %@", success, error);
+//                                           }];
+
+            
             [self bindToModel];
             
             self.textFieldMasterPassword.stringValue = @"";

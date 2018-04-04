@@ -14,6 +14,7 @@
 #import "Utils.h"
 #import "Strongbox.h"
 #import "PreferencesWindowController.h"
+#import "SafesMetaDataViewer.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -25,6 +26,7 @@
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
 @property (strong, nonatomic) PreferencesWindowController *preferencesWindowController;
+@property (strong, nonatomic) SafesMetaDataViewer *safesMetaDataViewer;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 
 @end
@@ -238,12 +240,28 @@
     return YES;
 }
 
+- (IBAction)onViewSafesMetaData:(id)sender {
+    if(self.safesMetaDataViewer == nil) {
+        self.safesMetaDataViewer = [[SafesMetaDataViewer alloc] initWithWindowNibName:@"SafesMetaDataViewer"];
+        
+        NSWindow *window = [NSApplication sharedApplication].mainWindow;
+        
+        [window beginSheet:self.safesMetaDataViewer.window completionHandler:^(NSModalResponse returnCode) {
+            self.safesMetaDataViewer = nil;
+        }];
+    }
+}
+
 - (IBAction)onPasswordGenerationPreferences:(id)sender {
-    self.preferencesWindowController = [[PreferencesWindowController alloc] initWithWindowNibName:@"PreferencesWindowController"];
-   
-    NSWindow *window = [NSApplication sharedApplication].mainWindow;
-    
-    [window beginSheet:self.preferencesWindowController.window completionHandler:nil];
+    if(self.preferencesWindowController == nil) {
+        self.preferencesWindowController = [[PreferencesWindowController alloc] initWithWindowNibName:@"PreferencesWindowController"];
+       
+        NSWindow *window = [NSApplication sharedApplication].mainWindow;
+        
+        [window beginSheet:self.preferencesWindowController.window completionHandler:^(NSModalResponse returnCode) {
+            self.preferencesWindowController = nil;
+        }];
+    }
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {
