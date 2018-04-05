@@ -11,13 +11,6 @@
 #import "Node.h"
 #import "CHCSVParser.h"
 
-static NSString* kCSVHeaderTitle = @"Title";
-static NSString* kCSVHeaderUsername = @"Username";
-static NSString* kCSVHeaderUrl = @"Url";
-static NSString* kCSVHeaderEmail = @"Email";
-static NSString* kCSVHeaderPassword = @"Password";
-static NSString* kCSVHeaderNotes = @"Notes";
-
 @interface ViewModel : NSObject
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;

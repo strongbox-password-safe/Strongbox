@@ -1039,36 +1039,6 @@ NSString* trimField(NSTextField* textField) {
     [[NSPasteboard generalPasteboard] setString:dump forType:NSStringPboardType];
 }
 
-- (IBAction)onCopyAsCsv:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    
-    NSString *newStr = [[NSString alloc] initWithData:[self getSafeAsCsv] encoding:NSUTF8StringEncoding];
-    
-    [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
-}
-
-- (NSData*)getSafeAsCsv {
-    NSArray<Node*>* nodes = [[self.model rootGroup] filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup;
-    }];
-    
-    NSOutputStream *output = [NSOutputStream outputStreamToMemory];
-    CHCSVWriter *writer = [[CHCSVWriter alloc] initWithOutputStream:output encoding:NSUTF8StringEncoding delimiter:','];
-    
-    [writer writeLineOfFields:@[@"Title", @"Username", @"Email", @"Password", @"Url", @"Notes"]];
-    
-    for(Node* node in nodes) {
-        [writer writeLineOfFields:@[node.title, node.fields.username, node.fields.email, node.fields.password, node.fields.url, node.fields.notes]];
-    }
-    
-    [writer closeStream];
-    
-    NSData *contents = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-    [output close];
-    
-    return contents;
-}
-
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
 {
     SEL theAction = [anItem action];
@@ -1159,6 +1129,14 @@ NSString* trimField(NSTextField* textField) {
     self.textFieldSafeSummaryLastUpdateTime.stringValue = [self formatDate:self.model.lastUpdateTime];
 }
 
+- (IBAction)onCopyAsCsv:(id)sender {
+    [[NSPasteboard generalPasteboard] clearContents];
+    
+    NSString *newStr = [[NSString alloc] initWithData:[Utils getSafeAsCsv:self.model.rootGroup] encoding:NSUTF8StringEncoding];
+    
+    [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
+}
+
 - (NSURL*)getFileThroughFileOpenDialog
 {  
     NSOpenPanel * panel = [NSOpenPanel openPanel];
@@ -1180,7 +1158,7 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onImportFromCsvFile:(id)sender {
-    NSString* message = [NSString stringWithFormat:@"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.", kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderUrl, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderNotes];
+    NSString* message = [NSString stringWithFormat:@"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.", kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes];
    
     [Alerts info:@"CSV Format" informativeText:message window:self.view.window completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{[self importFromCsvFile];});

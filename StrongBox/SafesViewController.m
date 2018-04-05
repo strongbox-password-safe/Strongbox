@@ -69,6 +69,9 @@
 
 - (void)refreshView {
     self.collection = SafesList.sharedInstance.snapshot;
+    
+    self.buttonToggleEdit.enabled = self.collection.count > 0;
+    
     [self.tableView reloadData];
     
     self.navigationController.navigationBar.hidden = NO;
@@ -97,6 +100,7 @@
             }
         }
         
+        [SafesList.sharedInstance save];
         Settings.sharedInstance.safesMigratedToNewSystem = YES;
     }
     

@@ -144,7 +144,7 @@
 		4DF3480D2074FA9700148741 /* CHCSVParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHCSVParser.h; path = ../../lib/chcsv/CHCSVParser.h; sourceTree = "<group>"; };
 		4DF3480E2074FA9700148741 /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = ../../lib/chcsv/CHCSVParser.m; sourceTree = "<group>"; };
 		4DF348102074FAB400148741 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "../../resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
-		4DF59F511F30DB7A00D68BFE /* Macbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Macbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DF59F511F30DB7A00D68BFE /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DF59F541F30DB7A00D68BFE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DF59F551F30DB7A00D68BFE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4DF59F581F30DB7A00D68BFE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -287,7 +287,7 @@
 		4DF59F521F30DB7A00D68BFE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4DF59F511F30DB7A00D68BFE /* Macbox.app */,
+				4DF59F511F30DB7A00D68BFE /* Strongbox.app */,
 				4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */,
 			);
 			name = Products;
@@ -376,9 +376,9 @@
 			productReference = 4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		4DF59F501F30DB7A00D68BFE /* Macbox */ = {
+		4DF59F501F30DB7A00D68BFE /* Strongbox */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Macbox" */;
+			buildConfigurationList = 4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Strongbox" */;
 			buildPhases = (
 				B9829F49E8DC84BA018303E5 /* [CP] Check Pods Manifest.lock */,
 				4DF59F4D1F30DB7A00D68BFE /* Sources */,
@@ -391,9 +391,9 @@
 			);
 			dependencies = (
 			);
-			name = Macbox;
+			name = Strongbox;
 			productName = MacBox;
-			productReference = 4DF59F511F30DB7A00D68BFE /* Macbox.app */;
+			productReference = 4DF59F511F30DB7A00D68BFE /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -441,7 +441,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4DF59F501F30DB7A00D68BFE /* Macbox */,
+				4DF59F501F30DB7A00D68BFE /* Strongbox */,
 				4DE92B701F49D0AA00282D98 /* PwSafeModelTests */,
 			);
 		};
@@ -583,7 +583,7 @@
 /* Begin PBXTargetDependency section */
 		4DE92B771F49D0AA00282D98 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4DF59F501F30DB7A00D68BFE /* Macbox */;
+			target = 4DF59F501F30DB7A00D68BFE /* Strongbox */;
 			targetProxy = 4DE92B761F49D0AA00282D98 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -790,7 +790,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Macbox" */ = {
+		4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Strongbox" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF59F691F30DB7A00D68BFE /* Debug */,

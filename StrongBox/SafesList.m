@@ -51,18 +51,6 @@ static NSString* kSafesList = @"safesList";
     return result;
 }
 
-//- (void)update:(SafeMetaData *_Nonnull)safe {
-//    dispatch_barrier_async(self.dataQueue, ^{
-//        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//            return [obj.uuid isEqualToString:safe.uuid];
-//        }];
-//        
-//        if(index != NSNotFound) {
-//            [self.data replaceObjectAtIndex:index withObject:safe];
-//        }
-//    });
-//}
-
 - (void)remove:(NSString*_Nonnull)uuid {
     dispatch_barrier_async(self.dataQueue, ^{
         NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
