@@ -263,6 +263,13 @@ CA
                                                 <action selector="onCopyDiagnosticDump:" target="Ady-hI-5gd" id="GjO-BA-qMn"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="fh9-SS-ZKd"/>
+                                        <menuItem title="Clear Touch ID Settings" id="4tp-eT-w72">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onClearTouchId:" target="Ady-hI-5gd" id="Djm-cK-BLe"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -397,7 +404,7 @@ CA
                 </windowController>
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-325" y="335"/>
+            <point key="canvasLocation" x="-348" y="552"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -610,7 +617,7 @@ DQ
                                                                     <rect key="frame" x="20" y="2" width="430" height="499"/>
                                                                     <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
                                                                         <rect key="frame" x="1" y="1" width="428" height="497"/>
-                                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                        <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="8" autosaveExpandedItems="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="428" height="497"/>
@@ -916,7 +923,7 @@ DQ
                                                                                         <rect key="frame" x="10" y="62" width="415" height="275"/>
                                                                                         <clipView key="contentView" id="n6X-39-X3W">
                                                                                             <rect key="frame" x="1" y="1" width="398" height="273"/>
-                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                             <subviews>
                                                                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
                                                                                                     <rect key="frame" x="0.0" y="0.0" width="398" height="273"/>
@@ -1615,6 +1622,7 @@ DQ
                         <outlet property="buttonCreateRecord" destination="2aS-iE-9qr" id="WfG-do-P2M"/>
                         <outlet property="buttonRevealDetail" destination="Qog-rh-kdt" id="9fG-YT-c4P"/>
                         <outlet property="buttonShowHidePassword" destination="51L-Cu-Tku" id="aXN-vV-Oue"/>
+                        <outlet property="buttonUnlockWithPassword" destination="mbW-RI-K5e" id="rnt-FW-9p5"/>
                         <outlet property="buttonUnlockWithTouchId" destination="MZ9-No-YKr" id="Sgd-0u-6Uf"/>
                         <outlet property="checkboxRevealDetailsImmediately" destination="hqH-vk-VIo" id="8TO-OF-6fH"/>
                         <outlet property="comboBoxEmail" destination="6Th-DT-vbL" id="Hyh-uW-XIn"/>
@@ -1647,7 +1655,7 @@ DQ
                 </viewController>
                 <customObject id="2Tp-Fl-jBw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-592" y="977.5"/>
+            <point key="canvasLocation" x="-325" y="974"/>
         </scene>
     </scenes>
     <resources>

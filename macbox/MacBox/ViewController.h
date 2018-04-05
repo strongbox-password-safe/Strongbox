@@ -44,11 +44,11 @@
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
 
 - (IBAction)onSearch:(id)sender;
-- (IBAction)onUnlock:(id)sender;
 - (IBAction)onOutlineViewDoubleClick:(id)sender;
 - (IBAction)onRevealDetails:(id)sender;
 - (IBAction)onConcealDetails:(id)sender;
 - (IBAction)onEnterMasterPassword:(id)sender;
+@property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
 
 // Safe Summary Fields
 

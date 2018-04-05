@@ -49,6 +49,7 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self removeUnwantedMenuItems];
     [self removeCopyDiagnosticDumpItem];
+    [self removeShowSafesMetaDataItem];
     
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
@@ -62,8 +63,6 @@
     }
     else {
         [self removeUpgradeMenuItem];
-        
-        [self randomlyPromptForAppStoreReview];
     }
     
     [self bindAutoLockUi];
@@ -128,16 +127,6 @@
         });
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), self.autoLockWorkBlock);
-    }
-}
-
-- (void)randomlyPromptForAppStoreReview {
-    NSUInteger random = arc4random_uniform(100);
-    
-    // TODO: use iRate app?
-    
-    if(random % 5) {
-        // TODO: Show
     }
 }
 
@@ -207,17 +196,31 @@
     }
 }
 
+- (void)removeShowSafesMetaDataItem {
+    [self removeMenuItem:@"View" action:@"onViewSafesMetaData:"];
+}
+
 - (void)removeCopyDiagnosticDumpItem {
-    NSMenu* safe = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Safe"] submenu];
-    if([[safe itemAtIndex:[safe numberOfItems] - 1] action] == NSSelectorFromString(@"onCopyDiagnosticDump:")) {
-        [safe removeItemAtIndex:[safe numberOfItems] - 1];
-    }
+    [self removeMenuItem:@"Safe" action:@"onCopyDiagnosticDump:"];
 }
 
 - (void)removeUpgradeMenuItem {
-    NSMenu* strongBox = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Strongbox"] submenu];
-    if([[strongBox itemAtIndex:2] action] == NSSelectorFromString(@"onUpgradeToFullVersion:")) {
-        [strongBox removeItemAtIndex:2];
+    [self removeMenuItem:@"Strongbox" action:@"onUpgradeToFullVersion:"];
+}
+
+- (void)removeMenuItem:(NSString*)topLevelTitle action:(NSString*)action {
+    NSMenu* strongBox = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: topLevelTitle] submenu];
+    
+    NSUInteger index = [strongBox.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.action == NSSelectorFromString(action);
+    }];
+    
+    if(index != NSNotFound) {
+        NSLog(@"Removing %@ from %@ Menu", action, topLevelTitle);
+        [strongBox removeItemAtIndex:index];
+    }
+    else {
+        NSLog(@"WARN: Menu Item %@ not found to remove.", action);
     }
 }
 

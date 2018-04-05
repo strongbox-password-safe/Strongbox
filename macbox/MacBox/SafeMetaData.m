@@ -36,9 +36,7 @@ static NSString* kKeychainService = @"Strongbox";
 - (NSString*)touchIdPassword {
     NSError *error;
     NSString * ret = [SAMKeychain passwordForService:kKeychainService account:self.uuid error:&error];
-    
-    NSLog(@"Error: %@", error);
-    
+
     return ret;
 }
 

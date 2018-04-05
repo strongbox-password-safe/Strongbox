@@ -63,6 +63,8 @@
     
     [self.comboboxUsername setDataSource:self];
     [self.comboBoxEmail setDataSource:self];
+    
+    self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
 }
 
 - (void)loadUIImages {
@@ -111,6 +113,16 @@
     @"[Not Saved]";
 }
 
+- (BOOL)biometricOpenIsAvailableForSafe {
+    SafeMetaData* metaData = [self getMetaDataForModel];
+    
+    return  metaData == nil ||
+            !metaData.isTouchIdEnabled ||
+            !metaData.touchIdPassword ||
+            !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
+    !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
+}
+
 - (void)bindToModel {
     if(self.model == nil) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:2];
@@ -121,8 +133,15 @@
     if(self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
         
-        SafeMetaData* metaData = [self getMetaDataForModel];
-        self.buttonUnlockWithTouchId.hidden = metaData == nil || !metaData.isTouchIdEnabled || !metaData.touchIdPassword || !BiometricIdHelper.sharedInstance.biometricIdAvailable;
+        if([self biometricOpenIsAvailableForSafe]) {
+            self.buttonUnlockWithTouchId.hidden = YES;
+            [self.buttonUnlockWithTouchId setKeyEquivalent:@""];
+            [self.buttonUnlockWithPassword setKeyEquivalent:@"\r"];
+        }
+        else {
+            self.buttonUnlockWithTouchId.hidden = NO;
+            [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
+            [self.buttonUnlockWithPassword setKeyEquivalent:@""];        }
     }
     else {        
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
@@ -137,7 +156,12 @@
 
 - (void)setInitialFocus {
     if(self.model == nil || self.model.locked) {
-        [self.view.window makeFirstResponder:self.textFieldMasterPassword];
+        if([self biometricOpenIsAvailableForSafe]) {
+            [self.view.window makeFirstResponder:self.textFieldMasterPassword];
+        }
+        else {
+            [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
+        }
     }
     else {
         [self.view.window makeFirstResponder:self.outlineView];
@@ -362,11 +386,17 @@
         }
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
+            [Alerts info:@"The stored password is unavailable for some reason. Please enter the password manually. Metadata for this safe will be cleared." window:self.view.window];
+            [SafesList.sharedInstance remove:safe.uuid];
         }
     }
 }
 
 - (SafeMetaData*)getMetaDataForModel {
+    if(!self.model || !self.model.fileUrl) {
+        return nil;
+    }
+    
     NSArray<SafeMetaData*>* matches = [SafesList.sharedInstance.snapshot filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [((SafeMetaData*)evaluatedObject).fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
     }]];
@@ -375,12 +405,21 @@
 }
 
 - (void)onSuccessfulUnlock:(NSString *)selectedItemId {
-    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable ) {
+    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable && (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial)) {
         NSLog(@"Biometric ID is available on Device. Should we enrol?");
+        
+        if(!Settings.sharedInstance.warnedAboutTouchId) {
+            Settings.sharedInstance.warnedAboutTouchId = YES;
+            
+            [Alerts info:@"Touch ID Considerations\n\nWhile this is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device or your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch ID. In addition, on your Mac, your master password will be securely stored in the Keychain. This means it is possible for someone with administrative privileges to search your Keychain for your master password. You should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox.\n\nPlease take all of this into account, and make your decision to use Touch ID based on your preferred balance of convenience and security."
+                  window:self.view.window];
+        }
         
         SafeMetaData* metaData = [self getMetaDataForModel];
         
         if(!metaData) {
+            // First Time? Display Touch ID Caveat
+            
             NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this safe in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
             
             [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
@@ -506,6 +545,19 @@
         [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
             if(returnCode == NSModalResponseOK) {
                 [self.model setMasterPassword:self.changeMasterPassword.confirmedPassword];
+                
+                // Update Touch Id Password
+                
+                SafeMetaData* safe = [self getMetaDataForModel];
+                if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
+                    NSLog(@"Updating Touch ID Password");
+                    safe.touchIdPassword = self.changeMasterPassword.confirmedPassword;
+                }
+    
+                // TODO: Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
+                
+                [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
+                
                 [Alerts info:@"Master Password Changed" window:self.view.window];
             }
         }];
@@ -1053,8 +1105,26 @@ NSString* trimField(NSTextField* textField) {
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
+    else if (theAction == @selector(onClearTouchId:)) {
+        SafeMetaData* metaData = [self getMetaDataForModel];
+        return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
+    }
+    else if(theAction == @selector(onCopyDiagnosticDump:)) {
+        return !self.model.locked;
+    }
     
     return YES;
+}
+
+- (IBAction)onClearTouchId:(id)sender {
+    SafeMetaData* metaData = [self getMetaDataForModel];
+    
+    if(metaData) {
+        [SafesList.sharedInstance remove:metaData.uuid];
+        [metaData removeTouchIdPassword];
+        
+        [self bindToModel];
+    }
 }
 
 - (IBAction)onGenerate:(id)sender {

@@ -15,6 +15,7 @@
 #define kPasswordGenerationParameters @"passwordGenerationParameters"
 #define kDoNotAutoFillFromClipboard @"doNotAutoFillFromClipboard"
 #define kDoNotAutoFillFromMostPopularFields @"doNotAutoFillFromMostPopularFields"
+#define kWarnedAboutTouchId @"warnedAboutTouchId"
 
 @implementation Settings
 
@@ -34,6 +35,14 @@
 
 - (void)setRevealDetailsImmediately:(BOOL)value {
     [self setBool:kRevealDetailsImmediately value:value];
+}
+
+- (BOOL)warnedAboutTouchId {
+    return [self getBool:kWarnedAboutTouchId];
+}
+
+- (void)setWarnedAboutTouchId:(BOOL)warnedAboutTouchId {
+    [self setBool:kWarnedAboutTouchId value:warnedAboutTouchId];
 }
 
 - (BOOL)fullVersion {
