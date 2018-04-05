@@ -611,11 +611,13 @@
         self.textFieldPw.stringValue = item.fields.password;
         self.textFieldPw.textColor = [NSColor purpleColor];// disabledControlTextColor]
         //self.buttonShowHidePassword.title = @"Hide Password (⌘P)";
+        self.buttonGeneratePassword.hidden = NO;
     }
     else {
         self.textFieldPw.enabled = NO;
         self.textFieldPw.stringValue = @"***********************";
         self.textFieldPw.textColor = [NSColor disabledControlTextColor];
+        self.buttonGeneratePassword.hidden = YES;
         //self.buttonShowHidePassword.title = @"Show Password (⌘P)";
     }
 }

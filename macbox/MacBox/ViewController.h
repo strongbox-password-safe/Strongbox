@@ -34,6 +34,7 @@
 @property (weak) IBOutlet NSButton *buttonRevealDetail;
 @property (weak) IBOutlet NSButton *checkboxRevealDetailsImmediately;
 @property (weak) IBOutlet NSButton *buttonShowHidePassword;
+@property (weak) IBOutlet NSButton *buttonGeneratePassword;
 
 @property (weak) IBOutlet NSTextField *textFieldTitle;
 @property (weak) IBOutlet NSTextField *textFieldUrl;
