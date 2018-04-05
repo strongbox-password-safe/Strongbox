@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
@@ -65,10 +66,11 @@
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DF785FB1EDB319E006D4918 /* SafesCollectionOld.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165331EDB2F9C00CCB8CF /* SafesCollectionOld.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
-		D52AF5C43235C242731E1270 /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox-iOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS.release.xcconfig"; sourceTree = "<group>"; };
 		4D0165321EDB2F9C00CCB8CF /* SafesCollectionOld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesCollectionOld.h; sourceTree = "<group>"; };
 		4D0165331EDB2F9C00CCB8CF /* SafesCollectionOld.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesCollectionOld.m; sourceTree = "<group>"; };
 		4D0BA7D61F23B844009243C9 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
@@ -173,7 +175,7 @@
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DA6335E1F62EAE1000A0E9D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		4DBE5B311C8356C700C310BC /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DBE5B311C8356C700C310BC /* Strongbox-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Strongbox-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4DBE5B381C8356C700C310BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 		4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeAlertController.h; sourceTree = "<group>"; };
 		4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeAlertController.m; sourceTree = "<group>"; };
 		63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
+		69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox-iOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StrongBox.release.xcconfig"; path = "Pods/Target Support Files/Pods-StrongBox/Pods-StrongBox.release.xcconfig"; sourceTree = "<group>"; };
 		A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StrongBox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -201,7 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
-				D52AF5C43235C242731E1270 /* Pods_Strongbox.framework in Frameworks */,
+				4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,6 +218,8 @@
 				9AC77600B59D88F6EA6B21A0 /* Pods-StrongBox.release.xcconfig */,
 				63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */,
 				CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */,
+				69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */,
+				4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -372,7 +377,7 @@
 		4DBE5B321C8356C700C310BC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4DBE5B311C8356C700C310BC /* Strongbox.app */,
+				4DBE5B311C8356C700C310BC /* Strongbox-iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -425,6 +430,7 @@
 				4D93FD761EDB7A520076BBAA /* StoreKit.framework */,
 				A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */,
 				AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */,
+				0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -432,9 +438,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4DBE5B301C8356C700C310BC /* Strongbox */ = {
+		4DBE5B301C8356C700C310BC /* Strongbox-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox" */;
+			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox-iOS" */;
 			buildPhases = (
 				4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */,
 				4DBE5B2D1C8356C700C310BC /* Sources */,
@@ -447,9 +453,9 @@
 			);
 			dependencies = (
 			);
-			name = Strongbox;
+			name = "Strongbox-iOS";
 			productName = StrongBox;
-			productReference = 4DBE5B311C8356C700C310BC /* Strongbox.app */;
+			productReference = 4DBE5B311C8356C700C310BC /* Strongbox-iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -489,7 +495,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4DBE5B301C8356C700C310BC /* Strongbox */,
+				4DBE5B301C8356C700C310BC /* Strongbox-iOS */,
 			);
 		};
 /* End PBXProject section */
@@ -521,7 +527,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Strongbox-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Strongbox-iOS-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -534,7 +540,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
@@ -565,7 +571,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */ = {
@@ -574,7 +580,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-resources.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS-resources.sh",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -583,7 +589,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -773,7 +779,7 @@
 		};
 		4DBE5B4C1C8356C700C310BC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */;
+			baseConfigurationReference = 69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -802,7 +808,7 @@
 		};
 		4DBE5B4D1C8356C700C310BC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */;
+			baseConfigurationReference = 4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -841,7 +847,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox" */ = {
+		4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DBE5B4C1C8356C700C310BC /* Debug */,

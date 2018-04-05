@@ -3,7 +3,7 @@ workspace 'StrongBox'
 project 'Strongbox.xcodeproj'
 project 'macbox/MacBox.xcodeproj'
 
-target :Macbox do
+target 'Strongbox' do
     project 'macbox/MacBox.xcodeproj'
     platform :osx, '10.9'
     use_frameworks!
@@ -11,7 +11,7 @@ target :Macbox do
     pod 'SAMKeychain'
 end
 
-target :Strongbox do
+target 'Strongbox-iOS' do
     project 'Strongbox.xcodeproj'
     platform :ios, '9.2'
     use_frameworks!
