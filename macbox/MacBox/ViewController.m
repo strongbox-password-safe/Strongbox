@@ -27,6 +27,8 @@
 @property (strong, nonatomic) NSImage *smallYellowFolderImage;
 @property (strong, nonatomic) NSImage *smallLockImage;
 @property (nonatomic) BOOL showPassword;
+@property (strong, nonatomic) NSArray<NSString*>* emailAutoCompleteCache;
+@property (strong, nonatomic) NSArray<NSString*>* usernameAutoCompleteCache;
 
 @end
 
@@ -38,6 +40,13 @@
     [self initializeFullOrTrialOrLiteUI];
     
     [self setInitialFocus];
+}
+
+- (void)updateAutocompleteCaches {
+    // NB: We use these caches tso that we don't get a feedback when entering entries in the fields and setting them on the model. Also PERF
+    
+    self.emailAutoCompleteCache = self.model ? [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
+    self.usernameAutoCompleteCache = self.model ? [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
 }
 
 - (void)viewDidLoad {
@@ -170,6 +179,8 @@
 
 - (void)bindDetailsPane {
     Node* it = [self getCurrentSelectedItem];
+    
+    [self updateAutocompleteCaches];
     
     if(!it) {        
         [self.tabViewRightPane selectTabViewItemAtIndex:2];
@@ -387,7 +398,9 @@
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
             [Alerts info:@"The stored password is unavailable for some reason. Please enter the password manually. Metadata for this safe will be cleared." window:self.view.window];
-            [SafesList.sharedInstance remove:safe.uuid];
+            if(safe) {
+                [SafesList.sharedInstance remove:safe.uuid];
+            }
         }
     }
 }
@@ -666,23 +679,14 @@
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? [self getUsernameAutocompletes] : [self getEmailAutocompletes];
-
+    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? self.usernameAutoCompleteCache : self.emailAutoCompleteCache;
     return src.count;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
 {
-    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? [self getUsernameAutocompletes] : [self getEmailAutocompletes];
+    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? self.usernameAutoCompleteCache : self.emailAutoCompleteCache;
     return [src objectAtIndex:index];
-}
-
-- (NSArray<NSString*>*)getEmailAutocompletes {
-    return [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator];
-}
-
-- (NSArray<NSString*>*)getUsernameAutocompletes {
-    return [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator];
 }
 
 - (void)comboBoxSelectionDidChange:(NSNotification *)notification{
@@ -690,10 +694,10 @@
         return;
     }
     
-    //NSLog(@"comboBoxSelectionDidChange");
+    //    NSLog(@"comboBoxSelectionDidChange");
 
     if(notification.object == self.comboboxUsername) {
-        NSString *strValue = [[self getUsernameAutocompletes] objectAtIndex:[notification.object indexOfSelectedItem]];
+        NSString *strValue = [self.usernameAutoCompleteCache objectAtIndex:[notification.object indexOfSelectedItem]];
         strValue = [Utils trim:strValue];
         
         Node* item = [self getCurrentSelectedItem];
@@ -705,7 +709,7 @@
         }
     }
     else if(notification.object == self.comboBoxEmail) {
-        NSString *strValue = [[self getEmailAutocompletes] objectAtIndex:[notification.object indexOfSelectedItem]];
+        NSString *strValue = [self.emailAutoCompleteCache objectAtIndex:[notification.object indexOfSelectedItem]];
         strValue = [Utils trim:strValue];
         
         Node* item = [self getCurrentSelectedItem];
@@ -723,6 +727,8 @@
         return;
     }
     
+    //    NSLog(@"textDidChange");
+    
     if(notification.object == self.textViewNotes) {
         Node* item = [self getCurrentSelectedItem];
         
@@ -739,7 +745,7 @@
 
 - (IBAction)controlTextDidChange:(NSNotification *)obj
 {
-    //NSLog(@"controlTextDidChange");
+    NSLog(@"controlTextDidChange");
     [self onDetailFieldChange:obj.object];
 }
 
@@ -1078,6 +1084,8 @@ NSString* trimField(NSTextField* textField) {
     }
     else if (theAction == @selector(onChangeMasterPassword:) ||
              theAction == @selector(onCopyAsCsv:) ||
+             theAction == @selector(onCopyDiagnosticDump:) ||
+             theAction == @selector(onImportFromCsvFile:) ||
              theAction == @selector(onLock:)) {
         return self.model && !self.model.locked;
     }
@@ -1110,9 +1118,6 @@ NSString* trimField(NSTextField* textField) {
     else if (theAction == @selector(onClearTouchId:)) {
         SafeMetaData* metaData = [self getMetaDataForModel];
         return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
-    }
-    else if(theAction == @selector(onCopyDiagnosticDump:)) {
-        return !self.model.locked;
     }
     
     return YES;
@@ -1154,6 +1159,78 @@ NSString* trimField(NSTextField* textField) {
     self.textFieldSafeSummaryLastUpdateTime.stringValue = [self formatDate:self.model.lastUpdateTime];
 }
 
+- (NSURL*)getFileThroughFileOpenDialog
+{  
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    [panel setTitle:@"Choose CSV file to Import"];
+    [panel setAllowsMultipleSelection:NO];
+    [panel setCanChooseDirectories:NO];
+    [panel setCanChooseFiles:YES];
+    [panel setFloatingPanel:NO];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+     panel.allowedFileTypes = @[@"csv"];
+
+    NSInteger result = [panel runModal];
+    if(result == NSModalResponseOK)
+    {
+        return [[panel URLs] firstObject];
+    }
+    
+    return nil;
+}
+
+- (IBAction)onImportFromCsvFile:(id)sender {
+    NSString* message = [NSString stringWithFormat:@"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.", kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderUrl, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderNotes];
+   
+    [Alerts info:@"CSV Format" informativeText:message window:self.view.window completion:^{
+        dispatch_async(dispatch_get_main_queue(), ^{[self importFromCsvFile];});
+    }];
+}
+
+- (void)importFromCsvFile {
+    NSURL* url = [self getFileThroughFileOpenDialog];
+        
+    if(url) {
+        NSError *error = nil;
+        NSArray *rows = [NSArray arrayWithContentsOfCSVURL:url options:CHCSVParserOptionsSanitizesFields | CHCSVParserOptionsUsesFirstLineAsKeys];
+        
+        if (rows == nil) {
+            //something went wrong; log the error and exit
+            NSLog(@"error parsing file: %@", error);
+            [Alerts error:error window:self.view.window];
+            return;
+        }
+        else if(rows.count == 0){
+            [Alerts info:@"CSV File Contains Zero Rows. Cannot Import." window:self.view.window];
+        }
+        else {
+            CHCSVOrderedDictionary *firstRow = [rows firstObject];
+            
+            if([firstRow objectForKey:kCSVHeaderTitle] ||
+               [firstRow objectForKey:kCSVHeaderUsername] ||
+               [firstRow objectForKey:kCSVHeaderUrl] ||
+               [firstRow objectForKey:kCSVHeaderEmail] ||
+               [firstRow objectForKey:kCSVHeaderPassword] ||
+               [firstRow objectForKey:kCSVHeaderNotes]) {
+                NSString* message = [NSString stringWithFormat:@"Found %lu valid rows in CSV file. Are you sure you would like to import now?", (unsigned long)rows.count];
+                
+                [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
+                    if(yesNo) {
+                        [self.model importRecordsFromCsvRows:rows];
+                        
+                        [Alerts info:@"CSV File Successfully Imported." window:self.view.window];
+                        
+                        [self bindToModel];
+                    }
+                }];
+            }
+            else {
+                [Alerts info:@"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields." window:self.view.window];
+            }
+        }
+    }
+}
+
 - (NSString *)formatDate:(NSDate *)date {
     if (!date) {
         return @"<Unknown>";
@@ -1169,7 +1246,6 @@ NSString* trimField(NSTextField* textField) {
     
     return dateString;
 }
-
 
 static NSComparator finderStringComparator = ^(id obj1, id obj2)
 {

@@ -270,6 +270,12 @@ CA
                                                 <action selector="onClearTouchId:" target="Ady-hI-5gd" id="Djm-cK-BLe"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="Import Entries from CSV..." id="MoE-nD-wes">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onImportFromCsvFile:" target="Ady-hI-5gd" id="xuX-JR-sVo"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>

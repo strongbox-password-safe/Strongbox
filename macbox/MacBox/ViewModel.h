@@ -9,6 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "Document.h"
 #import "Node.h"
+#import "CHCSVParser.h"
+
+static NSString* kCSVHeaderTitle = @"title";
+static NSString* kCSVHeaderUsername = @"username";
+static NSString* kCSVHeaderUrl = @"url";
+static NSString* kCSVHeaderEmail = @"email";
+static NSString* kCSVHeaderPassword = @"password";
+static NSString* kCSVHeaderNotes = @"notes";
 
 @interface ViewModel : NSObject
 
@@ -22,6 +30,8 @@
 @property (nonatomic, readonly) NSURL* _Nonnull fileUrl;
 @property (nonatomic, readonly) Node* _Nonnull rootGroup;
 @property (nonatomic, readonly) BOOL masterPasswordIsSet;
+
+- (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (BOOL)lock:(NSError*_Nonnull*_Nonnull)error selectedItem:(NSString*_Nullable)selectedItem;
 - (BOOL)unlock:(NSString*_Nonnull)password selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError*_Nonnull*_Nonnull)error;

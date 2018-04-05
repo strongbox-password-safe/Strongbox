@@ -266,6 +266,42 @@
     return record;
 }
 
+- (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows {
+    for (CHCSVOrderedDictionary* row  in rows) {
+        NSString* actualTitle = [row objectForKey:kCSVHeaderTitle];
+        NSString* actualUsername = [row objectForKey:kCSVHeaderUsername];
+        NSString* actualUrl = [row objectForKey:kCSVHeaderUrl];
+        NSString* actualEmail = [row objectForKey:kCSVHeaderEmail];
+        NSString* actualPassword = [row objectForKey:kCSVHeaderPassword];
+        NSString* actualNotes = [row objectForKey:kCSVHeaderNotes];
+        
+        actualTitle = actualTitle ? actualTitle : @"Unknown Title (Imported)";
+        actualUsername = actualUsername ? actualUsername : @"";
+        actualUrl = actualUrl ? actualUrl : @"";
+        actualEmail = actualEmail ? actualEmail : @"";
+        actualPassword = actualPassword ? actualPassword : @"";
+        actualNotes = actualNotes ? actualNotes : @"";
+
+        NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
+                                                              url:actualUrl
+                                                         password:actualPassword
+                                                            notes:actualNotes
+                                                            email:actualEmail];
+        
+        
+        Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.rootGroup fields:fields];
+        
+        NSDate* date = [NSDate date];
+        record.fields.created = date;
+        record.fields.accessed = date;
+        record.fields.modified = date;
+        
+        [self.passwordDatabase.rootGroup addChild:record];
+    }
+    
+    self.document.dirty = YES;
+}
+
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup {
     NSString *newGroupName = kNewUntitledGroupTitleBase;
     
