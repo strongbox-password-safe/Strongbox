@@ -9,7 +9,7 @@ target 'Strongbox' do
     use_frameworks!
 
     pod 'SAMKeychain'
-end
+end!
 
 target 'Strongbox-iOS' do
     project 'Strongbox.xcodeproj'
