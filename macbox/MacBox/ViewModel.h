@@ -11,12 +11,12 @@
 #import "Node.h"
 #import "CHCSVParser.h"
 
-static NSString* kCSVHeaderTitle = @"title";
-static NSString* kCSVHeaderUsername = @"username";
-static NSString* kCSVHeaderUrl = @"url";
-static NSString* kCSVHeaderEmail = @"email";
-static NSString* kCSVHeaderPassword = @"password";
-static NSString* kCSVHeaderNotes = @"notes";
+static NSString* kCSVHeaderTitle = @"Title";
+static NSString* kCSVHeaderUsername = @"Username";
+static NSString* kCSVHeaderUrl = @"Url";
+static NSString* kCSVHeaderEmail = @"Email";
+static NSString* kCSVHeaderPassword = @"Password";
+static NSString* kCSVHeaderNotes = @"Notes";
 
 @interface ViewModel : NSObject
 
