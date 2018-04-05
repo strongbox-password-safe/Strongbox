@@ -60,7 +60,7 @@
     for (NSDictionary *safeDict in existingSafes) {
         SafeMetaData *safe = [SafeMetaData fromDictionary:safeDict];
         
-        // TODO: Failure should only ever happen on initial load of 1.12.0 where someone has somehow got 2 identically named safes...
+        // WARN: Failure should only ever happen on initial load of 1.12.0 where someone has somehow got 2 identically named safes...
         // virtually impossible
         
         if(![self internalNoSaveAdd:safe]) {

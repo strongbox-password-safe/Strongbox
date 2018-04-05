@@ -179,7 +179,7 @@
         [Alerts info:self title:@"Restoration Unsuccessful" message:@"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?" completion:nil];
     }
     else {
-        // TODO: if multiple IAP - we need to check the product id is in the transactions queue
+        // FUTURE: if multiple IAP - we need to check the product id is in the transactions queue
         
         [[Settings sharedInstance] setPro:YES];
 

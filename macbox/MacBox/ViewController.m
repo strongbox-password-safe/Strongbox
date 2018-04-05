@@ -567,7 +567,7 @@
                     safe.touchIdPassword = self.changeMasterPassword.confirmedPassword;
                 }
     
-                // TODO: Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
+                // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
                 
                 [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
                 

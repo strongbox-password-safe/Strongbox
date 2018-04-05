@@ -51,8 +51,6 @@
         self.minimumLength = (int)[decoder decodeIntegerForKey:@"minimumLength"];
         self.maximumLength = (int)[decoder decodeIntegerForKey:@"maximumLength"];
         self.xkcdWordCount = (int)[decoder decodeIntegerForKey:@"xkcdWordCount"];
-    
-        self.xkcdWordCount = self.xkcdWordCount == 0 ? 4 : self.xkcdWordCount; // TODO: Remove?
     }
 
     return self;
