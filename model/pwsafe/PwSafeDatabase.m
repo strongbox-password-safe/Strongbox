@@ -197,7 +197,6 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
                          password:(NSString*)password
                           headers:(NSMutableArray<Field*> **)headerFields
                             error:(NSError **)ppError {
-    
     PasswordSafe3Header header = [SafeTools getHeader:safeData];
     
     NSData *pBar;

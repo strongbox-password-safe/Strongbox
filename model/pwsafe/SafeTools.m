@@ -258,42 +258,34 @@
 }
 
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    // TODO: Calculate minimum size of a PasswordSafe DB and verify length
-    
     PasswordSafe3Header header = [SafeTools getHeader:candidate];
     
     if (header.tag[0] != 'P' ||
         header.tag[1] != 'W' ||
         header.tag[2] != 'S' ||
         header.tag[3] != '3') {
-        NSLog(@"No PWS3 magic");
+        NSLog(@"Invalid Password Safe. No PWS3 magic");
         return NO;
     }
 
     NSUInteger endOfData = [SafeTools getEofFileOffset:candidate];
     
     if (endOfData == NSNotFound) {
-        NSLog(@"No End of File marker magic");
+        NSLog(@"Invalid Password Safe. No End of File marker magic");
         return NO;
     }
 
     NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
     if (recordsLength <= 0) {
-        NSLog(@"Negative or zero record length");
+        NSLog(@"Invalid Password Safe. Negative or zero record length");
         return NO;
     }
 
     NSInteger numBlocks = recordsLength / TWOFISH_BLOCK_SIZE;
-
-    if (numBlocks <= 0) {
-        NSLog(@"Zero blocks?! Eeek");
-        return NO;
-    }
-
     NSUInteger rem = recordsLength % TWOFISH_BLOCK_SIZE;
 
-    if (rem != 0) {
-        NSLog(@"Non zero remainder in blocks?! Eeek");
+    if (numBlocks <= 0 || rem != 0) {
+        NSLog(@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks.");
         return NO;
     }
 
@@ -323,25 +315,15 @@
 }
 
 + (NSUInteger)getEofFileOffset:(NSData*)data {
-    // TODO: Out of bounds checking
-    
     NSData *endMarker = [EOF_MARKER dataUsingEncoding:NSUTF8StringEncoding];
     NSRange endRange = [data rangeOfData:endMarker options:NSDataSearchBackwards range:NSMakeRange(0, data.length)];
     
     return endRange.location;
 }
 
-+ (void)doStretchKeyCompution:(int)iter header:(PasswordSafe3Header *)pHeader pBar_p:(NSData **)ppBar hPBar_p:(NSData **)hPBar_p password:(NSString *)password {
-    //NSLog(@"Keystretch Iterations: %d", iter);
-
-    // Do the keystretch to verify password
-
-    NSData *salt = [NSData dataWithBytes:pHeader->salt length:32];
++ (NSData*)keystretch:(int)iter header:(unsigned char[32])saltBytes pBar_p:(NSData **)ppBar password:(NSString *)password {
+    NSData *salt = [NSData dataWithBytes:saltBytes length:32];
     NSData *pw = [NSData dataWithData:[password dataUsingEncoding:NSUTF8StringEncoding]];
-
-    // MMcG
-    // For some reason appending the password and salt bytes together and doing a sha256 on them
-    // in one pass doesn't work. Must Initialize, update, update, final to get correct result...
 
     CC_SHA256_CTX context;
     NSMutableData *hash = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
@@ -360,7 +342,7 @@
 
     // We now have P' we need H(P') so one more sha256!
 
-    *hPBar_p = [SafeTools sha256:*ppBar];
+    return [SafeTools sha256:*ppBar];
 }
 
 + (BOOL)getKandL:(NSData *)pBar header:(PasswordSafe3Header)header K_p:(NSData **)K_p L_p:(NSData **)L_p {
@@ -425,17 +407,11 @@
 }
 
 + (BOOL)checkPassword:(PasswordSafe3Header *)pHeader password:(NSString *)password pBar:(NSData **)ppBar {
-    int iter;
+    int iter = [self littleEndian4BytesToInteger:pHeader->iter];
 
-    iter = [self littleEndian4BytesToInteger:pHeader->iter];
-
-    NSData *hPBar;
-
-    [self doStretchKeyCompution:iter header:pHeader pBar_p:ppBar hPBar_p:&hPBar password:password];
+    NSData *hPBar = [self keystretch:iter header:pHeader->salt pBar_p:ppBar password:password];
 
     NSData *actualHash = [NSData dataWithBytes:pHeader->hPBar length:32];
-
-    //NSLog(@"%@ => %@", actualHash, hPBar);
 
     if (![hPBar isEqualToData:actualHash]) {
         return NO;
@@ -532,13 +508,6 @@
     while (currentField < end) {
         FieldHeader *fieldStart = (FieldHeader *)currentField;
 
-        [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone];
-        
-#ifdef DEBUG_READING
-        NSLog(@"Reading Field %@ (%d)",
-              [Field prettyTypeString:fieldStart->type isHeaderField:!hdrDone], fieldStart->length);
-#endif
-
         [dataForHmac appendBytes:&(fieldStart->data) length:fieldStart->length];
 
         if (hdrDone) {
@@ -548,9 +517,7 @@
 
             if (fieldStart->type == FIELD_TYPE_END) {
                 Record *newRecord = [[Record alloc]initWithFields:fields];
-#ifdef DEBUG_READING
-                NSLog(@"Got Record: Title = %@", newRecord.title);
-#endif
+                
                 [*records_p addObject:newRecord];
 
                 fields = [[NSMutableDictionary alloc] init];
