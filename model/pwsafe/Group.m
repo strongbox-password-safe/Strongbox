@@ -10,6 +10,18 @@
 
 @implementation Group
 
++ (NSRegularExpression *)regex
+{
+    static NSRegularExpression *_regex;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        _regex = [NSRegularExpression regularExpressionWithPattern:@"^\\.{0,1}(.+?)((?<!\\\\)\\.|$)" options:0 error:Nil];
+    });
+    
+    return _regex;
+}
+
 - (instancetype)initAsRootGroup {
     return [self initWithPathComponents:[NSArray array]];
 }
@@ -35,10 +47,7 @@
     NSMutableArray *subgroups = [[NSMutableArray alloc] init];
     
     while (subGroupFullSuffix.length > 0 && ![subGroupFullSuffix isEqualToString:@"."]) {
-        // Regex here manages finding the immediate subgroup taking into account escape patterns and only selecting legitimate groups
-        
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\.{0,1}(.+?)((?<!\\\\)\\.|$)" options:0 error:Nil];
-        NSTextCheckingResult *match = [regex firstMatchInString:subGroupFullSuffix options:0  range:NSMakeRange(0, subGroupFullSuffix.length) ];
+        NSTextCheckingResult *match = [Group.regex firstMatchInString:subGroupFullSuffix options:0  range:NSMakeRange(0, subGroupFullSuffix.length) ];
         
         if (match && match.numberOfRanges > 0 && [match rangeAtIndex:1].location != NSNotFound) {
             NSRange range = [match rangeAtIndex:1];
