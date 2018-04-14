@@ -158,6 +158,10 @@
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
     }
     
+    NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
+    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
+    col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
+    //self.outlineView.headerView = nil;
     [self.outlineView reloadData];
     
     [self bindDetailsPane];
@@ -208,6 +212,7 @@
             [self concealDetails];
         }
         
+        self.showPassword = Settings.sharedInstance.alwaysShowPassword;
         [self showOrHidePassword];
     }
 }
@@ -348,19 +353,25 @@
 }
 
 - (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
-    NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"CellIdentifier" owner:self];
+    if([tableColumn.identifier isEqualToString:@"TitleColumn"]) {
+        NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"TitleCell" owner:self];
 
-    Node *it = (Node*)item;
-    
-    BOOL alwaysShowUsernameInOutlineView = Settings.sharedInstance.alwaysShowUsernameInOutlineView;
-    
-    NSString *title = it.isGroup || (self.searchField.stringValue.length == 0 && !alwaysShowUsernameInOutlineView) ? it.title :
-        [NSString stringWithFormat:@"%@%@", it.title, it.fields.username.length ? [NSString stringWithFormat:@" [%@]" ,it.fields.username] : @""];
-    
-    cell.textField.stringValue = title;
-    cell.imageView.objectValue = it.isGroup ? self.smallYellowFolderImage : self.smallLockImage;
-    
-    return cell;
+        Node *it = (Node*)item;
+        
+        cell.textField.stringValue = it.title;
+        cell.imageView.objectValue = it.isGroup ? self.smallYellowFolderImage : self.smallLockImage;
+        
+        return cell;
+    }
+    else {
+        NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"UsernameCell" owner:self];
+        
+        Node *it = (Node*)item;
+        
+        cell.textField.stringValue = it.fields.username;
+        
+        return cell;
+    }
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
@@ -589,12 +600,17 @@
     
     [self.outlineView reloadData];
     
+    NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
+    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
+    
     if( self.searchField.stringValue.length > 0) {
+        col.hidden = NO;
         self.buttonCreateGroup.enabled = NO;
         self.buttonCreateRecord.enabled = NO;
         [self.outlineView expandItem:nil expandChildren:YES];
     }
     else {
+        col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
         self.buttonCreateGroup.enabled = YES;
         self.buttonCreateRecord.enabled = YES;
         [self.outlineView collapseItem:nil collapseChildren:YES];
@@ -967,6 +983,7 @@ NSString* trimField(NSTextField* textField) {
         
         NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
         if ([cellView.textField acceptsFirstResponder]) {
+            cellView.textField.stringValue = item.title;
             [cellView.window makeFirstResponder:cellView.textField];
         }
     }
@@ -1112,8 +1129,8 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onGenerate:(id)sender {
-    self.showPassword = YES;
-    [self showOrHidePassword];
+    //self.showPassword = YES;
+    //[self showOrHidePassword];
 
     self.textFieldPw.stringValue = [self.model generatePassword];
     
@@ -1237,8 +1254,17 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (void)onPreferencesChanged:(NSNotification*)notification {
-    NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
+    //NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
+    
+    [self refreshViewAndMaintainSelection];
+}
+
+- (void)refreshViewAndMaintainSelection {
+    NSInteger selectedRow = [self.outlineView selectedRow];
+    
     [self bindToModel];
+    
+    [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: selectedRow] byExtendingSelection: NO];
 }
 
 static NSComparator finderStringComparator = ^(id obj1, id obj2)
