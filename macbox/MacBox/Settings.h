@@ -24,7 +24,8 @@
 
 @property (nonatomic) BOOL doNotAutoFillFromClipboard;
 @property (nonatomic) BOOL doNotAutoFillFromMostPopularFields;
-
+@property (nonatomic) BOOL alwaysShowUsernameInOutlineView;
+@property (nonatomic) BOOL alwaysShowPassword;
 @property (nonatomic) BOOL warnedAboutTouchId;
 
 @end

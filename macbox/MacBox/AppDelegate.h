@@ -10,6 +10,7 @@
 #import <StoreKit/StoreKit.h>
 
 #define kAutoLockTime @"autoLockTime"
+#define kPreferencesChangedNotification @"preferencesChangedNotification"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 

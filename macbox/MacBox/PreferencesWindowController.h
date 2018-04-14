@@ -10,6 +10,11 @@
 
 @interface PreferencesWindowController : NSWindowController
 
++ (instancetype)sharedInstance;
+
+- (void)show;
+- (void)showOnTab:(NSUInteger)tab;
+
 @property (weak) IBOutlet NSButton *radioBasic;
 @property (weak) IBOutlet NSButton *radioXkcd;
 @property (weak) IBOutlet NSButton *checkboxUseLower;
@@ -24,10 +29,21 @@
 @property (weak) IBOutlet NSStepper *stepperMaximumLength;
 @property (weak) IBOutlet NSStepper *stepperXkcdWordCount;
 @property (weak) IBOutlet NSTextField *labelSamplePassword;
-@property (weak) IBOutlet NSTextField *labelClickToRefresh;
+@property (weak) IBOutlet NSTabView *tabView;
 
 @property (weak) IBOutlet NSTextField *labelPasswordLength;
 @property (weak) IBOutlet NSTextField *labelMinimum;
 @property (weak) IBOutlet NSTextField *labelMaximum;
 @property (weak) IBOutlet NSTextField *labelWordcount;
+
+@property (weak) IBOutlet NSButton *checkboxAlwaysShowPassword;
+@property (weak) IBOutlet NSButton *checkboxAlwaysShowUsernameInOutlineView;
+@property (weak) IBOutlet NSButton *checkboxAutofillMostPopularUsernameEmail;
+@property (weak) IBOutlet NSButton *checkboxAutofillUrlNotes;
+
+@property (weak) IBOutlet NSButton *radioAutolockNever;
+@property (weak) IBOutlet NSButton *radioAutolock1Min;
+@property (weak) IBOutlet NSButton *radioAutolock2Min;
+@property (weak) IBOutlet NSButton *radioAutolock5Min;
+
 @end

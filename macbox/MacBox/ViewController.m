@@ -16,6 +16,7 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "SafesList.h"
 #import "BiometricIdHelper.h"
+#import "PreferencesWindowController.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -61,6 +62,7 @@
     [self bindToModel];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
 }
 
 - (void)customizeUi {
@@ -350,7 +352,12 @@
 
     Node *it = (Node*)item;
     
-    cell.textField.stringValue = it.title;
+    BOOL alwaysShowUsernameInOutlineView = Settings.sharedInstance.alwaysShowUsernameInOutlineView;
+    
+    NSString *title = it.isGroup || (self.searchField.stringValue.length == 0 && !alwaysShowUsernameInOutlineView) ? it.title :
+        [NSString stringWithFormat:@"%@%@", it.title, it.fields.username.length ? [NSString stringWithFormat:@" [%@]" ,it.fields.username] : @""];
+    
+    cell.textField.stringValue = title;
     cell.imageView.objectValue = it.isGroup ? self.smallYellowFolderImage : self.smallLockImage;
     
     return cell;
@@ -1223,6 +1230,15 @@ NSString* trimField(NSTextField* textField) {
     NSString *dateString = [dateFormatter stringFromDate:date];
     
     return dateString;
+}
+
+- (IBAction)onPasswordPreferences:(id)sender {
+    [PreferencesWindowController.sharedInstance showOnTab:1];
+}
+
+- (void)onPreferencesChanged:(NSNotification*)notification {
+    NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
+    [self bindToModel];
 }
 
 static NSComparator finderStringComparator = ^(id obj1, id obj2)

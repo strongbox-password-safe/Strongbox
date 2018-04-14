@@ -25,7 +25,6 @@
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
-@property (strong, nonatomic) PreferencesWindowController *preferencesWindowController;
 @property (strong, nonatomic) SafesMetaDataViewer *safesMetaDataViewer;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 
@@ -65,48 +64,7 @@
         [self removeUpgradeMenuItem];
     }
     
-    [self bindAutoLockUi];
-    [self bindAutoFillUi];
-    
     self.applicationHasFinishedLaunching = YES;
-}
-
-- (IBAction)onSetAutoFillUserOrEmail:(id)sender {
-    Settings.sharedInstance.doNotAutoFillFromMostPopularFields = ((NSMenuItem*)sender).state;
-    
-    [self bindAutoFillUi];
-}
-
-- (IBAction)onSetAutoFillUrlOrNotes:(id)sender {
-    Settings.sharedInstance.doNotAutoFillFromClipboard = ((NSMenuItem*)sender).state;
-    
-    [self bindAutoFillUi];
-}
-
-- (void)bindAutoFillUi {
-    NSMenu* rootMenu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Preferences"] submenu];
-    NSMenu* menu = [[rootMenu itemWithTitle: @"Auto Fill New Record"] submenu];
-
-    [[menu itemAtIndex:0] setState:!Settings.sharedInstance.doNotAutoFillFromMostPopularFields ? NSOnState : NSOffState ];
-    [[menu itemAtIndex:1] setState:!Settings.sharedInstance.doNotAutoFillFromClipboard ? NSOnState : NSOffState];
-}
-
-- (IBAction)onSetAutoLockTimeout:(id)sender {
-    [[Settings sharedInstance] setAutoLockTimeoutSeconds:[sender tag]];
-
-    [self bindAutoLockUi];
-}
-
-- (void)bindAutoLockUi {
-    NSMenu* rootMenu = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Preferences"] submenu];
-    NSMenu* menu = [[rootMenu itemWithTitle: @"Auto Lock"] submenu];
-    
-    NSInteger alt = [[Settings sharedInstance] autoLockTimeoutSeconds];
-
-    [[menu itemAtIndex:0] setState:alt == 0 ? NSOnState : NSOffState ];
-    [[menu itemAtIndex:1] setState:alt == 60 ? NSOnState : NSOffState ];
-    [[menu itemAtIndex:2] setState:alt == 120 ? NSOnState : NSOffState ];
-    [[menu itemAtIndex:3] setState:alt == 300 ? NSOnState : NSOffState ];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -255,16 +213,8 @@
     }
 }
 
-- (IBAction)onPasswordGenerationPreferences:(id)sender {
-    if(self.preferencesWindowController == nil) {
-        self.preferencesWindowController = [[PreferencesWindowController alloc] initWithWindowNibName:@"PreferencesWindowController"];
-       
-        NSWindow *window = [NSApplication sharedApplication].mainWindow;
-        
-        [window beginSheet:self.preferencesWindowController.window completionHandler:^(NSModalResponse returnCode) {
-            self.preferencesWindowController = nil;
-        }];
-    }
+- (IBAction)onPreferences:(id)sender {
+    [PreferencesWindowController.sharedInstance show];
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {

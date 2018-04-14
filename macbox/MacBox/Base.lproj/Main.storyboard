@@ -24,6 +24,12 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="81m-Fu-bNX"/>
+                                        <menuItem title="Preferences..." keyEquivalent="," id="A2S-Ex-gQq" userLabel="Preferences...">
+                                            <connections>
+                                                <action selector="onPreferences:" target="Ady-hI-5gd" id="z75-pR-b8J"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="IDX-PA-7xa"/>
                                         <menuItem title="Upgrade to Pro..." id="gks-42-4nA" userLabel="Upgrade...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -279,69 +285,6 @@ CA
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Preferences" id="Jel-iL-tXW" userLabel="Preferences">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Preferences" id="9O4-A1-KRf">
-                                    <items>
-                                        <menuItem title="Password Generation..." id="Ocv-5L-Nac" userLabel="Password Generation">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onPasswordGenerationPreferences:" target="Ady-hI-5gd" id="D77-BK-TIE"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Auto Lock" id="8Sd-C8-9Qq" userLabel="Autolock">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Auto Lock" id="qZz-Vd-jlc">
-                                                <items>
-                                                    <menuItem title="Never Auto Lock" state="on" id="K3n-Ua-8iV">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4Cb-1q-i9w"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="After 1 Minute" tag="60" id="5xY-0Q-3RE">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="4gI-Ze-9tU"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="After 2 Minutes" tag="120" id="rLC-w7-qJQ">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="9ws-Bq-Htj"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="After 5 Minutes" tag="300" id="YLv-WT-VfH">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="onSetAutoLockTimeout:" target="Ady-hI-5gd" id="66m-uj-7Uz"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
-                                        </menuItem>
-                                        <menuItem title="Auto Fill New Record" id="Jwh-Te-dZC" userLabel="Autofill">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Auto Fill New Record" id="ftP-7i-0nV">
-                                                <items>
-                                                    <menuItem title="Auto Fill Most Popular Username and Email" state="on" id="V5o-oq-xft">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="onSetAutoFillUserOrEmail:" target="Ady-hI-5gd" id="OI5-5E-dhw"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Auto Fill URL or Notes from Clipboard" state="on" id="1tF-kr-pGc">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="onSetAutoFillUrlOrNotes:" target="Ady-hI-5gd" id="exE-PY-aSE"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
-                                        </menuItem>
-                                    </items>
-                                </menu>
-                            </menuItem>
                             <menuItem title="Window" id="aUF-d1-5bR">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
@@ -410,7 +353,7 @@ CA
                 </windowController>
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-348" y="552"/>
+            <point key="canvasLocation" x="-349" y="405"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -976,7 +919,7 @@ DQ
                                                                                             <font key="font" metaFont="system"/>
                                                                                         </buttonCell>
                                                                                         <connections>
-                                                                                            <action selector="onPasswordGenerationPreferences:" target="2Tp-Fl-jBw" id="NXN-CI-pmI"/>
+                                                                                            <action selector="onPasswordPreferences:" target="5gI-5U-AMq" id="2zC-H8-Es7"/>
                                                                                         </connections>
                                                                                     </button>
                                                                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="beQ-mh-Dbp">

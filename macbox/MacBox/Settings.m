@@ -16,6 +16,8 @@
 #define kDoNotAutoFillFromClipboard @"doNotAutoFillFromClipboard"
 #define kDoNotAutoFillFromMostPopularFields @"doNotAutoFillFromMostPopularFields"
 #define kWarnedAboutTouchId @"warnedAboutTouchId"
+#define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
+#define kAlwaysShowPassword @"alwaysShowPassword"
 
 @implementation Settings
 
@@ -59,6 +61,22 @@
 
 -(BOOL)doNotAutoFillFromMostPopularFields {
     return [self getBool:kDoNotAutoFillFromMostPopularFields];
+}
+
+- (BOOL)alwaysShowPassword {
+    return [self getBool:kAlwaysShowPassword];
+}
+
+-(void)setAlwaysShowPassword:(BOOL)alwaysShowPassword {
+    [self setBool:kAlwaysShowPassword value:alwaysShowPassword];
+}
+
+- (BOOL)alwaysShowUsernameInOutlineView {
+    return [self getBool:kAlwaysShowUsernameInOutlineView];
+}
+
+- (void)setAlwaysShowUsernameInOutlineView:(BOOL)alwaysShowUsernameInOutlineView {
+    [self setBool:kAlwaysShowUsernameInOutlineView value:alwaysShowUsernameInOutlineView];
 }
 
 - (void)setDoNotAutoFillFromClipboard:(BOOL)doNotAutoFillFromClipboard {

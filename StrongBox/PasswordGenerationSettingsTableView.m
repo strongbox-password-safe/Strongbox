@@ -58,6 +58,10 @@
         params.maximumLength = params.minimumLength;
     }
 
+    if(params.xkcdWordCount < 2){
+        params.xkcdWordCount = 2;
+    }
+    
     if(params.xkcdWordCount > 50){
         params.xkcdWordCount = 50;
     }

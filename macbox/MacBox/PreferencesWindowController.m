@@ -10,6 +10,7 @@
 #import "Settings.h"
 #import "PasswordGenerator.h"
 #import "Alerts.h"
+#import "AppDelegate.h"
 
 @interface PreferencesWindowController ()
 
@@ -17,20 +18,34 @@
 
 @implementation PreferencesWindowController
 
-- (IBAction)onOk:(id)sender {
-    [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
++ (instancetype)sharedInstance {
+    static PreferencesWindowController *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[PreferencesWindowController alloc] initWithWindowNibName:@"PreferencesWindowController"];
+    });
+    
+    return sharedInstance;
+}
+
+- (void)show {
+    [self showWindow:nil];
+}
+
+- (void)showOnTab:(NSUInteger)tab {
+    [self show];
+    [self.tabView selectTabViewItemAtIndex:tab];
 }
 
 - (void)windowDidLoad {
     [super windowDidLoad];
     
-    [self bindUiToSettings];
+    [self bindPasswordUiToSettings];
+    [self bindGeneralUiToSettings];
     
-    NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangeParameters:)];
+    NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
     [self.labelSamplePassword addGestureRecognizer:click];
-
-    NSClickGestureRecognizer *click2 = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangeParameters:)];
-    [self.labelClickToRefresh addGestureRecognizer:click2];
 
     [self refreshSamplePassword];
 }
@@ -39,7 +54,7 @@
     self.labelSamplePassword.stringValue = [PasswordGenerator generatePassword:Settings.sharedInstance.passwordGenerationParameters];
 }
      
-- (void)bindUiToSettings {
+- (void)bindPasswordUiToSettings {
     PasswordGenerationParameters *params = Settings.sharedInstance.passwordGenerationParameters;
     
     self.radioBasic.state = params.algorithm == kBasic ? NSOnState : NSOffState;
@@ -78,7 +93,7 @@
     self.stepperXkcdWordCount.enabled = params.algorithm == kXkcd;
 }
 
-- (IBAction)onChangeParameters:(id)sender {
+- (IBAction)onChangePasswordParameters:(id)sender {
     PasswordGenerationParameters *params = Settings.sharedInstance.passwordGenerationParameters;
     
     params.algorithm = self.radioBasic.state == NSOnState ? kBasic : kXkcd;
@@ -108,6 +123,10 @@
     if(params.maximumLength < params.minimumLength) {
         params.maximumLength = params.minimumLength;
     }
+
+    if(params.xkcdWordCount < 2){
+        params.xkcdWordCount = 2;
+    }
     
     if(params.xkcdWordCount > 50){
         params.xkcdWordCount = 50;
@@ -120,9 +139,53 @@
     
     Settings.sharedInstance.passwordGenerationParameters = params;
     
-    [self bindUiToSettings];
-    
+    [self bindPasswordUiToSettings];
     [self refreshSamplePassword];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction)onGeneralSettingsChange:(id)sender {
+    Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
+    Settings.sharedInstance.alwaysShowUsernameInOutlineView = self.checkboxAlwaysShowUsernameInOutlineView.state == NSOnState;
+    Settings.sharedInstance.doNotAutoFillFromMostPopularFields = self.checkboxAutofillMostPopularUsernameEmail.state != NSOnState;
+    Settings.sharedInstance.doNotAutoFillFromClipboard = self.checkboxAutofillUrlNotes.state != NSOnState;
+    
+    if(self.radioAutolockNever.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 0;
+    }
+    else if (self.radioAutolock1Min.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 60;
+    }
+    else if (self.radioAutolock2Min.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 120;
+    }
+    else if (self.radioAutolock5Min.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 300;
+    }
+    
+    [self bindGeneralUiToSettings];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onAutolockChange:(id)sender {
+    [self onGeneralSettingsChange:sender];
+}
+
+- (void)bindGeneralUiToSettings {
+    self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
+    self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
+    self.checkboxAutofillMostPopularUsernameEmail.state = !Settings.sharedInstance.doNotAutoFillFromMostPopularFields ? NSOnState : NSOffState;
+    self.checkboxAutofillUrlNotes.state = !Settings.sharedInstance.doNotAutoFillFromClipboard ? NSOnState : NSOffState;
+
+    NSInteger alt = Settings.sharedInstance.autoLockTimeoutSeconds;
+    
+    self.radioAutolockNever.state = alt == 0 ? NSOnState : NSOffState;
+    self.radioAutolock1Min.state = alt == 60 ? NSOnState : NSOffState;
+    self.radioAutolock2Min.state = alt == 120 ? NSOnState : NSOffState;
+    self.radioAutolock5Min.state = alt == 300 ? NSOnState : NSOffState;
 }
 
 @end
