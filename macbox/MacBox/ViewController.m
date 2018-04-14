@@ -76,6 +76,9 @@
     [self.comboBoxEmail setDataSource:self];
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
+    
+    self.showPassword = Settings.sharedInstance.alwaysShowPassword;
+    [self showOrHidePassword];
 }
 
 - (void)loadUIImages {
@@ -608,23 +611,23 @@
         self.buttonCreateGroup.enabled = NO;
         self.buttonCreateRecord.enabled = NO;
         [self.outlineView expandItem:nil expandChildren:YES];
+
+        for(int i=0;i < [self.outlineView numberOfRows];i++) {
+            //NSLog(@"Searching: %d", i);
+            Node* node = [self.outlineView itemAtRow:i];
+            
+            if([self isSafeItemMatchesSearchCriteria:node recurse:NO]) {
+                //NSLog(@"Found: %@", node.title);
+                [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: i] byExtendingSelection: NO];
+                break;
+            }
+        }
     }
     else {
         col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
         self.buttonCreateGroup.enabled = YES;
         self.buttonCreateRecord.enabled = YES;
         [self.outlineView collapseItem:nil collapseChildren:YES];
-    }
-    
-    for(int i=0;i < [self.outlineView numberOfRows];i++) {
-        //NSLog(@"Searching: %d", i);
-        Node* node = [self.outlineView itemAtRow:i];
-        
-        if([self isSafeItemMatchesSearchCriteria:node recurse:NO]) {
-            //NSLog(@"Found: %@", node.title);
-            [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: i] byExtendingSelection: NO];
-            break;
-        }
     }
     
     [self bindDetailsPane];
@@ -768,7 +771,7 @@
 
 - (IBAction)controlTextDidChange:(NSNotification *)obj
 {
-    NSLog(@"controlTextDidChange");
+    //NSLog(@"controlTextDidChange");
     [self onDetailFieldChange:obj.object];
 }
 
@@ -793,6 +796,9 @@
     else if(sender == self.comboboxUsername) {
         if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
             [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
+
+            NSInteger row = [self.outlineView selectedRow];
+            [self.outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:1]];
 
             recordChanged = YES;
         }
@@ -836,12 +842,10 @@
 
     NSString* newTitle = trimField(textField);
     if(![item.title isEqualToString:newTitle]) {
-        //SafeItemViewModel *newlyNamedItem =
-        
-        if(![self.model setItemTitle:item title:newTitle]) {
+        if((item.isGroup && newTitle.length == 0) || ![self.model setItemTitle:item title:newTitle]) {
             [Alerts info:@"You cannot change the title of this item to this value." window:self.view.window];
         }
-
+        
         [self reloadDataAndSelectItem:item];
          
         [self bindDetailsPane];
@@ -980,12 +984,12 @@ NSString* trimField(NSTextField* textField) {
     }
     else {
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
-        
-        NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
-        if ([cellView.textField acceptsFirstResponder]) {
-            cellView.textField.stringValue = item.title;
-            [cellView.window makeFirstResponder:cellView.textField];
-        }
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            self.showPassword = YES;
+            [self showOrHidePassword];
+            [self.view.window makeFirstResponder:self.textFieldTitle];
+        });
     }
 }
 
@@ -1005,10 +1009,12 @@ NSString* trimField(NSTextField* textField) {
     else {
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
         
-        NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
-        if ([cellView.textField acceptsFirstResponder]) {
-            [cellView.window makeFirstResponder:cellView.textField];
-        }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
+            if ([cellView.textField acceptsFirstResponder]) {
+                [cellView.window makeFirstResponder:cellView.textField];
+            }
+        });
     }
 }
 

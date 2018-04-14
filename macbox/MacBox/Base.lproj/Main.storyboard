@@ -1605,6 +1605,7 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="buttonCreateGroup" destination="3CR-yA-5lZ" id="twI-uy-Rj6"/>
                         <outlet property="buttonCreateRecord" destination="2aS-iE-9qr" id="WfG-do-P2M"/>
                         <outlet property="buttonGeneratePassword" destination="LJc-Iz-DyC" id="AcH-tn-EHu"/>
                         <outlet property="buttonRevealDetail" destination="Qog-rh-kdt" id="9fG-YT-c4P"/>

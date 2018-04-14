@@ -142,7 +142,7 @@
     [self bindPasswordUiToSettings];
     [self refreshSamplePassword];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
