@@ -217,7 +217,7 @@
 }
 
 - (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
-    NSString* actualTitle = @"New Untitled Record";
+    NSString *actualTitle = @"New Untitled Record";
     NSString *actualNotes = @"";
     NSString *actualUrl = @"";
     NSString *actualUsername = @"";
@@ -226,17 +226,19 @@
     if(!Settings.sharedInstance.doNotAutoFillFromClipboard) {
         NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
         NSString* notesOrUrlFromClipboard = [myPasteboard  stringForType:NSPasteboardTypeString];
-        
-        // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
 
-        NSURL *url = [NSURL URLWithString:notesOrUrlFromClipboard];
-        if (url && url.scheme && url.host)
-        {
-            actualUrl = notesOrUrlFromClipboard;
-            actualTitle = url.host;
-        }
-        else {
-            actualNotes = notesOrUrlFromClipboard;
+        if(notesOrUrlFromClipboard) {
+            // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
+
+            NSURL *url = [NSURL URLWithString:notesOrUrlFromClipboard];
+            if (url && url.scheme && url.host)
+            {
+                actualUrl = notesOrUrlFromClipboard;
+                actualTitle = url.host;
+            }
+            else {
+                actualNotes = notesOrUrlFromClipboard;
+            }
         }
     }
 

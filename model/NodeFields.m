@@ -24,11 +24,11 @@
                                      notes:(NSString*_Nonnull)notes
                                      email:(NSString*_Nonnull)email {
     if (self = [super init]) {
-        self.username = username;
-        self.url = url;
-        self.password = password;
-        self.notes = notes;
-        self.email = email;
+        self.username = username == nil ? @"" : username;
+        self.url = url == nil ? @"" : url;
+        self.password = password == nil ? @"" : password;
+        self.notes = notes == nil ? @"" : notes;
+        self.email = email == nil ? @"" : email;
         self.passwordHistory = [[PasswordHistory alloc] init];
         self.created = [NSDate date];
     }
