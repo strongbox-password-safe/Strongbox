@@ -262,11 +262,11 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/main.m"
-            timestampString = "538656640.586262"
+            timestampString = "545652172.778061"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "17"
@@ -621,7 +621,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1065"
             endingLineNumber = "1065"
-            landmarkName = "-onCopyDiagnosticDump:"
+            landmarkName = "-onCopyPasswordAndLaunchUrl:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -637,7 +637,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1165"
             endingLineNumber = "1165"
-            landmarkName = "-onCopyAsCsv:"
+            landmarkName = "-updateSafeSummaryFields"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

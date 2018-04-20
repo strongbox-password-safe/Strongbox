@@ -402,17 +402,25 @@
                     if(error) {
                         [safe removeTouchIdPassword];
                         [SafesList.sharedInstance remove:safe.uuid];
-                        
-                        [Alerts error:@"Could not open safe with stored Touch ID Password. The stored password will now be removed from secure storage. You will need to enter the correct password to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
-                        
+
                         dispatch_async(dispatch_get_main_queue(), ^{
+                            [Alerts error:@"Could not open safe with stored Touch ID Password. The stored password will now be removed from secure storage. You will need to enter the correct password to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
+
                             [self bindToModel];
                         });
                     }
                 }
                 else {
                     NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
-                    [Alerts error:error window:self.view.window];
+                    
+                    if(error && (error.code == LAErrorUserFallback || error.code == LAErrorUserCancel)) {
+                        NSLog(@"User cancelled or selected fallback. Ignore...");
+                    }
+                    else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [Alerts error:error window:self.view.window];
+                        });
+                    }
                 }
             }];
         }
