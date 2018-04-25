@@ -616,11 +616,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "545937112.012358"
+            timestampString = "546351250.706485"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1065"
-            endingLineNumber = "1065"
+            startingLineNumber = "1067"
+            endingLineNumber = "1067"
             landmarkName = "-onCopyPasswordAndLaunchUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -632,11 +632,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "545937112.012795"
+            timestampString = "546351250.706549"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1165"
-            endingLineNumber = "1165"
+            startingLineNumber = "1167"
+            endingLineNumber = "1167"
             landmarkName = "-updateSafeSummaryFields"
             landmarkType = "7">
          </BreakpointContent>
@@ -680,7 +680,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "model/pwsafe/PwSafeDatabase.m"
-            timestampString = "544900561.4408261"
+            timestampString = "546350265.191115"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "233"
@@ -696,7 +696,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "model/pwsafe/PwSafeDatabase.m"
-            timestampString = "544900561.80888"
+            timestampString = "546350265.191375"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "234"
@@ -750,6 +750,22 @@
             startingLineNumber = "40"
             endingLineNumber = "40"
             landmarkName = "+calculateRFC2104Hmac:key:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "model/pwsafe/PwSafeDatabase.m"
+            timestampString = "546350265.1915981"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "453"
+            endingLineNumber = "453"
+            landmarkName = "-getAsData:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

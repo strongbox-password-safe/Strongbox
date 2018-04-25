@@ -78,7 +78,6 @@
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
     
     self.showPassword = Settings.sharedInstance.alwaysShowPassword;
-    [self showOrHidePassword];
 }
 
 - (void)loadUIImages {
@@ -396,33 +395,30 @@
         
         if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
             [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
-                if(success) {
-                    NSError* error = [self unlock:safe.touchIdPassword];
-                    
-                    if(error) {
-                        [safe removeTouchIdPassword];
-                        [SafesList.sharedInstance remove:safe.uuid];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if(success) {
+                        NSError* error = [self unlock:safe.touchIdPassword];
+                        
+                        if(error) {
+                            [safe removeTouchIdPassword];
+                            [SafesList.sharedInstance remove:safe.uuid];
 
-                        dispatch_async(dispatch_get_main_queue(), ^{
                             [Alerts error:@"Could not open safe with stored Touch ID Password. The stored password will now be removed from secure storage. You will need to enter the correct password to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
 
                             [self bindToModel];
-                        });
-                    }
-                }
-                else {
-                    NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
-                    
-                    if(error && (error.code == LAErrorUserFallback || error.code == LAErrorUserCancel)) {
-                        NSLog(@"User cancelled or selected fallback. Ignore...");
+                        }
                     }
                     else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
+                        NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
+                        
+                        if(error && (error.code == LAErrorUserFallback || error.code == LAErrorUserCancel)) {
+                            NSLog(@"User cancelled or selected fallback. Ignore...");
+                        }
+                        else {
                             [Alerts error:error window:self.view.window];
-                        });
+                        }
                     }
-                }
-            }];
+                });}];
         }
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
@@ -465,7 +461,6 @@
             NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this safe in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
             
             [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
-                
                 NSURL* url = self.model.fileUrl;
                 SafeMetaData* safeMetaData = [[SafeMetaData alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
                                                                     storageProvider:kLocalDevice
@@ -513,8 +508,9 @@
         NSString *selectedItemId;
         
         if([self.model unlock:password selectedItem:&selectedItemId error:&error]) {
-            [self onSuccessfulUnlock:selectedItemId];
-            return nil;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self onSuccessfulUnlock:selectedItemId];
+            });
         }
         else {
             return error;
@@ -653,7 +649,13 @@
 
 - (void)showOrHidePassword {
     Node* item = [self getCurrentSelectedItem];
+    if(!item)
+    {
+        return;
+    }
+    
     if(self.showPassword) {
+        
         self.textFieldPw.enabled = YES;
         self.textFieldPw.stringValue = item.fields.password;
         self.textFieldPw.textColor = [NSColor purpleColor];// disabledControlTextColor]

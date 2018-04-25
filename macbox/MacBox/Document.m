@@ -96,6 +96,11 @@ completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
             });
         }
         else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //ViewController *vc = (ViewController*)self.windowController.contentViewController;
+                [Alerts error:errorOrNil window:self.windowController.window];
+            });
+            
             NSLog(@"Error during saveToURL: %@", errorOrNil);
         }
     }];
