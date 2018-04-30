@@ -616,11 +616,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "546351250.706485"
+            timestampString = "546788223.08044"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1067"
-            endingLineNumber = "1067"
+            startingLineNumber = "1079"
+            endingLineNumber = "1079"
             landmarkName = "-onCopyPasswordAndLaunchUrl:"
             landmarkType = "7">
          </BreakpointContent>
@@ -632,11 +632,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "546351250.706549"
+            timestampString = "546788223.080929"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1167"
-            endingLineNumber = "1167"
+            startingLineNumber = "1179"
+            endingLineNumber = "1179"
             landmarkName = "-updateSafeSummaryFields"
             landmarkType = "7">
          </BreakpointContent>
@@ -766,6 +766,22 @@
             startingLineNumber = "453"
             endingLineNumber = "453"
             landmarkName = "-getAsData:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "546788223.0812989"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
+            landmarkName = "-bindToModel"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

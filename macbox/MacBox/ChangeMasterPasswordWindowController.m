@@ -23,6 +23,8 @@
         self.textFieldTitle.stringValue = self.titleText;
     }
     
+    self.buttonCancel.enabled = !self.required;
+    
     [self updateUi];
 }
 

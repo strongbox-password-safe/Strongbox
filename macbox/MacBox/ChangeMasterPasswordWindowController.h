@@ -14,11 +14,13 @@
 @property (weak) IBOutlet NSSecureTextField *textFieldNew;
 @property (weak) IBOutlet NSSecureTextField *textFieldConfirm;
 @property (weak) IBOutlet NSButton *buttonOk;
+@property (weak) IBOutlet NSButton *buttonCancel;
 
 @property (weak) IBOutlet NSAdvancedTextField *labelPasswordsMatch;
 @property (weak) IBOutlet NSTextField *textFieldTitle;
 
 @property (nonatomic, readonly) NSString* confirmedPassword;
 @property (nonatomic) NSString* titleText;
+@property (nonatomic) BOOL required;
 
 @end

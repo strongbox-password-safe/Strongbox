@@ -169,6 +169,10 @@
     [self bindDetailsPane];
     
     [self bindStatusPane];
+    
+    if(!self.model.masterPasswordIsSet) {
+        [self promptForMasterPassword:YES]; // New document - Require Master Password Set
+    }
 }
 
 - (void)setInitialFocus {
@@ -574,32 +578,39 @@
     [self.view.window makeFirstResponder:self.searchField];
 }
 
-- (IBAction)onChangeMasterPassword:(id)sender {
+- (void)promptForMasterPassword:(BOOL)required {
     if(self.model && !self.model.locked) {
-        self.changeMasterPassword = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-        
-        self.changeMasterPassword.titleText = @"Change Master Password";
-        
-        [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
-            if(returnCode == NSModalResponseOK) {
-                [self.model setMasterPassword:self.changeMasterPassword.confirmedPassword];
-                
-                // Update Touch Id Password
-                
-                SafeMetaData* safe = [self getMetaDataForModel];
-                if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
-                    NSLog(@"Updating Touch ID Password");
-                    safe.touchIdPassword = self.changeMasterPassword.confirmedPassword;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.changeMasterPassword = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+            
+            self.changeMasterPassword.titleText = required ? @"You must set a master password" : @"Change Master Password";
+            self.changeMasterPassword.required = required;
+            
+            [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
+                if(returnCode == NSModalResponseOK) {
+                    [self.model setMasterPassword:self.changeMasterPassword.confirmedPassword];
+                    
+                    // Update Touch Id Password
+                    
+                    SafeMetaData* safe = [self getMetaDataForModel];
+                    if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
+                        NSLog(@"Updating Touch ID Password");
+                        safe.touchIdPassword = self.changeMasterPassword.confirmedPassword;
+                    }
+                    
+                    // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
+                    
+                    [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
+                    
+                    [Alerts info:@"Master Password Changed" window:self.view.window];
                 }
-    
-                // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
-                
-                [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-                
-                [Alerts info:@"Master Password Changed" window:self.view.window];
-            }
-        }];
+            }];
+        });
     }
+}
+
+- (IBAction)onChangeMasterPassword:(id)sender {
+    [self promptForMasterPassword:NO];
 }
 
 - (IBAction)onSearch:(id)sender {
