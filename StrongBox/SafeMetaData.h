@@ -19,7 +19,6 @@
 - (void)removeTouchIdPassword;
 @property (nonatomic, strong) NSString* touchIdPassword;
 
-
 @property (nonatomic, strong) NSString *uuid;
 @property (nonatomic, strong) NSString *nickName;
 @property (nonatomic, strong) NSString *fileName;

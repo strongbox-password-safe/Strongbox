@@ -78,8 +78,8 @@
 		4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafesMetaDataViewer.m; sourceTree = "<group>"; };
 		4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SafesMetaDataViewer.xib; sourceTree = "<group>"; };
 		4D559FA020750D1D009856E3 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = MacBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
-		4D559FA120750D1D009856E3 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = MacBox/SafesList.m; sourceTree = SOURCE_ROOT; };
-		4D559FA220750D1D009856E3 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = MacBox/SafesList.h; sourceTree = SOURCE_ROOT; };
+		4D559FA120750D1D009856E3 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = "../New Group/SafesList.m"; sourceTree = SOURCE_ROOT; };
+		4D559FA220750D1D009856E3 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = "../New Group/SafesList.h"; sourceTree = SOURCE_ROOT; };
 		4D559FA320750D1D009856E3 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = MacBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
 		4D559FA620752537009856E3 /* BiometricIdHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BiometricIdHelper.h; sourceTree = "<group>"; };
 		4D559FA720752537009856E3 /* BiometricIdHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BiometricIdHelper.m; sourceTree = "<group>"; };

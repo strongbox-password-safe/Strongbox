@@ -146,7 +146,7 @@
                        
                        [self.viewModel.metadata removeTouchIdPassword];
                        
-                       [[SafesList sharedInstance] save];
+                       [[SafesList sharedInstance] update:self.viewModel.metadata];
                        [self updateTouchIdButtonText];
                        
                        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
@@ -177,7 +177,7 @@
     }
     
     [self updateTouchIdButtonText];
-    [[SafesList sharedInstance] save];
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
 }
 
 - (void)onToggleOfflineCache {

@@ -18,6 +18,7 @@
 - (void)add:(SafeMetaData *_Nonnull)safe;
 - (void)remove:(NSString*_Nonnull)uuid;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
+- (void)update:(SafeMetaData *_Nonnull)safe;
 
 + (NSString *_Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
 - (BOOL)isValidNickName:(NSString *_Nonnull)nickName;

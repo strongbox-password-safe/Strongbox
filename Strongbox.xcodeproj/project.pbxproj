@@ -29,7 +29,6 @@
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
-		4D402D722074EAFF00F7BC70 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D6F2074EAFF00F7BC70 /* SafesList.m */; };
 		4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
@@ -57,6 +56,7 @@
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
 		4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D93FD761EDB7A520076BBAA /* StoreKit.framework */; };
+		4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6335D1F62EAE1000A0E9D /* Main.storyboard */; };
 		4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBE5B381C8356C700C310BC /* AppDelegate.m */; };
@@ -118,9 +118,7 @@
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
 		4D402D6E2074EAFF00F7BC70 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = StrongBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
-		4D402D6F2074EAFF00F7BC70 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = StrongBox/SafesList.m; sourceTree = SOURCE_ROOT; };
 		4D402D702074EAFF00F7BC70 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = StrongBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
-		4D402D712074EAFF00F7BC70 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = StrongBox/SafesList.h; sourceTree = SOURCE_ROOT; };
 		4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = model/StorageProvider.h; sourceTree = SOURCE_ROOT; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserTableViewController.m; sourceTree = "<group>"; };
@@ -172,6 +170,8 @@
 		4D915D781EDC4B77002615F6 /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alerts.h; sourceTree = "<group>"; };
 		4D915D791EDC4B77002615F6 /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alerts.m; sourceTree = "<group>"; };
 		4D93FD761EDB7A520076BBAA /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4D970DAC20F8BB3F00EBF6C0 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = model/SafesList.h; sourceTree = SOURCE_ROOT; };
+		4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = model/SafesList.m; sourceTree = SOURCE_ROOT; };
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DA6335E1F62EAE1000A0E9D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -300,15 +300,15 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D970DAC20F8BB3F00EBF6C0 /* SafesList.h */,
+				4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */,
 				4D8C14982074F64A00CE9CAE /* crypt_argchk.c */,
 				4D8C14962074F63B00CE9CAE /* twofish.c */,
+				4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */,
 				4D8C147B2074F5D100CE9CAE /* CHCSVParser.h */,
 				4D8C147C2074F5D100CE9CAE /* CHCSVParser.m */,
-				4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */,
 				4D402D6E2074EAFF00F7BC70 /* SafeMetaData.h */,
 				4D402D702074EAFF00F7BC70 /* SafeMetaData.m */,
-				4D402D712074EAFF00F7BC70 /* SafesList.h */,
-				4D402D6F2074EAFF00F7BC70 /* SafesList.m */,
 				4D78AC591FB2281600A68A92 /* AbstractPasswordDatabase.h */,
 				4D78AC261FB1E27700A68A92 /* DatabaseModel.h */,
 				4D78AC271FB1E27700A68A92 /* DatabaseModel.m */,
@@ -619,6 +619,7 @@
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
+				4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
@@ -636,7 +637,6 @@
 				4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
-				4D402D722074EAFF00F7BC70 /* SafesList.m in Sources */,
 				4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,

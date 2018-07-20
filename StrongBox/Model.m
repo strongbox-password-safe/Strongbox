@@ -150,7 +150,7 @@
         safe.offlineCacheAvailable = YES;
     }
 
-    [[SafesList sharedInstance] save];
+    [[SafesList sharedInstance] update:safe];
 }
 
 - (void)disableAndClearOfflineCache {
@@ -160,7 +160,7 @@
                              self->_metadata.offlineCacheAvailable = NO;
                              self->_metadata.offlineCacheFileIdentifier = @"";
 
-                             [[SafesList sharedInstance] save];
+                             [[SafesList sharedInstance] update:self.metadata];
                          }];
 }
 
@@ -169,7 +169,7 @@
     _metadata.offlineCacheEnabled = YES;
     _metadata.offlineCacheFileIdentifier = @"";
 
-    [[SafesList sharedInstance] save];
+    [[SafesList sharedInstance] update:self.metadata];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

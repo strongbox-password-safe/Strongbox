@@ -94,10 +94,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         for(SafeMetaData *safe in localSafes) {
             [self migrateLocalSafeToICloud:safe];
+            [SafesList.sharedInstance update:safe];
         }
         
         self.showMigrationUi(NO);
-        [SafesList.sharedInstance save];
         self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
@@ -114,10 +114,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         for(SafeMetaData *safe in iCloudSafes) {
             [self migrateICloudSafeToLocal:safe];
+            [SafesList.sharedInstance update:safe];
         }
         
         self.showMigrationUi(NO);
-        [SafesList.sharedInstance save];
         self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
@@ -339,14 +339,12 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         AppleICloudOrLocalSafeFile *match = [theirs objectForKey:fileName];
         
         if(match) {
-            [mine objectForKey:fileName].fileIdentifier = [match.fileUrl absoluteString];
-            [mine objectForKey:fileName].hasUnresolvedConflicts = match.hasUnresolvedConflicts;
+            SafeMetaData* safe = [mine objectForKey:fileName];
+            safe.fileIdentifier = [match.fileUrl absoluteString];
+            safe.hasUnresolvedConflicts = match.hasUnresolvedConflicts;
             updated = YES;
+            [SafesList.sharedInstance update:safe];
         }
-    }
-    
-    if(updated) {
-        [[SafesList sharedInstance] save];
     }
     
     return updated;

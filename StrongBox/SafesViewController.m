@@ -83,26 +83,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    // TODO: Remove me in Next Release!
-    
-    if(!Settings.sharedInstance.safesMigratedToNewSystem) {
-        for(SafeMetaData* safe in [SafesCollectionOld.sharedInstance sortedSafes]) {
-            NSLog(@"Migrating Old Safe %@", safe);
-            
-            [SafesList.sharedInstance add:safe];
-            
-            if(safe.isTouchIdEnabled) {
-                NSString *touchIdPassword = [JNKeychain loadValueForKey:safe.nickName];
-                if(touchIdPassword != nil) {
-                    [safe setTouchIdPassword:touchIdPassword];
-                }
-            }
-        }
-        
-        [SafesList.sharedInstance save];
-        Settings.sharedInstance.safesMigratedToNewSystem = YES;
-    }
     
     self.collection = [NSArray array];
 
@@ -357,7 +337,6 @@
         NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
         [SafesList.sharedInstance move:sourceIndexPath.row to:destinationIndexPath.row];
-        [SafesList.sharedInstance save];
         [self refreshView];
     }
 }
@@ -454,7 +433,7 @@
         if(response) {
             if([SafesList.sharedInstance isValidNickName:text]) {
                 safe.nickName = text;
-                [SafesList.sharedInstance save];
+                [SafesList.sharedInstance update:safe];
                 [self refreshView];
             }
             else {
@@ -522,7 +501,6 @@
     }
          
     [[SafesList sharedInstance] remove:safe.uuid];
-    [[SafesList sharedInstance] save];
 
     [self refreshView];
 }
@@ -673,7 +651,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
             if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 safe.isEnrolledForTouchId = NO;
                 [safe removeTouchIdPassword];
-                [[SafesList sharedInstance] save];
+                [SafesList.sharedInstance update:safe];
                 
                 [Alerts info:self
                         title:@"Could not open safe"
@@ -699,7 +677,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    if (response) {
                        safe.isEnrolledForTouchId = YES;
                        [safe setTouchIdPassword:openedSafe.masterPassword];
-                       [[SafesList sharedInstance] save];
+                       [SafesList.sharedInstance update:safe];
                        
                        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enrol Successful", self.biometricIdName]
                                                   message:[NSString stringWithFormat:@"You can now use %@ with this safe. Opening...", self.biometricIdName]
@@ -715,7 +693,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                    else{
                        safe.isTouchIdEnabled = NO;
                        [safe setTouchIdPassword:openedSafe.masterPassword];
-                       [[SafesList sharedInstance] save];
+                       [SafesList.sharedInstance update:safe];
                        
                        [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
                    }
