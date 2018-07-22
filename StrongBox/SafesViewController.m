@@ -32,10 +32,6 @@
 #import "iCloudSafesCoordinator.h"
 #import "CHCSVParser.h"
 
-// TODO: Remove and Delete - Can tidy up 2 serialization methods from SafeMetaData also - NEXT RELEASE
-#import "SafesCollectionOld.h"
-#import "JNKeychain.h"
-
 @interface SafesViewController ()
 
 @property (nonatomic, strong) SKProductsRequest *productsRequest;

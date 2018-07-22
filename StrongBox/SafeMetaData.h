@@ -31,8 +31,5 @@
 @property (nonatomic) BOOL offlineCacheAvailable;
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
-@property (nonatomic, readonly, copy) NSDictionary *toDictionary;
-+ (SafeMetaData *)fromDictionary:(NSDictionary *)dictionary;
-
 @end
 

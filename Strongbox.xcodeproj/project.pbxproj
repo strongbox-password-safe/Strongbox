@@ -64,15 +64,12 @@
 		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
-		4DF785FB1EDB319E006D4918 /* SafesCollectionOld.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0165331EDB2F9C00CCB8CF /* SafesCollectionOld.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox-iOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS.release.xcconfig"; sourceTree = "<group>"; };
-		4D0165321EDB2F9C00CCB8CF /* SafesCollectionOld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesCollectionOld.h; sourceTree = "<group>"; };
-		4D0165331EDB2F9C00CCB8CF /* SafesCollectionOld.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesCollectionOld.m; sourceTree = "<group>"; };
 		4D0BA7D61F23B844009243C9 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		4D0BA7D71F23B844009243C9 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesTableViewController.h; sourceTree = "<group>"; };
@@ -287,8 +284,6 @@
 			children = (
 				4D1D6FD51F38760F00D2B8EC /* Model.h */,
 				4D1D6FD61F38760F00D2B8EC /* Model.m */,
-				4D0165321EDB2F9C00CCB8CF /* SafesCollectionOld.h */,
-				4D0165331EDB2F9C00CCB8CF /* SafesCollectionOld.m */,
 				4D0BA7D61F23B844009243C9 /* Settings.h */,
 				4D0BA7D71F23B844009243C9 /* Settings.m */,
 				4DCF5FBA1F7294A800011756 /* PasswordSafeUIDocument.h */,
@@ -610,7 +605,6 @@
 				4D8C148E2074F5F800CE9CAE /* PwSafeDatabase.m in Sources */,
 				4D8C14902074F5F900CE9CAE /* PasswordHistory.m in Sources */,
 				4D8C148C2074F5F800CE9CAE /* SafeTools.m in Sources */,
-				4DF785FB1EDB319E006D4918 /* SafesCollectionOld.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
