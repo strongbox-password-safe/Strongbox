@@ -834,9 +834,9 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                       preferredStyle:UIAlertControllerStyleActionSheet];
 
     NSArray<NSString*>* buttonTitles =
-        @[  @"Create New",
-            @"Open Existing",
-            @"Import from URL",
+        @[  @"Create New Safe",
+            @"Add Existing Safe",
+            @"Import Safe from URL",
             @"Import Email Attachment"];
     
     int index = 1;
@@ -1151,18 +1151,19 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                             buttonAlignment:UILayoutConstraintAxisVertical
                                             transitionStyle:PopupDialogTransitionStyleBounceUp
                                              preferredWidth:340
-                                           gestureDismissal:YES
+                                        tapGestureDismissal:YES
+                                        panGestureDismissal:YES
                                               hideStatusBar:NO
                                                  completion:nil];
 
     DefaultButton *ok = [[DefaultButton alloc] initWithTitle:@"Cool!" height:50 dismissOnTap:YES action:nil];
-    
+
     CancelButton *later = [[CancelButton alloc] initWithTitle:@"Got It! Never Remind Me Again!" height:50 dismissOnTap:YES action:^{
         [[Settings sharedInstance] setNeverShowForMacAppMessage:YES];
     }];
-    
+
     [popup addButtons: @[ok, later]];
-    
+
     [self presentViewController:popup animated:YES completion:nil];
 }
 
