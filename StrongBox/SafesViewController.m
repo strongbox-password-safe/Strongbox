@@ -57,6 +57,8 @@
     [self checkICloudAvailability];
     
     [self refreshView];
+    
+    [self segueToNagScreenIfAppropriate];
 }
 
 - (void)didBecomeActive:(NSNotification *)notification {
@@ -91,11 +93,30 @@
     if(![[Settings sharedInstance] isPro]) {
         [self getValidIapProducts];
         
-        if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
-            [self initializeFreeTrial];
+        if([[Settings sharedInstance] getEndFreeTrialDate] == nil) {
+            NSCalendar *cal = [NSCalendar currentCalendar];
+            NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
+            [[Settings sharedInstance] setEndFreeTrialDate:date];
         }
-        else {
-            [self showStartupMessaging];
+        
+        if([Settings.sharedInstance getLaunchCount] == 1) {
+            [Alerts info:self title:@"Welcome!"
+                 message:@"Hi, Welcome to Strongbox Pro!\n\nI hope you will enjoy the app!\n-Mark" completion:^{
+                     [self checkICloudAvailability];
+                 }];
+        }
+        else if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 6) {
+            if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
+                [Alerts info:self title:@"Strongbox Pro"
+                     message:@"Hi there!\nYou are currently using Strongbox Pro. You can evaluate this version over the next two months. I hope you like it.\n\nAfter this I would ask you to contribute to its development. If you choose not to support the app, you will then be transitioned to a little bit more limited version. You won't lose any of your safes or passwords.\n\nTo find out more you can tap the Upgrade button at anytime below. I hope you enjoy the app, and will choose to support it!\n-Mark" completion:^{
+                         [self checkICloudAvailability];
+                     }];
+                
+                [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
+            }
+            else {
+                [self showStartupMessaging];
+            }
         }
     }
     else {
@@ -276,31 +297,6 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (void)initializeFreeTrial {
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSDate *date;
-    
-    if(![self isReasonablyNewUser]) {
-        date = [cal dateByAddingUnit:NSCalendarUnitDay value:7 toDate:[NSDate date] options:0];
-        
-        [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, it looks like you've been using Strongbox for a while now. I have decided to move to a freemium business model to cover costs and support further development. From now, you will have a further week to evaluate the fully featured Strongbox. After this point, you will be transitioned to a more limited Lite version. You can find out more by pressing the Upgrade button below.\n-Mark\n\n* NB: You will not lose access to any existing safes." completion:^{
-                 [self checkICloudAvailability];
-             }];
-    }
-    else {
-        date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
-        
-        [Alerts info:self title:@"Upgrade Possibilites"
-             message:@"Hi there, Welcome to Strongbox!\nYou will be able to use the fully featured app for two months. At that point you will be transitioned to a more limited version. To find out more you can tap the Upgrade button at anytime below. I hope you will enjoy the app, and choose to support it!\n-Mark" completion:^{
-                 [self checkICloudAvailability];
-             }];
-    }
-    
-    [[Settings sharedInstance] setEndFreeTrialDate:date];
-    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
-}
-
 - (BOOL)isReasonablyNewUser {
     return [[Settings sharedInstance] getLaunchCount] <= 10;
 }
@@ -394,10 +390,11 @@
     if(safe.hasUnresolvedConflicts) {
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
-    else if (safe.isTouchIdEnabled &&
-        [IOsUtils isTouchIDAvailable] &&
-        safe.isEnrolledForTouchId &&
-        ([[Settings sharedInstance] isProOrFreeTrial])) {
+    else if (!Settings.sharedInstance.disallowAllBiometricId &&
+             safe.isTouchIdEnabled &&
+             [IOsUtils isTouchIDAvailable] &&
+             safe.isEnrolledForTouchId &&
+             ([[Settings sharedInstance] isProOrFreeTrial])) {
         [self showTouchIDAuthentication:safe];
     }
     else {
@@ -751,7 +748,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
 
 - (void)showTouchIDAuthentication:(SafeMetaData *)safe {
     LAContext *localAuthContext = [[LAContext alloc] init];
-    
+    localAuthContext.localizedFallbackTitle = @"Enter Master Password";
+
     [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
                      localizedReason:@"Identify to login"
                                reply:^(BOOL success, NSError *error) {
@@ -824,17 +822,11 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                             message:nil
                                       preferredStyle:UIAlertControllerStyleActionSheet];
 
-    BOOL createEnabled = [[Settings sharedInstance] isProOrFreeTrial];
-    
-    // Only allow have one safe in free mode
-    
-    BOOL addExistingEnabled = [self isAddExistingSafeAllowed];
-    
     NSArray<NSString*>* buttonTitles =
-        @[  (createEnabled ? @"Create New" : @"Create New [Upgrade Required]"),
-            (addExistingEnabled ? @"Open Existing" : @"Open Existing [Upgrade Required]"),
-            (addExistingEnabled ? @"Import from URL" :  @"Import from URL [Upgrade Required]") ,
-            (addExistingEnabled ? @"Import Email Attachment" : @"Import Email Attachment [Upgrade Required]")];
+        @[  @"Create New",
+            @"Open Existing",
+            @"Import from URL",
+            @"Import Email Attachment"];
     
     int index = 1;
     for (NSString *title in buttonTitles) {
@@ -843,17 +835,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                                        handler:^(UIAlertAction *a) {
                                                             [self onAddSafeActionSheetResponse:index];
                                                        }];
-        
-        // Disable create new button if we're not in pro/free trial mode.
-
-        if( index == 1) {
-            [action setEnabled:createEnabled];
-        }
-        
-        if (index > 1) {
-            [action setEnabled:addExistingEnabled];
-        }
-        
         [alertController addAction:action];
         index++;
     }
@@ -892,29 +873,20 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     }
 }
 
-- (BOOL)isAddExistingSafeAllowed {
-    return [[Settings sharedInstance] isProOrFreeTrial] || self.collection.count < 1;
-}
-
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL {
-    if([self isAddExistingSafeAllowed]) {
-        [self.navigationController popToRootViewControllerAnimated:YES];
+    [self.navigationController popToRootViewControllerAnimated:YES];
+    
+    NSData *importedData = [NSData dataWithContentsOfURL:importURL];
+    
+    if (![DatabaseModel isAValidSafe:importedData]) {
+        [Alerts warn:self
+               title:@"Invalid Safe"
+             message:@"This is not a valid Strongbox password safe database file."];
         
-        NSData *importedData = [NSData dataWithContentsOfURL:importURL];
-        
-        if (![DatabaseModel isAValidSafe:importedData]) {
-            [Alerts warn:self
-                   title:@"Invalid Safe"
-                 message:@"This is not a valid Strongbox password safe database file."];
-            
-            return;
-        }
-        
-        [self promptForImportedSafeNickName:importedData];
+        return;
     }
-    else {
-        [Alerts info:self title:@"Safe cannot be added" message:@"This safe could not be added because you are using the Lite version of Strongbox. Please upgrade to enjoy full benefits."];
-    }
+    
+    [self promptForImportedSafeNickName:importedData];
 }
 
 - (void)promptForImportedSafeNickName:(NSData *)data {
@@ -999,19 +971,17 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     }
 }
 
-static BOOL shownNagScreenThisSession = NO;
 - (void)segueToNagScreenIfAppropriate {
-    NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
-    NSInteger nagRate = 0;
-    
-    if(![[Settings sharedInstance] isFreeTrial]) {
-        nagRate = 10;
+    if(Settings.sharedInstance.isProOrFreeTrial) {
+        return;
     }
     
-    if(nagRate > 0 && !shownNagScreenThisSession && (launchCount % nagRate == 0)) {
-        shownNagScreenThisSession = YES;
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+    NSInteger random = arc4random_uniform(100);
+    
+    NSLog(@"Random: %ld", (long)random);
+    
+    if(random < 15) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
         });
     }
@@ -1065,24 +1035,20 @@ static BOOL shownNagScreenThisSession = NO;
     
     if(![[Settings sharedInstance] isPro]) {
         [self.buttonUpgrade setEnabled:YES];
-        
-        [self segueToNagScreenIfAppropriate];
     
         NSString *upgradeButtonTitle;
         if([[Settings sharedInstance] isFreeTrial]) {
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
+            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days Left)",
+                                  (long)daysLeft];
+            
             if(daysLeft < 10) {
-                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Trial Days Left)",
-                               (long)daysLeft];
                 [self.buttonUpgrade setTintColor: [UIColor redColor]];
-            }
-            else {
-                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info..."];
             }
         }
         else {
-            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info..."];
+            upgradeButtonTitle = [NSString stringWithFormat:@"Please Upgrade..."];
             [self.buttonUpgrade setTintColor: [UIColor redColor]];
         }
         

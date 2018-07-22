@@ -18,10 +18,13 @@
 - (IBAction)onShowPasswordOnDetails:(id)sender;
 - (IBAction)onSegmentAutoLockChanged:(id)sender;
 - (IBAction)onContactSupport:(id)sender;
+- (IBAction)onAllowBiometric:(id)sender;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchLongTouchCopy;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowPasswordOnDetails;
 @property (weak, nonatomic) IBOutlet UIButton *buttonAbout;
+@property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;

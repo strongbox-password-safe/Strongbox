@@ -28,6 +28,8 @@
 
 - (BOOL)isFreeTrial;
 - (NSInteger)getFreeTrialDaysRemaining;
+
+- (NSDate*)getEndFreeTrialDate;
 - (void)setEndFreeTrialDate:(NSDate*)value;
 
 - (void)resetLaunchCount;
@@ -57,5 +59,12 @@
 
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property (nonatomic) BOOL safesMigratedToNewSystem; 
+
+@property (nonatomic) NSDate* installDate;
+@property (nonatomic, readonly) NSInteger daysInstalled;
+
+- (void)clearInstallDate;
+
+@property (nonatomic) BOOL disallowAllBiometricId;
 
 @end

@@ -42,6 +42,7 @@
     [self bindUseICloud];
     [self bindAboutButton];
     [self bindLongTouchCopy];
+    [self bindAllowBiometric];
     [self bindShowPasswordOnDetails];
     [self bindAutoLock];
 }
@@ -90,6 +91,19 @@
     [[Settings sharedInstance] setCopyPasswordOnLongPress:self.switchLongTouchCopy.on];
      
     [self bindLongTouchCopy];
+}
+
+- (IBAction)onAllowBiometric:(id)sender {
+    NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
+    
+    Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+    
+    [self bindAllowBiometric];
+}
+
+- (void)bindAllowBiometric {
+    self.labelAllowBiometric.text = [NSString stringWithFormat:@"Allow %@ Open", [Settings.sharedInstance getBiometricIdName]];
+    self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;
 }
 
 - (void)bindShowPasswordOnDetails {
@@ -221,6 +235,7 @@
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
     NSString* pro = [[Settings sharedInstance] isPro] ? @"P" : @"";
     NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
+    long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
     
     NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox Password Safe... <br /><br />"
                          @"Please include as much detail as possible and screenshots if appropriate...<br /><br />"
@@ -229,7 +244,8 @@
                          @"Model: %@<br />"
                          @"System Name: %@<br />"
                          @"System Version: %@<br />"
-                         @"Flags: %@%@%@", safesMessage, model, systemName, systemVersion, pro, isFreeTrial, [Settings.sharedInstance getFlagsStringForDiagnostics]];
+                         @"Ep: %ld<br />"
+                         @"Flags: %@%@%@", safesMessage, model, systemName, systemVersion, epoch, pro, isFreeTrial, [Settings.sharedInstance getFlagsStringForDiagnostics]];
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     

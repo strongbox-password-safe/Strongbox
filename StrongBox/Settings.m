@@ -25,6 +25,8 @@ static NSString* kiCloudWasOn = @"iCloudWasOn";
 static NSString* kiCloudPrompted = @"iCloudPrompted";
 static NSString* kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
 static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
+static NSString* kInstallDate = @"installDate";
+static NSString* kDisallowBiometricId = @"disallowBiometricId";
 
 @interface Settings ()
 
@@ -167,10 +169,47 @@ static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
                                                 fromDate:[NSDate date]
                                                   toDate:date
                                                  options:0];
-
+    
     NSInteger days = [components day];
-
+    
     return days;
+}
+
+- (NSDate*)installDate {
+    return [[NSUserDefaults standardUserDefaults] objectForKey:kInstallDate];
+}
+
+- (void)setInstallDate:(NSDate *)installDate {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults setObject:installDate forKey:kInstallDate];
+    [userDefaults synchronize];
+}
+
+- (void)clearInstallDate {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults removeObjectForKey:kInstallDate];
+    [userDefaults synchronize];
+}
+
+- (NSInteger)daysInstalled
+{
+    NSDate* installDate = Settings.sharedInstance.installDate;
+
+    if(!installDate) {
+        return 0;
+    }
+    
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
+                                                fromDate:installDate
+                                                  toDate:[NSDate date]
+                                                 options:0];
+
+    NSInteger daysInstalled = [components day];
+    
+    return daysInstalled;
 }
 
 - (NSInteger)getLaunchCount
@@ -366,6 +405,15 @@ static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
 
 - (void)setSafesMigratedToNewSystem:(BOOL)safesMigratedToNewSystem {
     [[NSUserDefaults standardUserDefaults] setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)disallowAllBiometricId {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kDisallowBiometricId];
+}
+
+- (void)setDisallowAllBiometricId:(BOOL)disallowAllBiometricId {
+    [[NSUserDefaults standardUserDefaults] setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
