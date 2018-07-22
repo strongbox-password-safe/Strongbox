@@ -46,7 +46,8 @@
 
     if(self.existing) {
         self.providers = @[[GoogleDriveStorageProvider sharedInstance],
-                           [DropboxV2StorageProvider sharedInstance]];
+                           [DropboxV2StorageProvider sharedInstance],
+                           [LocalDeviceStorageProvider sharedInstance]];
     }
     else {
         if ([Settings sharedInstance].iCloudOn) {
@@ -103,7 +104,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
-    if (provider.storageId == kLocalDevice) {
+    if (provider.storageId == kLocalDevice && !self.existing) {
         [Alerts yesNo:self
                 title:@"Local Device Safe Caveat"
               message:@"Since a local safe is only stored on this device, any loss of this device will lead to the loss of "
@@ -125,7 +126,7 @@
 }
 
 - (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
-    if (provider.browsable) {
+    if ((self.existing && provider.browsableExisting) || (!self.existing && provider.browsableNew)) {
         [self performSegueWithIdentifier:@"SegueToBrowser" sender:provider];
     }
     else {

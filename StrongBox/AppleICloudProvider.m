@@ -33,7 +33,8 @@
         _storageId = kiCloud;
         _cloudBased = YES;
         _providesIcons = NO;
-        _browsable = NO;
+        _browsableNew = NO;
+        _browsableExisting = NO;
         
         return self;
     }

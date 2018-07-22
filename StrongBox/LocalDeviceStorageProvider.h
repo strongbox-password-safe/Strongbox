@@ -19,7 +19,8 @@
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL cloudBased;
 @property (nonatomic, readonly) BOOL providesIcons;
-@property (nonatomic, readonly) BOOL browsable;
+@property (nonatomic, readonly) BOOL browsableNew;
+@property (nonatomic, readonly) BOOL browsableExisting;
 
 - (void)createOfflineCacheFile:(SafeMetaData *)safe
                           data:(NSData *)data

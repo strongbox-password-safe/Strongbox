@@ -31,8 +31,9 @@
         _storageId = kGoogleDrive;
         _cloudBased = YES;
         _providesIcons = YES;
-        _browsable = YES;
-
+        _browsableNew = YES;
+        _browsableExisting = YES;
+        
         _iconsByUrl = [[NSMutableDictionary alloc] init];
 
         return self;

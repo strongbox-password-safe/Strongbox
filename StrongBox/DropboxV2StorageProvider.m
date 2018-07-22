@@ -30,8 +30,9 @@
         _storageId = kDropbox;
         _cloudBased = YES;
         _providesIcons = NO;
-        _browsable = YES;
-
+        _browsableNew = YES;
+        _browsableExisting = YES;
+        
         return self;
     }
     else {

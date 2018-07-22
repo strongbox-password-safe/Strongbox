@@ -28,28 +28,7 @@
     [self initializeDropbox];
 
     [[Settings sharedInstance] startMonitoringConnectivitity];
-    
-    
-    
-    
-    // [Settings.sharedInstance resetLaunchCount];
-    //[Settings.sharedInstance clearInstallDate];
-    //[Settings.sharedInstance setEndFreeTrialDate:nil];
-//    [Settings.sharedInstance setHavePromptedAboutFreeTrial:NO];
-//
-//    NSCalendar *cal = [NSCalendar currentCalendar];
-//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-2 toDate:[NSDate date] options:0];
-//    [[Settings sharedInstance] setEndFreeTrialDate:date];
-//
-    [Settings.sharedInstance setPro:YES];
-    
-    
-    
-    
-    
-    
-    
-    
+
     [[Settings sharedInstance] incrementLaunchCount];
 
     if(Settings.sharedInstance.installDate == nil) {

@@ -29,8 +29,9 @@
         _storageId = kLocalDevice;
         _cloudBased = NO;
         _providesIcons = NO;
-        _browsable = NO;
-
+        _browsableNew = NO;
+        _browsableExisting = YES;
+        
         return self;
     }
     else {
@@ -207,18 +208,47 @@
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
-    // NOTIMPL
+    
+    NSError *error;
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[IOsUtils applicationDocumentsDirectory].path
+                                                                                    error:&error];
+    int count;
+    
+    NSMutableArray<StorageBrowserItem*>* files = [NSMutableArray array];
+    for (count = 0; count < (int)[directoryContent count]; count++)
+    {
+        NSString *file = [directoryContent objectAtIndex:count];
+        
+        NSLog(@"File %d: %@", (count + 1), file);
+        
+        StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
+        browserItem.name = file;
+        browserItem.providerData = file;
+        [files addObject:browserItem];
+    }
+    
+    completion(files, error);
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
                   completion:(void (^)(NSData *data, NSError *error))completionHandler {
-    // NOTIMPL
+    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
+                      stringByAppendingPathComponent:
+                      (NSString*)providerData];
+    
+    NSLog(@"readWithProviderData at: %@", path);
+    
+    NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
+    
+    completionHandler(data, nil);
 }
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
-    // NOTIMPL
-    return nil;
+    return [[SafeMetaData alloc] initWithNickName:nickName
+                                  storageProvider:self.storageId
+                                         fileName:(NSString*)providerData
+                                   fileIdentifier:(NSString*)providerData];
 }
 
 @end
