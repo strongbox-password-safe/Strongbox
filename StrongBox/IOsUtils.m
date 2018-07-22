@@ -19,6 +19,11 @@
     return appName;
 }
 
++ (NSURL *)applicationSupportDirectory {
+    return [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
+                                                  inDomains:NSUserDomainMask].lastObject;
+}
+
 + (NSURL *)applicationDocumentsDirectory {
     return [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                   inDomains:NSUserDomainMask].lastObject;

@@ -11,6 +11,7 @@
 @interface IOsUtils : NSObject
 
 + (NSURL *)applicationDocumentsDirectory;
++ (NSURL *)applicationSupportDirectory;
 
 + (BOOL)   isTouchIDAvailable;
 

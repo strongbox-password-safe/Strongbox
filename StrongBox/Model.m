@@ -96,7 +96,6 @@
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (updatedSafeData != nil && self->_metadata.offlineCacheEnabled) {
-                    NSLog(@"Updating offline cache for safe.");
                     [self saveOfflineCacheFile:updatedSafeData safe:self->_metadata];
                 }
 
@@ -108,7 +107,6 @@
 
 - (void)updateOfflineCacheWithData:(NSData *)data {
     if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
-        NSLog(@"Updating offline cache for safe.");
         [self saveOfflineCacheFile:data safe:_metadata];
     }
 }
@@ -124,29 +122,27 @@
         [[LocalDeviceStorageProvider sharedInstance] updateOfflineCachedSafe:safe
                                           data:data
                                 viewController:nil
-                                    completion:^(NSError *error) {
+                                    completion:^(BOOL success) {
                                         [self  onStoredOfflineCacheFile:safe
-                                        error:error];
+                                                                success:success];
                                     }];
     }
     else {
-        safe.offlineCacheFileIdentifier = [[NSUUID alloc] init].UUIDString;
-
-        [[LocalDeviceStorageProvider sharedInstance] createOfflineCacheFile:safe.offlineCacheFileIdentifier data:data completion:^(NSError *error) {
-            [self  onStoredOfflineCacheFile:safe error:error];
+        [[LocalDeviceStorageProvider sharedInstance] createOfflineCacheFile:safe data:data completion:^(BOOL success) {
+            [self onStoredOfflineCacheFile:safe success:success];
         }];
     }
 }
 
-- (void)onStoredOfflineCacheFile:(SafeMetaData *)safe error:(NSError *)error {
-    if (error != nil) {
-        NSLog(@"Error updating Offline Cache file. %@", error);
+- (void)onStoredOfflineCacheFile:(SafeMetaData *)safe success:(BOOL)success {
+    if (!success) {
+        NSLog(@"Error updating Offline Cache file.");
 
         safe.offlineCacheAvailable = NO;
-        safe.offlineCacheFileIdentifier = @"";
     }
     else {
-        //NSLog(@"Offline cache save with name: %@", safe.offlineCacheFileIdentifier);
+        NSLog(@"Offline Cache Now Available.");
+
         safe.offlineCacheAvailable = YES;
     }
 
@@ -158,7 +154,6 @@
                          completion:^(NSError *error) {
                              self->_metadata.offlineCacheEnabled = NO;
                              self->_metadata.offlineCacheAvailable = NO;
-                             self->_metadata.offlineCacheFileIdentifier = @"";
 
                              [[SafesList sharedInstance] update:self.metadata];
                          }];
@@ -167,7 +162,6 @@
 - (void)enableOfflineCache {
     _metadata.offlineCacheAvailable = NO;
     _metadata.offlineCacheEnabled = YES;
-    _metadata.offlineCacheFileIdentifier = @"";
 
     [[SafesList sharedInstance] update:self.metadata];
 }

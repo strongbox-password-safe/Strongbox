@@ -26,7 +26,6 @@
 @property (nonatomic) StorageProvider storageProvider;
 @property (nonatomic) BOOL isTouchIdEnabled;
 @property (nonatomic) BOOL isEnrolledForTouchId;
-@property (nonatomic, strong) NSString *offlineCacheFileIdentifier;
 @property (nonatomic) BOOL offlineCacheEnabled;
 @property (nonatomic) BOOL offlineCacheAvailable;
 @property (nonatomic) BOOL hasUnresolvedConflicts;

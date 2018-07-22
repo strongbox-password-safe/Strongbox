@@ -61,17 +61,36 @@
     completion(metadata, nil);
 }
 
-- (void)createOfflineCacheFile:(NSString *)uniqueIdentifier
-                          data:(NSData *)data
-                    completion:(void (^)(NSError *error))completion {
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox-offline-cache.dat", uniqueIdentifier];
+- (NSString*)getOfflineCacheFileName:(SafeMetaData*)safe {
+    return [NSString stringWithFormat:@"%@-offline-cache.dat", safe.uuid];
+}
 
-    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:desiredFilename];
+- (void)createOfflineCacheFile:(SafeMetaData *)safe
+                          data:(NSData *)data
+                    completion:(void (^)(BOOL success))completion {
+    NSString* appSupportDir = [IOsUtils applicationSupportDirectory].path;
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:appSupportDir isDirectory:NULL]) {
+        NSError *error = nil;
+        
+        NSLog(@"Creating Application Support Directory.");
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:appSupportDir withIntermediateDirectories:YES attributes:nil error:&error]) {
+            NSLog(@"%@", error.localizedDescription);
+        }
+    }
     
-    [data writeToFile:path atomically:YES];
+    NSString *desiredFilename = [self getOfflineCacheFileName:safe];
+    NSString *path = [appSupportDir stringByAppendingPathComponent:desiredFilename];
     
-    completion(nil);
+    NSLog(@"Creating offline cache file at: %@", path);
+    
+    if(![data writeToFile:path atomically:YES]) {
+        NSLog(@"Error Writing offline Cache file.");
+        completion(NO);
+    }
+    else {
+        completion(YES);
+    }
 }
 
 - (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion {
@@ -89,7 +108,7 @@
                    completion:(void (^)(NSData *, NSError *error))completion {
     NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
 
-    NSLog(@"Local Reading at: %@", path);
+    NSLog(@"readOfflineCachedSafe at: %@", path);
 
     NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
 
@@ -106,12 +125,18 @@
     completion(nil);
 }
 
-- (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(NSError *error))completion {
+- (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion {
+    NSLog(@"updateOfflineCachedSafe");
+    
     NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
 
-    [data writeToFile:path atomically:YES ];
-
-    completion(nil);
+    if(![data writeToFile:path atomically:YES]) {
+        NSLog(@"Error updating offline cache.");
+        completion(NO);
+    }
+    else {
+        completion(YES);
+    }
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
@@ -142,20 +167,34 @@
 }
 
 - (NSString *)getFilePath:(SafeMetaData *)safeMetaData offlineCache:(BOOL)offlineCache {
-    // MMcG: BUGFIX: Bug in older versions saved full path instead of relative, just chop it out and re-append
+    if(offlineCache) {
+        NSString *filename = [self getOfflineCacheFileName:safeMetaData];
 
-    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:
-                      (offlineCache ? safeMetaData.offlineCacheFileIdentifier : safeMetaData.fileIdentifier).lastPathComponent];
-
-    return path;
+        NSString *path = [[IOsUtils applicationSupportDirectory].path
+                          stringByAppendingPathComponent:filename];
+        
+        return path;
+    }
+    else {
+        NSString *path = [[IOsUtils applicationDocumentsDirectory].path
+                          stringByAppendingPathComponent:
+                          safeMetaData.fileIdentifier.lastPathComponent];
+        
+        return path;
+    }
 }
 
 - (NSDate *)getOfflineCacheFileModificationDate:(SafeMetaData *)safeMetadata {
-    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:(safeMetadata.offlineCacheFileIdentifier).lastPathComponent];
-
+    NSString *path = [self getFilePath:safeMetadata offlineCache:YES];
+    
+    if(![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSLog(@"Offline cache file does NOT exist!");
+        return nil;
+    }
+    
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+
+    NSLog(@"Getting modification date for: %@ - %@", path, attributes);
 
     return [attributes fileModificationDate];
 }

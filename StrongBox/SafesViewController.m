@@ -523,13 +523,19 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     // Are we offline for cloud based providers?
     
     if (provider.cloudBased &&
-        
-        !(provider.storageId == kiCloud && [Settings sharedInstance].iCloudOn) &&
-        
+        !(provider.storageId == kiCloud &&
+          [Settings sharedInstance].iCloudOn) &&
         [[Settings sharedInstance] isOffline] &&
         safe.offlineCacheEnabled &&
         safe.offlineCacheAvailable) {
         NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
+        
+        if(modDate == nil) {
+            [Alerts info:self title:@"No Internet Connectivity" message:@"It looks like you are offline, and no offline cache is available. Please try when back online."];
+            safe.offlineCacheAvailable = NO;
+            [SafesList.sharedInstance update:safe];
+            return;
+        }
         
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
         df.dateFormat = @"dd-MMM-yyyy HH:mm:ss";
@@ -541,20 +547,20 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
               message:message
                action:^(BOOL response) {
                    if (response) {
-                       NSLog(@"Reading offline cache with file id: %@", safe.offlineCacheFileIdentifier);
-                       
                        [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:safe
                                       viewController:self
                                           completion:^(NSData *data, NSError *error)
                         {
-                            [self onProviderReadDone:provider
+                            if(data != nil) {
+                                [self onProviderReadDone:provider
                                        isTouchIdOpen:isTouchIdOpen
                                                 safe:safe
                                       masterPassword:masterPassword
                                                 data:data
                                                error:error
                                   isOfflineCacheMode:YES
-                                askAboutTouchIdEnrol:NO];                                                                                                                               // RO!
+                                askAboutTouchIdEnrol:NO]; // RO!
+                             }
                         }];
                    }
                }];

@@ -42,7 +42,6 @@
 
     [encoder encodeBool:self.isTouchIdEnabled forKey:@"isTouchIdEnabled"];
     [encoder encodeBool:self.isEnrolledForTouchId forKey:@"isEnrolledForTouchId"];
-    [encoder encodeObject:self.offlineCacheFileIdentifier forKey:@"offlineCacheFileIdentifier"];
 
     [encoder encodeBool:self.offlineCacheEnabled forKey:@"offlineCacheEnabled"];
     [encoder encodeBool:self.offlineCacheAvailable forKey:@"offlineCacheAvailable"];
@@ -59,7 +58,6 @@
         
         self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
         self.isEnrolledForTouchId = [decoder decodeBoolForKey:@"isEnrolledForTouchId"];
-        self.offlineCacheFileIdentifier = [decoder decodeObjectForKey:@"offlineCacheFileIdentifier"];
         
         self.offlineCacheEnabled = [decoder decodeBoolForKey:@"offlineCacheEnabled"];
         self.offlineCacheAvailable = [decoder decodeBoolForKey:@"offlineCacheAvailable"];

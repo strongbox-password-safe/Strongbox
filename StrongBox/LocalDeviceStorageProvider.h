@@ -21,9 +21,9 @@
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsable;
 
-- (void)createOfflineCacheFile:(NSString *)uniqueIdentifier
+- (void)createOfflineCacheFile:(SafeMetaData *)safe
                           data:(NSData *)data
-                    completion:(void (^)(NSError *error))completion;
+                     completion:(void (^)(BOOL success))completion;
 
 - (void)readOfflineCachedSafe:(SafeMetaData *)safeMetaData
                viewController:(UIViewController *)viewController
@@ -32,7 +32,7 @@
 - (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData
                            data:(NSData *)data
                  viewController:(UIViewController *)viewController
-                     completion:(void (^)(NSError *error))completion;
+                     completion:(void (^)(BOOL success))completion;
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
 
