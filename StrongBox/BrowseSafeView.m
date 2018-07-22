@@ -86,6 +86,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
+    self.searchController.searchBar.selectedScopeButtonIndex = 3;
     
     if ([[Settings sharedInstance] isProOrFreeTrial]) {
         if (@available(iOS 11.0, *)) {
