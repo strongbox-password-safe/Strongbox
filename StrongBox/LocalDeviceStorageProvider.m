@@ -9,6 +9,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "IOsUtils.h"
 #import "Utils.h"
+#import "SafesList.h"
 
 @implementation LocalDeviceStorageProvider
 
@@ -212,19 +213,31 @@
     NSError *error;
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[IOsUtils applicationDocumentsDirectory].path
                                                                                     error:&error];
-    int count;
+    
+    if (error) {
+        completion(nil, error);
+        return;
+    }
+    
+    NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+    NSMutableSet *existing = [NSMutableSet set];
+    for (SafeMetaData* safe in localSafes) {
+        [existing addObject:safe.fileName];
+    }
     
     NSMutableArray<StorageBrowserItem*>* files = [NSMutableArray array];
-    for (count = 0; count < (int)[directoryContent count]; count++)
+    for (int count = 0; count < (int)[directoryContent count]; count++)
     {
         NSString *file = [directoryContent objectAtIndex:count];
         
         NSLog(@"File %d: %@", (count + 1), file);
         
-        StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
-        browserItem.name = file;
-        browserItem.providerData = file;
-        [files addObject:browserItem];
+        if(![existing containsObject:file]) {
+            StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
+            browserItem.name = file;
+            browserItem.providerData = file;
+            [files addObject:browserItem];
+        }
     }
     
     completion(files, error);

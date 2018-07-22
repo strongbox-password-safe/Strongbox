@@ -225,9 +225,14 @@
 - (void)continueICloudAvailableProcedure {
     // If iCloud newly switched on, move local docs to iCloud
     if ([Settings sharedInstance].iCloudOn && ![Settings sharedInstance].iCloudWasOn && [self getLocalDeviceSafes].count) {
-        [Alerts info:self title:@"iCloud Available" message:@"Your previously local only safes are now being migrated to iCloud safes."];
-        [[iCloudSafesCoordinator sharedInstance] migrateLocalToiCloud:^(BOOL show) {
-            [self showiCloudMigrationUi:show];
+        [Alerts twoOptions:self title:@"iCloud Available" message:@"Would you like to migrate your current local device safes to iCloud?"
+         defaultButtonText:@"Migrate to iCloud"
+          secondButtonText:@"Keep Local" action:^(BOOL response) {
+            if(response) {
+                [[iCloudSafesCoordinator sharedInstance] migrateLocalToiCloud:^(BOOL show) {
+                    [self showiCloudMigrationUi:show];
+                }];
+            }
         }];
     }
 
@@ -590,7 +595,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         isOfflineCacheMode:(BOOL)isOfflineCacheMode
       askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (error != nil) {
+        if (error != nil || data == nil) {
             NSLog(@"Error: %@", error);
             [Alerts error:self
                     title:@"There was a problem opening the password safe file."
