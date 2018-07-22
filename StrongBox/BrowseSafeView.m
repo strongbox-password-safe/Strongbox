@@ -24,6 +24,14 @@
 @property (strong, nonatomic) UIBarButtonItem *savedOriginalNavButton;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
+//@property (strong, nonatomic) UITapGestureRecognizer *doubleTapRecognizer;
+
+
+
+@property (nonatomic) NSInteger tapCount;
+@property (nonatomic) NSIndexPath *tappedIndexPath;
+@property (strong, nonatomic) NSTimer *tapTimer;
+
 @end
 
 @implementation BrowseSafeView
@@ -67,17 +75,33 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
     
+    self.tableView.allowsMultipleSelection = NO;
+    self.tableView.allowsMultipleSelectionDuringEditing = YES;
+    self.tableView.allowsSelectionDuringEditing = YES;
+    
     if (!self.currentGroup || self.currentGroup.parent == nil) {
-        [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
-                                   message:@"Tap and hold entry for fast password copy"
-                                  duration:2.5f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeInfo
-                             alertPosition:ISAlertPositionBottom
-                                   didHide:nil];
+        if(arc4random_uniform(100) < 50) {
+            [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
+                                       message:@"Tap and hold entry for fast password copy"
+                                      duration:2.5f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeSuccess
+                                 alertPosition:ISAlertPositionBottom
+                                       didHide:nil];
+        }
+        else {
+            [ISMessages showCardAlertWithTitle:@"NEW! Fast Username Copy" // TODO: Remove the NEW Tag on next release
+                                       message:@"Double Tap for fast username copy"
+                                      duration:2.5f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeSuccess
+                                 alertPosition:ISAlertPositionBottom
+                                       didHide:nil];
+        }
     }
-   
+    
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.definesPresentationContext = YES;
     
@@ -202,9 +226,45 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
+        [self.tapTimer invalidate];
+
+        self.tapTimer = nil;
+        self.tapCount = 0;
+        self.tappedIndexPath = nil;
+
+        [self handleDoubleTap:indexPath];
+    }
+    else if(self.tapCount == 0){
+        //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
+        self.tapCount = self.tapCount + 1;
+        self.tappedIndexPath = indexPath;
+        self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
+    }
+    else if(![self.tappedIndexPath isEqual:indexPath]){
+        //tap on new row
+        self.tapCount = 0;
+        self.tappedIndexPath = indexPath;
+        if(self.tapTimer != nil){
+            [self.tapTimer invalidate];
+            self.tapTimer = nil;
+        }
+    }
+}
+
+- (void)tapTimerFired:(NSTimer *)aTimer{
+    //timer fired, there was a single tap on indexPath.row = tappedRow
+    [self tapOnCell:self.tappedIndexPath];
+    
+    self.tapCount = 0;
+    self.tappedIndexPath = nil;
+    self.tapTimer = nil;
+}
+
+- (void)tapOnCell:(NSIndexPath *)indexPath  {
     if (!self.editing) {
         Node *item = [self getDataSource][indexPath.row];
-        
+
         if (!item.isGroup) {
             [self performSegueWithIdentifier:@"segueToRecord" sender:item];
         }
@@ -369,6 +429,37 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [self setEditing:false];
 }
 
+- (void)handleDoubleTap:(NSIndexPath *)indexPath {
+    Node *item = [self getDataSource][indexPath.row];
+    
+    if (item.isGroup) {
+        NSLog(@"Item is group, cannot Fast Username Copy...");
+        
+        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+        
+        return;
+    }
+    
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    pasteboard.string = item.fields.username;
+    
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Username Copied", item.title]
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
+    
+    NSLog(@"Fast Username Copy on %@", item.title);
+
+    if(!self.isEditing) {
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Long Press
 
@@ -424,7 +515,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     pasteboard.string = item.fields.password;
     
-    [ISMessages showCardAlertWithTitle:@"Password Copied"
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Password Copied", item.title]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
