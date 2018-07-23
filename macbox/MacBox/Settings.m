@@ -13,7 +13,8 @@
 #define kEndFreeTrialDate @"endFreeTrialDate"
 #define kAutoLockTimeout @"autoLockTimeout"
 #define kPasswordGenerationParameters @"passwordGenerationParameters"
-#define kDoNotAutoFillFromClipboard @"doNotAutoFillFromClipboard"
+#define kDoNotAutoFillNotesFromClipboard @"doNotAutoFillFromClipboard"
+#define kDoNotAutoFillUrlFromClipboard @"doNotAutoFillUrlFromClipboard"
 #define kDoNotAutoFillFromMostPopularFields @"doNotAutoFillFromMostPopularFields"
 #define kWarnedAboutTouchId @"warnedAboutTouchId"
 #define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
@@ -55,10 +56,6 @@
     [self setBool:kFullVersion value:value];
 }
 
-- (BOOL)doNotAutoFillFromClipboard {
-    return [self getBool:kDoNotAutoFillFromClipboard];
-}
-
 -(BOOL)doNotAutoFillFromMostPopularFields {
     return [self getBool:kDoNotAutoFillFromMostPopularFields];
 }
@@ -77,10 +74,6 @@
 
 - (void)setAlwaysShowUsernameInOutlineView:(BOOL)alwaysShowUsernameInOutlineView {
     [self setBool:kAlwaysShowUsernameInOutlineView value:alwaysShowUsernameInOutlineView];
-}
-
-- (void)setDoNotAutoFillFromClipboard:(BOOL)doNotAutoFillFromClipboard {
-    [self setBool:kDoNotAutoFillFromClipboard value:doNotAutoFillFromClipboard];
 }
 
 - (void)setDoNotAutoFillFromMostPopularFields:(BOOL)doNotAutoFillFromMostPopularFields {
@@ -174,6 +167,22 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
     [defaults synchronize];
+}
+
+- (BOOL)doNotAutoFillUrlFromClipboard {
+    return [self getBool:kDoNotAutoFillUrlFromClipboard];
+}
+
+- (void)setDoNotAutoFillUrlFromClipboard:(BOOL)doNotAutoFillUrlFromClipboard {
+    [self setBool:kDoNotAutoFillUrlFromClipboard value:doNotAutoFillUrlFromClipboard];
+}
+
+-(BOOL)doNotAutoFillNotesFromClipboard {
+    return [self getBool:kDoNotAutoFillNotesFromClipboard];
+}
+
+- (void)setDoNotAutoFillNotesFromClipboard:(BOOL)doNotAutoFillNotesFromClipboard {
+    [self setBool:kDoNotAutoFillNotesFromClipboard value:doNotAutoFillNotesFromClipboard];
 }
 
 @end

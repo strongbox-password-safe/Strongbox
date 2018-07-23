@@ -39,7 +39,8 @@
 @property (weak) IBOutlet NSButton *checkboxAlwaysShowPassword;
 @property (weak) IBOutlet NSButton *checkboxAlwaysShowUsernameInOutlineView;
 @property (weak) IBOutlet NSButton *checkboxAutofillMostPopularUsernameEmail;
-@property (weak) IBOutlet NSButton *checkboxAutofillUrlNotes;
+@property (weak) IBOutlet NSButton *checkboxAutofillNotes;
+@property (weak) IBOutlet NSButton *checkboxAutofillUrl;
 
 @property (weak) IBOutlet NSButton *radioAutolockNever;
 @property (weak) IBOutlet NSButton *radioAutolock1Min;

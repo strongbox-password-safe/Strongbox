@@ -223,25 +223,26 @@
     NSString *actualUsername = @"";
     NSString *actualEmail = @"";
     
-    if(!Settings.sharedInstance.doNotAutoFillFromClipboard) {
-        NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-        NSString* notesOrUrlFromClipboard = [myPasteboard  stringForType:NSPasteboardTypeString];
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
 
-        if(notesOrUrlFromClipboard) {
+    if(clipboardText) {
+        if(!Settings.sharedInstance.doNotAutoFillNotesFromClipboard) {
+            actualNotes = clipboardText;
+        }
+        
+        if(!Settings.sharedInstance.doNotAutoFillUrlFromClipboard) {
             // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
-
-            NSURL *url = [NSURL URLWithString:notesOrUrlFromClipboard];
+        
+            NSURL *url = [NSURL URLWithString:clipboardText];
             if (url && url.scheme && url.host)
             {
-                actualUrl = notesOrUrlFromClipboard;
+                actualUrl = clipboardText;
                 actualTitle = url.host;
-            }
-            else {
-                actualNotes = notesOrUrlFromClipboard;
             }
         }
     }
-
+    
     if(!Settings.sharedInstance.doNotAutoFillFromMostPopularFields) {
         actualUsername = self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
         actualEmail = self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;

@@ -13,7 +13,6 @@
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
 		4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */; };
 		4D559F9F20750C2C009856E3 /* SafesMetaDataViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */; };
-		4D559FA420750D1D009856E3 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA120750D1D009856E3 /* SafesList.m */; };
 		4D559FA520750D1D009856E3 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* SafeMetaData.m */; };
 		4D559FA920752537009856E3 /* BiometricIdHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA720752537009856E3 /* BiometricIdHelper.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
@@ -21,6 +20,7 @@
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
+		4D6B2C35210607F700714BF8 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B2C34210607F700714BF8 /* SafesList.m */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
@@ -78,8 +78,6 @@
 		4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafesMetaDataViewer.m; sourceTree = "<group>"; };
 		4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SafesMetaDataViewer.xib; sourceTree = "<group>"; };
 		4D559FA020750D1D009856E3 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = MacBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
-		4D559FA120750D1D009856E3 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = "../New Group/SafesList.m"; sourceTree = SOURCE_ROOT; };
-		4D559FA220750D1D009856E3 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = "../New Group/SafesList.h"; sourceTree = SOURCE_ROOT; };
 		4D559FA320750D1D009856E3 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = MacBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
 		4D559FA620752537009856E3 /* BiometricIdHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BiometricIdHelper.h; sourceTree = "<group>"; };
 		4D559FA720752537009856E3 /* BiometricIdHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BiometricIdHelper.m; sourceTree = "<group>"; };
@@ -91,6 +89,8 @@
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UpgradeWindowController.xib; sourceTree = "<group>"; };
+		4D6B2C33210607F700714BF8 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = ../../model/SafesList.h; sourceTree = "<group>"; };
+		4D6B2C34210607F700714BF8 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = ../../model/SafesList.m; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -229,12 +229,12 @@
 			children = (
 				4D559FA020750D1D009856E3 /* SafeMetaData.h */,
 				4D559FA320750D1D009856E3 /* SafeMetaData.m */,
-				4D559FA220750D1D009856E3 /* SafesList.h */,
-				4D559FA120750D1D009856E3 /* SafesList.m */,
 				4DF347FF2074FA6C00148741 /* AbstractPasswordDatabase.h */,
 				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
 				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
 				4DF347FE2074FA6C00148741 /* Node.h */,
+				4D6B2C33210607F700714BF8 /* SafesList.h */,
+				4D6B2C34210607F700714BF8 /* SafesList.m */,
 				4DF348002074FA6C00148741 /* Node.m */,
 				4DF347FA2074FA6C00148741 /* NodeFields.h */,
 				4DF347F22074FA6B00148741 /* NodeFields.m */,
@@ -546,7 +546,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D559FA420750D1D009856E3 /* SafesList.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
 				4DF347EA2074FA3500148741 /* Record.m in Sources */,
 				4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */,
@@ -575,6 +574,7 @@
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF348042074FA6C00148741 /* PasswordGenerator.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
+				4D6B2C35210607F700714BF8 /* SafesList.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,

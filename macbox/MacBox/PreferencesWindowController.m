@@ -151,7 +151,8 @@
     Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
     Settings.sharedInstance.alwaysShowUsernameInOutlineView = self.checkboxAlwaysShowUsernameInOutlineView.state == NSOnState;
     Settings.sharedInstance.doNotAutoFillFromMostPopularFields = self.checkboxAutofillMostPopularUsernameEmail.state != NSOnState;
-    Settings.sharedInstance.doNotAutoFillFromClipboard = self.checkboxAutofillUrlNotes.state != NSOnState;
+    Settings.sharedInstance.doNotAutoFillNotesFromClipboard = self.checkboxAutofillNotes.state != NSOnState;
+    Settings.sharedInstance.doNotAutoFillUrlFromClipboard = self.checkboxAutofillUrl.state != NSOnState;
     
     if(self.radioAutolockNever.state == NSOnState) {
         Settings.sharedInstance.autoLockTimeoutSeconds = 0;
@@ -178,8 +179,9 @@
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
     self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
     self.checkboxAutofillMostPopularUsernameEmail.state = !Settings.sharedInstance.doNotAutoFillFromMostPopularFields ? NSOnState : NSOffState;
-    self.checkboxAutofillUrlNotes.state = !Settings.sharedInstance.doNotAutoFillFromClipboard ? NSOnState : NSOffState;
-
+    self.checkboxAutofillNotes.state = !Settings.sharedInstance.doNotAutoFillNotesFromClipboard ? NSOnState : NSOffState;
+    self.checkboxAutofillUrl.state = !Settings.sharedInstance.doNotAutoFillUrlFromClipboard ? NSOnState : NSOffState;
+    
     NSInteger alt = Settings.sharedInstance.autoLockTimeoutSeconds;
     
     self.radioAutolockNever.state = alt == 0 ? NSOnState : NSOffState;

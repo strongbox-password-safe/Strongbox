@@ -216,7 +216,7 @@
     NSLog(@"restoreCompletedTransactionsFailedWithError: %@", error);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [Alerts error:@"" error:error window:self.window completion:^{
+        [Alerts error:@"Error in restoreCompletedTransactionsFailedWithError" error:error window:self.window completion:^{
             [self close:NO];
         }];
     });

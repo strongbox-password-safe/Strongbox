@@ -49,7 +49,7 @@
     [self removeUnwantedMenuItems];
     [self removeCopyDiagnosticDumpItem];
     [self removeShowSafesMetaDataItem];
-
+    
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
 

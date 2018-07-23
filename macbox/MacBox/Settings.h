@@ -22,7 +22,8 @@
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 
-@property (nonatomic) BOOL doNotAutoFillFromClipboard;
+@property (nonatomic) BOOL doNotAutoFillUrlFromClipboard;
+@property (nonatomic) BOOL doNotAutoFillNotesFromClipboard;
 @property (nonatomic) BOOL doNotAutoFillFromMostPopularFields;
 @property (nonatomic) BOOL alwaysShowUsernameInOutlineView;
 @property (nonatomic) BOOL alwaysShowPassword;

@@ -74,7 +74,11 @@
     NSAlert *alert = [[NSAlert alloc] init];
 
     [alert setMessageText:message];
-    [alert setInformativeText:error.localizedDescription];
+    
+    if(error && error.localizedDescription) {
+        [alert setInformativeText:error.localizedDescription];
+    }
+    
     [alert setAlertStyle:NSAlertStyleWarning];
     [alert addButtonWithTitle:@"Ok"];
 

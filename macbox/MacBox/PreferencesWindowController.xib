@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -11,7 +11,8 @@
                 <outlet property="checkboxAlwaysShowPassword" destination="AIq-rw-YUd" id="Quw-Cn-9aM"/>
                 <outlet property="checkboxAlwaysShowUsernameInOutlineView" destination="FfB-of-qge" id="JfR-B3-7se"/>
                 <outlet property="checkboxAutofillMostPopularUsernameEmail" destination="DhK-aL-F3O" id="EoQ-iE-Hyt"/>
-                <outlet property="checkboxAutofillUrlNotes" destination="vCM-5B-jTW" id="vj0-xc-ANv"/>
+                <outlet property="checkboxAutofillNotes" destination="EqV-iQ-F3g" id="RuC-bJ-zj2"/>
+                <outlet property="checkboxAutofillUrl" destination="vCM-5B-jTW" id="k4X-Eb-gMH"/>
                 <outlet property="checkboxUseDigits" destination="nP6-Q0-au2" id="7Em-cA-YHl"/>
                 <outlet property="checkboxUseEasy" destination="2DG-Am-EOz" id="0ta-K5-4jX"/>
                 <outlet property="checkboxUseLower" destination="kF8-9A-1QK" id="gQ8-nK-JvL"/>
@@ -91,15 +92,15 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="dnP-B4-aJ1"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vCM-5B-jTW">
-                                            <rect key="frame" x="15" y="249" width="289" height="18"/>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EqV-iQ-F3g">
+                                            <rect key="frame" x="15" y="225" width="204" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Auto Smart Fill URL or Notes from Clipboard" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pCY-xN-Ps0">
+                                            <buttonCell key="cell" type="check" title="Auto Fill Notes from Clipboard" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fHS-3X-6jY">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="onGeneralSettingsChange:" target="-2" id="1KH-2m-ega"/>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="DPL-dU-OHR"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2FW-DH-BVp">
@@ -112,7 +113,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="z3G-vr-nFM">
-                                            <rect key="frame" x="17" y="223" width="382" height="5"/>
+                                            <rect key="frame" x="17" y="212" width="382" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KSu-vw-pYi">
@@ -157,6 +158,17 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onAutolockChange:" target="-2" id="ddd-57-43o"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vCM-5B-jTW">
+                                            <rect key="frame" x="15" y="249" width="304" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Auto Smart Fill Title &amp; URL if URL on Clipboard" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="pCY-xN-Ps0">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="1KH-2m-ega"/>
                                             </connections>
                                         </button>
                                     </subviews>

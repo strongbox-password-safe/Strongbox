@@ -27,6 +27,8 @@
 }
 
 - (BOOL)biometricIdAvailable {
+    //return YES;
+    
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
         
@@ -43,7 +45,10 @@
     return biometricIdName;
 }
 
-- (void)authorize:(void (^)(BOOL success, NSError *error))completion {    
+- (void)authorize:(void (^)(BOOL success, NSError *error))completion {
+    //completion(YES, nil);
+    //return;
+    
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
 
