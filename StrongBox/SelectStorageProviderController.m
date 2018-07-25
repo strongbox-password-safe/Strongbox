@@ -19,6 +19,7 @@
 #import "AppleICloudProvider.h"
 #import "Settings.h"
 #import "SafesList.h"
+#import "OneDriveStorageProvider.h"
 
 @interface SelectStorageProviderController ()
 
@@ -47,6 +48,7 @@
     if(self.existing) {
         self.providers = @[[GoogleDriveStorageProvider sharedInstance],
                            [DropboxV2StorageProvider sharedInstance],
+                           [OneDriveStorageProvider sharedInstance],
                            [LocalDeviceStorageProvider sharedInstance]];
     }
     else {
@@ -54,11 +56,13 @@
             self.providers = @[[AppleICloudProvider sharedInstance],
                                [GoogleDriveStorageProvider sharedInstance],
                                [DropboxV2StorageProvider sharedInstance],
+                               [OneDriveStorageProvider sharedInstance],
                                [LocalDeviceStorageProvider sharedInstance]];
         }
         else {
             self.providers = @[[GoogleDriveStorageProvider sharedInstance],
                                [DropboxV2StorageProvider sharedInstance],
+                               [OneDriveStorageProvider sharedInstance],
                                [LocalDeviceStorageProvider sharedInstance]];
         }
     }

@@ -10,5 +10,10 @@
 	<array>
 		<string>CloudDocuments</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.markmcguill.strongbox</string>
+		<string>$(AppIdentifierPrefix)com.microsoft.adalcache</string>
+	</array>
 </dict>
 </plist>

@@ -16,6 +16,7 @@
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
 #import "GoogleDriveManager.h"
 #import "Settings.h"
+#import "OneDriveSDK/OneDriveSDK.h"
 
 @implementation AppDelegate {
     NSDate *enterBackgroundTime;
@@ -27,6 +28,9 @@
 
     [self initializeDropbox];
 
+    // TODO: Constantize
+    [ODClient setMicrosoftAccountAppId:@"708058b4-71de-4c54-ae7f-0e6f5872e953" scopes:@[@"onedrive.readwrite"]];
+    
     [[Settings sharedInstance] startMonitoringConnectivitity];
 
     [[Settings sharedInstance] incrementLaunchCount];
