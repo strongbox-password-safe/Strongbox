@@ -13,6 +13,7 @@
 - (IBAction)onUseICloud:(id)sender;
 - (IBAction)onSignoutGoogleDrive:(id)sender;
 - (IBAction)onUnlinkDropbox:(id)sender;
+- (IBAction)onSignoutOneDrive:(id)sender;
 
 - (IBAction)onLongTouchCopy:(id)sender;
 - (IBAction)onShowPasswordOnDetails:(id)sender;
@@ -30,6 +31,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
 @property (weak, nonatomic) IBOutlet UIButton *buttonSignoutGoogleDrive;
 @property (weak, nonatomic) IBOutlet UIButton *buttonUnlinkDropbox;
+@property (weak, nonatomic) IBOutlet UIButton *buttonSignoutOneDrive;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAutoLock;
 
 

@@ -18,7 +18,6 @@
 		4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
 		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
-		4D1A5BFC1F7923FF0036684C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
 		4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */; };
 		4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5C011F7927D60036684C /* VersionConflictController.m */; };
 		4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
@@ -35,6 +34,7 @@
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
 		4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */; };
+		4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
 		4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
@@ -509,7 +509,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
-				4D1A5BFC1F7923FF0036684C /* Images.xcassets in Resources */,
+				4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,

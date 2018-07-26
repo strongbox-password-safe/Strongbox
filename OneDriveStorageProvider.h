@@ -21,4 +21,7 @@
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
 
+- (void)signout:(void (^)(NSError *error))completion;
+- (BOOL)isSignedIn;
+    
 @end

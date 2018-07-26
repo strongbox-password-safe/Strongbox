@@ -39,8 +39,8 @@
 
     self.navigationController.toolbar.hidden = NO;
     
-    _defaultFolderImage = [UIImage imageNamed:@"folder48"];
-    _defaultFileImage = [UIImage imageNamed:@"page_white48"];
+    _defaultFolderImage = [UIImage imageNamed:@"folder-48x48"];
+    _defaultFileImage = [UIImage imageNamed:@"page_white_text-48x48"];
     _iconsCache = [[NSMutableDictionary alloc] init];
 
     NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];

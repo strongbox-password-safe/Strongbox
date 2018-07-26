@@ -594,12 +594,34 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="59" id="zmR-Yk-HFk">
+                                        <rect key="frame" x="0.0" y="479" width="414" height="59"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="zmR-Yk-HFk" id="zHO-oI-nWB">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="59"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="50v-9v-56I">
+                                                    <rect key="frame" x="8" y="9" width="398" height="42"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                    <inset key="titleEdgeInsets" minX="24" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                    <state key="normal" title="Sign Out of OneDrive" image="one-drive-icon-only-32x32">
+                                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="onSignoutOneDrive:" destination="gAY-yV-Xd6" eventType="touchUpInside" id="bIS-zd-ZCN"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="About" id="Uo4-bG-nCB" userLabel="About">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="60" id="Y5P-hY-Bgg">
-                                        <rect key="frame" x="0.0" y="509" width="414" height="60"/>
+                                        <rect key="frame" x="0.0" y="568" width="414" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Y5P-hY-Bgg" id="ieM-n3-CLV">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
@@ -621,7 +643,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="60" id="VwV-lb-IZQ">
-                                        <rect key="frame" x="0.0" y="569" width="414" height="60"/>
+                                        <rect key="frame" x="0.0" y="628" width="414" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VwV-lb-IZQ" id="SPC-nB-5aN">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
@@ -658,6 +680,7 @@
                     <connections>
                         <outlet property="buttonAbout" destination="0iU-LP-tWR" id="kUD-ht-Ckh"/>
                         <outlet property="buttonSignoutGoogleDrive" destination="IZF-YV-e8C" id="l5d-gK-M73"/>
+                        <outlet property="buttonSignoutOneDrive" destination="50v-9v-56I" id="WeK-Z7-RwG"/>
                         <outlet property="buttonUnlinkDropbox" destination="tId-nx-yfD" id="lrZ-RX-mXG"/>
                         <outlet property="labelAllowBiometric" destination="Zzf-iT-nvy" id="wYP-Da-Vbb"/>
                         <outlet property="labelUseICloud" destination="KYS-WM-c5c" id="Wcd-FU-tW7"/>
@@ -1917,7 +1940,31 @@ Strongbox is provided as is with no guarantees or warrantees. It may contain bug
                                     </fragment>
                                     <fragment>
                                         <string key="content">
-While Touch Id is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device and your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch Id. Therefore you should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox. 
+While Touch Id is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device and your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch Id. Therefore you should be aware that a strong passphrase held only in your mind provides the most secure experience with Strong</string>
+                                        <attributes>
+                                            <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <font key="NSFont" size="12" name="HelveticaNeue"/>
+                                            <real key="NSKern" value="0.0"/>
+                                            <font key="NSOriginalFont" size="12" name="HelveticaNeue"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="14" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                            <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment content="b">
+                                        <attributes>
+                                            <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <font key="NSFont" size="12" name="HelveticaNeue"/>
+                                            <real key="NSKern" value="0.0"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="14" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                            <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <string key="content">ox. 
 
 Please Enjoy! 
 -Mark 
@@ -2337,11 +2384,11 @@ Copyright (c) 2013 Jeremias Nunez &lt;</string>
                                         </attributes>
                                     </fragment>
                                     <fragment>
-                                        <string key="content">&gt; 
+                                        <mutableString key="content">&gt; 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
-</string>
+</mutableString>
                                         <attributes>
                                             <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="HelveticaNeue"/>
@@ -2393,7 +2440,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPL
                                         </attributes>
                                     </fragment>
                                     <fragment>
-                                        <string key="content"> 
+                                        <mutableString key="content"> 
 Copyright (c) 2011-2013, Tony Million. 
 All rights reserved. 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
@@ -2403,7 +2450,7 @@ and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-</string>
+</mutableString>
                                         <attributes>
                                             <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="HelveticaNeue"/>
@@ -3121,6 +3168,7 @@ Cg
         <image name="key-gold-32" width="33" height="32"/>
         <image name="lock-24" width="24" height="24"/>
         <image name="magnifier_64" width="64" height="64"/>
+        <image name="one-drive-icon-only-32x32" width="32" height="32"/>
         <image name="product32" width="32" height="32"/>
         <image name="red-cross-24" width="24" height="24"/>
         <image name="support-40" width="40" height="40"/>

@@ -69,6 +69,17 @@
 				<string>com.googleusercontent.apps.747097248035-gu998atvo9dat2t6j7b4jkqlseee4543</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>msal708058b4-71de-4c54-ae7f-0e6f5872e953</string>
+				<string>auth</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>2603</string>

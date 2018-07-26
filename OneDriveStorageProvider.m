@@ -17,6 +17,8 @@
 
 @end
 
+static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
+
 @implementation OneDriveStorageProvider
 
 + (instancetype)sharedInstance {
@@ -32,12 +34,35 @@
 - (instancetype)init {
     if (self = [super init]) {
         _displayName = @"OneDrive";
-        _icon = @"dropbox-blue-32x32-nologo";
+        _icon = @"one-drive-icon-only-32x32";
         _storageId = kOneDrive;
         _cloudBased = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
+
+        [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite"]];
+
+        
+        
+        NSArray *foo = [[ODAccountStore defaultAccountStore] loadAccounts];
+        for (NSObject *each in foo) {
+            NSLog(@"Account: %@", each);
+        }
+        
+        NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
+        
+        
+        NSArray* clients = [ODClient loadClients];
+        
+        for (NSObject *client in clients) {
+            NSLog(@"Client %@", client);
+        }
+
+        ////ODClient applic
+        //[ODClient setCurrentClient:nil];
+        self.odClient = nil;
         
         return self;
     }
@@ -69,52 +94,30 @@
     completion:(void (^)(NSError *error))completion {
 }
 
-- (void)authWrapperWithCompletion:(void (^)(NSError* error))completion {
-    if(!self.odClient) {
-        [ODClient clientWithCompletion:^(ODClient *client, NSError *error){
-            if (!error){
-                self.odClient = client;
-                completion(nil);
-            }
-            else {
-                // TODO:
-                NSLog(@"error: %@", error);
-                self.odClient = nil;
-                completion(error);
-            }
-        }];
-    }
-    else {
-        completion(nil);
-    }
-}
-
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
             completion(nil, error);
+            return;
         }
         
         NSString *parentItemId = parentFolder == nil ? @"root" : ((ODItem*)parentFolder).id;
         
         ODChildrenCollectionRequest *request = [[[[self.odClient drive] items:parentItemId] children] request];
         
-        [self foo:request error:error existingItems:[NSMutableArray array] completion:completion];
+        [self listRecursive:request error:error existingItems:[NSMutableArray array] completion:completion];
     }];
 }
 
-- (void)foo:(ODChildrenCollectionRequest *)request
+- (void)listRecursive:(ODChildrenCollectionRequest *)request
       error:(NSError *)error
       existingItems:(NSMutableArray<StorageBrowserItem*>*)existingItems
  completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion
 {
     [request getWithCompletion:^(ODCollection *response, ODChildrenCollectionRequest *nr, NSError *error) {
- 
-        // TODO: Error
-        // TODO: Icons/Thumbnails!
-        
+        // TODO: Shared With Me files
         if(error) {
             NSLog(@"%@", error);
             completion(nil, error);
@@ -122,15 +125,10 @@
         }
 
         NSArray* chunk = [self mapToBrowserItems:response.value];
-        
-        NSLog(@"Chunksize: %lu", (unsigned long)chunk.count);
-        
         [existingItems addObjectsFromArray:chunk];
         
         if(nr) {
-            NSLog(@"NEXT!");
-            
-            [self foo:nr error:error existingItems:existingItems completion:completion];
+            [self listRecursive:nr error:error existingItems:existingItems completion:completion];
         }
         else {
             NSLog(@"Got all items: [%lu]", (unsigned long)existingItems.count);
@@ -166,6 +164,42 @@
     }
     
     return ret;
+}
+
+- (void)authWrapperWithCompletion:(void (^)(NSError* error))completion {
+    if(!self.odClient) {
+        [ODClient clientWithCompletion:^(ODClient *client, NSError *error){
+            if (!error){
+                self.odClient = client;
+                completion(nil);
+            }
+            else {
+                NSLog(@"Onedrive error: %@", error);
+                self.odClient = nil;
+                completion(error);
+            }
+        }];
+    }
+    else {
+        completion(nil);
+    }
+}
+
+- (void)signout:(void (^)(NSError *error))completion {
+    if(!self.odClient) {
+        NSLog(@"OneDrive Signout: No Active Session.");
+        completion(nil);
+    }
+    else {
+        [self.odClient signOutWithCompletion:^(NSError *error) {
+            self.odClient = nil;
+            completion(error);
+        }];
+    }
+}
+
+- (BOOL)isSignedIn {
+    return self.odClient != nil;
 }
 
 @end
