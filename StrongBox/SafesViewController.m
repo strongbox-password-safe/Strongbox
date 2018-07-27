@@ -31,6 +31,7 @@
 #import "VersionConflictController.h"
 #import "iCloudSafesCoordinator.h"
 #import "CHCSVParser.h"
+#import "OneDriveStorageProvider.h"
 
 @interface SafesViewController ()
 
@@ -376,6 +377,9 @@
     else if (providerId == kLocalDevice)
     {
         return [LocalDeviceStorageProvider sharedInstance];
+    }
+    else if(providerId == kOneDrive) {
+        return [OneDriveStorageProvider sharedInstance];
     }
     
     return nil;

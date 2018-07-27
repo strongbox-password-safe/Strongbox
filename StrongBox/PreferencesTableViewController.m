@@ -56,7 +56,7 @@
     
     self.buttonUnlinkDropbox.enabled = (DBClientsManager.authorizedClient != nil);
     self.buttonSignoutGoogleDrive.enabled =  [[GoogleDriveManager sharedInstance] isAuthorized];
-    //self.buttonSignoutOneDrive.enabled = [[OneDriveStorageProvider sharedInstance] isSignedIn];
+    self.buttonSignoutOneDrive.enabled = [[OneDriveStorageProvider sharedInstance] isSignedIn];
 }
 
 - (void)bindAboutButton {
@@ -159,26 +159,28 @@
 }
 
 - (IBAction)onSignoutOneDrive:(id)sender {
-    //if ([OneDriveStorageProvider.sharedInstance isSignedIn]) {
+    if ([OneDriveStorageProvider.sharedInstance isSignedIn]) {
         [Alerts yesNo:self
                 title:@"Sign out of OneDrive?"
               message:@"Are you sure you want to sign out of One Drive?"
                action:^(BOOL response) {
                    if (response) {
                        [OneDriveStorageProvider.sharedInstance signout:^(NSError *error) {
-                           if(!error) {
-                               //self.buttonSignoutOneDrive.enabled = NO;
-                               [Alerts info:self
-                                      title:@"Signout Successful"
-                                    message:@"You have successfully signed out of OneDrive."];
-                           }
-                           else {
-                               [Alerts error:self title:@"Error Signing out of OneDrive" error:error];
-                           }
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               if(!error) {
+                                   self.buttonSignoutOneDrive.enabled = NO;
+                                   [Alerts info:self
+                                          title:@"Signout Successful"
+                                        message:@"You have successfully signed out of OneDrive."];
+                               }
+                               else {
+                                   [Alerts error:self title:@"Error Signing out of OneDrive" error:error];
+                               }
+                           });
                        }];
                    }
                }];
-   // }
+   }
 }
 
 
