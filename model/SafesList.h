@@ -16,6 +16,8 @@
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *snapshot;
 
 - (void)add:(SafeMetaData *_Nonnull)safe;
+- (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe;
+
 - (void)remove:(NSString*_Nonnull)uuid;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 - (void)update:(SafeMetaData *_Nonnull)safe;

@@ -946,17 +946,17 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
         completion:^(SafeMetaData *metadata, NSError *error)
      {
          dispatch_async(dispatch_get_main_queue(), ^(void)
-                        {
-                            if (error == nil) {
-                                [[SafesList sharedInstance] add:metadata];
-                                [self refreshView];
-                            }
-                            else {
-                                [Alerts error:self
-                                        title:@"Error Importing Safe"
-                                        error:error];
-                            }
-                        });
+        {
+            if (error == nil) {
+                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+                [self refreshView];
+            }
+            else {
+                [Alerts error:self
+                        title:@"Error Importing Safe"
+                        error:error];
+            }
+        });
      }];
 }
 

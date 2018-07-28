@@ -370,7 +370,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
         
-        [[SafesList sharedInstance] add:newSafe];
+        [[SafesList sharedInstance] addWithDuplicateCheck:newSafe];
         
         added = YES;
     }

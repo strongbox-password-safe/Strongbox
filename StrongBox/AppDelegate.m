@@ -41,6 +41,8 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+    NSLog(@"openURL: [%@] => [%@]", options, url);
+    
     if ([url.absoluteString hasPrefix:@"db"]) {
         DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];
 

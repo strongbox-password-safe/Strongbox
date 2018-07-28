@@ -59,6 +59,25 @@ static NSString* kSafesList = @"safesList";
     });
 }
 
+- (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe {
+    dispatch_barrier_async(self.dataQueue, ^{
+        NSArray* duplicates = [self.data filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+            SafeMetaData* item = (SafeMetaData*)evaluatedObject;
+            return (item.storageProvider == safe.storageProvider &&
+                    [item.fileName isEqualToString:safe.fileName] &&
+                    [item.fileIdentifier isEqualToString:safe.fileIdentifier]);
+        }]];
+        
+        NSLog(@"Found %lu duplicates...", (unsigned long)duplicates.count);
+        
+        if([duplicates count] == 0) {
+            [self.data addObject:safe];
+            
+            [self serialize];
+        }
+    });
+}
+
 - (NSArray<SafeMetaData *> *)snapshot {
     __block NSArray<SafeMetaData *> *result;
     dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.data]; });
