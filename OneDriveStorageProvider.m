@@ -43,8 +43,6 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
         [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite"]];
 
-        self.odClient = nil;
-        
         return self;
     }
     else {
@@ -57,6 +55,48 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+    [self authWrapperWithCompletion:^(NSError *error) {
+        [SVProgressHUD show];
+        
+        NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
+        
+        ODItem* parent = ((ODItem*)parentFolder);
+        
+        NSString *parentItemId = parent == nil ? @"root" :
+        (parent.remoteItem == nil ? parent.id : parent.remoteItem.id);
+        
+        ODItemContentRequest *request;
+        if(parent.remoteItem) {
+            request = [[[[self.odClient drives:parent.remoteItem.parentReference.driveId] items:parent.remoteItem.id] itemByPath:desiredFilename] contentRequest];
+        }
+        else {
+            request = [[[[self.odClient drive] items:parentItemId] itemByPath:desiredFilename] contentRequest];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Updating..."];
+        });
+        
+        [request uploadFromData:data completion:^(ODItem *response, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+            
+            if (error == nil) {
+                //NSLog(@"%@ - %@", response, error);
+                
+                SafeMetaData *metadata = [self getSafeMetaData:nickName
+                                                  providerData:response];
+
+                completion(metadata, nil);
+            }
+            else {
+                NSLog(@"OneDrive create error: %@", error);
+                completion(nil, error);
+                return;
+            }
+        }];
+    }];
 
 }
 
@@ -77,7 +117,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
                     if(!item) {
                         error = [Utils createNSError:@"Could not locate the safe file. Has it been renamed or moved?" errorCode:45];
                     }
-                        
+                    
                     NSLog(@"OneDrive Read: %@", error);
                     completion(nil, error);
                     return;
@@ -135,6 +175,42 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 - (void)update:(SafeMetaData *)safeMetaData
           data:(NSData *)data
     completion:(void (^)(NSError *error))completion {
+    [self authWrapperWithCompletion:^(NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Locating..."];
+        });
+        
+        [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+            
+            if(error || !item) {
+                if(!item) {
+                    error = [Utils createNSError:@"Could not locate the safe file. Has it been renamed or moved?" errorCode:45];
+                }
+                
+                NSLog(@"OneDrive Read: %@", error);
+                completion(error);
+                return;
+            }
+            
+            ODItemContentRequest *request;
+            request = [[[self.odClient drives:item.parentReference.driveId] items:item.id] contentRequest];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:@"Updating..."];
+            });
+            
+            [request uploadFromData:data completion:^(ODItem *response, NSError *error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+                
+                completion(error);
+            }];
+        }];
+    }];
 }
 
 - (void)      list:(NSObject *)parentFolder
