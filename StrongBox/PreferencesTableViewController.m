@@ -106,6 +106,18 @@
     [self bindAllowBiometric];
 }
 
+- (IBAction)onHowTo:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/how-to-guide"]];
+}
+
+- (IBAction)onFaq:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"]];
+}
+
+- (IBAction)onPrivacyPolicy:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/privacy-policy"]];
+}
+
 - (void)bindAllowBiometric {
     self.labelAllowBiometric.text = [NSString stringWithFormat:@"Allow %@ Open", [Settings.sharedInstance getBiometricIdName]];
     self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;

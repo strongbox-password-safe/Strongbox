@@ -20,6 +20,9 @@
 - (IBAction)onSegmentAutoLockChanged:(id)sender;
 - (IBAction)onContactSupport:(id)sender;
 - (IBAction)onAllowBiometric:(id)sender;
+- (IBAction)onHowTo:(id)sender;
+- (IBAction)onFaq:(id)sender;
+- (IBAction)onPrivacyPolicy:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchLongTouchCopy;
