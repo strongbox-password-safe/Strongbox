@@ -41,7 +41,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         _browsableNew = YES;
         _browsableExisting = YES;
 
-        [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite"]];
+        [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite", @"offline_access"]];
 
         return self;
     }
@@ -372,22 +372,17 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 }
 
 - (void)authWrapperWithCompletion:(void (^)(NSError* error))completion {
-    if(!self.odClient) {
-        [ODClient clientWithCompletion:^(ODClient *client, NSError *error){
-            if (!error){
-                self.odClient = client;
-                completion(nil);
-            }
-            else {
-                NSLog(@"Onedrive error: %@", error);
-                self.odClient = nil;
-                completion(error);
-            }
-        }];
-    }
-    else {
-        completion(nil);
-    }
+    [ODClient clientWithCompletion:^(ODClient *client, NSError *error){
+        if (!error){
+            self.odClient = client;
+            completion(nil);
+        }
+        else {
+            NSLog(@"Onedrive error: %@", error);
+            self.odClient = nil;
+            completion(error);
+        }
+    }];
 }
 
 - (void)signout:(void (^)(NSError *error))completion {
