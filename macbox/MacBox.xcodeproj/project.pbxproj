@@ -391,7 +391,6 @@
 				4DF59F4E1F30DB7A00D68BFE /* Frameworks */,
 				4DF59F4F1F30DB7A00D68BFE /* Resources */,
 				E8957E36C777D4AF2AFDE57D /* [CP] Embed Pods Frameworks */,
-				9BA289D51E013B0B00AAFC72 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -480,21 +479,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		9BA289D51E013B0B00AAFC72 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		B9829F49E8DC84BA018303E5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
