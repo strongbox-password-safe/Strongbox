@@ -10,6 +10,8 @@
 #import "Utils.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "OneDriveSDK/OneDriveSDK.h"
+#import <MSAL/MSAL.h>
+#import <MSGraphMSALAuthProvider/MSALAuthenticationProvider.h>
 //#import <MSGraphSDK/MSGraphSDK.h>
 
 @interface OneDriveForBusinessStorageProvider()
@@ -18,9 +20,12 @@
 
 @end
 
+// OneDrive Personal - TODO: Remove after test
+static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
+
 // Strongbox Business Trial account mark@strongboxsafe.onmicrosoft.com
-static NSString *kApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
-static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
+//static NSString *kApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
+//static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
 
 // mmcguill@gmail.com account
 //static NSString *kApplicationId = @"91edee17-7688-4c85-8455-c94d87c312d0";
@@ -48,8 +53,40 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
         _browsableNew = YES;
         _browsableExisting = YES;
         
-        [ODClient setActiveDirectoryAppId:kApplicationId redirectURL:kRedirectUri];
+        //[ODClient setActiveDirectoryAppId:kApplicationId redirectURL:kRedirectUri];
         
+        NSError *error = nil;
+        
+        // TODO: Check error
+        
+        //NSURL* url = [NSURL URLWithString:kRedirectUri]; // ? Common Tenant?
+        //MSALAuthority *authority = [MSALAuthority authorityWithURL:url error:&error];
+        //MSALPublicClientApplication *application = [[MSALPublicClientApplication alloc] initWithClientId:kApplicationId authority:authority error:&error];
+
+        MSALPublicClientApplication *application = [[MSALPublicClientApplication alloc] initWithClientId:kApplicationId error:&error];
+
+        NSLog(@"%@", error);
+        
+        // TODO: Check error
+        
+        MSALAuthenticationProvider *authenticationProvider = [[MSALAuthenticationProvider alloc] initWithPublicClientApplication:application        andScopes:@[@"onedrive.readwrite", @"offline_access"]];
+
+        //MSGraphClient *client = [MSGraphClient client];
+        
+//        MSHTTPClient *httpClient = [MSClientFactory createHTTPClientWithAuthenticationProvider:authenticationProvider];
+//
+//        NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[MSGraphBaseURL stringByAppendingString:@"/me"]]];
+//
+//        MSURLSessionDataTask *meDataTask = [httpClient dataTaskWithRequest:urlRequest
+//
+//                                                         completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+//                                                             NSLog(@"Something responded");
+//                                                             //Do something
+//
+//                                                         }];
+//
+//        [meDataTask execute];
+//
         return self;
     }
     else {
