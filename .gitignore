@@ -2,3 +2,6 @@ Build/
 real-secrets.h
 Pods/
 no-git/
+Carthage/Build
+Carthage/Checkouts
+
