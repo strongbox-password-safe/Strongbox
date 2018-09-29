@@ -32,6 +32,7 @@
 #import "iCloudSafesCoordinator.h"
 #import "CHCSVParser.h"
 #import "OneDriveStorageProvider.h"
+#import "OneDriveForBusinessStorageProvider.h"
 
 @interface SafesViewController ()
 
@@ -380,6 +381,9 @@
     }
     else if(providerId == kOneDrive) {
         return [OneDriveStorageProvider sharedInstance];
+    }
+    else if(providerId == kOneDriveForBusiness) {
+        return [OneDriveForBusinessStorageProvider sharedInstance];
     }
     
     return nil;
