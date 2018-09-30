@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */; };
-		4D076F23215FC08600B9C284 /* MSAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D076F21215FC08600B9C284 /* MSAL.framework */; };
-		4D076F24215FC08600B9C284 /* MSGraphMSALAuthProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D076F22215FC08600B9C284 /* MSGraphMSALAuthProvider.framework */; };
-		4D076F27215FC3C000B9C284 /* MSGraphCoreSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D076F26215FC3BF00B9C284 /* MSGraphCoreSDK.framework */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
@@ -212,9 +209,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D076F27215FC3C000B9C284 /* MSGraphCoreSDK.framework in Frameworks */,
-				4D076F23215FC08600B9C284 /* MSAL.framework in Frameworks */,
-				4D076F24215FC08600B9C284 /* MSGraphMSALAuthProvider.framework in Frameworks */,
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
 				4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */,
 			);
@@ -839,10 +833,7 @@
 				CURRENT_PROJECT_VERSION = 1.11.2;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -871,10 +862,7 @@
 				CURRENT_PROJECT_VERSION = 1.11.2;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				INFOPLIST_FILE = "$(SRCROOT)/StrongBox/StrongBox-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
