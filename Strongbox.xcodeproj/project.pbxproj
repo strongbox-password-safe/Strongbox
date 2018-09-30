@@ -567,7 +567,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n# /usr/local/bin/carthage copy-frameworks\n";
 		};
 		6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
