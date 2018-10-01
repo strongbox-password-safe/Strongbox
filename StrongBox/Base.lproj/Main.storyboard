@@ -164,6 +164,12 @@
                                 <action selector="onMove:" destination="cYG-Rk-SmU" id="kzv-oN-J4M"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="Oph-xM-XMX"/>
+                        <barButtonItem systemItem="trash" id="xbZ-oA-nUL">
+                            <connections>
+                                <action selector="onDeleteToolbarButton:" destination="cYG-Rk-SmU" id="UiS-bh-Hsz"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem systemItem="flexibleSpace" id="RWT-dT-fZd"/>
                         <barButtonItem systemItem="organize" id="VeE-gV-vxI">
                             <connections>
@@ -184,9 +190,11 @@
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="[Subgroup]" id="XgN-hT-NXM"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="buttonAddGroup" destination="VeE-gV-vxI" id="9dW-BG-ef8"/>
                         <outlet property="buttonAddRecord" destination="Yxa-oY-T8H" id="AIL-Zg-7t8"/>
+                        <outlet property="buttonDelete" destination="xbZ-oA-nUL" id="m9y-6S-ue7"/>
                         <outlet property="buttonMove" destination="8iW-hV-8t1" id="07G-3X-cjh"/>
                         <outlet property="buttonSafeSettings" destination="Gi8-Hf-TQJ" id="hgJ-z3-Iyv"/>
                         <segue destination="DZY-DZ-POR" kind="presentation" identifier="segueToSelectDestination" id="J4l-7W-WKQ"/>

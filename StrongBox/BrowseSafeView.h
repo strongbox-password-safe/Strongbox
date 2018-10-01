@@ -19,6 +19,7 @@
 @property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonAddRecord;
 @property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonSafeSettings;
 @property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonMove;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonDelete;
 
 - (IBAction)onAddGroup:(id _Nullable )sender;
 - (IBAction)onAddRecord:(id _Nullable )sender;

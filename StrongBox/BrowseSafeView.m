@@ -24,10 +24,6 @@
 @property (strong, nonatomic) UIBarButtonItem *savedOriginalNavButton;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
-//@property (strong, nonatomic) UITapGestureRecognizer *doubleTapRecognizer;
-
-
-
 @property (nonatomic) NSInteger tapCount;
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
@@ -126,31 +122,46 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     return !self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [Alerts yesNo:self.searchController.isActive ? self.searchController : self
-                title:@"Are you sure?"
-              message:@"Are you sure you want to delete this item?"
-               action:^(BOOL response) {
-                   if (response) {
-                       Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
-                       
-                       [self.viewModel deleteItem:item];
-                       
-                       [self.viewModel update:^(NSError *error) {
-                           if (error) {
-                               [Alerts             error:self
-                                                   title:@"Error Saving"
-                                                   error:error];
+- (void)onRenameItem:(NSIndexPath * _Nonnull)indexPath {
+    [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Title"
+                            title:@"Rename Item"
+                          message:@"Please enter a new title for this item"
+                       completion:^(NSString *text, BOOL response) {
+                           if(response) {
+                               Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+                               
+                               item.title = text;
+                               
+                               [self saveChangesToSafeAndRefreshView];
                            }
                        }];
-                       
-                       [self setEditing:NO animated:YES];
-                       
-                       [self refresh];
-                   }
-               }];
-    }
+}
+
+- (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath {
+    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+            title:@"Are you sure?"
+          message:@"Are you sure you want to delete this item?"
+           action:^(BOOL response) {
+               if (response) {
+                   Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+                   
+                   [self.viewModel deleteItem:item];
+                   
+                   [self saveChangesToSafeAndRefreshView];
+               }
+           }];
+}
+
+- (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self onDeleteSingleItem:indexPath];
+    }];
+    
+    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Rename" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self onRenameItem:indexPath];
+    }];
+    
+    return @[removeAction, renameAction];
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
@@ -283,6 +294,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     (self.buttonAddRecord).enabled = !ro && !self.isEditing;
     (self.buttonSafeSettings).enabled = !self.isEditing;
     (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
+    (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
     (self.buttonAddGroup).enabled = !ro && !self.isEditing;
 }
 
@@ -384,6 +396,27 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     }
 }
 
+- (IBAction)onDeleteToolbarButton:(id)sender {
+    NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
+    
+    if (selectedRows.count > 0) {
+        [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+                title:@"Are you sure?"
+              message:@"Are you sure you want to delete these item(s)?"
+               action:^(BOOL response) {
+                   if (response) {
+                       NSArray<Node *> *items = [self getSelectedItems:selectedRows];
+                       
+                       for (Node* item in items) {
+                           [self.viewModel deleteItem:item];
+                       }
+                       
+                       [self saveChangesToSafeAndRefreshView];
+                   }
+               }];
+    }
+}
+
 - (NSArray<Node*> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
     NSMutableIndexSet *indicesOfItems = [NSMutableIndexSet new];
     
@@ -398,11 +431,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)saveChangesToSafeAndRefreshView {
     [self.viewModel update:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if (error != nil) {
-                [Alerts error:self title:@"Problem Saving" error:error];
-            }
+            [self setEditing:NO animated:YES];
             
             [self refresh];
+            
+            if (error) {
+                [Alerts error:self title:@"Error Saving" error:error];
+            }
         });
     }];
 }

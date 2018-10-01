@@ -11,7 +11,6 @@
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
-		4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D1757961C8361D200E6356F /* formatV3.txt */; };
 		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
 		4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579D1C8361D200E6356F /* IOsUtils.m */; };
@@ -81,7 +80,6 @@
 		4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowseSafeView.h; sourceTree = "<group>"; };
 		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowseSafeView.m; sourceTree = "<group>"; };
-		4D1757961C8361D200E6356F /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = formatV3.txt; sourceTree = "<group>"; };
 		4D1757971C8361D200E6356F /* GoogleDriveManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDriveManager.h; sourceTree = "<group>"; };
 		4D1757981C8361D200E6356F /* GoogleDriveManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoogleDriveManager.m; sourceTree = "<group>"; };
 		4D1757991C8361D200E6356F /* GoogleDriveStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoogleDriveStorageProvider.h; sourceTree = "<group>"; };
@@ -415,7 +413,6 @@
 				4D915D791EDC4B77002615F6 /* Alerts.m */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DBE5B381C8356C700C310BC /* AppDelegate.m */,
-				4D1757961C8361D200E6356F /* formatV3.txt */,
 				4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */,
 				4D17579C1C8361D200E6356F /* IOsUtils.h */,
 				4D17579D1C8361D200E6356F /* IOsUtils.m */,
@@ -520,7 +517,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D1757BF1C8361D300E6356F /* formatV3.txt in Resources */,
 				4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */,
