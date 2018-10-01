@@ -72,6 +72,12 @@
                   completion:(void (^)(NSString *password, BOOL response))completion;
 
 + (void)OkCancelWithTextField:(UIViewController *)viewController
+                textFieldText:(NSString *)textFieldText
+                        title:(NSString *)title
+                      message:(NSString *)message
+                   completion:(void (^) (NSString *text, BOOL response))completion;
+
++ (void)OkCancelWithTextField:(UIViewController *)viewController
          textFieldPlaceHolder:(NSString *)textFieldPlaceHolder
                         title:(NSString *)title
                       message:(NSString *)message

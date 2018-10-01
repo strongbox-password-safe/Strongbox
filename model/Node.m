@@ -48,6 +48,11 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent {
     if(self = [super init]) {
+        if(![title length]) {
+            NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
+            return nil;
+        }
+
         for (Node* child in parent.children) {
             if (child.isGroup && [child.title isEqualToString:title]) {
                 NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
@@ -107,6 +112,11 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
 }
 
 - (BOOL)setTitle:(NSString*_Nonnull)title {
+    if(![title length]) {
+        NSLog(@"setTitle: Cannot have empty title.");
+        return NO;
+    }
+    
     if(self.isGroup) {
         for (Node* child in self.parent.children) {
             if (child.isGroup && [child.title isEqualToString:title]) {

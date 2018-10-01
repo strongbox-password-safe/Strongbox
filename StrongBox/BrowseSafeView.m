@@ -123,13 +123,14 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (void)onRenameItem:(NSIndexPath * _Nonnull)indexPath {
-    [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Title"
+    Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+    
+    [Alerts OkCancelWithTextField:self
+                    textFieldText:item.title
                             title:@"Rename Item"
                           message:@"Please enter a new title for this item"
                        completion:^(NSString *text, BOOL response) {
-                           if(response) {
-                               Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
-                               
+                           if(response && [text length]) {
                                item.title = text;
                                
                                [self saveChangesToSafeAndRefreshView];

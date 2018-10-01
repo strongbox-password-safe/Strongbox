@@ -229,6 +229,36 @@
 }
 
 + (void)OkCancelWithTextField:(UIViewController *)viewController
+                textFieldText:(NSString *)textFieldText
+                        title:(NSString *)title
+                      message:(NSString *)message
+                   completion:(void (^) (NSString *text, BOOL response))completion {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                             message:message
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+        textField.text = textFieldText;
+    }];
+    
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+                                                              completion((alertController.textFields[0]).text, true);
+                                                          }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) {
+                                                             completion(nil, false);
+                                                         }];
+    
+    [alertController addAction:defaultAction];
+    [alertController addAction:cancelAction];
+    
+    [viewController presentViewController:alertController animated:YES completion:nil];
+}
+
++ (void)OkCancelWithTextField:(UIViewController *)viewController
          textFieldPlaceHolder:(NSString *)textFieldPlaceHolder
                         title:(NSString *)title
                       message:(NSString *)message
