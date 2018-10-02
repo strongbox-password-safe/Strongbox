@@ -41,15 +41,6 @@
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
 @property (nonatomic, strong) NSString* biometricIdName;
 
-
-
-// Dispatch queue
-@property (nonatomic, strong) dispatch_queue_t dispatchQueue;
-
-// A source of potential notifications
-@property (nonatomic, strong) dispatch_source_t source;
-
-
 @end
 
 @implementation SafesViewController
@@ -137,8 +128,9 @@
     // User may have just switched to our app after updating iCloud settings...
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    
+    [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory];
 }
-
 
 //
 //

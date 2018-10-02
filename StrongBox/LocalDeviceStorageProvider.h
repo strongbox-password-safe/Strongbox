@@ -44,4 +44,7 @@
 
 - (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData;
 
+- (void)startMonitoringDocumentsDirectory;
+- (void)stopMonitoringDocumentsDirectory;
+
 @end
