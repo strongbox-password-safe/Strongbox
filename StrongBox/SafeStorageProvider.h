@@ -20,6 +20,7 @@
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
+@property (nonatomic, readonly) BOOL rootFolderOnly;
 
 - (void)    create:(NSString *)nickName
               data:(NSData *)data

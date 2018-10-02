@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
+@property (nonatomic, readonly) BOOL rootFolderOnly;
 
 - (void)signout:(void (^)(NSError *error))completion;
 - (BOOL)isSignedIn;

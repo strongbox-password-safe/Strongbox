@@ -121,35 +121,35 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationWidth="0.0" reuseIdentifier="OpenSafeViewCell" textLabel="6Jz-ia-nJC" detailTextLabel="CGM-u3-rl3" imageView="Bzc-jM-vuc" rowHeight="44" style="IBUITableViewCellStyleSubtitle" id="eMw-27-faA">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="OpenSafeViewCell" textLabel="Byi-MG-rhO" detailTextLabel="3HA-sx-vUO" imageView="RTG-5E-cSQ" style="IBUITableViewCellStyleSubtitle" id="7uZ-83-SWL">
                                 <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eMw-27-faA" id="xQh-z3-iql">
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="7uZ-83-SWL" id="Vj4-9O-jJk">
                                     <rect key="frame" x="0.0" y="0.0" width="376" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="6Jz-ia-nJC">
-                                            <rect key="frame" x="79" y="4" width="35" height="21.666666666666668"/>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Byi-MG-rhO">
+                                            <rect key="frame" x="79" y="5" width="33.333333333333336" height="20.333333333333332"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="CGM-u3-rl3">
-                                            <rect key="frame" x="79" y="25.666666666666668" width="43.666666666666664" height="14.333333333333334"/>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3HA-sx-vUO">
+                                            <rect key="frame" x="79" y="25.333333333333332" width="43.666666666666664" height="14.333333333333334"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="Strongbox-80x80-new" id="Bzc-jM-vuc">
+                                        <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="folder-48x48" id="RTG-5E-cSQ">
                                             <rect key="frame" x="20" y="0.0" width="44" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </imageView>
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="cYG-Rk-SmU" kind="show" identifier="sequeToSubgroup" id="scc-zg-xsm"/>
+                                    <segue destination="cYG-Rk-SmU" kind="show" identifier="sequeToSubgroup" id="wBN-oK-Yfx"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -203,7 +203,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sE0-cy-knM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="142.40000000000001" y="742.12893553223398"/>
+            <point key="canvasLocation" x="-51" y="742"/>
         </scene>
         <!--Select Move To Destination-->
         <scene sceneID="cNP-MU-70V">
@@ -3234,6 +3234,7 @@ Cg
         <image name="copy_64" width="64" height="64"/>
         <image name="dropbox-blue-32x32-nologo" width="32" height="32"/>
         <image name="fingerprint" width="32" height="32"/>
+        <image name="folder-48x48" width="48" height="48"/>
         <image name="folder_in_24" width="24" height="24"/>
         <image name="gear_24" width="24" height="24"/>
         <image name="gear_64" width="64" height="64"/>

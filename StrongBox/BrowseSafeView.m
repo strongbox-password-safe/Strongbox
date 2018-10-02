@@ -448,6 +448,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     [self enableDisableToolbarButtons];
     
+    //NSLog(@"setEditing: %hhd", editing);
+    
     if (!editing) {
         self.navigationItem.leftBarButtonItem = self.savedOriginalNavButton;
     }

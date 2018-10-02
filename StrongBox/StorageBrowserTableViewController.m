@@ -61,15 +61,18 @@
                         viewController:self
                             completion:^(NSArray<StorageBrowserItem *> *items, NSError *error)
         {
-            [self onList:items
-                   error:error];
+            [self onList:items error:error];
         }];
     });
 }
 
 - (void)onList:(NSArray<StorageBrowserItem *> *)items error:(NSError *)error {
     if (error) {
-        [Alerts error:self title:@"Problem Listing Files & Folders" error:error];
+        [Alerts error:self title:@"Problem Listing Files & Folders" error:error completion:^{
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            });
+        }];
     }
     else {
         NSArray *tmp = [items filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (id object, NSDictionary *bindings)
@@ -148,7 +151,23 @@
             }];
 }
 
-- (void)validateAndAddExistingSafe:(StorageBrowserItem *)file {
+- (void)validateAndAddExistingSafe:(StorageBrowserItem *)file indexPath:(NSIndexPath *)indexPath  {
+    if(self.safeStorageProvider.storageId == kLocalDevice) {
+        NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+        NSMutableSet *existing = [NSMutableSet set];
+        for (SafeMetaData* safe in localSafes) {
+            [existing addObject:safe.fileName];
+        }
+        
+        if([existing containsObject:file.name]) {
+            [Alerts warn:self title:@"Safe Already Present" message:@"This file is already in your existing set of safes. No need to add it again, it will automatically pick up any updates made via iTunes File Sharing etc."];
+            
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+            
+            return;
+        }
+    }
+    
     [self.safeStorageProvider readWithProviderData:file.providerData
                                     viewController:self
                                         completion:^(NSData *data, NSError *error) {
@@ -193,10 +212,16 @@
     StorageBrowserItem *file = _items[indexPath.row];
 
     if (file.folder) {
-        [self performSegueWithIdentifier:@"recursiveSegue" sender:nil];
+        if(self.safeStorageProvider.rootFolderOnly) {
+            [Alerts info:self title:@"Root Folder Only" message:@"You can only have safes in the Root folder for this storage type."];
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
+        else {
+            [self performSegueWithIdentifier:@"recursiveSegue" sender:nil];
+        }
     }
     else {
-        [self validateAndAddExistingSafe:file];
+        [self validateAndAddExistingSafe:file indexPath:indexPath];
     }
 }
 

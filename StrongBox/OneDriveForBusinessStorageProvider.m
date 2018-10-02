@@ -58,6 +58,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
+        _rootFolderOnly = NO;
         
         [ODClient setActiveDirectoryAppId:kApplicationId redirectURL:kRedirectUri];
         

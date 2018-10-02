@@ -41,6 +41,15 @@
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
 @property (nonatomic, strong) NSString* biometricIdName;
 
+
+
+// Dispatch queue
+@property (nonatomic, strong) dispatch_queue_t dispatchQueue;
+
+// A source of potential notifications
+@property (nonatomic, strong) dispatch_source_t source;
+
+
 @end
 
 @implementation SafesViewController
@@ -129,6 +138,105 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
+
+
+//
+//
+//
+//#include <sys/stat.h>
+//#include <sys/types.h>
+//#include <sys/event.h>
+//#include <sys/time.h>
+//#include <fcntl.h>
+//
+//- (void)kqueueFired
+//{
+//    int             kq;
+//    struct kevent   event;
+//    struct timespec timeout = { 0, 0 };
+//    int             eventCount;
+//
+//    kq = CFFileDescriptorGetNativeDescriptor(self->_kqRef);
+//    assert(kq >= 0);
+//
+//    eventCount = kevent(kq, NULL, 0, &event, 1, &timeout);
+//    assert( (eventCount >= 0) && (eventCount < 2) );
+//
+//    if (eventCount == 1) {
+//        NSLog(@"dir changed");
+//    }
+//
+//    CFFileDescriptorEnableCallBacks(self->_kqRef, kCFFileDescriptorReadCallBack);
+//}
+//
+//static void KQCallback(CFFileDescriptorRef kqRef, CFOptionFlags callBackTypes, void *info)
+//{
+//    ViewController *    obj;
+//
+//    obj = (ViewController *) info;
+//    assert([obj isKindOfClass:[ViewController class]]);
+//    assert(kqRef == obj->_kqRef);
+//    assert(callBackTypes == kCFFileDescriptorReadCallBack);
+//
+//    [obj kqueueFired];
+//}
+//
+//- (IBAction)testAction:(id)sender
+//{
+//#pragma unused(sender)
+//    NSString *              docPath;
+//    int                     dirFD;
+//    int                     kq;
+//    int                     retVal;
+//    struct kevent           eventToAdd;
+//    CFFileDescriptorContext context = { 0, self, NULL, NULL, NULL };
+//    CFRunLoopSourceRef      rls;
+//
+//    docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+//    assert(docPath != 0);
+//
+//    NSLog(@"%@", docPath);
+//
+//    dirFD = open([docPath fileSystemRepresentation], O_EVTONLY);
+//    assert(dirFD >= 0);
+//
+//    kq = kqueue();
+//    assert(kq >= 0);
+//
+//    eventToAdd.ident  = dirFD;
+//    eventToAdd.filter = EVFILT_VNODE;
+//    eventToAdd.flags  = EV_ADD | EV_CLEAR;
+//    eventToAdd.fflags = NOTE_WRITE;
+//    eventToAdd.data   = 0;
+//    eventToAdd.udata  = NULL;
+//
+//    retVal = kevent(kq, &eventToAdd, 1, NULL, 0, NULL);
+//    assert(retVal == 0);
+//
+//    assert(self->_kqRef == NULL);
+//
+//    self->_kqRef = CFFileDescriptorCreate(NULL, kq, true, KQCallback, &context);
+//    assert(self->_kqRef != NULL);
+//
+//    rls = CFFileDescriptorCreateRunLoopSource(NULL, self->_kqRef, 0);
+//    assert(rls != NULL);
+//
+//    CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
+//
+//    CFRelease(rls);
+//
+//    CFFileDescriptorEnableCallBacks(self->_kqRef, kCFFileDescriptorReadCallBack);
+//}
+//
+//
+//
+
+
+
+
+
+
+
 
 - (void)onSafesListUpdated {
     dispatch_async(dispatch_get_main_queue(), ^(void) {

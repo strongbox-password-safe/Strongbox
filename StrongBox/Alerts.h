@@ -32,6 +32,11 @@
         title:(NSString *)title
         error:(NSError *)error;
 
++ (void)error:(UIViewController *)viewController
+        title:(NSString *)title
+        error:(NSError *)error
+   completion:(void (^)(void))completion;
+
 + (void)warn:(UIViewController *)viewController
        title:(NSString *)title
      message:(NSString *)message;

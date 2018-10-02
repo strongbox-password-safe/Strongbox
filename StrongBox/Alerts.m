@@ -124,6 +124,14 @@
 + (void)error:(UIViewController *)viewController
         title:(NSString *)title
         error:(NSError *)error {
+    [Alerts error:viewController title:title error:error completion:nil];
+}
+
++ (void)error:(UIViewController *)viewController
+        title:(NSString *)title
+        error:(NSError *)error
+   completion:(void (^)(void))completion
+{
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                              message:error.localizedDescription
                                                                       preferredStyle:UIAlertControllerStyleAlert];
@@ -134,7 +142,7 @@
 
     [alertController addAction:defaultAction];
 
-    [viewController presentViewController:alertController animated:YES completion:nil];
+    [viewController presentViewController:alertController animated:YES completion:completion];
 }
 
 + (void)warn:(UIViewController *)viewController

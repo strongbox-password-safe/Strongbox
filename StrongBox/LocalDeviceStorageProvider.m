@@ -32,6 +32,7 @@
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = YES;
+        _rootFolderOnly = YES;
         
         return self;
     }
@@ -219,21 +220,21 @@
         return;
     }
     
-    NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
-    NSMutableSet *existing = [NSMutableSet set];
-    for (SafeMetaData* safe in localSafes) {
-        [existing addObject:safe.fileName];
-    }
-    
     NSMutableArray<StorageBrowserItem*>* files = [NSMutableArray array];
     for (int count = 0; count < (int)[directoryContent count]; count++)
     {
         NSString *file = [directoryContent objectAtIndex:count];
         
-        NSLog(@"File %d: %@", (count + 1), file);
+        //NSLog(@"File %d: %@", (count + 1), file);
+     
+        StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
         
-        if(![existing containsObject:file]) {
-            StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
+        BOOL isDirectory;
+        NSString *fullPath = [NSString pathWithComponents:@[[IOsUtils applicationDocumentsDirectory].path, file]];
+        BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDirectory];
+
+        if(exists) {
+            browserItem.folder = isDirectory != 0;
             browserItem.name = file;
             browserItem.providerData = file;
             [files addObject:browserItem];

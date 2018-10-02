@@ -33,7 +33,7 @@
         _providesIcons = YES;
         _browsableNew = YES;
         _browsableExisting = YES;
-        
+        _rootFolderOnly = NO;
         _iconsByUrl = [[NSMutableDictionary alloc] init];
 
         return self;

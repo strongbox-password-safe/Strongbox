@@ -35,6 +35,7 @@
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;
+        _rootFolderOnly = NO;
         
         return self;
     }
