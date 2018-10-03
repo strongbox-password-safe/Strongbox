@@ -42,10 +42,27 @@
     [self hideOrShowPassword:_hidePassword];
     
     [self reloadFieldsFromRecord];
-        
+    
+    
+    self.navigationController.toolbar.hidden = YES;
+    self.navigationController.navigationBar.hidden = NO;
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+    
     [self setEditing:(self.record == nil) animated:YES];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.navigationController.toolbar.hidden = YES;
+    self.navigationController.navigationBar.hidden = NO;
+    
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+}
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
@@ -280,13 +297,6 @@
     (self.buttonCopyEmail).enabled = !self.isEditing && (self.record != nil && (self.record.fields.email).length);
     (self.buttonCopyUrl).enabled = !self.isEditing && (self.record != nil && (self.record.fields.url).length);
     (self.buttonCopyAndLaunchUrl).enabled = !self.isEditing;
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    self.navigationController.toolbar.hidden = YES;
-    self.navigationController.navigationBar.hidden = NO;
 }
 
 - (void)textViewDidChange:(UITextView *)textView {

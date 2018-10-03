@@ -56,7 +56,21 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [super viewWillAppear:animated];
     
     self.navigationController.toolbar.hidden = NO;
-
+    
+    if ([[Settings sharedInstance] isProOrFreeTrial]) {
+        if (@available(iOS 11.0, *)) {
+            self.navigationController.navigationBar.prefersLargeTitles = YES;
+            
+            self.navigationItem.searchController = self.searchController;
+            
+            // We want the search bar visible all the time.
+            self.navigationItem.hidesSearchBarWhenScrolling = NO;
+        } else {
+            self.tableView.tableHeaderView = self.searchController.searchBar;
+            [self.searchController.searchBar sizeToFit];
+        }
+    }
+    
     [self refresh];
 }
 
@@ -107,15 +121,6 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
     self.searchController.searchBar.selectedScopeButtonIndex = 3;
-    
-    if ([[Settings sharedInstance] isProOrFreeTrial]) {
-        if (@available(iOS 11.0, *)) {
-            self.navigationItem.searchController = self.searchController;
-        } else {
-            self.tableView.tableHeaderView = self.searchController.searchBar;
-            [self.searchController.searchBar sizeToFit];
-        }
-    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
