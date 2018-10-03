@@ -44,7 +44,8 @@
 
 - (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData;
 
-- (void)startMonitoringDocumentsDirectory;
+- (void)startMonitoringDocumentsDirectory:(void (^)(void))completion;
 - (void)stopMonitoringDocumentsDirectory;
+- (NSArray<StorageBrowserItem *>*)scanForNewSafes;
 
 @end

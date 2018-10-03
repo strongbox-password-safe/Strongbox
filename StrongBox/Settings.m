@@ -27,6 +27,7 @@ static NSString* kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
 static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
 static NSString* kInstallDate = @"installDate";
 static NSString* kDisallowBiometricId = @"disallowBiometricId";
+static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
 
 @interface Settings ()
 
@@ -414,6 +415,15 @@ static NSString* kDisallowBiometricId = @"disallowBiometricId";
 
 - (void)setDisallowAllBiometricId:(BOOL)disallowAllBiometricId {
     [[NSUserDefaults standardUserDefaults] setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)doNotAutoAddNewLocalSafes {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kDoNotAutoAddNewLocalSafes];
+}
+
+- (void)setDoNotAutoAddNewLocalSafes:(BOOL)doNotAutoAddNewLocalSafes {
+    [[NSUserDefaults standardUserDefaults] setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

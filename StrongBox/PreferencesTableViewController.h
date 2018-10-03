@@ -23,10 +23,12 @@
 - (IBAction)onHowTo:(id)sender;
 - (IBAction)onFaq:(id)sender;
 - (IBAction)onPrivacyPolicy:(id)sender;
+- (IBAction)onAutoAddNewLocalSafesChanged:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchLongTouchCopy;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowPasswordOnDetails;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoAddNewLocalSafes;
 @property (weak, nonatomic) IBOutlet UIButton *buttonAbout;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
 

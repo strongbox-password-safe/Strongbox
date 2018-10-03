@@ -32,6 +32,7 @@
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
+		4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
 		4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */; };
 		4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
@@ -128,6 +129,8 @@
 		4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserItem.m; sourceTree = "<group>"; };
 		4D4C49021EDEC0B900EB857D /* RecordView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordView.h; sourceTree = "<group>"; };
 		4D4C49031EDEC0B900EB857D /* RecordView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordView.m; sourceTree = "<group>"; };
+		4D4F184A2165125B00578F0E /* NSArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "model/NSArray+Extensions.h"; sourceTree = SOURCE_ROOT; };
+		4D4F184B2165125B00578F0E /* NSArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "model/NSArray+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		4D55F0D61EE2BFF400C43B26 /* TextFieldAutoSuggest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldAutoSuggest.h; sourceTree = "<group>"; };
 		4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAutoSuggest.m; sourceTree = "<group>"; };
 		4D5F3EDE2108A93800C7C64A /* OneDriveStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OneDriveStorageProvider.h; sourceTree = SOURCE_ROOT; };
@@ -329,6 +332,8 @@
 				4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */,
 				4D29E46D206D350300AD537E /* PasswordGenerator.h */,
 				4D29E46E206D350300AD537E /* PasswordGenerator.m */,
+				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
+				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
 			);
 			name = Model;
 			path = "New Group";
@@ -640,6 +645,7 @@
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D29E46F206D350300AD537E /* PasswordGenerator.m in Sources */,
+				4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
 				4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */,

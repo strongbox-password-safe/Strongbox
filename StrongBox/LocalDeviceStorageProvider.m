@@ -217,23 +217,25 @@
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
-    
+    NSError* error;
+    NSArray<StorageBrowserItem *> *items = [self listRoot:&error];
+
+    completion(items, error);
+}
+
+- (NSArray<StorageBrowserItem*>*)listRoot:(NSError**)ppError {
     NSError *error;
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[IOsUtils applicationDocumentsDirectory].path
                                                                                     error:&error];
     
     if (error) {
-        completion(nil, error);
-        return;
+        *ppError = error;
+        return nil;
     }
     
-    NSMutableArray<StorageBrowserItem*>* files = [NSMutableArray array];
-    for (int count = 0; count < (int)[directoryContent count]; count++)
+    NSMutableArray<StorageBrowserItem*>* items = [NSMutableArray array];
+    for (NSString* file in directoryContent)
     {
-        NSString *file = [directoryContent objectAtIndex:count];
-        
-        //NSLog(@"File %d: %@", (count + 1), file);
-     
         StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
         
         BOOL isDirectory;
@@ -244,11 +246,11 @@
             browserItem.folder = isDirectory != 0;
             browserItem.name = file;
             browserItem.providerData = file;
-            [files addObject:browserItem];
+            [items addObject:browserItem];
         }
     }
     
-    completion(files, error);
+    return items;
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
@@ -272,7 +274,7 @@
                                    fileIdentifier:(NSString*)providerData];
 }
 
-- (void)startMonitoringDocumentsDirectory
+- (void)startMonitoringDocumentsDirectory:(void (^)(void))completion
 {
     #define fileChangedNotification @"fileChangedNotification"
     
@@ -335,13 +337,51 @@
     
     // To recieve a notification about the file change we can use the NSNotificationCenter
     [[NSNotificationCenter defaultCenter] addObserverForName:fileChangedNotification object:Nil queue:Nil usingBlock:^(NSNotification * notification) {
-        NSLog(@"File change detected!");
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            completion();
+        });
     }];
 }
 
 - (void)stopMonitoringDocumentsDirectory
 {
     dispatch_source_cancel(_source);
+}
+
+- (NSArray<StorageBrowserItem *>*)scanForNewSafes {
+    NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+    NSMutableSet *existing = [NSMutableSet set];
+    for (SafeMetaData* safe in localSafes) {
+        [existing addObject:safe.fileName];
+    }
+    
+    NSError* error;
+    NSArray<StorageBrowserItem *> *items = [self listRoot:&error];
+    NSMutableArray<StorageBrowserItem *> *newSafes = [NSMutableArray array];
+
+    if(items) {
+        for (StorageBrowserItem *item in items) {
+            if(!item.folder && ![existing containsObject:item.name]) {
+                NSString *path = [[IOsUtils applicationDocumentsDirectory].path
+                                  stringByAppendingPathComponent:item.name];
+                
+                NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
+                
+                if([DatabaseModel isAValidSafe:data]) {
+                    NSLog(@"New File:%@ is a valid safe", item.name);
+                    [newSafes addObject:item];
+                }
+                else {
+                    NSLog(@"None Safe File:%@ is a not valid safe", item.name);
+                }
+            }
+        }
+    }
+    else {
+        NSLog(@"Error Scanning for New Files. List Root: %@", error);
+    }
+    
+    return newSafes;
 }
 
 @end

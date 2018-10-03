@@ -53,7 +53,8 @@
 @property (nonatomic) BOOL iCloudWasOn;
 @property (nonatomic) BOOL iCloudPrompted;
 @property (nonatomic) BOOL iCloudAvailable;
-
+@property (nonatomic) BOOL doNotAutoAddNewLocalSafes;
+        
 - (NSString*)getFlagsStringForDiagnostics;
 - (NSString*)getBiometricIdName;
 

@@ -33,6 +33,7 @@
 #import "CHCSVParser.h"
 #import "OneDriveStorageProvider.h"
 #import "OneDriveForBusinessStorageProvider.h"
+#import "NSArray+Extensions.h"
 
 @interface SafesViewController ()
 
@@ -53,6 +54,39 @@
     }
 }
 
+- (void)checkForNewLocalSafes {
+    NSArray<StorageBrowserItem*> *items = [LocalDeviceStorageProvider.sharedInstance scanForNewSafes];
+    
+    if(items.count) {
+        NSArray<NSString*>* names = [items map:^id _Nonnull(StorageBrowserItem * _Nonnull obj, NSUInteger idx) {
+            return obj.name;
+        }];
+        
+        NSString* namesString = [names componentsJoinedByString:@"\n"];
+
+        NSString* message;
+        
+        if(items.count > 1) {
+            message = [NSString stringWithFormat:@"Strongbox has detected new local safes in its Documents directory:\n\n%@\n\nWould you like to add them now?", namesString];
+
+        }
+        else {
+            message = [NSString stringWithFormat:@"Strongbox has detected a new local safe in its Documents directory:\n\n%@\n\nWould you like to add it now?", namesString];
+        }
+
+        for(StorageBrowserItem* item in items) {
+            NSString* name = [SafesList sanitizeSafeNickName:[item.name stringByDeletingPathExtension]];
+            SafeMetaData *safe = [LocalDeviceStorageProvider.sharedInstance getSafeMetaData:name
+                                                                               providerData:item.providerData];
+            [[SafesList sharedInstance] add:safe];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self refreshView];
+        });
+    }
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
@@ -60,7 +94,27 @@
     
     [self refreshView];
     
+    if(!Settings.sharedInstance.doNotAutoAddNewLocalSafes) {
+        [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory:^{
+            NSLog(@"File Change Detected! Scanning for New Safes");
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                [self checkForNewLocalSafes];
+            });
+        }];
+        
+        [self checkForNewLocalSafes];
+    }
+    
     [self segueToNagScreenIfAppropriate];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if(!Settings.sharedInstance.doNotAutoAddNewLocalSafes) {
+        [LocalDeviceStorageProvider.sharedInstance stopMonitoringDocumentsDirectory];
+    }
 }
 
 - (void)didBecomeActive:(NSNotification *)notification {
@@ -128,107 +182,7 @@
     // User may have just switched to our app after updating iCloud settings...
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-    
-    [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory];
 }
-
-//
-//
-//
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//#include <sys/event.h>
-//#include <sys/time.h>
-//#include <fcntl.h>
-//
-//- (void)kqueueFired
-//{
-//    int             kq;
-//    struct kevent   event;
-//    struct timespec timeout = { 0, 0 };
-//    int             eventCount;
-//
-//    kq = CFFileDescriptorGetNativeDescriptor(self->_kqRef);
-//    assert(kq >= 0);
-//
-//    eventCount = kevent(kq, NULL, 0, &event, 1, &timeout);
-//    assert( (eventCount >= 0) && (eventCount < 2) );
-//
-//    if (eventCount == 1) {
-//        NSLog(@"dir changed");
-//    }
-//
-//    CFFileDescriptorEnableCallBacks(self->_kqRef, kCFFileDescriptorReadCallBack);
-//}
-//
-//static void KQCallback(CFFileDescriptorRef kqRef, CFOptionFlags callBackTypes, void *info)
-//{
-//    ViewController *    obj;
-//
-//    obj = (ViewController *) info;
-//    assert([obj isKindOfClass:[ViewController class]]);
-//    assert(kqRef == obj->_kqRef);
-//    assert(callBackTypes == kCFFileDescriptorReadCallBack);
-//
-//    [obj kqueueFired];
-//}
-//
-//- (IBAction)testAction:(id)sender
-//{
-//#pragma unused(sender)
-//    NSString *              docPath;
-//    int                     dirFD;
-//    int                     kq;
-//    int                     retVal;
-//    struct kevent           eventToAdd;
-//    CFFileDescriptorContext context = { 0, self, NULL, NULL, NULL };
-//    CFRunLoopSourceRef      rls;
-//
-//    docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-//    assert(docPath != 0);
-//
-//    NSLog(@"%@", docPath);
-//
-//    dirFD = open([docPath fileSystemRepresentation], O_EVTONLY);
-//    assert(dirFD >= 0);
-//
-//    kq = kqueue();
-//    assert(kq >= 0);
-//
-//    eventToAdd.ident  = dirFD;
-//    eventToAdd.filter = EVFILT_VNODE;
-//    eventToAdd.flags  = EV_ADD | EV_CLEAR;
-//    eventToAdd.fflags = NOTE_WRITE;
-//    eventToAdd.data   = 0;
-//    eventToAdd.udata  = NULL;
-//
-//    retVal = kevent(kq, &eventToAdd, 1, NULL, 0, NULL);
-//    assert(retVal == 0);
-//
-//    assert(self->_kqRef == NULL);
-//
-//    self->_kqRef = CFFileDescriptorCreate(NULL, kq, true, KQCallback, &context);
-//    assert(self->_kqRef != NULL);
-//
-//    rls = CFFileDescriptorCreateRunLoopSource(NULL, self->_kqRef, 0);
-//    assert(rls != NULL);
-//
-//    CFRunLoopAddSource(CFRunLoopGetCurrent(), rls, kCFRunLoopDefaultMode);
-//
-//    CFRelease(rls);
-//
-//    CFFileDescriptorEnableCallBacks(self->_kqRef, kCFFileDescriptorReadCallBack);
-//}
-//
-//
-//
-
-
-
-
-
-
-
 
 - (void)onSafesListUpdated {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -1097,7 +1051,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     
     NSInteger random = arc4random_uniform(100);
     
-    NSLog(@"Random: %ld", (long)random);
+    //NSLog(@"Random: %ld", (long)random);
     
     if(random < 15) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{

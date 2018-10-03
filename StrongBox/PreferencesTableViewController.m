@@ -49,6 +49,7 @@
     [self bindAllowBiometric];
     [self bindShowPasswordOnDetails];
     [self bindAutoLock];
+    [self bindAutoAddNewLocalSafes];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -127,12 +128,24 @@
     self.switchShowPasswordOnDetails.on = [[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
 }
 
+- (void)bindAutoAddNewLocalSafes {
+    self.switchAutoAddNewLocalSafes.on = !Settings.sharedInstance.doNotAutoAddNewLocalSafes;
+}
+
 - (IBAction)onShowPasswordOnDetails:(id)sender {
     NSLog(@"Setting showPasswordOnDetails to %d", self.switchShowPasswordOnDetails.on);
     
     [[Settings sharedInstance] setShowPasswordByDefaultOnEditScreen:self.switchShowPasswordOnDetails.on];
     
     [self bindShowPasswordOnDetails];
+}
+
+- (IBAction)onAutoAddNewLocalSafesChanged:(id)sender {
+    NSLog(@"Setting doNotAutoAddNewLocalSafes to %d", !self.switchAutoAddNewLocalSafes.on);
+    
+    Settings.sharedInstance.doNotAutoAddNewLocalSafes = !self.switchAutoAddNewLocalSafes.on;
+    
+    [self bindAutoAddNewLocalSafes];
 }
 
 - (IBAction)onSegmentAutoLockChanged:(id)sender {
@@ -194,7 +207,6 @@
                }];
    }
 }
-
 
 - (BOOL)hasLocalOrICloudSafes {
     return ([SafesList.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesList.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
