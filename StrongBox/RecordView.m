@@ -43,7 +43,6 @@
     
     [self reloadFieldsFromRecord];
     
-    
     self.navigationController.toolbar.hidden = YES;
     self.navigationController.navigationBar.hidden = NO;
     if (@available(iOS 11.0, *)) {

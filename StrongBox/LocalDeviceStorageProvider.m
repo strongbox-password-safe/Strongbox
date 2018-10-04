@@ -384,4 +384,9 @@
     return newSafes;
 }
 
+- (BOOL)fileExists:(SafeMetaData*)metaData {
+    NSString *fullPath = [self getFilePath:metaData offlineCache:NO];
+    return [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
+}
+
 @end

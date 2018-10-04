@@ -47,5 +47,6 @@
 - (void)startMonitoringDocumentsDirectory:(void (^)(void))completion;
 - (void)stopMonitoringDocumentsDirectory;
 - (NSArray<StorageBrowserItem *>*)scanForNewSafes;
+- (BOOL)fileExists:(SafeMetaData*)metaData;
 
 @end

@@ -54,26 +54,14 @@
     }
 }
 
-- (void)checkForNewLocalSafes {
+- (void)syncLocalSafesWithFileSystem {
+    BOOL changedSomething = NO;
+    
+    // Add any new
+    
     NSArray<StorageBrowserItem*> *items = [LocalDeviceStorageProvider.sharedInstance scanForNewSafes];
     
     if(items.count) {
-        NSArray<NSString*>* names = [items map:^id _Nonnull(StorageBrowserItem * _Nonnull obj, NSUInteger idx) {
-            return obj.name;
-        }];
-        
-        NSString* namesString = [names componentsJoinedByString:@"\n"];
-
-        NSString* message;
-        
-        if(items.count > 1) {
-            message = [NSString stringWithFormat:@"Strongbox has detected new local safes in its Documents directory:\n\n%@\n\nWould you like to add them now?", namesString];
-
-        }
-        else {
-            message = [NSString stringWithFormat:@"Strongbox has detected a new local safe in its Documents directory:\n\n%@\n\nWould you like to add it now?", namesString];
-        }
-
         for(StorageBrowserItem* item in items) {
             NSString* name = [SafesList sanitizeSafeNickName:[item.name stringByDeletingPathExtension]];
             SafeMetaData *safe = [LocalDeviceStorageProvider.sharedInstance getSafeMetaData:name
@@ -81,6 +69,22 @@
             [[SafesList sharedInstance] add:safe];
         }
         
+        changedSomething = YES;
+    }
+    
+    // Remove deleted
+    
+    NSArray<SafeMetaData*> *localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+    
+    for (SafeMetaData* localSafe in localSafes) {
+        if(![LocalDeviceStorageProvider.sharedInstance fileExists:localSafe]) {
+            NSLog(@"Removing Safe [%@] because underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
+            [SafesList.sharedInstance remove:localSafe.uuid];
+            changedSomething = YES;
+        }
+    }
+    
+    if(changedSomething) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self refreshView];
         });
@@ -99,11 +103,11 @@
             NSLog(@"File Change Detected! Scanning for New Safes");
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                [self checkForNewLocalSafes];
+                [self syncLocalSafesWithFileSystem];
             });
         }];
         
-        [self checkForNewLocalSafes];
+        [self syncLocalSafesWithFileSystem];
     }
     
     [self segueToNagScreenIfAppropriate];
