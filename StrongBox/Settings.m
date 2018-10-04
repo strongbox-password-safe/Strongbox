@@ -28,6 +28,7 @@ static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
 static NSString* kInstallDate = @"installDate";
 static NSString* kDisallowBiometricId = @"disallowBiometricId";
 static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
+static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 
 @interface Settings ()
 
@@ -45,6 +46,7 @@ static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Settings alloc] init];
     });
+    
     return sharedInstance;
 }
 
@@ -424,6 +426,23 @@ static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
 
 - (void)setDoNotAutoAddNewLocalSafes:(BOOL)doNotAutoAddNewLocalSafes {
     [[NSUserDefaults standardUserDefaults] setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
+    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:kAutoFillNewRecordSettings];
+    
+    if(data) {
+        return (AutoFillNewRecordSettings *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
+    
+    return AutoFillNewRecordSettings.defaults;
+}
+
+- (void)setAutoFillNewRecordSettings:(AutoFillNewRecordSettings *)autoFillNewRecordSettings {
+    NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

@@ -38,6 +38,8 @@
 		4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
+		4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */; };
+		4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
 		4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
 		4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2A1FB1E27700A68A92 /* NodeFields.m */; };
 		4D78AC311FB1E27700A68A92 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2C1FB1E27700A68A92 /* Utils.m */; };
@@ -139,6 +141,10 @@
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iCloudSafesCoordinator.m; sourceTree = "<group>"; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsView.m; sourceTree = "<group>"; };
+		4D77A0B5216651C1003CB5CB /* AutoFillNewRecordSettingsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillNewRecordSettingsController.h; sourceTree = "<group>"; };
+		4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoFillNewRecordSettingsController.m; sourceTree = "<group>"; };
+		4D77A0B82166598B003CB5CB /* AutoFillNewRecordSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillNewRecordSettings.h; sourceTree = "<group>"; };
+		4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoFillNewRecordSettings.m; sourceTree = "<group>"; };
 		4D78AC261FB1E27700A68A92 /* DatabaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModel.h; path = model/DatabaseModel.h; sourceTree = SOURCE_ROOT; };
 		4D78AC271FB1E27700A68A92 /* DatabaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModel.m; path = model/DatabaseModel.m; sourceTree = SOURCE_ROOT; };
 		4D78AC281FB1E27700A68A92 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = model/NodeFields.h; sourceTree = SOURCE_ROOT; };
@@ -262,6 +268,8 @@
 				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
 				4D29E470206D434400AD537E /* PasswordGenerationSettingsTableView.h */,
 				4D29E471206D434400AD537E /* PasswordGenerationSettingsTableView.m */,
+				4D77A0B5216651C1003CB5CB /* AutoFillNewRecordSettingsController.h */,
+				4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -302,6 +310,8 @@
 				4D0BA7D71F23B844009243C9 /* Settings.m */,
 				4DCF5FBA1F7294A800011756 /* PasswordSafeUIDocument.h */,
 				4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */,
+				4D77A0B82166598B003CB5CB /* AutoFillNewRecordSettings.h */,
+				4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -657,6 +667,7 @@
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
 				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
+				4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */,
 				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
 				4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
@@ -678,6 +689,7 @@
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */,
+				4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */,

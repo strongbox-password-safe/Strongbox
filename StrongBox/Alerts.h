@@ -100,4 +100,8 @@
        buttonTitles:(NSArray<NSString *> *)buttonTitles
          completion:(void (^)(int response))completion;
 
+- (void)OkCancelWithTextFieldNotEmpty:(UIViewController *)viewController
+                        textFieldText:(NSString *)textFieldText
+                           completion:(void (^) (NSString *text, BOOL response))completion;
+
 @end

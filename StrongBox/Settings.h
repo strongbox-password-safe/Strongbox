@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "PasswordGenerationParameters.h"
+#import "AutoFillNewRecordSettings.h"
 
 @interface Settings : NSObject
 
@@ -67,5 +68,6 @@
 - (void)clearInstallDate;
 
 @property (nonatomic) BOOL disallowAllBiometricId;
+@property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
 
 @end
