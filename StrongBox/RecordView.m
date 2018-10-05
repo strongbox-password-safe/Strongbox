@@ -62,6 +62,7 @@
         self.navigationController.navigationBar.prefersLargeTitles = NO;
     }
 }
+
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
@@ -148,6 +149,7 @@
     
     // TODO: Magic values here?
     self.textFieldTitle = [[UITextField alloc] initWithFrame:CGRectMake(self.view.bounds.origin.x, 7, self.view.bounds.size.width, 31)];
+    
     self.textFieldTitle.backgroundColor = [UIColor clearColor];
     self.textFieldTitle.textAlignment = NSTextAlignmentCenter;
     self.textFieldTitle.borderStyle = UITextBorderStyleNone;
@@ -184,6 +186,34 @@
     self.navigationItem.titleView = self.textFieldTitle;
 }
 
+- (void)autoFillPasswordForNewRecord {
+    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    
+    self.textFieldPassword.text =
+        settings.passwordAutoFillMode == kNone ? @"" :
+        settings.passwordAutoFillMode == kGenerated ? [self.viewModel generatePassword] : settings.passwordCustomAutoFill;
+}
+
+- (void)autoFillNewRecord {
+    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    
+    self.textFieldTitle.text = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
+    
+    self.textFieldUsername.text =
+        settings.usernameAutoFillMode == kNone ? @"" :
+        settings.usernameAutoFillMode == kMostUsed ? self.viewModel.mostPopularUsername : settings.usernameCustomAutoFill;
+    
+    [self autoFillPasswordForNewRecord];
+    
+    self.textFieldEmail.text =
+        settings.emailAutoFillMode == kNone ? @"" :
+        settings.emailAutoFillMode == kMostUsed ? self.viewModel.mostPopularEmail : settings.emailCustomAutoFill;
+    
+    self.textFieldUrl.text = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
+    
+    self.textViewNotes.text = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
+}
+
 - (void)reloadFieldsFromRecord {
     if (self.record) {
         self.textFieldPassword.text = self.record.fields.password;
@@ -192,20 +222,12 @@
         self.textFieldUsername.text = self.record.fields.username;
         self.textFieldEmail.text = self.record.fields.email;
         self.textViewNotes.text = self.record.fields.notes;
-        
-        self.buttonHistory.enabled = YES;
     }
     else {
-        self.textFieldPassword.text = [self.viewModel generatePassword];
-        
-        self.textFieldTitle.text = @"Untitled";
-        self.textFieldUrl.text = @"";
-        self.textFieldUsername.text = self.viewModel.mostPopularUsername;
-        self.textFieldEmail.text = self.viewModel.mostPopularEmail;
-        self.textViewNotes.text = @"";
-        
-        self.buttonHistory.enabled = NO;
+        [self autoFillNewRecord];
     }
+    
+    self.buttonHistory.enabled = self.record != nil;
 }
 
 - (void)setEditing:(BOOL)flag animated:(BOOL)animated {
@@ -213,12 +235,14 @@
     
     if (flag == YES) {
         navBack = self.navigationItem.leftBarButtonItem;
-        self.editButtonItem.enabled = [self uiIsDirty];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
         self.buttonHistory.enabled = NO;
+        [self updateFieldsForEditable];
+        self.editButtonItem.enabled = [self validEditsPresent];
+        [self.textFieldTitle becomeFirstResponder];
     }
     else {
-        if ([self uiIsDirty]) { // Any other changes? Change the record and save the safe
+        if ([self validEditsPresent]) { // Any other changes? Change the record and save the safe
             [self saveAfterEdit:^(NSError *error) {
                 self.navigationItem.leftBarButtonItem = self->navBack;
                 self.editButtonItem.enabled = YES;
@@ -226,18 +250,12 @@
                 
                 if (error != nil) {
                     [self.navigationController popToRootViewControllerAnimated:YES];
-                    
-                    [Alerts   error:self
-                              title:@"Problem Saving"
-                              error:error];
-                    
+                    [Alerts error:self title:@"Problem Saving" error:error];
                     NSLog(@"%@", error);
                 }
                 else {
                     [self reloadFieldsFromRecord];
                     [self updateFieldsForEditable];
-                    
-                    //[self.navigationController popViewControllerAnimated:YES];
                 }
             }];
         }
@@ -248,19 +266,17 @@
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
             navBack = nil;
         }
-    }
-    
-    [self updateFieldsForEditable];
-    
-    if (flag == YES) {
-        [self.textFieldTitle becomeFirstResponder];
+        
+        [self updateFieldsForEditable];
     }
 }
 
 - (void)updateFieldsForEditable {
     self.textFieldTitle.enabled = self.editing;
-    self.textFieldTitle.borderStyle = self.editing ? UITextBorderStyleLine : UITextBorderStyleNone;
-
+    self.textFieldTitle.layer.borderWidth = self.editing ? 1.0f : 0.0f;
+    self.textFieldTitle.borderStyle = self.editing ? UITextBorderStyleRoundedRect : UITextBorderStyleNone;
+    [self setTitleTextFieldUIValidationIndicator];
+    
     self.textFieldPassword.enabled = self.editing;
     self.textFieldPassword.layer.borderColor = self.editing ? [UIColor darkGrayColor].CGColor : [UIColor lightGrayColor].CGColor;
     self.textFieldPassword.backgroundColor = [UIColor whiteColor];
@@ -298,17 +314,55 @@
     (self.buttonCopyAndLaunchUrl).enabled = !self.isEditing;
 }
 
-- (void)textViewDidChange:(UITextView *)textView {
-    self.editButtonItem.enabled = [self uiIsDirty];
+- (void)setTitleTextFieldUIValidationIndicator {
+    BOOL titleValid = trim(self.textFieldTitle.text).length > 0;
+    if(!titleValid) {
+        self.textFieldTitle.layer.borderColor = [UIColor redColor].CGColor;
+        self.textFieldTitle.placeholder = @"Title Is Required";
+    }
+    else {
+        self.textFieldTitle.layer.borderColor = nil;
+    }
 }
 
-- (BOOL)uiIsDirty {
-    return !([self.textViewNotes.text isEqualToString:self.record.fields.notes]
-             &&   [trim(self.textFieldPassword.text) isEqualToString:self.record.fields.password]
-             &&   [trim(self.textFieldTitle.text) isEqualToString:self.record.title]
-             &&   [trim(self.textFieldUrl.text) isEqualToString:self.record.fields.url]
-             &&   [trim(self.textFieldEmail.text) isEqualToString:self.record.fields.email]
-             &&   [trim(self.textFieldUsername.text) isEqualToString:self.record.fields.username]);
+- (void)textViewDidChange:(UITextView *)textView {
+    self.editButtonItem.enabled = [self validEditsPresent];
+
+    [self setTitleTextFieldUIValidationIndicator];
+}
+
+- (BOOL)validEditsPresent {
+    BOOL ret =  [self uiEditsPresent] && [self uiIsValid];
+
+    //NSLog(@"validEditsPresent: %d", ret);
+    
+    return ret;
+}
+
+- (BOOL)uiIsValid {
+    BOOL titleValid = trim(self.textFieldTitle.text).length > 0;
+    
+    return titleValid;
+}
+
+- (BOOL)uiEditsPresent {
+    if(!self.record) {
+        return YES;
+    }
+    
+    BOOL notesClean = [self.textViewNotes.text isEqualToString:self.record.fields.notes];
+    BOOL passwordClean = [trim(self.textFieldPassword.text) isEqualToString:self.record.fields.password];
+    BOOL titleClean = [trim(self.textFieldTitle.text) isEqualToString:self.record.title];
+    BOOL urlClean = [trim(self.textFieldUrl.text) isEqualToString:self.record.fields.url];
+    BOOL emailClean = [trim(self.textFieldEmail.text) isEqualToString:self.record.fields.email];
+    BOOL usernameClean = [trim(self.textFieldUsername.text) isEqualToString:self.record.fields.username];
+    
+    //NSLog(@"titleClean = %d, usernameClean = %d, passwordClean = %d, emailClean = %d, urlClean = %d, notesClean = %d",
+    //      titleClean, usernameClean, passwordClean, emailClean, urlClean, notesClean);
+
+    //NSLog(@"[%@] != [%@]", trim(self.textFieldPassword.text), self.record.fields.password);
+    
+    return !(notesClean && passwordClean && titleClean && urlClean && emailClean && usernameClean);
 }
 
 NSString * trim(NSString *string) {
@@ -340,7 +394,7 @@ NSString * trim(NSString *string) {
 - (IBAction)onGeneratePassword:(id)sender {
     if (self.editing) {
         self.textFieldPassword.text = [self.viewModel generatePassword];
-        self.editButtonItem.enabled = [self uiIsDirty];
+        self.editButtonItem.enabled = [self validEditsPresent];
     }
     else if (self.record)
     {
@@ -393,7 +447,14 @@ NSString * trim(NSString *string) {
     }
     else {
         [self.textFieldPassword setTextColor:[UIColor purpleColor]];
-        self.textFieldPassword.text = self.record ? self.record.fields.password : [self.viewModel generatePassword];
+        
+        if(self.record) {
+            self.textFieldPassword.text = self.record.fields.password;
+        }
+        else {
+            [self autoFillPasswordForNewRecord];
+        }
+        
         [self.buttonHidePassword setTitle:@"Hide" forState:UIControlStateNormal];
     }
 }

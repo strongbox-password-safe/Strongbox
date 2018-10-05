@@ -19,6 +19,10 @@
     // A little trick for removing the cell separators
     self.tableView.tableFooterView = [UIView new];
     
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+    
     [self bindUiToSettings];
     
     [self onGenerate:nil];

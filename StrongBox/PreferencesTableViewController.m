@@ -29,6 +29,10 @@
     
     self.navigationController.toolbar.hidden = NO;
     
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = YES;
+    }
+    
     _autoLockList = @{  @-1 : @0,
                         @0 : @1,
                         @60 : @2,

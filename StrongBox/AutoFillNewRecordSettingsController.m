@@ -20,6 +20,10 @@
     [super viewDidLoad];
     
     [self bindToSettings];
+
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -196,7 +200,7 @@
     // Password Options: None / Most Used / Generated / Custom
     
     index = [self autoFillModeToSegmentIndex:settings.passwordAutoFillMode];
-    self.segmentPassword.selectedSegmentIndex = index != -1 ? index : 3;
+    self.segmentPassword.selectedSegmentIndex = index != -1 ? index : 2;
     
     self.labelPassword.text = settings.passwordAutoFillMode == kCustom ? settings.passwordCustomAutoFill : @"";
 
@@ -233,10 +237,8 @@
             return 0;
             break;
         case kMostUsed:
-            return 1;
-            break;
         case kGenerated:
-            return 2;
+            return 1;
             break;
         case kCustom:
             return -1;
@@ -292,13 +294,10 @@
         case 0: // None
             settings.passwordAutoFillMode = kNone;
             break;
-        case 1: // Most Used
-            settings.passwordAutoFillMode = kMostUsed;
-            break;
-        case 2: // Generated
+        case 1: // Generated
             settings.passwordAutoFillMode = kGenerated;
             break;
-        case 3: // Custom
+        case 2: // Custom
             settings.passwordAutoFillMode = kCustom;
             break;
         default:
