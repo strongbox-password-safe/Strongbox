@@ -19,6 +19,7 @@
 #import "InitialViewController.h"
 #import "SafesViewController.h"
 #import "QuickLaunchViewController.h"
+#import "StorageBrowserTableViewController.h"
 
 @interface AppDelegate ()
 
@@ -79,13 +80,15 @@
     UITabBarController *tab = (UITabBarController*)self.window.rootViewController;
     UINavigationController *nav = tab.selectedViewController;
 
-    if (![nav.visibleViewController isKindOfClass:[SafesViewController class]] &&
-        ![nav.visibleViewController isKindOfClass:[QuickLaunchViewController class]]) {
+    if (![nav.visibleViewController isKindOfClass:[SafesViewController class]] && // Don't show lock screen for these two initial screens as Touch ID/Face ID causes a weird effect of present lock screen while waiting authentication
+        ![nav.visibleViewController isKindOfClass:[QuickLaunchViewController class]] &&
+        ![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]]) // Google Sign In Broken without this... sigh
+    {
         self.enterBackgroundTime = [[NSDate alloc] init];
 
         UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         self.lockView = [mainStoryboard instantiateViewControllerWithIdentifier:@"LockScreen"];
-        
+
         [self.lockView.view layoutIfNeeded];
         [tab presentViewController:self.lockView animated:NO completion:nil];
     }
