@@ -453,7 +453,8 @@
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
-    [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Safe Name"
+    [Alerts OkCancelWithTextField:self
+                    textFieldText:safe.nickName
                             title:@"Rename Safe"
                           message:@"Please enter a new name for this safe"
                        completion:^(NSString *text, BOOL response) {

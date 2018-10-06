@@ -18,6 +18,27 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    
+    gradient.frame = self.view.bounds;
+    
+    UIColor *color1 = [UIColor colorWithRed:0.20 green:0.20 blue:0.40 alpha:1.0];
+    UIColor *color2 = [UIColor colorWithRed:0.30 green:0.70 blue:0.80 alpha:1.0];
+
+    //UIColor *color1 = [UIColor whiteColor];
+    //UIColor *color2 = [UIColor blackColor];
+
+    gradient.colors = @[(id)color1.CGColor, (id)color2.CGColor];
+
+    [self.view.layer insertSublayer:gradient atIndex:0];
+    
+    //
+    
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openPrimarySafe)];
+    singleTap.numberOfTapsRequired = 1;
+    self.imageViewLogo.userInteractionEnabled = YES;
+    [self.imageViewLogo addGestureRecognizer:singleTap];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -31,7 +52,14 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    //[self openPrimarySafe];
+    SafeMetaData* primary = [self getPrimarySafe];
+    
+    if(!primary) {
+        [self switchToSafesListView];
+    }
+    else {
+        self.labelSafeName.text = primary.nickName;
+    }
 }
 
 - (InitialViewController *)getInitialViewController {
@@ -39,10 +67,14 @@
     return ivc;
 }
 
-- (IBAction)onViewSafesList:(id)sender {
+- (void)switchToSafesListView {
     Settings.sharedInstance.useQuickLaunchAsRootView = NO;
     
     [[self getInitialViewController] showSafesListView];
+}
+
+- (IBAction)onViewSafesList:(id)sender {
+    [self switchToSafesListView];
 }
 
 - (IBAction)onOpenPrimarySafe:(id)sender {
