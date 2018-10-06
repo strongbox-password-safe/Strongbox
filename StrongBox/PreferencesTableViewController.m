@@ -60,8 +60,7 @@
     [super viewWillAppear:animated];
 
     [self.navigationController setNavigationBarHidden:NO];
-    self.navigationController.navigationBar.hidden = NO;
-    
+
     self.navigationController.toolbar.hidden = YES;
     
     self.buttonUnlinkDropbox.enabled = (DBClientsManager.authorizedClient != nil);

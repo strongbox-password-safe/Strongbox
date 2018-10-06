@@ -22,6 +22,14 @@
 
 @implementation InitialViewController
 
+- (void)showQuickLaunchView {
+    self.selectedIndex = 1;
+}
+
+- (void)showSafesListView {
+    self.selectedIndex = 0;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 

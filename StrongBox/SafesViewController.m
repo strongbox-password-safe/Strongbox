@@ -34,6 +34,7 @@
 #import "OneDriveStorageProvider.h"
 #import "OneDriveForBusinessStorageProvider.h"
 #import "NSArray+Extensions.h"
+#import "InitialViewController.h"
 
 @interface SafesViewController ()
 
@@ -894,7 +895,8 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
                                NSURL *url = [NSURL URLWithString:text];
                                NSLog(@"URL: %@", url);
                                
-                               [self importFromUrlOrEmailAttachment:url];
+                               InitialViewController * ivc = [self getInitialViewController];
+                               [ivc importFromUrlOrEmailAttachment:url];
                            }
                        }];
 }
@@ -1165,6 +1167,19 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     [popup addButtons: @[ok, later]];
 
     [self presentViewController:popup animated:YES completion:nil];
+}
+
+- (InitialViewController *)getInitialViewController {
+    InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
+    return ivc;
+}
+
+- (IBAction)onSwitchToQuickLaunchView:(id)sender {
+    Settings.sharedInstance.useQuickLaunchAsRootView = YES;
+    
+    InitialViewController * ivc = [self getInitialViewController];
+    
+    [ivc showQuickLaunchView];
 }
 
 @end

@@ -93,6 +93,11 @@
                                     <segue destination="gAY-yV-Xd6" kind="show" identifier="segueToSettingsView" id="4jb-TP-1Xg"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem title="⚡" id="Nmk-hC-aIH">
+                                <connections>
+                                    <action selector="onSwitchToQuickLaunchView:" destination="9DM-GO-ZGc" id="S0C-AR-sFq"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
@@ -3657,11 +3662,27 @@ Cg
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h2J-n1-Io4">
-                                <rect key="frame" x="149" y="263" width="77" height="30"/>
+                                <rect key="frame" x="44" y="628" width="83" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Quick View"/>
+                                <state key="normal" title="Preferences"/>
                                 <connections>
                                     <segue destination="gAY-yV-Xd6" kind="show" id="nFA-zL-t4W"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n8l-3f-Gbd">
+                                <rect key="frame" x="52" y="218" width="129" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Open Primary Safe"/>
+                                <connections>
+                                    <action selector="onOpenPrimarySafe:" destination="ILm-TE-kV0" eventType="touchUpInside" id="uX2-8N-bCo"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aIO-Xq-I2V">
+                                <rect key="frame" x="135" y="620" width="104" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="View Safes List"/>
+                                <connections>
+                                    <action selector="onViewSafesList:" destination="ILm-TE-kV0" eventType="touchUpInside" id="ME0-bI-Ri7"/>
                                 </connections>
                             </button>
                         </subviews>

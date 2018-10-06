@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface InitialViewController : UITabBarController
 
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL;
+- (void)showQuickLaunchView;
+- (void)showSafesListView;
 
 @end
 
