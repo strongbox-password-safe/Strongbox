@@ -7,16 +7,8 @@
 //
 
 #import "SafesViewController.h"
-#import "SafeMetaData.h"
 #import "BrowseSafeView.h"
-#import "GTMOAuth2ViewControllerTouch.h"
-#import "GoogleDriveManager.h"
-#import "IOsUtils.h"
 #import "Utils.h"
-#import <LocalAuthentication/LocalAuthentication.h>
-#import "GoogleDriveStorageProvider.h"
-#import "DropboxV2StorageProvider.h"
-#import "LocalDeviceStorageProvider.h"
 #import "SafesList.h"
 #import "Alerts.h"
 #import "ISMessages/ISMessages.h"
@@ -25,23 +17,19 @@
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "SelectStorageProviderController.h"
 #import <PopupDialog/PopupDialog-Swift.h>
-#import "AppleICloudProvider.h"
 #import "Strongbox.h"
 #import "SafeItemTableCell.h"
 #import "VersionConflictController.h"
-#import "iCloudSafesCoordinator.h"
-#import "CHCSVParser.h"
-#import "OneDriveStorageProvider.h"
-#import "OneDriveForBusinessStorageProvider.h"
-#import "NSArray+Extensions.h"
 #import "InitialViewController.h"
+
+#import "iCloudSafesCoordinator.h"
+#import "AppleICloudProvider.h"
 
 @interface SafesViewController ()
 
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
-@property (nonatomic, strong) NSString* biometricIdName;
 
 @end
 
@@ -340,8 +328,6 @@
     self.tableView.emptyDataSetDelegate = self;
     // A little trick for removing the cell separators
     self.tableView.tableFooterView = [UIView new];
-    
-    self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
@@ -421,37 +407,12 @@
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
     
-    id<SafeStorageProvider> provider = [self getStorageProviderFromProviderId:safe.storageProvider];
+    id<SafeStorageProvider> provider = [[self getInitialViewController] getStorageProviderFromProviderId:safe.storageProvider];
     NSString *icon = provider.icon;
     cell.imageView.image = [UIImage imageNamed:icon];
     cell.imageViewWarningIndicator.hidden = !safe.hasUnresolvedConflicts;
     
     return cell;
-}
-
-- (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
-    if (providerId == kGoogleDrive) {
-        return [GoogleDriveStorageProvider sharedInstance];
-    }
-    else if (providerId == kDropbox)
-    {
-        return [DropboxV2StorageProvider sharedInstance];
-    }
-    else if (providerId == kiCloud) {
-        return [AppleICloudProvider sharedInstance];
-    }
-    else if (providerId == kLocalDevice)
-    {
-        return [LocalDeviceStorageProvider sharedInstance];
-    }
-    else if(providerId == kOneDrive) {
-        return [OneDriveStorageProvider sharedInstance];
-    }
-    else if(providerId == kOneDriveForBusiness) {
-        return [OneDriveForBusinessStorageProvider sharedInstance];
-    }
-    
-    return nil;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -468,15 +429,10 @@
     if(safe.hasUnresolvedConflicts) {
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
-    else if (!Settings.sharedInstance.disallowAllBiometricId &&
-             safe.isTouchIdEnabled &&
-             [IOsUtils isTouchIDAvailable] &&
-             safe.isEnrolledForTouchId &&
-             ([[Settings sharedInstance] isProOrFreeTrial])) {
-        [self showTouchIDAuthentication:safe];
-    }
     else {
-        [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:YES];
+        [[self getInitialViewController] beginOpenSafeSequence:safe completion:^(Model * model) {
+            [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
+        }];
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -575,230 +531,6 @@
 
     [self refreshView];
 }
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)promptForSafePassword:(SafeMetaData *)safe
-    askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate {
-    [Alerts OkCancelWithPassword:self
-                           title:[NSString stringWithFormat:@"Password for %@", safe.nickName]
-                         message:@"Enter Master Password"
-                      completion:^(NSString *password, BOOL response) {
-                          if (response) {
-                              [self openSafe:safe
-                               isTouchIdOpen:NO
-                              masterPassword:password
-                        askAboutTouchIdEnrol:askAboutTouchIdEnrolIfAppropriate];
-                          }
-                      }];
-}
-
-- (void)  openSafe:(SafeMetaData *)safe
-     isTouchIdOpen:(BOOL)isTouchIdOpen
-    masterPassword:(NSString *)masterPassword
-askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
-    id <SafeStorageProvider> provider = [self getStorageProviderFromProviderId:safe.storageProvider];
-    
-    // Are we offline for cloud based providers?
-    
-    if (provider.cloudBased &&
-        !(provider.storageId == kiCloud &&
-          [Settings sharedInstance].iCloudOn) &&
-        [[Settings sharedInstance] isOffline] &&
-        safe.offlineCacheEnabled &&
-        safe.offlineCacheAvailable) {
-        NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
-        
-        if(modDate == nil) {
-            [Alerts info:self title:@"No Internet Connectivity" message:@"It looks like you are offline, and no offline cache is available. Please try when back online."];
-            safe.offlineCacheAvailable = NO;
-            [SafesList.sharedInstance update:safe];
-            return;
-        }
-        
-        NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        df.dateFormat = @"dd-MMM-yyyy HH:mm:ss";
-        NSString *modDateStr = [df stringFromDate:modDate];
-        NSString *message = [NSString stringWithFormat:@"It looks like you are offline. Would you like to use a read-only cached version of this safe instead?\n\nLast Cached at: %@", modDateStr];
-        
-        [Alerts yesNo:self
-                title:@"No Internet Connectivity"
-              message:message
-               action:^(BOOL response) {
-                   if (response) {
-                       [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:safe
-                                      viewController:self
-                                          completion:^(NSData *data, NSError *error)
-                        {
-                            if(data != nil) {
-                                [self onProviderReadDone:provider
-                                       isTouchIdOpen:isTouchIdOpen
-                                                safe:safe
-                                      masterPassword:masterPassword
-                                                data:data
-                                               error:error
-                                  isOfflineCacheMode:YES
-                                askAboutTouchIdEnrol:NO]; // RO!
-                             }
-                        }];
-                   }
-               }];
-    }
-    else {
-        [provider read:safe
-        viewController:self
-            completion:^(NSData *data, NSError *error)
-         {
-             [self onProviderReadDone:provider
-                        isTouchIdOpen:isTouchIdOpen
-                                 safe:safe
-                       masterPassword:masterPassword
-                                 data:data
-                                error:error
-                   isOfflineCacheMode:NO
-              askAboutTouchIdEnrol:askAboutTouchIdEnrol];
-         }];
-    }
-}
-
-- (void)onProviderReadDone:(id)provider
-             isTouchIdOpen:(BOOL)isTouchIdOpen
-                      safe:(SafeMetaData *)safe
-            masterPassword:(NSString *)masterPassword
-                      data:(NSData *)data error:(NSError *)error
-        isOfflineCacheMode:(BOOL)isOfflineCacheMode
-      askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (error != nil || data == nil) {
-            NSLog(@"Error: %@", error);
-            [Alerts error:self
-                    title:@"There was a problem opening the password safe file."
-                    error:error];
-        }
-        else {
-            [self openSafeWithData:data
-                    masterPassword:masterPassword
-                              safe:safe
-                     isTouchIdOpen:isTouchIdOpen
-                          provider:provider
-                isOfflineCacheMode:isOfflineCacheMode
-             askAboutTouchIdEnrol:askAboutTouchIdEnrol];
-        }
-    });
-}
-
-- (void)openSafeWithData:(NSData *)data
-          masterPassword:(NSString *)masterPassword
-                    safe:(SafeMetaData *)safe
-           isTouchIdOpen:(BOOL)isTouchIdOpen
-                provider:(id)provider
-      isOfflineCacheMode:(BOOL)isOfflineCacheMode
-askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
-    [SVProgressHUD showWithStatus:@"Decrypting..."];
-
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        NSError *error;
-        DatabaseModel *openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data password:masterPassword error:&error];
-
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            [self openSafeWithDataDone:error
-                            openedSafe:openedSafe
-                         isTouchIdOpen:isTouchIdOpen
-                                  safe:safe
-                    isOfflineCacheMode:isOfflineCacheMode
-                  askAboutTouchIdEnrol:askAboutTouchIdEnrol
-                              provider:provider
-                                  data:data];
-             
-        });
-    });
-}
-
-- (void)openSafeWithDataDone:(NSError*)error
-                  openedSafe:(DatabaseModel*)openedSafe
-               isTouchIdOpen:(BOOL)isTouchIdOpen
-                        safe:(SafeMetaData *)safe
-          isOfflineCacheMode:(BOOL)isOfflineCacheMode
-        askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
-                    provider:(id)provider
-                        data:(NSData *)data {
-    [SVProgressHUD dismiss];
-    
-    if (error != nil) {
-        if (error.code == -2) {
-            if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
-                safe.isEnrolledForTouchId = NO;
-                [safe removeTouchIdPassword];
-                [SafesList.sharedInstance update:safe];
-                
-                [Alerts info:self
-                        title:@"Could not open safe"
-                      message:[NSString stringWithFormat:@"The linked password was incorrect for this safe. This safe has been unlinked from %@.", self.biometricIdName]] ;
-            }
-            else {
-                [Alerts info:self
-                       title:@"Incorrect Password"
-                     message:@"The password was incorrect for this safe."];
-            }
-        }
-        else {
-            [Alerts error:self title:@"There was a problem opening the safe." error:error];
-        }
-    }
-    else {
-        if (askAboutTouchIdEnrol && safe.isTouchIdEnabled && !safe.isEnrolledForTouchId &&
-            [IOsUtils isTouchIDAvailable] && [[Settings sharedInstance] isProOrFreeTrial]) {
-            [Alerts yesNo:self
-                    title:[NSString stringWithFormat:@"Use %@ to Open Safe?", self.biometricIdName]
-                  message:[NSString stringWithFormat:@"Would you like to use %@ to open this safe?", self.biometricIdName]
-                   action:^(BOOL response) {
-                   if (response) {
-                       safe.isEnrolledForTouchId = YES;
-                       [safe setTouchIdPassword:openedSafe.masterPassword];
-                       [SafesList.sharedInstance update:safe];
-                       
-                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enrol Successful", self.biometricIdName]
-                                                  message:[NSString stringWithFormat:@"You can now use %@ with this safe. Opening...", self.biometricIdName]
-                                                 duration:0.75f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:^(BOOL finished) {
-                                                      [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
-                                                  }];
-                   }
-                   else{
-                       safe.isTouchIdEnabled = NO;
-                       [safe setTouchIdPassword:openedSafe.masterPassword];
-                       [SafesList.sharedInstance update:safe];
-                       
-                       [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
-                   }
-            }];
-        }
-        else {
-            [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data];
-        }
-    }
-}
-
--(void)onSuccessfulSafeOpen:(BOOL)isOfflineCacheMode
-                provider:(id)provider
-               openedSafe:(DatabaseModel *)openedSafe
-                   safe:(SafeMetaData *)safe
-                     data:(NSData *)data {
-    Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
-                                                  metaData:safe
-                                           storageProvider:isOfflineCacheMode ? nil : provider // Guarantee nothing can be written!
-                                         usingOfflineCache:isOfflineCacheMode
-                                                isReadOnly:NO]; // ![[Settings sharedInstance] isProOrFreeTrial]
-
-    if (safe.offlineCacheEnabled) {
-        [viewModel updateOfflineCacheWithData:data];
-    }
-
-    [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:viewModel];
-}
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -825,60 +557,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
     else if ([segue.identifier isEqualToString:@"segueToVersionConflictResolution"]) {
         VersionConflictController* vc = (VersionConflictController*)segue.destinationViewController;
         vc.url = (NSString*)sender;
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)showTouchIDAuthentication:(SafeMetaData *)safe {
-    LAContext *localAuthContext = [[LAContext alloc] init];
-    localAuthContext.localizedFallbackTitle = @"Enter Master Password";
-
-    [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                     localizedReason:@"Identify to login"
-                               reply:^(BOOL success, NSError *error) {
-                                   [self  onTouchIdDone:success
-                                                  error:error
-                                                   safe:safe];
-                               } ];
-}
-
-- (void)onTouchIdDone:(BOOL)success error:(NSError *)error safe:(SafeMetaData *)safe {
-    if (success) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self openSafe:safe isTouchIdOpen:YES masterPassword:safe.touchIdPassword askAboutTouchIdEnrol:NO];
-        });
-    }
-    else {
-        if (error.code == LAErrorAuthenticationFailed) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts   warn:self
-                         title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
-                       message:[NSString stringWithFormat:@"%@ Authentication Failed. You must now enter your password manually to open the safe.", self.biometricIdName]
-                    completion:^{
-                        [self promptForSafePassword:safe
-                  askAboutTouchIdEnrolIfAppropriate:NO];
-                    }];
-            });
-        }
-        else if (error.code == LAErrorUserFallback)
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self promptForSafePassword:safe askAboutTouchIdEnrolIfAppropriate:NO];
-            });
-        }
-        else if (error.code != LAErrorUserCancel)
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts   warn:self
-                         title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
-                       message:[NSString stringWithFormat:@"%@ has not been setup or system has cancelled. You must now enter your password manually to open the safe.", self.biometricIdName]
-                    completion:^{
-                        [self promptForSafePassword:safe
-                  askAboutTouchIdEnrolIfAppropriate:NO];
-                    }];
-            });
-        }
     }
 }
 

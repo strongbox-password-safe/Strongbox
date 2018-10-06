@@ -7,6 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
+#import "SafeStorageProvider.h"
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)importFromUrlOrEmailAttachment:(NSURL *)importURL;
 - (void)showQuickLaunchView;
 - (void)showSafesListView;
+- (void)beginOpenSafeSequence:(SafeMetaData*)safe completion:(void (^)(Model* model))completion;
+
+- (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 
 @end
 

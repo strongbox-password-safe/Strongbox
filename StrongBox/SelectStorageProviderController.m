@@ -39,13 +39,13 @@
     else {
         [self.navigationItem setPrompt:@"Select what kind of safe you would like to create"];
     }
+
+    self.navigationController.toolbar.hidden = YES;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationController.toolbar.hidden = YES;
-
     if(self.existing) {
         self.providers = @[[GoogleDriveStorageProvider sharedInstance],
                            [DropboxV2StorageProvider sharedInstance],
