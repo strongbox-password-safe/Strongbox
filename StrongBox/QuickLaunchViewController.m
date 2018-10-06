@@ -39,6 +39,21 @@
     singleTap.numberOfTapsRequired = 1;
     self.imageViewLogo.userInteractionEnabled = YES;
     [self.imageViewLogo addGestureRecognizer:singleTap];
+    
+    //
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onApplicationBecameActive:)
+                                                 name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)onApplicationBecameActive:(NSNotification *)notification {
+    NSLog(@"onApplicationBecameActive");
+
+    if([[self getInitialViewController] isInQuickLaunchViewMode] &&
+       self.navigationController.visibleViewController == self) {
+        [self openPrimarySafe];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -96,7 +111,18 @@
         [Alerts warn:self title:@"Safe has Conflicts" message:@"This safe has unresolved conflicts. Please switch back to Safes List View and resolve these before opening."];
     }
     
+    // Turn off active notifications during open as touch id causes actice/resign
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIApplicationDidBecomeActiveNotification
+                                                  object:nil];
+    
     [[self getInitialViewController] beginOpenSafeSequence:safe completion:^(Model * _Nonnull model) {
+        // Restore once open sequence is done.
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onApplicationBecameActive:)
+                                                     name:UIApplicationDidBecomeActiveNotification object:nil];
+        
         if(model) {
             [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];
         }

@@ -3692,25 +3692,25 @@ Cg
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" textAlignment="justified" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mhF-UK-vxa" userLabel="ExplainerDetails">
-                                <rect key="frame" x="20" y="138.66666666666666" width="335" height="54"/>
-                                <string key="text">Strongbox will try to open this safe immediately when you open the application. You can switch back to the Safes List View at any time by tapping the button in the bottom right below.</string>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" minimumFontSize="8" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mhF-UK-vxa" userLabel="ExplainerDetails">
+                                <rect key="frame" x="20" y="138.66666666666666" width="335" height="89.666666666666657"/>
+                                <mutableString key="text">Strongbox will try to open your primary safe when you open the app. You can switch back to the Safes List at any time by tapping the button in the bottom right below. You can change your primary safe in the Safes List by selecting 'Edit' and reordering your safes. Your primary safe is the first safe.</mutableString>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nEd-uq-Vo0" userLabel="Center Container">
-                                <rect key="frame" x="20" y="20" width="335" height="741"/>
+                                <rect key="frame" x="20" y="90.333333333333314" width="335" height="670.66666666666674"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="a40-j1-jXu" userLabel="Logo">
-                                        <rect key="frame" x="42.666666666666657" y="245.66666666666669" width="249.99999999999997" height="250"/>
+                                        <rect key="frame" x="42.666666666666657" y="210.33333333333337" width="249.99999999999997" height="250"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="l9w-pX-Ywi"/>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="ygh-Rt-Smz"/>
                                         </constraints>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n8l-3f-Gbd" userLabel="Open Button">
-                                        <rect key="frame" x="94.666666666666686" y="503.66666666666663" width="146" height="36"/>
+                                        <rect key="frame" x="94.666666666666686" y="468.33333333333331" width="146" height="36"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                         <state key="normal" title="Open Safe Now">
                                             <color key="titleColor" red="1" green="0.68935331161591151" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3744,7 +3744,7 @@ Cg
                             <constraint firstItem="mhF-UK-vxa" firstAttribute="top" secondItem="ZV0-u6-cYw" secondAttribute="bottom" constant="8" symbolic="YES" id="bcJ-gQ-pwb"/>
                             <constraint firstItem="eAD-qG-K3p" firstAttribute="trailing" secondItem="ucd-z2-0RS" secondAttribute="trailing" constant="25" id="bsQ-I0-bAV"/>
                             <constraint firstItem="ucd-z2-0RS" firstAttribute="leading" secondItem="eAD-qG-K3p" secondAttribute="leading" constant="25" id="hFz-Vj-1Pk"/>
-                            <constraint firstItem="nEd-uq-Vo0" firstAttribute="top" secondItem="SqG-BD-ZEc" secondAttribute="top" constant="20" symbolic="YES" id="iD3-vm-bS9"/>
+                            <constraint firstItem="nEd-uq-Vo0" firstAttribute="top" secondItem="ucd-z2-0RS" secondAttribute="bottom" id="iD3-vm-bS9"/>
                             <constraint firstItem="mhF-UK-vxa" firstAttribute="leading" secondItem="ZV0-u6-cYw" secondAttribute="leading" id="j3W-B8-kRp"/>
                             <constraint firstItem="eAD-qG-K3p" firstAttribute="trailing" secondItem="nEd-uq-Vo0" secondAttribute="trailing" constant="20" id="koB-1o-7mp"/>
                             <constraint firstItem="ZV0-u6-cYw" firstAttribute="top" secondItem="ucd-z2-0RS" secondAttribute="bottom" constant="20" id="pkO-JL-dZy"/>

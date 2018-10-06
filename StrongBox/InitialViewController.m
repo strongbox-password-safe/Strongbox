@@ -40,6 +40,10 @@
     self.selectedIndex = 0;
 }
 
+- (BOOL)isInQuickLaunchViewMode {
+    return self.selectedIndex == 1;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
