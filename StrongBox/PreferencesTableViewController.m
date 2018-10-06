@@ -58,6 +58,11 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+
+    [self.navigationController setNavigationBarHidden:NO];
+    self.navigationController.navigationBar.hidden = NO;
+    
+    self.navigationController.toolbar.hidden = YES;
     
     self.buttonUnlinkDropbox.enabled = (DBClientsManager.authorizedClient != nil);
     self.buttonSignoutGoogleDrive.enabled =  [[GoogleDriveManager sharedInstance] isAuthorized];

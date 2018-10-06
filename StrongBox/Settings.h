@@ -69,5 +69,6 @@
 
 @property (nonatomic) BOOL disallowAllBiometricId;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
+@property (nonatomic) BOOL useQuickLaunchAsRootView;
 
 @end

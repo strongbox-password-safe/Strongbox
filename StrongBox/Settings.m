@@ -29,6 +29,7 @@ static NSString* kInstallDate = @"installDate";
 static NSString* kDisallowBiometricId = @"disallowBiometricId";
 static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
 static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
+static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
 @interface Settings ()
 
@@ -443,6 +444,15 @@ static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
     NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
     
     [[NSUserDefaults standardUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (BOOL)useQuickLaunchAsRootView {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kUseQuickLaunchAsRootView];
+}
+
+- (void)setUseQuickLaunchAsRootView:(BOOL)useQuickLaunchAsRootView {
+    [[NSUserDefaults standardUserDefaults] setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

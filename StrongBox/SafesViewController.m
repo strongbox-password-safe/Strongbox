@@ -125,12 +125,18 @@
     [self checkICloudAvailability];
 }
 
+- (void)reloadSafes {
+    self.collection = SafesList.sharedInstance.snapshot;
+
+    [self.tableView reloadData];
+}
+
 - (void)refreshView {
     self.collection = SafesList.sharedInstance.snapshot;
+
+    [self.tableView reloadData];
     
     self.buttonToggleEdit.enabled = self.collection.count > 0;
-    
-    [self.tableView reloadData];
     
     self.navigationController.navigationBar.hidden = NO;
     self.navigationItem.hidesBackButton = YES;
@@ -948,78 +954,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol {
          "\n"
          "Tapping on this will start the import process."];
     }
-}
-
-- (void)importFromUrlOrEmailAttachment:(NSURL *)importURL {
-    [self.navigationController popToRootViewControllerAnimated:YES];
-    
-    NSData *importedData = [NSData dataWithContentsOfURL:importURL];
-    
-    if (![DatabaseModel isAValidSafe:importedData]) {
-        [Alerts warn:self
-               title:@"Invalid Safe"
-             message:@"This is not a valid Strongbox password safe database file."];
-        
-        return;
-    }
-    
-    [self promptForImportedSafeNickName:importedData];
-}
-
-- (void)promptForImportedSafeNickName:(NSData *)data {
-    [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Nickname"
-                            title:@"You are about to import a safe. What nickname would you like to use for it?"
-                          message:@"Please Enter the URL of the Safe File."
-                       completion:^(NSString *text, BOOL response) {
-                           if (response) {
-                               NSString *nickName = [SafesList sanitizeSafeNickName:text];
-                               
-                               if (![[SafesList sharedInstance] isValidNickName:nickName]) {
-                                   [Alerts   info:self
-                                            title:@"Invalid Nickname"
-                                          message:@"That nickname may already exist, or is invalid, please try a different nickname."
-                                       completion:^{
-                                           [self promptForImportedSafeNickName:data];
-                                       }];
-                               }
-                               else {
-                                   [self addImportedSafe:nickName
-                                                    data:data];
-                               }
-                           }
-                       }];
-}
-
-- (void)addImportedSafe:(NSString *)nickName data:(NSData *)data {
-    id<SafeStorageProvider> provider;
-    
-    if(Settings.sharedInstance.iCloudOn) {
-        provider = AppleICloudProvider.sharedInstance;
-    }
-    else {
-        provider = LocalDeviceStorageProvider.sharedInstance;
-    }
-    
-    [provider create:nickName
-              data:data
-      parentFolder:nil
-    viewController:self
-        completion:^(SafeMetaData *metadata, NSError *error)
-     {
-         dispatch_async(dispatch_get_main_queue(), ^(void)
-        {
-            if (error == nil) {
-                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                [self refreshView];
-            }
-            else {
-                [Alerts error:self
-                        title:@"Error Importing Safe"
-                        error:error];
-            }
-        });
-     }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

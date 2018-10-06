@@ -315,7 +315,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
             NSMutableArray *driveFolders = [[NSMutableArray alloc] init];
             NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
 
-            NSLog(@"%@", fileList.files);
+            //NSLog(@"%@", fileList.files);
             
             for (GTLRDrive_File *file in fileList.files) {
                 if ([file.mimeType isEqual:@"application/vnd.google-apps.folder"]) {

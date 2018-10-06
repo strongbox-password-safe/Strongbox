@@ -11,17 +11,23 @@
 #import "BrowseSafeView.h"
 #import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
-#import "SafesViewController.h"
 #import "real-secrets.h"
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
 #import "GoogleDriveManager.h"
 #import "Settings.h"
 #import "OneDriveSDK/OneDriveSDK.h"
+#import "InitialViewController.h"
+#import "SafesViewController.h"
+#import "QuickLaunchViewController.h"
 
-@implementation AppDelegate {
-    NSDate *enterBackgroundTime;
-    UIViewController *lockView;
-}
+@interface AppDelegate ()
+
+@property (nonatomic, strong) NSDate *enterBackgroundTime;
+@property (nonatomic, strong) UIViewController *lockView;
+
+@end
+
+@implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeGoogleDrive];
@@ -35,7 +41,7 @@
     if(Settings.sharedInstance.installDate == nil) {
         Settings.sharedInstance.installDate = [NSDate date];
     }
-    
+ 
     return YES;
 }
 
@@ -59,11 +65,9 @@
                                           annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
     }
     else {
-        UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
+        InitialViewController *tabController = (InitialViewController *)self.window.rootViewController;
 
-        SafesViewController *rootController = (SafesViewController *)(nav.viewControllers)[0];
-
-        [rootController importFromUrlOrEmailAttachment:url];
+        [tabController importFromUrlOrEmailAttachment:url];
 
         return YES;
     }
@@ -72,43 +76,43 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
+    UITabBarController *tab = (UITabBarController*)self.window.rootViewController;
+    UINavigationController *nav = tab.selectedViewController;
 
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    if (![nav.visibleViewController isKindOfClass:[SafesViewController class]] &&
+        ![nav.visibleViewController isKindOfClass:[QuickLaunchViewController class]]) {
+        self.enterBackgroundTime = [[NSDate alloc] init];
 
-    if ([nav.visibleViewController isKindOfClass:[RecordView class]] ||
-        [nav.visibleViewController isKindOfClass:[BrowseSafeView class]] ||
-        [nav.visibleViewController isKindOfClass:[PasswordHistoryViewController class]] ||
-        [nav.visibleViewController isKindOfClass:[PreviousPasswordsTableViewController class]]) {
-        enterBackgroundTime = [[NSDate alloc] init];
-        lockView = [mainStoryboard instantiateViewControllerWithIdentifier:@"LockScreen"];
+        UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        self.lockView = [mainStoryboard instantiateViewControllerWithIdentifier:@"LockScreen"];
         
-        [lockView.view layoutIfNeeded];
-        [self.window.rootViewController presentViewController:lockView animated:NO completion:nil];
+        [self.lockView.view layoutIfNeeded];
+        [tab presentViewController:self.lockView animated:NO completion:nil];
     }
     else {
-        lockView = nil;
+        self.lockView = nil;
     }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    if (lockView) {
+    if (self.lockView) {
         [self.window.rootViewController dismissViewControllerAnimated:NO completion:nil];
-        lockView = nil;
+        self.lockView = nil;
     }
     
-    if (enterBackgroundTime) {
-        NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:enterBackgroundTime];
+    if (self.enterBackgroundTime) {
+        NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
         NSNumber *seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
 
         if (seconds.longValue != -1  && secondsBetween > seconds.longValue) { // -1 = never
             NSLog(@"Autolock Time [%@s] exceeded, locking safe.", seconds);
 
-            UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
+            UITabBarController *tabController = (UITabBarController *)self.window.rootViewController;
+            UINavigationController* nav = [tabController selectedViewController];
             [nav popToRootViewControllerAnimated:NO];
         }
         
-        enterBackgroundTime = nil;
+        self.enterBackgroundTime = nil;
     }
 }
 
