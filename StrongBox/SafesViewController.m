@@ -79,6 +79,10 @@
     
     [self.navigationController setNavigationBarHidden:NO];
     
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+    
     [self bindProOrFreeTrialUi];
     
     if(!Settings.sharedInstance.doNotAutoAddNewLocalSafes) {
@@ -94,6 +98,8 @@
     }
     
     [self segueToNagScreenIfAppropriate];
+    
+    [[self getInitialViewController] checkICloudAvailability];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

@@ -64,20 +64,6 @@
     self.selectedIndex = Settings.sharedInstance.useQuickLaunchAsRootView ? 1 : 0;
     self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
     
-    
-    
-    
-    
-    // TODO
-    [Settings.sharedInstance setPro:NO];
-    
-    
-    
-    
-    
-    
-    
-    
     // Pro or Free?
     
     if(![[Settings sharedInstance] isPro]) {

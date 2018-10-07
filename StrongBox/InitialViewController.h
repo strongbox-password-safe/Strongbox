@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 - (SafeMetaData*)getPrimarySafe;
+- (void)checkICloudAvailability;
 
 @end
 

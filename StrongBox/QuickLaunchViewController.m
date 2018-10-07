@@ -73,6 +73,26 @@
     [self.navigationController setNavigationBarHidden:YES];
     
     [self bindProOrFreeTrialUi];
+    
+    [self segueToNagScreenIfAppropriate];
+    
+    [[self getInitialViewController] checkICloudAvailability];
+}
+
+- (void)segueToNagScreenIfAppropriate {
+    if(Settings.sharedInstance.isProOrFreeTrial) {
+        return;
+    }
+    
+    NSInteger random = arc4random_uniform(100);
+    
+    //NSLog(@"Random: %ld", (long)random);
+    
+    if(random < 15) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
+        });
+    }
 }
 
 -(void)bindProOrFreeTrialUi {
