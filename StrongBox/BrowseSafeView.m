@@ -85,7 +85,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                                        didHide:nil];
         }
         else {
-            [ISMessages showCardAlertWithTitle:@"NEW! Fast Username Copy" // TODO: Remove the NEW Tag on next release
+            [ISMessages showCardAlertWithTitle:@"Fast Username Copy"
                                        message:@"Double Tap for fast username copy"
                                       duration:2.5f
                                    hideOnSwipe:YES
