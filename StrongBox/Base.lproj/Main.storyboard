@@ -1330,7 +1330,7 @@
             <objects>
                 <tableViewController title="View Record" extendedLayoutIncludesOpaqueBars="YES" id="PDC-ZT-MAP" userLabel="Record" customClass="RecordView" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="static" style="plain" separatorStyle="none" rowHeight="44" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="0er-gf-mGP">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <sections>
@@ -1589,14 +1589,12 @@
                             <outlet property="delegate" destination="PDC-ZT-MAP" id="T0x-lP-5Dm"/>
                         </connections>
                     </tableView>
-                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
                     <toolbarItems>
                         <barButtonItem systemItem="flexibleSpace" id="Tff-Bw-ckb"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="View Record" id="YpU-RQ-SS6">
                         <barButtonItem key="backBarButtonItem" title="Back" id="fFi-du-Qce"/>
                     </navigationItem>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="buttonCopyAndLaunchUrl" destination="GzH-5i-S3k" id="3V3-9h-H8r"/>
@@ -1823,7 +1821,7 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ysI-uD-8UF" userLabel="Free">
-                                                <rect key="frame" x="250" y="0.0" width="48.333333333333343" height="234.66666666666666"/>
+                                                <rect key="frame" x="250.00000000000003" y="0.0" width="48.333333333333343" height="234.66666666666666"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Free" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7AC-9K-6Us">
                                                         <rect key="frame" x="0.0" y="0.0" width="48.333333333333336" height="32.333333333333336"/>
@@ -3662,93 +3660,108 @@ Cg
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" text="Primary Safe Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="14" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ucd-z2-0RS" userLabel="Safe Name">
-                                <rect key="frame" x="25" y="52" width="325" height="38.333333333333343"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" verticalCompressionResistancePriority="755" text="Primary Safe Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="14" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ucd-z2-0RS" userLabel="Safe Name">
+                                <rect key="frame" x="25" y="52" width="325" height="38"/>
                                 <fontDescription key="fontDescription" name="ArialRoundedMTBold" family="Arial Rounded MT Bold" pointSize="33"/>
                                 <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h2J-n1-Io4" userLabel="Preferences">
-                                <rect key="frame" x="20" y="741" width="36" height="51"/>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h2J-n1-Io4" userLabel="Preferences">
+                                <rect key="frame" x="20" y="727" width="36" height="51"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                 <state key="normal" title="⚙️"/>
                                 <connections>
                                     <segue destination="gAY-yV-Xd6" kind="show" id="nFA-zL-t4W"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="751" contentHorizontalAlignment="trailing" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aIO-Xq-I2V" userLabel="Safes List Button">
-                                <rect key="frame" x="56" y="748.66666666666663" width="299" height="36"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aIO-Xq-I2V" userLabel="Safes List Button">
+                                <rect key="frame" x="195" y="735.66666666666663" width="160" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="Back to Safes List &gt;">
-                                    <color key="titleColor" red="1" green="0.68935331160000002" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <color key="titleColor" red="0.99953407049999998" green="0.98835557699999999" blue="0.47265523669999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
                                     <action selector="onViewSafesList:" destination="ILm-TE-kV0" eventType="touchUpInside" id="ME0-bI-Ri7"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" text="Quick Launch Mode" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZV0-u6-cYw" userLabel="ExplainerHeader">
-                                <rect key="frame" x="20" y="110.33333333333333" width="335" height="20.333333333333329"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="753" text="Quick Launch Mode" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZV0-u6-cYw" userLabel="ExplainerHeader">
+                                <rect key="frame" x="45" y="110" width="285" height="20.333333333333343"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" minimumFontSize="8" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mhF-UK-vxa" userLabel="ExplainerDetails">
-                                <rect key="frame" x="20" y="138.66666666666666" width="335" height="89.666666666666657"/>
-                                <mutableString key="text">Strongbox will try to open your primary safe when you open the app. You can switch back to the Safes List at any time by tapping the button in the bottom right below. You can change your primary safe in the Safes List by selecting 'Edit' and reordering your safes. Your primary safe is the first safe.</mutableString>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" verticalCompressionResistancePriority="748" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" minimumFontSize="8" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mhF-UK-vxa" userLabel="ExplainerDetails">
+                                <rect key="frame" x="45" y="130.33333333333334" width="285" height="89.666666666666657"/>
+                                <string key="text">Strongbox will try to open your primary safe when you open the app. You can switch back to the Safes List at any time by tapping the button in the bottom right below. You can change your primary safe in the Safes List by selecting 'Edit' and reordering your safes. Your primary safe is the first safe.</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nEd-uq-Vo0" userLabel="Center Container">
-                                <rect key="frame" x="20" y="90.333333333333314" width="335" height="670.66666666666674"/>
+                                <rect key="frame" x="20" y="240" width="335" height="467"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="a40-j1-jXu" userLabel="Logo">
-                                        <rect key="frame" x="42.666666666666657" y="210.33333333333337" width="249.99999999999997" height="250"/>
+                                    <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="HTi-cL-E0I" userLabel="LogoAndOpen">
+                                        <rect key="frame" x="42.666666666666657" y="86.666666666666686" width="249.99999999999997" height="294"/>
+                                        <subviews>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="a40-j1-jXu" userLabel="Logo">
+                                                <rect key="frame" x="0.0" y="0.0" width="250" height="250"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="l9w-pX-Ywi"/>
+                                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="ygh-Rt-Smz"/>
+                                                </constraints>
+                                            </imageView>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n8l-3f-Gbd" userLabel="Open Button">
+                                                <rect key="frame" x="52" y="257.99999999999994" width="146" height="36"/>
+                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                                <state key="normal" title="Open Safe Now">
+                                                    <color key="titleColor" red="1" green="0.68935331161591151" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="onOpenPrimarySafe:" destination="ILm-TE-kV0" eventType="touchUpInside" id="uX2-8N-bCo"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="l9w-pX-Ywi"/>
-                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="ygh-Rt-Smz"/>
+                                            <constraint firstItem="n8l-3f-Gbd" firstAttribute="top" secondItem="a40-j1-jXu" secondAttribute="bottom" constant="8" symbolic="YES" id="3bG-KT-TMZ"/>
+                                            <constraint firstAttribute="bottom" secondItem="n8l-3f-Gbd" secondAttribute="bottom" id="62U-ZW-19h"/>
+                                            <constraint firstAttribute="trailing" secondItem="a40-j1-jXu" secondAttribute="trailing" id="Jix-jH-1iG"/>
+                                            <constraint firstItem="a40-j1-jXu" firstAttribute="leading" secondItem="HTi-cL-E0I" secondAttribute="leading" id="Tki-TY-mZq"/>
+                                            <constraint firstItem="n8l-3f-Gbd" firstAttribute="centerX" secondItem="HTi-cL-E0I" secondAttribute="centerX" id="iQf-9n-xSw"/>
+                                            <constraint firstItem="a40-j1-jXu" firstAttribute="top" secondItem="HTi-cL-E0I" secondAttribute="top" id="ie4-r9-m0L"/>
+                                            <constraint firstItem="a40-j1-jXu" firstAttribute="centerX" secondItem="HTi-cL-E0I" secondAttribute="centerX" id="qug-MB-3Wl"/>
                                         </constraints>
-                                    </imageView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n8l-3f-Gbd" userLabel="Open Button">
-                                        <rect key="frame" x="94.666666666666686" y="468.33333333333331" width="146" height="36"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
-                                        <state key="normal" title="Open Safe Now">
-                                            <color key="titleColor" red="1" green="0.68935331161591151" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="onOpenPrimarySafe:" destination="ILm-TE-kV0" eventType="touchUpInside" id="uX2-8N-bCo"/>
-                                        </connections>
-                                    </button>
+                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstItem="n8l-3f-Gbd" firstAttribute="centerX" secondItem="nEd-uq-Vo0" secondAttribute="centerX" id="AI5-yr-3gp"/>
-                                    <constraint firstItem="n8l-3f-Gbd" firstAttribute="top" secondItem="a40-j1-jXu" secondAttribute="bottom" constant="8" symbolic="YES" id="Yar-Xg-g0s"/>
-                                    <constraint firstItem="a40-j1-jXu" firstAttribute="centerX" secondItem="nEd-uq-Vo0" secondAttribute="centerX" id="taT-JB-PZm"/>
-                                    <constraint firstItem="a40-j1-jXu" firstAttribute="centerY" secondItem="nEd-uq-Vo0" secondAttribute="centerY" id="vPm-j6-pIH"/>
+                                    <constraint firstItem="HTi-cL-E0I" firstAttribute="top" relation="greaterThanOrEqual" secondItem="nEd-uq-Vo0" secondAttribute="top" id="72K-ny-LtV"/>
+                                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="HTi-cL-E0I" secondAttribute="bottom" id="Jkj-9F-pCb"/>
+                                    <constraint firstItem="HTi-cL-E0I" firstAttribute="centerX" secondItem="nEd-uq-Vo0" secondAttribute="centerX" id="YpQ-ki-Ajf"/>
+                                    <constraint firstItem="HTi-cL-E0I" firstAttribute="centerY" secondItem="nEd-uq-Vo0" secondAttribute="centerY" id="cYt-ev-jNG"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="aIO-Xq-I2V" firstAttribute="leading" secondItem="h2J-n1-Io4" secondAttribute="trailing" id="1ZA-ZQ-b18"/>
-                            <constraint firstAttribute="trailing" secondItem="aIO-Xq-I2V" secondAttribute="trailing" constant="20" symbolic="YES" id="2r4-7X-kaF"/>
-                            <constraint firstItem="nEd-uq-Vo0" firstAttribute="bottom" secondItem="h2J-n1-Io4" secondAttribute="top" constant="20" id="8q2-YH-yAi"/>
-                            <constraint firstAttribute="trailing" secondItem="ZV0-u6-cYw" secondAttribute="trailing" constant="20" symbolic="YES" id="AyP-dR-gPn"/>
+                            <constraint firstItem="nEd-uq-Vo0" firstAttribute="trailing" secondItem="aIO-Xq-I2V" secondAttribute="trailing" id="2r4-7X-kaF"/>
+                            <constraint firstItem="h2J-n1-Io4" firstAttribute="top" secondItem="nEd-uq-Vo0" secondAttribute="bottom" constant="20" id="8q2-YH-yAi"/>
+                            <constraint firstItem="ucd-z2-0RS" firstAttribute="trailing" secondItem="ZV0-u6-cYw" secondAttribute="trailing" constant="20" id="AyP-dR-gPn"/>
                             <constraint firstItem="ZV0-u6-cYw" firstAttribute="trailing" secondItem="mhF-UK-vxa" secondAttribute="trailing" id="ErY-eF-wYg"/>
+                            <constraint firstItem="aIO-Xq-I2V" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="h2J-n1-Io4" secondAttribute="trailing" constant="8" symbolic="YES" id="Fya-gj-vNy"/>
                             <constraint firstItem="nEd-uq-Vo0" firstAttribute="leading" secondItem="eAD-qG-K3p" secondAttribute="leading" constant="20" id="H9I-3L-uQe"/>
                             <constraint firstItem="ucd-z2-0RS" firstAttribute="top" secondItem="eAD-qG-K3p" secondAttribute="top" constant="8" id="MKi-OT-77y"/>
                             <constraint firstItem="aIO-Xq-I2V" firstAttribute="centerY" secondItem="h2J-n1-Io4" secondAttribute="centerY" id="TYN-8a-G4G"/>
-                            <constraint firstAttribute="bottom" secondItem="h2J-n1-Io4" secondAttribute="bottom" constant="20" symbolic="YES" id="WHA-w6-MT8"/>
-                            <constraint firstItem="h2J-n1-Io4" firstAttribute="leading" secondItem="SqG-BD-ZEc" secondAttribute="leading" constant="20" symbolic="YES" id="aQ9-lB-Xzi"/>
-                            <constraint firstItem="mhF-UK-vxa" firstAttribute="top" secondItem="ZV0-u6-cYw" secondAttribute="bottom" constant="8" symbolic="YES" id="bcJ-gQ-pwb"/>
+                            <constraint firstItem="eAD-qG-K3p" firstAttribute="bottom" secondItem="h2J-n1-Io4" secondAttribute="bottom" id="WHA-w6-MT8"/>
+                            <constraint firstItem="h2J-n1-Io4" firstAttribute="leading" secondItem="nEd-uq-Vo0" secondAttribute="leading" id="aQ9-lB-Xzi"/>
+                            <constraint firstItem="mhF-UK-vxa" firstAttribute="top" secondItem="ZV0-u6-cYw" secondAttribute="bottom" id="bcJ-gQ-pwb"/>
                             <constraint firstItem="eAD-qG-K3p" firstAttribute="trailing" secondItem="ucd-z2-0RS" secondAttribute="trailing" constant="25" id="bsQ-I0-bAV"/>
                             <constraint firstItem="ucd-z2-0RS" firstAttribute="leading" secondItem="eAD-qG-K3p" secondAttribute="leading" constant="25" id="hFz-Vj-1Pk"/>
-                            <constraint firstItem="nEd-uq-Vo0" firstAttribute="top" secondItem="ucd-z2-0RS" secondAttribute="bottom" id="iD3-vm-bS9"/>
+                            <constraint firstItem="nEd-uq-Vo0" firstAttribute="top" secondItem="mhF-UK-vxa" secondAttribute="bottom" constant="20" id="iD3-vm-bS9"/>
                             <constraint firstItem="mhF-UK-vxa" firstAttribute="leading" secondItem="ZV0-u6-cYw" secondAttribute="leading" id="j3W-B8-kRp"/>
                             <constraint firstItem="eAD-qG-K3p" firstAttribute="trailing" secondItem="nEd-uq-Vo0" secondAttribute="trailing" constant="20" id="koB-1o-7mp"/>
                             <constraint firstItem="ZV0-u6-cYw" firstAttribute="top" secondItem="ucd-z2-0RS" secondAttribute="bottom" constant="20" id="pkO-JL-dZy"/>
-                            <constraint firstItem="ZV0-u6-cYw" firstAttribute="leading" secondItem="SqG-BD-ZEc" secondAttribute="leading" constant="20" symbolic="YES" id="tNw-gz-TbK"/>
+                            <constraint firstItem="ZV0-u6-cYw" firstAttribute="leading" secondItem="ucd-z2-0RS" secondAttribute="leading" constant="20" id="tNw-gz-TbK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="eAD-qG-K3p"/>
                     </view>

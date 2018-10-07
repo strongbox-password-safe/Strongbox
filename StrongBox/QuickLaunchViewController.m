@@ -14,14 +14,19 @@
 #import "SafesList.h"
 #import "BrowseSafeView.h"
 
+@interface QuickLaunchViewController ()
+
+@property (nonatomic, strong) CAGradientLayer *gradient;
+
+@end
+
 @implementation QuickLaunchViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    
-    gradient.frame = self.view.bounds;
+    self.gradient = [CAGradientLayer layer];
+    self.gradient.frame = self.view.bounds;
     
     UIColor *color1 = [UIColor colorWithRed:0.20 green:0.20 blue:0.40 alpha:1.0];
     UIColor *color2 = [UIColor colorWithRed:0.30 green:0.70 blue:0.80 alpha:1.0];
@@ -29,9 +34,9 @@
     //UIColor *color1 = [UIColor whiteColor];
     //UIColor *color2 = [UIColor blackColor];
 
-    gradient.colors = @[(id)color1.CGColor, (id)color2.CGColor];
+    self.gradient.colors = @[(id)color1.CGColor, (id)color2.CGColor];
 
-    [self.view.layer insertSublayer:gradient atIndex:0];
+    [self.view.layer insertSublayer:self.gradient atIndex:0];
     
     //
     
@@ -45,6 +50,12 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onApplicationBecameActive:)
                                                  name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    self.gradient.frame = self.view.bounds;
 }
 
 - (void)onApplicationBecameActive:(NSNotification *)notification {
