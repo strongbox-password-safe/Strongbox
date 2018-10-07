@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)beginOpenSafeSequence:(SafeMetaData*)safe completion:(void (^)(Model* model))completion;
 
 - (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
-- (SafeMetaData*)getPrimarySafe;
+- (nullable SafeMetaData* )getPrimarySafe;
 - (void)checkICloudAvailability;
 
 @end

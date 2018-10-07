@@ -290,32 +290,6 @@
     // Create a GCD source. This will monitor the file descriptor to see if a write command is detected
     // The following options are available
     
-    /*!
-     * @typedef dispatch_source_vnode_flags_t
-     * Type of dispatch_source_vnode flags
-     *
-     * @constant DISPATCH_VNODE_DELETE
-     * The filesystem object was deleted from the namespace.
-     *
-     * @constant DISPATCH_VNODE_WRITE
-     * The filesystem object data changed.
-     *
-     * @constant DISPATCH_VNODE_EXTEND
-     * The filesystem object changed in size.
-     *
-     * @constant DISPATCH_VNODE_ATTRIB
-     * The filesystem object metadata changed.
-     *
-     * @constant DISPATCH_VNODE_LINK
-     * The filesystem object link count changed.
-     *
-     * @constant DISPATCH_VNODE_RENAME
-     * The filesystem object was renamed in the namespace.
-     *
-     * @constant DISPATCH_VNODE_REVOKE
-     * The filesystem object was revoked.
-     */
-    
     // Write covers - adding a file, renaming a file and deleting a file...
     _source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,filedes,
                                      DISPATCH_VNODE_WRITE,
