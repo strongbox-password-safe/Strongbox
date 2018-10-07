@@ -7,16 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <StoreKit/StoreKit.h>
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
-@interface SafesViewController : UITableViewController<SKProductsRequestDelegate, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
+@interface SafesViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *barButtonFlexibleSpace;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonToggleEdit;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonQuickLaunchView;
 
 - (IBAction)onAddSafe:(id)sender;
 - (IBAction)onUpgrade:(id)sender;

@@ -20,6 +20,7 @@
 #import "SafesViewController.h"
 #import "QuickLaunchViewController.h"
 #import "StorageBrowserTableViewController.h"
+#import "UpgradeViewController.h"
 
 @interface AppDelegate ()
 
@@ -82,6 +83,7 @@
 
     if (![nav.visibleViewController isKindOfClass:[SafesViewController class]] && // Don't show lock screen for these two initial screens as Touch ID/Face ID causes a weird effect of present lock screen while waiting authentication
         ![nav.visibleViewController isKindOfClass:[QuickLaunchViewController class]] &&
+        ![nav.visibleViewController isKindOfClass:[UpgradeViewController class]] &&
         ![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]]) // Google Sign In Broken without this... sigh
     {
         self.enterBackgroundTime = [[NSDate alloc] init];

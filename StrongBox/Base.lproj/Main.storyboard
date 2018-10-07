@@ -100,15 +100,17 @@
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <connections>
                         <outlet property="barButtonFlexibleSpace" destination="a9W-k3-0mD" id="dGw-Gu-IOV"/>
+                        <outlet property="barButtonQuickLaunchView" destination="Nmk-hC-aIH" id="yBX-dB-JwD"/>
                         <outlet property="buttonAddSafe" destination="zN1-I2-XSj" id="SD8-XN-MaW"/>
                         <outlet property="buttonToggleEdit" destination="aVS-fM-gwN" id="j4B-ni-4cK"/>
                         <outlet property="buttonTogglePro" destination="UR1-FK-uNa" id="lLz-rj-yyu"/>
                         <outlet property="buttonUpgrade" destination="tmo-77-bgs" id="Ll3-sF-2r3"/>
                         <outlet property="navItemHeader" destination="g1g-nh-a5L" id="VqK-HH-5Cu"/>
                         <segue destination="cYG-Rk-SmU" kind="show" identifier="segueToOpenSafeView" animates="NO" id="aYd-mP-3oX"/>
-                        <segue destination="PKv-Yt-bNW" kind="presentation" identifier="segueToUpgrade" id="Hn4-75-OXC"/>
+                        <segue destination="PKv-Yt-bNW" kind="show" identifier="segueToUpgrade" id="Hn4-75-OXC"/>
                         <segue destination="wmK-Hs-VKJ" kind="show" identifier="segueToStorageType" id="hDV-D2-02z"/>
                         <segue destination="J3T-cl-XIs" kind="show" identifier="segueToVersionConflictResolution" id="zqQ-NH-xPv"/>
                     </connections>
@@ -701,7 +703,7 @@
                                         <rect key="frame" x="0.0" y="728" width="375" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VwV-lb-IZQ" id="SPC-nB-5aN">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="60"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="59.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vE1-dW-E1s">
@@ -1752,23 +1754,23 @@
             <objects>
                 <viewController title="Upgrade" id="PKv-Yt-bNW" customClass="UpgradeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="egQ-RU-2sp">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="641"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="w0F-qs-OC6">
-                                <rect key="frame" x="16" y="44" width="343" height="734"/>
+                                <rect key="frame" x="16" y="0.0" width="343" height="641"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="th0-xB-jBC" userLabel="Developer Message">
-                                        <rect key="frame" x="0.0" y="0.0" width="343" height="273.33333333333331"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="343" height="238.66666666666666"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Developer Message" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aex-VO-e8X">
-                                                <rect key="frame" x="0.0" y="0.0" width="343" height="129"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="343" height="94.333333333333329"/>
                                                 <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="23"/>
                                                 <color key="textColor" red="0.0" green="0.25098040700000002" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" textAlignment="justified" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Fv-IS-MMl">
-                                                <rect key="frame" x="0.0" y="133" width="343" height="140.33333333333337"/>
+                                                <rect key="frame" x="0.0" y="98.333333333333329" width="343" height="140.33333333333337"/>
                                                 <string key="text">Hi there! Would you like to upgrade and help to support the app? In addition to contributing to ongoing development, you will also get access to all the features listed below.  I hope you'll choose to contribute. -Mark</string>
                                                 <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="18"/>
                                                 <nil key="textColor"/>
@@ -1777,43 +1779,43 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="EYg-BL-V5o" userLabel="Feature Chart">
-                                        <rect key="frame" x="0.0" y="285.33333333333331" width="343" height="234.66666666666669"/>
+                                        <rect key="frame" x="0.0" y="250.66666666666669" width="343" height="205"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" axis="vertical" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="thy-Bh-L1x" userLabel="Name">
-                                                <rect key="frame" x="0.0" y="0.0" width="245" height="234.66666666666666"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="245" height="205"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Feature" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wjk-cf-Fgd">
-                                                        <rect key="frame" x="0.0" y="0.0" width="245" height="32.333333333333336"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="245" height="27.333333333333332"/>
                                                         <fontDescription key="fontDescription" name="Futura-Bold" family="Futura" pointSize="19"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Create, Edit &amp; View Passwords" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="efk-By-6ZZ">
-                                                        <rect key="frame" x="0.0" y="40.333333333333371" width="245" height="32.666666666666657"/>
+                                                        <rect key="frame" x="0.0" y="35.333333333333314" width="245" height="27.666666666666671"/>
                                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Import &amp; Export Safes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zhf-Xu-Fxs">
-                                                        <rect key="frame" x="0.0" y="81" width="245" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="71" width="245" height="27.666666666666671"/>
                                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Cloud Safes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jou-fh-1Bc">
-                                                        <rect key="frame" x="0.0" y="121.33333333333339" width="245" height="32.666666666666671"/>
+                                                        <rect key="frame" x="0.0" y="106.66666666666663" width="245" height="27.333333333333343"/>
                                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Open with Touch ID" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7LV-RY-Anr">
-                                                        <rect key="frame" x="0.0" y="162" width="245" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="142" width="245" height="27.666666666666657"/>
                                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Search" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PrB-RC-Xrj">
-                                                        <rect key="frame" x="0.0" y="202.33333333333331" width="245" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="177.66666666666669" width="245" height="27.333333333333343"/>
                                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
@@ -1821,64 +1823,64 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ysI-uD-8UF" userLabel="Free">
-                                                <rect key="frame" x="250.00000000000003" y="0.0" width="48.333333333333343" height="234.66666666666666"/>
+                                                <rect key="frame" x="250.00000000000003" y="0.0" width="48.333333333333343" height="205"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Free" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7AC-9K-6Us">
-                                                        <rect key="frame" x="0.0" y="0.0" width="48.333333333333336" height="32.333333333333336"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="48.333333333333336" height="27.333333333333332"/>
                                                         <fontDescription key="fontDescription" name="Futura-Bold" family="Futura" pointSize="19"/>
                                                         <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="kWl-IJ-V1I" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="40.333333333333371" width="48.333333333333336" height="32.666666666666657"/>
+                                                        <rect key="frame" x="0.0" y="35.333333333333314" width="48.333333333333336" height="27.666666666666671"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="48g-FY-lQN" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="81" width="48.333333333333336" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="71" width="48.333333333333336" height="27.666666666666671"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="vxa-xN-3fT" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="121.33333333333339" width="48.333333333333336" height="32.666666666666671"/>
+                                                        <rect key="frame" x="0.0" y="106.66666666666663" width="48.333333333333336" height="27.333333333333343"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="red-cross-24" translatesAutoresizingMaskIntoConstraints="NO" id="r8V-Q9-Nk4" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="162" width="48.333333333333336" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="142" width="48.333333333333336" height="27.666666666666657"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="red-cross-24" translatesAutoresizingMaskIntoConstraints="NO" id="j9Y-Lv-vVl" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="202.33333333333331" width="48.333333333333336" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="177.66666666666669" width="48.333333333333336" height="27.333333333333343"/>
                                                     </imageView>
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="3ze-pA-bRy" userLabel="Pro">
-                                                <rect key="frame" x="303.33333333333331" y="0.0" width="39.666666666666686" height="234.66666666666666"/>
+                                                <rect key="frame" x="303.33333333333331" y="0.0" width="39.666666666666686" height="205"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Pro" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0mO-fk-0Lk">
-                                                        <rect key="frame" x="0.0" y="0.0" width="39.666666666666664" height="32.333333333333336"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="39.666666666666664" height="27.333333333333332"/>
                                                         <fontDescription key="fontDescription" name="Futura-Bold" family="Futura" pointSize="19"/>
                                                         <color key="textColor" red="0.0" green="0.50196081400000003" blue="0.25098040700000002" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="fad-h4-Nji" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="40.333333333333371" width="39.666666666666664" height="32.666666666666657"/>
+                                                        <rect key="frame" x="0.0" y="35.333333333333314" width="39.666666666666664" height="27.666666666666671"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="rNi-tC-264" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="81" width="39.666666666666664" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="71" width="39.666666666666664" height="27.666666666666671"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="ekm-P7-gt6" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="121.33333333333339" width="39.666666666666664" height="32.666666666666671"/>
+                                                        <rect key="frame" x="0.0" y="106.66666666666663" width="39.666666666666664" height="27.333333333333343"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="jPm-Tm-1np" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="162" width="39.666666666666664" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="142" width="39.666666666666664" height="27.666666666666657"/>
                                                     </imageView>
                                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="9J5-PG-z39" userLabel="Clear">
-                                                        <rect key="frame" x="0.0" y="202.33333333333331" width="39.666666666666664" height="32.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="177.66666666666669" width="39.666666666666664" height="27.333333333333343"/>
                                                     </imageView>
                                                 </subviews>
                                             </stackView>
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="qwn-JT-pfl" userLabel="Buy Buttons">
-                                        <rect key="frame" x="0.0" y="532" width="343" height="202"/>
+                                        <rect key="frame" x="0.0" y="467.66666666666657" width="343" height="173.33333333333331"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="characterWrap" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7h4-mE-wDZ">
-                                                <rect key="frame" x="0.0" y="0.0" width="343" height="104.33333333333333"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="343" height="89.666666666666671"/>
                                                 <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                 <inset key="titleEdgeInsets" minX="2" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                 <inset key="imageEdgeInsets" minX="-2" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -1913,7 +1915,7 @@
                                                 </connections>
                                             </button>
                                             <stackView opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="749" distribution="fillProportionally" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="XPa-qe-L1C" userLabel="Nope &amp; Restore">
-                                                <rect key="frame" x="0.0" y="112.33333333333336" width="343" height="38.333333333333329"/>
+                                                <rect key="frame" x="0.0" y="97.666666666666742" width="343" height="32.666666666666657"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2d3-g4-SCX">
                                                         <rect key="frame" x="0.0" y="0.0" width="95.333333333333329" height="30"/>
@@ -1934,16 +1936,16 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="V3h-Uz-S9w" userLabel="Details &amp; Terms">
-                                                <rect key="frame" x="0.0" y="158.66666666666663" width="343" height="43.333333333333343"/>
+                                                <rect key="frame" x="0.0" y="138.33333333333337" width="343" height="35"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalCompressionResistancePriority="747" text="* One time purchase (No subscription required)" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1ax-iA-179">
-                                                        <rect key="frame" x="0.0" y="0.0" width="343" height="20.666666666666668"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="343" height="16.666666666666668"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="** OSX App requires separate upgrade" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zRA-rk-STZ">
-                                                        <rect key="frame" x="0.0" y="22.666666666666742" width="343" height="20.666666666666671"/>
+                                                        <rect key="frame" x="0.0" y="18.666666666666629" width="343" height="16.333333333333329"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -3667,7 +3669,7 @@ Cg
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h2J-n1-Io4" userLabel="Preferences">
-                                <rect key="frame" x="20" y="727" width="36" height="51"/>
+                                <rect key="frame" x="20" y="678" width="36" height="51"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                 <state key="normal" title="⚙️"/>
                                 <connections>
@@ -3675,7 +3677,7 @@ Cg
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aIO-Xq-I2V" userLabel="Safes List Button">
-                                <rect key="frame" x="195" y="735.66666666666663" width="160" height="34"/>
+                                <rect key="frame" x="195" y="686.66666666666663" width="160" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="Back to Safes List &gt;">
                                     <color key="titleColor" red="0.99953407049999998" green="0.98835557699999999" blue="0.47265523669999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3698,10 +3700,10 @@ Cg
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nEd-uq-Vo0" userLabel="Center Container">
-                                <rect key="frame" x="20" y="240" width="335" height="467"/>
+                                <rect key="frame" x="20" y="240" width="335" height="418"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="HTi-cL-E0I" userLabel="LogoAndOpen">
-                                        <rect key="frame" x="42.666666666666657" y="86.666666666666686" width="249.99999999999997" height="294"/>
+                                        <rect key="frame" x="42.666666666666657" y="62" width="249.99999999999997" height="294"/>
                                         <subviews>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="a40-j1-jXu" userLabel="Logo">
                                                 <rect key="frame" x="0.0" y="0.0" width="250" height="250"/>
@@ -3711,7 +3713,7 @@ Cg
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n8l-3f-Gbd" userLabel="Open Button">
-                                                <rect key="frame" x="52" y="257.99999999999994" width="146" height="36"/>
+                                                <rect key="frame" x="52" y="258" width="146" height="36"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                                 <state key="normal" title="Open Safe Now">
                                                     <color key="titleColor" red="1" green="0.68935331161591151" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3765,13 +3767,22 @@ Cg
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="eAD-qG-K3p"/>
                     </view>
+                    <toolbarItems>
+                        <barButtonItem title="Upgrade Info..." id="l6i-um-NTa">
+                            <connections>
+                                <action selector="onUpgrade:" destination="ILm-TE-kV0" id="1CF-jL-eK4"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" id="FnT-Kp-6mK"/>
                     <nil key="simulatedTopBarMetrics"/>
-                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <connections>
+                        <outlet property="buttonUpgrade" destination="l6i-um-NTa" id="rpK-U8-L2c"/>
                         <outlet property="imageViewLogo" destination="a40-j1-jXu" id="WYd-wH-1pj"/>
                         <outlet property="labelSafeName" destination="ucd-z2-0RS" id="KcP-Ph-bYX"/>
                         <segue destination="cYG-Rk-SmU" kind="show" identifier="segueToBrowseFromQuick" id="aI5-1C-HAz"/>
+                        <segue destination="PKv-Yt-bNW" kind="show" identifier="segueQuickLaunchToUpgrade" id="KHO-hI-Y60"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8pJ-19-apM" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -3849,8 +3860,9 @@ Cg
         <image name="warning-32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="B0D-Y9-Jhh"/>
-        <segue reference="nFA-zL-t4W"/>
-        <segue reference="aI5-1C-HAz"/>
+        <segue reference="Yf0-U4-iru"/>
+        <segue reference="Hn4-75-OXC"/>
+        <segue reference="4jb-TP-1Xg"/>
+        <segue reference="aYd-mP-3oX"/>
     </inferredMetricsTieBreakers>
 </document>

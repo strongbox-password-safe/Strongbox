@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *labelSafeName;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 
 @end
 

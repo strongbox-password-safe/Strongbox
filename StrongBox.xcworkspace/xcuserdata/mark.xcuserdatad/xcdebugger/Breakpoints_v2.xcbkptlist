@@ -138,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/StorageBrowserTableViewController.m"
-            timestampString = "560273683.38965"
+            timestampString = "560609395.897835"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "259"
@@ -776,7 +776,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/StorageBrowserTableViewController.m"
-            timestampString = "560273683.390185"
+            timestampString = "560609395.8982"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "108"
@@ -792,7 +792,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/StorageBrowserTableViewController.m"
-            timestampString = "560273683.390223"
+            timestampString = "560609395.898249"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "131"
@@ -824,7 +824,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/StorageBrowserTableViewController.m"
-            timestampString = "560273683.390313"
+            timestampString = "560609395.898297"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "162"
@@ -1087,6 +1087,70 @@
             endingLineNumber = "274"
             landmarkName = "-getFilesAndFolders:withParentFolder:completion:"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/UpgradeViewController.m"
+            timestampString = "560610010.7612751"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
+            landmarkName = "-paymentQueue:restoreCompletedTransactionsFailedWithError:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/UpgradeViewController.m"
+            timestampString = "560610010.761332"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "282"
+            endingLineNumber = "282"
+            landmarkName = "-paymentQueue:updatedTransactions:"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__58-[UpgradeViewController paymentQueue:updatedTransactions:]_block_invoke"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/UpgradeViewController.m"
+                  timestampString = "560609258.5295449"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "266"
+                  endingLineNumber = "266"
+                  offsetFromSymbolStart = "64">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__copy_helper_block_.212"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/UpgradeViewController.m"
+                  timestampString = "560609258.5314209"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "264"
+                  endingLineNumber = "264"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

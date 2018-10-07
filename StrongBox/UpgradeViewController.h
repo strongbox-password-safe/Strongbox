@@ -9,12 +9,10 @@
 #import <UIKit/UIKit.h>
 #import <StoreKit/StoreKit.h>
 
-#define kIapProId @"com.markmcguill.strongbox.pro"
-//#define kTestConsumable @"com.markmcguill.strongbox.testconsumable"
+static NSString* kIapProId =  @"com.markmcguill.strongbox.pro";
+//kTestConsumable @"com.markmcguill.strongbox.testconsumable"
 
-@interface UpgradeViewController : UIViewController<SKPaymentTransactionObserver>
-
-@property (nonatomic, strong) SKProduct *product;
+@interface UpgradeViewController : UIViewController<SKPaymentTransactionObserver, SKProductsRequestDelegate>
 
 - (IBAction)onUpgrade:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *buttonUpgrade2;

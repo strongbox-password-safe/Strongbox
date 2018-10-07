@@ -11,24 +11,101 @@
 #import "Settings.h"
 #import "SVProgressHUD.h"
 
-#define kFontName @"Futura-Bold"
+static NSString* kFontName =  @"Futura-Bold";
+
+typedef NS_ENUM (unsigned int, StoreRequestState) {
+    kInitial,
+    kWaitingForResponse,
+    kSuccess,
+    kFailed,
+};
+
+@interface UpgradeViewController ()
+
+@property (nonatomic, strong) SKProductsRequest *productsRequest;
+@property (nonatomic, strong) SKProduct *product;
+@property (nonatomic) StoreRequestState storeRequestState;
+
+@property (nonatomic, strong) NSDictionary* upgradeButtonTitleAttributes;
+@property (nonatomic, strong) NSDictionary* upgradeButtonSubtitleAttributes;
+
+@end
 
 @implementation UpgradeViewController
-
-- (IBAction)onNope:(id)sender {
-    [self dismissViewControllerAnimated:NO completion:nil];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
-
-    [super viewWillDisappear:animated];
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.storeRequestState = kWaitingForResponse;
+    
+    NSSet *productIdentifiers = [NSSet setWithObjects:kIapProId, nil];
+    self.productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
+    self.productsRequest.delegate = self;
+    [self.productsRequest start];
+    
+    [self initializeUi];
+    
+    [self updateUi];
+    
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.navigationController setNavigationBarHidden:YES];
+    
+    self.navigationController.toolbarHidden = YES;
+    self.navigationController.toolbar.hidden = YES;
+}
+
+- (IBAction)onNope:(id)sender {
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    if(self.productsRequest) {
+        [self.productsRequest cancel];
+        self.productsRequest = nil;
+        self.storeRequestState = kInitial;
+    }
+    
+    [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+    
+    [super viewWillDisappear:animated];
+}
+
+-(void)productsRequest:(SKProductsRequest *)request
+    didReceiveResponse:(SKProductsResponse *)response
+{
+    NSUInteger count = [response.products count];
+    self.productsRequest = nil;
+    
+    if (count > 0) {
+        //        for (SKProduct *validProduct in self.validProducts) {
+        //            NSLog(@"%@", validProduct.productIdentifier);
+        //            NSLog(@"%@", validProduct.localizedTitle);
+        //            NSLog(@"%@", validProduct.localizedDescription);
+        //            NSLog(@"%@", validProduct.price);
+        //        }
+        
+        self.product = [response.products objectAtIndex:0];
+        self.storeRequestState = kSuccess;
+    }
+    else {
+        self.storeRequestState = kFailed;
+    }
+    
+    [self updateUi];
+}
+
+- (void)initializeUi {
     self.labelBiometricIdFeature.text = [NSString stringWithFormat:@"Open with %@", [[Settings sharedInstance] getBiometricIdName]];
+    
+    UIColor *lemonColor = [[UIColor alloc] initWithRed:255/255 green:255/255 blue:0/255 alpha:1]; // select needed color
+
+    self.upgradeButtonTitleAttributes = [self getAttributedTextDictionaryWithFontSize:32.0f foregroundColor:[UIColor whiteColor]];
+    self.upgradeButtonSubtitleAttributes = [self getAttributedTextDictionaryWithFontSize:16.0f foregroundColor:lemonColor];
     
     self.buttonUpgrade2.layer.cornerRadius = 25;
     [self.buttonNope setHidden:YES];
@@ -38,89 +115,75 @@
         [self.buttonNope setHidden:NO];
         [self.buttonNope setEnabled:YES];
     });
-    
-    NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
-    formatter.numberStyle = NSNumberFormatterCurrencyStyle;
-    formatter.locale = self.product.priceLocale;
-    NSString* localCurrency = [formatter stringFromNumber:self.product.price];
-    NSString* priceText = [NSString stringWithFormat:@"(%@)*", localCurrency];
-    
+}
+
+- (NSDictionary*)getAttributedTextDictionaryWithFontSize:(CGFloat)fontSize foregroundColor:(UIColor*)foregroundColor {
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     [style setParagraphSpacing:4.0f];
     [style setAlignment:NSTextAlignmentCenter];
     [style setLineBreakMode:NSLineBreakByWordWrapping];
     
-    UIFont *font1 = [UIFont fontWithName:kFontName size:32.0f];
-    UIFont *font2 = [UIFont fontWithName:kFontName size:16.0f];
+    UIFont *font = [UIFont fontWithName:kFontName size:fontSize];
     
-    UIColor *lemonColor = [[UIColor alloc] initWithRed:255/255 green:255/255 blue:0/255 alpha:1]; // select needed color
-    
-    NSDictionary *dict1;
-    if(font1) {
-        dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSFontAttributeName:font1,
-                  NSForegroundColorAttributeName: [UIColor whiteColor],
+    NSDictionary *dict3;
+    if(font) {
+        dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
+                  NSFontAttributeName:font,
+                  NSForegroundColorAttributeName: foregroundColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     else {
-        dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName: [UIColor whiteColor],
+        dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
+                  NSForegroundColorAttributeName: foregroundColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     
-    NSDictionary *dict2;
-    if(font2) {
-        dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSFontAttributeName:font2,
-                  NSForegroundColorAttributeName: lemonColor,
-                  NSParagraphStyleAttributeName:style}; // Added line
-    }
-    else {
-        dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName: lemonColor,
-                  NSParagraphStyleAttributeName:style}; // Added line
-    }
+    return dict3;
+}
 
-    if(self.product != nil) {
+- (NSString *)getPriceTextFromProduct {
+    NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
+    formatter.numberStyle = NSNumberFormatterCurrencyStyle;
+    formatter.locale = self.product.priceLocale;
+    NSString* localCurrency = [formatter stringFromNumber:self.product.price];
+    NSString* priceText = [NSString stringWithFormat:@"(%@)*", localCurrency];
+    return priceText;
+}
+
+- (void)updateUi {
+    if(self.storeRequestState == kWaitingForResponse) {
+        NSAttributedString *attString = [[NSAttributedString alloc]
+                                         initWithString:@"Contacting App Store... Please Wait..."
+                                         attributes:self.upgradeButtonSubtitleAttributes];
+        
+        [self.buttonUpgrade2 setAttributedTitle:attString forState:UIControlStateNormal];
+        [self.buttonUpgrade2 setEnabled:NO];
+    }
+    else if(self.storeRequestState == kSuccess) {
+        NSString * priceText = [self getPriceTextFromProduct];
+        
         NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:@"Upgrade\n" attributes:dict1]];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:priceText attributes:dict2]];
+        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:@"Upgrade\n"
+                                                                          attributes:self.upgradeButtonTitleAttributes]];
+        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:priceText
+                                                                          attributes:self.upgradeButtonSubtitleAttributes]];
         
         [self.buttonUpgrade2 setAttributedTitle:attString forState:UIControlStateNormal];
         [[self.buttonUpgrade2 titleLabel] setNumberOfLines:2];
         [[self.buttonUpgrade2 titleLabel] setLineBreakMode:NSLineBreakByWordWrapping];
-        }
+        [self.buttonUpgrade2 setEnabled:YES];
+    }
     else {
-        UIFont *font3 = [UIFont fontWithName:kFontName size:16.0f];
-        
-        NSDictionary *dict3;
-        if(font3) {
-            dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                                NSFontAttributeName:font3,
-                                NSForegroundColorAttributeName: lemonColor,
-                                NSParagraphStyleAttributeName:style}; // Added line
-        }
-        else {
-            dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                      NSForegroundColorAttributeName: lemonColor,
-                      NSParagraphStyleAttributeName:style}; // Added line
-        }
-        
-        NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:@"Upgrade Momentarily Unavailable\nPlease Try Again Later" attributes:dict3]];
+        NSAttributedString *attString = [[NSAttributedString alloc]
+                                                initWithString:@"Upgrade Momentarily Unavailable\nPlease Try Again Later" attributes:self.upgradeButtonSubtitleAttributes];
         
         [self.buttonUpgrade2 setAttributedTitle:attString forState:UIControlStateNormal];
         [self.buttonUpgrade2 setEnabled:NO];
-
-        [self.buttonRestore setEnabled:NO];
-        [self.buttonRestore setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     }
-    
-    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
 }
 
 - (IBAction)onUpgrade:(id)sender {
-    if( self.product == nil) {
+    if( self.storeRequestState != kSuccess || self.product == nil) {
         [Alerts warn:self
                title:@"Product Error"
              message:@"Could not access Upgrade Product on App Store. Please try again later."];
@@ -183,9 +246,13 @@
         
         [[Settings sharedInstance] setPro:YES];
 
-        [Alerts info:self title:@"Welcome Back to Strongbox Pro" message:@"Upgrade Restored Successfully. Thank you!" completion:^{
-            [self dismissViewControllerAnimated:NO completion:nil];
-        }];
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        });
+        
+//        [Alerts info:self title:@"Welcome Back to Strongbox Pro" message:@"Upgrade Restored Successfully. Thank you!" completion:^{
+//            [self.navigationController popToRootViewControllerAnimated:YES];
+//        }];
     }
 }
 
@@ -207,9 +274,11 @@ updatedTransactions:(NSArray *)transactions {
             
                 [SVProgressHUD dismiss];
                 
-                [Alerts info:self title:@"Welcome to Strongbox Pro" message:@"Upgrade successful" completion:^{
-                    [self dismissViewControllerAnimated:NO completion:nil];
-                }];
+//                [Alerts info:self title:@"Welcome to Strongbox Pro" message:@"Upgrade successful" completion:^{
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    [self.navigationController popToRootViewControllerAnimated:YES];
+                });
+//                }];
 
             }
                 break;

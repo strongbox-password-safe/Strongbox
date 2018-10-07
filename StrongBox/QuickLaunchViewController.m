@@ -70,15 +70,46 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.navigationController.toolbarHidden = YES;
-    self.navigationController.toolbar.hidden = YES;
     [self.navigationController setNavigationBarHidden:YES];
+    
+    [self bindProOrFreeTrialUi];
+}
+
+-(void)bindProOrFreeTrialUi {
+    self.navigationController.toolbarHidden =  [[Settings sharedInstance] isPro];
+    self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
+    
+    if(![[Settings sharedInstance] isPro]) {
+        [self.buttonUpgrade setEnabled:YES];
+        
+        NSString *upgradeButtonTitle;
+        if([[Settings sharedInstance] isFreeTrial]) {
+            NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
+            
+            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days Left)",
+                                  (long)daysLeft];
+            
+            if(daysLeft < 10) {
+                [self.buttonUpgrade setTintColor: [UIColor redColor]];
+            }
+        }
+        else {
+            upgradeButtonTitle = [NSString stringWithFormat:@"Please Upgrade..."];
+            [self.buttonUpgrade setTintColor: [UIColor redColor]];
+        }
+        
+        [self.buttonUpgrade setTitle:upgradeButtonTitle];
+    }
+    else {
+        [self.buttonUpgrade setEnabled:NO];
+        [self.buttonUpgrade setTintColor: [UIColor clearColor]];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    SafeMetaData* primary = [self getPrimarySafe];
+    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
     
     if(!primary) {
         [self switchToSafesListView];
@@ -108,18 +139,12 @@
 }
 
 - (void)openPrimarySafe {
-    SafeMetaData* safe = [self getPrimarySafe];
+    SafeMetaData* safe = [[self getInitialViewController] getPrimarySafe];
     
     if(!safe) {
         [Alerts warn:self title:@"No Primary Safe" message:@"Strongbox could not determine your primary safe. Switch back to the Safes List View and ensure that there is at least one safe present."];
         
         return;
-    }
-    
-    NSLog(@"Primary Safe: [%@]", safe);
-    
-    if(safe.hasUnresolvedConflicts) {
-        [Alerts warn:self title:@"Safe has Conflicts" message:@"This safe has unresolved conflicts. Please switch back to Safes List View and resolve these before opening."];
     }
     
     // Turn off active notifications during open as touch id causes actice/resign
@@ -140,12 +165,6 @@
     }];
 }
 
-- (SafeMetaData*)getPrimarySafe {
-    SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstObject];
-
-    return safe;
-}
-
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToBrowseFromQuick"]) {
         BrowseSafeView *vc = segue.destinationViewController;
@@ -154,5 +173,8 @@
     }
 }
 
+- (IBAction)onUpgrade:(id)sender {
+    [self performSegueWithIdentifier:@"segueQuickLaunchToUpgrade" sender:nil];
+}
 
 @end
