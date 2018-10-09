@@ -15,6 +15,9 @@
 #import "WindowController.h"
 #import "Settings.h"
 #import "AppDelegate.h"
+#import "SafeMetaData.h"
+#import "SafesList.h"
+#import "NSArray+Extensions.h"
 
 @interface Document ()
 
@@ -70,6 +73,15 @@
     else {
         [super saveDocument:sender];
     
+        SafeMetaData* safe = [self getSafeMetaData];
+        if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
+            // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
+            // Update Touch Id Password
+            
+            NSLog(@"Updating Touch ID Password in case is has changed");
+            safe.touchIdPassword = self.model.masterPassword;
+        }
+        
         if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
             AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
             [appDelegate showUpgradeModal:5];
@@ -109,28 +121,15 @@ completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
     }];
 }
 
-//- (BOOL)saveToURL:(NSURL *)absoluteURL
-//           ofType:(NSString *)typeName
-// forSaveOperation:(NSSaveOperationType)saveOperation
-//            error:(NSError **)outError
-//{
-//    // Update the Last Update Fields
-//
-//    [self.model defaultLastUpdateFieldsToNow];
-//
-//    BOOL success = [super saveToURL:absoluteURL
-//                             ofType:typeName
-//                   forSaveOperation:saveOperation
-//                              error:outError];
-//
-//    if (success) {
-//        self.dirty = NO;
-//        ViewController *vc = (ViewController*)self.windowController.contentViewController;
-//        [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
-//    }
-//
-//    return success;
-//}
+- (SafeMetaData*)getSafeMetaData {
+    if(!self.model || !self.model.fileUrl) {
+        return nil;
+    }
+    
+    return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
+    }];
+}
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
     return [self.model getPasswordDatabaseAsData:outError];

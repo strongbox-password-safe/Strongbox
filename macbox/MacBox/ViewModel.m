@@ -97,6 +97,20 @@
     return NO;
 }
 
+-(NSString*)masterPassword {
+    return self.locked ? nil : self.passwordDatabase.masterPassword;
+}
+
+- (void)setMasterPassword:(NSString *)masterPassword {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.passwordDatabase setMasterPassword:masterPassword];
+    
+    self.document.dirty = YES;
+}
+
 - (BOOL)masterPasswordIsSet {
     if(!self.locked) {
         return self.passwordDatabase.masterPassword != nil;
@@ -143,18 +157,6 @@
     }
     
     return nil;
-}
-
-- (BOOL)setMasterPassword:(NSString*)password {
-    if(self.locked) {
-        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
-    }
-    
-    [self.passwordDatabase setMasterPassword:password];
-    
-    self.document.dirty = YES;
-    
-    return YES;
 }
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {

@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <StoreKit/StoreKit.h>
+#import "NSArray+Extensions.h"
 
 #define kAutoLockTime @"autoLockTime"
 #define kPreferencesChangedNotification @"preferencesChangedNotification"

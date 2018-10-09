@@ -127,7 +127,7 @@
 }
 
 - (BOOL)biometricOpenIsAvailableForSafe {
-    SafeMetaData* metaData = [self getMetaDataForModel];
+    SafeMetaData* metaData = [self getSafeMetaData];
     
     return  metaData == nil ||
             !metaData.isTouchIdEnabled ||
@@ -171,7 +171,7 @@
     [self bindStatusPane];
     
     if(!self.model.masterPasswordIsSet) {
-        [self promptForMasterPassword:YES]; // New document - Require Master Password Set
+        [self promptForMasterPassword:YES promptToSave:NO]; // New document - Require Master Password Set
     }
 }
 
@@ -395,7 +395,7 @@
 
 - (IBAction)onUnlockWithTouchId:(id)sender {
     if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-        SafeMetaData *safe = [self getMetaDataForModel];
+        SafeMetaData *safe = [self getSafeMetaData];
         
         if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
             [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
@@ -434,16 +434,14 @@
     }
 }
 
-- (SafeMetaData*)getMetaDataForModel {
+- (SafeMetaData*)getSafeMetaData {
     if(!self.model || !self.model.fileUrl) {
         return nil;
     }
     
-    NSArray<SafeMetaData*>* matches = [SafesList.sharedInstance.snapshot filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return [((SafeMetaData*)evaluatedObject).fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
-    }]];
-    
-    return [matches firstObject];
+    return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
+    }];
 }
 
 - (void)onSuccessfulUnlock:(NSString *)selectedItemId {
@@ -457,7 +455,7 @@
                   window:self.view.window];
         }
         
-        SafeMetaData* metaData = [self getMetaDataForModel];
+        SafeMetaData* metaData = [self getSafeMetaData];
         
         if(!metaData) {
             // First Time? Display Touch ID Caveat
@@ -536,12 +534,6 @@
     if(self.model && !self.model.locked) {
         if(self.model.dirty) {
             [Alerts info:@"You cannot lock a safe while changes are pending. Save your changes first." window:self.view.window];
-            //            NSLog(@"Saving...");
-            //            
-            //            SEL selector = NSSelectorFromString(@"saveDocument:");
-            //            [[NSApplication sharedApplication] sendAction:selector to:nil from:self];
-            //            
-            //[NSApplication sharedApplication] sendAction:NSSelectorFromString(saveDocument: to:]; from:(nullable id)
         }
         else {
             NSError* error;
@@ -578,31 +570,23 @@
     [self.view.window makeFirstResponder:self.searchField];
 }
 
-- (void)promptForMasterPassword:(BOOL)required {
+- (void)promptForMasterPassword:(BOOL)required promptToSave:(BOOL)promptToSave {
     if(self.model && !self.model.locked) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changeMasterPassword = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
-            self.changeMasterPassword.titleText = required ? @"You must set a master password" : @"Change Master Password";
+            self.changeMasterPassword.titleText = required ? @"Please set a master password for this new safe" : @"Change Master Password";
             self.changeMasterPassword.required = required;
             
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
                     [self.model setMasterPassword:self.changeMasterPassword.confirmedPassword];
                     
-                    // Update Touch Id Password
-                    
-                    SafeMetaData* safe = [self getMetaDataForModel];
-                    if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
-                        NSLog(@"Updating Touch ID Password");
-                        safe.touchIdPassword = self.changeMasterPassword.confirmedPassword;
+                    if(promptToSave) {
+                        [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
+                        
+                        [Alerts info:@"Master Password Changed" window:self.view.window];
                     }
-                    
-                    // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
-                    
-                    [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-                    
-                    [Alerts info:@"Master Password Changed" window:self.view.window];
                 }
             }];
         });
@@ -610,7 +594,7 @@
 }
 
 - (IBAction)onChangeMasterPassword:(id)sender {
-    [self promptForMasterPassword:NO];
+    [self promptForMasterPassword:NO promptToSave:YES];
 }
 
 - (IBAction)onSearch:(id)sender {
@@ -1137,7 +1121,7 @@ NSString* trimField(NSTextField* textField) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
     else if (theAction == @selector(onClearTouchId:)) {
-        SafeMetaData* metaData = [self getMetaDataForModel];
+        SafeMetaData* metaData = [self getSafeMetaData];
         return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
     }
     
@@ -1145,7 +1129,7 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onClearTouchId:(id)sender {
-    SafeMetaData* metaData = [self getMetaDataForModel];
+    SafeMetaData* metaData = [self getSafeMetaData];
     
     if(metaData) {
         [SafesList.sharedInstance remove:metaData.uuid];

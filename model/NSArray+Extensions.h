@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSArray<ObjectType> (Extensions)
 
 - (NSArray*)map:(id (^)(ObjectType obj, NSUInteger idx))block;
+- (nullable ObjectType)firstOrDefault:(BOOL (^)(ObjectType obj))block;
 
 @end
 

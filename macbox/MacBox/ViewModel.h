@@ -17,19 +17,11 @@
 - (instancetype _Nullable )initNewWithSampleData:(Document*_Nonnull)document;
 - (instancetype _Nullable )initWithData:(NSData*_Nonnull)data document:(Document*_Nonnull)document;
 
-@property (nonatomic, readonly) Document* _Nonnull document;
-@property (nonatomic, readonly) BOOL dirty;
-@property (nonatomic, readonly) BOOL locked;
-@property (nonatomic, readonly) NSURL* _Nonnull fileUrl;
-@property (nonatomic, readonly) Node* _Nonnull rootGroup;
-@property (nonatomic, readonly) BOOL masterPasswordIsSet;
-
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (BOOL)lock:(NSError*_Nonnull*_Nonnull)error selectedItem:(NSString*_Nullable)selectedItem;
 - (BOOL)unlock:(NSString*_Nonnull)password selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError*_Nonnull*_Nonnull)error;
 - (NSData*_Nullable)getPasswordDatabaseAsData:(NSError*_Nonnull*_Nonnull)error;
-- (BOOL)setMasterPassword:(NSString*_Nonnull)password;
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title;
 - (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username;
@@ -53,6 +45,15 @@
 - (NSString*_Nonnull)getDiagnosticDumpString;
 
 - (void)defaultLastUpdateFieldsToNow;
+
+@property (nonatomic, readonly) Document* _Nonnull document;
+@property (nonatomic, readonly) BOOL dirty;
+@property (nonatomic, readonly) BOOL locked;
+@property (nonatomic, readonly) NSURL* _Nonnull fileUrl;
+@property (nonatomic, readonly) Node* _Nonnull rootGroup;
+@property (nonatomic, readonly) BOOL masterPasswordIsSet;
+
+@property (nonatomic) NSString* masterPassword;
 
 // Convenience / Summary
 

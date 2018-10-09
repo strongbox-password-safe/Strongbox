@@ -11,6 +11,7 @@
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
 		4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF2216136D10054C8D0 /* formatV3.txt */; };
 		4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF3216136D10054C8D0 /* formatV4.txt */; };
+		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
 		4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */; };
@@ -74,6 +75,8 @@
 		4D00B1F71F3DB03300D7560B /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alerts.m; sourceTree = "<group>"; };
 		4D23BBF2216136D10054C8D0 /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = formatV3.txt; path = ../../model/pwsafe/formatV3.txt; sourceTree = "<group>"; };
 		4D23BBF3216136D10054C8D0 /* formatV4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = formatV4.txt; path = ../../model/pwsafe/formatV4.txt; sourceTree = "<group>"; };
+		4D446804216CDA4400F6358D /* NSArray+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "../../model/NSArray+Extensions.h"; sourceTree = "<group>"; };
+		4D446805216CDA4500F6358D /* NSArray+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "../../model/NSArray+Extensions.m"; sourceTree = "<group>"; };
 		4D48C3591F4AECBF0041A47E /* LockedSafeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockedSafeInfo.h; sourceTree = "<group>"; };
 		4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockedSafeInfo.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
@@ -233,6 +236,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D446804216CDA4400F6358D /* NSArray+Extensions.h */,
+				4D446805216CDA4500F6358D /* NSArray+Extensions.m */,
 				4D559FA020750D1D009856E3 /* SafeMetaData.h */,
 				4D559FA320750D1D009856E3 /* SafeMetaData.m */,
 				4DF347FF2074FA6C00148741 /* AbstractPasswordDatabase.h */,
@@ -569,6 +574,7 @@
 				4D6B2C35210607F700714BF8 /* SafesList.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
+				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
