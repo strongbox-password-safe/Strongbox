@@ -4,6 +4,7 @@
 #import "twofish/tomcrypt.h"
 #import "Record.h"
 #import "Field.h"
+#import "Utils.h"
 
 #include <Security/Security.h>
 
@@ -159,8 +160,8 @@
     // hdr.salt
 
     if (SecRandomCopyBytes(kSecRandomDefault, SIZE_OF_PASSWORD_SAFE_3_HEADER_SALT, hdr.salt)) {
-        // TODO: return error?
-        NSLog(@"Eeek");
+        NSLog(@"Could not securely copy header salt bytes");
+        [Utils createNSError:@"Could not securely copy header salt bytes" errorCode:-1];
     }
 
     // hdr.iter
@@ -202,8 +203,8 @@
         SecRandomCopyBytes(kSecRandomDefault, TWOFISH_BLOCK_SIZE, k2) ||
         SecRandomCopyBytes(kSecRandomDefault, TWOFISH_BLOCK_SIZE, l1) ||
         SecRandomCopyBytes(kSecRandomDefault, TWOFISH_BLOCK_SIZE, l2)) {
-        // TODO: return error?!
-        NSLog(@"Eeek");
+        NSLog(@"Could not securely copy K or L bytes");
+        [Utils createNSError:@"Could not securely copy K or L bytes" errorCode:-1];
     }
 
     //    NSLog(@"--------------- new ------------------");
@@ -219,8 +220,8 @@
     symmetric_key skey;
 
     if ((err = twofish_setup(pBarData.bytes, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
-        // TODO: return error?
-        NSLog(@"Eeek");
+        NSLog(@"Could not do twofish_setup ok: %d", err);
+        [Utils createNSError:@"Could not do twofish_setup ok" errorCode:err];
     }
 
     twofish_ecb_encrypt(k1, hdr.b1, &skey);
@@ -242,8 +243,8 @@
     // hdr.iv;
 
     if (SecRandomCopyBytes(kSecRandomDefault, SIZE_OF_PASSWORD_SAFE_3_HEADER_IV, hdr.iv)) {
-        // TODO: return error?
-        NSLog(@"Eeek");
+        NSLog(@"Could not do securely copy password safe header ok");
+        [Utils createNSError:@"Could not do securely copy password safe header ok" errorCode:-1];
     }
 
     return hdr;

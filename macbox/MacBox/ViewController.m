@@ -17,6 +17,7 @@
 #import "SafesList.h"
 #import "BiometricIdHelper.h"
 #import "PreferencesWindowController.h"
+#import "Csv.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -653,7 +654,14 @@
         
         self.textFieldPw.enabled = YES;
         self.textFieldPw.stringValue = item.fields.password;
-        self.textFieldPw.textColor = [NSColor purpleColor];// disabledControlTextColor]
+        
+        if (@available(macOS 10.13, *)) {
+            self.textFieldPw.textColor = [NSColor colorNamed:@"password-field-text-color"];
+            
+        } else {
+            self.textFieldPw.textColor = [NSColor controlTextColor];
+        }
+        
         //self.buttonShowHidePassword.title = @"Hide Password (⌘P)";
         self.buttonGeneratePassword.hidden = NO;
     }
@@ -1167,7 +1175,7 @@ NSString* trimField(NSTextField* textField) {
 - (IBAction)onCopyAsCsv:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     
-    NSString *newStr = [[NSString alloc] initWithData:[Utils getSafeAsCsv:self.model.rootGroup] encoding:NSUTF8StringEncoding];
+    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.model.rootGroup] encoding:NSUTF8StringEncoding];
     
     [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
 }

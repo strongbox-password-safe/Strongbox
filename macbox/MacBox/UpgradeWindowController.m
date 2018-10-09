@@ -63,6 +63,7 @@
 }
 
 - (void) customizeButtonsBasedOnProduct {
+    [self.buttonUpgrade.layer setBackgroundColor:[NSColor redColor].CGColor];
     self.buttonUpgrade.layer.cornerRadius = 15;
     
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
@@ -73,18 +74,32 @@
     NSFont *font1 = [NSFont fontWithName:kFontName size:32.0f];
     NSFont *font2 = [NSFont fontWithName:kFontName size:16.0f];
     
-    NSColor *lemonColor = [NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1];
+    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+    
+    // * If osxMode is nil then it isn't in dark mode, but if osxMode is @"Dark" then it is in dark mode.
+    
+    NSColor *upgradeButtonSubtitleColor;
+    NSColor *upgradeButtonTitleColor;
+    
+    if([osxMode isEqualToString:@"Dark"]) {
+        upgradeButtonSubtitleColor = [NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1]; // Lemon
+        upgradeButtonTitleColor = [NSColor whiteColor];
+    }
+    else {
+        upgradeButtonSubtitleColor = [NSColor controlTextColor]; //[NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1]; // Lemon
+        upgradeButtonTitleColor = [NSColor controlTextColor];
+    }
     
     NSDictionary *dict1;
     if(font1) {
         dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                   NSFontAttributeName:font1,
-                  NSForegroundColorAttributeName: [NSColor whiteColor],
+                  NSForegroundColorAttributeName: upgradeButtonTitleColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     else {
         dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName: [NSColor whiteColor],
+                  NSForegroundColorAttributeName: upgradeButtonTitleColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     
@@ -92,12 +107,12 @@
     if(font2) {
         dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                   NSFontAttributeName:font2,
-                  NSForegroundColorAttributeName: lemonColor,
+                  NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     else {
         dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName: lemonColor,
+                  NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     
@@ -123,12 +138,12 @@
         if(font3) {
             dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                       NSFontAttributeName:font3,
-                      NSForegroundColorAttributeName: lemonColor,
+                      NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
                       NSParagraphStyleAttributeName:style}; // Added line
         }
         else {
             dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                      NSForegroundColorAttributeName: lemonColor,
+                      NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
                       NSParagraphStyleAttributeName:style}; // Added line
         }
 

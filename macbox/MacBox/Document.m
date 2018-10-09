@@ -109,7 +109,7 @@ completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts error:errorOrNil window:self.windowController.window]; // TODO: Should we do this here? 
+                [Alerts error:errorOrNil window:self.windowController.window];
             });
             
             NSLog(@"Error during saveToURL: %@", errorOrNil);

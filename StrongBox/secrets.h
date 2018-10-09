@@ -9,6 +9,6 @@
 #ifndef secrets_h
 #define secrets_h
 
-#define DROPBOX_APP_KEY @"<TODO>"
+#define DROPBOX_APP_KEY @"<>"
 
 #endif /* secrets_h */

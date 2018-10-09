@@ -9,13 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "DatabaseModel.h"
 
-static NSString* kCSVHeaderTitle = @"Title";
-static NSString* kCSVHeaderUsername = @"Username";
-static NSString* kCSVHeaderUrl = @"Url";
-static NSString* kCSVHeaderEmail = @"Email";
-static NSString* kCSVHeaderPassword = @"Password";
-static NSString* kCSVHeaderNotes = @"Notes";
-
 @interface Utils : NSObject
 
 + (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode;
@@ -27,6 +20,5 @@ static NSString* kCSVHeaderNotes = @"Notes";
 + (NSString *)trim:(NSString*)string;
 + (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2;
 + (NSString*)generateUniqueId;
-+ (NSData*)getSafeAsCsv:(Node*)rootGroup;
 
 @end

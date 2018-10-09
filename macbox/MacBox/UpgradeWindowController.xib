@@ -20,29 +20,29 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Upgrade to Pro?" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES"/>
-            <rect key="contentRect" x="196" y="240" width="542" height="537"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="contentRect" x="196" y="240" width="597" height="584"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="542" height="537"/>
+                <rect key="frame" x="0.0" y="0.0" width="597" height="584"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <scrollView horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e6X-Fc-sXn">
-                        <rect key="frame" x="20" y="169" width="502" height="348"/>
+                    <scrollView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e6X-Fc-sXn">
+                        <rect key="frame" x="20" y="176" width="557" height="388"/>
                         <clipView key="contentView" drawsBackground="NO" id="K16-FS-nxk">
-                            <rect key="frame" x="0.0" y="0.0" width="502" height="348"/>
+                            <rect key="frame" x="0.0" y="0.0" width="542" height="388"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textView editable="NO" selectable="NO" importsGraphics="NO" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" textCompletion="NO" id="gBW-lD-OqW">
-                                    <rect key="frame" x="0.0" y="0.0" width="502" height="348"/>
+                                <textView editable="NO" selectable="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" textCompletion="NO" id="gBW-lD-OqW">
+                                    <rect key="frame" x="0.0" y="0.0" width="542" height="388"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="textColor" red="0.0" green="0.26667000000000002" blue="0.99607999999999997" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="502" height="348"/>
-                                    <size key="maxSize" width="528" height="10000000"/>
+                                    <size key="minSize" width="542" height="388"/>
+                                    <size key="maxSize" width="755" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="Pro Upgrade ">
                                             <attributes>
-                                                <color key="NSColor" red="0.0" green="0.26667000000000002" blue="0.99607999999999997" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="36" name="Futura-Bold"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -91,6 +91,7 @@
 Cg
 </string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -139,6 +140,7 @@ Cg
 Cg
 </string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Helvetica"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -187,6 +189,7 @@ Cg
 Thanks!
 -Mark</string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="14" name="Futura-Medium"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -235,6 +238,7 @@ Thanks!
 Cgo
 </string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Futura-Medium"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -280,7 +284,7 @@ Cgo
                                         </fragment>
                                         <fragment content="Pro Features">
                                             <attributes>
-                                                <color key="NSColor" red="0.0" green="0.26667000000000002" blue="0.99607999999999997" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="24" name="Futura-Medium"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -329,6 +333,7 @@ Cgo
 Cg
 </string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="12" name="Futura-Medium"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -377,6 +382,7 @@ Cg
 Search Your Safes
 Support Development via Caffeine Supply!</string>
                                             <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="16" name="Futura-MediumItalic"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" headIndent="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
@@ -424,7 +430,7 @@ Support Development via Caffeine Supply!</string>
                                             </attributes>
                                         </fragment>
                                     </attributedString>
-                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
                             </subviews>
                         </clipView>
@@ -433,18 +439,18 @@ Support Development via Caffeine Supply!</string>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="FPG-j6-DMY">
-                            <rect key="frame" x="486" y="0.0" width="16" height="348"/>
+                            <rect key="frame" x="542" y="0.0" width="15" height="388"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0sw-da-jUF">
-                        <rect key="frame" x="14" y="74" width="514" height="91"/>
+                    <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0sw-da-jUF">
+                        <rect key="frame" x="20" y="88" width="557" height="80"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="80" id="hn5-xa-wQ8"/>
+                            <constraint firstAttribute="height" constant="80" id="3Ma-XL-ZRP"/>
                         </constraints>
-                        <buttonCell key="cell" type="push" title="Upgrade" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="L9Y-AM-riU">
+                        <buttonCell key="cell" type="square" title="Upgrade" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" inset="2" id="L9Y-AM-riU">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" size="22" name="Futura-Bold"/>
+                            <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
@@ -453,11 +459,11 @@ DQ
                             <action selector="onPurchase:" target="-2" id="Xqr-xP-goI"/>
                         </connections>
                     </button>
-                    <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nVF-RT-ORX">
-                        <rect key="frame" x="20" y="49" width="502" height="21"/>
+                    <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nVF-RT-ORX" userLabel="Buttons Stack">
+                        <rect key="frame" x="20" y="59" width="557" height="21"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YZF-NG-M3q">
-                                <rect key="frame" x="-6" y="-7" width="174" height="32"/>
+                                <rect key="frame" x="-6" y="-7" width="192" height="32"/>
                                 <buttonCell key="cell" type="push" title="No Thanks" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dwj-mQ-ieS">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -467,7 +473,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="x8Y-Q3-Uu1">
-                                <rect key="frame" x="164" y="-7" width="344" height="32"/>
+                                <rect key="frame" x="182" y="-7" width="381" height="32"/>
                                 <buttonCell key="cell" type="push" title="Restore Previous Purchase" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ayo-C3-OXg">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -486,46 +492,49 @@ DQ
                             <real value="3.4028234663852886e+38"/>
                         </customSpacing>
                     </stackView>
-                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="EAJ-3L-JEi">
-                        <rect key="frame" x="255" y="327" width="32" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    </progressIndicator>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qUL-Pl-gGo">
-                        <rect key="frame" x="18" y="26" width="341" height="14"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qUL-Pl-gGo">
+                        <rect key="frame" x="18" y="36" width="142" height="14"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="* One Time Purchase Only" id="aa7-y6-JNA">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jcc-jf-Ou8">
-                        <rect key="frame" x="18" y="10" width="341" height="14"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jcc-jf-Ou8">
+                        <rect key="frame" x="18" y="20" width="341" height="14"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="** Upgrade for Mac only. Separate upgrade required for iOS App" id="YLi-lp-lIE">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="EAJ-3L-JEi">
+                        <rect key="frame" x="283" y="276" width="32" height="32"/>
+                    </progressIndicator>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="nVF-RT-ORX" secondAttribute="trailing" constant="20" symbolic="YES" id="57c-ly-h4S"/>
-                    <constraint firstItem="e6X-Fc-sXn" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" id="HGh-b3-5SQ"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="467" id="KkC-dc-dYu"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="top" secondItem="0sw-da-jUF" secondAttribute="bottom" constant="11" id="Vol-YQ-wqL"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="trailing" secondItem="0sw-da-jUF" secondAttribute="trailing" id="X4F-pi-gOW"/>
-                    <constraint firstItem="0sw-da-jUF" firstAttribute="top" secondItem="e6X-Fc-sXn" secondAttribute="bottom" constant="8" id="ZRk-Tp-GFf"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="leading" secondItem="e6X-Fc-sXn" secondAttribute="leading" id="f8m-Fg-duj"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="rB4-Xl-Rxd"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="leading" secondItem="0sw-da-jUF" secondAttribute="leading" id="sEv-6P-4wi"/>
-                    <constraint firstItem="nVF-RT-ORX" firstAttribute="trailing" secondItem="e6X-Fc-sXn" secondAttribute="trailing" id="sdD-qH-xQW"/>
+                    <constraint firstItem="jcc-jf-Ou8" firstAttribute="top" secondItem="qUL-Pl-gGo" secondAttribute="bottom" constant="2" id="0Be-TQ-xtX"/>
+                    <constraint firstAttribute="bottom" secondItem="jcc-jf-Ou8" secondAttribute="bottom" constant="20" symbolic="YES" id="2TL-ff-Xew"/>
+                    <constraint firstItem="nVF-RT-ORX" firstAttribute="top" secondItem="0sw-da-jUF" secondAttribute="bottom" constant="8" symbolic="YES" id="5QB-MI-Od3"/>
+                    <constraint firstItem="nVF-RT-ORX" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="8N7-dz-OrR"/>
+                    <constraint firstItem="e6X-Fc-sXn" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" symbolic="YES" id="HGh-b3-5SQ"/>
+                    <constraint firstAttribute="trailing" secondItem="e6X-Fc-sXn" secondAttribute="trailing" constant="20" symbolic="YES" id="LfK-t8-J5Q"/>
+                    <constraint firstAttribute="trailing" secondItem="0sw-da-jUF" secondAttribute="trailing" constant="20" symbolic="YES" id="MFV-7O-qqJ"/>
+                    <constraint firstItem="jcc-jf-Ou8" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="Om4-hG-wbN"/>
+                    <constraint firstItem="0sw-da-jUF" firstAttribute="leading" secondItem="nVF-RT-ORX" secondAttribute="leading" id="RrW-NY-C7j"/>
+                    <constraint firstItem="qUL-Pl-gGo" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="UzF-b6-D2C"/>
+                    <constraint firstItem="EAJ-3L-JEi" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" id="YM1-Xy-I1x"/>
+                    <constraint firstItem="0sw-da-jUF" firstAttribute="top" secondItem="e6X-Fc-sXn" secondAttribute="bottom" constant="8" symbolic="YES" id="ZZh-kF-7Uw"/>
+                    <constraint firstAttribute="trailing" secondItem="nVF-RT-ORX" secondAttribute="trailing" constant="20" symbolic="YES" id="dZt-Zo-k5b"/>
+                    <constraint firstItem="qUL-Pl-gGo" firstAttribute="top" secondItem="nVF-RT-ORX" secondAttribute="bottom" constant="9" id="ey4-Ft-EDm"/>
+                    <constraint firstItem="e6X-Fc-sXn" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="wfn-ds-MS4"/>
+                    <constraint firstItem="EAJ-3L-JEi" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="yN8-iA-k5L"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="383" y="386.5"/>
+            <point key="canvasLocation" x="817.5" y="246"/>
         </window>
     </objects>
 </document>

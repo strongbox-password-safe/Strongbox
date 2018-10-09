@@ -31,6 +31,7 @@
 		4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
+		4D446809216CE02C00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446808216CE02C00F6358D /* Csv.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
@@ -131,6 +132,8 @@
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserTableViewController.m; sourceTree = "<group>"; };
 		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserItem.h; sourceTree = "<group>"; };
 		4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageBrowserItem.m; sourceTree = "<group>"; };
+		4D446807216CE02C00F6358D /* Csv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = model/Csv.h; sourceTree = SOURCE_ROOT; };
+		4D446808216CE02C00F6358D /* Csv.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = model/Csv.m; sourceTree = SOURCE_ROOT; };
 		4D4C49021EDEC0B900EB857D /* RecordView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordView.h; sourceTree = "<group>"; };
 		4D4C49031EDEC0B900EB857D /* RecordView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordView.m; sourceTree = "<group>"; };
 		4D4F184A2165125B00578F0E /* NSArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "model/NSArray+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -349,6 +352,8 @@
 				4D29E46E206D350300AD537E /* PasswordGenerator.m */,
 				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
 				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
+				4D446807216CE02C00F6358D /* Csv.h */,
+				4D446808216CE02C00F6358D /* Csv.m */,
 			);
 			name = Model;
 			path = "New Group";
@@ -723,6 +728,7 @@
 				4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */,
 				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
 				4D8C147D2074F5D100CE9CAE /* CHCSVParser.m in Sources */,
+				4D446809216CE02C00F6358D /* Csv.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
