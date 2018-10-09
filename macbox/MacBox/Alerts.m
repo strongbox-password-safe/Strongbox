@@ -8,6 +8,13 @@
 
 #import "Alerts.h"
 
+@interface Alerts ()
+
+@property (nonatomic, strong) NSButton* okButton;
+@property (nonatomic) BOOL allowEmptyInput;
+
+@end
+
 @implementation Alerts
 
 + (void)info:(NSString *)info  window:(NSWindow*)window {
@@ -89,26 +96,51 @@
     }];
 }
 
-//+ (NSString *)input: (NSString *)prompt defaultValue: (NSString *)placeHolder {
-//    NSAlert *alert = [[NSAlert alloc] init];
-//    [alert setMessageText:prompt];
-//    
-//    [alert addButtonWithTitle:@"Ok"];
-//    [alert addButtonWithTitle:@"Cancel"];
-//    
-//    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-//    [input setStringValue:placeHolder];
-//    
-//    [alert setAccessoryView:input];
-//    NSInteger button = [alert runModal];
-//    
-//    if (button == NSAlertFirstButtonReturn) {
-//        return [input stringValue];
-//    } else if (button == NSAlertSecondButtonReturn) {
-//        return nil;
-//    }
-//    
-//    return nil;
+- (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:prompt];
+    
+    self.allowEmptyInput = allowEmpty;
+    self.okButton = [alert addButtonWithTitle:@"OK"];
+    self.okButton.enabled = self.allowEmptyInput || defaultValue.length;// ? YES :NO;
+    
+    [alert addButtonWithTitle:@"Cancel"];
+    
+    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+    [input setStringValue:defaultValue];
+    input.delegate=self;
+    
+    [alert setAccessoryView:input];
+    
+    [[alert window] setInitialFirstResponder: input];
+    
+    //[input becomeFirstResponder];
+    
+    NSInteger button = [alert runModal];
+    
+    if (button == NSAlertFirstButtonReturn) {
+        [input validateEditing];
+        return [input stringValue];
+    } else if (button == NSAlertSecondButtonReturn) {
+        return nil;
+    }
+    
+    return nil;
+}
+
+- (void)controlTextDidChange:(NSNotification *)notification {
+    //NSLog(@"controlTextDidChange");
+    
+    NSTextField* textField = (NSTextField*)notification.object;
+    
+    if(!self.allowEmptyInput && !textField.stringValue.length) {
+        textField.placeholderString = @"Field cannot be empty";
+    }
+    self.okButton.enabled = self.allowEmptyInput || textField.stringValue.length;// ? YES :NO;
+}
+
+//- (void)controlTextDidEndEditing:(NSNotification *)notification {
+//    NSLog(@"controlTextDidEndEditing");
 //}
 
 @end

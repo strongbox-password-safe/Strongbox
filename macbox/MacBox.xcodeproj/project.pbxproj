@@ -13,6 +13,7 @@
 		4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF3216136D10054C8D0 /* formatV4.txt */; };
 		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D44680C216CE08B00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
+		4D446812216D0C4800F6358D /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446811216D0C4800F6358D /* AutoFillNewRecordSettings.m */; };
 		4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
 		4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */; };
@@ -80,6 +81,8 @@
 		4D446805216CDA4500F6358D /* NSArray+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "../../model/NSArray+Extensions.m"; sourceTree = "<group>"; };
 		4D44680A216CE08A00F6358D /* Csv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = ../../model/Csv.h; sourceTree = "<group>"; };
 		4D44680B216CE08A00F6358D /* Csv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = ../../model/Csv.m; sourceTree = "<group>"; };
+		4D446810216D0C4800F6358D /* AutoFillNewRecordSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillNewRecordSettings.h; sourceTree = "<group>"; };
+		4D446811216D0C4800F6358D /* AutoFillNewRecordSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoFillNewRecordSettings.m; sourceTree = "<group>"; };
 		4D48C3591F4AECBF0041A47E /* LockedSafeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LockedSafeInfo.h; sourceTree = "<group>"; };
 		4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LockedSafeInfo.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewModel.h; sourceTree = "<group>"; };
@@ -266,6 +269,8 @@
 				4DF347FB2074FA6C00148741 /* Utils.m */,
 				4D559FA620752537009856E3 /* BiometricIdHelper.h */,
 				4D559FA720752537009856E3 /* BiometricIdHelper.m */,
+				4D446810216D0C4800F6358D /* AutoFillNewRecordSettings.h */,
+				4D446811216D0C4800F6358D /* AutoFillNewRecordSettings.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -564,6 +569,7 @@
 				4DF3480F2074FA9700148741 /* CHCSVParser.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */,
+				4D446812216D0C4800F6358D /* AutoFillNewRecordSettings.m in Sources */,
 				4D559FA920752537009856E3 /* BiometricIdHelper.m in Sources */,
 				4DF348022074FA6C00148741 /* NodeFields.m in Sources */,
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,

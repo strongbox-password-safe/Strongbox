@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
-@interface Alerts : NSObject
+@interface Alerts : NSObject<NSTextFieldDelegate>
 
 + (void)error:(NSError*)error window:(NSWindow*)window;
 + (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window;
@@ -19,5 +19,7 @@
 + (void)info:(NSString *)message informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(void))completion;
 
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
+
+- (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty;
 
 @end

@@ -47,4 +47,17 @@
 @property (weak) IBOutlet NSButton *radioAutolock2Min;
 @property (weak) IBOutlet NSButton *radioAutolock5Min;
 
+@property (weak) IBOutlet NSSegmentedControl *segmentTitle;
+@property (weak) IBOutlet NSTextField *labelCustomTitle;
+@property (weak) IBOutlet NSSegmentedControl *segmentUsername;
+@property (weak) IBOutlet NSTextField *labelCustomUsername;
+@property (weak) IBOutlet NSSegmentedControl *segmentEmail;
+@property (weak) IBOutlet NSTextField *labelCustomEmail;
+@property (weak) IBOutlet NSSegmentedControl *segmentPassword;
+@property (weak) IBOutlet NSTextField *labelCustomPassword;
+@property (weak) IBOutlet NSSegmentedControl *segmentUrl;
+@property (weak) IBOutlet NSTextField *labelCustomUrl;
+@property (weak) IBOutlet NSSegmentedControl *segmentNotes;
+@property (weak) IBOutlet NSTextField *labelCustomNotes;
+
 @end

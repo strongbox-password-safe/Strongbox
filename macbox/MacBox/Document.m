@@ -95,8 +95,6 @@
            ofType:(NSString *)typeName
  forSaveOperation:(NSSaveOperationType)saveOperation
 completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
-    // Update the Last Update Fields
-    
     [self.model defaultLastUpdateFieldsToNow];
     
     [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {

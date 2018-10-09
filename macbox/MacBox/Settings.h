@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "PasswordGenerationParameters.h"
+#import "AutoFillNewRecordSettings.h"
 
 @interface Settings : NSObject
 
@@ -28,6 +29,8 @@
 @property (nonatomic) BOOL alwaysShowUsernameInOutlineView;
 @property (nonatomic) BOOL alwaysShowPassword;
 @property (nonatomic) BOOL warnedAboutTouchId;
+
+@property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
 
 @end
 

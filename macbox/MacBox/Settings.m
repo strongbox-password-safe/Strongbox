@@ -20,6 +20,8 @@
 #define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
 #define kAlwaysShowPassword @"alwaysShowPassword"
 
+static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
+
 @implementation Settings
 
 + (instancetype)sharedInstance {
@@ -183,6 +185,23 @@
 
 - (void)setDoNotAutoFillNotesFromClipboard:(BOOL)doNotAutoFillNotesFromClipboard {
     [self setBool:kDoNotAutoFillNotesFromClipboard value:doNotAutoFillNotesFromClipboard];
+}
+
+- (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
+    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:kAutoFillNewRecordSettings];
+    
+    if(data) {
+        return (AutoFillNewRecordSettings *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
+    
+    return AutoFillNewRecordSettings.defaults;
+}
+
+- (void)setAutoFillNewRecordSettings:(AutoFillNewRecordSettings *)autoFillNewRecordSettings {
+    NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end
