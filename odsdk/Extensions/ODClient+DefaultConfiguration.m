@@ -119,7 +119,6 @@
 
 + (void)setActiveDirectoryAppId:(NSString *)activeDirectoryAppId redirectURL:(NSString *)activeDirectoryRedirectURL
 {
-    NSLog(@"Mark was here!");
     [ODClient setActiveDirectoryAppId:activeDirectoryAppId redirectURL:activeDirectoryRedirectURL flags:nil];
 }
 

@@ -9,7 +9,6 @@
 #import "OneDriveStorageProvider.h"
 #import "Utils.h"
 #import <SVProgressHUD/SVProgressHUD.h>
-//#import <OneDriveSDK/OneDriveSDK.h>
 #import "OneDriveSDK.h"
 
 @interface OneDriveStorageProvider()
@@ -44,7 +43,35 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         _rootFolderOnly = NO;
         
         [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite", @"offline_access"]];
+        
+        // MMcG: 10-Oct-2018 - Originally had OneDrive for Business as a separate provider but it turns out you can do
+        // this, and set it up as both personal and business. Deciding for simplicity to keep it to only one procider
+        // and not support multi accounting. Also, the underlying cookies are shared so it would be difficult to manage
+        // this...
+        
+        static NSString *kBusinessApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
+        static NSString *kBusinessRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
 
+        [ODClient setActiveDirectoryAppId:kBusinessApplicationId redirectURL:kBusinessRedirectUri];
+        
+        // Testing Code...
+        
+//        ODClient* blah = [ODClient loadCurrentClient];
+//
+//        if(blah) {
+//            [blah signOutWithCompletion:^(NSError *error) {
+//                NSLog(@"Signed Out");
+//                NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+//                for (NSHTTPCookie *each in cookieStorage.cookies) {
+//                    NSLog(@"%@", each);
+//                    [cookieStorage deleteCookie:each]; }
+//            }];
+//        }
+//        else {
+//            NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+//            for (NSHTTPCookie *each in cookieStorage.cookies) { NSLog(@"%@", each); [cookieStorage deleteCookie:each]; }
+//        }
+        
         return self;
     }
     else {

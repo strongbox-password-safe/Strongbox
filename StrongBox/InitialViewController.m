@@ -19,7 +19,6 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "GoogleDriveStorageProvider.h"
-#import "OneDriveForBusinessStorageProvider.h"
 #import "OneDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "iCloudSafesCoordinator.h"
@@ -646,9 +645,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     }
     else if(providerId == kOneDrive) {
         return [OneDriveStorageProvider sharedInstance];
-    }
-    else if(providerId == kOneDriveForBusiness) {
-        return [OneDriveForBusinessStorageProvider sharedInstance];
     }
     
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
