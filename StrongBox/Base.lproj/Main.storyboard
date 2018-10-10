@@ -315,7 +315,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2EQ-F6-cWG">
-                                                    <rect key="frame" x="361" y="7" width="51" height="31"/>
+                                                    <rect key="frame" x="306" y="6.3333333333333321" width="51" height="30.999999999999996"/>
                                                     <connections>
                                                         <action selector="onTogglePasswordHistoryEnabled:" destination="nJM-pW-a0b" eventType="valueChanged" id="Gc4-3e-vm7"/>
                                                     </connections>
@@ -346,13 +346,13 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="right" contentVerticalAlignment="center" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="jrg-cN-fHW">
-                                                    <rect key="frame" x="316" y="8" width="94" height="29"/>
+                                                    <rect key="frame" x="261" y="7.6666666666666679" width="94" height="29.000000000000004"/>
                                                     <connections>
                                                         <action selector="onMaxEntriesStepper:" destination="nJM-pW-a0b" eventType="valueChanged" id="2CH-pg-x3d"/>
                                                     </connections>
                                                 </stepper>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IuL-ne-iUf">
-                                                    <rect key="frame" x="295" y="11" width="12" height="22"/>
+                                                    <rect key="frame" x="242.66666666666666" y="11" width="10.333333333333343" height="22"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -472,7 +472,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Allow (Biometric) Open" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zzf-iT-nvy">
-                                                    <rect key="frame" x="16" y="11" width="176.33333333333334" height="28"/>
+                                                    <rect key="frame" x="16" y="11" width="176.66666666666666" height="28"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -502,7 +502,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show Password on Details Page" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hev-GE-yDO">
-                                                    <rect key="frame" x="16.000000000000014" y="11" width="243.33333333333337" height="28"/>
+                                                    <rect key="frame" x="15.999999999999986" y="11" width="243.66666666666663" height="28"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -654,7 +654,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Use iCloud" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KYS-WM-c5c">
-                                                    <rect key="frame" x="16" y="11" width="83.333333333333329" height="28"/>
+                                                    <rect key="frame" x="16" y="11" width="83.666666666666671" height="28"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -796,7 +796,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vE1-dW-E1s">
-                                                    <rect key="frame" x="8" y="8" width="359" height="44"/>
+                                                    <rect key="frame" x="16" y="11" width="343" height="38"/>
                                                     <inset key="titleEdgeInsets" minX="11" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                     <state key="normal" title="How To Guide" image="bulb_on_48">
                                                         <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -823,7 +823,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0J7-nh-EBP">
-                                                    <rect key="frame" x="8" y="8" width="359" height="44"/>
+                                                    <rect key="frame" x="8" y="8" width="304" height="43.666666666666664"/>
                                                     <inset key="titleEdgeInsets" minX="11" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                     <state key="normal" title="Frequently Asked Questions" image="question">
                                                         <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -850,7 +850,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DNx-ZZ-pEf">
-                                                    <rect key="frame" x="8" y="8" width="359" height="44"/>
+                                                    <rect key="frame" x="8" y="8" width="304" height="43.666666666666664"/>
                                                     <inset key="titleEdgeInsets" minX="11" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                     <state key="normal" title="Privacy Policy" image="privacy-policy">
                                                         <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -877,7 +877,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vmm-YC-bIC">
-                                                    <rect key="frame" x="8" y="8" width="359" height="43.666666666666664"/>
+                                                    <rect key="frame" x="8" y="8" width="304" height="43.666666666666664"/>
                                                     <inset key="titleEdgeInsets" minX="11" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                     <state key="normal" title="Contact Support" image="support-40">
                                                         <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -1776,40 +1776,34 @@
         <scene sceneID="Mbn-nO-Ibv">
             <objects>
                 <tableViewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="wmK-Hs-VKJ" customClass="SelectStorageProviderController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="65" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="RQs-3R-ObV">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="85" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="RQs-3R-ObV">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="storageProviderReuseIdentifier" id="xIp-vi-MpD" customClass="CustomStorageProviderTableViewCell">
-                                <rect key="frame" x="0.0" y="28" width="375" height="65"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="storageProviderReuseIdentifier" rowHeight="85" id="xIp-vi-MpD" customClass="CustomStorageProviderTableViewCell">
+                                <rect key="frame" x="0.0" y="28" width="375" height="85"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xIp-vi-MpD" id="alV-YM-TbJ">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="65"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="85"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="xxr-r2-ZaY">
-                                            <rect key="frame" x="87.666666666666686" y="11" width="200" height="43"/>
-                                            <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="product32" translatesAutoresizingMaskIntoConstraints="NO" id="XCJ-ng-sRh">
-                                                    <rect key="frame" x="0.0" y="0.0" width="32" height="43"/>
-                                                </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="This is a fairly long provider text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hmd-mk-C5q">
-                                                    <rect key="frame" x="46.999999999999986" y="0.0" width="153" height="43"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="200" id="zNQ-Kf-Y0g"/>
-                                            </constraints>
-                                        </stackView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="This is a fairly long provider text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hmd-mk-C5q">
+                                            <rect key="frame" x="66.333333333333329" y="32.666666666666664" width="242.66666666666669" height="20"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="product32" translatesAutoresizingMaskIntoConstraints="NO" id="XCJ-ng-sRh">
+                                            <rect key="frame" x="26.333333333333329" y="26.666666666666671" width="32" height="32"/>
+                                        </imageView>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="xxr-r2-ZaY" firstAttribute="centerX" secondItem="alV-YM-TbJ" secondAttribute="centerX" id="PVe-Ej-rdN"/>
-                                        <constraint firstItem="xxr-r2-ZaY" firstAttribute="top" secondItem="alV-YM-TbJ" secondAttribute="topMargin" id="UuM-mq-92f"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="xxr-r2-ZaY" secondAttribute="bottom" id="gBF-sx-Nru"/>
+                                        <constraint firstItem="XCJ-ng-sRh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="alV-YM-TbJ" secondAttribute="leading" constant="20" symbolic="YES" id="7Wc-bg-6Y6"/>
+                                        <constraint firstItem="hmd-mk-C5q" firstAttribute="leading" secondItem="XCJ-ng-sRh" secondAttribute="trailing" constant="8" symbolic="YES" id="GSc-Zy-raQ"/>
+                                        <constraint firstItem="XCJ-ng-sRh" firstAttribute="centerY" secondItem="hmd-mk-C5q" secondAttribute="centerY" id="UDD-Bc-fqp"/>
+                                        <constraint firstItem="hmd-mk-C5q" firstAttribute="centerX" secondItem="alV-YM-TbJ" secondAttribute="centerX" id="c7r-Ub-H1m"/>
+                                        <constraint firstItem="hmd-mk-C5q" firstAttribute="centerY" secondItem="alV-YM-TbJ" secondAttribute="centerY" id="n5K-zD-42Q"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
@@ -1830,7 +1824,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="um3-WA-UOS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-81" y="-65"/>
+            <point key="canvasLocation" x="-82.400000000000006" y="-65.024630541871929"/>
         </scene>
         <!--Splash & Lock Screen-->
         <scene sceneID="JiB-Dt-SJh">
