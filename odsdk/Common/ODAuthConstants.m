@@ -63,13 +63,12 @@ NSString * const OD_DISCOVERY_ACCOUNT_TYPE = @"account_type";
 NSString * const OD_DISCOVERY_ACCOUNT_TYPE_AAD = @"AAD";
 NSString * const OD_DISCOVERY_ACCOUNT_TYPE_MSA = @"MSA";
 
-//NSString * const OD_DISCOVERY_SERVICE_RESOURCEID = @"https://api.office.com/discovery/";
-//NSString * const OD_DISCOVERY_SERVICE_URL = @"https://api.office.com/discovery/v2.0/me/services";
+// MMcG: 10-Oct-2018 - Not actually really used now for discovery but there is a requirement that one be a substring of the other
+// and that we do request authentication/permission on this domain... Unfortunately must leave this as is without
+// full understanding for the moment, but it does work like this... :(
 
 NSString * const OD_DISCOVERY_SERVICE_RESOURCEID = @"https://graph.microsoft.com/";
 NSString * const OD_DISCOVERY_SERVICE_URL = @"https://graph.microsoft.com/v1.0/sites/root/sharepointIds/siteUrl";
-
-//NSString * const OD_DISCOVERY_SERVICE_URL = @"https://graph.microsoft.com/v1.0/me?$select=MyFiles";
 
 NSString * const OD_DISAMBIGUATION_URL = @"https://onedrive.live.com/picker/accountchooser?load_login=false";
 

@@ -51,6 +51,7 @@
            });
        }
     }
+    
     [self.authContext acquireTokenWithResource:self.serviceInfo.resourceId
                                       clientId:self.serviceInfo.appId
                                    redirectUri:[NSURL URLWithString:self.serviceInfo.redirectURL]
@@ -59,45 +60,38 @@
                           extraQueryParameters:nil
                                completionBlock:^(ADAuthenticationResult *result){
                               if (result.status == AD_SUCCEEDED){
+                                  // TODO: Another little horror show, but until I understand this code a little better
+                                  // Leaving it alone...
+                                  
                                   // If the resourceId being used is for the discovery service
                                   if ([self.serviceInfo.discoveryServiceURL containsString:self.serviceInfo.resourceId]){
-                                      // Find the resourceIds needed
-                                      [self discoverResourceWithAuthResult:result completion:^(ODServiceInfo *serviceInfo, NSError *error){
-                                          //Refresh the token with the correct resource Ids
-                                          if (!error){
-                                              self.serviceInfo = serviceInfo;
-                                          }
-                                          if (!self.serviceInfo.apiEndpoint){
-                                              NSError *apiEndpointError = [NSError errorWithDomain:OD_AUTH_ERROR_DOMAIN
-                                                                                              code:ODServiceError
-                                                                                          userInfo:@{
-                                                                                                     NSLocalizedDescriptionKey : @"There was a problem logging you in",
-                                                                                                     OD_AUTH_ERROR_KEY : @"Could not discover the api endpoint for the given user.  Make sure you have correctly enabled the SharePoint files permissions in Azure portal."
-                                                                                                    }];
-                                              completionHandler(apiEndpointError);
-                                          }
-                                          else if (result.tokenCacheStoreItem.refreshToken){
-                                              [self.authContext acquireTokenByRefreshToken:result.tokenCacheStoreItem.refreshToken clientId:self.serviceInfo.appId resource:self.serviceInfo.resourceId completionBlock:^(ADAuthenticationResult *innerResult){
-                                                  if (innerResult.status == AD_SUCCEEDED) {
-                                                      innerResult.tokenCacheStoreItem.userInformation = result.tokenCacheStoreItem.userInformation;
-                                                      
-                                                      [self setAccountSessionWithAuthResult:innerResult];
-                                                      completionHandler(nil);
-                                                  }
-                                                  else {
-                                                      completionHandler(innerResult.error);
-                                                  }
-                                              }];
-                                          }
-                                          else {
-                                              NSError *noRefreshTokenError = [NSError errorWithDomain:OD_AUTH_ERROR_DOMAIN
-                                                                                                 code:ODServiceError
-                                                                                             userInfo:@{
-                                                                                                        NSLocalizedDescriptionKey : @"There was a problem logging you in",
-                                                                                                        OD_AUTH_ERROR_KEY : @" The auth result must have a refresh token" }];
-                                              completionHandler(noRefreshTokenError);
-                                          }
-                                      }];
+ 
+                                      // TODO: HACK: Hardcoded API / Base URL here as discovery service no longer appears to be required...
+                                      // Gotta be a better way to do this.
+                                      
+                                      self.serviceInfo.apiEndpoint = @"https://graph.microsoft.com/v1.0/me";
+
+                                      if (result.tokenCacheStoreItem.refreshToken){
+                                          [self.authContext acquireTokenByRefreshToken:result.tokenCacheStoreItem.refreshToken clientId:self.serviceInfo.appId resource:self.serviceInfo.resourceId completionBlock:^(ADAuthenticationResult *innerResult){
+                                              if (innerResult.status == AD_SUCCEEDED) {
+                                                  innerResult.tokenCacheStoreItem.userInformation = result.tokenCacheStoreItem.userInformation;
+                                                  
+                                                  [self setAccountSessionWithAuthResult:innerResult];
+                                                  completionHandler(nil);
+                                              }
+                                              else {
+                                                  completionHandler(innerResult.error);
+                                              }
+                                          }];
+                                      }
+                                      else {
+                                          NSError *noRefreshTokenError = [NSError errorWithDomain:OD_AUTH_ERROR_DOMAIN
+                                                                                             code:ODServiceError
+                                                                                         userInfo:@{
+                                                                                                    NSLocalizedDescriptionKey : @"There was a problem logging you in",
+                                                                                                    OD_AUTH_ERROR_KEY : @" The auth result must have a refresh token" }];
+                                          completionHandler(noRefreshTokenError);
+                                      }
                                   }
                                   else {
                                       [self setAccountSessionWithAuthResult:result];
@@ -120,48 +114,6 @@
     if (self.accountSession.refreshToken){
         [self.accountStore storeCurrentAccount:self.accountSession];
     }
-}
-
--(void)discoverResourceWithAuthResult:(ADAuthenticationResult *)result completion:(void (^)(ODServiceInfo *, NSError *))completion
-{
-    NSMutableURLRequest *discoveryRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.serviceInfo.discoveryServiceURL]];
-    [ODAuthHelper appendAuthHeaders:discoveryRequest token:result.accessToken];
-    [[self.httpProvider dataTaskWithRequest:discoveryRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error){
-       if (!error){
-           NSDictionary *responseObject = [ODAuthHelper sessionDictionaryWithResponse:response data:data error:&error];
-           if (responseObject){
-               [self setServiceInfo:self.serviceInfo withCapability:self.serviceInfo.capability discoveryResponse:responseObject];
-           }
-           completion(self.serviceInfo, error);
-        }
-       else{
-           completion(nil, error);
-       }
-    }] resume];
-}
-
-- (void)setServiceInfo:(ODServiceInfo *)serviceInfo withCapability:(NSString *)capability discoveryResponse:(NSDictionary *)discoveryResponse
-{
-    NSString *value = discoveryResponse[@"value"];
-
-    NSLog(@"Discovery Response: %@", discoveryResponse);
-    
-    serviceInfo.resourceId = @"https://graph.microsoft.com";//@"https://graph.microsoft.com/v1.0/me";
-    serviceInfo.apiEndpoint = @"https://graph.microsoft.com/v1.0/me"; //serviceInfo.resourceId;//@"https://graph.microsoft.com/v1.0/me";
-    
-    NSLog(@"apiEndpoint: %@", serviceInfo.apiEndpoint);
-    
-    //serviceInfo.resourceId = value;
-    //serviceInfo.apiEndpoint = value; // [serviceInfo.resourceId stringByAppendingPathComponent:[OD_ACTIVE_DIRECTORY_URL_SUFFIX copy]];
-    //serviceInfo.apiEndpoint = value;
-    
-//    NSArray *values = discoveryResponse[@"value"];
-//    [values enumerateObjectsUsingBlock:^(NSDictionary *serviceResponse, NSUInteger index, BOOL *stop){
-//        if ([serviceResponse[@"capability"] isEqualToString:capability]){
-//            serviceInfo.resourceId = serviceResponse[@"serviceResourceId"];
-//            serviceInfo.apiEndpoint = serviceResponse[@"serviceEndpointUri"];
-//        }
-//    }];
 }
 
 - (void)refreshSession:(ODAccountSession *)session withCompletion:(void (^)(ODAccountSession *updatedSession, NSError *error))completionHandler

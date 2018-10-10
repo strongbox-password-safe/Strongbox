@@ -10,14 +10,6 @@
 #import "Utils.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "OneDriveSDK.h"
-//#import <MSAL/MSAL.h>
-//#import <MSGraphMSALAuthProvider/MSALAuthenticationProvider.h>
-//#import <MSGraphSDK/MSGraphUserRequestBuilder.h>
-//#import <MSGraphSDK/MSGraphDriveRequestBuilder.h>
-//#import <MSGraphSDK/MSGraphDriveItemRequest.h>
-//#import <MSGraphSDK/MSGraphDriveItemRequestBuilder.h>
-//#import <MSGraphSDK/MSGraphSDK.h>
-//#import <MSGraphSDK/MSGraphClient.h>
 
 @interface OneDriveForBusinessStorageProvider()
 
@@ -25,17 +17,8 @@
 
 @end
 
-// OneDrive Personal - TODO: Remove after test
-//static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
-
-// Strongbox Business Trial account mark@strongboxsafe.onmicrosoft.com
-
 static NSString *kApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
 static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
-
-// mmcguill@gmail.com account
-//static NSString *kApplicationId = @"91edee17-7688-4c85-8455-c94d87c312d0";
-//static NSString *kRedirectUri = @"https://strongboxsafe.com/azure-redirect-uri";
 
 @implementation OneDriveForBusinessStorageProvider
 
