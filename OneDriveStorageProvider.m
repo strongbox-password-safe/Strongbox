@@ -85,6 +85,11 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
+        if(error) {
+            completion(nil, error);
+            return;
+        }
+        
         [SVProgressHUD show];
         
         NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
@@ -133,9 +138,15 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
     viewController:(UIViewController *)viewController
         completion:(void (^)(NSData *data, NSError *error))completion {
         [self authWrapperWithCompletion:^(NSError *error) {
+            if(error) {
+                completion(nil, error);
+                return;
+            }
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD showWithStatus:@"Locating..."];
             });
+            
             
             [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -161,6 +172,11 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
               viewController:(UIViewController *)viewController
                   completion:(void (^)(NSData *data, NSError *error))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
+        if(error) {
+            completion(nil, error);
+            return;
+        }
+        
         ODItem* item = (ODItem*)providerData;
         
         //NSLog(@"OneDrive Reading: [%@]", item);
@@ -205,6 +221,11 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
           data:(NSData *)data
     completion:(void (^)(NSError *error))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
+        if(error) {
+            completion(error);
+            return;
+        }
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:@"Locating..."];
         });

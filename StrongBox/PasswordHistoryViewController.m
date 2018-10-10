@@ -22,25 +22,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                initWithTarget:self
-                                action:@selector(handleLongPress:)];
-    self.longPressRecognizer.minimumPressDuration = 20;
-    self.longPressRecognizer.cancelsTouchesInView = YES;
-    
-    [self.tableView addGestureRecognizer:self.longPressRecognizer];
-
     [self bindToModel];
-}
-
-- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
-    if (sender.state != UIGestureRecognizerStateBegan) {
-        return;
-    }
-    
-    [[Settings sharedInstance] setPro:YES];
-    
-    [Alerts info:self title:@"Done" message:@"Done and done." completion:nil];
 }
 
 - (IBAction)onMaxEntriesStepper:(id)sender {
