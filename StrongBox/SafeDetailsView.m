@@ -14,6 +14,7 @@
 #import "Settings.h"
 #import "ISMessages.h"
 #import "Utils.h"
+#import "Csv.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
     @property (readonly) NSArray *lines;
@@ -233,13 +234,13 @@
             [self exportEncryptedSafeByEmail];
         }
         else if(response == 1){
-            NSData *newStr = [Utils getSafeAsCsv:self.viewModel.rootGroup];
+            NSData *newStr = [Csv getSafeAsCsv:self.viewModel.rootGroup];
 
             NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
             [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
         }
         else if(response == 2){
-            NSString *newStr = [[NSString alloc] initWithData:[Utils getSafeAsCsv:self.viewModel.rootGroup] encoding:NSUTF8StringEncoding];
+            NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.rootGroup] encoding:NSUTF8StringEncoding];
 
             UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
             pasteboard.string = newStr;

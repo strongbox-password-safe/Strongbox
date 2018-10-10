@@ -25,6 +25,8 @@ target 'Strongbox-iOS' do
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
     pod 'PopupDialog'
-    pod 'OneDriveSDK'
+    #pod 'OneDriveSDK'
+    pod 'ADAL', '~> 1.2'
+    pod 'Base32', '~> 1.1'
 end
 

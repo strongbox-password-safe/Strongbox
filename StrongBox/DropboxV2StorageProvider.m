@@ -149,6 +149,7 @@
                       clientModified:nil
                                 mute:@(NO)
                       propertyGroups:nil
+                      strictConflict:@(NO)
                            inputData:data]
       setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
           dispatch_async(dispatch_get_main_queue(), ^{
