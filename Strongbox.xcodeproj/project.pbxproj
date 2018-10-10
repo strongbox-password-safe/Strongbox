@@ -19,6 +19,136 @@
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
 		4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */; };
 		4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5C011F7927D60036684C /* VersionConflictController.m */; };
+		4D1B9AEB216DF6FB00029F29 /* ODAccountStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C4216DF6FA00029F29 /* ODAccountStore.m */; };
+		4D1B9AEC216DF6FB00029F29 /* ODBaseAuthProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C6216DF6FA00029F29 /* ODBaseAuthProvider.m */; };
+		4D1B9AED216DF6FB00029F29 /* ODKeychainWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C7216DF6FA00029F29 /* ODKeychainWrapper.m */; };
+		4D1B9AEE216DF6FB00029F29 /* ODBusinessAuthProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C9216DF6FA00029F29 /* ODBusinessAuthProvider.m */; };
+		4D1B9AEF216DF6FB00029F29 /* ODAADAccountBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99CA216DF6FA00029F29 /* ODAADAccountBridge.m */; };
+		4D1B9AF0216DF6FB00029F29 /* ODPersonalAuthProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99CB216DF6FA00029F29 /* ODPersonalAuthProvider.m */; };
+		4D1B9AF1216DF6FB00029F29 /* ODAuthenticationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99CC216DF6FA00029F29 /* ODAuthenticationViewController.m */; };
+		4D1B9AF2216DF6FB00029F29 /* ODLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99CF216DF6FA00029F29 /* ODLogger.m */; };
+		4D1B9AF3216DF6FB00029F29 /* ODURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99D4216DF6FA00029F29 /* ODURLSessionManager.m */; };
+		4D1B9AF4216DF6FB00029F29 /* ODNSURLSessionTaskDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99D6216DF6FA00029F29 /* ODNSURLSessionTaskDelegate.m */; };
+		4D1B9AF5216DF6FB00029F29 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D1B99D7216DF6FA00029F29 /* Info.plist */; };
+		4D1B9AF6216DF6FB00029F29 /* ODClient+DefaultConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99DB216DF6FA00029F29 /* ODClient+DefaultConfiguration.m */; };
+		4D1B9AF7216DF6FB00029F29 /* ODClient+Authentication.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99DC216DF6FA00029F29 /* ODClient+Authentication.m */; };
+		4D1B9AF8216DF6FB00029F29 /* ODAppConfiguration+DefaultConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99DD216DF6FA00029F29 /* ODAppConfiguration+DefaultConfiguration.m */; };
+		4D1B9AF9216DF6FB00029F29 /* NSError+OneDriveSDK.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99DE216DF6FA00029F29 /* NSError+OneDriveSDK.m */; };
+		4D1B9AFA216DF6FB00029F29 /* ODServiceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99E3216DF6FA00029F29 /* ODServiceInfo.m */; };
+		4D1B9AFB216DF6FB00029F29 /* ODAuthHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99E4216DF6FA00029F29 /* ODAuthHelper.m */; };
+		4D1B9AFC216DF6FB00029F29 /* ODAuthConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99E5216DF6FA00029F29 /* ODAuthConstants.m */; };
+		4D1B9AFD216DF6FB00029F29 /* ODAccountSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99E7216DF6FA00029F29 /* ODAccountSession.m */; };
+		4D1B9AFE216DF6FB00029F29 /* ODHeaderOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F1216DF6FA00029F29 /* ODHeaderOptions.m */; };
+		4D1B9AFF216DF6FB00029F29 /* ODSelectOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F3216DF6FA00029F29 /* ODSelectOptions.m */; };
+		4D1B9B00216DF6FB00029F29 /* ODNameConflict.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F4216DF6FA00029F29 /* ODNameConflict.m */; };
+		4D1B9B01216DF6FB00029F29 /* ODRequestOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F5216DF6FA00029F29 /* ODRequestOptions.m */; };
+		4D1B9B02216DF6FB00029F29 /* ODIfNoneMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F6216DF6FA00029F29 /* ODIfNoneMatch.m */; };
+		4D1B9B03216DF6FB00029F29 /* ODTopOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F8216DF6FA00029F29 /* ODTopOptions.m */; };
+		4D1B9B04216DF6FB00029F29 /* ODOrderByOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99FB216DF6FA00029F29 /* ODOrderByOptions.m */; };
+		4D1B9B05216DF6FB00029F29 /* ODQueryParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A00216DF6FA00029F29 /* ODQueryParameters.m */; };
+		4D1B9B06216DF6FB00029F29 /* ODIfMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A01216DF6FA00029F29 /* ODIfMatch.m */; };
+		4D1B9B07216DF6FB00029F29 /* ODExpandOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A04216DF6FA00029F29 /* ODExpandOptions.m */; };
+		4D1B9B08216DF6FB00029F29 /* ODRequestOptionsBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A05216DF6FA00029F29 /* ODRequestOptionsBuilder.m */; };
+		4D1B9B09216DF6FB00029F29 /* ODCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A08216DF6FA00029F29 /* ODCollectionRequest.m */; };
+		4D1B9B0A216DF6FB00029F29 /* ODCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A09216DF6FA00029F29 /* ODCollectionRequestBuilder.m */; };
+		4D1B9B0B216DF6FB00029F29 /* ODRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A0A216DF6FA00029F29 /* ODRequest.m */; };
+		4D1B9B0C216DF6FB00029F29 /* ODObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A0C216DF6FA00029F29 /* ODObject.m */; };
+		4D1B9B0D216DF6FB00029F29 /* ODCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A0D216DF6FA00029F29 /* ODCollection.m */; };
+		4D1B9B0E216DF6FB00029F29 /* ODURLSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A15216DF6FA00029F29 /* ODURLSessionTask.m */; };
+		4D1B9B0F216DF6FB00029F29 /* ODURLSessionProgressTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A16216DF6FA00029F29 /* ODURLSessionProgressTask.m */; };
+		4D1B9B10216DF6FB00029F29 /* ODURLSessionUploadTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A17216DF6FA00029F29 /* ODURLSessionUploadTask.m */; };
+		4D1B9B11216DF6FB00029F29 /* ODAsyncURLSessionDataTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A18216DF6FA00029F29 /* ODAsyncURLSessionDataTask.m */; };
+		4D1B9B12216DF6FB00029F29 /* ODURLSessionDownloadTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A19216DF6FA00029F29 /* ODURLSessionDownloadTask.m */; };
+		4D1B9B13216DF6FB00029F29 /* ODURLSessionDataTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A1C216DF6FA00029F29 /* ODURLSessionDataTask.m */; };
+		4D1B9B14216DF6FB00029F29 /* ODRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A1F216DF6FA00029F29 /* ODRequestBuilder.m */; };
+		4D1B9B15216DF6FB00029F29 /* ODConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A22216DF6FA00029F29 /* ODConstants.m */; };
+		4D1B9B16216DF6FB00029F29 /* ODItemRequestBuilder+ItemByPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A26216DF6FA00029F29 /* ODItemRequestBuilder+ItemByPath.m */; };
+		4D1B9B17216DF6FB00029F29 /* ODClient+HelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2A216DF6FA00029F29 /* ODClient+HelperMethods.m */; };
+		4D1B9B18216DF6FB00029F29 /* NSDate+ODSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2B216DF6FA00029F29 /* NSDate+ODSerialization.m */; };
+		4D1B9B19216DF6FB00029F29 /* ODThumbnailSet+CustomThumbnail.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2C216DF6FA00029F29 /* ODThumbnailSet+CustomThumbnail.m */; };
+		4D1B9B1A216DF6FB00029F29 /* NSJSONSerialization+ResponseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2D216DF6FA00029F29 /* NSJSONSerialization+ResponseHelper.m */; };
+		4D1B9B1B216DF6FB00029F29 /* ODItemCreateLinkRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2F216DF6FA00029F29 /* ODItemCreateLinkRequestBuilder.m */; };
+		4D1B9B1C216DF6FB00029F29 /* ODThumbnailContentRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A31216DF6FA00029F29 /* ODThumbnailContentRequest.m */; };
+		4D1B9B1D216DF6FB00029F29 /* ODPermissionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A32216DF6FA00029F29 /* ODPermissionRequestBuilder.m */; };
+		4D1B9B1E216DF6FB00029F29 /* ODDriveRecentRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A35216DF6FA00029F29 /* ODDriveRecentRequestBuilder.m */; };
+		4D1B9B1F216DF6FB00029F29 /* ODItemRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A36216DF6FA00029F29 /* ODItemRequestBuilder.m */; };
+		4D1B9B20216DF6FB00029F29 /* ODThumbnailsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A3D216DF6FB00029F29 /* ODThumbnailsCollectionRequest.m */; };
+		4D1B9B21216DF6FB00029F29 /* ODDriveRecentRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A40216DF6FB00029F29 /* ODDriveRecentRequest.m */; };
+		4D1B9B22216DF6FB00029F29 /* ODItemCreateSessionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A42216DF6FB00029F29 /* ODItemCreateSessionRequest.m */; };
+		4D1B9B23216DF6FB00029F29 /* ODPermissionsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A44216DF6FB00029F29 /* ODPermissionsCollectionRequest.m */; };
+		4D1B9B24216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A46216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m */; };
+		4D1B9B25216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A4E216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.m */; };
+		4D1B9B26216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A4F216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.m */; };
+		4D1B9B27216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A51216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.m */; };
+		4D1B9B28216DF6FB00029F29 /* ODItemCopyRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A53216DF6FB00029F29 /* ODItemCopyRequest.m */; };
+		4D1B9B29216DF6FB00029F29 /* ODItemSearchRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A55216DF6FB00029F29 /* ODItemSearchRequestBuilder.m */; };
+		4D1B9B2A216DF6FB00029F29 /* ODItemCopyRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A56216DF6FB00029F29 /* ODItemCopyRequestBuilder.m */; };
+		4D1B9B2B216DF6FB00029F29 /* ODShareRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A58216DF6FB00029F29 /* ODShareRequestBuilder.m */; };
+		4D1B9B2C216DF6FB00029F29 /* ODItemDeltaRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A59216DF6FB00029F29 /* ODItemDeltaRequestBuilder.m */; };
+		4D1B9B2D216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A5A216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.m */; };
+		4D1B9B2E216DF6FB00029F29 /* ODItemDeltaCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A5B216DF6FB00029F29 /* ODItemDeltaCollection.m */; };
+		4D1B9B2F216DF6FB00029F29 /* ODThumbnailSetRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A5F216DF6FB00029F29 /* ODThumbnailSetRequestBuilder.m */; };
+		4D1B9B30216DF6FB00029F29 /* ODChildrenCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A60216DF6FB00029F29 /* ODChildrenCollectionRequest.m */; };
+		4D1B9B31216DF6FB00029F29 /* ODDrivesCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A63216DF6FB00029F29 /* ODDrivesCollectionRequest.m */; };
+		4D1B9B32216DF6FB00029F29 /* ODPermissionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A66216DF6FB00029F29 /* ODPermissionRequest.m */; };
+		4D1B9B33216DF6FB00029F29 /* ODThumbnailSetRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A67216DF6FB00029F29 /* ODThumbnailSetRequest.m */; };
+		4D1B9B34216DF6FB00029F29 /* ODItemContentRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A69216DF6FB00029F29 /* ODItemContentRequest.m */; };
+		4D1B9B35216DF6FB00029F29 /* ODDriveRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6A216DF6FB00029F29 /* ODDriveRequestBuilder.m */; };
+		4D1B9B36216DF6FB00029F29 /* ODThumbnailRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6C216DF6FB00029F29 /* ODThumbnailRequestBuilder.m */; };
+		4D1B9B37216DF6FB00029F29 /* ODItemCreateLinkRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6D216DF6FB00029F29 /* ODItemCreateLinkRequest.m */; };
+		4D1B9B38216DF6FB00029F29 /* ODSharesCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6E216DF6FB00029F29 /* ODSharesCollectionRequest.m */; };
+		4D1B9B39216DF6FB00029F29 /* ODSharedCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6F216DF6FB00029F29 /* ODSharedCollectionRequest.m */; };
+		4D1B9B3A216DF6FB00029F29 /* ODVersionsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A70216DF6FB00029F29 /* ODVersionsCollectionRequest.m */; };
+		4D1B9B3B216DF6FB00029F29 /* ODItemsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A71216DF6FB00029F29 /* ODItemsCollectionRequest.m */; };
+		4D1B9B3C216DF6FB00029F29 /* ODItemDeltaRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A72216DF6FB00029F29 /* ODItemDeltaRequest.m */; };
+		4D1B9B3D216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A76216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.m */; };
+		4D1B9B3E216DF6FB00029F29 /* ODShareRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A77216DF6FB00029F29 /* ODShareRequest.m */; };
+		4D1B9B3F216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A78216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.m */; };
+		4D1B9B40216DF6FB00029F29 /* ODItemRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A79216DF6FB00029F29 /* ODItemRequest.m */; };
+		4D1B9B41216DF6FB00029F29 /* ODThumbnailRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7A216DF6FB00029F29 /* ODThumbnailRequest.m */; };
+		4D1B9B42216DF6FB00029F29 /* ODSpecialCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7B216DF6FB00029F29 /* ODSpecialCollectionRequest.m */; };
+		4D1B9B43216DF6FB00029F29 /* ODClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7C216DF6FB00029F29 /* ODClient.m */; };
+		4D1B9B44216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7E216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.m */; };
+		4D1B9B45216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A81216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m */; };
+		4D1B9B46216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A86216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.m */; };
+		4D1B9B47216DF6FB00029F29 /* ODDriveRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A89216DF6FB00029F29 /* ODDriveRequest.m */; };
+		4D1B9B48216DF6FB00029F29 /* ODItemSearchRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A8A216DF6FB00029F29 /* ODItemSearchRequest.m */; };
+		4D1B9B49216DF6FB00029F29 /* ODPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A8E216DF6FB00029F29 /* ODPhoto.m */; };
+		4D1B9B4A216DF6FB00029F29 /* ODIdentitySet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A8F216DF6FB00029F29 /* ODIdentitySet.m */; };
+		4D1B9B4B216DF6FB00029F29 /* ODSearchResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A91216DF6FB00029F29 /* ODSearchResult.m */; };
+		4D1B9B4C216DF6FB00029F29 /* ODSharingInvitation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A93216DF6FB00029F29 /* ODSharingInvitation.m */; };
+		4D1B9B4D216DF6FB00029F29 /* ODImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A94216DF6FB00029F29 /* ODImage.m */; };
+		4D1B9B4E216DF6FB00029F29 /* ODFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A95216DF6FB00029F29 /* ODFolder.m */; };
+		4D1B9B4F216DF6FB00029F29 /* ODThumbnail.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A96216DF6FB00029F29 /* ODThumbnail.m */; };
+		4D1B9B50216DF6FB00029F29 /* ODSpecialFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A99216DF6FB00029F29 /* ODSpecialFolder.m */; };
+		4D1B9B51216DF6FB00029F29 /* ODUploadSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A9A216DF6FB00029F29 /* ODUploadSession.m */; };
+		4D1B9B52216DF6FB00029F29 /* ODDeleted.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA0216DF6FB00029F29 /* ODDeleted.m */; };
+		4D1B9B53216DF6FB00029F29 /* ODVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA3216DF6FB00029F29 /* ODVideo.m */; };
+		4D1B9B54216DF6FB00029F29 /* ODShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA4216DF6FB00029F29 /* ODShare.m */; };
+		4D1B9B55216DF6FB00029F29 /* ODItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA5216DF6FB00029F29 /* ODItemReference.m */; };
+		4D1B9B56216DF6FB00029F29 /* ODOpenWithApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA6216DF6FB00029F29 /* ODOpenWithApp.m */; };
+		4D1B9B57216DF6FB00029F29 /* ODSharingLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA7216DF6FB00029F29 /* ODSharingLink.m */; };
+		4D1B9B58216DF6FB00029F29 /* ODFileSystemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AAB216DF6FB00029F29 /* ODFileSystemInfo.m */; };
+		4D1B9B59216DF6FB00029F29 /* ODIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AAC216DF6FB00029F29 /* ODIdentity.m */; };
+		4D1B9B5A216DF6FB00029F29 /* ODHashes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AAE216DF6FB00029F29 /* ODHashes.m */; };
+		4D1B9B5B216DF6FB00029F29 /* ODAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AB2216DF6FB00029F29 /* ODAudio.m */; };
+		4D1B9B5C216DF6FB00029F29 /* ODDrive.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AB3216DF6FB00029F29 /* ODDrive.m */; };
+		4D1B9B5D216DF6FB00029F29 /* ODQuota.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AB8216DF6FB00029F29 /* ODQuota.m */; };
+		4D1B9B5E216DF6FB00029F29 /* ODThumbnailSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABA216DF6FB00029F29 /* ODThumbnailSet.m */; };
+		4D1B9B5F216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABB216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.m */; };
+		4D1B9B60216DF6FB00029F29 /* ODShared.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABD216DF6FB00029F29 /* ODShared.m */; };
+		4D1B9B61216DF6FB00029F29 /* ODLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABE216DF6FB00029F29 /* ODLocation.m */; };
+		4D1B9B62216DF6FB00029F29 /* ODOpenWithSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC0216DF6FB00029F29 /* ODOpenWithSet.m */; };
+		4D1B9B63216DF6FB00029F29 /* ODFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC2216DF6FB00029F29 /* ODFile.m */; };
+		4D1B9B64216DF6FB00029F29 /* ODAsyncOperationStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC3216DF6FB00029F29 /* ODAsyncOperationStatus.m */; };
+		4D1B9B65216DF6FB00029F29 /* ODPermission.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC9216DF6FB00029F29 /* ODPermission.m */; };
+		4D1B9B66216DF6FB00029F29 /* ODItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ACA216DF6FB00029F29 /* ODItem.m */; };
+		4D1B9B67216DF6FB00029F29 /* ODErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ACC216DF6FB00029F29 /* ODErrorCodes.m */; };
+		4D1B9B68216DF6FB00029F29 /* ODError.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ACF216DF6FB00029F29 /* ODError.m */; };
+		4D1B9B69216DF6FB00029F29 /* ODAADServiceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AD2216DF6FB00029F29 /* ODAADServiceInfo.m */; };
+		4D1B9B6A216DF6FB00029F29 /* ODAppConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AD5216DF6FB00029F29 /* ODAppConfiguration.m */; };
+		4D1B9B6B216DF6FB00029F29 /* ODMSAServiceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AD6216DF6FB00029F29 /* ODMSAServiceInfo.m */; };
+		4D1B9B6C216DF6FB00029F29 /* ODServiceInfoProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AD9216DF6FB00029F29 /* ODServiceInfoProvider.m */; };
 		4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
 		4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D275E561F1BC97600D79A30 /* UpgradeViewController.m */; };
 		4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
@@ -108,6 +238,277 @@
 		4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeItemTableCell.m; sourceTree = "<group>"; };
 		4D1A5C001F7927D60036684C /* VersionConflictController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VersionConflictController.h; sourceTree = "<group>"; };
 		4D1A5C011F7927D60036684C /* VersionConflictController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VersionConflictController.m; sourceTree = "<group>"; };
+		4D1B99BE216DF6FA00029F29 /* ODKeychainWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODKeychainWrapper.h; sourceTree = "<group>"; };
+		4D1B99BF216DF6FA00029F29 /* ODBaseAuthProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODBaseAuthProvider.h; sourceTree = "<group>"; };
+		4D1B99C0216DF6FA00029F29 /* ODBusinessAuthProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODBusinessAuthProvider.h; sourceTree = "<group>"; };
+		4D1B99C1216DF6FA00029F29 /* ODAuthProvider+Protected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODAuthProvider+Protected.h"; sourceTree = "<group>"; };
+		4D1B99C2216DF6FA00029F29 /* ODPersonalAuthProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPersonalAuthProvider.h; sourceTree = "<group>"; };
+		4D1B99C3216DF6FA00029F29 /* ODAADAccountBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAADAccountBridge.h; sourceTree = "<group>"; };
+		4D1B99C4216DF6FA00029F29 /* ODAccountStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAccountStore.m; sourceTree = "<group>"; };
+		4D1B99C5216DF6FA00029F29 /* ODAuthenticationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAuthenticationViewController.h; sourceTree = "<group>"; };
+		4D1B99C6216DF6FA00029F29 /* ODBaseAuthProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODBaseAuthProvider.m; sourceTree = "<group>"; };
+		4D1B99C7216DF6FA00029F29 /* ODKeychainWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODKeychainWrapper.m; sourceTree = "<group>"; };
+		4D1B99C8216DF6FA00029F29 /* ODAuth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAuth.h; sourceTree = "<group>"; };
+		4D1B99C9216DF6FA00029F29 /* ODBusinessAuthProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODBusinessAuthProvider.m; sourceTree = "<group>"; };
+		4D1B99CA216DF6FA00029F29 /* ODAADAccountBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAADAccountBridge.m; sourceTree = "<group>"; };
+		4D1B99CB216DF6FA00029F29 /* ODPersonalAuthProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPersonalAuthProvider.m; sourceTree = "<group>"; };
+		4D1B99CC216DF6FA00029F29 /* ODAuthenticationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAuthenticationViewController.m; sourceTree = "<group>"; };
+		4D1B99CD216DF6FA00029F29 /* ODAccountStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAccountStore.h; sourceTree = "<group>"; };
+		4D1B99CF216DF6FA00029F29 /* ODLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODLogger.m; sourceTree = "<group>"; };
+		4D1B99D0216DF6FA00029F29 /* ODLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODLogger.h; sourceTree = "<group>"; };
+		4D1B99D1216DF6FA00029F29 /* OneDriveSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneDriveSDK.h; sourceTree = "<group>"; };
+		4D1B99D3216DF6FA00029F29 /* ODNSURLSessionTaskDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODNSURLSessionTaskDelegate.h; sourceTree = "<group>"; };
+		4D1B99D4216DF6FA00029F29 /* ODURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODURLSessionManager.m; sourceTree = "<group>"; };
+		4D1B99D5216DF6FA00029F29 /* ODURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODURLSessionManager.h; sourceTree = "<group>"; };
+		4D1B99D6216DF6FA00029F29 /* ODNSURLSessionTaskDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODNSURLSessionTaskDelegate.m; sourceTree = "<group>"; };
+		4D1B99D7216DF6FA00029F29 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4D1B99D9216DF6FA00029F29 /* NSError+OneDriveSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+OneDriveSDK.h"; sourceTree = "<group>"; };
+		4D1B99DA216DF6FA00029F29 /* ODAppConfiguration+DefaultConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODAppConfiguration+DefaultConfiguration.h"; sourceTree = "<group>"; };
+		4D1B99DB216DF6FA00029F29 /* ODClient+DefaultConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ODClient+DefaultConfiguration.m"; sourceTree = "<group>"; };
+		4D1B99DC216DF6FA00029F29 /* ODClient+Authentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ODClient+Authentication.m"; sourceTree = "<group>"; };
+		4D1B99DD216DF6FA00029F29 /* ODAppConfiguration+DefaultConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ODAppConfiguration+DefaultConfiguration.m"; sourceTree = "<group>"; };
+		4D1B99DE216DF6FA00029F29 /* NSError+OneDriveSDK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+OneDriveSDK.m"; sourceTree = "<group>"; };
+		4D1B99DF216DF6FA00029F29 /* ODClient+Authentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODClient+Authentication.h"; sourceTree = "<group>"; };
+		4D1B99E0216DF6FA00029F29 /* ODClient+DefaultConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODClient+DefaultConfiguration.h"; sourceTree = "<group>"; };
+		4D1B99E2216DF6FA00029F29 /* ODAccountSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAccountSession.h; sourceTree = "<group>"; };
+		4D1B99E3216DF6FA00029F29 /* ODServiceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODServiceInfo.m; sourceTree = "<group>"; };
+		4D1B99E4216DF6FA00029F29 /* ODAuthHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAuthHelper.m; sourceTree = "<group>"; };
+		4D1B99E5216DF6FA00029F29 /* ODAuthConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAuthConstants.m; sourceTree = "<group>"; };
+		4D1B99E6216DF6FA00029F29 /* ODServiceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODServiceInfo.h; sourceTree = "<group>"; };
+		4D1B99E7216DF6FA00029F29 /* ODAccountSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAccountSession.m; sourceTree = "<group>"; };
+		4D1B99E8216DF6FA00029F29 /* ODAccountStoreProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAccountStoreProtocol.h; sourceTree = "<group>"; };
+		4D1B99E9216DF6FA00029F29 /* ODAuthHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAuthHelper.h; sourceTree = "<group>"; };
+		4D1B99EA216DF6FA00029F29 /* ODHttpProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODHttpProvider.h; sourceTree = "<group>"; };
+		4D1B99EB216DF6FA00029F29 /* ODLoggerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODLoggerProtocol.h; sourceTree = "<group>"; };
+		4D1B99EC216DF6FA00029F29 /* ODAuthProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAuthProvider.h; sourceTree = "<group>"; };
+		4D1B99ED216DF6FA00029F29 /* ODAuthConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAuthConstants.h; sourceTree = "<group>"; };
+		4D1B99F1216DF6FA00029F29 /* ODHeaderOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODHeaderOptions.m; sourceTree = "<group>"; };
+		4D1B99F2216DF6FA00029F29 /* ODQueryParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODQueryParameters.h; sourceTree = "<group>"; };
+		4D1B99F3216DF6FA00029F29 /* ODSelectOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSelectOptions.m; sourceTree = "<group>"; };
+		4D1B99F4216DF6FA00029F29 /* ODNameConflict.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODNameConflict.m; sourceTree = "<group>"; };
+		4D1B99F5216DF6FA00029F29 /* ODRequestOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODRequestOptions.m; sourceTree = "<group>"; };
+		4D1B99F6216DF6FA00029F29 /* ODIfNoneMatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODIfNoneMatch.m; sourceTree = "<group>"; };
+		4D1B99F7216DF6FA00029F29 /* ODIfMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODIfMatch.h; sourceTree = "<group>"; };
+		4D1B99F8216DF6FA00029F29 /* ODTopOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODTopOptions.m; sourceTree = "<group>"; };
+		4D1B99F9216DF6FA00029F29 /* ODRequestOptionsBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODRequestOptionsBuilder.h; sourceTree = "<group>"; };
+		4D1B99FA216DF6FA00029F29 /* ODExpandOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODExpandOptions.h; sourceTree = "<group>"; };
+		4D1B99FB216DF6FA00029F29 /* ODOrderByOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODOrderByOptions.m; sourceTree = "<group>"; };
+		4D1B99FC216DF6FA00029F29 /* ODRequestOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODRequestOptions.h; sourceTree = "<group>"; };
+		4D1B99FD216DF6FA00029F29 /* ODNameConflict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODNameConflict.h; sourceTree = "<group>"; };
+		4D1B99FE216DF6FA00029F29 /* ODSelectOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSelectOptions.h; sourceTree = "<group>"; };
+		4D1B99FF216DF6FA00029F29 /* ODHeaderOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODHeaderOptions.h; sourceTree = "<group>"; };
+		4D1B9A00216DF6FA00029F29 /* ODQueryParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODQueryParameters.m; sourceTree = "<group>"; };
+		4D1B9A01216DF6FA00029F29 /* ODIfMatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODIfMatch.m; sourceTree = "<group>"; };
+		4D1B9A02216DF6FA00029F29 /* ODTopOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODTopOptions.h; sourceTree = "<group>"; };
+		4D1B9A03216DF6FA00029F29 /* ODIfNoneMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODIfNoneMatch.h; sourceTree = "<group>"; };
+		4D1B9A04216DF6FA00029F29 /* ODExpandOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODExpandOptions.m; sourceTree = "<group>"; };
+		4D1B9A05216DF6FA00029F29 /* ODRequestOptionsBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODRequestOptionsBuilder.m; sourceTree = "<group>"; };
+		4D1B9A06216DF6FA00029F29 /* ODOrderByOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODOrderByOptions.h; sourceTree = "<group>"; };
+		4D1B9A07216DF6FA00029F29 /* ODRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A08216DF6FA00029F29 /* ODCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A09216DF6FA00029F29 /* ODCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A0A216DF6FA00029F29 /* ODRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODRequest.m; sourceTree = "<group>"; };
+		4D1B9A0B216DF6FA00029F29 /* ODConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODConstants.h; sourceTree = "<group>"; };
+		4D1B9A0C216DF6FA00029F29 /* ODObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODObject.m; sourceTree = "<group>"; };
+		4D1B9A0D216DF6FA00029F29 /* ODCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODCollection.m; sourceTree = "<group>"; };
+		4D1B9A0E216DF6FA00029F29 /* ODRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODRequest.h; sourceTree = "<group>"; };
+		4D1B9A10216DF6FA00029F29 /* ODURLSessionProgressTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODURLSessionProgressTask.h; sourceTree = "<group>"; };
+		4D1B9A11216DF6FA00029F29 /* ODURLSessionUploadTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODURLSessionUploadTask.h; sourceTree = "<group>"; };
+		4D1B9A12216DF6FA00029F29 /* ODURLSessionDownloadTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODURLSessionDownloadTask.h; sourceTree = "<group>"; };
+		4D1B9A13216DF6FA00029F29 /* ODAsyncURLSessionDataTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAsyncURLSessionDataTask.h; sourceTree = "<group>"; };
+		4D1B9A14216DF6FA00029F29 /* ODURLSessionDataTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODURLSessionDataTask.h; sourceTree = "<group>"; };
+		4D1B9A15216DF6FA00029F29 /* ODURLSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODURLSessionTask.m; sourceTree = "<group>"; };
+		4D1B9A16216DF6FA00029F29 /* ODURLSessionProgressTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODURLSessionProgressTask.m; sourceTree = "<group>"; };
+		4D1B9A17216DF6FA00029F29 /* ODURLSessionUploadTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODURLSessionUploadTask.m; sourceTree = "<group>"; };
+		4D1B9A18216DF6FA00029F29 /* ODAsyncURLSessionDataTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAsyncURLSessionDataTask.m; sourceTree = "<group>"; };
+		4D1B9A19216DF6FA00029F29 /* ODURLSessionDownloadTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODURLSessionDownloadTask.m; sourceTree = "<group>"; };
+		4D1B9A1A216DF6FA00029F29 /* ODURLSessionTask+Protected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODURLSessionTask+Protected.h"; sourceTree = "<group>"; };
+		4D1B9A1B216DF6FA00029F29 /* ODURLSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODURLSessionTask.h; sourceTree = "<group>"; };
+		4D1B9A1C216DF6FA00029F29 /* ODURLSessionDataTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODURLSessionDataTask.m; sourceTree = "<group>"; };
+		4D1B9A1D216DF6FA00029F29 /* ODCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A1E216DF6FA00029F29 /* ODCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A1F216DF6FA00029F29 /* ODRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A20216DF6FA00029F29 /* ODCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODCollection.h; sourceTree = "<group>"; };
+		4D1B9A21216DF6FA00029F29 /* ODObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODObject.h; sourceTree = "<group>"; };
+		4D1B9A22216DF6FA00029F29 /* ODConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODConstants.m; sourceTree = "<group>"; };
+		4D1B9A24216DF6FA00029F29 /* NSDate+ODSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+ODSerialization.h"; sourceTree = "<group>"; };
+		4D1B9A25216DF6FA00029F29 /* ODClient+HelperMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODClient+HelperMethods.h"; sourceTree = "<group>"; };
+		4D1B9A26216DF6FA00029F29 /* ODItemRequestBuilder+ItemByPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ODItemRequestBuilder+ItemByPath.m"; sourceTree = "<group>"; };
+		4D1B9A27216DF6FA00029F29 /* ODThumbnailSet+CustomThumbnail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODThumbnailSet+CustomThumbnail.h"; sourceTree = "<group>"; };
+		4D1B9A28216DF6FA00029F29 /* NSJSONSerialization+ResponseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSJSONSerialization+ResponseHelper.h"; sourceTree = "<group>"; };
+		4D1B9A29216DF6FA00029F29 /* ODItemRequestBuilder+ItemByPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODItemRequestBuilder+ItemByPath.h"; sourceTree = "<group>"; };
+		4D1B9A2A216DF6FA00029F29 /* ODClient+HelperMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ODClient+HelperMethods.m"; sourceTree = "<group>"; };
+		4D1B9A2B216DF6FA00029F29 /* NSDate+ODSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+ODSerialization.m"; sourceTree = "<group>"; };
+		4D1B9A2C216DF6FA00029F29 /* ODThumbnailSet+CustomThumbnail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ODThumbnailSet+CustomThumbnail.m"; sourceTree = "<group>"; };
+		4D1B9A2D216DF6FA00029F29 /* NSJSONSerialization+ResponseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSJSONSerialization+ResponseHelper.m"; sourceTree = "<group>"; };
+		4D1B9A2F216DF6FA00029F29 /* ODItemCreateLinkRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemCreateLinkRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A30216DF6FA00029F29 /* ODDrivesCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDrivesCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A31216DF6FA00029F29 /* ODThumbnailContentRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailContentRequest.m; sourceTree = "<group>"; };
+		4D1B9A32216DF6FA00029F29 /* ODPermissionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPermissionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A33216DF6FA00029F29 /* ODChildrenCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODChildrenCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A34216DF6FA00029F29 /* ODThumbnailSetRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailSetRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A35216DF6FA00029F29 /* ODDriveRecentRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDriveRecentRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A36216DF6FA00029F29 /* ODItemRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A37216DF6FA00029F29 /* ODItemsCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemsCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A38216DF6FA00029F29 /* ODSharedCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSharedCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A39216DF6FA00029F29 /* ODVersionsCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODVersionsCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A3A216DF6FA00029F29 /* ODThumbnailRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A3B216DF6FA00029F29 /* ODItemCreateLinkRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemCreateLinkRequest.h; sourceTree = "<group>"; };
+		4D1B9A3C216DF6FB00029F29 /* ODSharesCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSharesCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A3D216DF6FB00029F29 /* ODThumbnailsCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailsCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A3E216DF6FB00029F29 /* ODDriveRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDriveRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A3F216DF6FB00029F29 /* ODItemContentRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemContentRequest.h; sourceTree = "<group>"; };
+		4D1B9A40216DF6FB00029F29 /* ODDriveRecentRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDriveRecentRequest.m; sourceTree = "<group>"; };
+		4D1B9A41216DF6FB00029F29 /* ODPermissionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPermissionRequest.h; sourceTree = "<group>"; };
+		4D1B9A42216DF6FB00029F29 /* ODItemCreateSessionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemCreateSessionRequest.m; sourceTree = "<group>"; };
+		4D1B9A43216DF6FB00029F29 /* ODThumbnailSetRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailSetRequest.h; sourceTree = "<group>"; };
+		4D1B9A44216DF6FB00029F29 /* ODPermissionsCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPermissionsCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A45216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODChildrenCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A46216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSpecialCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A47216DF6FB00029F29 /* ODClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODClient.h; sourceTree = "<group>"; };
+		4D1B9A48216DF6FB00029F29 /* ODSpecialCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSpecialCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A49216DF6FB00029F29 /* ODItemRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemRequest.h; sourceTree = "<group>"; };
+		4D1B9A4A216DF6FB00029F29 /* ODThumbnailRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailRequest.h; sourceTree = "<group>"; };
+		4D1B9A4B216DF6FB00029F29 /* ODShareRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODShareRequest.h; sourceTree = "<group>"; };
+		4D1B9A4C216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemCreateSessionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A4D216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSharesCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A4E216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODVersionsCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A4F216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailsCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A50216DF6FB00029F29 /* ODItemDeltaRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemDeltaRequest.h; sourceTree = "<group>"; };
+		4D1B9A51216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSharedCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A52216DF6FB00029F29 /* ODItemSearchRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemSearchRequest.h; sourceTree = "<group>"; };
+		4D1B9A53216DF6FB00029F29 /* ODItemCopyRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemCopyRequest.m; sourceTree = "<group>"; };
+		4D1B9A54216DF6FB00029F29 /* ODDriveRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDriveRequest.h; sourceTree = "<group>"; };
+		4D1B9A55216DF6FB00029F29 /* ODItemSearchRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemSearchRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A56216DF6FB00029F29 /* ODItemCopyRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemCopyRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A57216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPermissionsCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A58216DF6FB00029F29 /* ODShareRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODShareRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A59216DF6FB00029F29 /* ODItemDeltaRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemDeltaRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A5A216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemsCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A5B216DF6FB00029F29 /* ODItemDeltaCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemDeltaCollection.m; sourceTree = "<group>"; };
+		4D1B9A5C216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDrivesCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A5D216DF6FB00029F29 /* ODDriveRecentRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDriveRecentRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A5E216DF6FB00029F29 /* ODItemRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A5F216DF6FB00029F29 /* ODThumbnailSetRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailSetRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A60216DF6FB00029F29 /* ODChildrenCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODChildrenCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A61216DF6FB00029F29 /* ODThumbnailContentRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailContentRequest.h; sourceTree = "<group>"; };
+		4D1B9A62216DF6FB00029F29 /* ODPermissionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPermissionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A63216DF6FB00029F29 /* ODDrivesCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDrivesCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A64216DF6FB00029F29 /* ODItemCreateLinkRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemCreateLinkRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A65216DF6FB00029F29 /* ODItemCreateSessionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemCreateSessionRequest.h; sourceTree = "<group>"; };
+		4D1B9A66216DF6FB00029F29 /* ODPermissionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPermissionRequest.m; sourceTree = "<group>"; };
+		4D1B9A67216DF6FB00029F29 /* ODThumbnailSetRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailSetRequest.m; sourceTree = "<group>"; };
+		4D1B9A68216DF6FB00029F29 /* ODDriveRecentRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDriveRecentRequest.h; sourceTree = "<group>"; };
+		4D1B9A69216DF6FB00029F29 /* ODItemContentRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemContentRequest.m; sourceTree = "<group>"; };
+		4D1B9A6A216DF6FB00029F29 /* ODDriveRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDriveRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A6B216DF6FB00029F29 /* ODThumbnailsCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailsCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A6C216DF6FB00029F29 /* ODThumbnailRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A6D216DF6FB00029F29 /* ODItemCreateLinkRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemCreateLinkRequest.m; sourceTree = "<group>"; };
+		4D1B9A6E216DF6FB00029F29 /* ODSharesCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSharesCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A6F216DF6FB00029F29 /* ODSharedCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSharedCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A70216DF6FB00029F29 /* ODVersionsCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODVersionsCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A71216DF6FB00029F29 /* ODItemsCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemsCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A72216DF6FB00029F29 /* ODItemDeltaRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemDeltaRequest.m; sourceTree = "<group>"; };
+		4D1B9A73216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailsCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A74216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSharedCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A75216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODVersionsCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A76216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSharesCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A77216DF6FB00029F29 /* ODShareRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODShareRequest.m; sourceTree = "<group>"; };
+		4D1B9A78216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemCreateSessionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A79216DF6FB00029F29 /* ODItemRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemRequest.m; sourceTree = "<group>"; };
+		4D1B9A7A216DF6FB00029F29 /* ODThumbnailRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailRequest.m; sourceTree = "<group>"; };
+		4D1B9A7B216DF6FB00029F29 /* ODSpecialCollectionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSpecialCollectionRequest.m; sourceTree = "<group>"; };
+		4D1B9A7C216DF6FB00029F29 /* ODClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODClient.m; sourceTree = "<group>"; };
+		4D1B9A7D216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSpecialCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A7E216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODChildrenCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A7F216DF6FB00029F29 /* ODPermissionsCollectionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPermissionsCollectionRequest.h; sourceTree = "<group>"; };
+		4D1B9A80216DF6FB00029F29 /* ODODataEntities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODODataEntities.h; sourceTree = "<group>"; };
+		4D1B9A81216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDrivesCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A82216DF6FB00029F29 /* ODItemDeltaCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemDeltaCollection.h; sourceTree = "<group>"; };
+		4D1B9A83216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemsCollectionRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A84216DF6FB00029F29 /* ODShareRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODShareRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A85216DF6FB00029F29 /* ODItemDeltaRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemDeltaRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A86216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPermissionsCollectionRequestBuilder.m; sourceTree = "<group>"; };
+		4D1B9A87216DF6FB00029F29 /* ODItemCopyRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemCopyRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A88216DF6FB00029F29 /* ODItemSearchRequestBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemSearchRequestBuilder.h; sourceTree = "<group>"; };
+		4D1B9A89216DF6FB00029F29 /* ODDriveRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDriveRequest.m; sourceTree = "<group>"; };
+		4D1B9A8A216DF6FB00029F29 /* ODItemSearchRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemSearchRequest.m; sourceTree = "<group>"; };
+		4D1B9A8B216DF6FB00029F29 /* ODItemCopyRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemCopyRequest.h; sourceTree = "<group>"; };
+		4D1B9A8C216DF6FB00029F29 /* ODCoreSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODCoreSDK.h; sourceTree = "<group>"; };
+		4D1B9A8E216DF6FB00029F29 /* ODPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPhoto.m; sourceTree = "<group>"; };
+		4D1B9A8F216DF6FB00029F29 /* ODIdentitySet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODIdentitySet.m; sourceTree = "<group>"; };
+		4D1B9A90216DF6FB00029F29 /* ODHashes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODHashes.h; sourceTree = "<group>"; };
+		4D1B9A91216DF6FB00029F29 /* ODSearchResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSearchResult.m; sourceTree = "<group>"; };
+		4D1B9A92216DF6FB00029F29 /* ODIdentity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODIdentity.h; sourceTree = "<group>"; };
+		4D1B9A93216DF6FB00029F29 /* ODSharingInvitation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSharingInvitation.m; sourceTree = "<group>"; };
+		4D1B9A94216DF6FB00029F29 /* ODImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODImage.m; sourceTree = "<group>"; };
+		4D1B9A95216DF6FB00029F29 /* ODFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODFolder.m; sourceTree = "<group>"; };
+		4D1B9A96216DF6FB00029F29 /* ODThumbnail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnail.m; sourceTree = "<group>"; };
+		4D1B9A97216DF6FB00029F29 /* ODDrive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDrive.h; sourceTree = "<group>"; };
+		4D1B9A98216DF6FB00029F29 /* ODAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAudio.h; sourceTree = "<group>"; };
+		4D1B9A99216DF6FB00029F29 /* ODSpecialFolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSpecialFolder.m; sourceTree = "<group>"; };
+		4D1B9A9A216DF6FB00029F29 /* ODUploadSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODUploadSession.m; sourceTree = "<group>"; };
+		4D1B9A9B216DF6FB00029F29 /* ODShared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODShared.h; sourceTree = "<group>"; };
+		4D1B9A9C216DF6FB00029F29 /* ODLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODLocation.h; sourceTree = "<group>"; };
+		4D1B9A9D216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODChunkedUploadSessionDescriptor.h; sourceTree = "<group>"; };
+		4D1B9A9E216DF6FB00029F29 /* ODThumbnailSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnailSet.h; sourceTree = "<group>"; };
+		4D1B9A9F216DF6FB00029F29 /* ODQuota.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODQuota.h; sourceTree = "<group>"; };
+		4D1B9AA0216DF6FB00029F29 /* ODDeleted.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDeleted.m; sourceTree = "<group>"; };
+		4D1B9AA1216DF6FB00029F29 /* ODItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItem.h; sourceTree = "<group>"; };
+		4D1B9AA2216DF6FB00029F29 /* ODPermission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPermission.h; sourceTree = "<group>"; };
+		4D1B9AA3216DF6FB00029F29 /* ODVideo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODVideo.m; sourceTree = "<group>"; };
+		4D1B9AA4216DF6FB00029F29 /* ODShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODShare.m; sourceTree = "<group>"; };
+		4D1B9AA5216DF6FB00029F29 /* ODItemReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItemReference.m; sourceTree = "<group>"; };
+		4D1B9AA6216DF6FB00029F29 /* ODOpenWithApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODOpenWithApp.m; sourceTree = "<group>"; };
+		4D1B9AA7216DF6FB00029F29 /* ODSharingLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODSharingLink.m; sourceTree = "<group>"; };
+		4D1B9AA8216DF6FB00029F29 /* ODAsyncOperationStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAsyncOperationStatus.h; sourceTree = "<group>"; };
+		4D1B9AA9216DF6FB00029F29 /* ODOpenWithSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODOpenWithSet.h; sourceTree = "<group>"; };
+		4D1B9AAA216DF6FB00029F29 /* ODFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODFile.h; sourceTree = "<group>"; };
+		4D1B9AAB216DF6FB00029F29 /* ODFileSystemInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODFileSystemInfo.m; sourceTree = "<group>"; };
+		4D1B9AAC216DF6FB00029F29 /* ODIdentity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODIdentity.m; sourceTree = "<group>"; };
+		4D1B9AAD216DF6FB00029F29 /* ODSearchResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSearchResult.h; sourceTree = "<group>"; };
+		4D1B9AAE216DF6FB00029F29 /* ODHashes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODHashes.m; sourceTree = "<group>"; };
+		4D1B9AAF216DF6FB00029F29 /* ODPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODPhoto.h; sourceTree = "<group>"; };
+		4D1B9AB0216DF6FB00029F29 /* ODIdentitySet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODIdentitySet.h; sourceTree = "<group>"; };
+		4D1B9AB1216DF6FB00029F29 /* ODModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODModels.h; sourceTree = "<group>"; };
+		4D1B9AB2216DF6FB00029F29 /* ODAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAudio.m; sourceTree = "<group>"; };
+		4D1B9AB3216DF6FB00029F29 /* ODDrive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODDrive.m; sourceTree = "<group>"; };
+		4D1B9AB4216DF6FB00029F29 /* ODThumbnail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODThumbnail.h; sourceTree = "<group>"; };
+		4D1B9AB5216DF6FB00029F29 /* ODFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODFolder.h; sourceTree = "<group>"; };
+		4D1B9AB6216DF6FB00029F29 /* ODImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODImage.h; sourceTree = "<group>"; };
+		4D1B9AB7216DF6FB00029F29 /* ODSharingInvitation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSharingInvitation.h; sourceTree = "<group>"; };
+		4D1B9AB8216DF6FB00029F29 /* ODQuota.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODQuota.m; sourceTree = "<group>"; };
+		4D1B9AB9216DF6FB00029F29 /* ODDeleted.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODDeleted.h; sourceTree = "<group>"; };
+		4D1B9ABA216DF6FB00029F29 /* ODThumbnailSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODThumbnailSet.m; sourceTree = "<group>"; };
+		4D1B9ABB216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODChunkedUploadSessionDescriptor.m; sourceTree = "<group>"; };
+		4D1B9ABC216DF6FB00029F29 /* ODUploadSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODUploadSession.h; sourceTree = "<group>"; };
+		4D1B9ABD216DF6FB00029F29 /* ODShared.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODShared.m; sourceTree = "<group>"; };
+		4D1B9ABE216DF6FB00029F29 /* ODLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODLocation.m; sourceTree = "<group>"; };
+		4D1B9ABF216DF6FB00029F29 /* ODSpecialFolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSpecialFolder.h; sourceTree = "<group>"; };
+		4D1B9AC0216DF6FB00029F29 /* ODOpenWithSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODOpenWithSet.m; sourceTree = "<group>"; };
+		4D1B9AC1216DF6FB00029F29 /* ODFileSystemInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODFileSystemInfo.h; sourceTree = "<group>"; };
+		4D1B9AC2216DF6FB00029F29 /* ODFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODFile.m; sourceTree = "<group>"; };
+		4D1B9AC3216DF6FB00029F29 /* ODAsyncOperationStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAsyncOperationStatus.m; sourceTree = "<group>"; };
+		4D1B9AC4216DF6FB00029F29 /* ODOpenWithApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODOpenWithApp.h; sourceTree = "<group>"; };
+		4D1B9AC5216DF6FB00029F29 /* ODSharingLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODSharingLink.h; sourceTree = "<group>"; };
+		4D1B9AC6216DF6FB00029F29 /* ODItemReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODItemReference.h; sourceTree = "<group>"; };
+		4D1B9AC7216DF6FB00029F29 /* ODShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODShare.h; sourceTree = "<group>"; };
+		4D1B9AC8216DF6FB00029F29 /* ODVideo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODVideo.h; sourceTree = "<group>"; };
+		4D1B9AC9216DF6FB00029F29 /* ODPermission.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODPermission.m; sourceTree = "<group>"; };
+		4D1B9ACA216DF6FB00029F29 /* ODItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODItem.m; sourceTree = "<group>"; };
+		4D1B9ACC216DF6FB00029F29 /* ODErrorCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODErrorCodes.m; sourceTree = "<group>"; };
+		4D1B9ACD216DF6FB00029F29 /* ODError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODError.h; sourceTree = "<group>"; };
+		4D1B9ACE216DF6FB00029F29 /* ODErrorCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODErrorCodes.h; sourceTree = "<group>"; };
+		4D1B9ACF216DF6FB00029F29 /* ODError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODError.m; sourceTree = "<group>"; };
+		4D1B9AD1216DF6FB00029F29 /* ODAppConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAppConfiguration.h; sourceTree = "<group>"; };
+		4D1B9AD2216DF6FB00029F29 /* ODAADServiceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAADServiceInfo.m; sourceTree = "<group>"; };
+		4D1B9AD3216DF6FB00029F29 /* ODMSAServiceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODMSAServiceInfo.h; sourceTree = "<group>"; };
+		4D1B9AD4216DF6FB00029F29 /* ODServiceInfoProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODServiceInfoProvider.h; sourceTree = "<group>"; };
+		4D1B9AD5216DF6FB00029F29 /* ODAppConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODAppConfiguration.m; sourceTree = "<group>"; };
+		4D1B9AD6216DF6FB00029F29 /* ODMSAServiceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODMSAServiceInfo.m; sourceTree = "<group>"; };
+		4D1B9AD7216DF6FB00029F29 /* ODAADServiceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODAADServiceInfo.h; sourceTree = "<group>"; };
+		4D1B9AD8216DF6FB00029F29 /* ODServiceInfo+Protected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ODServiceInfo+Protected.h"; sourceTree = "<group>"; };
+		4D1B9AD9216DF6FB00029F29 /* ODServiceInfoProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODServiceInfoProvider.m; sourceTree = "<group>"; };
 		4D1D6FD51F38760F00D2B8EC /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		4D1D6FD61F38760F00D2B8EC /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Model.m; sourceTree = "<group>"; };
 		4D275E551F1BC97600D79A30 /* UpgradeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpgradeViewController.h; sourceTree = "<group>"; };
@@ -248,6 +649,396 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		4D1B99A7216DF6FA00029F29 /* odsdk */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99BD216DF6FA00029F29 /* Auth */,
+				4D1B99CE216DF6FA00029F29 /* OneDriveSDK */,
+				4D1B99D8216DF6FA00029F29 /* Extensions */,
+				4D1B99E1216DF6FA00029F29 /* Common */,
+				4D1B99EE216DF6FA00029F29 /* OneDriveCoreSDK */,
+				4D1B9AD0216DF6FB00029F29 /* Accounts */,
+			);
+			path = odsdk;
+			sourceTree = SOURCE_ROOT;
+		};
+		4D1B99BD216DF6FA00029F29 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99BE216DF6FA00029F29 /* ODKeychainWrapper.h */,
+				4D1B99BF216DF6FA00029F29 /* ODBaseAuthProvider.h */,
+				4D1B99C0216DF6FA00029F29 /* ODBusinessAuthProvider.h */,
+				4D1B99C1216DF6FA00029F29 /* ODAuthProvider+Protected.h */,
+				4D1B99C2216DF6FA00029F29 /* ODPersonalAuthProvider.h */,
+				4D1B99C3216DF6FA00029F29 /* ODAADAccountBridge.h */,
+				4D1B99C4216DF6FA00029F29 /* ODAccountStore.m */,
+				4D1B99C5216DF6FA00029F29 /* ODAuthenticationViewController.h */,
+				4D1B99C6216DF6FA00029F29 /* ODBaseAuthProvider.m */,
+				4D1B99C7216DF6FA00029F29 /* ODKeychainWrapper.m */,
+				4D1B99C8216DF6FA00029F29 /* ODAuth.h */,
+				4D1B99C9216DF6FA00029F29 /* ODBusinessAuthProvider.m */,
+				4D1B99CA216DF6FA00029F29 /* ODAADAccountBridge.m */,
+				4D1B99CB216DF6FA00029F29 /* ODPersonalAuthProvider.m */,
+				4D1B99CC216DF6FA00029F29 /* ODAuthenticationViewController.m */,
+				4D1B99CD216DF6FA00029F29 /* ODAccountStore.h */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		4D1B99CE216DF6FA00029F29 /* OneDriveSDK */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99CF216DF6FA00029F29 /* ODLogger.m */,
+				4D1B99D0216DF6FA00029F29 /* ODLogger.h */,
+				4D1B99D1216DF6FA00029F29 /* OneDriveSDK.h */,
+				4D1B99D2216DF6FA00029F29 /* ODURLSessionManager */,
+				4D1B99D7216DF6FA00029F29 /* Info.plist */,
+			);
+			path = OneDriveSDK;
+			sourceTree = "<group>";
+		};
+		4D1B99D2216DF6FA00029F29 /* ODURLSessionManager */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99D3216DF6FA00029F29 /* ODNSURLSessionTaskDelegate.h */,
+				4D1B99D4216DF6FA00029F29 /* ODURLSessionManager.m */,
+				4D1B99D5216DF6FA00029F29 /* ODURLSessionManager.h */,
+				4D1B99D6216DF6FA00029F29 /* ODNSURLSessionTaskDelegate.m */,
+			);
+			path = ODURLSessionManager;
+			sourceTree = "<group>";
+		};
+		4D1B99D8216DF6FA00029F29 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99D9216DF6FA00029F29 /* NSError+OneDriveSDK.h */,
+				4D1B99DA216DF6FA00029F29 /* ODAppConfiguration+DefaultConfiguration.h */,
+				4D1B99DB216DF6FA00029F29 /* ODClient+DefaultConfiguration.m */,
+				4D1B99DC216DF6FA00029F29 /* ODClient+Authentication.m */,
+				4D1B99DD216DF6FA00029F29 /* ODAppConfiguration+DefaultConfiguration.m */,
+				4D1B99DE216DF6FA00029F29 /* NSError+OneDriveSDK.m */,
+				4D1B99DF216DF6FA00029F29 /* ODClient+Authentication.h */,
+				4D1B99E0216DF6FA00029F29 /* ODClient+DefaultConfiguration.h */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		4D1B99E1216DF6FA00029F29 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99E2216DF6FA00029F29 /* ODAccountSession.h */,
+				4D1B99E3216DF6FA00029F29 /* ODServiceInfo.m */,
+				4D1B99E4216DF6FA00029F29 /* ODAuthHelper.m */,
+				4D1B99E5216DF6FA00029F29 /* ODAuthConstants.m */,
+				4D1B99E6216DF6FA00029F29 /* ODServiceInfo.h */,
+				4D1B99E7216DF6FA00029F29 /* ODAccountSession.m */,
+				4D1B99E8216DF6FA00029F29 /* ODAccountStoreProtocol.h */,
+				4D1B99E9216DF6FA00029F29 /* ODAuthHelper.h */,
+				4D1B99EA216DF6FA00029F29 /* ODHttpProvider.h */,
+				4D1B99EB216DF6FA00029F29 /* ODLoggerProtocol.h */,
+				4D1B99EC216DF6FA00029F29 /* ODAuthProvider.h */,
+				4D1B99ED216DF6FA00029F29 /* ODAuthConstants.h */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		4D1B99EE216DF6FA00029F29 /* OneDriveCoreSDK */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99EF216DF6FA00029F29 /* Core */,
+				4D1B9A23216DF6FA00029F29 /* Extensions */,
+				4D1B9A2E216DF6FA00029F29 /* requests */,
+				4D1B9A8C216DF6FB00029F29 /* ODCoreSDK.h */,
+				4D1B9A8D216DF6FB00029F29 /* model */,
+				4D1B9ACB216DF6FB00029F29 /* Errors */,
+			);
+			path = OneDriveCoreSDK;
+			sourceTree = "<group>";
+		};
+		4D1B99EF216DF6FA00029F29 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99F0216DF6FA00029F29 /* Options */,
+				4D1B9A07216DF6FA00029F29 /* ODRequestBuilder.h */,
+				4D1B9A08216DF6FA00029F29 /* ODCollectionRequest.m */,
+				4D1B9A09216DF6FA00029F29 /* ODCollectionRequestBuilder.m */,
+				4D1B9A0A216DF6FA00029F29 /* ODRequest.m */,
+				4D1B9A0B216DF6FA00029F29 /* ODConstants.h */,
+				4D1B9A0C216DF6FA00029F29 /* ODObject.m */,
+				4D1B9A0D216DF6FA00029F29 /* ODCollection.m */,
+				4D1B9A0E216DF6FA00029F29 /* ODRequest.h */,
+				4D1B9A0F216DF6FA00029F29 /* ODURLSEssion */,
+				4D1B9A1D216DF6FA00029F29 /* ODCollectionRequestBuilder.h */,
+				4D1B9A1E216DF6FA00029F29 /* ODCollectionRequest.h */,
+				4D1B9A1F216DF6FA00029F29 /* ODRequestBuilder.m */,
+				4D1B9A20216DF6FA00029F29 /* ODCollection.h */,
+				4D1B9A21216DF6FA00029F29 /* ODObject.h */,
+				4D1B9A22216DF6FA00029F29 /* ODConstants.m */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		4D1B99F0216DF6FA00029F29 /* Options */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B99F1216DF6FA00029F29 /* ODHeaderOptions.m */,
+				4D1B99F2216DF6FA00029F29 /* ODQueryParameters.h */,
+				4D1B99F3216DF6FA00029F29 /* ODSelectOptions.m */,
+				4D1B99F4216DF6FA00029F29 /* ODNameConflict.m */,
+				4D1B99F5216DF6FA00029F29 /* ODRequestOptions.m */,
+				4D1B99F6216DF6FA00029F29 /* ODIfNoneMatch.m */,
+				4D1B99F7216DF6FA00029F29 /* ODIfMatch.h */,
+				4D1B99F8216DF6FA00029F29 /* ODTopOptions.m */,
+				4D1B99F9216DF6FA00029F29 /* ODRequestOptionsBuilder.h */,
+				4D1B99FA216DF6FA00029F29 /* ODExpandOptions.h */,
+				4D1B99FB216DF6FA00029F29 /* ODOrderByOptions.m */,
+				4D1B99FC216DF6FA00029F29 /* ODRequestOptions.h */,
+				4D1B99FD216DF6FA00029F29 /* ODNameConflict.h */,
+				4D1B99FE216DF6FA00029F29 /* ODSelectOptions.h */,
+				4D1B99FF216DF6FA00029F29 /* ODHeaderOptions.h */,
+				4D1B9A00216DF6FA00029F29 /* ODQueryParameters.m */,
+				4D1B9A01216DF6FA00029F29 /* ODIfMatch.m */,
+				4D1B9A02216DF6FA00029F29 /* ODTopOptions.h */,
+				4D1B9A03216DF6FA00029F29 /* ODIfNoneMatch.h */,
+				4D1B9A04216DF6FA00029F29 /* ODExpandOptions.m */,
+				4D1B9A05216DF6FA00029F29 /* ODRequestOptionsBuilder.m */,
+				4D1B9A06216DF6FA00029F29 /* ODOrderByOptions.h */,
+			);
+			path = Options;
+			sourceTree = "<group>";
+		};
+		4D1B9A0F216DF6FA00029F29 /* ODURLSEssion */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B9A10216DF6FA00029F29 /* ODURLSessionProgressTask.h */,
+				4D1B9A11216DF6FA00029F29 /* ODURLSessionUploadTask.h */,
+				4D1B9A12216DF6FA00029F29 /* ODURLSessionDownloadTask.h */,
+				4D1B9A13216DF6FA00029F29 /* ODAsyncURLSessionDataTask.h */,
+				4D1B9A14216DF6FA00029F29 /* ODURLSessionDataTask.h */,
+				4D1B9A15216DF6FA00029F29 /* ODURLSessionTask.m */,
+				4D1B9A16216DF6FA00029F29 /* ODURLSessionProgressTask.m */,
+				4D1B9A17216DF6FA00029F29 /* ODURLSessionUploadTask.m */,
+				4D1B9A18216DF6FA00029F29 /* ODAsyncURLSessionDataTask.m */,
+				4D1B9A19216DF6FA00029F29 /* ODURLSessionDownloadTask.m */,
+				4D1B9A1A216DF6FA00029F29 /* ODURLSessionTask+Protected.h */,
+				4D1B9A1B216DF6FA00029F29 /* ODURLSessionTask.h */,
+				4D1B9A1C216DF6FA00029F29 /* ODURLSessionDataTask.m */,
+			);
+			path = ODURLSEssion;
+			sourceTree = "<group>";
+		};
+		4D1B9A23216DF6FA00029F29 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B9A24216DF6FA00029F29 /* NSDate+ODSerialization.h */,
+				4D1B9A25216DF6FA00029F29 /* ODClient+HelperMethods.h */,
+				4D1B9A26216DF6FA00029F29 /* ODItemRequestBuilder+ItemByPath.m */,
+				4D1B9A27216DF6FA00029F29 /* ODThumbnailSet+CustomThumbnail.h */,
+				4D1B9A28216DF6FA00029F29 /* NSJSONSerialization+ResponseHelper.h */,
+				4D1B9A29216DF6FA00029F29 /* ODItemRequestBuilder+ItemByPath.h */,
+				4D1B9A2A216DF6FA00029F29 /* ODClient+HelperMethods.m */,
+				4D1B9A2B216DF6FA00029F29 /* NSDate+ODSerialization.m */,
+				4D1B9A2C216DF6FA00029F29 /* ODThumbnailSet+CustomThumbnail.m */,
+				4D1B9A2D216DF6FA00029F29 /* NSJSONSerialization+ResponseHelper.m */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		4D1B9A2E216DF6FA00029F29 /* requests */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B9A2F216DF6FA00029F29 /* ODItemCreateLinkRequestBuilder.m */,
+				4D1B9A30216DF6FA00029F29 /* ODDrivesCollectionRequest.h */,
+				4D1B9A31216DF6FA00029F29 /* ODThumbnailContentRequest.m */,
+				4D1B9A32216DF6FA00029F29 /* ODPermissionRequestBuilder.m */,
+				4D1B9A33216DF6FA00029F29 /* ODChildrenCollectionRequest.h */,
+				4D1B9A34216DF6FA00029F29 /* ODThumbnailSetRequestBuilder.h */,
+				4D1B9A35216DF6FA00029F29 /* ODDriveRecentRequestBuilder.m */,
+				4D1B9A36216DF6FA00029F29 /* ODItemRequestBuilder.m */,
+				4D1B9A37216DF6FA00029F29 /* ODItemsCollectionRequest.h */,
+				4D1B9A38216DF6FA00029F29 /* ODSharedCollectionRequest.h */,
+				4D1B9A39216DF6FA00029F29 /* ODVersionsCollectionRequest.h */,
+				4D1B9A3A216DF6FA00029F29 /* ODThumbnailRequestBuilder.h */,
+				4D1B9A3B216DF6FA00029F29 /* ODItemCreateLinkRequest.h */,
+				4D1B9A3C216DF6FB00029F29 /* ODSharesCollectionRequest.h */,
+				4D1B9A3D216DF6FB00029F29 /* ODThumbnailsCollectionRequest.m */,
+				4D1B9A3E216DF6FB00029F29 /* ODDriveRequestBuilder.h */,
+				4D1B9A3F216DF6FB00029F29 /* ODItemContentRequest.h */,
+				4D1B9A40216DF6FB00029F29 /* ODDriveRecentRequest.m */,
+				4D1B9A41216DF6FB00029F29 /* ODPermissionRequest.h */,
+				4D1B9A42216DF6FB00029F29 /* ODItemCreateSessionRequest.m */,
+				4D1B9A43216DF6FB00029F29 /* ODThumbnailSetRequest.h */,
+				4D1B9A44216DF6FB00029F29 /* ODPermissionsCollectionRequest.m */,
+				4D1B9A45216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.h */,
+				4D1B9A46216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m */,
+				4D1B9A47216DF6FB00029F29 /* ODClient.h */,
+				4D1B9A48216DF6FB00029F29 /* ODSpecialCollectionRequest.h */,
+				4D1B9A49216DF6FB00029F29 /* ODItemRequest.h */,
+				4D1B9A4A216DF6FB00029F29 /* ODThumbnailRequest.h */,
+				4D1B9A4B216DF6FB00029F29 /* ODShareRequest.h */,
+				4D1B9A4C216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.h */,
+				4D1B9A4D216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.h */,
+				4D1B9A4E216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.m */,
+				4D1B9A4F216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.m */,
+				4D1B9A50216DF6FB00029F29 /* ODItemDeltaRequest.h */,
+				4D1B9A51216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.m */,
+				4D1B9A52216DF6FB00029F29 /* ODItemSearchRequest.h */,
+				4D1B9A53216DF6FB00029F29 /* ODItemCopyRequest.m */,
+				4D1B9A54216DF6FB00029F29 /* ODDriveRequest.h */,
+				4D1B9A55216DF6FB00029F29 /* ODItemSearchRequestBuilder.m */,
+				4D1B9A56216DF6FB00029F29 /* ODItemCopyRequestBuilder.m */,
+				4D1B9A57216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.h */,
+				4D1B9A58216DF6FB00029F29 /* ODShareRequestBuilder.m */,
+				4D1B9A59216DF6FB00029F29 /* ODItemDeltaRequestBuilder.m */,
+				4D1B9A5A216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.m */,
+				4D1B9A5B216DF6FB00029F29 /* ODItemDeltaCollection.m */,
+				4D1B9A5C216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.h */,
+				4D1B9A5D216DF6FB00029F29 /* ODDriveRecentRequestBuilder.h */,
+				4D1B9A5E216DF6FB00029F29 /* ODItemRequestBuilder.h */,
+				4D1B9A5F216DF6FB00029F29 /* ODThumbnailSetRequestBuilder.m */,
+				4D1B9A60216DF6FB00029F29 /* ODChildrenCollectionRequest.m */,
+				4D1B9A61216DF6FB00029F29 /* ODThumbnailContentRequest.h */,
+				4D1B9A62216DF6FB00029F29 /* ODPermissionRequestBuilder.h */,
+				4D1B9A63216DF6FB00029F29 /* ODDrivesCollectionRequest.m */,
+				4D1B9A64216DF6FB00029F29 /* ODItemCreateLinkRequestBuilder.h */,
+				4D1B9A65216DF6FB00029F29 /* ODItemCreateSessionRequest.h */,
+				4D1B9A66216DF6FB00029F29 /* ODPermissionRequest.m */,
+				4D1B9A67216DF6FB00029F29 /* ODThumbnailSetRequest.m */,
+				4D1B9A68216DF6FB00029F29 /* ODDriveRecentRequest.h */,
+				4D1B9A69216DF6FB00029F29 /* ODItemContentRequest.m */,
+				4D1B9A6A216DF6FB00029F29 /* ODDriveRequestBuilder.m */,
+				4D1B9A6B216DF6FB00029F29 /* ODThumbnailsCollectionRequest.h */,
+				4D1B9A6C216DF6FB00029F29 /* ODThumbnailRequestBuilder.m */,
+				4D1B9A6D216DF6FB00029F29 /* ODItemCreateLinkRequest.m */,
+				4D1B9A6E216DF6FB00029F29 /* ODSharesCollectionRequest.m */,
+				4D1B9A6F216DF6FB00029F29 /* ODSharedCollectionRequest.m */,
+				4D1B9A70216DF6FB00029F29 /* ODVersionsCollectionRequest.m */,
+				4D1B9A71216DF6FB00029F29 /* ODItemsCollectionRequest.m */,
+				4D1B9A72216DF6FB00029F29 /* ODItemDeltaRequest.m */,
+				4D1B9A73216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.h */,
+				4D1B9A74216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.h */,
+				4D1B9A75216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.h */,
+				4D1B9A76216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.m */,
+				4D1B9A77216DF6FB00029F29 /* ODShareRequest.m */,
+				4D1B9A78216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.m */,
+				4D1B9A79216DF6FB00029F29 /* ODItemRequest.m */,
+				4D1B9A7A216DF6FB00029F29 /* ODThumbnailRequest.m */,
+				4D1B9A7B216DF6FB00029F29 /* ODSpecialCollectionRequest.m */,
+				4D1B9A7C216DF6FB00029F29 /* ODClient.m */,
+				4D1B9A7D216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.h */,
+				4D1B9A7E216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.m */,
+				4D1B9A7F216DF6FB00029F29 /* ODPermissionsCollectionRequest.h */,
+				4D1B9A80216DF6FB00029F29 /* ODODataEntities.h */,
+				4D1B9A81216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m */,
+				4D1B9A82216DF6FB00029F29 /* ODItemDeltaCollection.h */,
+				4D1B9A83216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.h */,
+				4D1B9A84216DF6FB00029F29 /* ODShareRequestBuilder.h */,
+				4D1B9A85216DF6FB00029F29 /* ODItemDeltaRequestBuilder.h */,
+				4D1B9A86216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.m */,
+				4D1B9A87216DF6FB00029F29 /* ODItemCopyRequestBuilder.h */,
+				4D1B9A88216DF6FB00029F29 /* ODItemSearchRequestBuilder.h */,
+				4D1B9A89216DF6FB00029F29 /* ODDriveRequest.m */,
+				4D1B9A8A216DF6FB00029F29 /* ODItemSearchRequest.m */,
+				4D1B9A8B216DF6FB00029F29 /* ODItemCopyRequest.h */,
+			);
+			path = requests;
+			sourceTree = "<group>";
+		};
+		4D1B9A8D216DF6FB00029F29 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B9A8E216DF6FB00029F29 /* ODPhoto.m */,
+				4D1B9A8F216DF6FB00029F29 /* ODIdentitySet.m */,
+				4D1B9A90216DF6FB00029F29 /* ODHashes.h */,
+				4D1B9A91216DF6FB00029F29 /* ODSearchResult.m */,
+				4D1B9A92216DF6FB00029F29 /* ODIdentity.h */,
+				4D1B9A93216DF6FB00029F29 /* ODSharingInvitation.m */,
+				4D1B9A94216DF6FB00029F29 /* ODImage.m */,
+				4D1B9A95216DF6FB00029F29 /* ODFolder.m */,
+				4D1B9A96216DF6FB00029F29 /* ODThumbnail.m */,
+				4D1B9A97216DF6FB00029F29 /* ODDrive.h */,
+				4D1B9A98216DF6FB00029F29 /* ODAudio.h */,
+				4D1B9A99216DF6FB00029F29 /* ODSpecialFolder.m */,
+				4D1B9A9A216DF6FB00029F29 /* ODUploadSession.m */,
+				4D1B9A9B216DF6FB00029F29 /* ODShared.h */,
+				4D1B9A9C216DF6FB00029F29 /* ODLocation.h */,
+				4D1B9A9D216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.h */,
+				4D1B9A9E216DF6FB00029F29 /* ODThumbnailSet.h */,
+				4D1B9A9F216DF6FB00029F29 /* ODQuota.h */,
+				4D1B9AA0216DF6FB00029F29 /* ODDeleted.m */,
+				4D1B9AA1216DF6FB00029F29 /* ODItem.h */,
+				4D1B9AA2216DF6FB00029F29 /* ODPermission.h */,
+				4D1B9AA3216DF6FB00029F29 /* ODVideo.m */,
+				4D1B9AA4216DF6FB00029F29 /* ODShare.m */,
+				4D1B9AA5216DF6FB00029F29 /* ODItemReference.m */,
+				4D1B9AA6216DF6FB00029F29 /* ODOpenWithApp.m */,
+				4D1B9AA7216DF6FB00029F29 /* ODSharingLink.m */,
+				4D1B9AA8216DF6FB00029F29 /* ODAsyncOperationStatus.h */,
+				4D1B9AA9216DF6FB00029F29 /* ODOpenWithSet.h */,
+				4D1B9AAA216DF6FB00029F29 /* ODFile.h */,
+				4D1B9AAB216DF6FB00029F29 /* ODFileSystemInfo.m */,
+				4D1B9AAC216DF6FB00029F29 /* ODIdentity.m */,
+				4D1B9AAD216DF6FB00029F29 /* ODSearchResult.h */,
+				4D1B9AAE216DF6FB00029F29 /* ODHashes.m */,
+				4D1B9AAF216DF6FB00029F29 /* ODPhoto.h */,
+				4D1B9AB0216DF6FB00029F29 /* ODIdentitySet.h */,
+				4D1B9AB1216DF6FB00029F29 /* ODModels.h */,
+				4D1B9AB2216DF6FB00029F29 /* ODAudio.m */,
+				4D1B9AB3216DF6FB00029F29 /* ODDrive.m */,
+				4D1B9AB4216DF6FB00029F29 /* ODThumbnail.h */,
+				4D1B9AB5216DF6FB00029F29 /* ODFolder.h */,
+				4D1B9AB6216DF6FB00029F29 /* ODImage.h */,
+				4D1B9AB7216DF6FB00029F29 /* ODSharingInvitation.h */,
+				4D1B9AB8216DF6FB00029F29 /* ODQuota.m */,
+				4D1B9AB9216DF6FB00029F29 /* ODDeleted.h */,
+				4D1B9ABA216DF6FB00029F29 /* ODThumbnailSet.m */,
+				4D1B9ABB216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.m */,
+				4D1B9ABC216DF6FB00029F29 /* ODUploadSession.h */,
+				4D1B9ABD216DF6FB00029F29 /* ODShared.m */,
+				4D1B9ABE216DF6FB00029F29 /* ODLocation.m */,
+				4D1B9ABF216DF6FB00029F29 /* ODSpecialFolder.h */,
+				4D1B9AC0216DF6FB00029F29 /* ODOpenWithSet.m */,
+				4D1B9AC1216DF6FB00029F29 /* ODFileSystemInfo.h */,
+				4D1B9AC2216DF6FB00029F29 /* ODFile.m */,
+				4D1B9AC3216DF6FB00029F29 /* ODAsyncOperationStatus.m */,
+				4D1B9AC4216DF6FB00029F29 /* ODOpenWithApp.h */,
+				4D1B9AC5216DF6FB00029F29 /* ODSharingLink.h */,
+				4D1B9AC6216DF6FB00029F29 /* ODItemReference.h */,
+				4D1B9AC7216DF6FB00029F29 /* ODShare.h */,
+				4D1B9AC8216DF6FB00029F29 /* ODVideo.h */,
+				4D1B9AC9216DF6FB00029F29 /* ODPermission.m */,
+				4D1B9ACA216DF6FB00029F29 /* ODItem.m */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
+		4D1B9ACB216DF6FB00029F29 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B9ACC216DF6FB00029F29 /* ODErrorCodes.m */,
+				4D1B9ACD216DF6FB00029F29 /* ODError.h */,
+				4D1B9ACE216DF6FB00029F29 /* ODErrorCodes.h */,
+				4D1B9ACF216DF6FB00029F29 /* ODError.m */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		4D1B9AD0216DF6FB00029F29 /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				4D1B9AD1216DF6FB00029F29 /* ODAppConfiguration.h */,
+				4D1B9AD2216DF6FB00029F29 /* ODAADServiceInfo.m */,
+				4D1B9AD3216DF6FB00029F29 /* ODMSAServiceInfo.h */,
+				4D1B9AD4216DF6FB00029F29 /* ODServiceInfoProvider.h */,
+				4D1B9AD5216DF6FB00029F29 /* ODAppConfiguration.m */,
+				4D1B9AD6216DF6FB00029F29 /* ODMSAServiceInfo.m */,
+				4D1B9AD7216DF6FB00029F29 /* ODAADServiceInfo.h */,
+				4D1B9AD8216DF6FB00029F29 /* ODServiceInfo+Protected.h */,
+				4D1B9AD9216DF6FB00029F29 /* ODServiceInfoProvider.m */,
+			);
+			path = Accounts;
+			sourceTree = "<group>";
+		};
 		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -287,6 +1078,7 @@
 		4D62D6961C85F35E0051E13B /* StorageProviders */ = {
 			isa = PBXGroup;
 			children = (
+				4D1B99A7216DF6FA00029F29 /* odsdk */,
 				4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */,
 				4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */,
 				4D1757971C8361D200E6356F /* GoogleDriveManager.h */,
@@ -558,6 +1350,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D1B9AF5216DF6FB00029F29 /* Info.plist in Resources */,
 				4D446814216D2EC100F6358D /* Cartfile in Resources */,
 				4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -676,65 +1469,194 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D1B9B53216DF6FB00029F29 /* ODVideo.m in Sources */,
 				4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */,
+				4D1B9B45216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m in Sources */,
+				4D1B9B56216DF6FB00029F29 /* ODOpenWithApp.m in Sources */,
+				4D1B9B36216DF6FB00029F29 /* ODThumbnailRequestBuilder.m in Sources */,
+				4D1B9B3D216DF6FB00029F29 /* ODSharesCollectionRequestBuilder.m in Sources */,
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
+				4D1B9B40216DF6FB00029F29 /* ODItemRequest.m in Sources */,
 				4D29E46F206D350300AD537E /* PasswordGenerator.m in Sources */,
+				4D1B9B0B216DF6FB00029F29 /* ODRequest.m in Sources */,
+				4D1B9B18216DF6FB00029F29 /* NSDate+ODSerialization.m in Sources */,
 				4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */,
+				4D1B9B21216DF6FB00029F29 /* ODDriveRecentRequest.m in Sources */,
+				4D1B9B5B216DF6FB00029F29 /* ODAudio.m in Sources */,
+				4D1B9B08216DF6FB00029F29 /* ODRequestOptionsBuilder.m in Sources */,
+				4D1B9B5A216DF6FB00029F29 /* ODHashes.m in Sources */,
+				4D1B9B32216DF6FB00029F29 /* ODPermissionRequest.m in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
+				4D1B9B41216DF6FB00029F29 /* ODThumbnailRequest.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
+				4D1B9B07216DF6FB00029F29 /* ODExpandOptions.m in Sources */,
 				4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */,
 				4D8C148E2074F5F800CE9CAE /* PwSafeDatabase.m in Sources */,
+				4D1B9AF4216DF6FB00029F29 /* ODNSURLSessionTaskDelegate.m in Sources */,
+				4D1B9B04216DF6FB00029F29 /* ODOrderByOptions.m in Sources */,
 				4D8C14902074F5F900CE9CAE /* PasswordHistory.m in Sources */,
+				4D1B9B54216DF6FB00029F29 /* ODShare.m in Sources */,
+				4D1B9AF8216DF6FB00029F29 /* ODAppConfiguration+DefaultConfiguration.m in Sources */,
+				4D1B9B47216DF6FB00029F29 /* ODDriveRequest.m in Sources */,
+				4D1B9B0F216DF6FB00029F29 /* ODURLSessionProgressTask.m in Sources */,
+				4D1B9B0C216DF6FB00029F29 /* ODObject.m in Sources */,
 				4D8C148C2074F5F800CE9CAE /* SafeTools.m in Sources */,
+				4D1B9AFC216DF6FB00029F29 /* ODAuthConstants.m in Sources */,
+				4D1B9B64216DF6FB00029F29 /* ODAsyncOperationStatus.m in Sources */,
+				4D1B9B6B216DF6FB00029F29 /* ODMSAServiceInfo.m in Sources */,
+				4D1B9B67216DF6FB00029F29 /* ODErrorCodes.m in Sources */,
+				4D1B9B68216DF6FB00029F29 /* ODError.m in Sources */,
+				4D1B9B19216DF6FB00029F29 /* ODThumbnailSet+CustomThumbnail.m in Sources */,
+				4D1B9AF7216DF6FB00029F29 /* ODClient+Authentication.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
 				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
 				4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */,
+				4D1B9B23216DF6FB00029F29 /* ODPermissionsCollectionRequest.m in Sources */,
+				4D1B9B2D216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.m in Sources */,
+				4D1B9B43216DF6FB00029F29 /* ODClient.m in Sources */,
+				4D1B9AFD216DF6FB00029F29 /* ODAccountSession.m in Sources */,
+				4D1B9B6A216DF6FB00029F29 /* ODAppConfiguration.m in Sources */,
 				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
+				4D1B9B52216DF6FB00029F29 /* ODDeleted.m in Sources */,
+				4D1B9B3B216DF6FB00029F29 /* ODItemsCollectionRequest.m in Sources */,
+				4D1B9B59216DF6FB00029F29 /* ODIdentity.m in Sources */,
+				4D1B9B30216DF6FB00029F29 /* ODChildrenCollectionRequest.m in Sources */,
+				4D1B9B65216DF6FB00029F29 /* ODPermission.m in Sources */,
+				4D1B9B1C216DF6FB00029F29 /* ODThumbnailContentRequest.m in Sources */,
+				4D1B9B29216DF6FB00029F29 /* ODItemSearchRequestBuilder.m in Sources */,
+				4D1B9B0A216DF6FB00029F29 /* ODCollectionRequestBuilder.m in Sources */,
 				4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */,
+				4D1B9AEF216DF6FB00029F29 /* ODAADAccountBridge.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
+				4D1B9B38216DF6FB00029F29 /* ODSharesCollectionRequest.m in Sources */,
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
+				4D1B9B06216DF6FB00029F29 /* ODIfMatch.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
+				4D1B9B2B216DF6FB00029F29 /* ODShareRequestBuilder.m in Sources */,
 				4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */,
+				4D1B9B11216DF6FB00029F29 /* ODAsyncURLSessionDataTask.m in Sources */,
+				4D1B9B37216DF6FB00029F29 /* ODItemCreateLinkRequest.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */,
+				4D1B9B13216DF6FB00029F29 /* ODURLSessionDataTask.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
+				4D1B9B2C216DF6FB00029F29 /* ODItemDeltaRequestBuilder.m in Sources */,
+				4D1B9AEB216DF6FB00029F29 /* ODAccountStore.m in Sources */,
+				4D1B9B5C216DF6FB00029F29 /* ODDrive.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
+				4D1B9B26216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.m in Sources */,
+				4D1B9B51216DF6FB00029F29 /* ODUploadSession.m in Sources */,
+				4D1B9B1B216DF6FB00029F29 /* ODItemCreateLinkRequestBuilder.m in Sources */,
 				4DCF5FBC1F7294A800011756 /* PasswordSafeUIDocument.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
 				4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */,
+				4D1B9B4F216DF6FB00029F29 /* ODThumbnail.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
 				4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */,
+				4D1B9B15216DF6FB00029F29 /* ODConstants.m in Sources */,
+				4D1B9B20216DF6FB00029F29 /* ODThumbnailsCollectionRequest.m in Sources */,
+				4D1B9B4A216DF6FB00029F29 /* ODIdentitySet.m in Sources */,
+				4D1B9B4D216DF6FB00029F29 /* ODImage.m in Sources */,
 				4D8C14952074F61800CE9CAE /* KeypassDatabase.m in Sources */,
+				4D1B9AED216DF6FB00029F29 /* ODKeychainWrapper.m in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
+				4D1B9B35216DF6FB00029F29 /* ODDriveRequestBuilder.m in Sources */,
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
+				4D1B9B17216DF6FB00029F29 /* ODClient+HelperMethods.m in Sources */,
+				4D1B9B03216DF6FB00029F29 /* ODTopOptions.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
+				4D1B9B02216DF6FB00029F29 /* ODIfNoneMatch.m in Sources */,
 				4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */,
+				4D1B9B28216DF6FB00029F29 /* ODItemCopyRequest.m in Sources */,
+				4D1B9B01216DF6FB00029F29 /* ODRequestOptions.m in Sources */,
+				4D1B9B0E216DF6FB00029F29 /* ODURLSessionTask.m in Sources */,
 				4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */,
+				4D1B9AF9216DF6FB00029F29 /* NSError+OneDriveSDK.m in Sources */,
+				4D1B9B33216DF6FB00029F29 /* ODThumbnailSetRequest.m in Sources */,
+				4D1B9B14216DF6FB00029F29 /* ODRequestBuilder.m in Sources */,
+				4D1B9B22216DF6FB00029F29 /* ODItemCreateSessionRequest.m in Sources */,
+				4D1B9B63216DF6FB00029F29 /* ODFile.m in Sources */,
 				4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */,
+				4D1B9B42216DF6FB00029F29 /* ODSpecialCollectionRequest.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
+				4D1B9B09216DF6FB00029F29 /* ODCollectionRequest.m in Sources */,
+				4D1B9B1D216DF6FB00029F29 /* ODPermissionRequestBuilder.m in Sources */,
+				4D1B9B66216DF6FB00029F29 /* ODItem.m in Sources */,
 				4D275E571F1BC97600D79A30 /* UpgradeViewController.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
+				4D1B9B50216DF6FB00029F29 /* ODSpecialFolder.m in Sources */,
+				4D1B9AF6216DF6FB00029F29 /* ODClient+DefaultConfiguration.m in Sources */,
+				4D1B9B48216DF6FB00029F29 /* ODItemSearchRequest.m in Sources */,
+				4D1B9B0D216DF6FB00029F29 /* ODCollection.m in Sources */,
+				4D1B9B5E216DF6FB00029F29 /* ODThumbnailSet.m in Sources */,
+				4D1B9B69216DF6FB00029F29 /* ODAADServiceInfo.m in Sources */,
 				4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */,
+				4D1B9B5F216DF6FB00029F29 /* ODChunkedUploadSessionDescriptor.m in Sources */,
+				4D1B9B60216DF6FB00029F29 /* ODShared.m in Sources */,
+				4D1B9AFA216DF6FB00029F29 /* ODServiceInfo.m in Sources */,
+				4D1B9B10216DF6FB00029F29 /* ODURLSessionUploadTask.m in Sources */,
+				4D1B9B2E216DF6FB00029F29 /* ODItemDeltaCollection.m in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */,
 				4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */,
+				4D1B9B3F216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.m in Sources */,
+				4D1B9B2F216DF6FB00029F29 /* ODThumbnailSetRequestBuilder.m in Sources */,
+				4D1B9B31216DF6FB00029F29 /* ODDrivesCollectionRequest.m in Sources */,
+				4D1B9AF3216DF6FB00029F29 /* ODURLSessionManager.m in Sources */,
+				4D1B9B34216DF6FB00029F29 /* ODItemContentRequest.m in Sources */,
 				4D38AD08215F96110027249F /* OneDriveForBusinessStorageProvider.m in Sources */,
 				4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */,
 				4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */,
+				4D1B9AF2216DF6FB00029F29 /* ODLogger.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
+				4D1B9B5D216DF6FB00029F29 /* ODQuota.m in Sources */,
 				4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */,
 				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
+				4D1B9AEC216DF6FB00029F29 /* ODBaseAuthProvider.m in Sources */,
+				4D1B9B44216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.m in Sources */,
+				4D1B9B39216DF6FB00029F29 /* ODSharedCollectionRequest.m in Sources */,
+				4D1B9AFF216DF6FB00029F29 /* ODSelectOptions.m in Sources */,
+				4D1B9B2A216DF6FB00029F29 /* ODItemCopyRequestBuilder.m in Sources */,
 				4D8C147D2074F5D100CE9CAE /* CHCSVParser.m in Sources */,
+				4D1B9B57216DF6FB00029F29 /* ODSharingLink.m in Sources */,
+				4D1B9B4B216DF6FB00029F29 /* ODSearchResult.m in Sources */,
+				4D1B9AF1216DF6FB00029F29 /* ODAuthenticationViewController.m in Sources */,
+				4D1B9AF0216DF6FB00029F29 /* ODPersonalAuthProvider.m in Sources */,
+				4D1B9B4C216DF6FB00029F29 /* ODSharingInvitation.m in Sources */,
+				4D1B9B55216DF6FB00029F29 /* ODItemReference.m in Sources */,
 				4D446809216CE02C00F6358D /* Csv.m in Sources */,
+				4D1B9B3E216DF6FB00029F29 /* ODShareRequest.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
+				4D1B9B1E216DF6FB00029F29 /* ODDriveRecentRequestBuilder.m in Sources */,
+				4D1B9B6C216DF6FB00029F29 /* ODServiceInfoProvider.m in Sources */,
 				4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */,
+				4D1B9B46216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.m in Sources */,
+				4D1B9B62216DF6FB00029F29 /* ODOpenWithSet.m in Sources */,
+				4D1B9B3C216DF6FB00029F29 /* ODItemDeltaRequest.m in Sources */,
+				4D1B9AFE216DF6FB00029F29 /* ODHeaderOptions.m in Sources */,
+				4D1B9B3A216DF6FB00029F29 /* ODVersionsCollectionRequest.m in Sources */,
+				4D1B9B27216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.m in Sources */,
+				4D1B9B49216DF6FB00029F29 /* ODPhoto.m in Sources */,
+				4D1B9AFB216DF6FB00029F29 /* ODAuthHelper.m in Sources */,
+				4D1B9AEE216DF6FB00029F29 /* ODBusinessAuthProvider.m in Sources */,
+				4D1B9B1A216DF6FB00029F29 /* NSJSONSerialization+ResponseHelper.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
+				4D1B9B61216DF6FB00029F29 /* ODLocation.m in Sources */,
+				4D1B9B05216DF6FB00029F29 /* ODQueryParameters.m in Sources */,
+				4D1B9B58216DF6FB00029F29 /* ODFileSystemInfo.m in Sources */,
+				4D1B9B24216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m in Sources */,
+				4D1B9B12216DF6FB00029F29 /* ODURLSessionDownloadTask.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
+				4D1B9B4E216DF6FB00029F29 /* ODFolder.m in Sources */,
+				4D1B9B16216DF6FB00029F29 /* ODItemRequestBuilder+ItemByPath.m in Sources */,
+				4D1B9B00216DF6FB00029F29 /* ODNameConflict.m in Sources */,
+				4D1B9B1F216DF6FB00029F29 /* ODItemRequestBuilder.m in Sources */,
+				4D1B9B25216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

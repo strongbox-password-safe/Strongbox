@@ -9,7 +9,7 @@
 #import "OneDriveForBusinessStorageProvider.h"
 #import "Utils.h"
 #import <SVProgressHUD/SVProgressHUD.h>
-#import <OneDriveSDK/OneDriveSDK.h>
+#import "OneDriveSDK.h"
 //#import <MSAL/MSAL.h>
 //#import <MSGraphMSALAuthProvider/MSALAuthenticationProvider.h>
 //#import <MSGraphSDK/MSGraphUserRequestBuilder.h>
