@@ -60,10 +60,8 @@
     }
     return [self.client.httpProvider dataTaskWithRequest:request
                                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error){
-        
-       NSLog(@"%@", response);
-       
-                                           _state = ODTaskCompleted;
+                                      
+       _state = ODTaskCompleted;
        NSError *resolvedError = nil;
        NSDictionary *resolvedResponse = nil;
         if (!error && response){

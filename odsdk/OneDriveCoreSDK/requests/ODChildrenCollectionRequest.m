@@ -50,6 +50,7 @@
 
 - (ODURLSessionDataTask *)getWithCompletion:(ODChildrenCompletionHandler)completionHandler
 {
+
     ODURLSessionDataTask * task = [self collectionTaskWithRequest:[self get]
                                              odObjectWithDictionary:^(NSDictionary *response){
                                             return [[ODItem alloc] initWithDictionary:response];
