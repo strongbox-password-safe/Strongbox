@@ -1,0 +1,55 @@
+{
+    "@odata.context": "https://api.onedrive.com/v1.0/$metadata#drives('me')/items/$entity",
+    "createdBy":  {
+        "application":  {
+            "displayName": "Test_OneDriveSdk",
+            "id": "4011dc49"
+        },
+        "user":  {
+            "displayName": "Ace Levenberg",
+            "id": "1234EEEE777"
+        }
+    },
+    "createdDateTime": "2015-05-20T21:14:01.077Z",
+    "cTag": "aYzpFRTVEMEYyRkRGNUQ4MjczITU5MTUyLjI1OA",
+    "eTag": "aRUU1RDBGMkZERjVEODI3MyE1OTE1Mi4y",
+    "id": "1234EEEE777!59152",
+    "lastModifiedBy":  {
+        "application":  {
+            "displayName": "OneDrive Explorer for iOS (sample app)",
+            "id": "48160af8"
+        },
+        "user":  {
+            "displayName": "Ace Levenberg",
+            "id": "1234EEEE777"
+        }
+    },
+    "lastModifiedDateTime": "2015-09-04T01:26:23.79Z",
+    "name": "fooFile.txt",
+    "parentReference":  {
+        "driveId": "1234EEEE777",
+        "id": "1234EEEE777!46068",
+        "path": "/drive/root:/fooFolder"
+    },
+    "size": 7,
+    "webUrl": "https://onedrive.live.com/redir?resid=EE5D0F2FDF5D8273!59152",
+    "file":  {
+        "hashes":  {
+            "crc32Hash": "54EB1E07",
+            "sha1Hash": "107E5F2E03223A8DBDD1E641BB9F75D07E7B4CEB"
+        },
+        "mimeType": "text/plain"
+    },
+    "fileSystemInfo":  {
+        "createdDateTime": "2015-05-20T21:14:01.077Z",
+        "lastModifiedDateTime": "2015-09-04T01:26:23.727Z"
+    },
+    "shared":  {
+        "owner":  {
+            "user":  {
+                "displayName": "Ace Levenberg",
+                "id": "1234EEEE777"
+            }
+        }
+    }
+}
