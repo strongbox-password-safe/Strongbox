@@ -142,13 +142,26 @@
 
 - (void)setServiceInfo:(ODServiceInfo *)serviceInfo withCapability:(NSString *)capability discoveryResponse:(NSDictionary *)discoveryResponse
 {
-    NSArray *values = discoveryResponse[@"value"];
-    [values enumerateObjectsUsingBlock:^(NSDictionary *serviceResponse, NSUInteger index, BOOL *stop){
-        if ([serviceResponse[@"capability"] isEqualToString:capability]){
-            serviceInfo.resourceId = serviceResponse[@"serviceResourceId"];
-            serviceInfo.apiEndpoint = serviceResponse[@"serviceEndpointUri"];
-        }
-    }];
+    NSString *value = discoveryResponse[@"value"];
+
+    NSLog(@"Discovery Response: %@", discoveryResponse);
+    
+    serviceInfo.resourceId = @"https://graph.microsoft.com";//@"https://graph.microsoft.com/v1.0/me";
+    serviceInfo.apiEndpoint = @"https://graph.microsoft.com/v1.0/me"; //serviceInfo.resourceId;//@"https://graph.microsoft.com/v1.0/me";
+    
+    NSLog(@"apiEndpoint: %@", serviceInfo.apiEndpoint);
+    
+    //serviceInfo.resourceId = value;
+    //serviceInfo.apiEndpoint = value; // [serviceInfo.resourceId stringByAppendingPathComponent:[OD_ACTIVE_DIRECTORY_URL_SUFFIX copy]];
+    //serviceInfo.apiEndpoint = value;
+    
+//    NSArray *values = discoveryResponse[@"value"];
+//    [values enumerateObjectsUsingBlock:^(NSDictionary *serviceResponse, NSUInteger index, BOOL *stop){
+//        if ([serviceResponse[@"capability"] isEqualToString:capability]){
+//            serviceInfo.resourceId = serviceResponse[@"serviceResourceId"];
+//            serviceInfo.apiEndpoint = serviceResponse[@"serviceEndpointUri"];
+//        }
+//    }];
 }
 
 - (void)refreshSession:(ODAccountSession *)session withCompletion:(void (^)(ODAccountSession *updatedSession, NSError *error))completionHandler

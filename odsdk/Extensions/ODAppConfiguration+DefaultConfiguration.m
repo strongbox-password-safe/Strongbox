@@ -38,7 +38,7 @@
         sharedConfig = [[ODAppConfiguration alloc] init];
         sharedConfig.httpProvider = [[ODURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
         sharedConfig.serviceInfoProvider = [[ODServiceInfoProvider alloc] init];
-        sharedConfig.logger = [[ODLogger alloc] initWithLogLevel:ODLogError];
+        sharedConfig.logger = [[ODLogger alloc] initWithLogLevel:ODLogVerbose];
         [ODAccountStore defaultAccountStore].logger = sharedConfig.logger;
         sharedConfig.accountStore = [ODAccountStore defaultAccountStore];
     });

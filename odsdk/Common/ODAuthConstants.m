@@ -62,8 +62,15 @@ NSString * const OD_AUTH_USER_EMAIL = @"user_email";
 NSString * const OD_DISCOVERY_ACCOUNT_TYPE = @"account_type";
 NSString * const OD_DISCOVERY_ACCOUNT_TYPE_AAD = @"AAD";
 NSString * const OD_DISCOVERY_ACCOUNT_TYPE_MSA = @"MSA";
-NSString * const OD_DISCOVERY_SERVICE_RESOURCEID = @"https://api.office.com/discovery/";
-NSString * const OD_DISCOVERY_SERVICE_URL = @"https://api.office.com/discovery/v2.0/me/services";
+
+//NSString * const OD_DISCOVERY_SERVICE_RESOURCEID = @"https://api.office.com/discovery/";
+//NSString * const OD_DISCOVERY_SERVICE_URL = @"https://api.office.com/discovery/v2.0/me/services";
+
+NSString * const OD_DISCOVERY_SERVICE_RESOURCEID = @"https://graph.microsoft.com/";
+NSString * const OD_DISCOVERY_SERVICE_URL = @"https://graph.microsoft.com/v1.0/sites/root/sharepointIds/siteUrl";
+
+//NSString * const OD_DISCOVERY_SERVICE_URL = @"https://graph.microsoft.com/v1.0/me?$select=MyFiles";
+
 NSString * const OD_DISAMBIGUATION_URL = @"https://onedrive.live.com/picker/accountchooser?load_login=false";
 
 NSString * const OD_MICROSOFT_ACCOUNT_ENDPOINT_HOST = @"login.live.com";

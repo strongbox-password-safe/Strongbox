@@ -64,18 +64,18 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
         
         // TODO: Remove
         
-//        ODClient* blah = [ODClient loadCurrentClient];
-//        if(blah) {
-//            [blah signOutWithCompletion:^(NSError *error) {
-//                NSLog(@"Signed Out");
-//                NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-//                for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
-//            }];
-//        }
-//        else {
-//            NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-//            for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
-//        }
+        ODClient* blah = [ODClient loadCurrentClient];
+        if(blah) {
+            [blah signOutWithCompletion:^(NSError *error) {
+                NSLog(@"Signed Out");
+                NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+                for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
+            }];
+        }
+        else {
+            NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+            for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
+        }
         
         return self;
     }

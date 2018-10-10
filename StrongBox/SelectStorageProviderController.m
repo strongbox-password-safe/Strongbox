@@ -50,7 +50,7 @@
         self.providers = @[[GoogleDriveStorageProvider sharedInstance],
                            [DropboxV2StorageProvider sharedInstance],
                            [OneDriveStorageProvider sharedInstance],
-                           //[OneDriveForBusinessStorageProvider sharedInstance],
+                           [OneDriveForBusinessStorageProvider sharedInstance],
                            [LocalDeviceStorageProvider sharedInstance]];
     }
     else {
