@@ -6,6 +6,8 @@
 	<dict>
 		<key>StrongBox Auto Fill.xcscheme</key>
 		<dict>
+			<key>isShown</key>
+			<true/>
 			<key>orderHint</key>
 			<integer>20</integer>
 		</dict>
@@ -28,6 +30,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>4DBE5B301C8356C700C310BC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>4DE48A54216F54A300C9C991</key>
 		<dict>
 			<key>primary</key>
 			<true/>

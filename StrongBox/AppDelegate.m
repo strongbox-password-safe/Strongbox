@@ -31,6 +31,8 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [self migrateUserDefaultsToAppGroup]; // iOS Credentials Extension needs access to user settings/safes etc... migrate
+    
     [self initializeGoogleDrive];
 
     [self initializeDropbox];
@@ -44,6 +46,34 @@
     }
  
     return YES;
+}
+
+-(void)migrateUserDefaultsToAppGroup {
+    NSUserDefaults *userDefaults = NSUserDefaults.standardUserDefaults;
+    
+    NSUserDefaults *groupDefaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
+    
+    static NSString* kDidMigrateSafesToAppGroups = @"DidMigrateToAppGroups";
+    
+    if(groupDefaults != nil) {
+        if (![groupDefaults boolForKey:kDidMigrateSafesToAppGroups]) {
+            for(NSString *key in [[userDefaults dictionaryRepresentation] allKeys]) {
+                NSLog(@"Migrating Setting: %@", key);
+                [groupDefaults setObject:[userDefaults objectForKey:key] forKey:key];
+            }
+            
+            [groupDefaults setBool:YES forKey:kDidMigrateSafesToAppGroups];
+            [groupDefaults synchronize];
+            
+            NSLog(@"Successfully migrated defaults");
+        }
+        else {
+            NSLog(@"No need to migrate defaults, already done.");
+        }
+    }
+    else {
+        NSLog(@"Unable to create NSUserDefaults with given app group");
+    }
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url

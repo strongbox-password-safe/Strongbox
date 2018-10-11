@@ -1,8 +1,5 @@
 workspace 'StrongBox'
 
-project 'Strongbox.xcodeproj'
-project 'macbox/MacBox.xcodeproj'
-
 target 'Strongbox' do
     project 'macbox/MacBox.xcodeproj'
     platform :osx, '10.9'
@@ -11,7 +8,7 @@ target 'Strongbox' do
     pod 'SAMKeychain'
 end
 
-target 'Strongbox-iOS' do
+abstract_target 'common-ios' do
     project 'Strongbox.xcodeproj'
     platform :ios, '9.2'
     use_frameworks!
@@ -19,14 +16,19 @@ target 'Strongbox-iOS' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'JNKeychain'
-    pod 'ISMessages'
-    pod 'SVProgressHUD'  
-    pod 'Reachability'
     pod 'ObjectiveDropboxOfficial'
-    pod 'DZNEmptyDataSet'
-    pod 'PopupDialog'
-    #pod 'OneDriveSDK'
-    pod 'ADAL', '~> 1.2'
-    pod 'Base32', '~> 1.1'
+
+    target 'Strongbox-iOS' do
+        pod 'ISMessages' 
+        pod 'Reachability'
+        pod 'DZNEmptyDataSet'
+        pod 'PopupDialog'
+        pod 'ADAL', '~> 1.2'
+        pod 'Base32', '~> 1.1'
+        pod 'SVProgressHUD' 
+    end
+
+    target 'Strongbox Auto Fill' do
+    end
 end
 

@@ -51,6 +51,12 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
     return sharedInstance;
 }
 
+static NSUserDefaults *getUserDefaults() {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
+    
+    return defaults;
+}
+
 - (void) startMonitoringConnectivitity {
     self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"www.google.com"];
     
@@ -77,13 +83,13 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
    
     return [userDefaults boolForKey:kShowPasswordByDefaultOnEditScreen];
 }
 
 - (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setBool:value forKey:kShowPasswordByDefaultOnEditScreen];
     
@@ -96,7 +102,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (void)setPro:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setBool:value forKey:kIsProKey];
     
@@ -105,13 +111,13 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
 - (BOOL)isPro
 {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     return [userDefaults boolForKey:kIsProKey];
 }
 
 - (void)setHavePromptedAboutFreeTrial:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setBool:value forKey:kIsHavePromptedAboutFreeTrial];
     
@@ -119,7 +125,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (BOOL)isHavePromptedAboutFreeTrial {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     return [userDefaults boolForKey:kIsHavePromptedAboutFreeTrial];
 }
@@ -141,7 +147,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (NSDate*)getEndFreeTrialDate {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     //[userDefaults removeObjectForKey:kEndFreeTrialDate];
     
@@ -149,7 +155,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (void)setEndFreeTrialDate:(NSDate*)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setObject:value forKey:kEndFreeTrialDate];
 
@@ -159,7 +165,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (NSInteger)getFreeTrialDaysRemaining {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     NSDate* date = [userDefaults objectForKey:kEndFreeTrialDate];
     
@@ -180,18 +186,18 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (NSDate*)installDate {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:kInstallDate];
+    return [getUserDefaults() objectForKey:kInstallDate];
 }
 
 - (void)setInstallDate:(NSDate *)installDate {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setObject:installDate forKey:kInstallDate];
     [userDefaults synchronize];
 }
 
 - (void)clearInstallDate {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults removeObjectForKey:kInstallDate];
     [userDefaults synchronize];
@@ -218,7 +224,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
 - (NSInteger)getLaunchCount
 {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     NSInteger launchCount = [userDefaults integerForKey:kLaunchCountKey];
     
@@ -226,7 +232,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (void)resetLaunchCount {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults removeObjectForKey:kLaunchCountKey];
     
@@ -240,7 +246,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
     
     NSLog(@"Application has been launched %ld times", (long)launchCount);
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
     
     [userDefaults synchronize];
@@ -248,7 +254,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
 -(NSNumber*)getAutoLockTimeoutSeconds
 {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
 
     NSNumber *seconds = [userDefaults objectForKey:kAutoLockTimeSeconds];
 
@@ -260,7 +266,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 -(void)setAutoLockTimeoutSeconds:(NSNumber*)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setObject:value forKey:kAutoLockTimeSeconds];
     
@@ -268,13 +274,13 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (NSInteger)isUserHasBeenPromptedForReview {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
  
     return [userDefaults integerForKey:kPromptedForReview];
 }
 
 - (void)setUserHasBeenPromptedForReview:(NSInteger)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setInteger:value forKey:kPromptedForReview];
 
@@ -282,13 +288,13 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (BOOL)isHasPromptedForCopyPasswordGesture {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
 
     return [userDefaults boolForKey:kPromptedForCopyPasswordGesture];
 }
 
 - (void)setHasPromptedForCopyPasswordGesture:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setBool:value forKey:kPromptedForCopyPasswordGesture];
 
@@ -296,13 +302,13 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (BOOL)isCopyPasswordOnLongPress {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
 
     return [userDefaults boolForKey:kCopyPasswordOnLongPress];
 }
 
 - (void)setCopyPasswordOnLongPress:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *userDefaults = getUserDefaults();
     
     [userDefaults setBool:value forKey:kCopyPasswordOnLongPress];
     
@@ -310,45 +316,45 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (void)setNeverShowForMacAppMessage:(BOOL)neverShowForMacAppMessage {
-    [[NSUserDefaults standardUserDefaults] setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
+    [getUserDefaults() setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
     
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)neverShowForMacAppMessage {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kNeverShowForMacAppMessage];
+    return [getUserDefaults() boolForKey:kNeverShowForMacAppMessage];
 }
 
 
 - (BOOL)iCloudOn {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kiCloudOn];
+    return [getUserDefaults() boolForKey:kiCloudOn];
 }
 
 - (void)setICloudOn:(BOOL)iCloudOn {
-    [[NSUserDefaults standardUserDefaults] setBool:iCloudOn forKey:kiCloudOn];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:iCloudOn forKey:kiCloudOn];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)iCloudWasOn {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kiCloudWasOn];
+    return [getUserDefaults() boolForKey:kiCloudWasOn];
 }
 
 -(void)setICloudWasOn:(BOOL)iCloudWasOn {
-    [[NSUserDefaults standardUserDefaults] setBool:iCloudWasOn forKey:kiCloudWasOn];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:iCloudWasOn forKey:kiCloudWasOn];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)iCloudPrompted {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kiCloudPrompted];
+    return [getUserDefaults() boolForKey:kiCloudPrompted];
 }
 
 - (void)setICloudPrompted:(BOOL)iCloudPrompted {
-    [[NSUserDefaults standardUserDefaults] setBool:iCloudPrompted forKey:kiCloudPrompted];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:iCloudPrompted forKey:kiCloudPrompted];
+    [getUserDefaults() synchronize];
 }
 
 - (PasswordGenerationParameters *)passwordGenerationParameters {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = getUserDefaults();
     NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
     
     if(encodedObject == nil) {
@@ -361,7 +367,7 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
 -(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = getUserDefaults();
     [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
     [defaults synchronize];
 }
@@ -404,34 +410,34 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 }
 
 - (BOOL)safesMigratedToNewSystem {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kSafesMigratedToNewSystem];
+    return [getUserDefaults() boolForKey:kSafesMigratedToNewSystem];
 }
 
 - (void)setSafesMigratedToNewSystem:(BOOL)safesMigratedToNewSystem {
-    [[NSUserDefaults standardUserDefaults] setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)disallowAllBiometricId {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kDisallowBiometricId];
+    return [getUserDefaults() boolForKey:kDisallowBiometricId];
 }
 
 - (void)setDisallowAllBiometricId:(BOOL)disallowAllBiometricId {
-    [[NSUserDefaults standardUserDefaults] setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)doNotAutoAddNewLocalSafes {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kDoNotAutoAddNewLocalSafes];
+    return [getUserDefaults() boolForKey:kDoNotAutoAddNewLocalSafes];
 }
 
 - (void)setDoNotAutoAddNewLocalSafes:(BOOL)doNotAutoAddNewLocalSafes {
-    [[NSUserDefaults standardUserDefaults] setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
+    [getUserDefaults() synchronize];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
-    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:kAutoFillNewRecordSettings];
+    NSData *data = [getUserDefaults() objectForKey:kAutoFillNewRecordSettings];
     
     if(data) {
         return (AutoFillNewRecordSettings *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -443,17 +449,17 @@ static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 - (void)setAutoFillNewRecordSettings:(AutoFillNewRecordSettings *)autoFillNewRecordSettings {
     NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
     
-    [[NSUserDefaults standardUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setObject:encoded forKey:kAutoFillNewRecordSettings];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)useQuickLaunchAsRootView {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:kUseQuickLaunchAsRootView];
+    return [getUserDefaults() boolForKey:kUseQuickLaunchAsRootView];
 }
 
 - (void)setUseQuickLaunchAsRootView:(BOOL)useQuickLaunchAsRootView {
-    [[NSUserDefaults standardUserDefaults] setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [getUserDefaults() setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
+    [getUserDefaults() synchronize];
 }
 
 @end

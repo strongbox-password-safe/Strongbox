@@ -7,7 +7,6 @@
 //
 
 #import "SafesList.h"
-#import "Settings.h"
 
 @interface SafesList()
 
@@ -39,14 +38,8 @@ static NSString* kSafesList = @"safesList";
     return self;
 }
 
-static NSUserDefaults *getUserDefaults() {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
-    
-    return defaults;
-}
-
 - (NSMutableArray<SafeMetaData*>*)load {
-    NSUserDefaults * defaults = getUserDefaults();
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *encodedObject = [defaults objectForKey:kSafesList];
     
     if(encodedObject == nil) {
@@ -59,7 +52,7 @@ static NSUserDefaults *getUserDefaults() {
 
 - (void)serialize {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
-    NSUserDefaults * defaults = getUserDefaults();
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:encodedObject forKey:kSafesList];
     [defaults synchronize];
 }
