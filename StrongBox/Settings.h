@@ -16,9 +16,6 @@ static NSString* kAppGroupName = @"group.strongbox.mcguill";
 
 + (Settings *)sharedInstance;
 
-- (void) startMonitoringConnectivitity;
-- (BOOL) isOffline;
-
 - (BOOL)isShowPasswordByDefaultOnEditScreen;
 - (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value;
 

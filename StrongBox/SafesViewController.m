@@ -217,7 +217,8 @@
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
     
-    id<SafeStorageProvider> provider = [[self getInitialViewController] getStorageProviderFromProviderId:safe.storageProvider];
+    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
+
     NSString *icon = provider.icon;
     cell.imageView.image = [UIImage imageNamed:icon];
     cell.imageViewWarningIndicator.hidden = !safe.hasUnresolvedConflicts;

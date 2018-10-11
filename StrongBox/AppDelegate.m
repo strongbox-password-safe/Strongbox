@@ -20,6 +20,7 @@
 #import "QuickLaunchViewController.h"
 #import "StorageBrowserTableViewController.h"
 #import "UpgradeViewController.h"
+#import "OfflineDetector.h"
 
 @interface AppDelegate ()
 
@@ -37,7 +38,7 @@
 
     [self initializeDropbox];
 
-    [[Settings sharedInstance] startMonitoringConnectivitity];
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity];
 
     [[Settings sharedInstance] incrementLaunchCount];
 

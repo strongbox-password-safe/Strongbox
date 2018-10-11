@@ -157,6 +157,9 @@
 		4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E471206D434400AD537E /* PasswordGenerationSettingsTableView.m */; };
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
+		4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D34940F216FB87200C411B1 /* SafesListTableViewController.m */; };
+		4D349413216FB8E600C411B1 /* InitialTabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D349412216FB8E600C411B1 /* InitialTabViewController.m */; };
+		4D349416216FB95700C411B1 /* QuickViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D349415216FB95700C411B1 /* QuickViewController.m */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
@@ -207,8 +210,15 @@
 		4DE48A62216F54A300C9C991 /* Strongbox Auto Fill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4DE48A66216F558E00C9C991 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
 		4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
+		4DE6104C216FCF2C00028C9A /* SafeStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */; };
 		4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C22168AC9A00A5800A /* InitialViewController.m */; };
 		4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C52168B63200A5800A /* QuickLaunchViewController.m */; };
+		4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
+		4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
+		4DEF7B97216FC74A00A3EE12 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
+		4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
+		4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
+		4DEF7B9B216FC90600A3EE12 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DEF7B9A216FC90600A3EE12 /* Media.xcassets */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
 		E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 /* End PBXBuildFile section */
@@ -556,6 +566,12 @@
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectStorageProviderController.m; sourceTree = "<group>"; };
 		4D2F82331F754FB0001688C9 /* Strongbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox.entitlements; path = Strongbox/Strongbox.entitlements; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4D34940E216FB87200C411B1 /* SafesListTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafesListTableViewController.h; path = "StrongBox Auto Fill/SafesListTableViewController.h"; sourceTree = SOURCE_ROOT; };
+		4D34940F216FB87200C411B1 /* SafesListTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafesListTableViewController.m; path = "StrongBox Auto Fill/SafesListTableViewController.m"; sourceTree = SOURCE_ROOT; };
+		4D349411216FB8E600C411B1 /* InitialTabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InitialTabViewController.h; path = "StrongBox Auto Fill/InitialTabViewController.h"; sourceTree = SOURCE_ROOT; };
+		4D349412216FB8E600C411B1 /* InitialTabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InitialTabViewController.m; path = "StrongBox Auto Fill/InitialTabViewController.m"; sourceTree = SOURCE_ROOT; };
+		4D349414216FB95700C411B1 /* QuickViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickViewController.h; path = "StrongBox Auto Fill/QuickViewController.h"; sourceTree = SOURCE_ROOT; };
+		4D349415216FB95700C411B1 /* QuickViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickViewController.m; path = "StrongBox Auto Fill/QuickViewController.m"; sourceTree = SOURCE_ROOT; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
 		4D402D6E2074EAFF00F7BC70 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = StrongBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
@@ -650,6 +666,9 @@
 		4DED20C22168AC9A00A5800A /* InitialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InitialViewController.m; sourceTree = "<group>"; };
 		4DED20C42168B63200A5800A /* QuickLaunchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QuickLaunchViewController.h; sourceTree = "<group>"; };
 		4DED20C52168B63200A5800A /* QuickLaunchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QuickLaunchViewController.m; sourceTree = "<group>"; };
+		4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OfflineDetector.h; sourceTree = "<group>"; };
+		4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OfflineDetector.m; sourceTree = "<group>"; };
+		4DEF7B9A216FC90600A3EE12 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Media.xcassets; path = "StrongBox Auto Fill/Media.xcassets"; sourceTree = SOURCE_ROOT; };
 		4DFAA3851EDDBFA8003FB355 /* AddSafeAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddSafeAlertController.h; sourceTree = "<group>"; };
 		4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddSafeAlertController.m; sourceTree = "<group>"; };
 		5184D51882C3500AD4B06058 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1299,6 +1318,8 @@
 				4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */,
 				4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */,
 				4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */,
+				4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */,
+				4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1311,6 +1332,13 @@
 				4DE48A5B216F54A300C9C991 /* MainInterface.storyboard */,
 				4DE48A5E216F54A300C9C991 /* Info.plist */,
 				4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */,
+				4D34940E216FB87200C411B1 /* SafesListTableViewController.h */,
+				4D34940F216FB87200C411B1 /* SafesListTableViewController.m */,
+				4D349411216FB8E600C411B1 /* InitialTabViewController.h */,
+				4D349412216FB8E600C411B1 /* InitialTabViewController.m */,
+				4D349414216FB95700C411B1 /* QuickViewController.h */,
+				4D349415216FB95700C411B1 /* QuickViewController.m */,
+				4DEF7B9A216FC90600A3EE12 /* Media.xcassets */,
 			);
 			path = "Strongbox Auto Fill";
 			sourceTree = "<group>";
@@ -1472,6 +1500,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DEF7B9B216FC90600A3EE12 /* Media.xcassets in Resources */,
 				4DE48A5D216F54A300C9C991 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1731,6 +1760,7 @@
 				4D1B9B17216DF6FB00029F29 /* ODClient+HelperMethods.m in Sources */,
 				4D1B9B03216DF6FB00029F29 /* ODTopOptions.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
+				4DEF7B97216FC74A00A3EE12 /* OfflineDetector.m in Sources */,
 				4D1B9B02216DF6FB00029F29 /* ODIfNoneMatch.m in Sources */,
 				4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */,
 				4D1B9B28216DF6FB00029F29 /* ODItemCopyRequest.m in Sources */,
@@ -1824,9 +1854,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DE6104C216FCF2C00028C9A /* SafeStorageProvider.m in Sources */,
+				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,
+				4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */,
+				4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */,
+				4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */,
 				4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */,
 				4DE48A66216F558E00C9C991 /* SafesList.m in Sources */,
+				4D349413216FB8E600C411B1 /* InitialTabViewController.m in Sources */,
+				4D349416216FB95700C411B1 /* QuickViewController.m in Sources */,
 				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
+				4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

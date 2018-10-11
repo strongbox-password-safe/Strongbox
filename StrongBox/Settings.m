@@ -7,7 +7,6 @@
 //
 
 #import "Settings.h"
-#import "Reachability.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 
 static NSString* kLaunchCountKey = @"launchCount";
@@ -31,13 +30,6 @@ static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
 static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
-@interface Settings ()
-
-@property (nonatomic, strong) Reachability *internetReachabilityDetector;
-@property (nonatomic) BOOL offline; // Global Online/Offline variable
-
-@end
-
 @implementation Settings
 
 + (instancetype)sharedInstance {
@@ -55,31 +47,6 @@ static NSUserDefaults *getUserDefaults() {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
     
     return defaults;
-}
-
-- (void) startMonitoringConnectivitity {
-    self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"www.google.com"];
-    
-    // Internet is reachable
-    
-    __weak typeof(self) weakSelf = self;
-    self.internetReachabilityDetector.reachableBlock = ^(Reachability *reach)
-    {
-        weakSelf.offline = NO;
-    };
-    
-    // Internet is not reachable
-    
-    self.internetReachabilityDetector.unreachableBlock = ^(Reachability *reach)
-    {
-        weakSelf.offline = YES;
-    };
-    
-    [self.internetReachabilityDetector startNotifier];
-}
-
-- (BOOL) isOffline {
-    return self.offline;
 }
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen {
@@ -373,8 +340,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d%d%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
-    self.isOffline,
+    return [NSString stringWithFormat:@"[%d%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
     self.isShowPasswordByDefaultOnEditScreen,
     self.isHavePromptedAboutFreeTrial,
     self.isProOrFreeTrial,

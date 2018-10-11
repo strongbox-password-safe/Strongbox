@@ -25,6 +25,7 @@
 #import <StoreKit/StoreKit.h>
 #import "ISMessages/ISMessages.h"
 #import <PopupDialog/PopupDialog-Swift.h>
+#import "OfflineDetector.h"
 
 @interface InitialViewController ()
 
@@ -406,14 +407,13 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
     masterPassword:(NSString *)masterPassword
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
         completion:(void (^)(Model* model))completion {
-    id <SafeStorageProvider> provider = [self getStorageProviderFromProviderId:safe.storageProvider];
+    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
     
     // Are we offline for cloud based providers?
     
     if (provider.cloudBased &&
-        !(provider.storageId == kiCloud &&
-          [Settings sharedInstance].iCloudOn) &&
-        [[Settings sharedInstance] isOffline] &&
+        !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
+        OfflineDetector.sharedInstance.isOffline &&
         safe.offlineCacheEnabled &&
         safe.offlineCacheAvailable) {
         NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
@@ -626,30 +626,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     }
     
     completion(viewModel);
-}
-
-- (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
-    if (providerId == kGoogleDrive) {
-        return [GoogleDriveStorageProvider sharedInstance];
-    }
-    else if (providerId == kDropbox)
-    {
-        return [DropboxV2StorageProvider sharedInstance];
-    }
-    else if (providerId == kiCloud) {
-        return [AppleICloudProvider sharedInstance];
-    }
-    else if (providerId == kLocalDevice)
-    {
-        return [LocalDeviceStorageProvider sharedInstance];
-    }
-    else if(providerId == kOneDrive) {
-        return [OneDriveStorageProvider sharedInstance];
-    }
-    
-    [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
-
-    return [LocalDeviceStorageProvider sharedInstance];
 }
 
 - (SafeMetaData*)getPrimarySafe {

@@ -52,3 +52,9 @@
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
 
 @end
+
+@interface SafeStorageProviderFactory
+
++ (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
+
+@end
