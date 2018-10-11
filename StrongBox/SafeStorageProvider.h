@@ -53,7 +53,7 @@
 
 @end
 
-@interface SafeStorageProviderFactory
+@interface SafeStorageProviderFactory : NSObject
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 
