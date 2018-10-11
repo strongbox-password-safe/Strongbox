@@ -40,13 +40,7 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
-    // TODO: Migration
-    //self.checkboxAutofillMostPopularUsernameEmail.state = !Settings.sharedInstance.doNotAutoFillFromMostPopularFields ? NSOnState : NSOffState;
-    //self.checkboxAutofillNotes.state = !Settings.sharedInstance.doNotAutoFillNotesFromClipboard ? NSOnState : NSOffState;
-    //self.checkboxAutofillUrl.state = !Settings.sharedInstance.doNotAutoFillUrlFromClipboard ? NSOnState : NSOffState;
 
-    
     [self bindPasswordUiToSettings];
     [self bindGeneralUiToSettings];
     [self bindAutoFillToSettings];

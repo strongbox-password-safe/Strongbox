@@ -23,9 +23,6 @@
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 
-@property (nonatomic) BOOL doNotAutoFillUrlFromClipboard;
-@property (nonatomic) BOOL doNotAutoFillNotesFromClipboard;
-@property (nonatomic) BOOL doNotAutoFillFromMostPopularFields;
 @property (nonatomic) BOOL alwaysShowUsernameInOutlineView;
 @property (nonatomic) BOOL alwaysShowPassword;
 @property (nonatomic) BOOL warnedAboutTouchId;
@@ -33,7 +30,6 @@
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
 
 @end
-
 
 //    [[Settings sharedInstance] setPro:NO];
 //    [[Settings sharedInstance] setEndFreeTrialDate:nil];

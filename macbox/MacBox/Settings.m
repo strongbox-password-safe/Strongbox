@@ -13,9 +13,6 @@
 #define kEndFreeTrialDate @"endFreeTrialDate"
 #define kAutoLockTimeout @"autoLockTimeout"
 #define kPasswordGenerationParameters @"passwordGenerationParameters"
-#define kDoNotAutoFillNotesFromClipboard @"doNotAutoFillFromClipboard"
-#define kDoNotAutoFillUrlFromClipboard @"doNotAutoFillUrlFromClipboard"
-#define kDoNotAutoFillFromMostPopularFields @"doNotAutoFillFromMostPopularFields"
 #define kWarnedAboutTouchId @"warnedAboutTouchId"
 #define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
 #define kAlwaysShowPassword @"alwaysShowPassword"
@@ -58,10 +55,6 @@ static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
     [self setBool:kFullVersion value:value];
 }
 
--(BOOL)doNotAutoFillFromMostPopularFields {
-    return [self getBool:kDoNotAutoFillFromMostPopularFields];
-}
-
 - (BOOL)alwaysShowPassword {
     return [self getBool:kAlwaysShowPassword];
 }
@@ -76,10 +69,6 @@ static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 
 - (void)setAlwaysShowUsernameInOutlineView:(BOOL)alwaysShowUsernameInOutlineView {
     [self setBool:kAlwaysShowUsernameInOutlineView value:alwaysShowUsernameInOutlineView];
-}
-
-- (void)setDoNotAutoFillFromMostPopularFields:(BOOL)doNotAutoFillFromMostPopularFields {
-    [self setBool:kDoNotAutoFillFromMostPopularFields value:doNotAutoFillFromMostPopularFields];
 }
 
 - (BOOL)freeTrial {
@@ -169,22 +158,6 @@ static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
     [defaults synchronize];
-}
-
-- (BOOL)doNotAutoFillUrlFromClipboard {
-    return [self getBool:kDoNotAutoFillUrlFromClipboard];
-}
-
-- (void)setDoNotAutoFillUrlFromClipboard:(BOOL)doNotAutoFillUrlFromClipboard {
-    [self setBool:kDoNotAutoFillUrlFromClipboard value:doNotAutoFillUrlFromClipboard];
-}
-
--(BOOL)doNotAutoFillNotesFromClipboard {
-    return [self getBool:kDoNotAutoFillNotesFromClipboard];
-}
-
-- (void)setDoNotAutoFillNotesFromClipboard:(BOOL)doNotAutoFillNotesFromClipboard {
-    [self setBool:kDoNotAutoFillNotesFromClipboard value:doNotAutoFillNotesFromClipboard];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {

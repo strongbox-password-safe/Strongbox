@@ -218,44 +218,99 @@
     self.document.dirty = YES;
 }
 
-- (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
-    NSString *actualTitle = @"New Untitled Record";
-    NSString *actualNotes = @"";
-    NSString *actualUrl = @"";
-    NSString *actualUsername = @"";
-    NSString *actualEmail = @"";
-    
+NSString* getSmartFillTitle() {
     NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
     NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
-
+    
     if(clipboardText) {
-        if(!Settings.sharedInstance.doNotAutoFillNotesFromClipboard) {
-            actualNotes = clipboardText;
-        }
+        // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
+
+        NSURL *url = [NSURL URLWithString:clipboardText];
         
-        if(!Settings.sharedInstance.doNotAutoFillUrlFromClipboard) {
-            // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
-        
-            NSURL *url = [NSURL URLWithString:clipboardText];
-            if (url && url.scheme && url.host)
-            {
-                actualUrl = clipboardText;
-                actualTitle = url.host;
-            }
+        if (url && url.scheme && url.host)
+        {
+            return url.host;
         }
     }
     
-    if(!Settings.sharedInstance.doNotAutoFillFromMostPopularFields) {
-        actualUsername = self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
-        actualEmail = self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
+    return @"";
+}
+
+NSString* getSmartFillUrl() {
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
+    
+    if(clipboardText) {
+        NSURL *url = [NSURL URLWithString:clipboardText];
+        if (url && url.scheme && url.host)
+        {
+            return clipboardText;
+        }
     }
+    
+    return @"";
+}
+
+
+NSString* getSmartFillNotes() {
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
+    
+    if(clipboardText) {
+        return clipboardText;
+    }
+    
+    return @"";
+}
+
+
+-(NSString*) getAutoFillMostPopularUsername {
+    return self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
+}
+
+-(NSString*) getAutoFillMostPopularEmail {
+    return self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
+}
+
+- (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
+    AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
+    
+    // Title
+    
+    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? @"Untitled" :
+            autoFill.titleAutoFillMode == kSmartUrlFill ? getSmartFillTitle() : autoFill.titleCustomAutoFill;
+    
+    // Username
+    
+    NSString *actualUsername = autoFill.usernameAutoFillMode == kNone ? @"" :
+            autoFill.usernameAutoFillMode == kMostUsed ? [self getAutoFillMostPopularUsername] : autoFill.usernameCustomAutoFill;
+    
+    // Password
+    
+    NSString *actualPassword = autoFill.passwordAutoFillMode == kNone ? @"" : autoFill.passwordAutoFillMode == kGenerated ? [self generatePassword] : autoFill.passwordCustomAutoFill;
+    
+    // Email
+    
+    NSString *actualEmail = autoFill.emailAutoFillMode == kNone ? @"" :
+            autoFill.emailAutoFillMode == kMostUsed ? [self getAutoFillMostPopularEmail] : autoFill.emailCustomAutoFill;
+    
+    // URL
+    
+    NSString *actualUrl = autoFill.urlAutoFillMode == kNone ? @"" :
+        autoFill.urlAutoFillMode == kSmartUrlFill ? getSmartFillUrl(): autoFill.urlCustomAutoFill;
+    
+    // Notes
+
+    NSString *actualNotes = autoFill.notesAutoFillMode == kNone ? @"" :
+        autoFill.notesAutoFillMode == kClipboard ? getSmartFillNotes() : autoFill.notesCustomAutoFill;
+    
+    /////////////////////////////////////
     
     NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
                                                           url:actualUrl
-                                                     password:[self generatePassword]
+                                                     password:actualPassword
                                                         notes:actualNotes
                                                         email:actualEmail];
-    
 
     Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields];
     

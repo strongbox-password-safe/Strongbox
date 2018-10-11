@@ -6,6 +6,7 @@ target 'Strongbox' do
     use_frameworks!
 
     pod 'SAMKeychain'
+#    pod 'KKDomain', :git => 'https://github.com/kejinlu/KKDomain.git'
 end
 
 abstract_target 'common-ios' do
