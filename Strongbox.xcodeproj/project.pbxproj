@@ -168,6 +168,7 @@
 		4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */; };
 		4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		4D67FDF1216F4349005C0E12 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
 		4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */; };
 		4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
@@ -199,10 +200,39 @@
 		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
+		4DE48A56216F54A300C9C991 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */; };
+		4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */; };
+		4DE48A5D216F54A300C9C991 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE48A5B216F54A300C9C991 /* MainInterface.storyboard */; };
+		4DE48A62216F54A300C9C991 /* Strongbox Auto Fill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4DE48A66216F558E00C9C991 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
 		4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C22168AC9A00A5800A /* InitialViewController.m */; };
 		4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C52168B63200A5800A /* QuickLaunchViewController.m */; };
 		4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFAA3861EDDBFA8003FB355 /* AddSafeAlertController.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4DE48A60216F54A300C9C991 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4DBE5B291C8356C700C310BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4DE48A54216F54A300C9C991;
+			remoteInfo = "Strongbox Auto Fill";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4D67FDF0216F3FA2005C0E12 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4DE48A62216F54A300C9C991 /* Strongbox Auto Fill.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -544,6 +574,7 @@
 		4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OneDriveStorageProvider.m; sourceTree = SOURCE_ROOT; };
 		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iCloudSafesCoordinator.h; sourceTree = "<group>"; };
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iCloudSafesCoordinator.m; sourceTree = "<group>"; };
+		4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsView.m; sourceTree = "<group>"; };
 		4D77A0B5216651C1003CB5CB /* AutoFillNewRecordSettingsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillNewRecordSettingsController.h; sourceTree = "<group>"; };
@@ -605,6 +636,12 @@
 		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
+		4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox Auto Fill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DE48A58216F54A300C9C991 /* CredentialProviderViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CredentialProviderViewController.h; sourceTree = "<group>"; };
+		4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CredentialProviderViewController.m; sourceTree = "<group>"; };
+		4DE48A5C216F54A300C9C991 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		4DE48A5E216F54A300C9C991 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Strongbox_Auto_Fill.entitlements; sourceTree = "<group>"; };
 		4DED20C12168AC9A00A5800A /* InitialViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InitialViewController.h; sourceTree = "<group>"; };
 		4DED20C22168AC9A00A5800A /* InitialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InitialViewController.m; sourceTree = "<group>"; };
 		4DED20C42168B63200A5800A /* QuickLaunchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QuickLaunchViewController.h; sourceTree = "<group>"; };
@@ -625,8 +662,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D67FDF1216F4349005C0E12 /* AuthenticationServices.framework in Frameworks */,
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
 				4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4DE48A52216F54A300C9C991 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DE48A56216F54A300C9C991 /* AuthenticationServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1188,6 +1234,7 @@
 				4D78AC231FB1E22C00A68A92 /* Model */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
 				4DBE5B331C8356C700C310BC /* StrongBox */,
+				4DE48A57216F54A300C9C991 /* Strongbox Auto Fill */,
 				4DBE5B321C8356C700C310BC /* Products */,
 				278AD75AE9346420015475D7 /* Pods */,
 				C28E68E855D68D8BECCE3B5B /* Frameworks */,
@@ -1198,6 +1245,7 @@
 			isa = PBXGroup;
 			children = (
 				4DBE5B311C8356C700C310BC /* Strongbox.app */,
+				4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1244,6 +1292,18 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		4DE48A57216F54A300C9C991 /* Strongbox Auto Fill */ = {
+			isa = PBXGroup;
+			children = (
+				4DE48A58216F54A300C9C991 /* CredentialProviderViewController.h */,
+				4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */,
+				4DE48A5B216F54A300C9C991 /* MainInterface.storyboard */,
+				4DE48A5E216F54A300C9C991 /* Info.plist */,
+				4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */,
+			);
+			path = "Strongbox Auto Fill";
+			sourceTree = "<group>";
+		};
 		4DED20C72168BF1800A5800A /* Root */ = {
 			isa = PBXGroup;
 			children = (
@@ -1267,6 +1327,7 @@
 				A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */,
 				AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */,
 				0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */,
+				4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1285,15 +1346,34 @@
 				6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */,
 				E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */,
 				4D076F25215FC09200B9C284 /* ShellScript */,
+				4D67FDF0216F3FA2005C0E12 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4DE48A61216F54A300C9C991 /* PBXTargetDependency */,
 			);
 			name = "Strongbox-iOS";
 			productName = StrongBox;
 			productReference = 4DBE5B311C8356C700C310BC /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4DE48A54216F54A300C9C991 /* Strongbox Auto Fill */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4DE48A63216F54A300C9C991 /* Build configuration list for PBXNativeTarget "Strongbox Auto Fill" */;
+			buildPhases = (
+				4DE48A51216F54A300C9C991 /* Sources */,
+				4DE48A52216F54A300C9C991 /* Frameworks */,
+				4DE48A53216F54A300C9C991 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Strongbox Auto Fill";
+			productName = "Strongbox Auto Fill";
+			productReference = 4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -1301,6 +1381,8 @@
 		4DBE5B291C8356C700C310BC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				DefaultBuildSystemTypeForWorkspace = Original;
+				LastSwiftUpdateCheck = 1000;
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
@@ -1309,6 +1391,9 @@
 						DevelopmentTeam = 4326J8XDF2;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.AutoFillCredentialProvider = {
+								enabled = 1;
+							};
 							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
@@ -1319,6 +1404,11 @@
 								enabled = 1;
 							};
 						};
+					};
+					4DE48A54216F54A300C9C991 = {
+						CreatedOnToolsVersion = 10.0;
+						DevelopmentTeam = 4326J8XDF2;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -1336,6 +1426,7 @@
 			projectRoot = "";
 			targets = (
 				4DBE5B301C8356C700C310BC /* Strongbox-iOS */,
+				4DE48A54216F54A300C9C991 /* Strongbox Auto Fill */,
 			);
 		};
 /* End PBXProject section */
@@ -1351,6 +1442,14 @@
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DA6335F1F62EDA5000A0E9D /* Main.storyboard in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4DE48A53216F54A300C9C991 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DE48A5D216F54A300C9C991 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1654,7 +1753,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4DE48A51216F54A300C9C991 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DE48A66216F558E00C9C991 /* SafesList.m in Sources */,
+				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4DE48A61216F54A300C9C991 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4DE48A54216F54A300C9C991 /* Strongbox Auto Fill */;
+			targetProxy = 4DE48A60216F54A300C9C991 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		4DA6335D1F62EAE1000A0E9D /* Main.storyboard */ = {
@@ -1663,6 +1779,14 @@
 				4DA6335E1F62EAE1000A0E9D /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4DE48A5B216F54A300C9C991 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4DE48A5C216F54A300C9C991 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1835,6 +1959,60 @@
 			};
 			name = Release;
 		};
+		4DE48A64216F54A300C9C991 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.Strongbox-Auto-Fill";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4DE48A65216F54A300C9C991 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.Strongbox-Auto-Fill";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1852,6 +2030,15 @@
 			buildConfigurations = (
 				4DBE5B4C1C8356C700C310BC /* Debug */,
 				4DBE5B4D1C8356C700C310BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4DE48A63216F54A300C9C991 /* Build configuration list for PBXNativeTarget "Strongbox Auto Fill" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4DE48A64216F54A300C9C991 /* Debug */,
+				4DE48A65216F54A300C9C991 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

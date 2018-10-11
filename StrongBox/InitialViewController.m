@@ -655,7 +655,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
 - (SafeMetaData*)getPrimarySafe {
     SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstObject];
     
-    NSLog(@"Primary Safe: [%@]", safe);
+    //NSLog(@"Primary Safe: [%@]", safe);
 
     return safe.hasUnresolvedConflicts ? nil : safe;
 }
