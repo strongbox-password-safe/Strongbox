@@ -8,8 +8,18 @@
 
 #import "CredentialProviderViewController.h"
 #import "SafesList.h"
+#import "NSArray+Extensions.h"
 
 @implementation CredentialProviderViewController
+
+-(void)viewDidLoad {
+    [super viewDidLoad];
+
+    [self.viewModel.rootGroup.children map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        NSLog(@"%@", obj.title);
+        return obj.title;
+    }];
+}
 
 /*
  Prepare your UI to list available credentials for the user to choose from. The items in

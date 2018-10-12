@@ -15,8 +15,6 @@
 
 + (GoogleDriveManager *)sharedInstance;
 
-- (void)                initialize;
-
 @property (NS_NONATOMIC_IOSONLY, getter = isAuthorized, readonly) BOOL authorized;
 
 - (void)                signout;

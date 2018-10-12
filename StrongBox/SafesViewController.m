@@ -17,6 +17,7 @@
 #import "InitialViewController.h"
 #import "AppleICloudProvider.h"
 #import "SafeStorageProviderFactory.h"
+#import "OpenSafeSequenceHelper.h"
 
 @interface SafesViewController ()
 
@@ -248,9 +249,13 @@
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
     else {
-        [[self getInitialViewController] beginOpenSafeSequence:safe completion:^(Model * model) {
+        [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
+                                                                safe:safe
+                                   askAboutTouchIdEnrolIfAppropriate:YES
+                                                          completion:^(Model * _Nonnull model) {
+        if(model) {
             [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
-        }];
+        }}];
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];

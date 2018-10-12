@@ -12,6 +12,8 @@
 #import "SafesList.h"
 #import "Settings.h"
 #import "Alerts.h"
+#import "OpenSafeSequenceHelper.h"
+#import "CredentialProviderViewController.h"
 
 @interface QuickViewController ()
 
@@ -43,6 +45,12 @@
     singleTap.numberOfTapsRequired = 1;
     self.imageViewLogo.userInteractionEnabled = YES;
     [self.imageViewLogo addGestureRecognizer:singleTap];
+    
+    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
+
+    if(primary){
+        self.labelSafeName.text = primary.nickName;
+    }
 }
 
 - (void)viewDidLayoutSubviews {
@@ -69,8 +77,6 @@
         [self switchToSafesListView];
     }
     else {
-        self.labelSafeName.text = primary.nickName;
-
         [self openPrimarySafe];
     }
 }
@@ -103,20 +109,21 @@
         return;
     }
     
-//    [[self getInitialViewController] beginOpenSafeSequence:safe completion:^(Model * _Nonnull model) {
-//       
-//        if(model) {
-//            [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];
-//        }
-//    }];
+    [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
+                                                            safe:safe
+                               askAboutTouchIdEnrolIfAppropriate:NO
+                                                      completion:^(Model * _Nonnull model) {
+        if(model) {
+            [self performSegueWithIdentifier:@"segueFromQuickToPickCredentials" sender:model];
+        }
+    }];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    if ([segue.identifier isEqualToString:@"segueToBrowseFromQuick"]) {
-//        BrowseSafeView *vc = segue.destinationViewController;
-//        vc.viewModel = (Model *)sender;
-//        vc.currentGroup = vc.viewModel.rootGroup;
-//    }
+    if ([segue.identifier isEqualToString:@"segueFromQuickToPickCredentials"]) {
+        CredentialProviderViewController *vc = segue.destinationViewController;
+        vc.viewModel = (Model *)sender;
+    }
 }
 
 @end

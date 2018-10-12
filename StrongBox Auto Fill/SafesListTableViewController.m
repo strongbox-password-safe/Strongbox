@@ -13,6 +13,8 @@
 #import "SafeStorageProviderFactory.h"
 #import "Settings.h"
 #import <AuthenticationServices/AuthenticationServices.h>
+#import "CredentialProviderViewController.h"
+#import "OpenSafeSequenceHelper.h"
 
 @interface SafesListTableViewController ()
 
@@ -139,6 +141,27 @@
     return ivc;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    SafeMetaData* safe = [self.safes objectAtIndex:indexPath.row];
+
+    [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
+                                                            safe:safe
+                               askAboutTouchIdEnrolIfAppropriate:NO
+                                                      completion:^(Model * _Nonnull model) {
+                                                          if(model) {
+                                                              [self performSegueWithIdentifier:@"segueFromListToPickCredentials" sender:model];
+                                                          }
+                                                      }];
+
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueFromListToPickCredentials"]) {
+        CredentialProviderViewController *vc = segue.destinationViewController;
+        vc.viewModel = (Model *)sender;
+    }
+}
+
 /*
 #pragma mark - Navigation
 
@@ -146,8 +169,11 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
-}
+
+ //segueFromListToPickCredentials
+ }
 */
+
 - (IBAction)onShowQuickLaunchView:(id)sender {
     Settings.sharedInstance.useQuickLaunchAsRootView = YES;
     

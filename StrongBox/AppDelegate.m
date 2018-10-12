@@ -33,8 +33,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self migrateUserDefaultsToAppGroup]; // iOS Credentials Extension needs access to user settings/safes etc... migrate
-    
-    [self initializeGoogleDrive];
 
     [self initializeDropbox];
 
@@ -149,14 +147,6 @@
         
         self.enterBackgroundTime = nil;
     }
-}
-
-- (void)initializeGoogleDrive {
-    // Google - Try to sign in if we have a previous session. This allows us to display the Signout Button
-    // state correctly. No need to popup sign in window at this stage, as user may not be using google drive at all
-
-    [GIDSignIn sharedInstance].clientID = GOOGLE_CLIENT_ID;
-    [[GoogleDriveManager sharedInstance] initialize];
 }
 
 - (void)initializeDropbox {

@@ -10,6 +10,7 @@
 #import "Utils.h"
 #import "GTMSessionFetcherService.h"
 #import "SVProgressHUD/SVProgressHUD.h"
+#import "real-secrets.h"
 
 static NSString *const kMimeType = @"application/octet-stream";
 
@@ -29,6 +30,26 @@ typedef void (^Authenticationcompletion)(NSError *error);
     return sharedInstance;
 }
 
+- (instancetype)init {
+    if(self = [super init]) {
+        [GIDSignIn sharedInstance].clientID = GOOGLE_CLIENT_ID;
+        
+        // Try to sign in if we have a previous session. This allows us to display the Signout Button
+        // state correctly. No need to popup sign in window at this stage, as user may not be using google drive at all
+        
+        GIDSignIn *signIn = [GIDSignIn sharedInstance];
+        
+        signIn.delegate = self;
+        signIn.scopes = @[kGTLRAuthScopeDrive];
+        
+        authenticationcompletion = nil;
+        
+        [signIn signInSilently];
+    }
+    
+    return self;
+}
+
 - (GTLRDriveService *)driveService {
     static GTLRDriveService *service = nil;
 
@@ -39,20 +60,6 @@ typedef void (^Authenticationcompletion)(NSError *error);
     }
 
     return service;
-}
-
-- (void)initialize {
-    // Try to sign in if we have a previous session. This allows us to display the Signout Button
-    // state correctly. No need to popup sign in window at this stage, as user may not be using google drive at all
-
-    GIDSignIn *signIn = [GIDSignIn sharedInstance];
-
-    signIn.delegate = self;
-    signIn.scopes = @[kGTLRAuthScopeDrive];
-
-    authenticationcompletion = nil;
-
-    [signIn signInSilently];
 }
 
 - (BOOL)isAuthorized {

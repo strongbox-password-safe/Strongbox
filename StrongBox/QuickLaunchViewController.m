@@ -13,6 +13,7 @@
 #import "SafeMetaData.h"
 #import "SafesList.h"
 #import "BrowseSafeView.h"
+#import "OpenSafeSequenceHelper.h"
 
 @interface QuickLaunchViewController ()
 
@@ -173,7 +174,10 @@
                                                     name:UIApplicationDidBecomeActiveNotification
                                                   object:nil];
     
-    [[self getInitialViewController] beginOpenSafeSequence:safe completion:^(Model * _Nonnull model) {
+    [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
+                                                            safe:safe
+                               askAboutTouchIdEnrolIfAppropriate:YES
+                                                      completion:^(Model * _Nonnull model) {
         // Restore once open sequence is done.
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(onApplicationBecameActive:)

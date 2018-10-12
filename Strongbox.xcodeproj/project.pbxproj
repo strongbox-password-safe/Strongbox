@@ -150,6 +150,12 @@
 		4D18854D2170AC60001AE6B0 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
 		4D18855D2170CD4F001AE6B0 /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
+		4D1885632170E260001AE6B0 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
+		4D1885642170E268001AE6B0 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
+		4D1885652170E386001AE6B0 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46E206D350300AD537E /* PasswordGenerator.m */; };
+		4D1885662170E532001AE6B0 /* OpenSafeSequenceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */; };
+		4D1885672170E55F001AE6B0 /* OpenSafeSequenceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */; };
+		4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */; };
 		4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5C011F7927D60036684C /* VersionConflictController.m */; };
 		4D1B9AEB216DF6FB00029F29 /* ODAccountStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C4216DF6FA00029F29 /* ODAccountStore.m */; };
@@ -408,6 +414,8 @@
 		4D1757B51C8361D300E6356F /* StrongBox-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StrongBox-Info.plist"; sourceTree = "<group>"; };
 		4D18854A2170ABD7001AE6B0 /* SafeStorageProviderFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeStorageProviderFactory.h; sourceTree = "<group>"; };
 		4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeStorageProviderFactory.m; sourceTree = "<group>"; };
+		4D18855F2170DE90001AE6B0 /* OpenSafeSequenceHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenSafeSequenceHelper.h; sourceTree = "<group>"; };
+		4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenSafeSequenceHelper.m; sourceTree = "<group>"; };
 		4D1A5BFB1F7923FF0036684C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D1A5BFD1F7924C30036684C /* SafeItemTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeItemTableCell.h; sourceTree = "<group>"; };
 		4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeItemTableCell.m; sourceTree = "<group>"; };
@@ -697,7 +705,7 @@
 		4D2E35671F62C9CB0064B5D5 /* SelectStorageProviderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectStorageProviderController.h; sourceTree = "<group>"; };
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectStorageProviderController.m; sourceTree = "<group>"; };
 		4D2F82331F754FB0001688C9 /* Strongbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox.entitlements; path = Strongbox/Strongbox.entitlements; sourceTree = "<group>"; };
-		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D34940E216FB87200C411B1 /* SafesListTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafesListTableViewController.h; path = "StrongBox Auto Fill/SafesListTableViewController.h"; sourceTree = SOURCE_ROOT; };
 		4D34940F216FB87200C411B1 /* SafesListTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafesListTableViewController.m; path = "StrongBox Auto Fill/SafesListTableViewController.m"; sourceTree = SOURCE_ROOT; };
 		4D349411216FB8E600C411B1 /* InitialTabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InitialTabViewController.h; path = "StrongBox Auto Fill/InitialTabViewController.h"; sourceTree = SOURCE_ROOT; };
@@ -1317,6 +1325,8 @@
 				4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */,
 				4D77A0B82166598B003CB5CB /* AutoFillNewRecordSettings.h */,
 				4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */,
+				4D18855F2170DE90001AE6B0 /* OpenSafeSequenceHelper.h */,
+				4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -1438,10 +1448,10 @@
 				4D915D791EDC4B77002615F6 /* Alerts.m */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DBE5B381C8356C700C310BC /* AppDelegate.m */,
-				4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */,
 				4D17579C1C8361D200E6356F /* IOsUtils.h */,
 				4D17579D1C8361D200E6356F /* IOsUtils.m */,
 				4DBE5B351C8356C700C310BC /* main.m */,
+				4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4DD59F731D3A6FC800F864ED /* secrets.h */,
 				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
@@ -1633,6 +1643,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DEF7B9B216FC90600A3EE12 /* Media.xcassets in Resources */,
+				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
 				4DE48A5D216F54A300C9C991 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1791,6 +1802,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D1885672170E55F001AE6B0 /* OpenSafeSequenceHelper.m in Sources */,
 				4D1B9B53216DF6FB00029F29 /* ODVideo.m in Sources */,
 				4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */,
 				4D1B9B45216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m in Sources */,
@@ -1987,6 +1999,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D1885662170E532001AE6B0 /* OpenSafeSequenceHelper.m in Sources */,
+				4D1885652170E386001AE6B0 /* PasswordGenerator.m in Sources */,
+				4D1885642170E268001AE6B0 /* OfflineDetector.m in Sources */,
+				4D1885632170E260001AE6B0 /* Model.m in Sources */,
 				4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */,
 				4D18855D2170CD4F001AE6B0 /* DropboxV2StorageProvider.m in Sources */,
 				4D18854D2170AC60001AE6B0 /* SafeStorageProviderFactory.m in Sources */,

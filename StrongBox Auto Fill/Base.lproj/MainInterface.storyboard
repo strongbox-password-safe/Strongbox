@@ -110,6 +110,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="barButtonShowQuickView" destination="5w0-Ls-VNT" id="ue1-dY-hC1"/>
+                        <segue destination="Xki-Si-B7m" kind="show" identifier="segueFromListToPickCredentials" id="rus-3M-iAS"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C3w-yW-2mZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -203,7 +204,7 @@
                     <connections>
                         <outlet property="imageViewLogo" destination="MIf-Kg-59w" id="Jsf-Br-f7x"/>
                         <outlet property="labelSafeName" destination="QwD-TW-iTr" id="vbp-go-PM8"/>
-                        <segue destination="Xki-Si-B7m" kind="show" id="dVV-3A-dhM"/>
+                        <segue destination="Xki-Si-B7m" kind="show" identifier="segueFromQuickToPickCredentials" id="dVV-3A-dhM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yz6-ie-lB9" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -272,4 +273,7 @@
         <image name="Strongbox-1024x1024-new" width="1024" height="1024"/>
         <image name="product32" width="32" height="32"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="dVV-3A-dhM"/>
+    </inferredMetricsTieBreakers>
 </document>

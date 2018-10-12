@@ -30,10 +30,11 @@ abstract_target 'common-ios' do
     pod 'JNKeychain'
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
+    pod 'Reachability'
     
     target 'Strongbox-iOS' do
         pod 'ISMessages' 
-        pod 'Reachability'
+        #pod 'Reachability'
         pod 'PopupDialog'
         pod 'ADAL', '~> 1.2'
         pod 'Base32', '~> 1.1'
@@ -47,7 +48,7 @@ end
 
 post_install do |installer|
     installer.pods_project.targets.each do |target|
-        puts "#{target.name}"
+        #puts "#{target.name}"
         if target.name == "SVProgressHUD-Pods-common-ios-Strongbox Auto Fill"
             puts "Adding SV_APP_EXTENSIONS"    
             target.build_configurations.each do |config|

@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showQuickLaunchView;
 - (void)showSafesListView;
 - (BOOL)isInQuickLaunchViewMode;
-- (void)beginOpenSafeSequence:(SafeMetaData*)safe completion:(void (^)(Model* model))completion;
 - (nullable SafeMetaData* )getPrimarySafe;
 - (void)checkICloudAvailability;
 
