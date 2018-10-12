@@ -10,6 +10,7 @@
 #import "IOsUtils.h"
 #import "Utils.h"
 #import "SafesList.h"
+#import "Settings.h"
 
 @interface LocalDeviceStorageProvider ()
 
@@ -41,6 +42,17 @@
         _browsableExisting = YES;
         _rootFolderOnly = YES;
         
+        NSString* appSupportDir = [self getDirectory:YES];
+        
+        if (![[NSFileManager defaultManager] fileExistsAtPath:appSupportDir isDirectory:NULL]) {
+            NSError *error = nil;
+            
+            NSLog(@"Creating Application Support Directory.");
+            if (![[NSFileManager defaultManager] createDirectoryAtPath:appSupportDir withIntermediateDirectories:YES attributes:nil error:&error]) {
+                NSLog(@"%@", error.localizedDescription);
+            }
+        }
+
         return self;
     }
     else {
@@ -54,10 +66,9 @@
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
-
-    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:desiredFilename];
-
+    NSString *path = [self getFilePathFromFileName:desiredFilename offlineCache:NO];
+    
+    
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         path = [Utils insertTimestampInFilename:path];
     }
@@ -71,26 +82,11 @@
     completion(metadata, nil);
 }
 
-- (NSString*)getOfflineCacheFileName:(SafeMetaData*)safe {
-    return [NSString stringWithFormat:@"%@-offline-cache.dat", safe.uuid];
-}
-
 - (void)createOfflineCacheFile:(SafeMetaData *)safe
                           data:(NSData *)data
                     completion:(void (^)(BOOL success))completion {
-    NSString* appSupportDir = [IOsUtils applicationSupportDirectory].path;
-
-    if (![[NSFileManager defaultManager] fileExistsAtPath:appSupportDir isDirectory:NULL]) {
-        NSError *error = nil;
-        
-        NSLog(@"Creating Application Support Directory.");
-        if (![[NSFileManager defaultManager] createDirectoryAtPath:appSupportDir withIntermediateDirectories:YES attributes:nil error:&error]) {
-            NSLog(@"%@", error.localizedDescription);
-        }
-    }
-    
     NSString *desiredFilename = [self getOfflineCacheFileName:safe];
-    NSString *path = [appSupportDir stringByAppendingPathComponent:desiredFilename];
+    NSString *path = [self getFilePathFromFileName:desiredFilename offlineCache:YES];
     
     NSLog(@"Creating offline cache file at: %@", path);
     
@@ -104,7 +100,7 @@
 }
 
 - (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion {
-    NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:NO];
 
     NSLog(@"Local Reading at: %@", path);
 
@@ -116,7 +112,7 @@
 - (void)readOfflineCachedSafe:(SafeMetaData *)safeMetaData
                viewController:(UIViewController *)viewController
                    completion:(void (^)(NSData *, NSError *error))completion {
-    NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:YES];
 
     NSLog(@"readOfflineCachedSafe at: %@", path);
 
@@ -128,7 +124,7 @@
 - (void)update:(SafeMetaData *)safeMetaData
           data:(NSData *)data
     completion:(void (^)(NSError *error))completion {
-    NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:NO];
 
     [data writeToFile:path atomically:YES ];
 
@@ -138,7 +134,7 @@
 - (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion {
     NSLog(@"updateOfflineCachedSafe");
     
-    NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:YES];
 
     if(![data writeToFile:path atomically:YES]) {
         NSLog(@"Error updating offline cache.");
@@ -150,7 +146,7 @@
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
-    NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:NO];
 
     NSError *error;
 
@@ -160,7 +156,7 @@
 }
 
 - (void)deleteOfflineCachedSafe:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
-    NSString *path = [self getFilePath:safeMetaData offlineCache:YES];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:YES];
 
     NSError *error;
 
@@ -171,31 +167,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (NSURL*)getFileUrl:(SafeMetaData*)safeMetaData {
-    NSString *path = [self getFilePath:safeMetaData offlineCache:NO];
-    return [NSURL fileURLWithPath:path];
-}
-
-- (NSString *)getFilePath:(SafeMetaData *)safeMetaData offlineCache:(BOOL)offlineCache {
-    if(offlineCache) {
-        NSString *filename = [self getOfflineCacheFileName:safeMetaData];
-
-        NSString *path = [[IOsUtils applicationSupportDirectory].path
-                          stringByAppendingPathComponent:filename];
-        
-        return path;
-    }
-    else {
-        NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                          stringByAppendingPathComponent:
-                          safeMetaData.fileIdentifier.lastPathComponent];
-        
-        return path;
-    }
-}
-
 - (NSDate *)getOfflineCacheFileModificationDate:(SafeMetaData *)safeMetadata {
-    NSString *path = [self getFilePath:safeMetadata offlineCache:YES];
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetadata offlineCache:YES];
     
     if(![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         NSLog(@"Offline cache file does NOT exist!");
@@ -225,7 +198,7 @@
 
 - (NSArray<StorageBrowserItem*>*)listRoot:(NSError**)ppError {
     NSError *error;
-    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[IOsUtils applicationDocumentsDirectory].path
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self getDirectory:NO]
                                                                                     error:&error];
     
     if (error) {
@@ -239,7 +212,8 @@
         StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
         
         BOOL isDirectory;
-        NSString *fullPath = [NSString pathWithComponents:@[[IOsUtils applicationDocumentsDirectory].path, file]];
+        NSString *fullPath = [self getFilePathFromFileName:file offlineCache:NO];
+    
         BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDirectory];
 
         if(exists) {
@@ -256,9 +230,7 @@
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
                   completion:(void (^)(NSData *data, NSError *error))completionHandler {
-    NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                      stringByAppendingPathComponent:
-                      (NSString*)providerData];
+    NSString *path = [self getFilePathFromFileName:(NSString *)providerData offlineCache:NO];
     
     NSLog(@"readWithProviderData at: %@", path);
     
@@ -279,7 +251,7 @@
     #define fileChangedNotification @"fileChangedNotification"
     
     // Get the path to the home directory
-    NSString * homeDirectory = [IOsUtils applicationDocumentsDirectory].path; //NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+    NSString * homeDirectory = [self getDirectory:NO];
     
     // Create a new file descriptor - we need to convert the NSString to a char * i.e. C style string
     int filedes = open([homeDirectory cStringUsingEncoding:NSASCIIStringEncoding], O_EVTONLY);
@@ -336,8 +308,7 @@
     if(items) {
         for (StorageBrowserItem *item in items) {
             if(!item.folder && ![existing containsObject:item.name]) {
-                NSString *path = [[IOsUtils applicationDocumentsDirectory].path
-                                  stringByAppendingPathComponent:item.name];
+                NSString *path = [self getFilePathFromFileName:item.name offlineCache:NO];
                 
                 NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
                 
@@ -359,8 +330,54 @@
 }
 
 - (BOOL)fileExists:(SafeMetaData*)metaData {
-    NSString *fullPath = [self getFilePath:metaData offlineCache:NO];
+    NSString *fullPath = [self getFilePathFromSafeMetaData:metaData offlineCache:NO];
     return [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+
+- (NSString*)getOfflineCacheFileName:(SafeMetaData*)safe {
+    return [NSString stringWithFormat:@"%@-offline-cache.dat", safe.uuid];
+}
+
+- (NSURL*)getFileUrl:(SafeMetaData*)safeMetaData {
+    NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:NO];
+    return [NSURL fileURLWithPath:path];
+}
+
+- (NSString *)getFilePathFromSafeMetaData:(SafeMetaData *)safeMetaData offlineCache:(BOOL)offlineCache {
+    if(offlineCache) {
+        NSString *filename = [self getOfflineCacheFileName:safeMetaData];
+        
+        return [self getFilePathFromFileName:filename offlineCache:YES];
+    }
+    else {
+        return [self getFilePathFromFileName:safeMetaData.fileIdentifier.lastPathComponent offlineCache:NO];
+    }
+}
+
+- (NSString*)getFilePathFromFileName:(NSString*)fileName offlineCache:(BOOL)offlineCache {
+    return [[self getDirectory:offlineCache] stringByAppendingPathComponent:fileName];
+}
+
+- (NSString*)getDirectory:(BOOL)offlineCache {
+    if(offlineCache) {
+        return [IOsUtils applicationSupportDirectory].path;
+    }
+    else {
+        // TODO: Maybe we could make Local Safes eligible for auto fill by offering user a choice.
+        // Basically if we move to the Group Container iTunes File Sharing/Files app no longer works. So it's either/or
+        // Seems like Apple didn't really think this one through fully
+        //
+        //NSString *appGroupDirectoryPath = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:kAppGroupName].path;
+        //return Settings.sharedInstance.makeLocalSafesAvailableForAutoFill ? appGroupDirectoryPath : [IOsUtils applicationDocumentsDirectory].path;
+        
+        return [IOsUtils applicationDocumentsDirectory].path;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 @end

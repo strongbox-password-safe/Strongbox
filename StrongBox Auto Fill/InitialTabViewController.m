@@ -25,7 +25,7 @@
 }
 
 - (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider {
-    return storageProvider == kOneDrive;
+    return storageProvider == kOneDrive || storageProvider == kLocalDevice;
 }
 
 - (BOOL)isInQuickLaunchViewMode {
