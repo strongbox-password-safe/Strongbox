@@ -139,6 +139,12 @@
     self.tableView.emptyDataSetDelegate = self;
     // A little trick for removing the cell separators
     self.tableView.tableFooterView = [UIView new];
+    
+    self.tableView.rowHeight = 65.0f;
+}
+
+- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
+    return [UIImage imageNamed:@"Strongbox-215x215"];
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView

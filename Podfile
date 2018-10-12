@@ -29,11 +29,12 @@ abstract_target 'common-ios' do
     pod 'GoogleSignIn'
     pod 'JNKeychain'
     pod 'ObjectiveDropboxOfficial'
+    pod 'DZNEmptyDataSet'
 
     target 'Strongbox-iOS' do
         pod 'ISMessages' 
         pod 'Reachability'
-        pod 'DZNEmptyDataSet'
+        #pod 'DZNEmptyDataSet'
         pod 'PopupDialog'
         pod 'ADAL', '~> 1.2'
         pod 'Base32', '~> 1.1'

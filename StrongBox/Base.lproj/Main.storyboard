@@ -21,34 +21,34 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <viewLayoutGuide key="safeArea" id="DPs-vg-Ix4"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="reuseIdentifier" textLabel="2dd-zl-Wnd" detailTextLabel="5zE-7P-4sb" imageView="Juw-gn-39c" style="IBUITableViewCellStyleSubtitle" id="Xvk-43-9Cp" customClass="SafeItemTableCell">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="reuseIdentifier" textLabel="2dd-zl-Wnd" detailTextLabel="5zE-7P-4sb" imageView="Juw-gn-39c" rowHeight="100" style="IBUITableViewCellStyleSubtitle" id="Xvk-43-9Cp" customClass="SafeItemTableCell">
+                                <rect key="frame" x="0.0" y="28" width="375" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="redraw" tableViewCell="Xvk-43-9Cp" id="q9O-CF-FTv">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="2dd-zl-Wnd">
-                                            <rect key="frame" x="63" y="4" width="35" height="21.666666666666668"/>
+                                            <rect key="frame" x="63" y="28.666666666666664" width="35" height="21.666666666666668"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="5zE-7P-4sb">
-                                            <rect key="frame" x="63" y="25.666666666666668" width="32.666666666666664" height="14.333333333333334"/>
+                                            <rect key="frame" x="63" y="53.666666666666671" width="32.666666666666664" height="14.333333333333334"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="product32" id="Juw-gn-39c">
-                                            <rect key="frame" x="16" y="6" width="32" height="32"/>
+                                            <rect key="frame" x="16" y="34" width="32" height="32"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </imageView>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="warning-32" translatesAutoresizingMaskIntoConstraints="NO" id="W8I-mM-aFL">
-                                            <rect key="frame" x="335" y="13" width="32" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="335" y="23" width="32" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         </imageView>
                                     </subviews>
                                 </tableViewCellContentView>
@@ -117,7 +117,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aFA-j3-EVC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3412" y="1177"/>
+            <point key="canvasLocation" x="-3412" y="1175.615763546798"/>
         </scene>
         <!--Browse-->
         <scene sceneID="c46-7i-tlg">

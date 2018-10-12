@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SafesListTableViewController : UITableViewController
+@interface SafesListTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
+
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonShowQuickView;
 
 @end

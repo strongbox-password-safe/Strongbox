@@ -12,6 +12,7 @@
 #import "InitialTabViewController.h"
 #import "SafeStorageProviderFactory.h"
 #import "Settings.h"
+#import <AuthenticationServices/AuthenticationServices.h>
 
 @interface SafesListTableViewController ()
 
@@ -34,7 +35,68 @@
         [self.barButtonShowQuickView setEnabled:NO];
         [self.barButtonShowQuickView setTintColor: [UIColor clearColor]];
     }
+    
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    
+    self.tableView.rowHeight = 65.0f;
 }
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+   
+    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
+        self.tableView.contentOffset = CGPointZero;
+    }
+}
+
+- (void)emptyDataSet:(UIScrollView *)scrollView didTapView:(UIView *)view {
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
+}
+
+- (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button
+{
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
+}
+
+- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
+    return [UIImage imageNamed:@"Strongbox-180x180-greyed"];
+}
+
+- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
+    NSDictionary *attributes = @{
+                                 NSFontAttributeName: [UIFont boldSystemFontOfSize:21.0f],
+                                 NSForegroundColorAttributeName: [UIColor blueColor]
+                                 };
+    
+    return [[NSAttributedString alloc] initWithString:@"Got It, Take Me Back" attributes:attributes];
+}
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = @"You Have No Strongbox Safes :(";
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
+                                 NSForegroundColorAttributeName: [UIColor darkGrayColor]};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = @"To use Strongbox for Password Autofill you need to add a safe. You can do this in the Strongbox App.";
+    
+    NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
+    paragraph.lineBreakMode = NSLineBreakByWordWrapping;
+    paragraph.alignment = NSTextAlignmentCenter;
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14.0f],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor],
+                                 NSParagraphStyleAttributeName: paragraph};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
 
 - (SafeMetaData*)getPrimarySafe {
     SafeMetaData* primary = [self.safes firstObject];
@@ -78,7 +140,6 @@
 }
 */
 - (IBAction)onShowQuickLaunchView:(id)sender {
-    NSLog(@"TODO: Show Quick View");
     Settings.sharedInstance.useQuickLaunchAsRootView = YES;
     
     [[self getInitialViewController] showQuickLaunchView];

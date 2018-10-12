@@ -57,34 +57,34 @@
         <scene sceneID="FrF-Ab-s53">
             <objects>
                 <tableViewController title="Select Your Safe" id="GnU-eV-N6f" customClass="SafesListTableViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ncG-XL-f6f">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ncG-XL-f6f">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="reuseIdentifier" textLabel="dvf-G9-7Rb" detailTextLabel="wYj-ns-Tje" imageView="KE7-rd-Unc" rowHeight="70" style="IBUITableViewCellStyleSubtitle" id="cPg-pF-DK7" userLabel="Table View Cell">
-                                <rect key="frame" x="0.0" y="28" width="375" height="70"/>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="reuseIdentifier" textLabel="dvf-G9-7Rb" detailTextLabel="wYj-ns-Tje" imageView="KE7-rd-Unc" rowHeight="100" style="IBUITableViewCellStyleSubtitle" id="cPg-pF-DK7" userLabel="Table View Cell">
+                                <rect key="frame" x="0.0" y="28" width="375" height="100"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="redraw" tableViewCell="cPg-pF-DK7" id="IfI-xD-cz0">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="69.666666666666671"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="dvf-G9-7Rb">
-                                            <rect key="frame" x="63" y="13.666666666666666" width="35" height="21.666666666666668"/>
+                                            <rect key="frame" x="63" y="28.666666666666664" width="35" height="21.666666666666668"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="wYj-ns-Tje">
-                                            <rect key="frame" x="63" y="38.666666666666671" width="32.666666666666664" height="14.333333333333334"/>
+                                            <rect key="frame" x="63" y="53.666666666666671" width="32.666666666666664" height="14.333333333333334"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="product32" id="KE7-rd-Unc">
-                                            <rect key="frame" x="16" y="18" width="32" height="32"/>
+                                            <rect key="frame" x="16" y="34" width="32" height="32"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </imageView>
                                     </subviews>
