@@ -148,7 +148,8 @@
 		4D1885452170A469001AE6B0 /* ODConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A22216DF6FA00029F29 /* ODConstants.m */; };
 		4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
 		4D18854D2170AC60001AE6B0 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
-		4D18854E2170AC80001AE6B0 /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
+		4D18855D2170CD4F001AE6B0 /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
+		4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */; };
 		4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5C011F7927D60036684C /* VersionConflictController.m */; };
 		4D1B9AEB216DF6FB00029F29 /* ODAccountStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C4216DF6FA00029F29 /* ODAccountStore.m */; };
@@ -1986,7 +1987,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D18854E2170AC80001AE6B0 /* DropboxV2StorageProvider.m in Sources */,
+				4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */,
+				4D18855D2170CD4F001AE6B0 /* DropboxV2StorageProvider.m in Sources */,
 				4D18854D2170AC60001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
 				4D1885452170A469001AE6B0 /* ODConstants.m in Sources */,
 				4D1885442170A448001AE6B0 /* ODErrorCodes.m in Sources */,

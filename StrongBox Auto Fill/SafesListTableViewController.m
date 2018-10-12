@@ -27,7 +27,7 @@
     
     self.safes = SafesList.sharedInstance.snapshot;
 
-    if([self getPrimarySafe]) {
+    if([[self getInitialViewController] getPrimarySafe]) {
         [self.barButtonShowQuickView setEnabled:YES];
         [self.barButtonShowQuickView setTintColor:nil];
     }
@@ -48,6 +48,10 @@
     if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
         self.tableView.contentOffset = CGPointZero;
     }
+}
+
+- (IBAction)onCancel:(id)sender {
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapView:(UIView *)view {
@@ -97,13 +101,6 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-
-- (SafeMetaData*)getPrimarySafe {
-    SafeMetaData* primary = [self.safes firstObject];
-    
-    return primary;
-}
-
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -118,9 +115,21 @@
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
     
-    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
-    NSString *icon = provider.icon;
-    cell.imageView.image = [UIImage imageNamed:icon];
+    if(![[self getInitialViewController] isUnsupportedAutoFillProvider:safe.storageProvider]) {
+        id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
+        
+        NSString *icon = provider.icon;
+        cell.imageView.image = [UIImage imageNamed:icon];
+    }
+    else {
+        cell.imageView.image = [UIImage imageNamed:@"cancel_32"];
+        cell.imageView.userInteractionEnabled = NO;
+        cell.textLabel.text = [NSString stringWithFormat:@"%@ [Autofill Not Supported]", safe.nickName];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ [Autofill Not Supported]", safe.fileName];
+        cell.userInteractionEnabled = NO;
+        cell.textLabel.enabled = NO;
+        cell.detailTextLabel.enabled = NO;
+    }
     
     return cell;
 }

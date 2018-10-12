@@ -31,7 +31,12 @@
         return [LocalDeviceStorageProvider sharedInstance];
     }
     else if(providerId == kOneDrive) {
+#ifndef IS_APP_EXTENSION
         return [OneDriveStorageProvider sharedInstance];
+#else
+        NSLog(@"ADAL Onedrive Library doesn't support App Extensions. TODO: Use new ADAL! ");
+        return nil;
+#endif
     }
     
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showQuickLaunchView;
 - (void)showSafesListView;
 - (BOOL)isInQuickLaunchViewMode;
+- (SafeMetaData*)getPrimarySafe;
+- (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider;
 
 @end
 

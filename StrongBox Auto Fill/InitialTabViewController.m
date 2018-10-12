@@ -8,6 +8,9 @@
 
 #import "InitialTabViewController.h"
 #import "Settings.h"
+#import "SafesList.h"
+#import "StorageProvider.h"
+#import "NSArray+Extensions.h"
 
 @implementation InitialTabViewController
 
@@ -21,6 +24,10 @@
     self.tabBar.hidden = YES;
 }
 
+- (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider {
+    return storageProvider == kOneDrive;
+}
+
 - (BOOL)isInQuickLaunchViewMode {
     return self.selectedIndex == 1;
 }
@@ -30,6 +37,14 @@
 
     self.tabBar.hidden = YES;
     self.selectedIndex = Settings.sharedInstance.useQuickLaunchAsRootView ? 1 : 0;
+}
+
+- (SafeMetaData*)getPrimarySafe {
+    SafeMetaData* primary = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        return ![self isUnsupportedAutoFillProvider:obj.storageProvider];
+    }];
+    
+    return primary;
 }
 
 /*

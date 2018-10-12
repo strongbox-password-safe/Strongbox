@@ -63,7 +63,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    SafeMetaData* primary = [self getPrimarySafe];
+    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
     
     if(!primary) {
         [self switchToSafesListView];
@@ -73,12 +73,6 @@
 
         [self openPrimarySafe];
     }
-}
-
-- (SafeMetaData*)getPrimarySafe {
-    SafeMetaData* primary = [SafesList.sharedInstance.snapshot firstObject];
-
-    return primary;
 }
 
 - (InitialTabViewController *)getInitialViewController {
@@ -101,7 +95,7 @@
 }
 
 - (void)openPrimarySafe {
-    SafeMetaData* safe = [self getPrimarySafe];
+    SafeMetaData* safe = [[self getInitialViewController] getPrimarySafe];
     
     if(!safe) {
         [Alerts warn:self title:@"No Primary Safe" message:@"Strongbox could not determine your primary safe. Switch back to the Safes List View and ensure that there is at least one safe present."];

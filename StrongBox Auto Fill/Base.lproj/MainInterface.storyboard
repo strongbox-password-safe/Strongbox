@@ -97,6 +97,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Select Your Safe" prompt="Strongbox Password Safe" id="F9U-mp-PMJ">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="AZx-fg-qxm">
+                            <connections>
+                                <action selector="onCancel:" destination="GnU-eV-N6f" id="5AR-2U-HAU"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="⚡" id="5w0-Ls-VNT">
                             <connections>
                                 <action selector="onShowQuickLaunchView:" destination="GnU-eV-N6f" id="jEt-pU-Q4S"/>
