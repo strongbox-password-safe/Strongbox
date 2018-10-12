@@ -15,6 +15,7 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "CredentialProviderViewController.h"
 #import "OpenSafeSequenceHelper.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface SafesListTableViewController ()
 
@@ -42,8 +43,17 @@
     self.tableView.emptyDataSetDelegate = self;
     
     self.tableView.rowHeight = 65.0f;
+    
+    [SVProgressHUD setViewForExtension:self.view];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.navigationController setToolbarHidden:YES];
+    self.navigationController.toolbar.hidden = YES;
+    self.navigationController.toolbarHidden = YES;
+}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
    

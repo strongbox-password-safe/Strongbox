@@ -19,6 +19,14 @@
         NSLog(@"%@", obj.title);
         return obj.title;
     }];
+    
+    [self.navigationController setToolbarHidden:NO];
+    self.navigationController.toolbar.hidden = NO;
+    self.navigationController.toolbarHidden = NO;
+
+    [self.navigationController setNavigationBarHidden:NO];
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationController.navigationBarHidden = NO;
 }
 
 /*

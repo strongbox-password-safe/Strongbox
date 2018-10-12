@@ -14,6 +14,7 @@
 #import "Alerts.h"
 #import "OpenSafeSequenceHelper.h"
 #import "CredentialProviderViewController.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface QuickViewController ()
 
@@ -46,10 +47,13 @@
     self.imageViewLogo.userInteractionEnabled = YES;
     [self.imageViewLogo addGestureRecognizer:singleTap];
     
+    [SVProgressHUD setViewForExtension:self.view];
+    
     SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
 
     if(primary){
         self.labelSafeName.text = primary.nickName;
+        [self openPrimarySafe];
     }
 }
 
@@ -75,9 +79,6 @@
     
     if(!primary) {
         [self switchToSafesListView];
-    }
-    else {
-        [self openPrimarySafe];
     }
 }
 
