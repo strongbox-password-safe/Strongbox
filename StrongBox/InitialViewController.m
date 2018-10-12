@@ -11,7 +11,6 @@
 #import "DatabaseModel.h"
 #import "SafesList.h"
 #import "Settings.h"
-#import "SafeStorageProvider.h"
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "SafesViewController.h"
@@ -26,6 +25,7 @@
 #import "ISMessages/ISMessages.h"
 #import <PopupDialog/PopupDialog-Swift.h>
 #import "OfflineDetector.h"
+#import "SafeStorageProviderFactory.h"
 
 @interface InitialViewController ()
 

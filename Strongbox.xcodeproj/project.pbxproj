@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		03E0BBBD5993702720D6A527 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
-		4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
@@ -18,6 +17,138 @@
 		4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
 		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
+		4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
+		4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
+		4D1884C721709CBF001AE6B0 /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
+		4D1884C821709CCD001AE6B0 /* PasswordSafeUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */; };
+		4D1884C921709CD4001AE6B0 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2C1FB1E27700A68A92 /* Utils.m */; };
+		4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579D1C8361D200E6356F /* IOsUtils.m */; };
+		4D1884CB21709CE5001AE6B0 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		4D1884CC21709CF1001AE6B0 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
+		4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
+		4D1884CE21709D01001AE6B0 /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
+		4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
+		4D1884D021709DF3001AE6B0 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2E1FB1E27700A68A92 /* Node.m */; };
+		4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2A1FB1E27700A68A92 /* NodeFields.m */; };
+		4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14842074F5F800CE9CAE /* PwSafeDatabase.m */; };
+		4D1884D321709E0E001AE6B0 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14882074F5F800CE9CAE /* Field.m */; };
+		4D1884D421709E13001AE6B0 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14852074F5F800CE9CAE /* Group.m */; };
+		4D1884D521709E18001AE6B0 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C148A2074F5F800CE9CAE /* Record.m */; };
+		4D1884D621709E1F001AE6B0 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14822074F5F700CE9CAE /* PasswordHistoryEntry.m */; };
+		4D1884D721709E26001AE6B0 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14862074F5F800CE9CAE /* PasswordHistory.m */; };
+		4D1884D821709E2D001AE6B0 /* SafeTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14802074F5F700CE9CAE /* SafeTools.m */; };
+		4D1884D921709E3C001AE6B0 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
+		4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14982074F64A00CE9CAE /* crypt_argchk.c */; };
+		4D1884DB21709E81001AE6B0 /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */; };
+		4D1884DC21709E98001AE6B0 /* ODClient+DefaultConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99DB216DF6FA00029F29 /* ODClient+DefaultConfiguration.m */; };
+		4D1884DD21709E98001AE6B0 /* ODClient+Authentication.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99DC216DF6FA00029F29 /* ODClient+Authentication.m */; };
+		4D1884DE21709E98001AE6B0 /* ODClient+HelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2A216DF6FA00029F29 /* ODClient+HelperMethods.m */; };
+		4D1884DF21709E98001AE6B0 /* ODClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7C216DF6FB00029F29 /* ODClient.m */; };
+		4D1884E021709F8F001AE6B0 /* ODShareRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A58216DF6FB00029F29 /* ODShareRequestBuilder.m */; };
+		4D1884E121709F9A001AE6B0 /* ODDrivesCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A81216DF6FB00029F29 /* ODDrivesCollectionRequestBuilder.m */; };
+		4D1884E221709FA5001AE6B0 /* ODDriveRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6A216DF6FB00029F29 /* ODDriveRequestBuilder.m */; };
+		4D1884E321709FB0001AE6B0 /* ODAppConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AD5216DF6FB00029F29 /* ODAppConfiguration.m */; };
+		4D1884E421709FEF001AE6B0 /* ODRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A1F216DF6FA00029F29 /* ODRequestBuilder.m */; };
+		4D1884E52170A00A001AE6B0 /* ODSharedCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A51216DF6FB00029F29 /* ODSharedCollectionRequestBuilder.m */; };
+		4D1884E62170A00A001AE6B0 /* ODShareRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A77216DF6FB00029F29 /* ODShareRequest.m */; };
+		4D1884E72170A018001AE6B0 /* ODDriveRecentRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A35216DF6FA00029F29 /* ODDriveRecentRequestBuilder.m */; };
+		4D1884E82170A023001AE6B0 /* ODCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A09216DF6FA00029F29 /* ODCollectionRequestBuilder.m */; };
+		4D1884E92170A040001AE6B0 /* ODItemsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A5A216DF6FB00029F29 /* ODItemsCollectionRequestBuilder.m */; };
+		4D1884EA2170A040001AE6B0 /* ODItemsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A71216DF6FB00029F29 /* ODItemsCollectionRequest.m */; };
+		4D1884EB2170A04F001AE6B0 /* ODSpecialCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A46216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m */; };
+		4D1884EC2170A058001AE6B0 /* ODRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A0A216DF6FA00029F29 /* ODRequest.m */; };
+		4D1884ED2170A06C001AE6B0 /* ODDrivesCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A63216DF6FB00029F29 /* ODDrivesCollectionRequest.m */; };
+		4D1884EE2170A075001AE6B0 /* ODDriveRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A89216DF6FB00029F29 /* ODDriveRequest.m */; };
+		4D1884EF2170A07E001AE6B0 /* ODDriveRecentRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A40216DF6FB00029F29 /* ODDriveRecentRequest.m */; };
+		4D1884F02170A08A001AE6B0 /* ODItemRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A36216DF6FA00029F29 /* ODItemRequestBuilder.m */; };
+		4D1884F12170A093001AE6B0 /* ODShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA4216DF6FB00029F29 /* ODShare.m */; };
+		4D1884F22170A09C001AE6B0 /* ODSpecialCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7B216DF6FB00029F29 /* ODSpecialCollectionRequest.m */; };
+		4D1884F32170A0A6001AE6B0 /* ODTopOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F8216DF6FA00029F29 /* ODTopOptions.m */; };
+		4D1884F42170A0B7001AE6B0 /* ODURLSessionDataTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A1C216DF6FA00029F29 /* ODURLSessionDataTask.m */; };
+		4D1884F52170A0C4001AE6B0 /* ODAsyncURLSessionDataTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A18216DF6FA00029F29 /* ODAsyncURLSessionDataTask.m */; };
+		4D1884F62170A0CF001AE6B0 /* ODRequestOptionsBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A05216DF6FA00029F29 /* ODRequestOptionsBuilder.m */; };
+		4D1884F72170A0D9001AE6B0 /* ODCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A08216DF6FA00029F29 /* ODCollectionRequest.m */; };
+		4D1884F82170A10F001AE6B0 /* ODAuthConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99E5216DF6FA00029F29 /* ODAuthConstants.m */; };
+		4D1884F92170A120001AE6B0 /* ODSharedCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6F216DF6FB00029F29 /* ODSharedCollectionRequest.m */; };
+		4D1884FA2170A14A001AE6B0 /* ODIfMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A01216DF6FA00029F29 /* ODIfMatch.m */; };
+		4D1884FB2170A157001AE6B0 /* ODOrderByOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99FB216DF6FA00029F29 /* ODOrderByOptions.m */; };
+		4D1884FC2170A165001AE6B0 /* ODURLSessionUploadTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A17216DF6FA00029F29 /* ODURLSessionUploadTask.m */; };
+		4D1884FD2170A16F001AE6B0 /* ODExpandOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A04216DF6FA00029F29 /* ODExpandOptions.m */; };
+		4D1884FE2170A175001AE6B0 /* ODDrive.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AB3216DF6FB00029F29 /* ODDrive.m */; };
+		4D1884FF2170A17D001AE6B0 /* ODItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ACA216DF6FB00029F29 /* ODItem.m */; };
+		4D1885002170A18C001AE6B0 /* ODItemSearchRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A55216DF6FB00029F29 /* ODItemSearchRequestBuilder.m */; };
+		4D1885012170A18C001AE6B0 /* ODItemSearchRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A8A216DF6FB00029F29 /* ODItemSearchRequest.m */; };
+		4D1885022170A1B2001AE6B0 /* ODIfNoneMatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F6216DF6FA00029F29 /* ODIfNoneMatch.m */; };
+		4D1885032170A1BB001AE6B0 /* ODSelectOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F3216DF6FA00029F29 /* ODSelectOptions.m */; };
+		4D1885042170A1CA001AE6B0 /* ODItemDeltaRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A59216DF6FB00029F29 /* ODItemDeltaRequestBuilder.m */; };
+		4D1885052170A1CA001AE6B0 /* ODItemDeltaCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A5B216DF6FB00029F29 /* ODItemDeltaCollection.m */; };
+		4D1885062170A1CA001AE6B0 /* ODItemDeltaRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A72216DF6FB00029F29 /* ODItemDeltaRequest.m */; };
+		4D1885072170A1D9001AE6B0 /* ODItemCreateLinkRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2F216DF6FA00029F29 /* ODItemCreateLinkRequestBuilder.m */; };
+		4D1885082170A1D9001AE6B0 /* ODItemCreateSessionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A42216DF6FB00029F29 /* ODItemCreateSessionRequest.m */; };
+		4D1885092170A1D9001AE6B0 /* ODItemCreateLinkRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6D216DF6FB00029F29 /* ODItemCreateLinkRequest.m */; };
+		4D18850A2170A1E4001AE6B0 /* ODItemCopyRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A53216DF6FB00029F29 /* ODItemCopyRequest.m */; };
+		4D18850B2170A1E4001AE6B0 /* ODItemCopyRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A56216DF6FB00029F29 /* ODItemCopyRequestBuilder.m */; };
+		4D18850C2170A1FA001AE6B0 /* ODItemCreateSessionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A78216DF6FB00029F29 /* ODItemCreateSessionRequestBuilder.m */; };
+		4D18850D2170A21D001AE6B0 /* ODItemContentRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A69216DF6FB00029F29 /* ODItemContentRequest.m */; };
+		4D18850E2170A227001AE6B0 /* ODAsyncOperationStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC3216DF6FB00029F29 /* ODAsyncOperationStatus.m */; };
+		4D18850F2170A230001AE6B0 /* ODURLSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A15216DF6FA00029F29 /* ODURLSessionTask.m */; };
+		4D1885102170A23C001AE6B0 /* ODChildrenCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A60216DF6FB00029F29 /* ODChildrenCollectionRequest.m */; };
+		4D1885112170A23C001AE6B0 /* ODChildrenCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7E216DF6FB00029F29 /* ODChildrenCollectionRequestBuilder.m */; };
+		4D1885122170A258001AE6B0 /* ODHeaderOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F1216DF6FA00029F29 /* ODHeaderOptions.m */; };
+		4D1885132170A261001AE6B0 /* ODRequestOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99F5216DF6FA00029F29 /* ODRequestOptions.m */; };
+		4D1885142170A279001AE6B0 /* ODURLSessionProgressTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A16216DF6FA00029F29 /* ODURLSessionProgressTask.m */; };
+		4D1885152170A28A001AE6B0 /* ODQueryParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A00216DF6FA00029F29 /* ODQueryParameters.m */; };
+		4D1885162170A28A001AE6B0 /* ODQuota.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AB8216DF6FB00029F29 /* ODQuota.m */; };
+		4D1885172170A299001AE6B0 /* ODThumbnailSet+CustomThumbnail.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A2C216DF6FA00029F29 /* ODThumbnailSet+CustomThumbnail.m */; };
+		4D1885182170A299001AE6B0 /* ODThumbnailSetRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A5F216DF6FB00029F29 /* ODThumbnailSetRequestBuilder.m */; };
+		4D1885192170A299001AE6B0 /* ODThumbnailSetRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A67216DF6FB00029F29 /* ODThumbnailSetRequest.m */; };
+		4D18851A2170A299001AE6B0 /* ODThumbnailSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABA216DF6FB00029F29 /* ODThumbnailSet.m */; };
+		4D18851B2170A2A0001AE6B0 /* ODVideo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA3216DF6FB00029F29 /* ODVideo.m */; };
+		4D18851C2170A2A7001AE6B0 /* ODPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A8E216DF6FB00029F29 /* ODPhoto.m */; };
+		4D18851D2170A2B4001AE6B0 /* ODSpecialFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A99216DF6FB00029F29 /* ODSpecialFolder.m */; };
+		4D18851E2170A2BE001AE6B0 /* ODOpenWithApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA6216DF6FB00029F29 /* ODOpenWithApp.m */; };
+		4D18851F2170A2BE001AE6B0 /* ODOpenWithSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC0216DF6FB00029F29 /* ODOpenWithSet.m */; };
+		4D1885202170A2C4001AE6B0 /* ODImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A94216DF6FB00029F29 /* ODImage.m */; };
+		4D1885212170A2D7001AE6B0 /* ODThumbnailContentRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A31216DF6FA00029F29 /* ODThumbnailContentRequest.m */; };
+		4D1885222170A2D7001AE6B0 /* ODThumbnailsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A3D216DF6FB00029F29 /* ODThumbnailsCollectionRequest.m */; };
+		4D1885232170A2D7001AE6B0 /* ODThumbnailsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A4F216DF6FB00029F29 /* ODThumbnailsCollectionRequestBuilder.m */; };
+		4D1885242170A2D7001AE6B0 /* ODThumbnailRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A6C216DF6FB00029F29 /* ODThumbnailRequestBuilder.m */; };
+		4D1885252170A2D7001AE6B0 /* ODThumbnailRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A7A216DF6FB00029F29 /* ODThumbnailRequest.m */; };
+		4D1885262170A2D7001AE6B0 /* ODThumbnail.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A96216DF6FB00029F29 /* ODThumbnail.m */; };
+		4D1885272170A2E9001AE6B0 /* ODSearchResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A91216DF6FB00029F29 /* ODSearchResult.m */; };
+		4D1885282170A2F1001AE6B0 /* ODFileSystemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AAB216DF6FB00029F29 /* ODFileSystemInfo.m */; };
+		4D1885292170A2FA001AE6B0 /* ODFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A95216DF6FB00029F29 /* ODFolder.m */; };
+		4D18852A2170A300001AE6B0 /* ODDeleted.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA0216DF6FB00029F29 /* ODDeleted.m */; };
+		4D18852B2170A308001AE6B0 /* ODIdentitySet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A8F216DF6FB00029F29 /* ODIdentitySet.m */; };
+		4D18852C2170A308001AE6B0 /* ODIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AAC216DF6FB00029F29 /* ODIdentity.m */; };
+		4D18852D2170A310001AE6B0 /* ODAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AB2216DF6FB00029F29 /* ODAudio.m */; };
+		4D18852E2170A31A001AE6B0 /* ODUploadSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A9A216DF6FB00029F29 /* ODUploadSession.m */; };
+		4D18852F2170A325001AE6B0 /* ODCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A0D216DF6FA00029F29 /* ODCollection.m */; };
+		4D1885302170A32C001AE6B0 /* ODFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC2216DF6FB00029F29 /* ODFile.m */; };
+		4D1885312170A33D001AE6B0 /* ODItemRequestBuilder+ItemByPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A26216DF6FA00029F29 /* ODItemRequestBuilder+ItemByPath.m */; };
+		4D1885322170A33D001AE6B0 /* ODItemRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A79216DF6FB00029F29 /* ODItemRequest.m */; };
+		4D1885332170A33D001AE6B0 /* ODItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA5216DF6FB00029F29 /* ODItemReference.m */; };
+		4D1885342170A351001AE6B0 /* ODPermissionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A32216DF6FA00029F29 /* ODPermissionRequestBuilder.m */; };
+		4D1885352170A351001AE6B0 /* ODPermissionsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A44216DF6FB00029F29 /* ODPermissionsCollectionRequest.m */; };
+		4D1885362170A351001AE6B0 /* ODPermissionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A66216DF6FB00029F29 /* ODPermissionRequest.m */; };
+		4D1885372170A351001AE6B0 /* ODPermissionsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A86216DF6FB00029F29 /* ODPermissionsCollectionRequestBuilder.m */; };
+		4D1885382170A351001AE6B0 /* ODPermission.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AC9216DF6FB00029F29 /* ODPermission.m */; };
+		4D1885392170A36B001AE6B0 /* ODURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99D4216DF6FA00029F29 /* ODURLSessionManager.m */; };
+		4D18853A2170A36B001AE6B0 /* ODURLSessionDownloadTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A19216DF6FA00029F29 /* ODURLSessionDownloadTask.m */; };
+		4D18853B2170A378001AE6B0 /* ODObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A0C216DF6FA00029F29 /* ODObject.m */; };
+		4D18853C2170A39A001AE6B0 /* ODLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABE216DF6FB00029F29 /* ODLocation.m */; };
+		4D18853D2170A3A2001AE6B0 /* ODSharingLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AA7216DF6FB00029F29 /* ODSharingLink.m */; };
+		4D18853E2170A3AA001AE6B0 /* ODSharingInvitation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A93216DF6FB00029F29 /* ODSharingInvitation.m */; };
+		4D18853F2170A3B3001AE6B0 /* ODVersionsCollectionRequestBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A4E216DF6FB00029F29 /* ODVersionsCollectionRequestBuilder.m */; };
+		4D1885402170A3B3001AE6B0 /* ODVersionsCollectionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A70216DF6FB00029F29 /* ODVersionsCollectionRequest.m */; };
+		4D1885412170A3C1001AE6B0 /* ODShared.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ABD216DF6FB00029F29 /* ODShared.m */; };
+		4D1885422170A3C9001AE6B0 /* ODHashes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9AAE216DF6FB00029F29 /* ODHashes.m */; };
+		4D1885432170A419001AE6B0 /* ODNSURLSessionTaskDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99D6216DF6FA00029F29 /* ODNSURLSessionTaskDelegate.m */; };
+		4D1885442170A448001AE6B0 /* ODErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9ACC216DF6FB00029F29 /* ODErrorCodes.m */; };
+		4D1885452170A469001AE6B0 /* ODConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B9A22216DF6FA00029F29 /* ODConstants.m */; };
+		4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
+		4D18854D2170AC60001AE6B0 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
+		4D18854E2170AC80001AE6B0 /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */; };
 		4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A5C011F7927D60036684C /* VersionConflictController.m */; };
 		4D1B9AEB216DF6FB00029F29 /* ODAccountStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B99C4216DF6FA00029F29 /* ODAccountStore.m */; };
@@ -210,7 +341,6 @@
 		4DE48A62216F54A300C9C991 /* Strongbox Auto Fill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4DE48A66216F558E00C9C991 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
 		4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
-		4DE6104C216FCF2C00028C9A /* SafeStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */; };
 		4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C22168AC9A00A5800A /* InitialViewController.m */; };
 		4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C52168B63200A5800A /* QuickLaunchViewController.m */; };
 		4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
@@ -270,12 +400,13 @@
 		4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalDeviceStorageProvider.m; sourceTree = "<group>"; };
 		4D1757A21C8361D200E6356F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeStorageProvider.h; sourceTree = "<group>"; };
-		4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeStorageProvider.m; sourceTree = "<group>"; };
 		4D1757AF1C8361D300E6356F /* SafesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesViewController.h; sourceTree = "<group>"; };
 		4D1757B01C8361D300E6356F /* SafesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesViewController.m; sourceTree = "<group>"; };
 		4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectDestinationGroupController.h; sourceTree = "<group>"; };
 		4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectDestinationGroupController.m; sourceTree = "<group>"; };
 		4D1757B51C8361D300E6356F /* StrongBox-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "StrongBox-Info.plist"; sourceTree = "<group>"; };
+		4D18854A2170ABD7001AE6B0 /* SafeStorageProviderFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeStorageProviderFactory.h; sourceTree = "<group>"; };
+		4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafeStorageProviderFactory.m; sourceTree = "<group>"; };
 		4D1A5BFB1F7923FF0036684C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D1A5BFD1F7924C30036684C /* SafeItemTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeItemTableCell.h; sourceTree = "<group>"; };
 		4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeItemTableCell.m; sourceTree = "<group>"; };
@@ -690,7 +821,6 @@
 			files = (
 				4D67FDF1216F4349005C0E12 /* AuthenticationServices.framework in Frameworks */,
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
-				4162D3BD6CEC779BD0ADC06E /* Pods_Strongbox_iOS.framework in Frameworks */,
 				E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1151,6 +1281,8 @@
 		4D62D6961C85F35E0051E13B /* StorageProviders */ = {
 			isa = PBXGroup;
 			children = (
+				4D18854A2170ABD7001AE6B0 /* SafeStorageProviderFactory.h */,
+				4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */,
 				4D1B99A7216DF6FA00029F29 /* odsdk */,
 				4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */,
 				4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */,
@@ -1161,7 +1293,6 @@
 				4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */,
 				4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */,
 				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
-				4D1757AE1C8361D300E6356F /* SafeStorageProvider.m */,
 				4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */,
 				4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */,
 				4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */,
@@ -1839,6 +1970,7 @@
 				4D1B9B61216DF6FB00029F29 /* ODLocation.m in Sources */,
 				4D1B9B05216DF6FB00029F29 /* ODQueryParameters.m in Sources */,
 				4D1B9B58216DF6FB00029F29 /* ODFileSystemInfo.m in Sources */,
+				4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
 				4D1B9B24216DF6FB00029F29 /* ODSpecialCollectionRequestBuilder.m in Sources */,
 				4D1B9B12216DF6FB00029F29 /* ODURLSessionDownloadTask.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
@@ -1854,7 +1986,137 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DE6104C216FCF2C00028C9A /* SafeStorageProvider.m in Sources */,
+				4D18854E2170AC80001AE6B0 /* DropboxV2StorageProvider.m in Sources */,
+				4D18854D2170AC60001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
+				4D1885452170A469001AE6B0 /* ODConstants.m in Sources */,
+				4D1885442170A448001AE6B0 /* ODErrorCodes.m in Sources */,
+				4D1885432170A419001AE6B0 /* ODNSURLSessionTaskDelegate.m in Sources */,
+				4D1885422170A3C9001AE6B0 /* ODHashes.m in Sources */,
+				4D1885412170A3C1001AE6B0 /* ODShared.m in Sources */,
+				4D18853F2170A3B3001AE6B0 /* ODVersionsCollectionRequestBuilder.m in Sources */,
+				4D1885402170A3B3001AE6B0 /* ODVersionsCollectionRequest.m in Sources */,
+				4D18853E2170A3AA001AE6B0 /* ODSharingInvitation.m in Sources */,
+				4D18853D2170A3A2001AE6B0 /* ODSharingLink.m in Sources */,
+				4D18853C2170A39A001AE6B0 /* ODLocation.m in Sources */,
+				4D18853B2170A378001AE6B0 /* ODObject.m in Sources */,
+				4D1885392170A36B001AE6B0 /* ODURLSessionManager.m in Sources */,
+				4D18853A2170A36B001AE6B0 /* ODURLSessionDownloadTask.m in Sources */,
+				4D1885342170A351001AE6B0 /* ODPermissionRequestBuilder.m in Sources */,
+				4D1885352170A351001AE6B0 /* ODPermissionsCollectionRequest.m in Sources */,
+				4D1885362170A351001AE6B0 /* ODPermissionRequest.m in Sources */,
+				4D1885372170A351001AE6B0 /* ODPermissionsCollectionRequestBuilder.m in Sources */,
+				4D1885382170A351001AE6B0 /* ODPermission.m in Sources */,
+				4D1885312170A33D001AE6B0 /* ODItemRequestBuilder+ItemByPath.m in Sources */,
+				4D1885322170A33D001AE6B0 /* ODItemRequest.m in Sources */,
+				4D1885332170A33D001AE6B0 /* ODItemReference.m in Sources */,
+				4D1885302170A32C001AE6B0 /* ODFile.m in Sources */,
+				4D18852F2170A325001AE6B0 /* ODCollection.m in Sources */,
+				4D18852E2170A31A001AE6B0 /* ODUploadSession.m in Sources */,
+				4D18852D2170A310001AE6B0 /* ODAudio.m in Sources */,
+				4D18852B2170A308001AE6B0 /* ODIdentitySet.m in Sources */,
+				4D18852C2170A308001AE6B0 /* ODIdentity.m in Sources */,
+				4D18852A2170A300001AE6B0 /* ODDeleted.m in Sources */,
+				4D1885292170A2FA001AE6B0 /* ODFolder.m in Sources */,
+				4D1885282170A2F1001AE6B0 /* ODFileSystemInfo.m in Sources */,
+				4D1885272170A2E9001AE6B0 /* ODSearchResult.m in Sources */,
+				4D1885212170A2D7001AE6B0 /* ODThumbnailContentRequest.m in Sources */,
+				4D1885222170A2D7001AE6B0 /* ODThumbnailsCollectionRequest.m in Sources */,
+				4D1885232170A2D7001AE6B0 /* ODThumbnailsCollectionRequestBuilder.m in Sources */,
+				4D1885242170A2D7001AE6B0 /* ODThumbnailRequestBuilder.m in Sources */,
+				4D1885252170A2D7001AE6B0 /* ODThumbnailRequest.m in Sources */,
+				4D1885262170A2D7001AE6B0 /* ODThumbnail.m in Sources */,
+				4D1885202170A2C4001AE6B0 /* ODImage.m in Sources */,
+				4D18851E2170A2BE001AE6B0 /* ODOpenWithApp.m in Sources */,
+				4D18851F2170A2BE001AE6B0 /* ODOpenWithSet.m in Sources */,
+				4D18851D2170A2B4001AE6B0 /* ODSpecialFolder.m in Sources */,
+				4D18851C2170A2A7001AE6B0 /* ODPhoto.m in Sources */,
+				4D18851B2170A2A0001AE6B0 /* ODVideo.m in Sources */,
+				4D1885172170A299001AE6B0 /* ODThumbnailSet+CustomThumbnail.m in Sources */,
+				4D1885182170A299001AE6B0 /* ODThumbnailSetRequestBuilder.m in Sources */,
+				4D1885192170A299001AE6B0 /* ODThumbnailSetRequest.m in Sources */,
+				4D18851A2170A299001AE6B0 /* ODThumbnailSet.m in Sources */,
+				4D1885152170A28A001AE6B0 /* ODQueryParameters.m in Sources */,
+				4D1885162170A28A001AE6B0 /* ODQuota.m in Sources */,
+				4D1885142170A279001AE6B0 /* ODURLSessionProgressTask.m in Sources */,
+				4D1885132170A261001AE6B0 /* ODRequestOptions.m in Sources */,
+				4D1885122170A258001AE6B0 /* ODHeaderOptions.m in Sources */,
+				4D1885102170A23C001AE6B0 /* ODChildrenCollectionRequest.m in Sources */,
+				4D1885112170A23C001AE6B0 /* ODChildrenCollectionRequestBuilder.m in Sources */,
+				4D18850F2170A230001AE6B0 /* ODURLSessionTask.m in Sources */,
+				4D18850E2170A227001AE6B0 /* ODAsyncOperationStatus.m in Sources */,
+				4D18850D2170A21D001AE6B0 /* ODItemContentRequest.m in Sources */,
+				4D18850C2170A1FA001AE6B0 /* ODItemCreateSessionRequestBuilder.m in Sources */,
+				4D18850A2170A1E4001AE6B0 /* ODItemCopyRequest.m in Sources */,
+				4D18850B2170A1E4001AE6B0 /* ODItemCopyRequestBuilder.m in Sources */,
+				4D1885072170A1D9001AE6B0 /* ODItemCreateLinkRequestBuilder.m in Sources */,
+				4D1885082170A1D9001AE6B0 /* ODItemCreateSessionRequest.m in Sources */,
+				4D1885092170A1D9001AE6B0 /* ODItemCreateLinkRequest.m in Sources */,
+				4D1885042170A1CA001AE6B0 /* ODItemDeltaRequestBuilder.m in Sources */,
+				4D1885052170A1CA001AE6B0 /* ODItemDeltaCollection.m in Sources */,
+				4D1885062170A1CA001AE6B0 /* ODItemDeltaRequest.m in Sources */,
+				4D1885032170A1BB001AE6B0 /* ODSelectOptions.m in Sources */,
+				4D1885022170A1B2001AE6B0 /* ODIfNoneMatch.m in Sources */,
+				4D1885002170A18C001AE6B0 /* ODItemSearchRequestBuilder.m in Sources */,
+				4D1885012170A18C001AE6B0 /* ODItemSearchRequest.m in Sources */,
+				4D1884FF2170A17D001AE6B0 /* ODItem.m in Sources */,
+				4D1884FE2170A175001AE6B0 /* ODDrive.m in Sources */,
+				4D1884FD2170A16F001AE6B0 /* ODExpandOptions.m in Sources */,
+				4D1884FC2170A165001AE6B0 /* ODURLSessionUploadTask.m in Sources */,
+				4D1884FB2170A157001AE6B0 /* ODOrderByOptions.m in Sources */,
+				4D1884FA2170A14A001AE6B0 /* ODIfMatch.m in Sources */,
+				4D1884F92170A120001AE6B0 /* ODSharedCollectionRequest.m in Sources */,
+				4D1884F82170A10F001AE6B0 /* ODAuthConstants.m in Sources */,
+				4D1884F72170A0D9001AE6B0 /* ODCollectionRequest.m in Sources */,
+				4D1884F62170A0CF001AE6B0 /* ODRequestOptionsBuilder.m in Sources */,
+				4D1884F52170A0C4001AE6B0 /* ODAsyncURLSessionDataTask.m in Sources */,
+				4D1884F42170A0B7001AE6B0 /* ODURLSessionDataTask.m in Sources */,
+				4D1884F32170A0A6001AE6B0 /* ODTopOptions.m in Sources */,
+				4D1884F22170A09C001AE6B0 /* ODSpecialCollectionRequest.m in Sources */,
+				4D1884F12170A093001AE6B0 /* ODShare.m in Sources */,
+				4D1884F02170A08A001AE6B0 /* ODItemRequestBuilder.m in Sources */,
+				4D1884EF2170A07E001AE6B0 /* ODDriveRecentRequest.m in Sources */,
+				4D1884EE2170A075001AE6B0 /* ODDriveRequest.m in Sources */,
+				4D1884ED2170A06C001AE6B0 /* ODDrivesCollectionRequest.m in Sources */,
+				4D1884EC2170A058001AE6B0 /* ODRequest.m in Sources */,
+				4D1884EB2170A04F001AE6B0 /* ODSpecialCollectionRequestBuilder.m in Sources */,
+				4D1884E92170A040001AE6B0 /* ODItemsCollectionRequestBuilder.m in Sources */,
+				4D1884EA2170A040001AE6B0 /* ODItemsCollectionRequest.m in Sources */,
+				4D1884E82170A023001AE6B0 /* ODCollectionRequestBuilder.m in Sources */,
+				4D1884E72170A018001AE6B0 /* ODDriveRecentRequestBuilder.m in Sources */,
+				4D1884E52170A00A001AE6B0 /* ODSharedCollectionRequestBuilder.m in Sources */,
+				4D1884E62170A00A001AE6B0 /* ODShareRequest.m in Sources */,
+				4D1884E421709FEF001AE6B0 /* ODRequestBuilder.m in Sources */,
+				4D1884E321709FB0001AE6B0 /* ODAppConfiguration.m in Sources */,
+				4D1884E221709FA5001AE6B0 /* ODDriveRequestBuilder.m in Sources */,
+				4D1884E121709F9A001AE6B0 /* ODDrivesCollectionRequestBuilder.m in Sources */,
+				4D1884E021709F8F001AE6B0 /* ODShareRequestBuilder.m in Sources */,
+				4D1884DC21709E98001AE6B0 /* ODClient+DefaultConfiguration.m in Sources */,
+				4D1884DD21709E98001AE6B0 /* ODClient+Authentication.m in Sources */,
+				4D1884DE21709E98001AE6B0 /* ODClient+HelperMethods.m in Sources */,
+				4D1884DF21709E98001AE6B0 /* ODClient.m in Sources */,
+				4D1884DB21709E81001AE6B0 /* OneDriveStorageProvider.m in Sources */,
+				4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */,
+				4D1884D921709E3C001AE6B0 /* twofish.c in Sources */,
+				4D1884D821709E2D001AE6B0 /* SafeTools.m in Sources */,
+				4D1884D721709E26001AE6B0 /* PasswordHistory.m in Sources */,
+				4D1884D621709E1F001AE6B0 /* PasswordHistoryEntry.m in Sources */,
+				4D1884D521709E18001AE6B0 /* Record.m in Sources */,
+				4D1884D421709E13001AE6B0 /* Group.m in Sources */,
+				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
+				4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */,
+				4D1884D021709DF3001AE6B0 /* Node.m in Sources */,
+				4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */,
+				4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */,
+				4D1884CE21709D01001AE6B0 /* GoogleDriveManager.m in Sources */,
+				4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */,
+				4D1884CC21709CF1001AE6B0 /* DatabaseModel.m in Sources */,
+				4D1884CB21709CE5001AE6B0 /* iCloudSafesCoordinator.m in Sources */,
+				4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */,
+				4D1884C921709CD4001AE6B0 /* Utils.m in Sources */,
+				4D1884C821709CCD001AE6B0 /* PasswordSafeUIDocument.m in Sources */,
+				4D1884C721709CBF001AE6B0 /* GoogleDriveStorageProvider.m in Sources */,
+				4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */,
+				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
 				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,
 				4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */,
 				4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */,
@@ -2085,6 +2347,7 @@
 					"$(inherited)",
 					"COCOAPODS=1",
 					"$(inherited)",
+					"IS_APP_EXTENSION=1",
 					"GTM_OAUTH2_USE_FRAMEWORK_IMPORTS=1",
 					SV_APP_EXTENSIONS,
 				);
@@ -2122,6 +2385,7 @@
 					"$(inherited)",
 					"COCOAPODS=1",
 					"$(inherited)",
+					"IS_APP_EXTENSION=1",
 					"GTM_OAUTH2_USE_FRAMEWORK_IMPORTS=1",
 					SV_APP_EXTENSIONS,
 				);

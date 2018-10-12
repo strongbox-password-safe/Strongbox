@@ -246,7 +246,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
             NSString* dn = displayName ? displayName : [self displayNameFromUrl:fileURL];
             
             NSNumber *hasUnresolvedConflicts = [result valueForAttribute:NSMetadataUbiquitousItemHasUnresolvedConflictsKey];
-            BOOL huc = hasUnresolvedConflicts ? [hasUnresolvedConflicts boolValue] : NO;
+            BOOL huc = hasUnresolvedConflicts != nil ? [hasUnresolvedConflicts boolValue] : NO;
             
             AppleICloudOrLocalSafeFile* iCloudFile = [[AppleICloudOrLocalSafeFile alloc] initWithDisplayName:dn fileUrl:fileURL hasUnresolvedConflicts:huc];
             

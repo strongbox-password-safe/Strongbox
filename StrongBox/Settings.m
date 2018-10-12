@@ -225,7 +225,7 @@ static NSUserDefaults *getUserDefaults() {
 
     NSNumber *seconds = [userDefaults objectForKey:kAutoLockTimeSeconds];
 
-    if (!seconds) {
+    if (seconds == nil) {
         seconds = @60;
     }
     

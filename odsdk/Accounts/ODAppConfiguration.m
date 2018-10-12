@@ -25,9 +25,12 @@
 
 - (UIViewController *)parentAuthController
 {
+    // TODO: App Extension
+#ifndef IS_APP_EXTENSION
     if (!_parentAuthController){
         _parentAuthController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
     }
+#endif
     return _parentAuthController;
 }
 

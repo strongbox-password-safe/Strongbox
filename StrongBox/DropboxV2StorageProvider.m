@@ -188,6 +188,7 @@
 - (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
                                            task:(void (^)(NSError *error))task {
     if (!DBClientsManager.authorizedClient) {
+#ifndef IS_APP_EXTENSION
         NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
         id __block token = [center addObserverForName:@"isDropboxLinked"
                                                           object:nil
@@ -210,12 +211,19 @@
             }
         }];
 
+
         // Sigh... required to ignore warning about unused variable... which is actually used. Bad design of addObserverForName
         (void)token;
         
         [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
                                        controller:viewController
                                           openURL:^(NSURL *url) { [[UIApplication sharedApplication] openURL:url]; }];
+#else
+        NSLog(@"Dropbox not fully available with App Extension. Displaying Alert.");
+        
+        task([Utils createNSError:@"Could not create link to Dropbox. Dropbox is not full available in App Extension."
+                        errorCode:-1]);
+#endif
     }
     else {
         task(nil);

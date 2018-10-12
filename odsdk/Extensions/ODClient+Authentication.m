@@ -145,13 +145,20 @@
                               logger:(id <ODLogger>)logger
                           completion:(void (^)(NSError *error))completion
 {
-    
+#ifndef IS_APP_EXTENSION
     UIViewController *rootViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
     [self authenticateWithAuthProvider:authProvider
                             httpProvider:httpProvider
                                 logger:logger
                         viewController:rootViewController
                             completion:completion];
+
+#else
+    // TODO: Fix for App Extension...
+    NSLog(@"OneDrive - App Extension not Supported. authenticateWithAuthProvider. TODO: Find a way.");
+    completion(nil); // TODO: Set Error
+    return;
+#endif
 }
 
 - (void)authenticateWithAuthProvider:(id<ODAuthProvider>)authProvider

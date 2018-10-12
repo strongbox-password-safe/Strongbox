@@ -10,8 +10,8 @@
 #import "SafeMetaData.h"
 #import "SafesList.h"
 #import "SafeItemTableCell.h"
-#import "SafeStorageProvider.h"
 #import "InitialTabViewController.h"
+#import "SafeStorageProviderFactory.h"
 
 @interface SafesListTableViewController ()
 

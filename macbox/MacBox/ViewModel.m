@@ -14,7 +14,7 @@
 #import "PasswordGenerator.h"
 #import "Settings.h"
 
-#define kNewUntitledGroupTitleBase @"New Untitled Group"
+static const NSString* kDefaultNewTitle = @"Untitled"
 
 @interface ViewModel ()
 
@@ -32,7 +32,7 @@
         
         [self addSampleRecord:self.rootGroup];
         
-        Node* newGroup = [[Node alloc] initAsGroup:kNewUntitledGroupTitleBase parent:self.rootGroup];
+        Node* newGroup = [[Node alloc] initAsGroup:kDefaultNewTitle parent:self.rootGroup];
 
         [self.passwordDatabase.rootGroup addChild:newGroup];
         
@@ -233,7 +233,7 @@ NSString* getSmartFillTitle() {
         }
     }
     
-    return @"";
+    return kDefaultNewTitle;
 }
 
 NSString* getSmartFillUrl() {
@@ -277,7 +277,7 @@ NSString* getSmartFillNotes() {
     
     // Title
     
-    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? @"Untitled" :
+    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? kDefaultNewTitle :
             autoFill.titleAutoFillMode == kSmartUrlFill ? getSmartFillTitle() : autoFill.titleCustomAutoFill;
     
     // Username
@@ -363,7 +363,7 @@ NSString* getSmartFillNotes() {
 }
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup {
-    NSString *newGroupName = kNewUntitledGroupTitleBase;
+    NSString *newGroupName = kDefaultNewTitle;
     
     NSInteger i = 0;
     BOOL success = NO;
@@ -372,7 +372,7 @@ NSString* getSmartFillNotes() {
         newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup];
         success =  newGroup && [parentGroup addChild:newGroup];
         i++;
-        newGroupName = [NSString stringWithFormat:@"%@ %ld", kNewUntitledGroupTitleBase, i];
+        newGroupName = [NSString stringWithFormat:@"%@ %ld", kDefaultNewTitle, i];
     }while (!success);
     
     self.document.dirty = YES;

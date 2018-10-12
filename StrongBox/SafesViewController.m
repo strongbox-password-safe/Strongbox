@@ -16,6 +16,7 @@
 #import "VersionConflictController.h"
 #import "InitialViewController.h"
 #import "AppleICloudProvider.h"
+#import "SafeStorageProviderFactory.h"
 
 @interface SafesViewController ()
 
