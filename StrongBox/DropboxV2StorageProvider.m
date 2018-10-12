@@ -221,7 +221,7 @@
 #else
         NSLog(@"Dropbox not fully available with App Extension. Displaying Alert.");
         
-        task([Utils createNSError:@"Could not create link to Dropbox. Dropbox is not full available in App Extension."
+        task([Utils createNSError:@"Could not create link to Dropbox. Dropbox is not fully available in App Extension."
                         errorCode:-1]);
 #endif
     }

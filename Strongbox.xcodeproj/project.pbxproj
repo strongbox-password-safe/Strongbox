@@ -2367,7 +2367,7 @@
 					"$(inherited)",
 					"IS_APP_EXTENSION=1",
 					"GTM_OAUTH2_USE_FRAMEWORK_IMPORTS=1",
-					SV_APP_EXTENSIONS,
+					"SV_APP_EXTENSIONS=1",
 				);
 				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -2405,7 +2405,7 @@
 					"$(inherited)",
 					"IS_APP_EXTENSION=1",
 					"GTM_OAUTH2_USE_FRAMEWORK_IMPORTS=1",
-					SV_APP_EXTENSIONS,
+					"SV_APP_EXTENSIONS=1",
 				);
 				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
