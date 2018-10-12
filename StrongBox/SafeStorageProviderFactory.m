@@ -39,10 +39,5 @@
     return [LocalDeviceStorageProvider sharedInstance];
 }
 
-- (id<SafeStorageProvider>)foo:(StorageProvider)providerId {
-    //blah
-    return nil; // TODO: Remove func
-}
-
 @end
 

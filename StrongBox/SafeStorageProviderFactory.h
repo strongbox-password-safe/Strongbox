@@ -15,8 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 
-- (id<SafeStorageProvider>)foo:(StorageProvider)providerId;
-
 @end
 
 NS_ASSUME_NONNULL_END

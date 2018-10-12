@@ -9,9 +9,9 @@
 #import "SafesListTableViewController.h"
 #import "SafeMetaData.h"
 #import "SafesList.h"
-#import "SafeItemTableCell.h"
 #import "InitialTabViewController.h"
 #import "SafeStorageProviderFactory.h"
+#import "Settings.h"
 
 @interface SafesListTableViewController ()
 
@@ -25,6 +25,21 @@
     [super viewDidLoad];
     
     self.safes = SafesList.sharedInstance.snapshot;
+
+    if([self getPrimarySafe]) {
+        [self.barButtonShowQuickView setEnabled:YES];
+        [self.barButtonShowQuickView setTintColor:nil];
+    }
+    else {
+        [self.barButtonShowQuickView setEnabled:NO];
+        [self.barButtonShowQuickView setTintColor: [UIColor clearColor]];
+    }
+}
+
+- (SafeMetaData*)getPrimarySafe {
+    SafeMetaData* primary = [self.safes firstObject];
+    
+    return primary;
 }
 
 #pragma mark - Table view data source
@@ -34,7 +49,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SafeItemTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
     
     SafeMetaData *safe = [self.safes objectAtIndex:indexPath.row];
     
@@ -44,7 +59,6 @@
     id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
     NSString *icon = provider.icon;
     cell.imageView.image = [UIImage imageNamed:icon];
-    cell.imageViewWarningIndicator.hidden = !safe.hasUnresolvedConflicts;
     
     return cell;
 }
@@ -63,5 +77,11 @@
     // Pass the selected object to the new view controller.
 }
 */
+- (IBAction)onShowQuickLaunchView:(id)sender {
+    NSLog(@"TODO: Show Quick View");
+    Settings.sharedInstance.useQuickLaunchAsRootView = YES;
+    
+    [[self getInitialViewController] showQuickLaunchView];
+}
 
 @end

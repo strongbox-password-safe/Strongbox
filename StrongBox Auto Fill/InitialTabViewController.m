@@ -7,19 +7,18 @@
 //
 
 #import "InitialTabViewController.h"
-
-@interface InitialTabViewController ()
-
-@end
+#import "Settings.h"
 
 @implementation InitialTabViewController
 
 - (void)showQuickLaunchView {
     self.selectedIndex = 1;
+    self.tabBar.hidden = YES;
 }
 
 - (void)showSafesListView {
     self.selectedIndex = 0;
+    self.tabBar.hidden = YES;
 }
 
 - (BOOL)isInQuickLaunchViewMode {
@@ -28,7 +27,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+
+    self.tabBar.hidden = YES;
+    self.selectedIndex = Settings.sharedInstance.useQuickLaunchAsRootView ? 1 : 0;
 }
 
 /*

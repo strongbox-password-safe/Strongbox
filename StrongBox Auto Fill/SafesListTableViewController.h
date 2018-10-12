@@ -11,6 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SafesListTableViewController : UITableViewController
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonShowQuickView;
 
 @end
 
