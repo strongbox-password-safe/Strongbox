@@ -88,18 +88,23 @@
                             <outlet property="delegate" destination="GnU-eV-N6f" id="hl2-A0-K7L"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Select Your Safe" prompt="Strongbox Password Safe" id="F9U-mp-PMJ">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="AZx-fg-qxm">
+                    <toolbarItems>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="42d-xb-Dax"/>
+                        <barButtonItem systemItem="cancel" id="AZx-fg-qxm">
                             <connections>
-                                <action selector="onCancel:" destination="GnU-eV-N6f" id="5AR-2U-HAU"/>
+                                <action selector="onCancel:" destination="GnU-eV-N6f" id="XTd-9A-uOT"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="c82-cz-CuT"/>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Select Your Safe" prompt="Strongbox Password Safe" id="F9U-mp-PMJ">
                         <barButtonItem key="rightBarButtonItem" title="⚡" id="5w0-Ls-VNT">
                             <connections>
                                 <action selector="onShowQuickLaunchView:" destination="GnU-eV-N6f" id="jEt-pU-Q4S"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <connections>
                         <outlet property="barButtonShowQuickView" destination="5w0-Ls-VNT" id="ue1-dY-hC1"/>
                         <segue destination="Xki-Si-B7m" kind="show" identifier="segueFromListToPickCredentials" id="rus-3M-iAS"/>
@@ -188,7 +193,13 @@
                         <viewLayoutGuide key="safeArea" id="kCg-Ld-ACZ"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="Upgrade Info..." id="zts-En-vwi"/>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="r5w-RA-szv"/>
+                        <barButtonItem systemItem="cancel" id="wlX-8I-iP5">
+                            <connections>
+                                <action selector="onCancel:" destination="ZXE-qS-cIr" id="bFb-Hd-LRM"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="nbE-bx-MAQ"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" id="Uqe-rk-cRU"/>
                     <nil key="simulatedTopBarMetrics"/>
@@ -266,6 +277,6 @@
         <image name="product32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="rus-3M-iAS"/>
+        <segue reference="dVV-3A-dhM"/>
     </inferredMetricsTieBreakers>
 </document>

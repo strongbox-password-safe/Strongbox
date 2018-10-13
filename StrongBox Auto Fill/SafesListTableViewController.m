@@ -30,7 +30,9 @@
     
     self.safes = SafesList.sharedInstance.snapshot;
 
-    if([[self getInitialViewController] getPrimarySafe]) {
+    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
+
+    if(primary && ![[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
         [self.barButtonShowQuickView setEnabled:YES];
         [self.barButtonShowQuickView setTintColor:nil];
     }
@@ -50,10 +52,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.navigationController setToolbarHidden:YES];
-    self.navigationController.toolbar.hidden = YES;
-    self.navigationController.toolbarHidden = YES;
+    [self.navigationController setToolbarHidden:NO];
+    self.navigationController.toolbar.hidden = NO;
+    self.navigationController.toolbarHidden = NO;
 }
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
    

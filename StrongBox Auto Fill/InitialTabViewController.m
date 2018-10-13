@@ -25,7 +25,10 @@
 }
 
 - (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider {
-    return storageProvider == kOneDrive || storageProvider == kLocalDevice;
+    return storageProvider == kOneDrive ||
+    storageProvider == kLocalDevice ||
+    storageProvider == kDropbox ||
+    storageProvider == kGoogleDrive;
 }
 
 - (BOOL)isInQuickLaunchViewMode {
@@ -40,11 +43,7 @@
 }
 
 - (SafeMetaData*)getPrimarySafe {
-    SafeMetaData* primary = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return ![self isUnsupportedAutoFillProvider:obj.storageProvider];
-    }];
-    
-    return primary;
+    return [SafesList.sharedInstance.snapshot firstObject];
 }
 
 /*

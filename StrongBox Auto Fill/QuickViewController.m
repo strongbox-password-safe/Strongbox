@@ -50,8 +50,8 @@
     [SVProgressHUD setViewForExtension:self.view];
     
     SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
-
-    if(primary){
+    
+    if(primary && ![[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
         self.labelSafeName.text = primary.nickName;
         [self openPrimarySafe];
     }
@@ -68,18 +68,19 @@
     
     [self.navigationController setNavigationBarHidden:YES];
     
-    self.navigationController.toolbarHidden = YES;
-    self.navigationController.toolbar.hidden = YES;
+    [self.navigationController setToolbarHidden:NO];
+    self.navigationController.toolbar.hidden = NO;
+    self.navigationController.toolbarHidden = NO;
+    
+    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
+    
+    if(!primary || [[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
+        [self switchToSafesListView];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
-    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
-    
-    if(!primary) {
-        [self switchToSafesListView];
-    }
 }
 
 - (InitialTabViewController *)getInitialViewController {
@@ -88,8 +89,6 @@
 }
 
 - (void)switchToSafesListView {
-    Settings.sharedInstance.useQuickLaunchAsRootView = NO;
-    
     [[self getInitialViewController] showSafesListView];
 }
 
@@ -125,6 +124,12 @@
         CredentialProviderViewController *vc = segue.destinationViewController;
         vc.viewModel = (Model *)sender;
     }
+}
+
+- (IBAction)onCancel:(id)sender {
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
+                                                                      code:ASExtensionErrorCodeUserCanceled
+                                                                  userInfo:nil]];
 }
 
 @end
