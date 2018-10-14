@@ -7,6 +7,7 @@
 //
 
 #import "PickCredentialsTableViewController.h"
+#import "regdom.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -48,8 +49,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.searchResultsUpdater = self;
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
-    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
-    self.searchController.searchBar.selectedScopeButtonIndex = 3;
+    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
+    self.searchController.searchBar.selectedScopeButtonIndex = 0;
     
     if (@available(iOS 11.0, *)) {
         self.navigationItem.searchController = self.searchController;
@@ -78,7 +79,23 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = [NSURL URLWithString:serviceId.identifier];
             
-            return url.host;
+            NSLog(@"URL: %@", url);
+            void *tree = loadTldTree();
+            
+            const char *cStringUrl = [url.host UTF8String];
+            const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
+            
+            NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
+        
+            NSLog(@"Calculated Domain: %@", domain);
+            
+            NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
+            
+            NSLog(@"%@", parts);
+            
+            return parts.count ? parts[0] : domain;
+        
+            //return domain;
         }
     }
     
@@ -133,6 +150,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     else if (scope == 2)
     {
         predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
+    }
+    else if (scope == 3)
+    {
+        predicate = [NSPredicate predicateWithFormat:@"fields.url contains[c] %@", searchText];
     }
     else {
         predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ "

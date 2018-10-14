@@ -329,6 +329,8 @@
 		4D8C14972074F63B00CE9CAE /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14982074F64A00CE9CAE /* crypt_argchk.c */; };
 		4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */; };
+		4D8E425D2173C5DA00878540 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E425B2173C5DA00878540 /* regdom.c */; };
+		4D8E425E2173C6CB00878540 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E425B2173C5DA00878540 /* regdom.c */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -770,6 +772,9 @@
 		4D8C14962074F63B00CE9CAE /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = model/pwsafe/twofish/twofish.c; sourceTree = SOURCE_ROOT; };
 		4D8C14982074F64A00CE9CAE /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = model/pwsafe/twofish/crypt_argchk.c; sourceTree = SOURCE_ROOT; };
 		4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = SOURCE_ROOT; };
+		4D8E425A2173C5D900878540 /* regdom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = regdom.h; path = psl/regdom.h; sourceTree = SOURCE_ROOT; };
+		4D8E425B2173C5DA00878540 /* regdom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = regdom.c; path = psl/regdom.c; sourceTree = SOURCE_ROOT; };
+		4D8E425C2173C5DA00878540 /* tld-canon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tld-canon.h"; path = "psl/tld-canon.h"; sourceTree = SOURCE_ROOT; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
@@ -1398,9 +1403,21 @@
 			path = "New Group2";
 			sourceTree = "<group>";
 		};
+		4D8E42592173C5A800878540 /* PSL */ = {
+			isa = PBXGroup;
+			children = (
+				4D8E425B2173C5DA00878540 /* regdom.c */,
+				4D8E425A2173C5D900878540 /* regdom.h */,
+				4D8E425C2173C5DA00878540 /* tld-canon.h */,
+			);
+			name = PSL;
+			path = "New Group";
+			sourceTree = "<group>";
+		};
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D8E42592173C5A800878540 /* PSL */,
 				4D78AC251FB1E24D00A68A92 /* Keypass */,
 				4D78AC241FB1E23B00A68A92 /* PwSafe */,
 				4D78AC231FB1E22C00A68A92 /* Model */,
@@ -1599,6 +1616,9 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+							com.apple.Keychain = {
 								enabled = 1;
 							};
 						};
@@ -1846,6 +1866,7 @@
 				4D1B9AF7216DF6FB00029F29 /* ODClient+Authentication.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
+				4D8E425D2173C5DA00878540 /* regdom.c in Sources */,
 				4DBE5B391C8356C700C310BC /* AppDelegate.m in Sources */,
 				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
 				4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */,
@@ -1999,6 +2020,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D8E425E2173C6CB00878540 /* regdom.c in Sources */,
 				4D1885662170E532001AE6B0 /* OpenSafeSequenceHelper.m in Sources */,
 				4D1885652170E386001AE6B0 /* PasswordGenerator.m in Sources */,
 				4D1885642170E268001AE6B0 /* OfflineDetector.m in Sources */,

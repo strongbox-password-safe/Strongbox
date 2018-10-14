@@ -53,7 +53,10 @@
     
     if(primary && ![[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
         self.labelSafeName.text = primary.nickName;
-        [self openPrimarySafe];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self openPrimarySafe];
+        });
     }
 }
 

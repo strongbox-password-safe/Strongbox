@@ -8,5 +8,10 @@
 	<array>
 		<string>group.strongbox.mcguill</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.markmcguill.strongbox.autofill</string>
+		<string>$(AppIdentifierPrefix)com.markmcguill.strongbox</string>
+	</array>
 </dict>
 </plist>
