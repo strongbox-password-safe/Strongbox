@@ -9,24 +9,30 @@
 #import "CredentialProviderViewController.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
+#import "InitialTabViewController.h"
+
+@interface CredentialProviderViewController ()
+
+@property (nonatomic, strong) InitialTabViewController* otherViewCon;
+
+@end
 
 @implementation CredentialProviderViewController
 
 -(void)viewDidLoad {
     [super viewDidLoad];
 
-//    [self.viewModel.rootGroup.children map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-//        NSLog(@"%@", obj.title);
-//        return obj.title;
-//    }];
-    
-    [self.navigationController setToolbarHidden:NO];
-    self.navigationController.toolbar.hidden = NO;
-    self.navigationController.toolbarHidden = NO;
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
+    self.otherViewCon = [mainStoryboard instantiateViewControllerWithIdentifier:@"InitialTabViewController"];
+}
 
-    [self.navigationController setNavigationBarHidden:NO];
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationController.navigationBarHidden = NO;
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    //[self.otherViewCon.view layoutIfNeeded];
+
+    //self.otherViewCon.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [self presentViewController:self.otherViewCon animated:NO completion:nil];
 }
 
 /*

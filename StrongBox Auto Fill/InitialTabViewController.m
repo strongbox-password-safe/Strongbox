@@ -16,12 +16,12 @@
 
 - (void)showQuickLaunchView {
     self.selectedIndex = 1;
-    self.tabBar.hidden = YES;
+    //self.tabBar.hidden = YES;
 }
 
 - (void)showSafesListView {
     self.selectedIndex = 0;
-    self.tabBar.hidden = YES;
+    //self.tabBar.hidden = YES;
 }
 
 - (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider {
@@ -38,8 +38,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.tabBar.hidden = YES;
     self.selectedIndex = Settings.sharedInstance.useQuickLaunchAsRootView ? 1 : 0;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    NSLog(@"View Did Appear! ITC");
+    
+    //[self.tabBar setHidden:YES];
+    
+    NSLog(@"self: [%f, %f, %f, %f]", self.view.frame.origin.x, self.view.frame.origin.y, self.view.frame.size.width, self.view.frame.size.height);
+    NSLog(@"child: [%f, %f, %f, %f]",
+          self.childViewControllers[0].view.frame.origin.x,
+          self.childViewControllers[0].view.frame.origin.y,
+          self.childViewControllers[0].view.frame.size.width,
+          self.childViewControllers[0].view.frame.size.height);
 }
 
 - (SafeMetaData*)getPrimarySafe {

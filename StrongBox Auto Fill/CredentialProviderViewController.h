@@ -7,10 +7,7 @@
 //
 
 #import <AuthenticationServices/AuthenticationServices.h>
-#import "Model.h"
 
 @interface CredentialProviderViewController : ASCredentialProviderViewController
-
-@property (nonatomic, strong) Model* viewModel;
 
 @end

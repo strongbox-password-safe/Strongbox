@@ -168,12 +168,12 @@
 
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueFromListToPickCredentials"]) {
-        CredentialProviderViewController *vc = segue.destinationViewController;
-        vc.viewModel = (Model *)sender;
-    }
-}
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+//    if ([segue.identifier isEqualToString:@"segueFromListToPickCredentials"]) {
+//        CredentialProviderViewController *vc = segue.destinationViewController;
+//        vc.viewModel = (Model *)sender;
+//    }
+//}
 
 /*
 #pragma mark - Navigation

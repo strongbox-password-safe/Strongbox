@@ -53,12 +53,18 @@
     
     if(primary && ![[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
         self.labelSafeName.text = primary.nickName;
-        [self openPrimarySafe];
+        // TODO: [self openPrimarySafe];
     }
+//
+//    [self.navigationController setToolbarHidden:NO];
+//    self.navigationController.toolbar.hidden = NO;
+//    self.navigationController.toolbarHidden = NO;
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    
+    //NSLog(@"viewDidLayoutSubviews");
     
     self.gradient.frame = self.view.bounds;
 }
@@ -67,20 +73,16 @@
     [super viewWillAppear:animated];
     
     [self.navigationController setNavigationBarHidden:YES];
-    
+//
     [self.navigationController setToolbarHidden:NO];
     self.navigationController.toolbar.hidden = NO;
     self.navigationController.toolbarHidden = NO;
-    
+//
     SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
     
     if(!primary || [[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
         [self switchToSafesListView];
     }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
 }
 
 - (InitialTabViewController *)getInitialViewController {
@@ -119,12 +121,12 @@
     }];
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueFromQuickToPickCredentials"]) {
-        CredentialProviderViewController *vc = segue.destinationViewController;
-        vc.viewModel = (Model *)sender;
-    }
-}
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+//    if ([segue.identifier isEqualToString:@"segueFromQuickToPickCredentials"]) {
+//        CredentialProviderViewController *vc = segue.destinationViewController;
+//        vc.viewModel = (Model *)sender;
+//    }
+//}
 
 - (IBAction)onCancel:(id)sender {
     [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain

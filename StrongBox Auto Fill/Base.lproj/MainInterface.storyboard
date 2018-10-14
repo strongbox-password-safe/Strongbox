@@ -12,7 +12,7 @@
         <!--Credential Provider View Controller-->
         <scene sceneID="Uma-9u-xWV">
             <objects>
-                <viewController extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="Xki-Si-B7m" customClass="CredentialProviderViewController" sceneMemberID="viewController">
+                <viewController extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" providesPresentationContextTransitionStyle="YES" id="Xki-Si-B7m" customClass="CredentialProviderViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BuU-Ak-iZz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -40,18 +40,17 @@
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="EZ1-5X-YsA"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" id="DZ8-YE-Q1o"/>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RwB-HB-TSk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-152.80000000000001" y="133.74384236453201"/>
+            <point key="canvasLocation" x="308" y="134"/>
         </scene>
         <!--Select Your Safe-->
         <scene sceneID="FrF-Ab-s53">
             <objects>
-                <tableViewController title="Select Your Safe" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="GnU-eV-N6f" customClass="SafesListTableViewController" sceneMemberID="viewController">
+                <tableViewController title="Select Your Safe" extendedLayoutIncludesOpaqueBars="YES" id="GnU-eV-N6f" customClass="SafesListTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ncG-XL-f6f">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="685"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -89,6 +88,7 @@
                             <outlet property="delegate" destination="GnU-eV-N6f" id="hl2-A0-K7L"/>
                         </connections>
                     </tableView>
+                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <toolbarItems>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="42d-xb-Dax"/>
                         <barButtonItem systemItem="cancel" id="AZx-fg-qxm">
@@ -117,13 +117,13 @@
         <!--Quick Launch-->
         <scene sceneID="HFQ-UK-RJR">
             <objects>
-                <viewController storyboardIdentifier="QuickLaunchViewController" wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="ZXE-qS-cIr" userLabel="Quick Launch" customClass="QuickViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="QuickLaunchViewController" wantsFullScreenLayout="YES" id="ZXE-qS-cIr" userLabel="Quick Launch" customClass="QuickViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Rt0-d5-ai9">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="685"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" verticalCompressionResistancePriority="755" text="Primary Safe Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="14" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QwD-TW-iTr" userLabel="Safe Name">
-                                <rect key="frame" x="16" y="227" width="343" height="38"/>
+                                <rect key="frame" x="16" y="163.66666666666666" width="343" height="38"/>
                                 <fontDescription key="fontDescription" name="ArialRoundedMTBold" family="Arial Rounded MT Bold" pointSize="33"/>
                                 <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
@@ -135,14 +135,14 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="MIf-Kg-59w" userLabel="Logo">
-                                <rect key="frame" x="62.666666666666657" y="281" width="249.99999999999997" height="250"/>
+                                <rect key="frame" x="62.666666666666657" y="217.66666666666663" width="249.99999999999997" height="250"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="j9u-Qf-gdF"/>
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="orv-Ub-2SL"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XJY-fc-zJ2" userLabel="Open Button">
-                                <rect key="frame" x="145.66666666666666" y="536" width="84" height="30"/>
+                                <rect key="frame" x="145.66666666666666" y="472.66666666666669" width="84" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <state key="normal" title="Tap to Open">
                                     <color key="titleColor" red="1" green="0.68935331160000002" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -152,7 +152,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWT-S1-Ufn" userLabel="Safes List Button">
-                                <rect key="frame" x="199" y="695" width="160" height="34"/>
+                                <rect key="frame" x="199" y="651" width="160" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="Back to Safes List &gt;">
                                     <color key="titleColor" red="0.99953407049999998" green="0.98835557699999999" blue="0.47265523669999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -192,6 +192,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="kCg-Ld-ACZ"/>
                     </view>
+                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <toolbarItems>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="r5w-RA-szv"/>
                         <barButtonItem systemItem="cancel" id="wlX-8I-iP5">
@@ -216,9 +217,10 @@
         <!--Initial Tab View Controller-->
         <scene sceneID="ipN-dX-lM1">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="3sV-ab-9mf" customClass="InitialTabViewController" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="InitialTabViewController" id="3sV-ab-9mf" customClass="InitialTabViewController" sceneMemberID="viewController">
+                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <toolbarItems/>
-                    <tabBar key="tabBar" hidden="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="1ve-a3-U1i">
+                    <tabBar key="tabBar" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="1ve-a3-U1i">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -235,7 +237,7 @@
         <!--Quick Launch-->
         <scene sceneID="Em5-6Z-iS1">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="oN2-12-PYU" sceneMemberID="viewController">
+                <navigationController extendedLayoutIncludesOpaqueBars="YES" toolbarHidden="NO" id="oN2-12-PYU" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Quick Launch" id="tKJ-aI-VBr"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="HId-rQ-YHs">
@@ -243,6 +245,10 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="8yn-4J-Js6">
+                        <rect key="frame" x="0.0" y="685" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="ZXE-qS-cIr" kind="relationship" relationship="rootViewController" id="Osu-I7-Ycc"/>
                     </connections>
@@ -254,7 +260,8 @@
         <!--Safes List-->
         <scene sceneID="Cst-IT-Tg9">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" hidesBottomBarWhenPushed="YES" id="EWK-sZ-E7G" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="EWK-sZ-E7G" sceneMemberID="viewController">
+                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <tabBarItem key="tabBarItem" title="Safes List" id="iVa-Cy-fpA"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Wr8-ux-Qav">
@@ -262,6 +269,10 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="67C-Qe-59h">
+                        <rect key="frame" x="0.0" y="685" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="GnU-eV-N6f" kind="relationship" relationship="rootViewController" id="Pw2-nS-WhE"/>
                     </connections>
