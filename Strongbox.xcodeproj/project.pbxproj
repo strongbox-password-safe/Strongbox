@@ -296,7 +296,6 @@
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D34940F216FB87200C411B1 /* SafesListTableViewController.m */; };
-		4D349413216FB8E600C411B1 /* InitialTabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D349412216FB8E600C411B1 /* InitialTabViewController.m */; };
 		4D349416216FB95700C411B1 /* QuickViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D349415216FB95700C411B1 /* QuickViewController.m */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
@@ -341,6 +340,7 @@
 		4DCF5FBC1F7294A800011756 /* PasswordSafeUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* PasswordSafeUIDocument.m */; };
 		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
+		4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DE48A56216F54A300C9C991 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */; };
 		4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */; };
@@ -708,8 +708,6 @@
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D34940E216FB87200C411B1 /* SafesListTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafesListTableViewController.h; path = "StrongBox Auto Fill/SafesListTableViewController.h"; sourceTree = SOURCE_ROOT; };
 		4D34940F216FB87200C411B1 /* SafesListTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafesListTableViewController.m; path = "StrongBox Auto Fill/SafesListTableViewController.m"; sourceTree = SOURCE_ROOT; };
-		4D349411216FB8E600C411B1 /* InitialTabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InitialTabViewController.h; path = "StrongBox Auto Fill/InitialTabViewController.h"; sourceTree = SOURCE_ROOT; };
-		4D349412216FB8E600C411B1 /* InitialTabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InitialTabViewController.m; path = "StrongBox Auto Fill/InitialTabViewController.m"; sourceTree = SOURCE_ROOT; };
 		4D349414216FB95700C411B1 /* QuickViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickViewController.h; path = "StrongBox Auto Fill/QuickViewController.h"; sourceTree = SOURCE_ROOT; };
 		4D349415216FB95700C411B1 /* QuickViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickViewController.m; path = "StrongBox Auto Fill/QuickViewController.m"; sourceTree = SOURCE_ROOT; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
@@ -794,6 +792,8 @@
 		4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleICloudProvider.h; sourceTree = "<group>"; };
 		4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleICloudProvider.m; sourceTree = "<group>"; };
 		4DD59F731D3A6FC800F864ED /* secrets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = secrets.h; sourceTree = "<group>"; };
+		4DD7B7EB2173A0F900B4FD98 /* PickCredentialsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PickCredentialsTableViewController.h; path = "StrongBox Auto Fill/PickCredentialsTableViewController.h"; sourceTree = SOURCE_ROOT; };
+		4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PickCredentialsTableViewController.m; path = "StrongBox Auto Fill/PickCredentialsTableViewController.m"; sourceTree = SOURCE_ROOT; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxV2StorageProvider.m; sourceTree = "<group>"; };
 		4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox Auto Fill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1476,11 +1476,11 @@
 				4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */,
 				4D34940E216FB87200C411B1 /* SafesListTableViewController.h */,
 				4D34940F216FB87200C411B1 /* SafesListTableViewController.m */,
-				4D349411216FB8E600C411B1 /* InitialTabViewController.h */,
-				4D349412216FB8E600C411B1 /* InitialTabViewController.m */,
 				4D349414216FB95700C411B1 /* QuickViewController.h */,
 				4D349415216FB95700C411B1 /* QuickViewController.m */,
 				4DEF7B9A216FC90600A3EE12 /* Media.xcassets */,
+				4DD7B7EB2173A0F900B4FD98 /* PickCredentialsTableViewController.h */,
+				4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */,
 			);
 			path = "Strongbox Auto Fill";
 			sourceTree = "<group>";
@@ -2141,10 +2141,10 @@
 				4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */,
 				4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */,
 				4DE48A66216F558E00C9C991 /* SafesList.m in Sources */,
-				4D349413216FB8E600C411B1 /* InitialTabViewController.m in Sources */,
 				4D349416216FB95700C411B1 /* QuickViewController.m in Sources */,
 				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
 				4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */,
+				4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

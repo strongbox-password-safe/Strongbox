@@ -9,7 +9,6 @@
 #import "SafesListTableViewController.h"
 #import "SafeMetaData.h"
 #import "SafesList.h"
-#import "InitialTabViewController.h"
 #import "SafeStorageProviderFactory.h"
 #import "Settings.h"
 #import <AuthenticationServices/AuthenticationServices.h>
@@ -66,7 +65,7 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
+    [[self getInitialViewController] cancel:nil];
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapView:(UIView *)view {
@@ -149,9 +148,8 @@
     return cell;
 }
 
-- (InitialTabViewController *)getInitialViewController {
-    InitialTabViewController *ivc = (InitialTabViewController*)self.navigationController.parentViewController;
-    return ivc;
+- (CredentialProviderViewController *)getInitialViewController {
+    return self.rootViewController;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -162,7 +160,7 @@
                                askAboutTouchIdEnrolIfAppropriate:NO
                                                       completion:^(Model * _Nonnull model) {
                                                           if(model) {
-                                                              [self performSegueWithIdentifier:@"segueFromListToPickCredentials" sender:model];
+                                                              [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
                                                           }
                                                       }];
 

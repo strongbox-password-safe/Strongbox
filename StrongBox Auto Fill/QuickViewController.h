@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CredentialProviderViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *labelSafeName;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
+@property (nonatomic) CredentialProviderViewController *rootViewController;
 
 @end
 

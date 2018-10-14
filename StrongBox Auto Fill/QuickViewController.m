@@ -7,7 +7,6 @@
 //
 
 #import "QuickViewController.h"
-#import "InitialTabViewController.h"
 #import "SafeMetaData.h"
 #import "SafesList.h"
 #import "Settings.h"
@@ -53,18 +52,12 @@
     
     if(primary && ![[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
         self.labelSafeName.text = primary.nickName;
-        // TODO: [self openPrimarySafe];
+        [self openPrimarySafe];
     }
-//
-//    [self.navigationController setToolbarHidden:NO];
-//    self.navigationController.toolbar.hidden = NO;
-//    self.navigationController.toolbarHidden = NO;
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-    
-    //NSLog(@"viewDidLayoutSubviews");
     
     self.gradient.frame = self.view.bounds;
 }
@@ -73,11 +66,11 @@
     [super viewWillAppear:animated];
     
     [self.navigationController setNavigationBarHidden:YES];
-//
+
     [self.navigationController setToolbarHidden:NO];
     self.navigationController.toolbar.hidden = NO;
     self.navigationController.toolbarHidden = NO;
-//
+
     SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
     
     if(!primary || [[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
@@ -85,9 +78,9 @@
     }
 }
 
-- (InitialTabViewController *)getInitialViewController {
-    InitialTabViewController *ivc = (InitialTabViewController*)self.navigationController.parentViewController;
-    return ivc;
+
+- (CredentialProviderViewController *)getInitialViewController {
+    return self.rootViewController; 
 }
 
 - (void)switchToSafesListView {
@@ -116,7 +109,7 @@
                                askAboutTouchIdEnrolIfAppropriate:NO
                                                       completion:^(Model * _Nonnull model) {
         if(model) {
-            [self performSegueWithIdentifier:@"segueFromQuickToPickCredentials" sender:model];
+            [self performSegueWithIdentifier:@"toPickCredentials" sender:model];
         }
     }];
 }
@@ -129,9 +122,7 @@
 //}
 
 - (IBAction)onCancel:(id)sender {
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
-                                                                      code:ASExtensionErrorCodeUserCanceled
-                                                                  userInfo:nil]];
+    [[self getInitialViewController] cancel:nil];
 }
 
 @end
