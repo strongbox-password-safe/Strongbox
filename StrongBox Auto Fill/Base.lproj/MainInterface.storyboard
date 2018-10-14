@@ -48,7 +48,7 @@
         <!--Select Your Safe-->
         <scene sceneID="FrF-Ab-s53">
             <objects>
-                <tableViewController title="Select Your Safe" extendedLayoutIncludesOpaqueBars="YES" id="GnU-eV-N6f" customClass="SafesListTableViewController" sceneMemberID="viewController">
+                <tableViewController title="Select Your Safe" id="GnU-eV-N6f" customClass="SafesListTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ncG-XL-f6f">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="685"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -117,7 +117,7 @@
         <!--Quick Launch-->
         <scene sceneID="HFQ-UK-RJR">
             <objects>
-                <viewController storyboardIdentifier="QuickLaunchViewController" wantsFullScreenLayout="YES" id="ZXE-qS-cIr" userLabel="Quick Launch" customClass="QuickViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="QuickLaunchViewController" id="ZXE-qS-cIr" userLabel="Quick Launch" customClass="QuickViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Rt0-d5-ai9">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="685"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -217,10 +217,9 @@
         <!--Initial Tab View Controller-->
         <scene sceneID="ipN-dX-lM1">
             <objects>
-                <tabBarController storyboardIdentifier="InitialTabViewController" id="3sV-ab-9mf" customClass="InitialTabViewController" sceneMemberID="viewController">
-                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
+                <tabBarController storyboardIdentifier="InitialTabViewController" extendedLayoutIncludesOpaqueBars="YES" id="3sV-ab-9mf" customClass="InitialTabViewController" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <tabBar key="tabBar" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="1ve-a3-U1i">
+                    <tabBar key="tabBar" hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="1ve-a3-U1i">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -237,7 +236,8 @@
         <!--Quick Launch-->
         <scene sceneID="Em5-6Z-iS1">
             <objects>
-                <navigationController extendedLayoutIncludesOpaqueBars="YES" toolbarHidden="NO" id="oN2-12-PYU" sceneMemberID="viewController">
+                <navigationController toolbarHidden="NO" id="oN2-12-PYU" sceneMemberID="viewController">
+                    <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <tabBarItem key="tabBarItem" title="Quick Launch" id="tKJ-aI-VBr"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="HId-rQ-YHs">
@@ -260,7 +260,7 @@
         <!--Safes List-->
         <scene sceneID="Cst-IT-Tg9">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="EWK-sZ-E7G" sceneMemberID="viewController">
+                <navigationController toolbarHidden="NO" id="EWK-sZ-E7G" sceneMemberID="viewController">
                     <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <tabBarItem key="tabBarItem" title="Safes List" id="iVa-Cy-fpA"/>
                     <toolbarItems/>
