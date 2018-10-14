@@ -15,10 +15,10 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
 
-    [self.viewModel.rootGroup.children map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        NSLog(@"%@", obj.title);
-        return obj.title;
-    }];
+//    [self.viewModel.rootGroup.children map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+//        NSLog(@"%@", obj.title);
+//        return obj.title;
+//    }];
     
     [self.navigationController setToolbarHidden:NO];
     self.navigationController.toolbar.hidden = NO;
@@ -38,7 +38,7 @@
 {
     NSLog(@"Hi! %@", serviceIdentifiers);
     
-    NSLog(@"%@", SafesList.sharedInstance.snapshot);
+    //NSLog(@"%@", SafesList.sharedInstance.snapshot);
     
 //    var hint : String? = nil;
 //    if(serviceIdentifiers.first != nil) {

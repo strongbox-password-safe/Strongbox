@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="3sV-ab-9mf">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Xki-Si-B7m">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -39,11 +39,12 @@
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="EZ1-5X-YsA"/>
                     </toolbarItems>
+                    <navigationItem key="navigationItem" id="DZ8-YE-Q1o"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RwB-HB-TSk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4124" y="31.934032983508249"/>
+            <point key="canvasLocation" x="-152.80000000000001" y="133.74384236453201"/>
         </scene>
         <!--Select Your Safe-->
         <scene sceneID="FrF-Ab-s53">
@@ -107,12 +108,11 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <connections>
                         <outlet property="barButtonShowQuickView" destination="5w0-Ls-VNT" id="ue1-dY-hC1"/>
-                        <segue destination="Xki-Si-B7m" kind="show" identifier="segueFromListToPickCredentials" id="rus-3M-iAS"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C3w-yW-2mZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2088.8000000000002" y="-277.09359605911334"/>
+            <point key="canvasLocation" x="3031.1999999999998" y="-277.09359605911334"/>
         </scene>
         <!--Quick Launch-->
         <scene sceneID="HFQ-UK-RJR">
@@ -207,12 +207,11 @@
                     <connections>
                         <outlet property="imageViewLogo" destination="MIf-Kg-59w" id="Jsf-Br-f7x"/>
                         <outlet property="labelSafeName" destination="QwD-TW-iTr" id="vbp-go-PM8"/>
-                        <segue destination="Xki-Si-B7m" kind="show" identifier="segueFromQuickToPickCredentials" id="dVV-3A-dhM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yz6-ie-lB9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2088.8000000000002" y="419.64017991004499"/>
+            <point key="canvasLocation" x="3031.1999999999998" y="418.9655172413793"/>
         </scene>
         <!--Initial Tab View Controller-->
         <scene sceneID="ipN-dX-lM1">
@@ -231,7 +230,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KHo-im-VC8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="134" y="134"/>
+            <point key="canvasLocation" x="1076" y="133.74384236453201"/>
         </scene>
         <!--Quick Launch-->
         <scene sceneID="Em5-6Z-iS1">
@@ -250,7 +249,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="j0C-th-8C6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1149.5999999999999" y="419.64017991004499"/>
+            <point key="canvasLocation" x="2092" y="418.9655172413793"/>
         </scene>
         <!--Safes List-->
         <scene sceneID="Cst-IT-Tg9">
@@ -269,14 +268,11 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xMl-lJ-N1Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1149.5999999999999" y="-276.61169415292358"/>
+            <point key="canvasLocation" x="2092" y="-277.09359605911334"/>
         </scene>
     </scenes>
     <resources>
         <image name="Strongbox-1024x1024-new" width="1024" height="1024"/>
         <image name="product32" width="32" height="32"/>
     </resources>
-    <inferredMetricsTieBreakers>
-        <segue reference="dVV-3A-dhM"/>
-    </inferredMetricsTieBreakers>
 </document>
