@@ -74,38 +74,10 @@
     return self.serviceIdentifiers;
 }
 
-/*
- Prepare your UI to list available credentials for the user to choose from. The items in
- 'serviceIdentifiers' describe the service the user is logging in to, so your extension can
- prioritize the most relevant credentials in the list.
-*/
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers
 {
     self.serviceIdentifiers = serviceIdentifiers;
-    NSLog(@"Hi! %@", serviceIdentifiers);
 }
-
-    //NSLog(@"%@", SafesList.sharedInstance.snapshot);
-    
-//    var hint : String? = nil;
-//    if(serviceIdentifiers.first != nil) {
-//        let firstIdentifier = serviceIdentifiers.first!
-//        
-//        if(firstIdentifier.type == ASCredentialServiceIdentifier.IdentifierType.URL) {
-//            let url = NSURL(string: firstIdentifier.identifier)!
-//            
-//            print (url.host!)
-//            
-//            hint = url.host!
-//        }
-//        
-//        dump(SafesList.sharedInstance()?.snapshot)
-//        
-//        //let foo : SafesList? = nil
-//        
-//        hint = serviceIdentifiers.first?.identifier
-//    }
-//}
 
 /*
  Implement this method if your extension supports showing credentials in the QuickType bar.

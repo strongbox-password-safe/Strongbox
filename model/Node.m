@@ -282,7 +282,7 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         }
     }
     
-    return ret;
+    return [ret copy];
 }
 
 - (NSArray<NSString*>*)getTitleHierarchy {

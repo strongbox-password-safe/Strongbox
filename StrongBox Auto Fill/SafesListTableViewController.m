@@ -15,6 +15,7 @@
 #import "CredentialProviderViewController.h"
 #import "OpenSafeSequenceHelper.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "PickCredentialsTableViewController.h"
 
 @interface SafesListTableViewController ()
 
@@ -166,24 +167,13 @@
 
 }
 
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    if ([segue.identifier isEqualToString:@"segueFromListToPickCredentials"]) {
-//        CredentialProviderViewController *vc = segue.destinationViewController;
-//        vc.viewModel = (Model *)sender;
-//    }
-//}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-
- //segueFromListToPickCredentials
- }
-*/
+    if ([segue.identifier isEqualToString:@"toPickCredentialsFromSafes"]) {
+        PickCredentialsTableViewController *vc = segue.destinationViewController;
+        vc.model = (Model *)sender;
+        vc.rootViewController = self.rootViewController;
+    }
+}
 
 - (IBAction)onShowQuickLaunchView:(id)sender {
     Settings.sharedInstance.useQuickLaunchAsRootView = YES;

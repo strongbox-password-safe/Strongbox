@@ -47,6 +47,18 @@
     return self.passwordDatabase.rootGroup;
 }
 
+- (NSArray<Node *> *)allNodes {
+    return self.passwordDatabase.allNodes;
+}
+
+- (NSArray<Node *> *)allRecords {
+    return self.passwordDatabase.allRecords;
+}
+
+-(NSArray<Node *> *)allGroups {
+    return self.passwordDatabase.allGroups;
+}
+
 - (BOOL)isCloudBasedStorage {
     return _storageProvider.cloudBased;
 }

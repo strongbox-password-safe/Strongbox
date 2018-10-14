@@ -14,6 +14,7 @@
 #import "OpenSafeSequenceHelper.h"
 #import "CredentialProviderViewController.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "PickCredentialsTableViewController.h"
 
 @interface QuickViewController ()
 
@@ -114,12 +115,13 @@
     }];
 }
 
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    if ([segue.identifier isEqualToString:@"segueFromQuickToPickCredentials"]) {
-//        CredentialProviderViewController *vc = segue.destinationViewController;
-//        vc.viewModel = (Model *)sender;
-//    }
-//}
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"toPickCredentials"]) {
+        PickCredentialsTableViewController *vc = segue.destinationViewController;
+        vc.model = (Model *)sender;
+        vc.rootViewController = self.rootViewController;
+    }
+}
 
 - (IBAction)onCancel:(id)sender {
     [[self getInitialViewController] cancel:nil];

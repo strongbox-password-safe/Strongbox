@@ -84,6 +84,18 @@
     return self.theSafe.rootGroup;
 }
 
+- (NSArray<Node *> *)allNodes{
+    return self.theSafe.allNodes;
+}
+
+- (NSArray<Node *> *)allRecords {
+    return self.theSafe.allRecords;
+}
+
+-(NSArray<Node *> *)allGroups {
+    return self.theSafe.allGroups;
+}
+
 -(NSString*)masterPassword {
     return self.theSafe.masterPassword;
 }

@@ -597,4 +597,20 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     }
 }
 
+- (NSArray<Node *>*)allNodes {
+    return [self.rootGroup filterChildren:YES predicate:nil];
+}
+
+-(NSArray<Node *> *)allRecords {
+    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup;
+    }];
+}
+
+-(NSArray<Node *> *)allGroups {
+    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return node.isGroup;
+    }];
+}
+
 @end

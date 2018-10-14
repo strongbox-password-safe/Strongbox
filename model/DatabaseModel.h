@@ -26,6 +26,9 @@ typedef enum {
 - (void)defaultLastUpdateFieldsToNow;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
 @property (nonatomic) NSInteger keyStretchIterations;
 @property (nonatomic, retain, nullable) NSString *masterPassword;
 @property (nonatomic, nullable) NSDate *lastUpdateTime;
