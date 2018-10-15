@@ -306,10 +306,11 @@
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
+		4D56CBE42174A6F900AC9187 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; };
+		4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; };
 		4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */; };
 		4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
-		4D67FDF1216F4349005C0E12 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
 		4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */; };
 		4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
@@ -344,7 +345,6 @@
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
-		4DE48A56216F54A300C9C991 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */; };
 		4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */; };
 		4DE48A5D216F54A300C9C991 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE48A5B216F54A300C9C991 /* MainInterface.storyboard */; };
 		4DE48A62216F54A300C9C991 /* Strongbox Auto Fill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -730,11 +730,11 @@
 		4D4F184B2165125B00578F0E /* NSArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "model/NSArray+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		4D55F0D61EE2BFF400C43B26 /* TextFieldAutoSuggest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFieldAutoSuggest.h; sourceTree = "<group>"; };
 		4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFieldAutoSuggest.m; sourceTree = "<group>"; };
+		4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		4D5F3EDE2108A93800C7C64A /* OneDriveStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OneDriveStorageProvider.h; sourceTree = SOURCE_ROOT; };
 		4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OneDriveStorageProvider.m; sourceTree = SOURCE_ROOT; };
 		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iCloudSafesCoordinator.h; sourceTree = "<group>"; };
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iCloudSafesCoordinator.m; sourceTree = "<group>"; };
-		4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeDetailsView.m; sourceTree = "<group>"; };
 		4D77A0B5216651C1003CB5CB /* AutoFillNewRecordSettingsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillNewRecordSettingsController.h; sourceTree = "<group>"; };
@@ -833,7 +833,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D67FDF1216F4349005C0E12 /* AuthenticationServices.framework in Frameworks */,
+				4D56CBE42174A6F900AC9187 /* AuthenticationServices.framework in Frameworks */,
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
 				E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
 			);
@@ -843,7 +843,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DE48A56216F54A300C9C991 /* AuthenticationServices.framework in Frameworks */,
+				4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */,
 				03E0BBBD5993702720D6A527 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1518,6 +1518,7 @@
 		C28E68E855D68D8BECCE3B5B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */,
 				4D076F26215FC3BF00B9C284 /* MSGraphCoreSDK.framework */,
 				4D076F21215FC08600B9C284 /* MSAL.framework */,
 				4D076F22215FC08600B9C284 /* MSGraphMSALAuthProvider.framework */,
@@ -1525,7 +1526,6 @@
 				A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */,
 				AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */,
 				0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */,
-				4D67FDE0216F3FA2005C0E12 /* AuthenticationServices.framework */,
 				73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */,
 				1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */,
 			);
@@ -1618,7 +1618,13 @@
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
 							};
+							com.apple.AutoFillCredentialProvider = {
+								enabled = 1;
+							};
 							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};

@@ -18,5 +18,6 @@
 - (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider;
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers;
 - (IBAction)cancel:(id)sender;
+- (void)onCredentialSelected:(NSString*)username password:(NSString*)password;
 
 @end

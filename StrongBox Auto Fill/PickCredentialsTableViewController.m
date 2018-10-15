@@ -65,16 +65,17 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     self.items = self.model.allRecords;
     
-    [self.searchController.searchBar setText:[self getInitialSearchString]];
+    [self smartInitializeSearch];
 }
 
-- (NSString*)getInitialSearchString {
+- (void)smartInitializeSearch {
     NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
     
-    NSLog(@"Service Identifiers: [%@]", serviceIdentifiers);
+    if(serviceIdentifiers.count > 1) {
+        NSLog(@"Service Identifiers > 1: [%@]", serviceIdentifiers);
+    }
     
     ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
-    
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = [NSURL URLWithString:serviceId.identifier];
@@ -93,13 +94,19 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             
             NSLog(@"%@", parts);
             
-            return parts.count ? parts[0] : domain;
+            NSString *searchTerm =  parts.count ? parts[0] : domain;
         
-            //return domain;
+            self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
+            [self.searchController.searchBar setText:searchTerm];
+            return;
+        }
+        else {
+            NSLog(@"Service Identifier Not URL: [%@]", serviceIdentifiers);
         }
     }
     
-    return @"";
+    self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
+    [self.searchController.searchBar setText:@""];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -203,6 +210,18 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     NSString *path = [[hierarchy subarrayWithRange:NSMakeRange(0, hierarchy.count - 1)] componentsJoinedByString:@"/"];
     
     return hierarchy.count == 1 ? @"(in /)" : [NSString stringWithFormat:@"(in /%@)", path];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    Node* record = [[self getDataSource] objectAtIndex:indexPath.row];
+
+    if(record) {
+        NSLog(@"[%@] selected... Sending credentials [%@/%@]...", record.title, record.fields.username, record.fields.password);
+        [self.rootViewController onCredentialSelected:record.fields.username password:record.fields.password];
+    }
+    else {
+        NSLog(@"WARN: DidSelectRow with no Record?!");
+    }
 }
 
 @end

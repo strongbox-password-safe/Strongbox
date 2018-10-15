@@ -9,14 +9,62 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox Auto Fill/PickCredentialsTableViewController.m"
-            timestampString = "561237127.032828"
+            filePath = "StrongBox/AppleICloudProvider.m"
+            timestampString = "561292737.151744"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
-            landmarkName = "-viewDidLoad"
+            startingLineNumber = "110"
+            endingLineNumber = "110"
+            landmarkName = "-read:viewController:completion:"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/AppleICloudProvider.m"
+            timestampString = "561292737.151839"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "118"
+            endingLineNumber = "118"
+            landmarkName = "-read:viewController:completion:"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__54-[AppleICloudProvider read:viewController:completion:]_block_invoke_2"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/AppleICloudProvider.m"
+                  timestampString = "561292608.0727431"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "118"
+                  endingLineNumber = "118"
+                  offsetFromSymbolStart = "46">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__54-[AppleICloudProvider read:viewController:completion:]_block_invoke_3"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/AppleICloudProvider.m"
+                  timestampString = "561292608.0746861"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "119"
+                  endingLineNumber = "119"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
