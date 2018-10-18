@@ -306,7 +306,7 @@
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
-		4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; };
+		4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4D5F3EE02108A93800C7C64A /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F3EDF2108A93800C7C64A /* OneDriveStorageProvider.m */; };
 		4D5F3EE42108EE6000C7C64A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A5BFB1F7923FF0036684C /* Images.xcassets */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
@@ -343,7 +343,7 @@
 		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
 		4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
-		4DDB4AAA2177A72B00A06A73 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; };
+		4DDB4AAA2177A72B00A06A73 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */; };
 		4DE48A5D216F54A300C9C991 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE48A5B216F54A300C9C991 /* MainInterface.storyboard */; };
