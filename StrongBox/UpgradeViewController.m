@@ -11,7 +11,7 @@
 #import "Settings.h"
 #import "SVProgressHUD.h"
 
-static NSString* kFontName =  @"Futura-Bold";
+static NSString* const kFontName =  @"Futura-Bold";
 
 typedef NS_ENUM (unsigned int, StoreRequestState) {
     kInitial,

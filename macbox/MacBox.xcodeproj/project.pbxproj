@@ -26,11 +26,39 @@
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
+		4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
+		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
+		4D9E098221825108007BA1E7 /* Argon2.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095521825103007BA1E7 /* Argon2.m */; };
+		4D9E098321825108007BA1E7 /* Times.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095621825103007BA1E7 /* Times.m */; };
+		4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */; };
+		4D9E098521825108007BA1E7 /* XmlTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095B21825104007BA1E7 /* XmlTree.m */; };
+		4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */; };
+		4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095D21825104007BA1E7 /* KeePassFile.m */; };
+		4D9E098821825108007BA1E7 /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095F21825104007BA1E7 /* SerializationData.m */; };
+		4D9E098921825108007BA1E7 /* String.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096221825104007BA1E7 /* String.m */; };
+		4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096521825104007BA1E7 /* AesCipher.m */; };
+		4D9E098B21825108007BA1E7 /* KeepassMetaDataAndNodeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096621825104007BA1E7 /* KeepassMetaDataAndNodeModel.m */; };
+		4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096A21825105007BA1E7 /* XmlItem.m */; };
+		4D9E098D21825108007BA1E7 /* DecryptionParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096B21825105007BA1E7 /* DecryptionParameters.m */; };
+		4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */; };
+		4D9E098F21825108007BA1E7 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
+		4D9E099021825108007BA1E7 /* GenericTextStringElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */; };
+		4D9E099121825108007BA1E7 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
+		4D9E099221825108007BA1E7 /* KeePassXmlParserDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097221825106007BA1E7 /* KeePassXmlParserDelegate.m */; };
+		4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */; };
+		4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
+		4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
+		4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
+		4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097C21825107007BA1E7 /* Kdbx4Database.m */; };
+		4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */; };
+		4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097E21825107007BA1E7 /* XMLWriter.m */; };
+		4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099B21825134007BA1E7 /* KdbxSerialization.m */; };
+		4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
+		4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
 		4DE48A69216F5DAA00C9C991 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE48A68216F5DAA00C9C991 /* SafesList.m */; };
-		4DE92B741F49D0AA00282D98 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */; };
 		4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */; };
 		4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
@@ -50,7 +78,6 @@
 		4DF348052074FA6C00148741 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
 		4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF348072074FA6C00148741 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF348002074FA6C00148741 /* Node.m */; };
-		4DF3480B2074FA8100148741 /* KeypassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF3480A2074FA8100148741 /* KeypassDatabase.m */; };
 		4DF3480F2074FA9700148741 /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF3480E2074FA9700148741 /* CHCSVParser.m */; };
 		4DF348112074FAB400148741 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DF348102074FAB400148741 /* google-10000-english-usa-no-swears-medium.txt */; };
 		4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F551F30DB7A00D68BFE /* AppDelegate.m */; };
@@ -59,17 +86,10 @@
 		4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5E1F30DB7A00D68BFE /* Document.m */; };
 		4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F601F30DB7A00D68BFE /* Assets.xcassets */; };
 		4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F621F30DB7A00D68BFE /* Main.storyboard */; };
+		4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF40092180726700B69383 /* BasicOrderedDictionary.m */; };
+		4DFF400D2180726700B69383 /* BinaryParsingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF400B2180726700B69383 /* BinaryParsingHelper.m */; };
+		4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		4DE92B761F49D0AA00282D98 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DF59F491F30DB7A00D68BFE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4DF59F501F30DB7A00D68BFE;
-			remoteInfo = MacBox;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.release.xcconfig"; sourceTree = "<group>"; };
@@ -104,6 +124,67 @@
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UpgradeWindowController.xib; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
+		4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = ../model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = "<group>"; };
+		4D9E094A21825103007BA1E7 /* KeePassGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassGroup.h; path = ../model/keepass/KeePassGroup.h; sourceTree = "<group>"; };
+		4D9E094B21825103007BA1E7 /* RootXmlDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootXmlDomainObject.h; path = ../model/keepass/RootXmlDomainObject.h; sourceTree = "<group>"; };
+		4D9E094C21825103007BA1E7 /* SerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializationData.h; path = ../model/keepass/SerializationData.h; sourceTree = "<group>"; };
+		4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlStrongBoxModelAdaptor.h; path = ../model/keepass/XmlStrongBoxModelAdaptor.h; sourceTree = "<group>"; };
+		4D9E094E21825103007BA1E7 /* GenericTextDateElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextDateElementHandler.h; path = ../model/keepass/GenericTextDateElementHandler.h; sourceTree = "<group>"; };
+		4D9E094F21825103007BA1E7 /* Root.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Root.h; path = ../model/keepass/Root.h; sourceTree = "<group>"; };
+		4D9E095021825103007BA1E7 /* DecryptionParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DecryptionParameters.h; path = ../model/keepass/DecryptionParameters.h; sourceTree = "<group>"; };
+		4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongboxNodeModelAdaptor.m; path = ../model/keepass/XmlStrongboxNodeModelAdaptor.m; sourceTree = "<group>"; };
+		4D9E095221825103007BA1E7 /* Entry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Entry.m; path = ../model/keepass/Entry.m; sourceTree = "<group>"; };
+		4D9E095321825103007BA1E7 /* GenericTextUuidElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextUuidElementHandler.h; path = ../model/keepass/GenericTextUuidElementHandler.h; sourceTree = "<group>"; };
+		4D9E095421825103007BA1E7 /* Times.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Times.h; path = ../model/keepass/Times.h; sourceTree = "<group>"; };
+		4D9E095521825103007BA1E7 /* Argon2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Argon2.m; path = ../model/keepass/Argon2.m; sourceTree = "<group>"; };
+		4D9E095621825103007BA1E7 /* Times.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Times.m; path = ../model/keepass/Times.m; sourceTree = "<group>"; };
+		4D9E095721825103007BA1E7 /* KeepassMetaDataAndNodeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeepassMetaDataAndNodeModel.h; path = ../model/keepass/KeepassMetaDataAndNodeModel.h; sourceTree = "<group>"; };
+		4D9E095821825103007BA1E7 /* KeePassConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassConstants.h; path = ../model/keepass/KeePassConstants.h; sourceTree = "<group>"; };
+		4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RootXmlDomainObject.m; path = ../model/keepass/RootXmlDomainObject.m; sourceTree = "<group>"; };
+		4D9E095A21825104007BA1E7 /* Meta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Meta.h; path = ../model/keepass/Meta.h; sourceTree = "<group>"; };
+		4D9E095B21825104007BA1E7 /* XmlTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlTree.m; path = ../model/keepass/XmlTree.m; sourceTree = "<group>"; };
+		4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseXmlDomainObjectHandler.m; path = ../model/keepass/BaseXmlDomainObjectHandler.m; sourceTree = "<group>"; };
+		4D9E095D21825104007BA1E7 /* KeePassFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassFile.m; path = ../model/keepass/KeePassFile.m; sourceTree = "<group>"; };
+		4D9E095E21825104007BA1E7 /* Argon2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Argon2.h; path = ../model/keepass/Argon2.h; sourceTree = "<group>"; };
+		4D9E095F21825104007BA1E7 /* SerializationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SerializationData.m; path = ../model/keepass/SerializationData.m; sourceTree = "<group>"; };
+		4D9E096021825104007BA1E7 /* AesCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AesCipher.h; path = ../model/keepass/AesCipher.h; sourceTree = "<group>"; };
+		4D9E096121825104007BA1E7 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = String.h; path = ../model/keepass/String.h; sourceTree = "<group>"; };
+		4D9E096221825104007BA1E7 /* String.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = String.m; path = ../model/keepass/String.m; sourceTree = "<group>"; };
+		4D9E096321825104007BA1E7 /* XmlTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlTree.h; path = ../model/keepass/XmlTree.h; sourceTree = "<group>"; };
+		4D9E096421825104007BA1E7 /* KeePassXmlParserDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassXmlParserDelegate.h; path = ../model/keepass/KeePassXmlParserDelegate.h; sourceTree = "<group>"; };
+		4D9E096521825104007BA1E7 /* AesCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AesCipher.m; path = ../model/keepass/AesCipher.m; sourceTree = "<group>"; };
+		4D9E096621825104007BA1E7 /* KeepassMetaDataAndNodeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeepassMetaDataAndNodeModel.m; path = ../model/keepass/KeepassMetaDataAndNodeModel.m; sourceTree = "<group>"; };
+		4D9E096721825105007BA1E7 /* XMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLWriter.h; path = ../model/keepass/XMLWriter.h; sourceTree = "<group>"; };
+		4D9E096821825105007BA1E7 /* XmlStrongboxNodeModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlStrongboxNodeModelAdaptor.h; path = ../model/keepass/XmlStrongboxNodeModelAdaptor.h; sourceTree = "<group>"; };
+		4D9E096921825105007BA1E7 /* Kdbx4Database.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kdbx4Database.h; path = ../model/keepass/Kdbx4Database.h; sourceTree = "<group>"; };
+		4D9E096A21825105007BA1E7 /* XmlItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlItem.m; path = ../model/keepass/XmlItem.m; sourceTree = "<group>"; };
+		4D9E096B21825105007BA1E7 /* DecryptionParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DecryptionParameters.m; path = ../model/keepass/DecryptionParameters.m; sourceTree = "<group>"; };
+		4D9E096C21825105007BA1E7 /* XmlTreeSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlTreeSerializer.h; path = ../model/keepass/XmlTreeSerializer.h; sourceTree = "<group>"; };
+		4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlTreeSerializer.m; path = ../model/keepass/XmlTreeSerializer.m; sourceTree = "<group>"; };
+		4D9E096E21825105007BA1E7 /* Root.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Root.m; path = ../model/keepass/Root.m; sourceTree = "<group>"; };
+		4D9E096F21825105007BA1E7 /* XmlParsingDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlParsingDomainObject.h; path = ../model/keepass/XmlParsingDomainObject.h; sourceTree = "<group>"; };
+		4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextStringElementHandler.m; path = ../model/keepass/GenericTextStringElementHandler.m; sourceTree = "<group>"; };
+		4D9E097121825106007BA1E7 /* Meta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Meta.m; path = ../model/keepass/Meta.m; sourceTree = "<group>"; };
+		4D9E097221825106007BA1E7 /* KeePassXmlParserDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlParserDelegate.m; path = ../model/keepass/KeePassXmlParserDelegate.m; sourceTree = "<group>"; };
+		4D9E097321825106007BA1E7 /* KeePassFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassFile.h; path = ../model/keepass/KeePassFile.h; sourceTree = "<group>"; };
+		4D9E097421825106007BA1E7 /* Entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entry.h; path = ../model/keepass/Entry.h; sourceTree = "<group>"; };
+		4D9E097521825106007BA1E7 /* KeePassDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseMetadata.h; path = ../model/keepass/KeePassDatabaseMetadata.h; sourceTree = "<group>"; };
+		4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextUuidElementHandler.m; path = ../model/keepass/GenericTextUuidElementHandler.m; sourceTree = "<group>"; };
+		4D9E097721825106007BA1E7 /* XmlItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlItem.h; path = ../model/keepass/XmlItem.h; sourceTree = "<group>"; };
+		4D9E097821825107007BA1E7 /* GenericTextStringElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextStringElementHandler.h; path = ../model/keepass/GenericTextStringElementHandler.h; sourceTree = "<group>"; };
+		4D9E097921825107007BA1E7 /* KeePassGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassGroup.m; path = ../model/keepass/KeePassGroup.m; sourceTree = "<group>"; };
+		4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongBoxModelAdaptor.m; path = ../model/keepass/XmlStrongBoxModelAdaptor.m; sourceTree = "<group>"; };
+		4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseMetadata.m; path = ../model/keepass/KeePassDatabaseMetadata.m; sourceTree = "<group>"; };
+		4D9E097C21825107007BA1E7 /* Kdbx4Database.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kdbx4Database.m; path = ../model/keepass/Kdbx4Database.m; sourceTree = "<group>"; };
+		4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextDateElementHandler.m; path = ../model/keepass/GenericTextDateElementHandler.m; sourceTree = "<group>"; };
+		4D9E097E21825107007BA1E7 /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLWriter.m; path = ../model/keepass/XMLWriter.m; sourceTree = "<group>"; };
+		4D9E097F21825107007BA1E7 /* InnerRandomStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InnerRandomStream.h; path = ../model/keepass/InnerRandomStream.h; sourceTree = "<group>"; };
+		4D9E099A21825134007BA1E7 /* KdbxSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbxSerialization.h; path = ../model/keepass/KdbxSerialization.h; sourceTree = "<group>"; };
+		4D9E099B21825134007BA1E7 /* KdbxSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KdbxSerialization.m; path = ../model/keepass/KdbxSerialization.m; sourceTree = "<group>"; };
+		4D9E099C21825134007BA1E7 /* KeePassDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabase.h; path = ../model/keepass/KeePassDatabase.h; sourceTree = "<group>"; };
+		4D9E099D21825134007BA1E7 /* KeePassDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabase.m; path = ../model/keepass/KeePassDatabase.m; sourceTree = "<group>"; };
+		4D9E09A021825161007BA1E7 /* Salsa20Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Salsa20Stream.h; path = ../model/keepass/Salsa20Stream.h; sourceTree = "<group>"; };
+		4D9E09A121825161007BA1E7 /* Salsa20Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Salsa20Stream.m; path = ../model/keepass/Salsa20Stream.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4DC225701F558D47000B0FBB /* StrongBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrongBox.entitlements; sourceTree = "<group>"; };
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentController.h; sourceTree = "<group>"; };
@@ -111,9 +192,6 @@
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		4DE48A67216F5DAA00C9C991 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafesList.h; sourceTree = "<group>"; };
 		4DE48A68216F5DAA00C9C991 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SafesList.m; sourceTree = "<group>"; };
-		4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PwSafeModelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PwSafeModelTests.m; sourceTree = "<group>"; };
-		4DE92B751F49D0AA00282D98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4DEAEC261F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeMasterPasswordWindowController.h; sourceTree = "<group>"; };
 		4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeMasterPasswordWindowController.m; sourceTree = "<group>"; };
 		4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChangeMasterPasswordWindowController.xib; sourceTree = "<group>"; };
@@ -152,8 +230,6 @@
 		4DF347FE2074FA6C00148741 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../../model/Node.h; sourceTree = "<group>"; };
 		4DF347FF2074FA6C00148741 /* AbstractPasswordDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractPasswordDatabase.h; path = ../../model/AbstractPasswordDatabase.h; sourceTree = "<group>"; };
 		4DF348002074FA6C00148741 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../../model/Node.m; sourceTree = "<group>"; };
-		4DF348092074FA8100148741 /* KeypassDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeypassDatabase.h; path = ../../model/keypass/KeypassDatabase.h; sourceTree = "<group>"; };
-		4DF3480A2074FA8100148741 /* KeypassDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeypassDatabase.m; path = ../../model/keypass/KeypassDatabase.m; sourceTree = "<group>"; };
 		4DF3480D2074FA9700148741 /* CHCSVParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHCSVParser.h; path = ../../lib/chcsv/CHCSVParser.h; sourceTree = "<group>"; };
 		4DF3480E2074FA9700148741 /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = ../../lib/chcsv/CHCSVParser.m; sourceTree = "<group>"; };
 		4DF348102074FAB400148741 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "../../resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
@@ -168,6 +244,13 @@
 		4DF59F601F30DB7A00D68BFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4DF59F631F30DB7A00D68BFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4DF59F651F30DB7A00D68BFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4DFF40072180726700B69383 /* BasicOrderedDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BasicOrderedDictionary.h; path = ../../model/BasicOrderedDictionary.h; sourceTree = "<group>"; };
+		4DFF40082180726700B69383 /* BinaryParsingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BinaryParsingHelper.h; path = ../../model/BinaryParsingHelper.h; sourceTree = "<group>"; };
+		4DFF40092180726700B69383 /* BasicOrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BasicOrderedDictionary.m; path = ../../model/BasicOrderedDictionary.m; sourceTree = "<group>"; };
+		4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractDatabaseMetadata.h; path = ../../model/AbstractDatabaseMetadata.h; sourceTree = "<group>"; };
+		4DFF400B2180726700B69383 /* BinaryParsingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BinaryParsingHelper.m; path = ../../model/BinaryParsingHelper.m; sourceTree = "<group>"; };
+		4DFF408E21807A0200B69383 /* PwSafeMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeMetadata.h; path = ../../model/pwsafe/PwSafeMetadata.h; sourceTree = "<group>"; };
+		4DFF408F21807A0200B69383 /* PwSafeMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeMetadata.m; path = ../../model/pwsafe/PwSafeMetadata.m; sourceTree = "<group>"; };
 		8226BDC94F5CC4BFEC5DB819 /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		8C4527BC2C332744D4401E3D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,13 +259,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		4DE92B6E1F49D0AA00282D98 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4DF59F4E1F30DB7A00D68BFE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -205,18 +281,79 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4DE92B721F49D0AA00282D98 /* PwSafeModelTests */ = {
+		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
-				4DE92B731F49D0AA00282D98 /* PwSafeModelTests.m */,
-				4DE92B751F49D0AA00282D98 /* Info.plist */,
+				4D9E09A021825161007BA1E7 /* Salsa20Stream.h */,
+				4D9E09A121825161007BA1E7 /* Salsa20Stream.m */,
+				4D9E099A21825134007BA1E7 /* KdbxSerialization.h */,
+				4D9E099B21825134007BA1E7 /* KdbxSerialization.m */,
+				4D9E099C21825134007BA1E7 /* KeePassDatabase.h */,
+				4D9E099D21825134007BA1E7 /* KeePassDatabase.m */,
+				4D9E096021825104007BA1E7 /* AesCipher.h */,
+				4D9E096521825104007BA1E7 /* AesCipher.m */,
+				4D9E095E21825104007BA1E7 /* Argon2.h */,
+				4D9E095521825103007BA1E7 /* Argon2.m */,
+				4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */,
+				4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */,
+				4D9E095021825103007BA1E7 /* DecryptionParameters.h */,
+				4D9E096B21825105007BA1E7 /* DecryptionParameters.m */,
+				4D9E097421825106007BA1E7 /* Entry.h */,
+				4D9E095221825103007BA1E7 /* Entry.m */,
+				4D9E094E21825103007BA1E7 /* GenericTextDateElementHandler.h */,
+				4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */,
+				4D9E097821825107007BA1E7 /* GenericTextStringElementHandler.h */,
+				4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */,
+				4D9E095321825103007BA1E7 /* GenericTextUuidElementHandler.h */,
+				4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */,
+				4D9E097F21825107007BA1E7 /* InnerRandomStream.h */,
+				4D9E096921825105007BA1E7 /* Kdbx4Database.h */,
+				4D9E097C21825107007BA1E7 /* Kdbx4Database.m */,
+				4D9E095821825103007BA1E7 /* KeePassConstants.h */,
+				4D9E097521825106007BA1E7 /* KeePassDatabaseMetadata.h */,
+				4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */,
+				4D9E097321825106007BA1E7 /* KeePassFile.h */,
+				4D9E095D21825104007BA1E7 /* KeePassFile.m */,
+				4D9E094A21825103007BA1E7 /* KeePassGroup.h */,
+				4D9E097921825107007BA1E7 /* KeePassGroup.m */,
+				4D9E095721825103007BA1E7 /* KeepassMetaDataAndNodeModel.h */,
+				4D9E096621825104007BA1E7 /* KeepassMetaDataAndNodeModel.m */,
+				4D9E096421825104007BA1E7 /* KeePassXmlParserDelegate.h */,
+				4D9E097221825106007BA1E7 /* KeePassXmlParserDelegate.m */,
+				4D9E095A21825104007BA1E7 /* Meta.h */,
+				4D9E097121825106007BA1E7 /* Meta.m */,
+				4D9E094F21825103007BA1E7 /* Root.h */,
+				4D9E096E21825105007BA1E7 /* Root.m */,
+				4D9E094B21825103007BA1E7 /* RootXmlDomainObject.h */,
+				4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */,
+				4D9E094C21825103007BA1E7 /* SerializationData.h */,
+				4D9E095F21825104007BA1E7 /* SerializationData.m */,
+				4D9E096121825104007BA1E7 /* String.h */,
+				4D9E096221825104007BA1E7 /* String.m */,
+				4D9E095421825103007BA1E7 /* Times.h */,
+				4D9E095621825103007BA1E7 /* Times.m */,
+				4D9E097721825106007BA1E7 /* XmlItem.h */,
+				4D9E096A21825105007BA1E7 /* XmlItem.m */,
+				4D9E096F21825105007BA1E7 /* XmlParsingDomainObject.h */,
+				4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */,
+				4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */,
+				4D9E096821825105007BA1E7 /* XmlStrongboxNodeModelAdaptor.h */,
+				4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */,
+				4D9E096321825104007BA1E7 /* XmlTree.h */,
+				4D9E095B21825104007BA1E7 /* XmlTree.m */,
+				4D9E096C21825105007BA1E7 /* XmlTreeSerializer.h */,
+				4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */,
+				4D9E096721825105007BA1E7 /* XMLWriter.h */,
+				4D9E097E21825107007BA1E7 /* XMLWriter.m */,
 			);
-			path = PwSafeModelTests;
+			name = KeePass;
 			sourceTree = "<group>";
 		};
 		4DF347D52074FA1D00148741 /* PwSafe */ = {
 			isa = PBXGroup;
 			children = (
+				4DFF408E21807A0200B69383 /* PwSafeMetadata.h */,
+				4DFF408F21807A0200B69383 /* PwSafeMetadata.m */,
 				4D23BBF2216136D10054C8D0 /* formatV3.txt */,
 				4D23BBF3216136D10054C8D0 /* formatV4.txt */,
 				4DF347EB2074FA3F00148741 /* crypt_argchk.c */,
@@ -242,6 +379,11 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */,
+				4DFF40072180726700B69383 /* BasicOrderedDictionary.h */,
+				4DFF40092180726700B69383 /* BasicOrderedDictionary.m */,
+				4DFF40082180726700B69383 /* BinaryParsingHelper.h */,
+				4DFF400B2180726700B69383 /* BinaryParsingHelper.m */,
 				4DE48A67216F5DAA00C9C991 /* SafesList.h */,
 				4DE48A68216F5DAA00C9C991 /* SafesList.m */,
 				4D44680A216CE08A00F6358D /* Csv.h */,
@@ -275,15 +417,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		4DF348082074FA7600148741 /* Keypass */ = {
-			isa = PBXGroup;
-			children = (
-				4DF348092074FA8100148741 /* KeypassDatabase.h */,
-				4DF3480A2074FA8100148741 /* KeypassDatabase.m */,
-			);
-			path = Keypass;
-			sourceTree = "<group>";
-		};
 		4DF3480C2074FA8D00148741 /* lib */ = {
 			isa = PBXGroup;
 			children = (
@@ -296,12 +429,11 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D9E0948218250F6007BA1E7 /* KeePass */,
 				4DF3480C2074FA8D00148741 /* lib */,
-				4DF348082074FA7600148741 /* Keypass */,
 				4DF347EF2074FA5A00148741 /* Model */,
 				4DF347D52074FA1D00148741 /* PwSafe */,
 				4DF59F531F30DB7A00D68BFE /* MacBox */,
-				4DE92B721F49D0AA00282D98 /* PwSafeModelTests */,
 				4DF59F521F30DB7A00D68BFE /* Products */,
 				4D1D6F3A1F386CB700D2B8EC /* Frameworks */,
 				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
@@ -313,7 +445,6 @@
 			isa = PBXGroup;
 			children = (
 				4DF59F511F30DB7A00D68BFE /* Strongbox.app */,
-				4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -385,24 +516,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4DE92B701F49D0AA00282D98 /* PwSafeModelTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4DE92B7A1F49D0AA00282D98 /* Build configuration list for PBXNativeTarget "PwSafeModelTests" */;
-			buildPhases = (
-				4DE92B6D1F49D0AA00282D98 /* Sources */,
-				4DE92B6E1F49D0AA00282D98 /* Frameworks */,
-				4DE92B6F1F49D0AA00282D98 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4DE92B771F49D0AA00282D98 /* PBXTargetDependency */,
-			);
-			name = PwSafeModelTests;
-			productName = PwSafeModelTests;
-			productReference = 4DE92B711F49D0AA00282D98 /* PwSafeModelTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		4DF59F501F30DB7A00D68BFE /* Strongbox */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DF59F681F30DB7A00D68BFE /* Build configuration list for PBXNativeTarget "Strongbox" */;
@@ -431,12 +544,6 @@
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
-					4DE92B701F49D0AA00282D98 = {
-						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 4326J8XDF2;
-						ProvisioningStyle = Automatic;
-						TestTargetID = 4DF59F501F30DB7A00D68BFE;
-					};
 					4DF59F501F30DB7A00D68BFE = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = 4326J8XDF2;
@@ -469,19 +576,11 @@
 			projectRoot = "";
 			targets = (
 				4DF59F501F30DB7A00D68BFE /* Strongbox */,
-				4DE92B701F49D0AA00282D98 /* PwSafeModelTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		4DE92B6F1F49D0AA00282D98 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4DF59F4F1F30DB7A00D68BFE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -527,11 +626,15 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GZIP-macOS/GZIP.framework",
 				"${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework",
+				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GZIP.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SAMKeychain.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -541,69 +644,84 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		4DE92B6D1F49D0AA00282D98 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4DE92B741F49D0AA00282D98 /* PwSafeModelTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4DF59F4D1F30DB7A00D68BFE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */,
+				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
+				4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */,
 				4DF347EA2074FA3500148741 /* Record.m in Sources */,
+				4DFF400D2180726700B69383 /* BinaryParsingHelper.m in Sources */,
 				4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
+				4D9E098221825108007BA1E7 /* Argon2.m in Sources */,
+				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
 				4DF347E42074FA3500148741 /* SafeTools.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
+				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
 				4DE48A69216F5DAA00C9C991 /* SafesList.m in Sources */,
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
+				4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */,
+				4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */,
+				4D9E098D21825108007BA1E7 /* DecryptionParameters.m in Sources */,
+				4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */,
+				4D9E099221825108007BA1E7 /* KeePassXmlParserDelegate.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
 				4D559FA520750D1D009856E3 /* SafeMetaData.m in Sources */,
+				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
+				4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */,
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
 				4DF3480F2074FA9700148741 /* CHCSVParser.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
+				4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m in Sources */,
 				4D446812216D0C4800F6358D /* AutoFillNewRecordSettings.m in Sources */,
+				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D559FA920752537009856E3 /* BiometricIdHelper.m in Sources */,
 				4DF348022074FA6C00148741 /* NodeFields.m in Sources */,
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,
+				4D9E098921825108007BA1E7 /* String.m in Sources */,
+				4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */,
+				4D9E098521825108007BA1E7 /* XmlTree.m in Sources */,
+				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4D44680C216CE08B00F6358D /* Csv.m in Sources */,
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
+				4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */,
 				4DF347EE2074FA3F00148741 /* twofish.c in Sources */,
+				4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */,
 				4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */,
+				4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
+				4D9E098B21825108007BA1E7 /* KeepassMetaDataAndNodeModel.m in Sources */,
 				4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
+				4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF348042074FA6C00148741 /* PasswordGenerator.m in Sources */,
+				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
+				4D9E098321825108007BA1E7 /* Times.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
+				4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
+				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
+				4D9E099021825108007BA1E7 /* GenericTextStringElementHandler.m in Sources */,
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
+				4D9E098821825108007BA1E7 /* SerializationData.m in Sources */,
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
-				4DF3480B2074FA8100148741 /* KeypassDatabase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4DE92B771F49D0AA00282D98 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4DF59F501F30DB7A00D68BFE /* Strongbox */;
-			targetProxy = 4DE92B761F49D0AA00282D98 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		4DF59F621F30DB7A00D68BFE /* Main.storyboard */ = {
@@ -617,34 +735,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		4DE92B781F49D0AA00282D98 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 4326J8XDF2;
-				INFOPLIST_FILE = PwSafeModelTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.PwSafeModelTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StrongBox.app/Contents/MacOS/StrongBox";
-			};
-			name = Debug;
-		};
-		4DE92B791F49D0AA00282D98 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 4326J8XDF2;
-				INFOPLIST_FILE = PwSafeModelTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.PwSafeModelTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StrongBox.app/Contents/MacOS/StrongBox";
-			};
-			name = Release;
-		};
 		4DF59F661F30DB7A00D68BFE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -791,15 +881,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4DE92B7A1F49D0AA00282D98 /* Build configuration list for PBXNativeTarget "PwSafeModelTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4DE92B781F49D0AA00282D98 /* Debug */,
-				4DE92B791F49D0AA00282D98 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		4DF59F4C1F30DB7A00D68BFE /* Build configuration list for PBXProject "MacBox" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

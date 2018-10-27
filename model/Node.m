@@ -11,7 +11,6 @@
 
 @interface Node ()
 
-@property (nonatomic, strong) NSString *uniqueRecordId;
 @property (nonatomic, strong) NSMutableArray<Node*> *mutableChildren;
 
 @end
@@ -33,73 +32,47 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     return [Utils finderStringCompare:n1.title string2:n2.title];
 };
 
-- (instancetype)initAsRoot {
-    if(self = [super init]) {
-        _isGroup = YES;
-        _parent = nil;
-        _title = @"<ROOT>";
-        _mutableChildren = [NSMutableArray array];
-        return self;
-    }
-    
-    return self;
+- (instancetype)initAsRoot:(NSUUID*)uuid {
+    return [self initWithParent:nil title:@"<ROOT>" isGroup:YES uuid:uuid fields:nil];
 }
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
-                                parent:(Node* _Nonnull)parent {
-    if(self = [super init]) {
-        if(![title length]) {
-            NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
+                                parent:(Node* _Nonnull)parent
+                                  uuid:(NSUUID*)uuid {
+    if(![title length]) {
+        NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
+        return nil;
+    }
+
+    for (Node* child in parent.children) {
+        if (child.isGroup && [child.title isEqualToString:title]) {
+            NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
             return nil;
         }
-
-        for (Node* child in parent.children) {
-            if (child.isGroup && [child.title isEqualToString:title]) {
-                NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
-                return nil;
-            }
-        }
-        
-        _parent = parent;
-        _title = title;
-        _isGroup = YES;
-        _mutableChildren = [NSMutableArray array];
-        _fields = [[NodeFields alloc] init];
-
-        return self;
     }
     
-    return self;
+    return [self initWithParent:parent title:title isGroup:YES uuid:uuid fields:nil];
 }
 
-- (instancetype _Nullable )initAsRecord:(NSString *_Nonnull)title
-                                 parent:(Node* _Nonnull)parent
-                                 fields:(NodeFields*_Nonnull)fields {
-    if(self = [super init]) {
-        _parent = parent;
-        _title = title;
-        _isGroup = NO;
-        _mutableChildren = nil;
-        _uniqueRecordId = [Utils generateUniqueId];
-        _fields = fields;
-
-        return self;
-    }
-    
-    return self;
-}
-
-- (instancetype _Nullable )initAsRecord:(NSString *_Nonnull)title
+- (instancetype)initAsRecord:(NSString *_Nonnull)title
                                  parent:(Node* _Nonnull)parent
                                  fields:(NodeFields*_Nonnull)fields
-                         uniqueRecordId:(NSString*)uniqueRecordId {
+                                    uuid:(NSUUID*)uuid {
+    return [self initWithParent:parent title:title isGroup:NO uuid:uuid fields:fields];
+}
+
+- (instancetype)initWithParent:(Node*)parent
+                         title:(nonnull NSString*)title
+                       isGroup:(BOOL)isGroup
+                          uuid:(NSUUID*)uuid
+                        fields:(NodeFields*)fields {
     if(self = [super init]) {
         _parent = parent;
         _title = title;
-        _isGroup = NO;
-        _mutableChildren = nil;
-        _uniqueRecordId = uniqueRecordId;
-        _fields = fields;
+        _isGroup = isGroup;
+        _mutableChildren = [NSMutableArray array];
+        _uuid = uuid == nil ?  [[NSUUID alloc] init] : uuid;
+        _fields = fields == nil ? [[NodeFields alloc] init] : fields;
         
         return self;
     }
@@ -108,7 +81,19 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
 }
 
 - (NSArray<Node*>*)children {
-    return self.isGroup ? _mutableChildren : [NSArray array];
+    return self.isGroup ? [self filterChildren:NO predicate:nil] : [NSArray array];
+}
+
+- (NSArray<Node *> *)childGroups {
+    return self.isGroup ? [self filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
+        return node.isGroup;
+    }] : [NSArray array];
+}
+
+- (NSArray<Node *> *)childRecords {
+    return self.isGroup ? [self filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup;
+    }] : [NSArray array];
 }
 
 - (BOOL)setTitle:(NSString*_Nonnull)title {
@@ -174,10 +159,9 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
 }
 
 - (BOOL)validateChangeParent:(Node*)parent {
-    return parent != self &&
-    self.parent != parent &&
-    ![parent isChildOf:self] &&
-    [parent validateAddChild:self];
+    return  parent != self &&
+            self.parent != parent &&
+            ![parent isChildOf:self] && [parent validateAddChild:self];
 }
 
 - (BOOL)changeParent:(Node*)parent {
@@ -218,7 +202,7 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         identifier = [titleHierarchy componentsJoinedByString:@":"];
     }
     else {
-        identifier = self.uniqueRecordId;
+        identifier = [self.uuid UUIDString];
     }
     
     return [NSString stringWithFormat:@"%@%@", self.isGroup ? @"G" : @"R",  identifier];
@@ -235,54 +219,59 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
 }
 
 - (Node*_Nullable)findFirstChild:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate {
-    for(Node* child in self.children) {
-        if(predicate(child)) {
-            return child;
-        }
+    NSArray<Node*> *match = [self filterChildren:recursive predicate:predicate firstMatchOnly:YES];
+
+    return match.firstObject;
+}
+
+- (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive
+                                predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate {
+    return [self filterChildren:recursive predicate:predicate firstMatchOnly:NO];
+}
+
+- (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive
+                                predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate
+                           firstMatchOnly:(BOOL)firstMatchOnly {
+    if(!self.isGroup) {
+        return [NSArray array];
     }
-    
-    if(recursive) {
-        for(Node* child in self.children) {
-            if(child.isGroup) {
-                Node* found = [child findFirstChild:recursive predicate:predicate];
-                
-                if(found) {
-                    return found;
+
+    NSMutableArray<Node*>* matching = [[NSMutableArray alloc] init];
+
+    if(predicate) {
+        for(Node* child in _mutableChildren) {
+            if(predicate(child)) {
+                if(firstMatchOnly) {
+                    return [NSArray arrayWithObject:child];
+                }
+                else {
+                    [matching addObject:child];
                 }
             }
         }
     }
-    
-    return nil;
-}
-
-- (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate {
-    NSMutableArray<Node*> *ret = [NSMutableArray array];
-    
-    NSArray<Node*>* matching;
-    if(predicate) {
-        matching = [self.children filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-            Node* child = (Node*)evaluatedObject;
-            return predicate(child);
-        }]];
+    else if(firstMatchOnly && _mutableChildren.count > 0) {
+        return [NSArray arrayWithObject:_mutableChildren.firstObject];
     }
     else {
-        matching = self.children;
+        [matching addObjectsFromArray:_mutableChildren];
     }
     
-    [ret addObjectsFromArray:matching];
-    
     if(recursive) {
-        for(Node* child in self.children) {
+        for(Node* child in _mutableChildren) {
             if(child.isGroup) {
-                NSArray<Node*> *bar = [child filterChildren:recursive predicate:predicate];
+                NSArray<Node*> *bar = [child filterChildren:recursive predicate:predicate firstMatchOnly:firstMatchOnly];
                 
-                [ret addObjectsFromArray:bar];
+                if(firstMatchOnly && bar.count > 0) {
+                    return bar;
+                }
+
+                [matching addObjectsFromArray:bar];
             }
         }
     }
     
-    return [ret copy];
+    return matching;
 }
 
 - (NSArray<NSString*>*)getTitleHierarchy {
@@ -298,5 +287,49 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     }
 }
 
+- (NSString*)recursiveTreeDescription:(uint32_t)indentLevel {
+    NSMutableString *ret = [NSMutableString string];
+    
+    uint32_t baseIndentSpaces = 4;
+    NSString* baseIndent = [[[NSString alloc] init] stringByPaddingToLength:baseIndentSpaces withString:@" " startingAtIndex:0];
+    NSString* indent = [[[NSString alloc] init] stringByPaddingToLength:(indentLevel * baseIndentSpaces) withString:baseIndent startingAtIndex:0];
+    
+    if(self.children.count) {
+        [ret appendFormat:@"\n%@{\n", indent];
+        
+        for (Node* child in self.childRecords) {
+            [ret appendFormat:@"%@%@[%@] (username: [%@], password: [%@], url: [%@])\n",
+             indent, baseIndent, child.title, child.fields.username, child.fields.password, child.fields.url];
+        }
+
+        for (Node* child in self.childGroups) {
+            [ret appendFormat:@"%@%@[%@]", indent, baseIndent, child.title];
+            if(child.children.count) {
+                NSString *childString = [child recursiveTreeDescription:indentLevel + 1];
+                [ret appendFormat:@"%@", childString];
+            }
+            else {
+                [ret appendString:@"\n"];
+            }
+        }
+        [ret appendFormat:@"%@}\n", indent];
+    }
+    
+    return ret;
+}
+
+- (NSString *)description {
+    if(self.isGroup) {
+        if(self.children.count) {
+            return [NSString stringWithFormat:@"\n[%@]%@", self.title, [self recursiveTreeDescription:0]];
+        }
+        else {
+            return [NSString stringWithFormat:@"\n[%@]\n", self.title];
+        }
+    }
+    else {
+        return [NSString stringWithFormat:@"{\n[%@] (username: [%@], password: [%@], url: [%@])\n}", self.title, self.fields.username, self.fields.password, self.fields.url];
+    }
+}
 
 @end

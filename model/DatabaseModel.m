@@ -1,9 +1,10 @@
 #import <Foundation/Foundation.h>
 #import "DatabaseModel.h"
 #import "PwSafeDatabase.h"
-#import "KeypassDatabase.h"
+#import "KeePassDatabase.h"
 #import "AbstractPasswordDatabase.h"
 #import "Utils.h"
+#import "Kdbx4Database.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,7 +17,10 @@
 @implementation DatabaseModel
 
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return [PwSafeDatabase isAValidSafe:candidate]; // TODO: || [KeypassDatabase isAValidSafe:candidate];
+    return [PwSafeDatabase isAValidSafe:candidate];
+//    ||
+//            [KeePassDatabase isAValidSafe:candidate] ||
+//            [Kdbx4Database isAValidSafe:candidate];
 }
 
 - (instancetype)initNewWithoutPassword {
@@ -31,15 +35,18 @@
     if(self = [super init]) {
         self.theSafe = [[PwSafeDatabase alloc] initNewWithPassword:password];
         
-        [[self.theSafe rootGroup] addChild:[[Node alloc] initAsGroup:@"New Group" parent:[self.theSafe rootGroup]]];
+        [[self.theSafe rootGroup] addChild:[[Node alloc] initAsGroup:@"New Group" parent:[self.theSafe rootGroup] uuid:nil]];
+        
+        NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username"
+                                         url:@"https://www.google.com"
+                                    password:@"password"
+                                       notes:@""
+                                       email:@"user@gmail.com"];
         
         [[self.theSafe rootGroup] addChild:[[Node alloc] initAsRecord:@"New Entry"
                                                                parent:[self.theSafe rootGroup]
-                                                               fields:[[NodeFields alloc] initWithUsername:@"username"
-                                                                                                       url:@"https://www.google.com"
-                                                                                                  password:@"password"
-                                                                                                     notes:@""
-                                                                                                     email:@"user@gmail.com"]]];
+                                                               fields:fields
+                                                                 uuid:nil]];
     }
     
     return self;
@@ -57,11 +64,16 @@
             
             _format = kPasswordSafe;
         }
+//        else if([KeePassDatabase isAValidSafe:safeData]) {
+//            self.theSafe = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+//            _format = kKeePass;
+//        }
+//        else if([Kdbx4Database isAValidSafe:safeData]) {
+//            self.theSafe = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+//            _format = kKeePass4;
+//        }
         else {
             self = nil;
-           
-            //self.theSafe = [[KeypassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
-            //_format = kKeypass;
         }
     }
     
@@ -76,24 +88,12 @@
     return [self.theSafe getDiagnosticDumpString:plaintextPasswords];
 }
 
-- (void)defaultLastUpdateFieldsToNow {
-    return [self.theSafe defaultLastUpdateFieldsToNow];
-}
-
 - (Node*)rootGroup {
     return self.theSafe.rootGroup;
 }
 
-- (NSArray<Node *> *)allNodes{
-    return self.theSafe.allNodes;
-}
-
-- (NSArray<Node *> *)allRecords {
-    return self.theSafe.allRecords;
-}
-
--(NSArray<Node *> *)allGroups {
-    return self.theSafe.allGroups;
+-(id<AbstractDatabaseMetadata>)metadata {
+    return self.theSafe.metadata;
 }
 
 -(NSString*)masterPassword {
@@ -104,52 +104,20 @@
     self.theSafe.masterPassword = masterPassword;
 }
 
--(NSDate *)lastUpdateTime {
-    return self.theSafe.lastUpdateTime;
-}
-
--(void)setLastUpdateTime:(NSDate *)lastUpdateTime {
-    self.theSafe.lastUpdateTime = lastUpdateTime;
-}
-
--(NSString *)lastUpdateUser {
-    return self.theSafe.lastUpdateUser;
-}
-
--(void)setLastUpdateUser:(NSString *)lastUpdateUser {
-    self.theSafe.lastUpdateUser = lastUpdateUser;
-}
-
--(NSString *)lastUpdateHost {
-    return self.theSafe.lastUpdateHost;
-}
-
--(void)setLastUpdateHost:(NSString *)lastUpdateHost {
-    self.theSafe.lastUpdateHost = lastUpdateHost;
-}
-
--(NSString *)lastUpdateApp {
-    return self.theSafe.lastUpdateApp;
-}
-
--(void)setLastUpdateApp:(NSString *)lastUpdateApp {
-    self.theSafe.lastUpdateApp = lastUpdateApp;
-}
-
--(NSString *)version {
-    return self.theSafe.version;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience
 
-- (NSArray<Node*>*)getAllRecords {
+- (NSArray<Node *>*)allNodes {
+    return [self.rootGroup filterChildren:YES predicate:nil];
+}
+
+-(NSArray<Node *> *)allRecords {
     return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
     }];
 }
 
-- (NSArray<Node*>*)getAllGroups {
+-(NSArray<Node *> *)allGroups {
     return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return node.isGroup;
     }];
@@ -158,7 +126,7 @@
 - (NSSet<NSString*> *)usernameSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *recordNode in [self getAllRecords]) {
+for (Node *recordNode in self.allRecords) {
         if ([Utils trim:recordNode.fields.username].length > 0) {
             [bag addObject:recordNode.fields.username];
         }
@@ -170,7 +138,7 @@
 - (NSSet<NSString*> *)emailSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in [self getAllRecords]) {
+    for (Node *record in self.allRecords) {
         if ([Utils trim:record.fields.email].length > 0) {
             [bag addObject:record.fields.email];
         }
@@ -182,7 +150,7 @@
 - (NSSet<NSString*> *)passwordSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in [self getAllRecords]) {
+    for (Node *record in self.allRecords) {
         if ([Utils trim:record.fields.password].length > 0) {
             [bag addObject:record.fields.password];
         }
@@ -194,7 +162,7 @@
 - (NSString *)mostPopularEmail {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in [self getAllRecords]) {
+    for (Node *record in self.allRecords) {
         if(record.fields.email.length) {
             [bag addObject:record.fields.email];
         }
@@ -206,7 +174,7 @@
 - (NSString *)mostPopularUsername {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in [self getAllRecords]) {
+    for (Node *record in self.allRecords) {
         if(record.fields.username.length) {
             [bag addObject:record.fields.username];
         }
@@ -218,7 +186,7 @@
 - (NSString *)mostPopularPassword {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in [self getAllRecords]) {
+    for (Node *record in self.allRecords) {
         [bag addObject:record.fields.password];
     }
     
@@ -226,20 +194,11 @@
 }
 
 -(NSInteger)numberOfRecords {
-    return [self getAllRecords].count;
+    return self.allRecords.count;
 }
 
 -(NSInteger)numberOfGroups {
-    return [self getAllGroups].count;
-}
-
-// TODO: This isn't appropriate for Keypass
--(NSInteger)keyStretchIterations {
-    return self.theSafe.keyStretchIterations;
-}
-
-- (void)setKeyStretchIterations:(NSInteger)keyStretchIterations {
-    self.theSafe.keyStretchIterations = keyStretchIterations;
+    return self.allGroups.count;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

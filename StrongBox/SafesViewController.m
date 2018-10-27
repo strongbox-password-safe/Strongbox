@@ -362,6 +362,7 @@
     if ([segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
         BrowseSafeView *vc = segue.destinationViewController;
         vc.viewModel = (Model *)sender;
+        
         vc.currentGroup = vc.viewModel.rootGroup;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])

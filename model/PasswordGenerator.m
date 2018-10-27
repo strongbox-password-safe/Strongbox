@@ -10,11 +10,11 @@
 
 @implementation PasswordGenerator
 
-static NSString* kAllSymbols = @"+-=_@#$%^&;:,.<>/~\\[](){}?!|*";
-static NSString* kAllUppercase = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static NSString* kAllLowercase = @"abcdefghijklmnopqrstuvwxyz";
-static NSString* kAllDigits = @"0123456789";
-static NSString* kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
+static NSString* const kAllSymbols = @"+-=_@#$%^&;:,.<>/~\\[](){}?!|*";
+static NSString* const kAllUppercase = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static NSString* const kAllLowercase = @"abcdefghijklmnopqrstuvwxyz";
+static NSString* const kAllDigits = @"0123456789";
+static NSString* const kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
 
 + (NSString *)generatePassword:(PasswordGenerationParameters*)parameters {
     if(parameters.algorithm == kBasic) {

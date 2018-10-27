@@ -42,7 +42,6 @@ typedef struct _FieldHeader {
 + (PasswordSafe3Header)getHeader:(NSData*)data;
 + (NSInteger)getKeyStretchIterations:(NSData*)data;
 + (NSInteger)getNumberOfBlocks:(NSData*)candidate;
-+ (int)littleEndian4BytesToInteger:(unsigned char *)bytes;
 + (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations masterPassword:(NSString *)masterPassword K:(NSData **)K L:(NSData **)L;
 + (NSData *)serializeField:(Field *)field;
 + (NSData *)encryptCBC:(NSData *)K ptData:(NSData *)ptData iv:(unsigned char *)iv;
@@ -52,5 +51,8 @@ typedef struct _FieldHeader {
 + (NSMutableData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks;
 + (NSData *)extractDbHeaderAndRecords:(NSData *)decData headerFields_p:(NSMutableArray **)headerFields_p records_p:(NSMutableArray **)records_p;
 + (void)dumpDbHeaderAndRecords:(NSMutableArray *)headerFields records:(NSMutableArray *)records;
+
++ (NSData *)sha256:(NSData *)keyData;
++ (NSData*)getRandomData:(uint32_t)length;
 
 @end

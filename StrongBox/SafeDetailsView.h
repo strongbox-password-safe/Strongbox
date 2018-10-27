@@ -13,25 +13,18 @@
 
 @property (nonatomic, nonnull) Model *viewModel;
 
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelLastUser;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelLastHost;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelLastUpdateTime;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelLastApp;
-
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfGroups;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfRecords;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfUniqueUsernames;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfUniquePasswords;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelMostPopularUsername;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelKeyStretchIterations;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelVersion;
+@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfUniqueEmails;
+@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelMostPopularEmail;
 
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelToggleOfflineCache;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelExportByEmail;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelToggleTouchId;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelChangeMasterPassword;
 
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfUniqueEmails;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelMostPopularEmail;
 
 @end

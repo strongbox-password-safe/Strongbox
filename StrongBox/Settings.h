@@ -10,7 +10,7 @@
 #import "PasswordGenerationParameters.h"
 #import "AutoFillNewRecordSettings.h"
 
-static NSString* kAppGroupName = @"group.strongbox.mcguill";
+static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 
 @interface Settings : NSObject
 

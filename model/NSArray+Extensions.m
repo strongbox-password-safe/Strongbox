@@ -10,6 +10,18 @@
 
 @implementation NSArray (Extensions)
 
+-(NSArray *)filter:(BOOL(^)(id _Nonnull))block {
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
+    
+    for(id obj in self) {
+        if(block(obj)) {
+            [result addObject:obj];
+        }
+    }
+    
+    return result;
+}
+
 - (NSArray *)map:(id (^)(id obj, NSUInteger idx))block {
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
     [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {

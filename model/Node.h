@@ -13,26 +13,34 @@
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
-- (instancetype _Nullable )initAsRoot NS_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid;
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
-                                parent:(Node* _Nonnull)parent NS_DESIGNATED_INITIALIZER;
+                                parent:(Node* _Nonnull)parent
+                                  uuid:(nullable NSUUID*)uuid;
 
-- (instancetype _Nullable )initAsRecord:(NSString *_Nonnull)title
-                                 parent:(Node* _Nonnull)parent
-                                 fields:(NodeFields*_Nonnull)fields NS_DESIGNATED_INITIALIZER;
-
-- (instancetype _Nullable )initAsRecord:(NSString *_Nonnull)title
+- (nonnull instancetype)initAsRecord:(NSString *_Nonnull)title
                                  parent:(Node* _Nonnull)parent
                                  fields:(NodeFields*_Nonnull)fields
-                         uniqueRecordId:(NSString*_Nonnull)uniqueRecordId NS_DESIGNATED_INITIALIZER;
+                                   uuid:(nullable NSUUID*)uuid;
+
+- (nonnull instancetype)initWithParent:(nullable Node*)parent
+                         title:(nonnull NSString*)title
+                       isGroup:(BOOL)isGroup
+                          uuid:(nullable NSUUID*)uuid
+                        fields:(nullable NodeFields*)fields NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) BOOL isGroup;
+
 @property (nonatomic, strong, readonly, nonnull) NSString *title;
+@property (nonatomic, strong, readonly, nonnull) NSUUID *uuid;
 @property (nonatomic, strong, readonly, nonnull) NSString *serializationId; // Must remain save across serializations
 @property (nonatomic, strong, readonly, nonnull) NodeFields *fields;
 @property (nonatomic, strong, readonly, nullable) Node* parent;
+
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* children;
+@property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childGroups;
+@property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childRecords;
 
 - (BOOL)setTitle:(NSString*_Nonnull)title;
 - (BOOL)validateAddChild:(Node* _Nonnull)node;
@@ -41,7 +49,6 @@
 - (BOOL)validateChangeParent:(Node*_Nonnull)parent;
 - (BOOL)changeParent:(Node*_Nonnull)parent;
 
-
 - (NSArray<NSString*>*_Nonnull)getTitleHierarchy;
 
 - (Node*_Nullable)getChildGroupWithTitle:(NSString*_Nonnull)title;
@@ -49,7 +56,11 @@
 - (Node*_Nullable)findFirstChild:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate;
 - (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate;
 
-// For use by any Safe Format Provider - PWSafe uses this to store original record so we don't overwrite unknown fields
+///////////////////////////////////////////////
+// For use by any Safe Format Provider
+//
+// PWSafe uses this to store original record so we don't overwrite unknown fields
+// KeePass to store a link back to the original Xml element so we retain unknown attributes/text/elements
 
 @property (nonatomic, strong, nullable) NSObject *linkedData;
 

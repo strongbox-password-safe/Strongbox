@@ -20,10 +20,10 @@
 #import "DropboxV2StorageProvider.h"
 #import "iCloudSafesCoordinator.h"
 #import <StoreKit/StoreKit.h>
-#import "ISMessages/ISMessages.h"
-#import <PopupDialog/PopupDialog-Swift.h>
 #import "OfflineDetector.h"
 #import "SafeStorageProviderFactory.h"
+#import "ISMessages/ISMessages.h"
+#import <PopupDialog/PopupDialog-Swift.h>
 
 @implementation InitialViewController
 

@@ -44,7 +44,19 @@
 }
 
 - (Node*)rootGroup {
-    return self.passwordDatabase.rootGroup;
+    if(self.passwordDatabase.format == kKeePass) {
+        // Hide the root group - Can not add entries and not really useful - Perhaps make this optional?
+    
+        if(self.passwordDatabase.rootGroup.children.count > 0) {
+            return [self.passwordDatabase.rootGroup.children objectAtIndex:0];
+        }
+        else {
+            return self.passwordDatabase.rootGroup; // This should never be able to happen but for safety
+        }
+    }
+    else {
+        return self.passwordDatabase.rootGroup;
+    }
 }
 
 - (NSArray<Node *> *)allNodes {
@@ -73,8 +85,6 @@
 
 - (void)update:(void (^)(NSError *error))handler {
     if (!_isUsingOfflineCache && !_isReadOnly) {
-        [self.passwordDatabase defaultLastUpdateFieldsToNow];
-        
         [self encrypt:^(NSData * _Nullable updatedSafeData, NSError * _Nullable error) {
             if (updatedSafeData == nil) {
                 handler(error);
@@ -190,7 +200,7 @@
                                                         notes:@"Sample Database Record. You can have any text here..."
                                                         email:@"user@gmail.com"];
     
-    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:parentGroup fields:fields];
+    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:parentGroup fields:fields uuid:nil];
     
     if([parentGroup addChild:record]) {
         return record;
@@ -200,7 +210,7 @@
 }
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title {
-    Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup];
+    Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup uuid:nil];
     if( [parentGroup addChild:newGroup]) {
         return newGroup;
     }
@@ -220,10 +230,6 @@
     return [node changeParent:parent];
 }
 
-- (void)defaultLastUpdateFieldsToNow {
-    [self.passwordDatabase defaultLastUpdateFieldsToNow];
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (NSString *)masterPassword {
@@ -234,22 +240,6 @@
     self.passwordDatabase.masterPassword = value;
 }
 
--(NSDate*)lastUpdateTime {
-    return self.passwordDatabase.lastUpdateTime;
-}
-  
--(NSString*)lastUpdateUser {
-    return self.passwordDatabase.lastUpdateUser;
-}
-
--(NSString*)lastUpdateHost {
-    return self.passwordDatabase.lastUpdateHost;
-}
-  
--(NSString*)lastUpdateApp {
-    return self.passwordDatabase.lastUpdateApp;
-}
-    
 -(void)encrypt:(void (^)(NSData* data, NSError* error))completion {
     [SVProgressHUD showWithStatus:@"Encrypting"];
     
@@ -306,12 +296,7 @@
     return self.passwordDatabase.numberOfGroups;
 }
 
-- (NSInteger) keyStretchIterations {
-    return self.passwordDatabase.keyStretchIterations;
+-(id<AbstractDatabaseMetadata>)databaseMetadata {
+    return self.passwordDatabase.metadata;
 }
-
-- (NSString*)version {
-    return self.passwordDatabase.version;
-}
-
 @end

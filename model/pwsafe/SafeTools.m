@@ -5,6 +5,7 @@
 #import "Record.h"
 #import "Field.h"
 #import "Utils.h"
+#import "BinaryParsingHelper.h"
 
 #include <Security/Security.h>
 
@@ -166,7 +167,7 @@
 
     // hdr.iter
 
-    [SafeTools integerTolittleEndian4Bytes:keyStretchIterations bytes:hdr.iter];
+    [BinaryParsingHelper integerTolittleEndian4Bytes:keyStretchIterations bytes:hdr.iter];
 
     // P' => We generate P' using master password and salt
 
@@ -265,7 +266,6 @@
         header.tag[1] != 'W' ||
         header.tag[2] != 'S' ||
         header.tag[3] != '3') {
-        NSLog(@"Invalid Password Safe. No PWS3 magic");
         return NO;
     }
 
@@ -312,7 +312,7 @@
 
 + (NSInteger)getKeyStretchIterations:(NSData *)data {
     PasswordSafe3Header header = [SafeTools getHeader:data];
-    return [SafeTools littleEndian4BytesToInteger:header.iter];
+    return littleEndian4BytesToInt32(header.iter);
 }
 
 + (NSUInteger)getEofFileOffset:(NSData*)data {
@@ -391,24 +391,8 @@
     }
 }
 
-+ (void)integerTolittleEndian4Bytes:(int)data bytes:(unsigned char *)b {
-    b[0] = (unsigned char)data;
-    b[1] = (unsigned char)(((uint)data >> 8) & 0xFF);
-    b[2] = (unsigned char)(((uint)data >> 16) & 0xFF);
-    b[3] = (unsigned char)(((uint)data >> 24) & 0xFF);
-}
-
-+ (int)littleEndian4BytesToInteger:(unsigned char *)bytes {
-    int ret =  (bytes[3] << 24)
-        |   (bytes[2] << 16)
-        |   (bytes[1] << 8)
-        |    bytes[0];
-
-    return ret;
-}
-
 + (BOOL)checkPassword:(PasswordSafe3Header *)pHeader password:(NSString *)password pBar:(NSData **)ppBar {
-    int iter = [self littleEndian4BytesToInteger:pHeader->iter];
+    int iter = littleEndian4BytesToInt32(pHeader->iter);
 
     NSData *hPBar = [self keystretch:iter header:pHeader->salt pBar_p:ppBar password:password];
 
@@ -557,27 +541,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
-    unsigned long i;
-
-    for (i = 0; i < index; i++) {
-        printf("%02x ", buffer[i]);
-    }
-
-    for (unsigned long spacer = index; spacer < width; spacer++) {
-        printf("	");
-    }
-
-    printf(": ");
-
-    for (i = 0; i < index; i++) {
-        if (!isprint(buffer[i])) printf(".");
-        else printf("%c", buffer[i]);
-    }
-
-    printf("\n");
-}
-
 + (NSData *)sha256:(NSData *)keyData {
     uint8_t digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
 
@@ -588,21 +551,15 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
     return out;
 }
 
-+ (NSString *)hexadecimalString:(NSData *)data {
-    const unsigned char *dataBuffer = (const unsigned char *)data.bytes;
-
-    if (!dataBuffer) {
-        return [NSString string];
++ (NSData*)getRandomData:(uint32_t)length {
+    NSMutableData *start = [NSMutableData dataWithLength:length];
+    if(SecRandomCopyBytes(kSecRandomDefault, length, start.mutableBytes))
+    {
+        NSLog(@"Could not securely copy new random bytes");
+        return nil;
     }
-
-    NSUInteger dataLength = data.length;
-    NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
-
-    for (int i = 0; i < dataLength; ++i) {
-        [hexString appendString:[NSString stringWithFormat:@"%02lX", (unsigned long)dataBuffer[i]]];
-    }
-
-    return [NSString stringWithString:hexString];
+    
+    return start;
 }
 
 @end

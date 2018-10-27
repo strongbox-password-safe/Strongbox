@@ -35,15 +35,9 @@
     self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
     self.labelToggleTouchId.enabled = [self canToggleTouchId];
     self.labelToggleOfflineCache.enabled = [self canToggleOfflineCache];
-    
-    self.labelLastUpdateTime.text = [self formatDate:self.viewModel.lastUpdateTime];
-    self.labelVersion.text = self.viewModel.version;
-    self.labelLastUser.text = self.viewModel.lastUpdateUser;
-    self.labelLastHost.text = self.viewModel.lastUpdateHost;
-    self.labelLastApp.text = self.viewModel.lastUpdateApp;
+
     self.labelMostPopularUsername.text = self.viewModel.mostPopularUsername ? self.viewModel.mostPopularUsername : @"<None>";
     self.labelMostPopularEmail.text = self.viewModel.mostPopularEmail ? self.viewModel.mostPopularEmail : @"<None>";
-    self.labelKeyStretchIterations.text = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.keyStretchIterations];
     self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.usernameSet count]];
     self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.emailSet count]];
     self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.passwordSet count]];
@@ -70,6 +64,31 @@
             [self onToggleTouchId];
         }
     }
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    
+    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.databaseMetadata kvpForUi];
+    if(indexPath.section == 2 && indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
+    {
+        NSString* key = [metadataKvps.allKeys objectAtIndex:indexPath.row];
+        cell.textLabel.text = key;
+        cell.detailTextLabel.text = [metadataKvps objectForKey:key];
+    }
+    
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.databaseMetadata kvpForUi];
+    if(indexPath.section == 2 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
+    {
+        return 0;
+    }
+    
+    return [super tableView:tableView heightForRowAtIndexPath:indexPath];
 }
 
 - (BOOL)canChangeMasterPassword {
@@ -297,22 +316,6 @@
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:^{ }];
-}
-
-- (NSString *)formatDate:(NSDate *)date {
-    if (!date) {
-        return @"<Unknown>";
-    }
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    
-    dateFormatter.dateStyle = NSDateFormatterMediumStyle;
-    dateFormatter.timeStyle = NSDateFormatterShortStyle;
-    dateFormatter.locale = [NSLocale currentLocale];
-    
-    NSString *dateString = [dateFormatter stringFromDate:date];
-    
-    return dateString;
 }
 
 @end

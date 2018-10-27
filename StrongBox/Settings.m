@@ -9,26 +9,26 @@
 #import "Settings.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 
-static NSString* kLaunchCountKey = @"launchCount";
-static NSString* kAutoLockTimeSeconds = @"autoLockTimeSeconds";
-static NSString* kPromptedForReview = @"newPromptedForReview";
-static NSString* kIsProKey = @"isPro";
-static NSString* kEndFreeTrialDate = @"endFreeTrialDate";
-static NSString* kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGesture";
-static NSString* kCopyPasswordOnLongPress = @"copyPasswordOnLongPress";
-static NSString* kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
-static NSString* kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
-static NSString* kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
-static NSString* kiCloudOn = @"iCloudOn";
-static NSString* kiCloudWasOn = @"iCloudWasOn";
-static NSString* kiCloudPrompted = @"iCloudPrompted";
-static NSString* kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
-static NSString* kPasswordGenerationParameters = @"passwordGenerationSettings";
-static NSString* kInstallDate = @"installDate";
-static NSString* kDisallowBiometricId = @"disallowBiometricId";
-static NSString* kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
-static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
-static NSString* kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
+static NSString* const kLaunchCountKey = @"launchCount";
+static NSString* const kAutoLockTimeSeconds = @"autoLockTimeSeconds";
+static NSString* const kPromptedForReview = @"newPromptedForReview";
+static NSString* const kIsProKey = @"isPro";
+static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
+static NSString* const kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGesture";
+static NSString* const kCopyPasswordOnLongPress = @"copyPasswordOnLongPress";
+static NSString* const kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
+static NSString* const kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
+static NSString* const kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
+static NSString* const kiCloudOn = @"iCloudOn";
+static NSString* const kiCloudWasOn = @"iCloudWasOn";
+static NSString* const kiCloudPrompted = @"iCloudPrompted";
+static NSString* const kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
+static NSString* const kPasswordGenerationParameters = @"passwordGenerationSettings";
+static NSString* const kInstallDate = @"installDate";
+static NSString* const kDisallowBiometricId = @"disallowBiometricId";
+static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
+static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
+static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 
 @implementation Settings
 

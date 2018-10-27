@@ -31,6 +31,9 @@
         self.email = email == nil ? @"" : email;
         self.passwordHistory = [[PasswordHistory alloc] init];
         self.created = [NSDate date];
+        self.modified = [NSDate date];
+        self.accessed = [NSDate date];
+        self.passwordModified = [NSDate date];
     }
     
     return self;
@@ -56,6 +59,14 @@
             [pwHistory.entries addObjectsFromArray:slice];
         }
     }
+}
+
+-(NSString *)description {
+    return [NSString stringWithFormat:@"{\n    password = [%@]\n    username = [%@]\n    email = [%@]\n    url = [%@]\n}",
+            self.password,
+            self.username,
+            self.email,
+            self.url];
 }
 
 @end

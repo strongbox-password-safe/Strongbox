@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SafeStorageProviderFactory : NSObject
 
-+ (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
++ (nullable id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 
 @end
 

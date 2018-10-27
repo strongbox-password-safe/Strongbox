@@ -14,7 +14,7 @@
 #import "PasswordGenerator.h"
 #import "Settings.h"
 
-static const NSString* kDefaultNewTitle = @"Untitled"
+static NSString* kDefaultNewTitle = @"Untitled";
 
 @interface ViewModel ()
 
@@ -32,7 +32,7 @@ static const NSString* kDefaultNewTitle = @"Untitled"
         
         [self addSampleRecord:self.rootGroup];
         
-        Node* newGroup = [[Node alloc] initAsGroup:kDefaultNewTitle parent:self.rootGroup];
+        Node* newGroup = [[Node alloc] initAsGroup:kDefaultNewTitle parent:self.rootGroup uuid:nil];
 
         [self.passwordDatabase.rootGroup addChild:newGroup];
         
@@ -143,9 +143,9 @@ static const NSString* kDefaultNewTitle = @"Untitled"
                                               url:@"https://strongboxsafe.com"
                                          password:password
                                             notes:@""
-                                            email:@"user@gmail.com"];
+                                            email:@"user@gmail.com"]; // TODO: Keepass
     
-    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:group fields:fields];
+    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:group fields:fields uuid:nil];
     
     NSDate* date = [NSDate date];
     record.fields.created = date;
@@ -312,7 +312,7 @@ NSString* getSmartFillNotes() {
                                                         notes:actualNotes
                                                         email:actualEmail];
 
-    Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields];
+    Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
     
     NSDate* date = [NSDate date];
     record.fields.created = date;
@@ -349,7 +349,7 @@ NSString* getSmartFillNotes() {
                                                             email:actualEmail];
         
         
-        Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.rootGroup fields:fields];
+        Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.rootGroup fields:fields uuid:nil];
         
         NSDate* date = [NSDate date];
         record.fields.created = date;
@@ -369,7 +369,7 @@ NSString* getSmartFillNotes() {
     BOOL success = NO;
     Node* newGroup;
     do {
-        newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup];
+        newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup uuid:nil];
         success =  newGroup && [parentGroup addChild:newGroup];
         i++;
         newGroupName = [NSString stringWithFormat:@"%@ %ld", kDefaultNewTitle, i];
@@ -416,10 +416,6 @@ NSString* getSmartFillNotes() {
     return [self.passwordDatabase getDiagnosticDumpString:YES];
 }
 
-- (void)defaultLastUpdateFieldsToNow {
-    [self.passwordDatabase defaultLastUpdateFieldsToNow];
-}
-
 - (NSSet<NSString*> *)emailSet {
     return self.passwordDatabase.emailSet;
 }
@@ -446,30 +442,6 @@ NSString* getSmartFillNotes() {
 
 - (NSInteger)numberOfGroups {
     return self.passwordDatabase.numberOfGroups;
-}
-
-- (NSInteger)keyStretchIterations {
-    return self.passwordDatabase.keyStretchIterations;
-}
-
-- (NSString *)version {
-    return self.passwordDatabase.version;
-}
-
--(NSDate*)lastUpdateTime {
-    return self.passwordDatabase.lastUpdateTime;
-}
-
--(NSString*)lastUpdateUser {
-    return self.passwordDatabase.lastUpdateUser;
-}
-
--(NSString*)lastUpdateHost {
-    return self.passwordDatabase.lastUpdateHost;
-}
-
--(NSString*)lastUpdateApp {
-    return self.passwordDatabase.lastUpdateApp;
 }
 
 @end

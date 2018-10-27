@@ -11,12 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString* kCSVHeaderTitle = @"Title";
-static NSString* kCSVHeaderUsername = @"Username";
-static NSString* kCSVHeaderUrl = @"Url";
-static NSString* kCSVHeaderEmail = @"Email";
-static NSString* kCSVHeaderPassword = @"Password";
-static NSString* kCSVHeaderNotes = @"Notes";
+static NSString* const kCSVHeaderTitle = @"Title";
+static NSString* const kCSVHeaderUsername = @"Username";
+static NSString* const kCSVHeaderUrl = @"Url";
+static NSString* const kCSVHeaderEmail = @"Email";
+static NSString* const kCSVHeaderPassword = @"Password";
+static NSString* const kCSVHeaderNotes = @"Notes";
 
 @interface Csv : NSObject
 

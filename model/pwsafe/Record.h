@@ -25,10 +25,8 @@
 @property (nonatomic, retain) NSDate *created;
 @property (nonatomic, retain) NSDate *passwordModified;
 
-@property (nonatomic, retain, readonly) NSString *uuid;
+@property (nonatomic, retain, readonly) NSUUID *uuid;
 @property (nonatomic, retain) PasswordHistory *passwordHistory;
-
-- (void)    generateNewUUID;
 
 - (Record*)init;
 - (Record *)initWithFields:(NSDictionary *)fields NS_DESIGNATED_INITIALIZER;

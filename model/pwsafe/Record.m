@@ -163,8 +163,8 @@
     }
 }
 
-- (NSString *)uuid {
-    return [self getPrettyStringForField:FIELD_TYPE_UUID];
+- (NSUUID *)uuid {
+    return [self getUUIDForField:FIELD_TYPE_UUID];
 }
 
 - (void)generateNewUUID {
@@ -237,6 +237,16 @@
     }
 
     return nil;
+}
+
+- (NSUUID *)getUUIDForField:(FieldType)type {
+    Field *field = [self getFieldForType:type];
+    
+    if (field) {
+        return field.dataAsUuid;
+    }
+    
+    return [NSUUID UUID];
 }
 
 - (NSString *)getPrettyStringForField:(FieldType)type {

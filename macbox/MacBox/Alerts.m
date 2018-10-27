@@ -22,7 +22,7 @@
     
     [alert setMessageText:info];
     [alert setAlertStyle:NSAlertStyleInformational];
-    [alert addButtonWithTitle:@"Ok"];
+    [alert addButtonWithTitle:@"OK"];
     
     [alert beginSheetModalForWindow:window completionHandler:nil];
 }
@@ -36,7 +36,7 @@
     [alert setMessageText:message];
     [alert setInformativeText:informativeText];
     [alert setAlertStyle:NSAlertStyleInformational];
-    [alert addButtonWithTitle:@"Ok"];
+    [alert addButtonWithTitle:@"OK"];
     
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         if(completion) {
@@ -87,7 +87,7 @@
     }
     
     [alert setAlertStyle:NSAlertStyleWarning];
-    [alert addButtonWithTitle:@"Ok"];
+    [alert addButtonWithTitle:@"OK"];
 
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         if(completion) {

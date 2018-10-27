@@ -544,7 +544,8 @@ NSString * trim(NSString *string) {
         
         self.record = [[Node alloc] initAsRecord:trim(self.textFieldTitle.text)
                                           parent:self.parentGroup
-                                          fields:nodeFields];
+                                          fields:nodeFields
+                                            uuid:nil];
 
         self.record.fields.created = [[NSDate alloc] init];
         

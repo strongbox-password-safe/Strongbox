@@ -3,12 +3,14 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
+#import "AbstractDatabaseMetadata.h"
 
 @interface DatabaseModel : NSObject
 
 typedef enum {
     kPasswordSafe,
-    kKeypass,
+    kKeePass,
+    kKeePass4,
 } DatabaseFormat;
 
 @property (nonatomic, readonly) DatabaseFormat format;
@@ -23,18 +25,12 @@ typedef enum {
 - (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
 - (NSString*_Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords;
 
-- (void)defaultLastUpdateFieldsToNow;
-
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
-@property (nonatomic) NSInteger keyStretchIterations;
+@property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, retain, nullable) NSString *masterPassword;
-@property (nonatomic, nullable) NSDate *lastUpdateTime;
-@property (nonatomic, nullable) NSString *lastUpdateUser;
-@property (nonatomic, nullable) NSString *lastUpdateHost;
-@property (nonatomic, nullable) NSString *lastUpdateApp;
 
 // Helpers
 
@@ -44,10 +40,8 @@ typedef enum {
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
-
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
-@property (nonatomic, readonly) NSString * _Nonnull version;
 
 @end
 

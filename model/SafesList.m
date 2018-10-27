@@ -16,7 +16,7 @@
 
 @end
 
-static NSString* kSafesList = @"safesList";
+static NSString* const kSafesList = @"safesList";
 
 @implementation SafesList
 

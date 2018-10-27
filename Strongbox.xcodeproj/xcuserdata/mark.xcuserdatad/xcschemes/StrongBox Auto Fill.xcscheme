@@ -43,13 +43,23 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4D25E8EA2175F4CD00ACF108"
+               BuildableName = "StrongboxTests.xctest"
+               BlueprintName = "StrongboxTests"
+               ReferencedContainer = "container:Strongbox.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4DE48A54216F54A300C9C991"
-            BuildableName = "Strongbox Auto Fill.appex"
-            BlueprintName = "Strongbox Auto Fill"
+            BlueprintIdentifier = "4DBE5B301C8356C700C310BC"
+            BuildableName = "Strongbox.app"
+            BlueprintName = "Strongbox-iOS"
             ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

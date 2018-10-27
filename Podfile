@@ -6,7 +6,8 @@ target 'Strongbox' do
     use_frameworks!
 
     pod 'SAMKeychain'
-#    pod 'KKDomain', :git => 'https://github.com/kejinlu/KKDomain.git'
+    pod 'libsodium'
+    pod 'GZIP'
 end
 
 pre_install do |installer|
@@ -31,6 +32,8 @@ abstract_target 'common-ios' do
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
     pod 'Reachability'
+    pod 'GZIP'
+    pod 'libsodium'    
     
     target 'Strongbox-iOS' do
         pod 'ISMessages' 
@@ -39,6 +42,7 @@ abstract_target 'common-ios' do
         pod 'ADAL', '~> 1.2'
         pod 'Base32', '~> 1.1'
         pod 'SVProgressHUD' 
+        pod 'OneDriveSDK'
     end
 
     target 'Strongbox Auto Fill' do

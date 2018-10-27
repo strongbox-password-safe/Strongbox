@@ -38,6 +38,16 @@
                ReferencedContainer = "container:MacBox.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4D25E8EA2175F4CD00ACF108"
+               BuildableName = "StrongboxTests.xctest"
+               BlueprintName = "StrongboxTests"
+               ReferencedContainer = "container:../Strongbox.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

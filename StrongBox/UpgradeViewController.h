@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <StoreKit/StoreKit.h>
 
-static NSString* kIapProId =  @"com.markmcguill.strongbox.pro";
+static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
 //kTestConsumable @"com.markmcguill.strongbox.testconsumable"
 
 @interface UpgradeViewController : UIViewController<SKPaymentTransactionObserver, SKProductsRequestDelegate>

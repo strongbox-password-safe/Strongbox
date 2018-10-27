@@ -9,7 +9,7 @@
 #ifndef Strongbox_h
 #define Strongbox_h
 
-static NSString* kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
-static NSString* kDefaultFileExtension = @"psafe3";
+static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
+static NSString* const kDefaultFileExtension = @"psafe3";
 
 #endif /* Strongbox_h */

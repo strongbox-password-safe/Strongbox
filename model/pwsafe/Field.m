@@ -8,6 +8,7 @@
 
 #import "Field.h"
 #import "SafeTools.h"
+#import "BinaryParsingHelper.h"
 
 @implementation Field {
     NSData *_data;
@@ -58,6 +59,21 @@
 
 - (NSString *)dataAsString {
     return [[NSString alloc]initWithData:_data encoding:NSUTF8StringEncoding];
+}
+
+- (NSUUID *)dataAsUuid {
+    uuid_t uuid;
+    [_data getBytes:&uuid length:sizeof(uuid_t)];
+    NSUUID *u = [[NSUUID alloc] initWithUUIDBytes:uuid];
+
+    return u;
+}
+
++ (NSString *)dataToUUIDString:(NSData *)data {
+    uuid_t uuid;
+    [data getBytes:&uuid length:sizeof(uuid_t)];
+    NSUUID *u = [[NSUUID alloc] initWithUUIDBytes:uuid];
+    return u.UUIDString;
 }
 
 - (NSDate *)dataAsDate {
@@ -150,7 +166,7 @@
                 break;
 
             case FIELD_TYPE_XTIME_INT: {
-                int intervalInDays = [SafeTools littleEndian4BytesToInteger:(unsigned char *)self->_data.bytes ];
+                int intervalInDays = littleEndian4BytesToInt32((unsigned char *)self->_data.bytes);
                 return intervalInDays == 0 ? @"< Not Set >" : [[NSString alloc] initWithFormat:@"%d Days", intervalInDays];
             }
                                        break;
@@ -412,14 +428,6 @@
     NSString *dateString = [dateFormatter stringFromDate:date];
 
     return dateString;
-}
-
-+ (NSString *)dataToUUIDString:(NSData *)data {
-    uuid_t uuid;
-
-    [data getBytes:&uuid length:sizeof(uuid_t)];
-    NSUUID *u = [[NSUUID alloc] initWithUUIDBytes:uuid];
-    return u.UUIDString;
 }
 
 @end

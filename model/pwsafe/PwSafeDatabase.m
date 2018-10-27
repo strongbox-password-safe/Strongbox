@@ -15,9 +15,6 @@
 
 @implementation PwSafeDatabase
 
-static const NSInteger kDefaultVersionMajor = 0x03;
-static const NSInteger kDefaultVersionMinor = 0x0D;
-
 + (BOOL)isAValidSafe:(NSData *)candidate {
     return [SafeTools isAValidSafe:candidate];
 }
@@ -30,10 +27,13 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     if (self = [super init]) {
         _dbHeaderFields = [[NSMutableArray alloc] init];
         
-        self.keyStretchIterations = DEFAULT_KEYSTRETCH_ITERATIONS;
+        _metadata = [[PwSafeMetadata alloc] init];
+        _rootGroup = [[Node alloc] initAsRoot:nil];
+        
         self.masterPassword = password;
         
-        _rootGroup = [[Node alloc] initAsRoot];
+        [self defaultLastUpdateFieldsToNow];
+        
         return self;
     }
     else {
@@ -62,15 +62,11 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
                                                 error:ppError];
 
         if(!records) {
+            NSLog(@"Decrypt Safe failed.");
             return nil;
         }
         
-        // Headers
-        
         _dbHeaderFields = headerFields;
-        self.masterPassword = password;
-        self.keyStretchIterations = [SafeTools getKeyStretchIterations:safeData];
-        [self syncLastUpdateFieldsFromHeaders];
         
         // Records and Groups
         
@@ -86,6 +82,12 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
             return nil;
         }
         
+        _metadata = [[PwSafeMetadata alloc] initWithVersion:[self getVersion]];
+        self.metadata.keyStretchIterations = [SafeTools getKeyStretchIterations:safeData];
+        [self syncLastUpdateFieldsFromHeaders];
+        
+        self.masterPassword = password;
+        
         return self;
     }
     else {
@@ -97,7 +99,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
 // Deserialization
 
 - (Node*)buildModel:(NSArray<Record*>*)records headers:(NSArray<Field*>*)headers  {
-    Node* root = [[Node alloc] initAsRoot];
+    Node* root = [[Node alloc] initAsRoot:nil];
     
     // Group Records by their group
     
@@ -152,8 +154,8 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     fields.created = record.created;
     fields.passwordModified = record.passwordModified;
     
-    NSString* uniqueId = record.uuid && record.uuid.length ? record.uuid : [Utils generateUniqueId];
-    Node* ret = [[Node alloc] initAsRecord:record.title parent:group fields:fields uniqueRecordId:uniqueId];
+    NSUUID* uniqueId = record.uuid ? record.uuid : [NSUUID UUID];
+    Node* ret = [[Node alloc] initAsRecord:record.title parent:group fields:fields uuid:uniqueId];
     
     ret.linkedData = record;
     
@@ -180,7 +182,7 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
         Node* foo = [node getChildGroupWithTitle:component];
         
         if(!foo) {
-            foo = [[Node alloc] initAsGroup:component parent:node];
+            foo = [[Node alloc] initAsGroup:component parent:node uuid:nil];
             if(![node addChild:foo]) {
                 NSLog(@"Problem adding child group [%@] to node [%@]", component, node.title);
                 return nil;
@@ -411,39 +413,32 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     return hmacData;
 }
 
-- (void)defaultLastUpdateFieldsToNow {
-    self.lastUpdateTime = [[NSDate alloc] init];
-    self.lastUpdateUser = [Utils getUsername];
-    self.lastUpdateHost = [Utils hostname];
-    self.lastUpdateApp =  [Utils getAppName];
-}
-
 - (void)syncLastUpdateFieldsToHeaders {
-    [self setHeaderFieldString:HDR_LASTUPDATEAPPLICATION value:self.lastUpdateApp];
-    [self setHeaderFieldString:HDR_LASTUPDATEHOST value:self.lastUpdateHost];
-    [self setHeaderFieldString:HDR_LASTUPDATEUSER value:self.lastUpdateUser];
-    [self setHeaderFieldDate:HDR_LASTUPDATETIME value:self.lastUpdateTime];
+    [self setHeaderFieldString:HDR_LASTUPDATEAPPLICATION value:self.metadata.lastUpdateApp];
+    [self setHeaderFieldString:HDR_LASTUPDATEHOST value:self.metadata.lastUpdateHost];
+    [self setHeaderFieldString:HDR_LASTUPDATEUSER value:self.metadata.lastUpdateUser];
+    [self setHeaderFieldDate:HDR_LASTUPDATETIME value:self.metadata.lastUpdateTime];
 }
 
 - (void)syncLastUpdateFieldsFromHeaders {
     Field *appField = [self getFirstHeaderFieldOfType:HDR_LASTUPDATETIME];
     if(appField) {
-        self.lastUpdateTime = appField.dataAsDate;
+        self.metadata.lastUpdateTime = appField.dataAsDate;
     }
 
     appField = [self getFirstHeaderFieldOfType:HDR_LASTUPDATEHOST];
     if(appField) {
-        self.lastUpdateHost = appField.dataAsString;
+        self.metadata.lastUpdateHost = appField.dataAsString;
     }
 
     appField = [self getFirstHeaderFieldOfType:HDR_LASTUPDATEUSER];
     if(appField) {
-        self.lastUpdateUser = appField.dataAsString;
+        self.metadata.lastUpdateUser = appField.dataAsString;
     }
     
     appField = [self getFirstHeaderFieldOfType:HDR_LASTUPDATEAPPLICATION];
     if(appField) {
-        self.lastUpdateApp = appField.dataAsString;
+        self.metadata.lastUpdateApp = appField.dataAsString;
     }
 }
 
@@ -456,12 +451,14 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
         return nil;
     }
 
+    [self defaultLastUpdateFieldsToNow];
+    
     // File Header
     
     NSMutableData *ret = [[NSMutableData alloc] init];
     
     NSData *K, *L;
-    PasswordSafe3Header hdr = [SafeTools generateNewHeader:(int)self.keyStretchIterations
+    PasswordSafe3Header hdr = [SafeTools generateNewHeader:(int)self.metadata.keyStretchIterations
                                             masterPassword:self.masterPassword
                                                          K:&K
                                                          L:&L];
@@ -547,8 +544,14 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     return dump;
 }
 
+- (void)defaultLastUpdateFieldsToNow {
+    self.metadata.lastUpdateTime = [[NSDate alloc] init];
+    self.metadata.lastUpdateUser = [Utils getUsername];
+    self.metadata.lastUpdateHost = [Utils hostname];
+    self.metadata.lastUpdateApp =  [Utils getAppName];
+}
 
--(NSString*)version {
+-(NSString*)getVersion {
     Field *version = [self getFirstHeaderFieldOfType:HDR_VERSION];
     if(!version) {
         return [NSString stringWithFormat:@"%ld.%ld", (long)kDefaultVersionMajor, (long)kDefaultVersionMinor];
@@ -597,20 +600,8 @@ static const NSInteger kDefaultVersionMinor = 0x0D;
     }
 }
 
-- (NSArray<Node *>*)allNodes {
-    return [self.rootGroup filterChildren:YES predicate:nil];
-}
-
--(NSArray<Node *> *)allRecords {
-    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup;
-    }];
-}
-
--(NSArray<Node *> *)allGroups {
-    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return node.isGroup;
-    }];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"metadata = [%@], Root=[%@]", self.metadata, self.rootGroup];
 }
 
 @end

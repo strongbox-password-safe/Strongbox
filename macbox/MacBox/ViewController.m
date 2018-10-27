@@ -1163,13 +1163,14 @@ NSString* trimField(NSTextField* textField) {
     self.textFieldSafeSummaryMostPopularUsername.stringValue = self.model.mostPopularUsername ? self.model.mostPopularUsername : @"<None>";
     self.textFieldSafeSummaryRecords.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.numberOfRecords];
     self.textFieldSafeSummaryGroups.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.numberOfGroups];
-    self.textFieldSafeSummaryKeyStretchIterations.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.keyStretchIterations];
-    self.textFieldSafeSummaryVersion.stringValue = self.model.version ? self.model.version : @"<Unknown>";
     
-    self.textFieldSafeSummaryLastUpdateUser.stringValue = self.model.lastUpdateUser ? self.model.lastUpdateUser : @"<Unknown>";
-    self.textFieldSafeSummaryLastUpdateHost.stringValue = self.model.lastUpdateHost ? self.model.lastUpdateHost : @"<Unknown>";
-    self.textFieldSafeSummaryLastUpdateApp.stringValue = self.model.lastUpdateApp ? self.model.lastUpdateApp : @"<Unknown>";
-    self.textFieldSafeSummaryLastUpdateTime.stringValue = [self formatDate:self.model.lastUpdateTime];
+    // TODO: KeePass and Password Safe Ordered KVP UI Dictionary Metadat
+//    self.textFieldSafeSummaryKeyStretchIterations.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.keyStretchIterations];
+//    self.textFieldSafeSummaryVersion.stringValue = self.model.version ? self.model.version : @"<Unknown>";
+//    self.textFieldSafeSummaryLastUpdateUser.stringValue = self.model.lastUpdateUser ? self.model.lastUpdateUser : @"<Unknown>";
+//    self.textFieldSafeSummaryLastUpdateHost.stringValue = self.model.lastUpdateHost ? self.model.lastUpdateHost : @"<Unknown>";
+//    self.textFieldSafeSummaryLastUpdateApp.stringValue = self.model.lastUpdateApp ? self.model.lastUpdateApp : @"<Unknown>";
+//    self.textFieldSafeSummaryLastUpdateTime.stringValue = [self formatDate:self.model.lastUpdateTime];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {

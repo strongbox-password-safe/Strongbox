@@ -80,6 +80,7 @@ typedef NS_ENUM (NSUInteger, FieldType) {
 @property (readonly) NSData *data;
 @property (readonly) NSString *dataAsString;
 @property (readonly) NSDate *dataAsDate;
+@property (readonly) NSUUID *dataAsUuid;
 
 @property (readonly) FieldType type;
 @property (readonly) HeaderFieldType dbHeaderFieldType;

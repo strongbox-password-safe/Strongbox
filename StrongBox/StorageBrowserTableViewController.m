@@ -253,8 +253,7 @@
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password {
     DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password];
-    [newSafe defaultLastUpdateFieldsToNow];
-    
+ 
     NSError *error;
     NSData *data = [newSafe getAsData:&error];
 

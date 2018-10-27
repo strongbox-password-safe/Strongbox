@@ -11,7 +11,10 @@
 #import "DropboxV2StorageProvider.h"
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
+
+#ifndef IS_APP_EXTENSION
 #import "OneDriveStorageProvider.h"
+#endif
 
 @implementation SafeStorageProviderFactory
 
