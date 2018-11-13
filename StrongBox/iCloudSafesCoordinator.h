@@ -21,7 +21,7 @@
 @property (nonatomic, copy) void (^showMigrationUi)(BOOL show);
 
 -(NSURL*)getFullICloudURLWithFileName:(NSString *)filename;
--(NSString*)getUniqueICloudFilename:(NSString *)prefix;
+-(NSString*)getUniqueICloudFilename:(NSString *)prefix extension:(NSString*)extension;
 
 - (void)migrateLocalToiCloud:(void (^)(BOOL show)) completion;
 - (void)migrateiCloudToLocal:(void (^)(BOOL show)) completion;

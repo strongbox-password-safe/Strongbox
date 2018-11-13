@@ -69,5 +69,8 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property (nonatomic) BOOL disallowAllBiometricId;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
 @property (nonatomic) BOOL useQuickLaunchAsRootView;
+@property (nonatomic) BOOL showKeePassCreateSafeOptions;
+@property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
+@property (nonatomic) BOOL hasShownKeePassBetaWarning;
 
 @end

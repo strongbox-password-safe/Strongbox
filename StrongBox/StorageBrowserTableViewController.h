@@ -8,14 +8,17 @@
 
 #import <UIKit/UIKit.h>
 #import "SafeStorageProvider.h"
+#import "AbstractPasswordDatabase.h"
 
 @interface StorageBrowserTableViewController : UITableViewController
 
 @property (nonatomic) NSObject *parentFolder;
 @property (nonatomic) BOOL existing;
 @property (nonatomic) id<SafeStorageProvider> safeStorageProvider;
+@property (nonatomic) DatabaseFormat format;
 
 - (IBAction)onSelectThisFolder:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSelectThis;
+
 @end

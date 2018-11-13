@@ -11,19 +11,21 @@
 
 @implementation KeePassGroup
 
-- (instancetype)init {
-    if(self = [super initWithXmlElementName:kGroupElementName]) {
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
+    if(self = [super initWithXmlElementName:kGroupElementName context:context]) {
         self.groups = [NSMutableArray array];
         self.entries = [NSMutableArray array];
-        self.name = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kNameElementName];
-        self.uuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName];
+        self.name = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kNameElementName context:context];
+        self.uuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:context];
+        self.iconId = nil; // [[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:context];
+        self.customIconUuid = nil; //[[GenericTextUuidElementHandler alloc] initWithXmlElementName:kCustomIconUuid context:context];
     }
     
     return self;
 }
 
--(instancetype)initAsKeePassRoot {
-    self = [self init];
+-(instancetype)initAsKeePassRoot:(XmlProcessingContext*)context {
+    self = [self initWithContext:context];
     if (self) {
         self.name.text = kDefaultRootGroupName;
     }
@@ -32,18 +34,24 @@
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
     if([xmlElementName isEqualToString:kGroupElementName]) {
-        return [[KeePassGroup alloc] init];
+        return [[KeePassGroup alloc] initWithContext:self.context];
     }
     else if([xmlElementName isEqualToString:kNameElementName]) {
-        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kNameElementName];
+        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kNameElementName context:self.context];
     }
     else if([xmlElementName isEqualToString:kUuidElementName]) {
-        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName];
+        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:self.context];
     }
     else if([xmlElementName isEqualToString:kEntryElementName]) {
-        return [[Entry alloc] init];
+        return [[Entry alloc] initWithContext:self.context];
     }
-
+    else if([xmlElementName isEqualToString:kIconIdElementName]) {
+        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:self.context];
+    }
+    else if([xmlElementName isEqualToString:kCustomIconUuidElementName]) {
+        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kCustomIconUuidElementName context:self.context];
+    }
+    
     return [super getChildHandler:xmlElementName];
 }
 
@@ -60,8 +68,16 @@
         self.uuid = (GenericTextUuidElementHandler*)completedObject;
         return YES;
     }
-    if([withXmlElementName isEqualToString:kEntryElementName]) {
+    else if([withXmlElementName isEqualToString:kEntryElementName]) {
         [self.entries addObject:(Entry*)completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kIconIdElementName]) {
+        self.iconId = (GenericTextStringElementHandler*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kCustomIconUuidElementName]) {
+        self.customIconUuid = (GenericTextUuidElementHandler*)completedObject;
         return YES;
     }
     
@@ -76,6 +92,9 @@
     [ret.children addObject:[self.uuid generateXmlTree]];
     [ret.children addObject:[self.name generateXmlTree]];
     
+    if(self.iconId) [ret.children addObject:[self.iconId generateXmlTree]];
+    if(self.customIconUuid) [ret.children addObject:[self.customIconUuid generateXmlTree]];
+
     // To Try make comparison of XML easier
     
     NSArray<KeePassGroup*>* sortedByName = [self.groups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
@@ -99,8 +118,37 @@
     return ret;
 }
 
+- (NSNumber *)icon {
+    return (self.iconId && self.iconId.text.length) ? @([self.iconId.text intValue]) : nil;
+}
+
+- (void)setIcon:(NSNumber *)icon {
+    if(icon) {
+        if(!self.iconId) {
+            self.iconId = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:self.context];
+        }
+    
+        self.iconId.text = icon ? icon.stringValue : nil;
+    }
+    else {
+        self.iconId = nil;
+    }
+}
+
+-(NSUUID *)customIcon {
+    return self.customIconUuid ? self.customIconUuid.uuid : nil;
+}
+
+-(void)setCustomIcon:(NSUUID *)customIcon {
+    if(!self.customIconUuid) {
+        self.customIconUuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kCustomIconUuidElementName context:self.context];
+    }
+    
+    self.customIconUuid.uuid = customIcon;
+}
+
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Name = [%@], Entries = [%@], Groups = [%@]\nUUID = [%@]", self.name, self.entries, self.groups, self.uuid];
+    return [NSString stringWithFormat:@"Name = [%@], Entries = [%@], Groups = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.entries, self.groups, self.iconId, self.customIcon, self.uuid];
 }
 
 @end

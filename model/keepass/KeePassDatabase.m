@@ -1,16 +1,20 @@
 #import <Foundation/Foundation.h>
 #import "KeePassDatabase.h"
 #import "Utils.h"
-#import "BinaryParsingHelper.h"
-#import "SafeTools.h"
+#import "Utils.h"
+#import "PwSafeSerialization.h"
 #import "KdbxSerialization.h"
 #import "RootXmlDomainObject.h"
 #import "KeePassXmlParserDelegate.h"
 #import "XmlStrongBoxModelAdaptor.h"
 #import "KeePassConstants.h"
 #import "XmlTreeSerializer.h"
+#import "AttachmentsRationalizer.h"
+#import "KdbxSerializationCommon.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static const BOOL kLogVerbose = NO;
 
 @interface KeePassDatabase ()
 
@@ -20,6 +24,22 @@
 @end
 
 @implementation KeePassDatabase
+
++ (NSString *)fileExtension {
+    return @"kdbx";
+}
+
+- (NSString *)fileExtension {
+    return [KeePassDatabase fileExtension];
+}
+
+- (DatabaseFormat)format {
+    return kKeePass;
+}
+
++ (BOOL)isAValidSafe:(NSData *)candidate {
+    return [KdbxSerialization isAValidSafe:candidate];
+}
 
 - (instancetype)initNewWithoutPassword {
     return [self initNewWithPassword:nil];
@@ -35,6 +55,8 @@
         Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:_rootGroup uuid:nil];
         [_rootGroup addChild:keePassRootGroup];
         
+        _attachments = [NSMutableArray array];
+        _customIcons = [NSMutableDictionary dictionary];
         _metadata = [[KeePassDatabaseMetadata alloc] init];
         
         self.existingRootXmlDocument = nil;
@@ -71,9 +93,14 @@
         
         // 2. Convert the Xml to a more usable Xml Model
         
-        NSLog(@"%@", serializationData.xml);
+        //NSLog(@"%@", serializationData.xml);
         
-        self.existingRootXmlDocument = [self parseKeePassXml:serializationData error:ppError];
+        self.existingRootXmlDocument = parseKeePassXml(serializationData.innerRandomStreamId,
+                                                       serializationData.protectedStreamKey,
+                                                       XmlProcessingContext.standardV3Context,
+                                                       serializationData.xml,
+                                                       ppError);
+        
         if(self.existingRootXmlDocument == nil) {
             NSLog(@"Error getting parseKeePassXml: [%@]", *ppError);
             return nil;
@@ -98,20 +125,51 @@
         // 4. Convert the Xml Model to the Strongbox Model
         
         XmlStrongBoxModelAdaptor *xmlStrongboxModelAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
-        KeepassMetaDataAndNodeModel *metadataAndNodeModel = [xmlStrongboxModelAdaptor fromXmlModelToStrongboxModel:self.existingRootXmlDocument error:ppError];
+        _rootGroup = [xmlStrongboxModelAdaptor fromXmlModelToStrongboxModel:self.existingRootXmlDocument error:ppError];
         
-        if(metadataAndNodeModel == nil) {
+        if(_rootGroup == nil) {
             NSLog(@"Error converting Xml model to Strongbox model: [%@]", *ppError);
             return nil;
         }
 
-        _rootGroup = metadataAndNodeModel.rootNode;
-        _metadata = metadataAndNodeModel.metadata;
+        // 5. Get Attachments
+        
+        NSArray<V3Binary*>* v3Binaries = safeGetBinaries(self.existingRootXmlDocument);
 
+        _attachments = [NSMutableArray array];
+
+        NSArray *sortedById = [v3Binaries sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            return [@(((V3Binary*)obj1).id) compare:@(((V3Binary*)obj2).id)];
+        }];
+        
+        for (V3Binary* binary in sortedById) {
+            DatabaseAttachment* dbA = [[DatabaseAttachment alloc] init];
+            dbA.data = binary.data;
+            dbA.compressed = binary.compressed;
+            [_attachments addObject:dbA];
+        }
+        
+        if(kLogVerbose) {
+            NSLog(@"Attachments: %@", self.attachments);
+        }
+        
+        // 6.
+        
+        _customIcons = safeGetCustomIcons(self.existingRootXmlDocument);
+        
+        // 7. Metadata
+    
+        _metadata = [[KeePassDatabaseMetadata alloc] init];
+        
+        if(self.existingRootXmlDocument.keePassFile.meta.generator.text) {
+            self.metadata.generator = self.existingRootXmlDocument.keePassFile.meta.generator.text;
+        }
+        
         self.metadata.transformRounds = serializationData.transformRounds;
         self.metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
         self.metadata.compressionFlags = serializationData.compressionFlags;
         self.metadata.version = serializationData.fileVersion;
+        self.metadata.cipherUuid = serializationData.cipherId;
         
         self.existingExtraUnknownHeaders = serializationData.extraUnknownHeaders;
         self.masterPassword = password;
@@ -120,8 +178,27 @@
     return self;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return [KdbxSerialization isAValidSafe:candidate];
+static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainObject* root) {
+    if(root && root.keePassFile && root.keePassFile.meta && root.keePassFile.meta.customIconList) {
+        if(root.keePassFile.meta.customIconList.icons) {
+            NSArray<CustomIcon*> *icons = root.keePassFile.meta.customIconList.icons;
+            NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
+            for (CustomIcon* icon in icons) {
+                [ret setObject:icon.data forKey:icon.uuid];
+            }
+            return ret;
+        }
+    }
+    
+    return [NSMutableDictionary dictionary];
+}
+
+static NSMutableArray<V3Binary*>* safeGetBinaries(RootXmlDomainObject* root) {
+    if(root && root.keePassFile && root.keePassFile.meta && root.keePassFile.meta.v3binaries) {
+        return root.keePassFile.meta.v3binaries.binaries;
+    }
+    
+    return [NSMutableArray array];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,14 +212,17 @@
         return nil;
     }
     
-    // 1. From Strongbox to Xml Model
+    // 1. Attachments - Rationalise. This needs to come first in case we change the attachments list / and node references
     
-    KeepassMetaDataAndNodeModel *nodeAndMetadata = [[KeepassMetaDataAndNodeModel alloc] initWithMetadata:self.metadata
-                                                                                               nodeModel:self.rootGroup];
+    _attachments = [[AttachmentsRationalizer rationalizeAttachments:self.attachments root:self.rootGroup] mutableCopy];
+    
+    // 2. From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
-    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:nodeAndMetadata
+    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:self.rootGroup
+                                                                        customIcons:self.customIcons
                                                             existingRootXmlDocument:self.existingRootXmlDocument
+                                                                            context:[XmlProcessingContext standardV3Context]
                                                                               error:error];
     
     if(!rootXmlDocument) {
@@ -154,7 +234,25 @@
         return nil;
     }
     
-    // 2. We need to calculate the header hash unfortunately before we generate the xml blob, and set it in the Xml
+    // 3. Add Attachments to Xml Doc
+    
+    if(!rootXmlDocument.keePassFile.meta.v3binaries) {
+        rootXmlDocument.keePassFile.meta.v3binaries = [[V3BinariesList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
+    }
+    
+    NSMutableArray<V3Binary*>* v3Binaries = rootXmlDocument.keePassFile.meta.v3binaries.binaries;
+    [v3Binaries removeAllObjects];
+    
+    int i = 0;
+    for (DatabaseAttachment* binary in self.attachments) {
+        V3Binary* bin = [[V3Binary alloc] initWithContext:[XmlProcessingContext standardV3Context]];
+        bin.compressed = binary.compressed;
+        bin.data = binary.data;
+        bin.id = i++;
+        [v3Binaries addObject:bin];
+    }
+    
+    // 4. We need to calculate the header hash unfortunately before we generate the xml blob, and set it in the Xml
     
     XmlTreeSerializer *xmlSerializer = [[XmlTreeSerializer alloc] initWithProtectedStreamId:self.metadata.innerRandomStreamId
                                                                                         key:nil // Auto generated new key
@@ -168,12 +266,23 @@
     serializationData.innerRandomStreamId = self.metadata.innerRandomStreamId;
     serializationData.transformRounds = self.metadata.transformRounds;
     serializationData.fileVersion = self.metadata.version;
+    serializationData.cipherId = self.metadata.cipherUuid;
     
     KdbxSerialization *kdbxSerializer = [[KdbxSerialization alloc] init:serializationData];
     
     // Set Header Hash
     
-    NSString *headerHash = [kdbxSerializer stage1Serialize:self.masterPassword];
+    NSString *headerHash = [kdbxSerializer stage1Serialize:self.masterPassword error:error];
+    if(!headerHash) {
+        NSLog(@"Could not serialize Document to KDBX. Stage 1");
+        
+        if(error) {
+            *error = [Utils createNSError:@"Could not serialize Document to KDBX. Stage 1." errorCode:-6];
+        }
+        
+        return nil;
+    }
+    
     [rootXmlDocument.keePassFile.meta setHash:headerHash];
     
     // 3. From Xml Model to Xml String (including inner stream encryption)
@@ -195,7 +304,7 @@
     
     // 3. KDBX serialize this Xml Document...
     
-    NSData *data = [kdbxSerializer stage2Serialize:xml];
+    NSData *data = [kdbxSerializer stage2Serialize:xml error:error];
     if(!data) {
         NSLog(@"Could not serialize Document to KDBX.");
         
@@ -207,32 +316,6 @@
     }
     
     return data;
-}
-
-- (RootXmlDomainObject*)parseKeePassXml:(SerializationData*)serializationData error:(NSError**)error{
-    //NSLog(@"Parsing Xml Document:\n%@", serializationData.xml);
-    
-    KeePassXmlParserDelegate *parserDelegate =
-    [[KeePassXmlParserDelegate alloc] initWithProtectedStreamId:serializationData.innerRandomStreamId
-                                                            key:serializationData.protectedStreamKey];
-    
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[serializationData.xml dataUsingEncoding:NSUTF8StringEncoding]];
-    [parser setDelegate:parserDelegate];
-    [parser parse];
-    NSError* err = [parser parserError];
-    
-    if(err)
-    {
-        NSLog(@"ERROR: %@", err);
-        if(error) {
-            *error = err;
-        }
-        return nil;
-    }
-    
-    RootXmlDomainObject* rootDocument = parserDelegate.rootElement;
-
-    return rootDocument;
 }
 
 - (NSString * _Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords {

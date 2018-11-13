@@ -7,12 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Cipher.h"
+#import "InnerRandomStream.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ChaCha20Cipher : NSObject
+@interface ChaCha20Cipher : NSObject<Cipher>
 
 - (NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (NSData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (NSData*)generateIv;
 
 @end
 

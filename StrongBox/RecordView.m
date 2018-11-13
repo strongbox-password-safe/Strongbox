@@ -15,6 +15,9 @@
 #import "ISMessages/ISMessages.h"
 #import "TextFieldAutoSuggest.h"
 #import "Settings.h"
+#import "FileAttachmentsViewControllerTableViewController.h"
+
+static const int kMinNotesCellHeight = 160;
 
 @interface RecordView ()
 
@@ -22,70 +25,25 @@
 @property (nonatomic, strong) TextFieldAutoSuggest *usernameAutoSuggest;
 @property (nonatomic, strong) TextFieldAutoSuggest *emailAutoSuggest;
 @property (nonatomic, strong) UITextField *textFieldTitle;
+@property (weak, nonatomic) IBOutlet UILabel *labelAttachmentCount;
+@property BOOL editingNewRecord;
+@property UIBarButtonItem *navBack;
+@property BOOL hidePassword;
 
 @end
 
-@implementation RecordView {
-    UIBarButtonItem *navBack;
-    BOOL _hidePassword;
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    [self setInitialTextFieldBordersAndColors];
-    [self setupAutoComplete];
-    
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    _hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
-    [self hideOrShowPassword:_hidePassword];
-    
-    [self reloadFieldsFromRecord];
-    
-    self.navigationController.toolbar.hidden = YES;
-    self.navigationController.navigationBar.hidden = NO;
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-    
-    [self setEditing:(self.record == nil) animated:YES];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    self.navigationController.toolbar.hidden = YES;
-    self.navigationController.navigationBar.hidden = NO;
-    
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    if(self.record == nil) {
-        [self.textFieldTitle becomeFirstResponder];
-        [self.textFieldTitle selectAll:nil];
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Autocomplete
+@implementation RecordView
 
 - (void)setupAutoComplete {
     self.passwordAutoSuggest = [[TextFieldAutoSuggest alloc]
                                 initForTextField:self.textFieldPassword
                                 viewController:self
                                 suggestionsProvider:^NSArray<NSString *> *(NSString *text) {
-                                    NSSet<NSString*> *allPasswords = self.viewModel.passwordSet;
+                                    NSSet<NSString*> *allPasswords = self.viewModel.database.passwordSet;
                                     
                                     NSArray<NSString*> *filtered = [[allPasswords allObjects]
-                                            filteredArrayUsingPredicate:[NSPredicate
-                                                                         predicateWithFormat:@"SELF BEGINSWITH[c] %@", text]];
+                                                                    filteredArrayUsingPredicate:[NSPredicate
+                                                                                                 predicateWithFormat:@"SELF BEGINSWITH[c] %@", text]];
                                     
                                     return [filtered sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
                                 }];
@@ -94,27 +52,27 @@
                                 initForTextField:self.textFieldUsername
                                 viewController:self
                                 suggestionsProvider:^NSArray<NSString *> *(NSString *text) {
-                                    NSSet<NSString*> *allUsernames = self.viewModel.usernameSet;
+                                    NSSet<NSString*> *allUsernames = self.viewModel.database.usernameSet;
                                     
                                     NSArray* filtered = [[allUsernames allObjects]
-                                            filteredArrayUsingPredicate:[NSPredicate
-                                                                         predicateWithFormat:@"SELF BEGINSWITH[c] %@", text]];
-                                
-                                    return [filtered sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-                                }];
-    
-    self.emailAutoSuggest = [[TextFieldAutoSuggest alloc]
-                                initForTextField:self.textFieldEmail
-                                viewController:self
-                                suggestionsProvider:^NSArray<NSString *> *(NSString *text) {
-                                    NSSet<NSString*> *allEmails = self.viewModel.emailSet;
-                                    
-                                    NSArray* filtered = [[allEmails allObjects]
                                                          filteredArrayUsingPredicate:[NSPredicate
                                                                                       predicateWithFormat:@"SELF BEGINSWITH[c] %@", text]];
                                     
                                     return [filtered sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
                                 }];
+    
+    self.emailAutoSuggest = [[TextFieldAutoSuggest alloc]
+                             initForTextField:self.textFieldEmail
+                             viewController:self
+                             suggestionsProvider:^NSArray<NSString *> *(NSString *text) {
+                                 NSSet<NSString*> *allEmails = self.viewModel.database.emailSet;
+                                 
+                                 NSArray* filtered = [[allEmails allObjects]
+                                                      filteredArrayUsingPredicate:[NSPredicate
+                                                                                   predicateWithFormat:@"SELF BEGINSWITH[c] %@", text]];
+                                 
+                                 return [filtered sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+                             }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +105,6 @@
     
     self.textViewNotes.delegate = self;
     
-    // TODO: Magic values here?
     self.textFieldTitle = [[UITextField alloc] initWithFrame:CGRectMake(self.view.bounds.origin.x, 7, self.view.bounds.size.width, 31)];
     
     self.textFieldTitle.backgroundColor = [UIColor clearColor];
@@ -164,114 +121,112 @@
     self.textFieldTitle.tag = 1;
     
     [self.textFieldTitle addTarget:self
-                        action:@selector(textViewDidChange:)
-              forControlEvents:UIControlEventEditingChanged];
+                            action:@selector(textViewDidChange:)
+                  forControlEvents:UIControlEventEditingChanged];
     
     [self.textFieldPassword addTarget:self
-                        action:@selector(textViewDidChange:)
-              forControlEvents:UIControlEventEditingChanged];
+                               action:@selector(textViewDidChange:)
+                     forControlEvents:UIControlEventEditingChanged];
     
     [self.textFieldUsername addTarget:self
-                        action:@selector(textViewDidChange:)
-              forControlEvents:UIControlEventEditingChanged];
-
-    [self.textFieldEmail addTarget:self
                                action:@selector(textViewDidChange:)
                      forControlEvents:UIControlEventEditingChanged];
     
+    [self.textFieldEmail addTarget:self
+                            action:@selector(textViewDidChange:)
+                  forControlEvents:UIControlEventEditingChanged];
+    
     [self.textFieldUrl addTarget:self
-                               action:@selector(textViewDidChange:)
-                     forControlEvents:UIControlEventEditingChanged];
+                          action:@selector(textViewDidChange:)
+                forControlEvents:UIControlEventEditingChanged];
     
     self.navigationItem.titleView = self.textFieldTitle;
 }
 
-- (void)autoFillPasswordForNewRecord {
-    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
-    self.textFieldPassword.text =
-        settings.passwordAutoFillMode == kNone ? @"" :
-        settings.passwordAutoFillMode == kGenerated ? [self.viewModel generatePassword] : settings.passwordCustomAutoFill;
+    self.navigationController.toolbar.hidden = YES;
+    self.navigationController.navigationBar.hidden = NO;
+    
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
 }
 
-- (void)autoFillNewRecord {
-    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
     
-    self.textFieldTitle.text = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
-    
-    self.textFieldUsername.text =
-        settings.usernameAutoFillMode == kNone ? @"" :
-        settings.usernameAutoFillMode == kMostUsed ? self.viewModel.mostPopularUsername : settings.usernameCustomAutoFill;
-    
-    [self autoFillPasswordForNewRecord];
-    
-    self.textFieldEmail.text =
-        settings.emailAutoFillMode == kNone ? @"" :
-        settings.emailAutoFillMode == kMostUsed ? self.viewModel.mostPopularEmail : settings.emailCustomAutoFill;
-    
-    self.textFieldUrl.text = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
-    
-    self.textViewNotes.text = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
+    if(self.editingNewRecord) {
+        [self.textFieldTitle becomeFirstResponder];
+        [self.textFieldTitle selectAll:nil];
+    }
 }
 
-- (void)reloadFieldsFromRecord {
-    if (self.record) {
-        self.textFieldPassword.text = self.record.fields.password;
-        self.textFieldTitle.text = self.record.title;
-        self.textFieldUrl.text = self.record.fields.url;
-        self.textFieldUsername.text = self.record.fields.username;
-        self.textFieldEmail.text = self.record.fields.email;
-        self.textViewNotes.text = self.record.fields.notes;
-    }
-    else {
-        [self autoFillNewRecord];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setInitialTextFieldBordersAndColors];
+    [self setupAutoComplete];
+    
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+    self.hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
+
+    if(!self.record) {
+        self.record = [self createNewRecord];
+        self.editingNewRecord = YES;
     }
     
-    self.buttonHistory.enabled = self.record != nil;
+    [self bindUiToRecord];
+    
+    [self setEditing:self.editingNewRecord animated:YES];
+}
+
+- (void)bindUiToRecord {
+    self.textFieldPassword.text = self.record.fields.password;
+    self.textFieldTitle.text = self.record.title;
+    self.textFieldUrl.text = self.record.fields.url;
+    self.textFieldUsername.text = self.record.fields.username;
+    self.textFieldEmail.text = self.record.fields.email;
+    self.textViewNotes.text = self.record.fields.notes;
+    
+    int count = (int)self.record.fields.attachments.count;
+    
+    NSString* singleAttachment;
+    if(count == 1) {
+        singleAttachment = [NSString stringWithFormat:@"📎 %@", [self.record.fields.attachments objectAtIndex:0].filename];
+    }
+    self.labelAttachmentCount.text = count == 0 ? @"📎 None" : count == 1 ? singleAttachment : [NSString stringWithFormat:@"📎 %d Attachments", count];
 }
 
 - (void)setEditing:(BOOL)flag animated:(BOOL)animated {
     [super setEditing:flag animated:animated];
     
     if (flag == YES) {
-        navBack = self.navigationItem.leftBarButtonItem;
+        self.navBack = self.navigationItem.leftBarButtonItem;
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
-        self.buttonHistory.enabled = NO;
-        [self updateFieldsForEditable];
-        self.editButtonItem.enabled = [self validEditsPresent];
+        [self enableDisableUiForEditing];
+        self.editButtonItem.enabled = [self recordCanBeSaved];
         [self.textFieldTitle becomeFirstResponder];
     }
     else {
-        if ([self validEditsPresent]) { // Any other changes? Change the record and save the safe
-            [self saveAfterEdit:^(NSError *error) {
-                self.navigationItem.leftBarButtonItem = self->navBack;
-                self.editButtonItem.enabled = YES;
-                self->navBack = nil;
-                
-                if (error != nil) {
-                    [self.navigationController popToRootViewControllerAnimated:YES];
-                    [Alerts error:self title:@"Problem Saving" error:error];
-                    NSLog(@"%@", error);
-                }
-                else {
-                    [self reloadFieldsFromRecord];
-                    [self updateFieldsForEditable];
-                }
-            }];
+        if ([self recordCanBeSaved]) { // Any other changes? Change the record and save the safe
+            [self onDoneWithChanges];
         }
         else {
-            self.buttonHistory.enabled = (self.record != nil);
-            self.navigationItem.leftBarButtonItem = navBack;
+            self.navigationItem.leftBarButtonItem = self.navBack;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
-            navBack = nil;
-        }
+            self.navBack = nil;
         
-        [self updateFieldsForEditable];
+            [self enableDisableUiForEditing];
+        }
     }
 }
 
-- (void)updateFieldsForEditable {
+- (void)enableDisableUiForEditing {
     self.textFieldTitle.enabled = self.editing;
     self.textFieldTitle.layer.borderWidth = self.editing ? 1.0f : 0.0f;
     self.textFieldTitle.borderStyle = self.editing ? UITextBorderStyleRoundedRect : UITextBorderStyleNone;
@@ -305,13 +260,24 @@
     [self.buttonGeneratePassword setImage:btnImage forState:UIControlStateNormal];
     (self.buttonGeneratePassword).enabled = self.editing || (!self.isEditing && (self.record != nil && (self.record.fields.password).length));
     
-    [self hideOrShowPassword:self.isEditing ? NO : _hidePassword];
-    (self.buttonHidePassword).enabled = !self.isEditing;
-    
     (self.buttonCopyUsername).enabled = !self.isEditing && (self.record != nil && (self.record.fields.username).length);
     (self.buttonCopyEmail).enabled = !self.isEditing && (self.record != nil && (self.record.fields.email).length);
     (self.buttonCopyUrl).enabled = !self.isEditing && (self.record != nil && (self.record.fields.url).length);
     (self.buttonCopyAndLaunchUrl).enabled = !self.isEditing;
+    
+    // Attachments screen not available in edit mode
+    
+    self.labelAttachmentCount.textColor = self.editing ? [UIColor grayColor] : [UIColor blueColor];
+    self.tableCellAttachments.userInteractionEnabled = !self.editing;
+
+    // History only available on Password Safe and non new
+
+    self.buttonHistory.enabled = !self.editing && self.viewModel.database.format == kPasswordSafe;
+
+    // Show / Hide Password
+    
+    [self hideOrShowPassword:self.isEditing ? NO : _hidePassword];
+    (self.buttonHidePassword).enabled = !self.isEditing;
 }
 
 - (void)setTitleTextFieldUIValidationIndicator {
@@ -326,13 +292,13 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    self.editButtonItem.enabled = [self validEditsPresent];
+    self.editButtonItem.enabled = [self recordCanBeSaved];
 
     [self setTitleTextFieldUIValidationIndicator];
 }
 
-- (BOOL)validEditsPresent {
-    BOOL ret =  [self uiEditsPresent] && [self uiIsValid];
+- (BOOL)recordCanBeSaved {
+    BOOL ret =  ([self uiEditsPresent] || self.editingNewRecord) && [self uiIsValid];
 
     //NSLog(@"validEditsPresent: %d", ret);
     
@@ -365,7 +331,31 @@
     return !(notesClean && passwordClean && titleClean && urlClean && emailClean && usernameClean);
 }
 
-NSString * trim(NSString *string) {
+- (Node*)createNewRecord {
+    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    
+    NSString *title = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
+    
+    NSString* username = settings.usernameAutoFillMode == kNone ? @"" :
+    settings.usernameAutoFillMode == kMostUsed ? self.viewModel.database.mostPopularUsername : settings.usernameCustomAutoFill;
+    
+    NSString *password =
+    settings.passwordAutoFillMode == kNone ? @"" :
+    settings.passwordAutoFillMode == kGenerated ? [self.viewModel generatePassword] : settings.passwordCustomAutoFill;
+    
+    NSString* email =
+    settings.emailAutoFillMode == kNone ? @"" :
+    settings.emailAutoFillMode == kMostUsed ? self.viewModel.database.mostPopularEmail : settings.emailCustomAutoFill;
+    
+    NSString* url = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
+    NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
+    
+    NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
+    
+    return [[Node alloc] initAsRecord:title parent:self.parentGroup fields:fields uuid:nil];
+}
+
+static NSString * trim(NSString *string) {
     return [string stringByTrimmingCharactersInSet:
             [NSCharacterSet whitespaceCharacterSet]];
 }
@@ -388,15 +378,12 @@ NSString * trim(NSString *string) {
                                didHide:nil];
 }
 
-- (IBAction)onSettings:(id)sender {
-}
-
-- (IBAction)onGeneratePassword:(id)sender {
+- (IBAction)onGenerateOrCopyPassword:(id)sender {
     if (self.editing) {
         self.textFieldPassword.text = [self.viewModel generatePassword];
-        self.editButtonItem.enabled = [self validEditsPresent];
+        self.editButtonItem.enabled = [self recordCanBeSaved];
     }
-    else if (self.record)
+    else
     {
         [self copyToClipboard:self.record.fields.password message:@"Password Copied"];
     }
@@ -447,26 +434,18 @@ NSString * trim(NSString *string) {
     }
     else {
         [self.textFieldPassword setTextColor:[UIColor purpleColor]];
-        
-        if(self.record) {
-            self.textFieldPassword.text = self.record.fields.password;
-        }
-        else {
-            [self autoFillPasswordForNewRecord];
-        }
-        
+        self.textFieldPassword.text = self.record.fields.password;
         [self.buttonHidePassword setTitle:@"Hide" forState:UIControlStateNormal];
     }
 }
 
 - (void)onCancelBarButton {
-    if (self.record == nil) {
+    if (self.editingNewRecord) {
         // Back to safe view if we just cancelled out of a new record
         [self.navigationController popViewControllerAnimated:YES];
     }
     else {
-        [self reloadFieldsFromRecord];
-        
+        [self bindUiToRecord];
         [self setEditing:NO animated:YES];
     }
 }
@@ -479,21 +458,25 @@ NSString * trim(NSString *string) {
         vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
         
         vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(NSError *)) {
-            self.record.fields.passwordHistory = changed;
-            self.record.fields.accessed = [[NSDate alloc] init];
-            self.record.fields.modified = [[NSDate alloc] init];
-
-            [self.viewModel update:^(NSError *error) {
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    onDone(error);
-                });
-            }];
+            [self onPasswordHistoryChanged:changed onDone:onDone];
+        };
+    }
+    else if ([segue.identifier isEqual:@"segueToFileAttachments"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        
+        FileAttachmentsViewControllerTableViewController* vc = (FileAttachmentsViewControllerTableViewController*)[nav topViewController];
+        vc.nodeAttachments = self.record.fields.attachments;
+        vc.databaseAttachments = self.viewModel.database.attachments;
+        vc.format = self.viewModel.database.format;
+        
+        __weak FileAttachmentsViewControllerTableViewController* weakRef = vc;
+        vc.onDoneWithChanges = ^{
+            [self onAttachmentsChanged:weakRef.nodeAttachments databaseAttachments:weakRef.databaseAttachments];
         };
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // Hide Delete Buttons and Indentation during editing and autosize last row to fill available space
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -504,26 +487,60 @@ NSString * trim(NSString *string) {
     return NO;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (section == 4) { // Hide Attachments Section for PasswordSafe
+        return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForHeaderInSection:section];
+    }
+    else if (section == 2) {  // Hide Email Section for KeePass
+        return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForHeaderInSection:section] : 0;
+    }
+    
+    return [super tableView:tableView heightForHeaderInSection:section];
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 4 && indexPath.row == 0) {
-        int cell1 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-        int cell2 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
-        int cell3 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]];
-        int cell4 = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
+    if (indexPath.section == 5 && indexPath.row == 0) {
+        int password = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+        int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
+        int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
+       
+        int attachments = self.viewModel.database.format == kPasswordSafe ? 0 :
+            [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:4]] + self.tableView.sectionHeaderHeight;
         
-        int otherCellsHeight = cell1 + cell2 + cell3 + cell4;
+        int email = self.viewModel.database.format == kPasswordSafe ?
+            [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]] + self.tableView.sectionHeaderHeight : 0;
+
+        //NSLog(@"Cells: %d-%d-%d-%d-%d", password, username, email, url, attachments);
+
+        // Include Header Height (not from cells as they're set to UITableViewAutomaicDimension (-1) so ask for default
+        // Tableview section header height then x 3 fixed header
+        
+        int otherCellsAndCellHeadersHeight = password + username + email + url + attachments + (3 * self.tableView.sectionHeaderHeight);
         
         int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int toolBarHeight = self.navigationController.toolbar.frame.size.height;
         int navBarHeight = self.navigationController.navigationBar.frame.size.height;
         
+        //NSLog(@"Bars: %d-%d-%d", statusBarHeight, navBarHeight, toolBarHeight);
+
+        //NSLog(@"Total Height: %f", self.tableView.bounds.size.height);
         int totalVisibleHeight = self.tableView.bounds.size.height - statusBarHeight - navBarHeight - toolBarHeight;
         
-        int availableHeight = totalVisibleHeight - otherCellsHeight;
+        //NSLog(@"Total Visible Height: %d", totalVisibleHeight);
         
-        availableHeight = (availableHeight > 80) ? availableHeight : 80;
+        int availableHeight = totalVisibleHeight - otherCellsAndCellHeadersHeight;
+        
+        //NSLog(@"Total availableHeight: %d", availableHeight);
+        
+        availableHeight = (availableHeight > kMinNotesCellHeight) ? availableHeight : kMinNotesCellHeight;
         
         return availableHeight;
+    }
+    else if (indexPath.section == 4 && indexPath.row == 0) { // Hide Attachments Section for Passwprd Safe
+        return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
+    }
+    else if (indexPath.section == 2 && indexPath.row == 0) { // Hide Email Section for KeePass
+        return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForRowAtIndexPath:indexPath] : 0;
     }
     else {
         return [super tableView:tableView heightForRowAtIndexPath:indexPath];
@@ -532,38 +549,78 @@ NSString * trim(NSString *string) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)saveAfterEdit:(void (^)(NSError *))completion {
-    BOOL recordNeedsToBeAddedToSafe = (self.record == nil);
-    
-    if (recordNeedsToBeAddedToSafe) {
-        NodeFields *nodeFields = [[NodeFields alloc] initWithUsername:trim(self.textFieldUsername.text)
-                                                                  url:trim(self.textFieldUrl.text)
-                                                             password:trim(self.textFieldPassword.text)
-                                                                notes:self.textViewNotes.text
-                                                                email:trim(self.textFieldEmail.text)];
-        
-        self.record = [[Node alloc] initAsRecord:trim(self.textFieldTitle.text)
-                                          parent:self.parentGroup
-                                          fields:nodeFields
-                                            uuid:nil];
-
-        self.record.fields.created = [[NSDate alloc] init];
-        
-        [self.parentGroup addChild:self.record];
-    }
-    else {
-        self.record.fields.accessed = [[NSDate alloc] init];
-        self.record.fields.modified = [[NSDate alloc] init];
-
-        self.record.fields.notes = self.textViewNotes.text;
-        self.record.fields.password = trim(self.textFieldPassword.text);
-        self.record.title = trim(self.textFieldTitle.text);
-        self.record.fields.url = trim(self.textFieldUrl.text);
-        self.record.fields.username = trim(self.textFieldUsername.text);
-        self.record.fields.email = trim(self.textFieldEmail.text);
-    }
+- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(NSError *))onDone {
+    self.record.fields.passwordHistory = changed;
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
     
     [self.viewModel update:^(NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            onDone(error);
+        });
+    }];
+}
+
+- (void)onDoneWithChanges {
+    [self saveChanges:^(NSError *error) {
+        self.navigationItem.leftBarButtonItem = self.navBack;
+        self.editButtonItem.enabled = YES;
+        self.navBack = nil;
+        
+        if (error != nil) {
+            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
+            NSLog(@"%@", error);
+        }
+        else {
+            [self bindUiToRecord];
+            [self enableDisableUiForEditing];
+        }
+    }];
+}
+
+- (void)onAttachmentsChanged:(NSArray<NodeFileAttachment*>*)nodeAttachments
+         databaseAttachments:(NSArray<DatabaseAttachment*>*)databaseAttachments {
+    [self.record.fields.attachments removeAllObjects];
+    [self.record.fields.attachments addObjectsFromArray:nodeAttachments];
+    
+    [self.viewModel.database.attachments removeAllObjects];
+    [self.viewModel.database.attachments addObjectsFromArray:databaseAttachments];
+    
+    [self saveChanges:^(NSError *error) {
+        if (error != nil) {
+            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
+            NSLog(@"%@", error);
+        }
+        else {
+            [self bindUiToRecord];
+        }
+    }];
+}
+
+- (void)saveChanges:(void (^)(NSError *))completion {
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+    self.record.fields.notes = self.textViewNotes.text;
+    self.record.fields.password = trim(self.textFieldPassword.text);
+    self.record.title = trim(self.textFieldTitle.text);
+    self.record.fields.url = trim(self.textFieldUrl.text);
+    self.record.fields.username = trim(self.textFieldUsername.text);
+    self.record.fields.email = trim(self.textFieldEmail.text);
+
+    if (self.editingNewRecord) {
+        self.record.fields.created = [[NSDate alloc] init];
+        [self.parentGroup addChild:self.record];
+    }
+
+    [self.viewModel update:^(NSError *error) {
+        if(!error) {
+            self.editingNewRecord = NO;
+        }
+        
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             completion(error);
         });

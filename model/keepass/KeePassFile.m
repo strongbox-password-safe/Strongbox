@@ -11,16 +11,16 @@
 
 @implementation KeePassFile
 
-- (instancetype)init {
-    return [super initWithXmlElementName:kKeePassFileElementName];
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
+    return [super initWithXmlElementName:kKeePassFileElementName context:context];
 }
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren {
-    self = [self init];
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context {
+    self = [self initWithContext:context];
     
     if(self) {
-        _root = [[Root alloc] initWithDefaultsAndInstantiatedChildren];
-        _meta = [[Meta alloc] initWithDefaultsAndInstantiatedChildren];
+        _root = [[Root alloc] initWithDefaultsAndInstantiatedChildren:context];
+        _meta = [[Meta alloc] initWithDefaultsAndInstantiatedChildren:context];
     }
     
     return self;
@@ -28,10 +28,10 @@
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
     if([xmlElementName isEqualToString:kMetaElementName]) {
-        return [[Meta alloc] init];
+        return [[Meta alloc] initWithContext:self.context];
     }
     else if ([xmlElementName isEqualToString:kRootElementName]) {
-        return [[Root alloc] init];
+        return [[Root alloc] initWithContext:self.context];
     }
     
     return [super getChildHandler:xmlElementName];

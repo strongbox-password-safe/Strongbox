@@ -8,13 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import "AbstractPasswordDatabase.h"
-#import "KeePassDatabaseMetadata.h"
+#import "KeePass4DatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdbx4Database : NSObject<AbstractPasswordDatabase>
 
 + (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
++ (NSString *)fileExtension;
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 - (instancetype _Nullable )initNewWithoutPassword;
@@ -25,8 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*_Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
-@property (nonatomic, readonly, nonnull) KeePassDatabaseMetadata* metadata; // TODO: 
+@property (nonatomic, readonly, nonnull) KeePass4DatabaseMetadata* metadata; 
 @property (nonatomic, retain, nullable) NSString *masterPassword;
+@property (nonatomic, readonly, nonnull) NSMutableArray<DatabaseAttachment*>* attachments;
+@property (nonatomic, readonly, nonnull) NSMutableDictionary<NSUUID*, NSData*>* customIcons;
 
 @end
 

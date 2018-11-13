@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Root : BaseXmlDomainObjectHandler
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren;
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context;
 
 @property (nonatomic) KeePassGroup* rootGroup;
 

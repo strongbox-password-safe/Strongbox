@@ -49,4 +49,12 @@
 - (NSArray<StorageBrowserItem *>*)scanForNewSafes;
 - (BOOL)fileExists:(SafeMetaData*)metaData;
 
+// Auto Fill Cache
+
+- (void)createAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(BOOL success))completion;
+- (void)readAutoFillCache:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion;
+- (void)deleteAutoFillCache:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
+- (void)updateAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion;
+- (NSDate *)getAutoFillCacheModificationDate:(SafeMetaData *)safeMetadata;
+
 @end

@@ -37,10 +37,7 @@ abstract_target 'common-ios' do
     
     target 'Strongbox-iOS' do
         pod 'ISMessages' 
-        #pod 'Reachability'
         pod 'PopupDialog'
-        pod 'ADAL', '~> 1.2'
-        pod 'Base32', '~> 1.1'
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
     end

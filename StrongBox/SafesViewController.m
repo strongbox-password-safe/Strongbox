@@ -18,6 +18,7 @@
 #import "AppleICloudProvider.h"
 #import "SafeStorageProviderFactory.h"
 #import "OpenSafeSequenceHelper.h"
+#import "NewSafeFormatController.h"
 
 @interface SafesViewController ()
 
@@ -363,7 +364,7 @@
         BrowseSafeView *vc = segue.destinationViewController;
         vc.viewModel = (Model *)sender;
         
-        vc.currentGroup = vc.viewModel.rootGroup;
+        vc.currentGroup = vc.viewModel.database.rootGroup;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
     {
@@ -433,7 +434,12 @@
 
 - (void)onAddSafeActionSheetResponse:(int)response {
     if (response == 1) {
-        [self performSegueWithIdentifier:@"segueToStorageType" sender:@"New"];
+        if(Settings.sharedInstance.showKeePassCreateSafeOptions) {
+            [self performSegueWithIdentifier:@"segueToSelectNewSafeFormat" sender:self];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToStorageType" sender:@"New"];
+        }
     }
     else if (response == 2) {
         [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];

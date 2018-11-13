@@ -11,6 +11,7 @@
 #import "Utils.h"
 #import "SafesList.h"
 #import "Settings.h"
+#import "DatabaseModel.h"
 
 @interface LocalDeviceStorageProvider ()
 
@@ -61,11 +62,12 @@
 }
 
 - (void)    create:(NSString *)nickName
+         extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
     NSString *path = [self getFilePathFromFileName:desiredFilename offlineCache:NO];
     
     
@@ -87,7 +89,7 @@
                     completion:(void (^)(BOOL success))completion {
     NSString *desiredFilename = [self getOfflineCacheFileName:safe];
     NSString *path = [self getFilePathFromFileName:desiredFilename offlineCache:YES];
-    
+
     NSLog(@"Creating offline cache file at: %@", path);
     
     if(![data writeToFile:path atomically:YES]) {
@@ -177,7 +179,7 @@
     
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
 
-    NSLog(@"Getting modification date for: %@ - %@", path, attributes);
+    //NSLog(@"Getting modification date for: %@ - %@", path, attributes);
 
     return [attributes fileModificationDate];
 }
@@ -245,6 +247,100 @@
                                          fileName:(NSString*)providerData
                                    fileIdentifier:(NSString*)providerData];
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)createAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(BOOL success))completion {
+    NSString *filePath = getAutoFillFilePath(safeMetaData);
+    NSLog(@"Creating AutoFill cache file at: %@", filePath);
+    
+    NSError* error;
+    if(![data writeToFile:filePath options:NSDataWritingAtomic error:&error]) {
+        NSLog(@"Error Writing AutoFill Cache file. [%@]", error);
+        completion(NO);
+    }
+    else {
+        completion(YES);
+    }
+}
+
+- (void)readAutoFillCache:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion {
+    NSString *filePath = getAutoFillFilePath(safeMetaData);
+    
+    NSLog(@"Reading AutoFill cache file at: %@", filePath);
+    
+    NSError* error;
+    NSData *data = [NSData dataWithContentsOfFile:filePath options:kNilOptions error:&error];
+    
+    if(!data) {
+        NSLog(@"Error Reading AutoFill Cache File: [%@]", error);
+    }
+    
+    completion(data, error);
+}
+
+- (void)updateAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion {
+    NSString *filePath = getAutoFillFilePath(safeMetaData);
+    
+    NSLog(@"Updating AutoFill cache file at: %@", filePath);
+    
+    NSError* error;
+    if(![data writeToFile:filePath options:NSDataWritingAtomic error:&error]) {
+        NSLog(@"Error updating AutoFill cache. [%@]", error);
+        completion(NO);
+    }
+    else {
+        completion(YES);
+    }
+}
+
+- (void)deleteAutoFillCache:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
+    NSString *filePath = getAutoFillFilePath(safeMetaData);
+    NSError *error;
+    
+    NSLog(@"Deleting AutoFill cache file at: %@", filePath);
+    
+    [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+    completion(error);
+}
+
+- (NSDate *)getAutoFillCacheModificationDate:(SafeMetaData *)safeMetadata {
+    NSString *filePath = getAutoFillFilePath(safeMetadata);
+    
+    if(![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        NSLog(@"Offline cache file does NOT exist!");
+        return nil;
+    }
+    
+    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
+    
+    //NSLog(@"Getting modification date for: %@ - %@", filePath, attributes);
+    
+    return [attributes fileModificationDate];
+}
+
+static NSString* getAutoFillCacheFileName(SafeMetaData* safe) {
+    return [NSString stringWithFormat:@"%@-autofill-cache.dat", safe.uuid];
+}
+
+static NSString* getAutoFillCacheDirectory() {
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:kAppGroupName];
+    NSString* ret = [url.path stringByAppendingPathComponent:@"auto-fill-caches"];
+    NSError* error;
+    
+    //NSLog(@"Creating Auto Fill Cache Directory.");
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
+        NSLog(@"Error Auto Fill Cache Directory: %@", error.localizedDescription);
+    }
+    
+    return ret;
+}
+
+static NSString* getAutoFillFilePath(SafeMetaData* safeMetaData) {
+    NSString* autoFillCacheDir = getAutoFillCacheDirectory();
+    return [autoFillCacheDir stringByAppendingPathComponent:getAutoFillCacheFileName(safeMetaData)];
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)startMonitoringDocumentsDirectory:(void (^)(void))completion
 {
@@ -366,7 +462,7 @@
         return [IOsUtils applicationSupportDirectory].path;
     }
     else {
-        // TODO: Maybe we could make Local Safes eligible for auto fill by offering user a choice.
+        // FUTURE: Maybe we could make Local Safes eligible for auto fill by offering user a choice.
         // Basically if we move to the Group Container iTunes File Sharing/Files app no longer works. So it's either/or
         // Seems like Apple didn't really think this one through fully
         //

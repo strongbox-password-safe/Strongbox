@@ -17,7 +17,9 @@
 #import "Csv.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
-    @property (readonly) NSArray *lines;
+
+@property (readonly) NSArray *lines;
+
 @end
 
 @interface SafeDetailsView () <MFMailComposeViewControllerDelegate>
@@ -31,18 +33,19 @@
     
     [self updateTouchIdButtonText];
     [self updateOfflineCacheButtonText];
-    
+    [self updateAutoFillCacheButtonText];
+
     self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
     self.labelToggleTouchId.enabled = [self canToggleTouchId];
     self.labelToggleOfflineCache.enabled = [self canToggleOfflineCache];
 
-    self.labelMostPopularUsername.text = self.viewModel.mostPopularUsername ? self.viewModel.mostPopularUsername : @"<None>";
-    self.labelMostPopularEmail.text = self.viewModel.mostPopularEmail ? self.viewModel.mostPopularEmail : @"<None>";
-    self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.usernameSet count]];
-    self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.emailSet count]];
-    self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.passwordSet count]];
-    self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.numberOfGroups];
-    self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.numberOfRecords];
+    self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : @"<None>";
+    self.labelMostPopularEmail.text = self.viewModel.database.mostPopularEmail ? self.viewModel.database.mostPopularEmail : @"<None>";
+    self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
+    self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.emailSet count]];
+    self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.passwordSet count]];
+    self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfGroups];
+    self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfRecords];
     
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
@@ -63,13 +66,16 @@
         else if (indexPath.row == 3  && [self canToggleTouchId]) { // Toggle Touch ID
             [self onToggleTouchId];
         }
+        else if (indexPath.row == 4) { // Autofill Cache
+            [self onToggleAutoFillCache];
+        }
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     
-    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.databaseMetadata kvpForUi];
+    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
     if(indexPath.section == 2 && indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
     {
         NSString* key = [metadataKvps.allKeys objectAtIndex:indexPath.row];
@@ -82,7 +88,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.databaseMetadata kvpForUi];
+    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
     if(indexPath.section == 2 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
     {
         return 0;
@@ -104,12 +110,12 @@
 }
 
 - (void)changeMasterPassword:(NSString *)password {
-    self.viewModel.masterPassword = password;
+    self.viewModel.database.masterPassword = password;
     
     [self.viewModel update:^(NSError *error) {
         if (error == nil) {
             if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
-                [self.viewModel.metadata setTouchIdPassword:self.viewModel.masterPassword];
+                [self.viewModel.metadata setTouchIdPassword:self.viewModel.database.masterPassword];
                 NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
             }
             
@@ -149,6 +155,10 @@
 
 - (void)updateOfflineCacheButtonText {
     self.labelToggleOfflineCache.text = self.viewModel.metadata.offlineCacheEnabled ? @"Disable Offline Cache" : @"Enable Offline Cache";
+}
+
+- (void)updateAutoFillCacheButtonText {
+    self.labelToggleAutoFillCache.text = self.viewModel.metadata.autoFillCacheEnabled ? @"Disable Auto Fill Cache" : @"Enable Auto Fill Cache";
 }
 
 - (void)onToggleTouchId {
@@ -242,6 +252,44 @@
     }
 }
 
+- (void)onToggleAutoFillCache {
+    if (self.viewModel.metadata.autoFillCacheEnabled) {
+        [Alerts yesNo:self
+                title:@"Disable Autofill Cache?"
+              message:@"Disabling the Autofill Cache will remove the autofill cache and you will not be able to access the safe for use during autofill. Are you sure you want to do this?"
+               action:^(BOOL response) {
+                   if (response) {
+                       [self.viewModel disableAndClearAutoFillCache];
+                       [self updateAutoFillCacheButtonText];
+
+                       [ISMessages showCardAlertWithTitle:@"Autofill Cache Disabled"
+                                                  message:nil
+                                                 duration:3.f
+                                              hideOnSwipe:YES
+                                                hideOnTap:YES
+                                                alertType:ISAlertTypeSuccess
+                                            alertPosition:ISAlertPositionTop
+                                                  didHide:nil];
+                   }
+               }];
+    }
+    else {
+        [self.viewModel enableAutoFillCache];
+        [self.viewModel updateAutoFillCache:^{
+            [self updateAutoFillCacheButtonText];
+            
+            [ISMessages                 showCardAlertWithTitle:@"Autofill Cache Enabled"
+                                                       message:nil
+                                                      duration:3.f
+                                                   hideOnSwipe:YES
+                                                     hideOnTap:YES
+                                                     alertType:ISAlertTypeSuccess
+                                                 alertPosition:ISAlertPositionTop
+                                                       didHide:nil];
+        }];
+    }
+}
+
 - (void)onExport {
     [Alerts threeOptions:self title:@"How would you like to export your safe?"
                  message:@"You can export your encrypted safe by email, or you can copy your safe in plaintext format (CSV) to the clipboard."
@@ -253,13 +301,13 @@
             [self exportEncryptedSafeByEmail];
         }
         else if(response == 1){
-            NSData *newStr = [Csv getSafeAsCsv:self.viewModel.rootGroup];
+            NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
 
             NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
             [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
         }
         else if(response == 2){
-            NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.rootGroup] encoding:NSUTF8StringEncoding];
+            NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database.rootGroup] encoding:NSUTF8StringEncoding];
 
             UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
             pasteboard.string = newStr;

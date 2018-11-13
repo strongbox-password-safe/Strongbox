@@ -67,28 +67,27 @@
     //NSLog(@"%@", data.xml);
     XCTAssert([data.xml hasPrefix:@"<?xml"]);
 }
-
-- (void)testDeserializeDesktopFileToXml {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Desktop/Database.kdbx"];
-    
-    NSError* error;
-    //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
-    
-    if(!data) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssert(data != nil);
-    
-    NSLog(@"%@", data);
-    NSLog(@"%@", data.xml);
-    XCTAssert([data.xml hasPrefix:@"<?xml"]);
-    
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/Database.xml" contents:[data.xml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
-}
-
+//
+//- (void)testDeserializeDesktopFileToXml {
+//    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Desktop/Database.kdbx"];
+//
+//    NSError* error;
+//    //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
+//
+//    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
+//
+//    if(!data) {
+//        NSLog(@"%@", error);
+//    }
+//
+//    XCTAssert(data != nil);
+//
+//    NSLog(@"%@", data);
+//    NSLog(@"%@", data.xml);
+//    XCTAssert([data.xml hasPrefix:@"<?xml"]);
+//
+//    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/Database.xml" contents:[data.xml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+//}
 
 - (void)testDeserializeGoogleDriveFileToXml {
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database.kdbx"];

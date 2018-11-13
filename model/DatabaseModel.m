@@ -5,6 +5,7 @@
 #import "AbstractPasswordDatabase.h"
 #import "Utils.h"
 #import "Kdbx4Database.h"
+#import "Kdb1Database.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,36 +18,63 @@
 @implementation DatabaseModel
 
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return [PwSafeDatabase isAValidSafe:candidate];
-//    ||
-//            [KeePassDatabase isAValidSafe:candidate] ||
-//            [Kdbx4Database isAValidSafe:candidate];
+    return  [PwSafeDatabase isAValidSafe:candidate] ||
+            [KeePassDatabase isAValidSafe:candidate] ||
+            [Kdbx4Database isAValidSafe:candidate] ||
+            [Kdb1Database isAValidSafe:candidate];
 }
 
-- (instancetype)initNewWithoutPassword {
-    if(self = [super init]) {
-        self.theSafe = [[PwSafeDatabase alloc] initNewWithPassword:nil];
++ (NSString*)getLikelyFileExtension:(NSData *)candidate {
+    if([PwSafeDatabase isAValidSafe:candidate]) {
+        return [PwSafeDatabase fileExtension];
+    }
+    else if ([KeePassDatabase isAValidSafe:candidate]) {
+        return [KeePassDatabase fileExtension];
+    }
+    else if([Kdbx4Database isAValidSafe:candidate]) {
+        return [Kdbx4Database fileExtension];
+    }
+    else if([Kdb1Database isAValidSafe:candidate]) {
+        return [Kdb1Database fileExtension];
     }
     
-    return self;
+    return @"dat";
 }
 
-- (instancetype)initNewWithPassword:(NSString *)password {
+- (instancetype)initNewWithoutPassword:(DatabaseFormat)format {
+    return [self initNewWithPassword:nil format:format];
+}
+
+- (instancetype)initNewWithPassword:(NSString *)password format:(DatabaseFormat)format {
     if(self = [super init]) {
-        self.theSafe = [[PwSafeDatabase alloc] initNewWithPassword:password];
+        if(format == kPasswordSafe) {
+            self.theSafe = [[PwSafeDatabase alloc] initNewWithPassword:password];
+            [self addSampleGroupAndRecordToRoot];
+        }
+        else if(format == kKeePass) {
+            self.theSafe = [[KeePassDatabase alloc] initNewWithPassword:password];
+            [self addSampleGroupAndRecordToRoot];
+        }
+        else if(format == kKeePass4) {
+            self.theSafe = [[Kdbx4Database alloc] initNewWithPassword:password];
+            [self addSampleGroupAndRecordToRoot];
+        }
+        else if(format == kKeePass1) {
+            self.theSafe = [[Kdb1Database alloc] initNewWithPassword:password];
+            if (self.theSafe == nil) {
+                return nil;
+            }
+            
+            Node *parent = self.theSafe.rootGroup.childGroups[0];
+            addSampleGroupAndRecordToGroup(parent);
+        }
+        else {
+            return nil;
+        }
         
-        [[self.theSafe rootGroup] addChild:[[Node alloc] initAsGroup:@"New Group" parent:[self.theSafe rootGroup] uuid:nil]];
-        
-        NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username"
-                                         url:@"https://www.google.com"
-                                    password:@"password"
-                                       notes:@""
-                                       email:@"user@gmail.com"];
-        
-        [[self.theSafe rootGroup] addChild:[[Node alloc] initAsRecord:@"New Entry"
-                                                               parent:[self.theSafe rootGroup]
-                                                               fields:fields
-                                                                 uuid:nil]];
+        if (self.theSafe == nil) {
+            return nil;
+        }
     }
     
     return self;
@@ -58,22 +86,22 @@
     if(self = [super init]) {
         if([PwSafeDatabase isAValidSafe:safeData]) {
             self.theSafe = [[PwSafeDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
-            if (self.theSafe == nil) {
-                return nil;
-            }
-            
-            _format = kPasswordSafe;
         }
-//        else if([KeePassDatabase isAValidSafe:safeData]) {
-//            self.theSafe = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
-//            _format = kKeePass;
-//        }
-//        else if([Kdbx4Database isAValidSafe:safeData]) {
-//            self.theSafe = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
-//            _format = kKeePass4;
-//        }
+        else if([KeePassDatabase isAValidSafe:safeData]) {
+            self.theSafe = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+        }
+        else if([Kdbx4Database isAValidSafe:safeData]) {
+            self.theSafe = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+        }
+        else if([Kdb1Database isAValidSafe:safeData]) {
+            self.theSafe = [[Kdb1Database alloc] initExistingWithDataAndPassword:safeData password:password error:ppError];
+        }
         else {
-            self = nil;
+            return nil;
+        }
+        
+        if (self.theSafe == nil) {
+            return nil;
         }
     }
     
@@ -88,12 +116,63 @@
     return [self.theSafe getDiagnosticDumpString:plaintextPasswords];
 }
 
+- (void)addSampleGroupAndRecordToRoot {
+    addSampleGroupAndRecordToGroup(self.rootGroup);
+}
+
+void addSampleGroupAndRecordToGroup(Node* parent) {
+    [parent addChild:[[Node alloc] initAsGroup:@"Sample Group" parent:parent uuid:nil]];
+    
+    NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username"
+                                                          url:@"https://www.google.com"
+                                                     password:@"password"
+                                                        notes:@""
+                                                        email:@"user@gmail.com"];
+    
+    [parent addChild:[[Node alloc] initAsRecord:@"Sample Entry"
+                                                 parent:parent
+                                                 fields:fields
+                                                    uuid:nil]];
+}
+
 - (Node*)rootGroup {
-    return self.theSafe.rootGroup;
+    if(self.theSafe.format == kKeePass || self.theSafe.format == kKeePass4) {
+        // Hide the root group - Can not add entries and not really useful - Perhaps make this optional?
+        // Later discovery: KeePass 1 allows multiple root groups but no entries to root, Had to put in
+        // Code to block root entry additions, meaning that we could display the root group here if we
+        // wanted to, and block entries. For the moment, happy to hide the root group for KeePass 3 and 4
+        // we'll see if there is some feedback on this. Root Group seems to be pretty useless
+        
+        if(self.theSafe.rootGroup.children.count > 0) {
+            return [self.theSafe.rootGroup.children objectAtIndex:0];
+        }
+        else {
+            return self.theSafe.rootGroup; // This should never be able to happen but for safety
+        }
+    }
+    else {
+        return self.theSafe.rootGroup;
+    }
+}
+
+- (DatabaseFormat)format {
+    return self.theSafe.format;
+}
+
+- (NSString *)fileExtension {
+    return self.theSafe.fileExtension;
 }
 
 -(id<AbstractDatabaseMetadata>)metadata {
     return self.theSafe.metadata;
+}
+
+-(NSMutableArray *)attachments {
+    return self.theSafe.attachments;
+}
+
+- (NSMutableDictionary<NSUUID *,NSData *> *)customIcons {
+    return self.theSafe.customIcons;
 }
 
 -(NSString*)masterPassword {

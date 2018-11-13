@@ -18,13 +18,30 @@
 
 @implementation CommonTesting
 
+
++ (NSDictionary<NSString*, NSString*>*)testKdbFilesAndPasswords {
+    static NSDictionary<NSString*, NSString*> *fooDict = nil;
+    if (fooDict == nil) {
+        fooDict = [NSMutableDictionary dictionary];
+        
+        [fooDict setValue:@"a" forKey:@"Database-1"];
+        [fooDict setValue:@"a" forKey:@"Database-twofish"];
+    }
+    return fooDict;
+}
+
 + (NSDictionary<NSString*, NSString*>*)testKdbx4FilesAndPasswords {
     static NSDictionary<NSString*, NSString*> *fooDict = nil;
     if (fooDict == nil) {
         fooDict = [NSMutableDictionary dictionary];
         
         [fooDict setValue:@"a" forKey:@"basic"];
+        [fooDict setValue:@"a" forKey:@"Database-Aes-Argon2NonDefault"];
+        [fooDict setValue:@"a" forKey:@"twofish-argon-2"];
+        [fooDict setValue:@"a" forKey:@"custom-icon-4"];
+        [fooDict setValue:@"a" forKey:@"db-4-nocompression"];
     }
+    
     return fooDict;
 }
 
@@ -37,6 +54,8 @@
         [fooDict setValue:@"a" forKey:@"generic-non-gzipped"];
         [fooDict setValue:@"a" forKey:@"Database"];
         [fooDict setValue:@"a" forKey:@"a"];
+        [fooDict setValue:@"a" forKey:@"Database-ChCha20-AesKdf"];
+        [fooDict setValue:@"a" forKey:@"custom-icon"];
     }
     return fooDict;
 }
@@ -82,7 +101,7 @@
 }
 
 + (RootXmlDomainObject*)parseKeePassXmlSalsa20:(NSString*)xml b64key:(NSString*)b64key {
-    NSData *key = b64key.length ? [[NSData alloc] initWithBase64EncodedString:b64key options:kNilOptions] : nil;
+    NSData *key = b64key.length ? [[NSData alloc] initWithBase64EncodedString:b64key options:NSDataBase64DecodingIgnoreUnknownCharacters] : nil;
     
     return [self parseKeePassXmlSalsa20:xml key:key];
 }
@@ -92,10 +111,10 @@
 
     KeePassXmlParserDelegate *parserDelegate;
     if(!key) {
-        parserDelegate = [[KeePassXmlParserDelegate alloc] initPlaintext];
+        parserDelegate = [[KeePassXmlParserDelegate alloc] initV3Plaintext];
     }
     else {
-        parserDelegate = [[KeePassXmlParserDelegate alloc] initWithProtectedStreamId:kInnerStreamSalsa20 key:key];
+        parserDelegate = [[KeePassXmlParserDelegate alloc] initV3WithProtectedStreamId:kInnerStreamSalsa20 key:key];
     }
     
     [parser setDelegate:parserDelegate];

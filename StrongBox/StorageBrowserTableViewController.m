@@ -252,7 +252,7 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password {
-    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password];
+    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password format:self.format];
  
     NSError *error;
     NSData *data = [newSafe getAsData:&error];
@@ -268,12 +268,13 @@
     // The Saving must be done on the main GUI thread!
 
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self saveNewSafe:name data:data];
+        [self saveNewSafe:name data:data safe:newSafe];
     });
 }
 
-- (void)saveNewSafe:(NSString *)nickName data:(NSData *)data {
+- (void)saveNewSafe:(NSString *)nickName data:(NSData *)data safe:(DatabaseModel*)safe {
     [self.safeStorageProvider create:nickName
+                           extension:safe.fileExtension
                                 data:data
                         parentFolder:self.parentFolder
                       viewController:self

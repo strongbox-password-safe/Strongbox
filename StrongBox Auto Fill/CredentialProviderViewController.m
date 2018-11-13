@@ -12,6 +12,10 @@
 #import "SafesListTableViewController.h"
 #import "QuickViewController.h"
 #import "Settings.h"
+#import "iCloudSafesCoordinator.h"
+#import "Alerts.h"
+
+#import "GoogleDriveManager.h"
 
 @interface CredentialProviderViewController ()
 
@@ -26,8 +30,6 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
 
-    NSLog(@"viewDidLoad");
-    
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
 
     self.safesList = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
@@ -35,6 +37,10 @@
     
     ((SafesListTableViewController*)(self.safesList.topViewController)).rootViewController = self;
     ((QuickViewController*)(self.quickLaunch.topViewController)).rootViewController = self;
+
+    [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
+        NSLog(@"iCloud Access Initialized...");
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -58,14 +64,24 @@
     [self presentViewController:self.safesList animated:NO completion:nil];
 }
 
+- (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider {
+    return storageProvider == kiCloud || storageProvider == kGoogleDrive;
+}
 
 - (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider {
-    return
-    storageProvider == kOneDrive ||
-    storageProvider == kLocalDevice ||
-    storageProvider == kDropbox;
-    // ||
-    //storageProvider == kGoogleDrive;
+    return storageProvider == kLocalDevice;
+}
+
+- (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
+    if([self isUnsupportedAutoFillProvider:safeMetaData.storageProvider]) {
+        return NO;
+    }
+    
+    if([self isLiveAutoFillProvider:safeMetaData.storageProvider]) {
+        return YES;
+    }
+    
+    return safeMetaData.autoFillCacheEnabled && safeMetaData.autoFillCacheAvailable;
 }
 
 - (SafeMetaData*)getPrimarySafe {
@@ -90,6 +106,14 @@
 {
     ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
     [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+}
+
+void showWelcomeMessageIfAppropriate(UIViewController *vc) {
+    if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
+        Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
+        
+        [Alerts info:vc title:@"Welcome to Strongbox Auto Fill" message:@"It should be noted that the following cloud providers do not support live access to your safe from App Extensions:\n\n- Dropbox\n- OneDrive\n\nIn these cases, Strongbox uses a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy the Auto Fill extension!\n-Mark"];
+    }
 }
 
 @end

@@ -30,5 +30,8 @@
 @property (nonatomic) BOOL offlineCacheAvailable;
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
+@property (nonatomic) BOOL autoFillCacheEnabled;
+@property (nonatomic) BOOL autoFillCacheAvailable;
+
 @end
 

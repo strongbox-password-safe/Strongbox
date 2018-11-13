@@ -7,12 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "VariantObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VariantDictionary : NSObject
 
-+ (NSDictionary<NSString*, NSObject*>*)fromData:(NSData*)data;
++ (NSDictionary<NSString*, VariantObject*>*)fromData:(NSData*)data;
++ (NSData*)toData:(NSDictionary<NSString*, VariantObject*>*)dictionary;
 
 @end
 

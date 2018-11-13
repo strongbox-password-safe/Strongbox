@@ -18,8 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) uint32_t compressionFlags;
 @property (nonatomic) uint64_t transformRounds;
 @property (nonatomic) uint32_t innerRandomStreamId;
-
-// TODO: Memory Protection elements?
+@property NSUUID* cipherUuid;
 
 @end
 

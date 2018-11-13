@@ -277,6 +277,14 @@
             forControlEvents:UIControlEventEditingChanged];
     
         textField.text = [textFieldText length] ? textFieldText : @"Not Empty!";
+   
+        int extensionLength = textFieldText.pathExtension ? (int)textFieldText.pathExtension.length : 0;
+
+        UITextPosition *startPosition = [textField positionFromPosition:textField.beginningOfDocument offset:0];
+        UITextPosition *endPosition = [textField positionFromPosition:textField.endOfDocument offset:-extensionLength];
+        UITextRange *selection = [textField textRangeFromPosition:startPosition toPosition:endPosition];
+
+        [textField setSelectedTextRange:selection];
     }];
     
     self.defaultAction = [UIAlertAction actionWithTitle:@"OK"

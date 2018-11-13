@@ -9,6 +9,11 @@
 #import "ChaCha20Cipher.h"
 #import "sodium.h"
 
+static const uint32_t kIvSize = 12;
+static const uint32_t kKeySize = 32;
+
+static const BOOL kLogVerbose = NO;
+
 @implementation ChaCha20Cipher
 
 - (instancetype)init
@@ -26,29 +31,44 @@
 }
 
 - (NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key {
-    NSMutableData *foo = [NSMutableData dataWithLength:data.length];
-    
-    NSLog(@"IV12: %@", [iv base64EncodedStringWithOptions:kNilOptions]);
-    NSLog(@"KEY32: %@", [key base64EncodedStringWithOptions:kNilOptions]);
-    NSLog(@"ChaCha Data In: %@", [data base64EncodedStringWithOptions:kNilOptions]);
-
-    // TODO: Verify iv and key are of correct lenght? This might not actually be necessary if we calculate it correctly
-    
-    if(iv.length != 12 || key.length != 32) {
+    if(kLogVerbose) {
+        NSLog(@"IV12: %@", [iv base64EncodedStringWithOptions:kNilOptions]);
+        NSLog(@"KEY32: %@", [key base64EncodedStringWithOptions:kNilOptions]);
+        NSLog(@"ChaCha Data In: %@", [data base64EncodedStringWithOptions:kNilOptions]);
+    }
+ 
+    if(iv.length != kIvSize || key.length != kKeySize) {
         NSLog(@"IV or Key not of the expected length.");
         return nil;
     }
     
-    //int status = crypto_stream_chacha20_xor(foo.mutableBytes, data.bytes, data.length, iv.bytes, key.bytes);
-    
+    NSMutableData *foo = [NSMutableData dataWithLength:data.length];
     int status = crypto_stream_chacha20_ietf_xor(foo.mutableBytes, data.bytes, data.length, iv.bytes, key.bytes);
     
-    NSLog(@"Status: %d", status);
-    // Check status
-    
-    NSLog(@"Out (b64): %@", [foo base64EncodedStringWithOptions:kNilOptions]);
+    if(kLogVerbose) {
+        NSLog(@"Status: %d", status);
+        NSLog(@"Out (b64): %@", [foo base64EncodedStringWithOptions:kNilOptions]);
+    }
     
     return foo;
 }
+
+- (nonnull NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+    return [self decrypt:data iv:iv key:key];
+}
+
+
+- (nonnull NSData *)generateIv {
+    NSMutableData *newKey = [NSMutableData dataWithLength:kIvSize];
+    
+    if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))
+    {
+        NSLog(@"Could not securely copy new bytes");
+        return nil;
+    }
+    
+    return newKey;
+}
+
 
 @end

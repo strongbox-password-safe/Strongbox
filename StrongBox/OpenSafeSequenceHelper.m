@@ -50,16 +50,29 @@
                          safe:(SafeMetaData*)safe
 askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                    completion:(void (^)(Model* model))completion {
+    [self beginOpenSafeSequence:viewController
+                           safe:safe
+              openAutoFillCache:NO
+askAboutTouchIdEnrolIfAppropriate:askAboutTouchIdEnrolIfAppropriate
+                     completion:completion];
+}
+
+- (void)beginOpenSafeSequence:(UIViewController*)viewController
+                         safe:(SafeMetaData*)safe
+            openAutoFillCache:(BOOL)openAutoFillCache
+askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
+                   completion:(void (^)(Model* model))completion {
     if (!Settings.sharedInstance.disallowAllBiometricId &&
         safe.isTouchIdEnabled &&
         [IOsUtils isTouchIDAvailable] &&
         safe.isEnrolledForTouchId &&
         ([[Settings sharedInstance] isProOrFreeTrial])) {
-        [self showTouchIDAuthentication:viewController safe:safe completion:completion];
+        [self showTouchIDAuthentication:viewController safe:safe openAutoFillCache:openAutoFillCache completion:completion];
     }
     else {
         [self promptForSafePassword:viewController
                                safe:safe
+                  openAutoFillCache:openAutoFillCache
   askAboutTouchIdEnrolIfAppropriate:askAboutTouchIdEnrolIfAppropriate
                          completion:completion];
     }
@@ -67,6 +80,7 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
 
 - (void)showTouchIDAuthentication:(UIViewController*)viewController
                              safe:(SafeMetaData *)safe
+                openAutoFillCache:(BOOL)openAutoFillCache
                        completion:(void (^)(Model* model))completion {
     LAContext *localAuthContext = [[LAContext alloc] init];
     localAuthContext.localizedFallbackTitle = @"Enter Master Password";
@@ -75,6 +89,7 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                      localizedReason:@"Identify to login"
                                reply:^(BOOL success, NSError *error) {
                                    [self  onTouchIdDone:viewController
+                                      openAutoFillCache:openAutoFillCache
                                                 success:success
                                                   error:error
                                                    safe:safe
@@ -83,12 +98,14 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
 }
 
 - (void)onTouchIdDone:(UIViewController*)viewController
+    openAutoFillCache:(BOOL)openAutoFillCache
               success:(BOOL)success
                 error:(NSError *)error safe:(SafeMetaData *)safe completion:(void (^)(Model* model))completion {
     if (success) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self openSafe:viewController
                       safe:safe
+         openAutoFillCache:openAutoFillCache
              isTouchIdOpen:YES
             masterPassword:safe.touchIdPassword
       askAboutTouchIdEnrol:NO
@@ -102,14 +119,14 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                          title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
                        message:[NSString stringWithFormat:@"%@ Authentication Failed. You must now enter your password manually to open the safe.", self.biometricIdName]
                     completion:^{
-                        [self promptForSafePassword:viewController safe:safe askAboutTouchIdEnrolIfAppropriate:NO completion:completion];
+                        [self promptForSafePassword:viewController safe:safe openAutoFillCache:openAutoFillCache askAboutTouchIdEnrolIfAppropriate:NO completion:completion];
                     }];
             });
         }
         else if (error.code == LAErrorUserFallback)
         {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self promptForSafePassword:viewController safe:safe askAboutTouchIdEnrolIfAppropriate:NO completion:completion];
+                [self promptForSafePassword:viewController safe:safe openAutoFillCache:openAutoFillCache askAboutTouchIdEnrolIfAppropriate:NO completion:completion];
             });
         }
         else if (error.code != LAErrorUserCancel)
@@ -119,7 +136,7 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                          title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
                        message:[NSString stringWithFormat:@"%@ has not been setup or system has cancelled. You must now enter your password manually to open the safe.", self.biometricIdName]
                     completion:^{
-                        [self promptForSafePassword:viewController safe:safe askAboutTouchIdEnrolIfAppropriate:NO completion:completion];
+                        [self promptForSafePassword:viewController safe:safe openAutoFillCache:openAutoFillCache askAboutTouchIdEnrolIfAppropriate:NO completion:completion];
                     }];
             });
         }
@@ -128,6 +145,7 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
 
 - (void)promptForSafePassword:(UIViewController*)viewController
                          safe:(SafeMetaData *)safe
+            openAutoFillCache:(BOOL)openAutoFillCache
 askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                    completion:(void (^)(Model* model))completion {
     [Alerts OkCancelWithPassword:viewController
@@ -137,6 +155,7 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                           if (response) {
                               [self openSafe:viewController
                                         safe:safe
+                           openAutoFillCache:openAutoFillCache
                                isTouchIdOpen:NO
                               masterPassword:password
                         askAboutTouchIdEnrol:askAboutTouchIdEnrolIfAppropriate
@@ -147,6 +166,7 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
 
 - (void)  openSafe:(UIViewController*)viewController
               safe:(SafeMetaData *)safe
+ openAutoFillCache:(BOOL)openAutoFillCache
      isTouchIdOpen:(BOOL)isTouchIdOpen
     masterPassword:(NSString *)masterPassword
 askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
@@ -154,8 +174,26 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
     
     // Are we offline for cloud based providers?
-    
-    if (provider.cloudBased &&
+    if(openAutoFillCache) {
+        [[LocalDeviceStorageProvider sharedInstance] readAutoFillCache:safe
+                                                        viewController:viewController
+                                                            completion:^(NSData *data, NSError *error)
+         {
+             if(data != nil) {
+                 [self onProviderReadDone:provider
+                            isTouchIdOpen:isTouchIdOpen
+                           viewController:viewController
+                                     safe:safe
+                           masterPassword:masterPassword
+                                     data:data
+                                    error:error
+                                cacheMode:YES
+                     askAboutTouchIdEnrol:NO
+                               completion:completion]; // RO!
+             }
+         }];
+    }
+    else if (provider.cloudBased &&
         !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
         OfflineDetector.sharedInstance.isOffline &&
         safe.offlineCacheEnabled &&
@@ -174,9 +212,14 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
         }
         
         NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        df.dateFormat = @"dd-MMM-yyyy HH:mm:ss";
+        df.timeStyle = NSDateFormatterShortStyle;
+        df.dateStyle = NSDateFormatterShortStyle;
+        df.doesRelativeDateFormatting = YES;
+        df.locale = NSLocale.currentLocale;
+        
         NSString *modDateStr = [df stringFromDate:modDate];
-        NSString *message = [NSString stringWithFormat:@"It looks like you are offline. Would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached at: %@", modDateStr];
+        
+        NSString *message = [NSString stringWithFormat:@"It looks like you are offline. Would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", modDateStr];
         
         [Alerts yesNo:viewController
                 title:@"No Internet Connectivity"
@@ -195,7 +238,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                                           masterPassword:masterPassword
                                                     data:data
                                                    error:error
-                                      isOfflineCacheMode:YES
+                                               cacheMode:YES
                                     askAboutTouchIdEnrol:NO
                                               completion:completion]; // RO!
                             }
@@ -218,7 +261,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                        masterPassword:masterPassword
                                  data:data
                                 error:error
-                   isOfflineCacheMode:NO
+                            cacheMode:NO
                  askAboutTouchIdEnrol:askAboutTouchIdEnrol
                            completion:completion];
          }];
@@ -231,7 +274,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                       safe:(SafeMetaData *)safe
             masterPassword:(NSString *)masterPassword
                       data:(NSData *)data error:(NSError *)error
-        isOfflineCacheMode:(BOOL)isOfflineCacheMode
+                 cacheMode:(BOOL)cacheMode
       askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                 completion:(void (^)(Model* model))completion  {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -248,7 +291,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                               safe:safe
                      isTouchIdOpen:isTouchIdOpen
                           provider:provider
-                isOfflineCacheMode:isOfflineCacheMode
+                         cacheMode:cacheMode
               askAboutTouchIdEnrol:askAboutTouchIdEnrol
                         completion:completion];
         }
@@ -261,7 +304,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                     safe:(SafeMetaData *)safe
            isTouchIdOpen:(BOOL)isTouchIdOpen
                 provider:(id)provider
-      isOfflineCacheMode:(BOOL)isOfflineCacheMode
+               cacheMode:(BOOL)cacheMode
     askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
               completion:(void (^)(Model* model))completion{
     [SVProgressHUD showWithStatus:@"Decrypting..."];
@@ -276,7 +319,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                          isTouchIdOpen:isTouchIdOpen
                         viewController:viewController
                                   safe:safe
-                    isOfflineCacheMode:isOfflineCacheMode
+                    cacheMode:cacheMode
                   askAboutTouchIdEnrol:askAboutTouchIdEnrol
                               provider:provider
                                   data:data
@@ -290,13 +333,17 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                isTouchIdOpen:(BOOL)isTouchIdOpen
               viewController:(UIViewController*)viewController
                         safe:(SafeMetaData *)safe
-          isOfflineCacheMode:(BOOL)isOfflineCacheMode
+                   cacheMode:(BOOL)cacheMode
         askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                     provider:(id)provider
                         data:(NSData *)data
                   completion:(void (^)(Model* model))completion {
     [SVProgressHUD dismiss];
     
+    if(openedSafe == nil) {
+        [Alerts error:viewController title:@"There was a problem opening the safe." error:error];
+        completion(nil);
+    }
     if (error) {
         if (error.code == -2) {
             if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
@@ -344,7 +391,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                                                     alertType:ISAlertTypeSuccess
                                                 alertPosition:ISAlertPositionTop
                                                       didHide:^(BOOL finished) {
-                                                          [self onSuccessfulSafeOpen:isOfflineCacheMode
+                                                          [self onSuccessfulSafeOpen:cacheMode
                                                                             provider:provider
                                                                           openedSafe:openedSafe
                                                                                 safe:safe
@@ -352,7 +399,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                                                                           completion:completion];
                                                       }];
 #else
-                           [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data completion:completion];
+                           [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe safe:safe data:data completion:completion];
 #endif
                        }
                        else{
@@ -360,7 +407,7 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                            [safe setTouchIdPassword:openedSafe.masterPassword];
                            [SafesList.sharedInstance update:safe];
                            
-                           [self onSuccessfulSafeOpen:isOfflineCacheMode
+                           [self onSuccessfulSafeOpen:cacheMode
                                              provider:provider
                                            openedSafe:openedSafe
                                                  safe:safe
@@ -370,12 +417,12 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                    }];
         }
         else {
-            [self onSuccessfulSafeOpen:isOfflineCacheMode provider:provider openedSafe:openedSafe safe:safe data:data completion:completion];
+            [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe safe:safe data:data completion:completion];
         }
     }
 }
 
--(void)onSuccessfulSafeOpen:(BOOL)isOfflineCacheMode
+-(void)onSuccessfulSafeOpen:(BOOL)cacheMode
                    provider:(id)provider
                  openedSafe:(DatabaseModel *)openedSafe
                        safe:(SafeMetaData *)safe
@@ -383,12 +430,18 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                  completion:(void (^)(Model* model))completion {
     Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
                                                   metaData:safe
-                                           storageProvider:isOfflineCacheMode ? nil : provider // Guarantee nothing can be written!
-                                         usingOfflineCache:isOfflineCacheMode
+                                           storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
+                                                 cacheMode:cacheMode
                                                 isReadOnly:NO]; // ![[Settings sharedInstance] isProOrFreeTrial]
     
-    if (safe.offlineCacheEnabled) {
-        [viewModel updateOfflineCacheWithData:data];
+    if (!cacheMode)
+    {
+        if(safe.offlineCacheEnabled) {
+            [viewModel updateOfflineCacheWithData:data];
+        }
+        if(safe.autoFillCacheEnabled) {
+            [viewModel updateAutoFillCacheWithData:data];
+        }
     }
     
     completion(viewModel);

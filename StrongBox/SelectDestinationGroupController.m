@@ -67,7 +67,13 @@
 
 - (IBAction)onMoveHere:(id)sender {
     for(Node* itemToMove in self.itemsToMove) {
-        [itemToMove changeParent:self.currentGroup];
+        if(![itemToMove changeParent:self.currentGroup]) {
+            NSLog(@"Error Changing Parents.");
+            [Alerts warn:self title:@"Error Changing Parents" message:@"Error Changing Parents" completion:^{
+                [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+            }];
+            return;
+        }
     }
 
     [self.viewModel update:^(NSError *error) {
@@ -75,7 +81,7 @@
             [Alerts error:self title:@"Error Saving" error:error];
         }
 
-        [self.navigationController dismissViewControllerAnimated:YES completion:^{  }];
+        [self.navigationController dismissViewControllerAnimated:YES completion:nil];
     }];
 }
 

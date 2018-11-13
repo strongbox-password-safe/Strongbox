@@ -36,7 +36,7 @@
         [self.navigationItem setPrompt:@"Select where your existing safe is stored"];
     }
     else {
-        [self.navigationItem setPrompt:@"Select what kind of safe you would like to create"];
+        [self.navigationItem setPrompt:@"Select where you would like to store your new safe"];
     }
 
     self.navigationController.toolbar.hidden = YES;
@@ -67,27 +67,6 @@
         }
     }
 }
-
-//- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-//    CGFloat contentHeight = 0.0;
-//    for (int section = 0; section < [self numberOfSectionsInTableView: tableView]; section++) {
-//        for (int row = 0; row < [self tableView: tableView numberOfRowsInSection: section]; row++) {
-//            NSIndexPath *indexPath = [NSIndexPath indexPathForRow: row inSection: section];
-//            contentHeight += [self tableView: tableView heightForRowAtIndexPath: indexPath];
-//        }
-//    }
-//
-//    CGFloat height = [[UIApplication sharedApplication] statusBarFrame].size.height + self.navigationController.navigationBar.frame.size.height;
-//
-//    return (self.tableView.frame.size.height - height - contentHeight)/2;
-//}
-//
-//
-//- (UIView *) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-//    UIView *view = [[UIView alloc] initWithFrame: CGRectZero];
-//    view.backgroundColor = [UIColor clearColor];
-//    return view;
-//}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -155,7 +134,7 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password provider:(id<SafeStorageProvider>)provider {
-    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password];
+    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password format:self.format];
 
     NSError *error;
     NSData *data = [newSafe getAsData:&error];
@@ -166,6 +145,7 @@
     }
     
     [provider create:name
+           extension:newSafe.fileExtension
                 data:data
         parentFolder:nil
       viewController:self
@@ -206,6 +186,7 @@
         StorageBrowserTableViewController *vc = segue.destinationViewController;
         
         vc.existing = self.existing;
+        vc.format = self.format;
         vc.safeStorageProvider = sender;
         vc.parentFolder = nil;
     }

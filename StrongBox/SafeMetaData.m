@@ -24,6 +24,7 @@
     
         self.isTouchIdEnabled = YES;
         self.offlineCacheEnabled = YES;
+        self.autoFillCacheEnabled = YES;
     }
     
     return self;
@@ -46,6 +47,8 @@
     [encoder encodeBool:self.offlineCacheEnabled forKey:@"offlineCacheEnabled"];
     [encoder encodeBool:self.offlineCacheAvailable forKey:@"offlineCacheAvailable"];
     [encoder encodeBool:self.hasUnresolvedConflicts forKey:@"hasUnresolvedConflicts"];
+    [encoder encodeBool:self.autoFillCacheEnabled forKey:@"autoFillCacheEnabled"];
+    [encoder encodeBool:self.autoFillCacheAvailable forKey:@"autoFillCacheAvailable"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -62,6 +65,17 @@
         self.offlineCacheEnabled = [decoder decodeBoolForKey:@"offlineCacheEnabled"];
         self.offlineCacheAvailable = [decoder decodeBoolForKey:@"offlineCacheAvailable"];
         self.hasUnresolvedConflicts = [decoder decodeBoolForKey:@"hasUnresolvedConflicts"];
+        
+        if([decoder containsValueForKey:@"autoFillCacheEnabled"]) {
+            self.autoFillCacheEnabled = [decoder decodeBoolForKey:@"autoFillCacheEnabled"];
+        }
+        else {
+            self.autoFillCacheEnabled = YES;
+        }
+
+        if([decoder containsValueForKey:@"autoFillCacheAvailable"]) {
+            self.autoFillCacheAvailable = [decoder decodeBoolForKey:@"autoFillCacheAvailable"];
+        }
     }
     
     return self;

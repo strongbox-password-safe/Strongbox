@@ -11,16 +11,16 @@
 
 @implementation Meta
 
-- (instancetype)init {
-    return [super initWithXmlElementName:kMetaElementName];
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
+    return [super initWithXmlElementName:kMetaElementName context:context];
 }
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren {
-    self = [self init];
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context {
+    self = [self initWithContext:context];
     
     if(self) {
-        _generator = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kGeneratorElementName];
-        self.generator.text = kDefaultGenerator;
+        _generator = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kGeneratorElementName context:context];
+        self.generator.text = kStrongboxGenerator;
     }
     
     return self;
@@ -28,7 +28,7 @@
 
 - (void)setHash:(NSString*)hash {
     if(!self.headerHash) {
-        self.headerHash = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kHeaderHashElementName];
+        self.headerHash = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kHeaderHashElementName context:self.context];
     }
     
     self.headerHash.text = hash;
@@ -36,13 +36,21 @@
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
     if([xmlElementName isEqualToString:kGeneratorElementName]) {
-        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kGeneratorElementName];
+        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kGeneratorElementName context:self.context];
     }
     else if ([xmlElementName isEqualToString:kHeaderHashElementName]) {
-        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kHeaderHashElementName];
+        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kHeaderHashElementName context:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kV3BinariesListElementName]) {
+        return [[V3BinariesList alloc] initWithContext:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kCustomIconListElementName]) {
+        return [[CustomIconList alloc] initWithContext:self.context];
     }
     
     return [super getChildHandler:xmlElementName];
+
+
 }
 
 - (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
@@ -50,8 +58,16 @@
         self.generator = (GenericTextStringElementHandler*)completedObject;
         return YES;
     }
-    if([withXmlElementName isEqualToString:kHeaderHashElementName]) {
+    else if([withXmlElementName isEqualToString:kHeaderHashElementName]) {
         self.headerHash = (GenericTextStringElementHandler*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kV3BinariesListElementName]) {
+        self.v3binaries = (V3BinariesList*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kCustomIconListElementName]) {
+        self.customIconList = (CustomIconList*)completedObject;
         return YES;
     }
     else {
@@ -66,6 +82,8 @@
     
     if(self.generator) [ret.children addObject:[self.generator generateXmlTree]];
     if(self.headerHash) [ret.children addObject:[self.headerHash generateXmlTree]];
+    if(self.v3binaries) [ret.children addObject:[self.v3binaries generateXmlTree]];
+    if(self.customIconList) [ret.children addObject:[self.customIconList generateXmlTree]];
     
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
@@ -73,7 +91,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nUnknown Children = [%@]", self.generator, self.headerHash, self.nonCustomisedXmlTree.children];
+    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@]", self.generator, self.headerHash, self.v3binaries];
 }
 
 @end

@@ -17,16 +17,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePassGroup : BaseXmlDomainObjectHandler
 
--(instancetype)initAsKeePassRoot;
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+-(instancetype)initAsKeePassRoot:(XmlProcessingContext*)context;
 
 @property (nonatomic) NSMutableArray<KeePassGroup*>* groups;
 @property (nonatomic) NSMutableArray<Entry*>* entries;
 @property (nonatomic) GenericTextStringElementHandler* name;
 @property (nonatomic) GenericTextUuidElementHandler* uuid;
+@property (nonatomic, nullable) GenericTextStringElementHandler* iconId;
+@property (nonatomic, nullable) GenericTextUuidElementHandler* customIconUuid;
 
-// TODO:
-// <Notes />
-// <IconID>48</IconID>
+@property (nonatomic) NSNumber* icon;
+@property (nonatomic, nullable) NSUUID* customIcon;
 
 @end
 

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Cipher.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,6 +21,16 @@ NSData* argon2CipherUuidData(void);
 
 NSUUID* const chaCha20CipherUuid(void);
 NSData* chaCha20CipherUuidData(void);
+
+NSUUID* const twoFishCipherUuid(void);
+NSData* twoFishCipherUuidData(void);
+
+
+NSString* innerEncryptionString(uint32_t innerRandomStreamId);
+NSString* keyDerivationAlgorithmString(NSUUID* uuid);
+NSString* outerEncryptionAlgorithmString(NSUUID* uuid);
+
+id<Cipher> getCipher(NSUUID* cipherUuid);
 
 @end
 

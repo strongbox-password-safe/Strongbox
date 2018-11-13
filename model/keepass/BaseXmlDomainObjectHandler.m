@@ -19,12 +19,22 @@
     [NSException raise:NSInternalInconsistencyException
                 format:@"You must override %@ in a subclass", NSStringFromSelector(_cmd)];
 
-    return [self initWithXmlElementName:@"<DUMMY - Unreachable>"];
+    return nil;
+//    return [self initWithXmlElementName:@"<DUMMY - Unreachable>" context:nil];
 }
 
-- (instancetype)initWithXmlElementName:(NSString*)xmlElementName {
+- (instancetype)initWithXmlElementName:(NSString*)xmlElementName context:(nonnull XmlProcessingContext *)context {
     if(self = [super init]) {
         self.nonCustomisedXmlTree = [[XmlTree alloc] initWithXmlElementName:xmlElementName];
+        
+        if(!context) {
+            NSLog(@"Parsing Context cannot be nil.");
+            [NSException raise:NSInternalInconsistencyException
+                        format:@"Parsing Context cannot be nil %@ in a subclass", NSStringFromSelector(_cmd)];
+            return nil;
+        }
+        
+        self.context = context;
     }
 
     return self;

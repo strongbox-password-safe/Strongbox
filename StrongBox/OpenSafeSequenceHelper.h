@@ -18,6 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)beginOpenSafeSequence:(UIViewController*)viewController
                          safe:(SafeMetaData*)safe
+            openAutoFillCache:(BOOL)openAutoFillCache
+askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
+                   completion:(void (^)(Model* model))completion;
+
+- (void)beginOpenSafeSequence:(UIViewController*)viewController
+                         safe:(SafeMetaData*)safe
 askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                    completion:(void (^)(Model* model))completion;
 

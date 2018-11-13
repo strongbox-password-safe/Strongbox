@@ -10,7 +10,7 @@
 #import "XmlTree.h"
 #import "XMLWriter.h"
 #import "KeePassDatabase.h"
-#import "Salsa20Stream.h"
+#import "InnerRandomStreamFactory.h"
 
 @interface XmlTreeSerializer ()
 
@@ -28,7 +28,7 @@
 - (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
                     b64ProtectedStreamKey:(NSString*)b64ProtectedStreamKey
                               prettyPrint:(BOOL)prettyPrint {
-    NSData *key = [[NSData alloc] initWithBase64EncodedString:b64ProtectedStreamKey options:kNilOptions];
+    NSData *key = [[NSData alloc] initWithBase64EncodedString:b64ProtectedStreamKey options:NSDataBase64DecodingIgnoreUnknownCharacters];
 
     return [self initWithProtectedStreamId:innerRandomStreamId key:key prettyPrint:prettyPrint];
 }
@@ -36,31 +36,8 @@
 - (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
                                       key:(nullable NSData*)key
                               prettyPrint:(BOOL)prettyPrint {
-    // TODO: This same code is in Xml Parser. Move to a common RandomStream Factory
     if(self = [super init]) {
-        if(innerRandomStreamId == kInnerStreamSalsa20) {
-            if(!key) {
-                key = [Salsa20Stream generateNewKey];
-            }
-            
-            const uint8_t iv[] = {0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A};
-            self.innerRandomStream = [[Salsa20Stream alloc] initWithIv:iv key:key];
-        }
-        else if (innerRandomStreamId == kInnerStreamArc4) {
-            // TODO: Support this for older DBs?
-            return nil;
-        }
-        else if (innerRandomStreamId == kInnerChaCha20) {
-            // TODO: believe this is for KDBX 4+ ?
-            return nil;
-        }
-        else if (innerRandomStreamId == kInnerStreamPlainText) {
-            self.innerRandomStream = nil;
-        }
-        else {
-            NSLog(@"Unknown innerRandomStreamId = %d", innerRandomStreamId);
-            return nil;
-        }
+        self.innerRandomStream = [InnerRandomStreamFactory getStream:innerRandomStreamId key:key];
         
         self.xmlWriter = [[XMLWriter alloc] init];
         

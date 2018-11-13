@@ -34,6 +34,7 @@
         self.modified = [NSDate date];
         self.accessed = [NSDate date];
         self.passwordModified = [NSDate date];
+        self.attachments = [NSMutableArray array];
     }
     
     return self;

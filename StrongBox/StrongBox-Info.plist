@@ -9,12 +9,36 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.markmcguill.strongbox.kdb</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleTypeName</key>
+			<string>Strongbox KeePass 1 Safe</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Strongbox KeePass 2 Safe</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.markmcguill.strongbox.kdbx</string>
+			</array>
+		</dict>
+		<dict>
 			<key>CFBundleTypeName</key>
 			<string>Strongbox Password Safe</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
-			<string>Owner</string>
+			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.markmcguill.strongbox.dat</string>
@@ -26,7 +50,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
-			<string>Owner</string>
+			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.markmcguill.strongbox.psafe3</string>
@@ -35,10 +59,6 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIcons</key>
-	<dict/>
-	<key>CFBundleIcons~ipad</key>
-	<dict/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -48,7 +68,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.17.4</string>
+	<string>1.18.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -82,7 +102,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2617</string>
+	<string>2618</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -94,6 +114,10 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Strongbox can use Face ID to open your safes. Would you like to do this?</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Required to Save Attachments</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Required to Add Attachments</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.com.strongbox</key>
@@ -136,6 +160,38 @@
 	<true/>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.markmcguill.strongbox.kdb</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<string>application/strongbox</string>
+				<key>public.filename-extension</key>
+				<string>kdb</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Strongbox KeePass Safe</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.markmcguill.strongbox.kdbx</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>kdbx</string>
+				<key>public.mime-type</key>
+				<string>application/strongbox</string>
+			</dict>
+		</dict>
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>

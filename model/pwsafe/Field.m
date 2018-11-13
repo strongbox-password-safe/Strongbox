@@ -7,8 +7,8 @@
 //
 
 #import "Field.h"
-#import "SafeTools.h"
-#import "BinaryParsingHelper.h"
+#import "PwSafeSerialization.h"
+#import "Utils.h"
 
 @implementation Field {
     NSData *_data;

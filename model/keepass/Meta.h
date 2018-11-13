@@ -8,15 +8,20 @@
 
 #import "BaseXmlDomainObjectHandler.h"
 #import "GenericTextStringElementHandler.h"
+#import "V3BinariesList.h"
+#import "CustomIconList.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Meta : BaseXmlDomainObjectHandler
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren;
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context;
 
 @property (nonatomic) GenericTextStringElementHandler *generator;
-@property (nonatomic) GenericTextStringElementHandler *headerHash;
+@property (nonatomic, nullable) GenericTextStringElementHandler *headerHash;
+@property (nonatomic) V3BinariesList *v3binaries;
+@property (nonatomic) CustomIconList *customIconList;
 
 - (void)setHash:(NSString*)hash;
 

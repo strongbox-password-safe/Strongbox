@@ -7,7 +7,7 @@
 //
 
 #import "BrowseSafeView.h"
-#import "SafeTools.h"
+#import "PwSafeSerialization.h"
 #import "SelectDestinationGroupController.h"
 #import <MessageUI/MessageUI.h>
 #import "RecordView.h"
@@ -15,6 +15,9 @@
 #import <ISMessages/ISMessages.h>
 #import "Settings.h"
 #import "SafeDetailsView.h"
+#import "NSArray+Extensions.h"
+#import "Utils.h"
+#import "NodeIconHelper.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -56,10 +59,20 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [super viewWillAppear:animated];
     
     [self refresh];
+    
+    // TODO: Remove once KeePass has been proven solid...
+    
+    if(self.viewModel.database.format != kPasswordSafe && !Settings.sharedInstance.hasShownKeePassBetaWarning) {
+        Settings.sharedInstance.hasShownKeePassBetaWarning = YES;
+    
+        [Alerts warn:self title:@"KeePass Beta Warning!" message:@"Hi, this is your first time opening a KeePass safe. Please remember that Strongbox KeePass support is still in Beta, so it is strongly advised that you backup your KeePass safes before using them with Strongbox. Every effort has been made to ensure KeePass support is solid, but bugs are always possible. Please, please backup your safe! Thanks,\n-Mark"];
+    }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //self.customIconsCache = [NSMutableDictionary dictionary];
     
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
                                 initWithTarget:self
@@ -105,6 +118,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
     self.searchController.searchBar.selectedScopeButtonIndex = 3;
+    
+    self.tableView.rowHeight = 55.0f;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -194,7 +209,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                      searchText, searchText, searchText, searchText, searchText, searchText];
     }
     
-    NSArray<Node*> *foo = [self.viewModel.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*> *foo = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return [predicate evaluateWithObject:node];
     }];
     
@@ -211,17 +226,17 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-    Node *vm = [self getDataSource][indexPath.row];
+    Node *node = [self getDataSource][indexPath.row];
     
-    NSString *groupLocation = (self.searchController.isActive ? [self getGroupPathDisplayString:vm] : vm.isGroup ? @"" : vm.fields.username);
+    NSString *groupLocation = (self.searchController.isActive ? [self getGroupPathDisplayString:node] : node.isGroup ? @"" : node.fields.username);
     
-    cell.textLabel.text = vm.isGroup ? vm.title :
-    (self.searchController.isActive ? [NSString stringWithFormat:@"%@%@", vm.title, vm.fields.username.length ? [NSString stringWithFormat:@" [%@]" ,vm.fields.username] : @""] :
-         vm.title);
+    cell.textLabel.text = node.isGroup ? node.title :
+    (self.searchController.isActive ? [NSString stringWithFormat:@"%@%@", node.title, node.fields.username.length ? [NSString stringWithFormat:@" [%@]" , node.fields.username] : @""] :
+         node.title);
     
     cell.detailTextLabel.text = groupLocation;
-    cell.accessoryType = vm.isGroup ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
-    cell.imageView.image = vm.isGroup ? [UIImage imageNamed:@"folder-80.png"] : [UIImage imageNamed:@"lock-48.png"];
+    cell.accessoryType = node.isGroup ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+    cell.imageView.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
     
     return cell;
 }
@@ -281,7 +296,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)enableDisableToolbarButtons {
     BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
     
-    (self.buttonAddRecord).enabled = !ro && !self.isEditing;
+    (self.buttonAddRecord).enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
     (self.buttonSafeSettings).enabled = !self.isEditing;
     (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
     (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
@@ -358,7 +373,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         UINavigationController *nav = segue.destinationViewController;
         SelectDestinationGroupController *vc = nav.viewControllers.firstObject;
         
-        vc.currentGroup = self.viewModel.rootGroup;
+        vc.currentGroup = self.viewModel.database.rootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
     }

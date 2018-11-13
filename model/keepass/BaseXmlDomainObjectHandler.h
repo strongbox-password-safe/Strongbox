@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 #import "XmlParsingDomainObject.h"
 #import "XmlTree.h"
+#import "XmlProcessingContext.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BaseXmlDomainObjectHandler : NSObject<XmlParsingDomainObject>
 
-- (instancetype)init;
-- (instancetype)initWithXmlElementName:(NSString*)xmlElementName NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithXmlElementName:(NSString*)xmlElementName context:(XmlProcessingContext*)context NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic) XmlTree* nonCustomisedXmlTree;
+@property (nonatomic) XmlProcessingContext* context;
 
 @end
 

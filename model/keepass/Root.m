@@ -11,15 +11,15 @@
 
 @implementation Root
 
-- (instancetype)init {
-    return self = [super initWithXmlElementName:kRootElementName];
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
+    return self = [super initWithXmlElementName:kRootElementName context:context];
 }
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren {
-    self = [self init];
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context {
+    self = [self initWithContext:context];
     
     if(self) {
-        _rootGroup = [[KeePassGroup alloc] initAsKeePassRoot];
+        _rootGroup = [[KeePassGroup alloc] initAsKeePassRoot:context];
     }
     
     return self;
@@ -32,7 +32,7 @@
             // we only look at the first (which is I believe how the model works. If
             // somehow this isn't the case, we will not overwrite the other groups but just ignore them
             
-            return [[KeePassGroup alloc] init];
+            return [[KeePassGroup alloc] initWithContext:self.context];
         }
         else {
             NSLog(@"WARN: Multiple Root Groups found. Ignoring extra.");

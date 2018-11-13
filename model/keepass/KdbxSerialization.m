@@ -8,11 +8,11 @@
 
 #import "KdbxSerialization.h"
 #import "DecryptionParameters.h"
-#import "BinaryParsingHelper.h"
+#import "Utils.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
 #import "DecryptionParameters.h"
-#import "SafeTools.h"
+#import "PwSafeSerialization.h"
 #import "Utils.h"
 #import "GZIP.h"
 #import "KeePassConstants.h"
@@ -36,11 +36,6 @@ typedef struct _BlockHeader {
 static const struct _BlockHeader EndOfBlocksHeaderTemplate; // Useful way to zero everything out. Id needs to be set on use.
 
 static const uint32_t kDefaultStartStreamBytesLength = 32;
-static const uint32_t kDefaultTransformSeedLength = 32;
-static const uint32_t kDefaultMasterSeedLength = 32;
-static const uint32_t kDefaultEncryptionIvLength = 16;
-
-static NSString* const kEndOfHeaderEntriesWeirdString = @"\r\n\r\n"; // No idea why they bother with this but seems to be done... Cargo cult...
 
 static const uint32_t kKdbx3MajorVersionNumber = 3;
 static const uint32_t kKdbx3MinorVersionNumber = 1;
@@ -55,12 +50,12 @@ static const uint32_t kKdbx3MinorVersionNumber = 1;
 
 @end
 
-static BOOL kLogVerbose = YES;
+static BOOL kLogVerbose = NO;
 
 @implementation KdbxSerialization
 
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return keePassSignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber);
+    return keePass2SignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber);
 }
 
 - (instancetype)init:(SerializationData*)serializationData {
@@ -73,23 +68,37 @@ static BOOL kLogVerbose = YES;
     return self;
 }
 
-- (NSString*)stage1Serialize:(NSString*)password {
+- (NSString*)stage1Serialize:(NSString*)password error:(NSError**)error {
     // 1. File Header
     
-    KeepassFileHeader header = getNewFileHeader(self.serializationData);
+    KeepassFileHeader header = getNewFileHeader(self.serializationData.fileVersion);
     [self.headerData appendBytes:&header length:SIZE_OF_KEEPASS_HEADER];
     
     // 2. Generate Encryption Parameters To Be Serialized in the Headers
     
     NSData* compositeKey = getCompositeKey(password);
-    NSData* transformSeed = [SafeTools getRandomData:kDefaultTransformSeedLength];
+    NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
     NSData* transformKey = getAesTransformKey(compositeKey, transformSeed, self.serializationData.transformRounds);
-    NSData* masterSeed = [SafeTools getRandomData:kDefaultMasterSeedLength];
+    NSData* masterSeed = getRandomData(kMasterSeedLength);
     self.masterKey = getMasterKey(masterSeed, transformKey);
-    self.encryptionIv = [SafeTools getRandomData:kDefaultEncryptionIvLength];
-    self.startStream = [SafeTools getRandomData:kDefaultStartStreamBytesLength];
+    
+    id<Cipher> cipher = getCipher(self.serializationData.cipherId);
+    if(!cipher) {
+        NSString *message=[NSString stringWithFormat:@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [self.serializationData.cipherId UUIDString]];
+        
+        if (error) {
+            *error = [Utils createNSError:message errorCode:-5];
+        }
+        
+        return nil;
+    }
+
+    self.encryptionIv = [cipher generateIv];
+    self.startStream = getRandomData(kDefaultStartStreamBytesLength);
     
     if(kLogVerbose) {
+        NSLog(@"Serialize: compositeKey = [%@]", compositeKey);
+        NSLog(@"Serialize: transformSeed = [%@]", transformSeed);
         NSLog(@"Serialize: masterSeed = [%@]", masterSeed);
         NSLog(@"Serialize: encryptionIv = [%@]", self.encryptionIv);
         NSLog(@"Serialize: StartStream = [%@]", self.startStream);
@@ -107,7 +116,9 @@ static BOOL kLogVerbose = YES;
     [headers setObject:Uint32ToLittleEndianData(self.serializationData.innerRandomStreamId) forKey:@(INNERRANDOMSTREAMID)];
     [headers setObject:self.serializationData.protectedStreamKey forKey:@(PROTECTEDSTREAMKEY)];
     [headers setObject:Uint32ToLittleEndianData(self.serializationData.compressionFlags) forKey:@(COMPRESSIONFLAGS)];
-    [headers setObject:aesCipherUuidData() forKey:@(CIPHERID)];
+    uuid_t uuid;
+    [self.serializationData.cipherId getUUIDBytes:uuid];
+    [headers setObject:[NSData dataWithBytes:uuid length:sizeof(uuid_t)] forKey:@(CIPHERID)];
     
     NSData* headerEntriesData = [KdbxSerialization getHeadersData:headers];
     [self.headerData appendData:headerEntriesData];
@@ -118,7 +129,7 @@ static BOOL kLogVerbose = YES;
     return [hashData base64EncodedStringWithOptions:kNilOptions];
 }
 
-- (NSData*)stage2Serialize:xml {
+- (NSData*)stage2Serialize:xml error:(NSError**)error {
     NSMutableData *ret = [[NSMutableData alloc] initWithData:self.headerData];
     
     // 4. Xml to Payload Data (optional GZIP compression)
@@ -129,7 +140,19 @@ static BOOL kLogVerbose = YES;
     // 5. Get Encrypted Data Blob
     
     NSData * toBeEncrypted = getEncryptionBlob(payload, self.startStream);
-    NSData *encrypted = [AesCipher encrypt:toBeEncrypted iv:self.encryptionIv key:self.masterKey];
+    
+    id<Cipher> cipher = getCipher(self.serializationData.cipherId);
+    if(!cipher) {
+        NSString *message=[NSString stringWithFormat:@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [self.serializationData.cipherId UUIDString]];
+        
+        if (error) {
+            *error = [Utils createNSError:message errorCode:-5];
+        }
+        
+        return nil;
+    }
+
+    NSData *encrypted = [cipher encrypt:toBeEncrypted iv:self.encryptionIv key:self.masterKey];
     
     if(!encrypted) {
         return nil;
@@ -171,7 +194,9 @@ static BOOL kLogVerbose = YES;
     
     // Decrypt
     
-    if(![decryptionParameters.cipherId isEqual:aesCipherUuid()]) {
+    id<Cipher> cipher = getCipher(decryptionParameters.cipherId);
+    
+    if(!cipher) {
         NSString *message=[NSString stringWithFormat:@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [decryptionParameters.cipherId UUIDString]];
         
         if (ppError != nil) {
@@ -181,7 +206,7 @@ static BOOL kLogVerbose = YES;
         return nil;
     }
     
-    NSData *decrypted = [AesCipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
+    NSData *decrypted = [cipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
     
     // Verify Start Stream - This checks the correct passphrase/keyfile has been used (or we've done something very wrong in the decryption process :/)
     
@@ -227,27 +252,9 @@ static BOOL kLogVerbose = YES;
     ret.extraUnknownHeaders = getUnknownHeaders(headerEntries);
     ret.headerHash = [headerHash base64EncodedStringWithOptions:kNilOptions];
     ret.xml = xml;
+    ret.cipherId = decryptionParameters.cipherId;
     
     return ret;
-}
-
-static KeepassFileHeader getNewFileHeader(SerializationData * _Nonnull serializationData) {
-    KeepassFileHeader header;
-    
-    header.signature1[0] = 0x03;
-    header.signature1[1] = 0xD9;
-    header.signature1[2] = 0xA2;
-    header.signature1[3] = 0x9A;
-    header.signature2[0] = 0x67;
-    header.signature2[1] = 0xFB;
-    header.signature2[2] = 0x4B;
-    header.signature2[3] = 0xB5;
-    
-    NSArray<NSString*> *versionComponents = [serializationData.fileVersion componentsSeparatedByString:@"."];
-    header.major = [versionComponents objectAtIndex:0].intValue;
-    header.minor = [versionComponents objectAtIndex:1].intValue;
-    
-    return header;
 }
 
 +(NSData*)getHeadersData:(NSDictionary<NSNumber*, NSData*>*)headers {
@@ -270,7 +277,7 @@ static KeepassFileHeader getNewFileHeader(SerializationData * _Nonnull serializa
     HeaderEntryHeader heh;
     heh.id = END_OF_ENTRIES;
     
-    NSData *endOfEntriesWeirdString = [kEndOfHeaderEntriesWeirdString dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *endOfEntriesWeirdString = [kEndOfHeaderEntriesMagicString dataUsingEncoding:NSUTF8StringEncoding];
     
     NSData* lengthData = Uint16ToLittleEndianData(endOfEntriesWeirdString.length);
     heh.lengthBytes[0] = ((uint8_t*)lengthData.bytes)[0];
@@ -283,20 +290,34 @@ static KeepassFileHeader getNewFileHeader(SerializationData * _Nonnull serializa
 }
 
 static NSData * _Nonnull getEncryptionBlob(NSData *payload, NSData* startStream) {
-    // Layout 2 Blocks (first one (id = 0) is the payload. Second is an end marker).
-    
     NSMutableData *blockified = [[NSMutableData alloc] init];
     
-    BlockHeader mainBlockHeader;
-    [BinaryParsingHelper integerTolittleEndian4Bytes:0 bytes:mainBlockHeader.id];
-    [BinaryParsingHelper integerTolittleEndian4Bytes:(uint32_t)payload.length bytes:mainBlockHeader.size];
-    CC_SHA256(payload.bytes, (int)payload.length, mainBlockHeader.hash);
-    
-    [blockified appendBytes:&mainBlockHeader length:SIZE_OF_BLOCK_HEADER];
-    [blockified appendData:payload];
+    uint64_t bytesRemaining = payload.length;
+    int blockNumber = 0;
+    while (bytesRemaining) {
+        BlockHeader blockHeader;
+        [Utils integerTolittleEndian4Bytes:blockNumber bytes:blockHeader.id];
+        
+        uint64_t blockLength = MIN(kDefaultBlockifySize, bytesRemaining);
+        [Utils integerTolittleEndian4Bytes:(uint32_t)blockLength bytes:blockHeader.size];
+        
+        NSData* block = [payload subdataWithRange:NSMakeRange(blockNumber * kDefaultBlockifySize, (uint32_t)blockLength)];
+        
+        CC_SHA256(block.bytes, (CC_LONG)blockLength, blockHeader.hash);
+   
+        if(kLogVerbose) {
+            NSLog(@"Writing Block %d [%llu bytes]", blockNumber, blockLength);
+        }
+        
+        [blockified appendBytes:&blockHeader length:SIZE_OF_BLOCK_HEADER];
+        [blockified appendData:block];
+        
+        bytesRemaining -= blockLength;
+        blockNumber++;
+    }
     
     BlockHeader endBlockHeader = EndOfBlocksHeaderTemplate;
-    [BinaryParsingHelper integerTolittleEndian4Bytes:1 bytes:endBlockHeader.id]; // id = 1
+    [Utils integerTolittleEndian4Bytes:blockNumber bytes:endBlockHeader.id];
     
     [blockified appendBytes:&endBlockHeader length:SIZE_OF_BLOCK_HEADER];
     
@@ -308,7 +329,7 @@ static NSData * _Nonnull getEncryptionBlob(NSData *payload, NSData* startStream)
     return ret;
 }
 
-NSDictionary<NSNumber *,NSObject *>* getUnknownHeaders(NSDictionary<NSNumber *,NSObject *>* headers) {
+static NSDictionary<NSNumber *,NSObject *>* getUnknownHeaders(NSDictionary<NSNumber *,NSObject *>* headers) {
     NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:headers];
     
     [ret removeObjectForKey:@(TRANSFORMSEED)];

@@ -32,4 +32,9 @@
     return YES;
 }
 
+- (void)handleError:(NSError *)error userInteractionPermitted:(BOOL)userInteractionPermitted {
+    NSLog(@"UIDocument: error = %@", error);
+    [super handleError:error userInteractionPermitted:userInteractionPermitted];
+}
+
 @end

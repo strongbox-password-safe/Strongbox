@@ -163,10 +163,10 @@
     NSString *path = [bundle pathForResource:@"ladder" ofType:@"xml"];
     NSString *xml = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:path] encoding:NSUTF8StringEncoding];
     
-    NSData *key = [[NSData alloc] initWithBase64EncodedString:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ=" options:kNilOptions];
+    NSData *key = [[NSData alloc] initWithBase64EncodedString:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ=" options:NSDataBase64DecodingIgnoreUnknownCharacters];
     
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
-    KeePassXmlParserDelegate *parserDelegate = [[KeePassXmlParserDelegate alloc] initWithProtectedStreamId:kInnerStreamSalsa20
+    KeePassXmlParserDelegate *parserDelegate = [[KeePassXmlParserDelegate alloc] initV3WithProtectedStreamId:kInnerStreamSalsa20
                                                                                          key:key];
     
     [parser setDelegate:parserDelegate];
@@ -250,6 +250,8 @@
     XCTAssertTrue([[root.rootGroup.groups objectAtIndex:3].name.text isEqualToString:@"EMail"]);
     XCTAssertTrue([[root.rootGroup.groups objectAtIndex:4].name.text isEqualToString:@"Homebanking"]);
     XCTAssertTrue([[root.rootGroup.groups objectAtIndex:5].name.text isEqualToString:@"New Group"]);
+    
+    NSLog(@"%@", root.rootGroup.groups);
 }
 
 - (void)testLadderEntries {
@@ -275,6 +277,18 @@
     NSLog(@"%@", entry.customFields);
     
     XCTAssertTrue([[entry.customFields objectForKey:@"Blah-Mark"] isEqualToString:@"Blah Value"]);
+}
+
+- (void)testViewCustomIcon {
+    NSString * xml = [CommonTesting getXmlFromBundleFile:@"custom-icon"];
+    RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXml:xml];
+    XCTAssertNotNil(rootObject);
+    
+    Root* root = rootObject.keePassFile.root;
+    //NSArray* entries = [root.rootGroup.groups objectAtIndex:5].entries;
+    
+    NSLog(@"%@", root.rootGroup);
+
 }
 
 @end

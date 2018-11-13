@@ -24,14 +24,16 @@ NS_ASSUME_NONNULL_BEGIN
 //    <LocationChanged>2018-10-17T19:28:42Z</LocationChanged>
 // </Times>
 
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+
 @property (nonatomic) GenericTextDateElementHandler* lastModificationTime;
 @property (nonatomic) GenericTextDateElementHandler* creationTime;
 @property (nonatomic) GenericTextDateElementHandler* lastAccessTime;
 
-//@property (nonatomic) GenericTextElementHandler* expiryTime;        // TODO:
-//@property (nonatomic) GenericTextElementHandler* locationChanged;   // TODO:
-// expires          // TODO:
-// usageCount       // TODO:
+//@property (nonatomic) GenericTextElementHandler* expiryTime;        // FUTURE:
+//@property (nonatomic) GenericTextElementHandler* locationChanged;   // FUTURE:
+// expires          // FUTURE:
+// usageCount       // FUTURE:
 
 
 @end

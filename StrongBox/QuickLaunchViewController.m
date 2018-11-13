@@ -193,7 +193,7 @@
     if ([segue.identifier isEqualToString:@"segueToBrowseFromQuick"]) {
         BrowseSafeView *vc = segue.destinationViewController;
         vc.viewModel = (Model *)sender;
-        vc.currentGroup = vc.viewModel.rootGroup;
+        vc.currentGroup = vc.viewModel.database.rootGroup;
     }
 }
 

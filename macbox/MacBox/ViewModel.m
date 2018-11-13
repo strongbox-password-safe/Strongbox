@@ -27,7 +27,7 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
 - (instancetype)initNewWithSampleData:(Document*)document; {
     if (self = [super init]) {
-        self.passwordDatabase = [[DatabaseModel alloc] initNewWithoutPassword];
+        self.passwordDatabase = [[DatabaseModel alloc] initNewWithoutPassword:kPasswordSafe]; // TODO: Offer Choice
         self.lockedSafeInfo = nil;
         
         [self addSampleRecord:self.rootGroup];
@@ -319,11 +319,12 @@ NSString* getSmartFillNotes() {
     record.fields.accessed = date;
     record.fields.modified = date;
     
-    [parentGroup addChild:record];
+    if([parentGroup addChild:record]) {
+        self.document.dirty = YES;
+        return record;
+    }
     
-    self.document.dirty = YES;
-
-    return record;
+    return nil;
 }
 
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows {

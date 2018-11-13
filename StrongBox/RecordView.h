@@ -29,11 +29,11 @@
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyEmail;
 
 @property (strong, nonatomic) IBOutlet UIButton * _Nullable buttonHistory;
+@property (weak, nonatomic) IBOutlet UITableViewCell *tableCellAttachments;
 
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonPasswordGenerationSettings;
-- (IBAction)onSettings:(id _Nullable )sender;
 
-- (IBAction)onGeneratePassword:(id _Nullable )sender;
+- (IBAction)onGenerateOrCopyPassword:(id _Nullable )sender;
 - (IBAction)onCopyUsername:(id _Nullable)sender;
 - (IBAction)onCopyUrl:(id _Nullable)sender;
 - (IBAction)onHide:(id _Nullable)sender;

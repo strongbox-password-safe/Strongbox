@@ -29,6 +29,9 @@ static NSString* const kDisallowBiometricId = @"disallowBiometricId";
 static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
+static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
+static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
+static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
 
 @implementation Settings
 
@@ -47,6 +50,17 @@ static NSUserDefaults *getUserDefaults() {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
     
     return defaults;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)hasShownKeePassBetaWarning {
+    return [getUserDefaults() boolForKey:kHasShownKeePassBetaWarning];
+}
+
+- (void)setHasShownKeePassBetaWarning:(BOOL)hasShownKeePassBetaWarning {
+    [getUserDefaults() setBool:hasShownKeePassBetaWarning forKey:kHasShownKeePassBetaWarning];
+    [getUserDefaults() synchronize];
 }
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen {
@@ -329,6 +343,10 @@ static NSUserDefaults *getUserDefaults() {
     }
     
     PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+
+    //NSError *error; // This fails because PGP doesn't conform to NSSecureCoding... something to do some day...
+    //PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchivedObjectOfClass:PasswordGenerationParameters.class fromData:encodedObject error:&error];
+
     return object;
 }
 
@@ -425,6 +443,24 @@ static NSUserDefaults *getUserDefaults() {
 
 - (void)setUseQuickLaunchAsRootView:(BOOL)useQuickLaunchAsRootView {
     [getUserDefaults() setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
+    [getUserDefaults() synchronize];
+}
+
+- (BOOL)showKeePassCreateSafeOptions {
+    return [getUserDefaults() boolForKey:kShowKeePassCreateSafeOptions];
+}
+
+- (void)setShowKeePassCreateSafeOptions:(BOOL)showKeePassCreateSafeOptions {
+    [getUserDefaults() setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
+    [getUserDefaults() synchronize];
+}
+
+- (BOOL)hasShownAutoFillLaunchWelcome {
+    return [getUserDefaults() boolForKey:kHasShownAutoFillLaunchWelcome];
+}
+
+- (void)setHasShownAutoFillLaunchWelcome:(BOOL)hasShownAutoFillLaunchWelcome {
+    [getUserDefaults() setBool:hasShownAutoFillLaunchWelcome forKey:kHasShownAutoFillLaunchWelcome];
     [getUserDefaults() synchronize];
 }
 

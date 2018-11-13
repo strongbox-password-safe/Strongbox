@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GenericTextDateElementHandler : BaseXmlDomainObjectHandler
 
-- (instancetype)initWithXmlElementName:(NSString*)xmlElementName NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithXmlElementName:(NSString*)xmlElementName context:(nonnull XmlProcessingContext *)context NS_DESIGNATED_INITIALIZER;
 
 @property NSDate *date;
 

@@ -131,7 +131,7 @@
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel error:&error];
+    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
     
     // Compare Original and Regenerated
     
@@ -162,7 +162,7 @@
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel error:&error];
+    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
 
     // Compare Original and Regenerated
 
@@ -179,9 +179,9 @@
     XCTAssertTrue([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
 }
 
-- (void)testToFromModelAndCompareXmlLarge {
-    NSString * xml = [CommonTesting getXmlFromBundleFile:@"keypass-database-with-binary"];
-    RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"ztCAmxaRzv/Q/ws53V4wLACfqfJtDELuEa0lR0lK1UA="];
+- (void)testToFromModelAndCompareXmlCustomIcon {
+    NSString * xml = [CommonTesting getXmlFromBundleFile:@"custom-icon"];
+    RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXml:xml];
     
     // Xml Model to Strongbox Model...
     
@@ -193,19 +193,56 @@
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel error:&error];
+    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
     
     // Compare Original and Regenerated
     
     XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
     NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
-    
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/orig.xml" contents:[originalXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
-    //NSLog(@"%@", originalXml);
+    NSLog(@"%@", originalXml);
     
     NSLog(@"============================================================================================================================");
     
     s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
+    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
+    NSLog(@"%@", regeneratedXml);
+    
+    XCTAssertTrue([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+}
+
+- (void)testToFromModelAndCompareXmlLarge {
+    NSString * xml = [CommonTesting getXmlFromBundleFile:@"keypass-database-with-binary"];
+    RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"ztCAmxaRzv/Q/ws53V4wLACfqfJtDELuEa0lR0lK1UA="];
+    
+    DatabaseAttachment *fakeAttachment = [[DatabaseAttachment alloc] init];
+    fakeAttachment.data = [NSData data];
+    
+    // Xml Model to Strongbox Model...
+    
+    KeePassGroup *origRootGroup = rootObject.keePassFile.root.rootGroup;
+    XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
+    NSError *error;
+    Node* strongboxModel = [adaptor toModel:origRootGroup error:&error];
+    
+    NSLog(@"%@", strongboxModel);
+    
+    // Strongbox Model to Xml Model
+    
+    adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
+    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
+    
+    // Compare Original and Regenerated
+    
+    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
+    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
+    
+    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/orig.xml" contents:[originalXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+    //NSLog(@"%@", originalXml);
+    
+
+    NSLog(@"============================================================================================================================");
+    
+    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
     NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
     //NSLog(@"%@", regeneratedXml);
     [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regen.xml" contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
@@ -234,7 +271,7 @@
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel error:&error];
+    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
     
     // Compare Original and Regenerated
     
@@ -267,7 +304,7 @@
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel error:&error];
+    KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
     
     // Compare Original and Regenerated
     

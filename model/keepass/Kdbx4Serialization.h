@@ -7,13 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SerializationData.h"
+#import "Kdbx4SerializationData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdbx4Serialization : NSObject
 
-+ (nullable SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError;
++ (nullable Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError;
++ (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData password:(NSString*)password ppError:(NSError**)ppError;
 
 @end
 

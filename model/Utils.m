@@ -7,6 +7,7 @@
 //
 
 #import "Utils.h"
+#import <CommonCrypto/CommonCrypto.h>
 
 @implementation Utils
 
@@ -95,6 +96,204 @@
                       range:string1Range
                      locale:[NSLocale currentLocale]];
 };
+
+
++ (void)integerTolittleEndian4Bytes:(int)data bytes:(unsigned char *)b {
+    b[0] = (unsigned char)data;
+    b[1] = (unsigned char)(((uint)data >> 8) & 0xFF);
+    b[2] = (unsigned char)(((uint)data >> 16) & 0xFF);
+    b[3] = (unsigned char)(((uint)data >> 24) & 0xFF);
+}
+
+NSData* Int64ToLittleEndianData(int64_t integer) {
+    return IntToLittleEndianData(integer, 8);
+}
+
+NSData* Int32ToLittleEndianData(int32_t integer) {
+    return IntToLittleEndianData(integer, 4);
+}
+
+NSData* Int16ToLittleEndianData(int16_t integer) {
+    return IntToLittleEndianData(integer, 2);
+}
+
+NSData* Uint64ToLittleEndianData(uint64_t integer) {
+    return UintToLittleEndianData(integer, 8);
+}
+
+NSData* Uint32ToLittleEndianData(uint32_t integer) {
+    return UintToLittleEndianData(integer, 4);
+}
+
+NSData* Uint16ToLittleEndianData(uint16_t integer) {
+    return UintToLittleEndianData(integer, 2);
+}
+
+int64_t littleEndian8BytesToInt64(uint8_t* bytes) {
+    return littleEndianNBytesToInt64(bytes, 8);
+}
+
+int32_t littleEndian4BytesToInt32(uint8_t* bytes) {
+    int32_t ret = (int32_t)littleEndianNBytesToInt64(bytes, 4);
+    
+    return ret;
+}
+
+int16_t littleEndian2BytesToInt16(uint8_t *bytes) {
+    int16_t ret = (int16_t)littleEndianNBytesToInt64(bytes, 2);
+    
+    return ret;
+}
+
+uint64_t littleEndian8BytesToUInt64(uint8_t* bytes) {
+    uint64_t ret = (uint64_t)littleEndianNBytesToInt64(bytes, 8);
+    return ret;
+}
+
+uint32_t littleEndian4BytesToUInt32(uint8_t* bytes) {
+    uint32_t ret = (uint32_t)littleEndianNBytesToInt64(bytes, 4);
+    return ret;
+}
+
+uint16_t littleEndian2BytesToUInt16(uint8_t *bytes) {
+    uint16_t ret = (uint16_t)littleEndianNBytesToInt64(bytes, 2);
+    
+    return ret;
+}
+
+int64_t littleEndianNBytesToInt64(uint8_t* bytes, int n)  {
+    if(n > 8) {
+        NSLog(@"n > 8 passed to littleEndianNBytesToInt64");
+        return -1;
+    }
+    
+    int64_t ret = 0;
+    
+    for (int i=0; i<n; i++) {
+        int64_t tmp = bytes[i];
+        ret |= tmp << (i*8);
+    }
+    
+    return ret;
+}
+
+NSData* UintToLittleEndianData(uint64_t integer, uint8_t byteCount) {
+    NSMutableData *ret = [[NSMutableData alloc] initWithLength:byteCount];
+    
+    for(int i=0;i<byteCount;i++) {
+        ((uint8_t*)ret.mutableBytes)[i] = (uint8_t)(((uint64_t)integer >> (i * 8)) & 0xFF);
+    }
+    
+    return ret;
+}
+
+NSData* IntToLittleEndianData(int64_t integer, uint8_t byteCount) {
+    NSMutableData *ret = [[NSMutableData alloc] initWithLength:byteCount];
+    
+    for(int i=0;i<byteCount;i++) {
+        ((uint8_t*)ret.mutableBytes)[i] = (uint8_t)(((int64_t)integer >> (i * 8)) & 0xFF);
+    }
+    
+    return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
+    unsigned long i;
+    
+    for (i = 0; i < index; i++) {
+        printf("%02x ", buffer[i]);
+    }
+    
+    for (unsigned long spacer = index; spacer < width; spacer++) {
+        printf("    ");
+    }
+    
+    printf(": ");
+    
+    for (i = 0; i < index; i++) {
+        if (!isprint(buffer[i])) printf(".");
+        else printf("%c", buffer[i]);
+    }
+    
+    printf("\n");
+}
+
++ (NSString *)hexadecimalString:(NSData *)data {
+    const unsigned char *dataBuffer = (const unsigned char *)data.bytes;
+    
+    if (!dataBuffer) {
+        return [NSString string];
+    }
+    
+    NSUInteger dataLength = data.length;
+    NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
+    
+    for (int i = 0; i < dataLength; ++i) {
+        [hexString appendString:[NSString stringWithFormat:@"%02lX", (unsigned long)dataBuffer[i]]];
+    }
+    
+    return [NSString stringWithString:hexString];
+}
+
+NSData* sha256(NSData *data) {
+    uint8_t digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
+    
+    CC_SHA256(data.bytes, (CC_LONG)data.length, digest);
+    
+    NSData *out = [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
+    
+    return out;
+}
+
+uint32_t getRandomUint32() {
+    uint32_t ret;
+    if(SecRandomCopyBytes(kSecRandomDefault, sizeof(uint32_t), &ret))
+    {
+        NSLog(@"Could not securely copy new random bytes");
+        return -1;
+    }
+    
+    return ret;
+}
+
+NSData* getRandomData(uint32_t length) {
+    NSMutableData *start = [NSMutableData dataWithLength:length];
+    if(SecRandomCopyBytes(kSecRandomDefault, length, start.mutableBytes))
+    {
+        NSLog(@"Could not securely copy new random bytes");
+        return nil;
+    }
+    
+    return start;
+}
+
+#if TARGET_OS_IPHONE
+UIImage* scaleImage(UIImage* image, CGSize newSize)
+{
+    float heightToWidthRatio = image.size.height / image.size.width;
+    float scaleFactor = 1;
+    if(heightToWidthRatio > 0) {
+        scaleFactor = newSize.height / image.size.height;
+    } else {
+        scaleFactor = newSize.width / image.size.width;
+    }
+    
+    CGSize newSize2 = newSize;
+    newSize2.width = image.size.width * scaleFactor;
+    newSize2.height = image.size.height * scaleFactor;
+    
+    @autoreleasepool { // Prevent App Extension Crash
+        UIGraphicsBeginImageContext(newSize2);
+        [image drawInRect:CGRectMake(0,0,newSize2.width,newSize2.height)];
+        UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+   
+        return newImage;
+    }
+}
+#endif
 
 //    [[Settings sharedInstance] setPro:NO];
 //    [[Settings sharedInstance] setEndFreeTrialDate:nil];

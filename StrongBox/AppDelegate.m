@@ -166,7 +166,8 @@
         ![nav.visibleViewController isKindOfClass:[UpgradeViewController class]] &&
         ![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]] && // Google Sign In Broken without this... sigh
         ![className isEqualToString:@"SFAuthenticationViewController"] && // Google Sign In Broken without this... sigh. This is kinda brittle but I see no other way around it.
-        ![className isEqualToString:@"ODAuthenticationViewController"] &&
+        ![className isEqualToString:@"ODAuthenticationViewController"] && // OneDrive Personal
+        ![className isEqualToString:@"ADAuthenticationViewController"] && // OneDrive Biz
         ![className isEqualToString:@"DBMobileSafariViewController"]) // OneDrive too
     {
         self.enterBackgroundTime = [[NSDate alloc] init];

@@ -44,4 +44,8 @@
     return [self.kvps objectForKey:key];
 }
 
+- (NSString *)description {
+    return [_kvps description];
+}
+
 @end

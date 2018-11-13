@@ -5,7 +5,6 @@
 //  Created by Mark on 06/10/2018.
 //  Copyright © 2018 Mark McGuill. All rights reserved.
 //
-
 #import "InitialViewController.h"
 #import "Alerts.h"
 #import "DatabaseModel.h"
@@ -250,10 +249,11 @@
         return;
     }
     
-    [self promptForImportedSafeNickName:importedData];
+    NSString* fileExtension = [DatabaseModel getLikelyFileExtension:importedData];
+    [self promptForImportedSafeNickName:importedData extension:fileExtension];
 }
 
-- (void)promptForImportedSafeNickName:(NSData *)data {
+- (void)promptForImportedSafeNickName:(NSData *)data extension:(NSString*)extension {
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:@"Nickname"
                             title:@"You are about to import a safe. What nickname would you like to use for it?"
@@ -267,17 +267,17 @@
                                             title:@"Invalid Nickname"
                                           message:@"That nickname may already exist, or is invalid, please try a different nickname."
                                        completion:^{
-                                           [self promptForImportedSafeNickName:data];
+                                           [self promptForImportedSafeNickName:data extension:extension];
                                        }];
                                }
                                else {
-                                   [self addImportedSafe:nickName data:data];
+                                   [self addImportedSafe:nickName data:data extension:extension];
                                }
                            }
                        }];
 }
 
-- (void)addImportedSafe:(NSString *)nickName data:(NSData *)data {
+- (void)addImportedSafe:(NSString *)nickName data:(NSData *)data extension:(NSString*)extension {
     id<SafeStorageProvider> provider;
     
     if(Settings.sharedInstance.iCloudOn) {
@@ -288,6 +288,7 @@
     }
     
     [provider create:nickName
+           extension:extension
                 data:data
         parentFolder:nil
       viewController:self

@@ -49,11 +49,6 @@
     
     NSArray* aCheckableElements = [self checkableElements:self.children];
     NSArray* bCheckableElements = [self checkableElements:other.children];
-
-    if(aCheckableElements.count != bCheckableElements.count) {
-        NSLog(@"Mismatching Children:\na=[%lu]\nb=[%lu]", (unsigned long)self.children.count, (unsigned long)other.children.count);
-        return NO;
-    }
     
     NSArray* a = [aCheckableElements sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         // NOTE: Generally it's only Group, Entry and String elements that can be multiple. If we happen to sort like
@@ -67,6 +62,15 @@
     NSArray* b = [bCheckableElements sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         return [((XmlTree*)obj1).node.xmlElementName compare:((XmlTree*)obj2).node.xmlElementName];
     }];
+    
+    if(a.count != b.count) {
+        NSLog(@"Mismatching Children:\na=[%lu]\nb=[%lu]", (unsigned long)self.children.count, (unsigned long)other.children.count);
+        
+        NSLog(@"a = [%@]", a);
+        NSLog(@"b = [%@]", b);
+        
+        return NO;
+    }
     
     for (int i=0; i<a.count; i++) {
         XmlTree* aTree = [a objectAtIndex:i];

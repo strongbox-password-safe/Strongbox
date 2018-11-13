@@ -32,7 +32,7 @@
 
     SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
 
-    if(primary && ![[self getInitialViewController] isUnsupportedAutoFillProvider:primary.storageProvider]) {
+    if(primary && [[self getInitialViewController] autoFillIsPossibleWithSafe:primary]) {
         [self.barButtonShowQuickView setEnabled:YES];
         [self.barButtonShowQuickView setTintColor:nil];
     }
@@ -55,6 +55,8 @@
     [self.navigationController setToolbarHidden:NO];
     self.navigationController.toolbar.hidden = NO;
     self.navigationController.toolbarHidden = NO;
+    
+    showWelcomeMessageIfAppropriate(self);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -129,9 +131,27 @@
     
     cell.textLabel.text = safe.nickName;
     cell.detailTextLabel.text = safe.fileName;
+    cell.imageView.userInteractionEnabled = YES;
+    cell.userInteractionEnabled = YES;
+    cell.textLabel.enabled = YES;
+    cell.detailTextLabel.enabled = YES;
     
-    if(![[self getInitialViewController] isUnsupportedAutoFillProvider:safe.storageProvider]) {
+    if([[self getInitialViewController] autoFillIsPossibleWithSafe:safe]) {
         id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
+        
+        if(![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider]) {
+            NSDate* mod = [LocalDeviceStorageProvider.sharedInstance getAutoFillCacheModificationDate:safe];
+            
+            NSDateFormatter *df = [[NSDateFormatter alloc] init];
+            df.timeStyle = NSDateFormatterShortStyle;
+            df.dateStyle = NSDateFormatterShortStyle;
+            df.doesRelativeDateFormatting = YES;
+            df.locale = NSLocale.currentLocale;
+            
+            NSString *modDateStr = [df stringFromDate:mod];
+            
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"[Cached %@]", modDateStr];
+        }
         
         NSString *icon = provider.icon;
         cell.imageView.image = [UIImage imageNamed:icon];
@@ -139,11 +159,21 @@
     else {
         cell.imageView.image = [UIImage imageNamed:@"cancel_32"];
         cell.imageView.userInteractionEnabled = NO;
-        cell.textLabel.text = [NSString stringWithFormat:@"%@ [Autofill Not Supported]", safe.nickName];
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ [Autofill Not Supported]", safe.fileName];
         cell.userInteractionEnabled = NO;
         cell.textLabel.enabled = NO;
         cell.detailTextLabel.enabled = NO;
+        
+        if([[self getInitialViewController] isUnsupportedAutoFillProvider:safe.storageProvider]) {
+            cell.detailTextLabel.text = @"[Autofill Not Supported for Local Device Safes]";
+        }
+        else {
+            if(safe.autoFillCacheEnabled) {
+                cell.detailTextLabel.text = @"[No Auto Fill Cache File Yet]";
+            }
+            else {
+                cell.detailTextLabel.text = @"[Auto Fill Cache Disabled]";
+            }
+        }
     }
     
     return cell;
@@ -156,15 +186,17 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SafeMetaData* safe = [self.safes objectAtIndex:indexPath.row];
 
+    BOOL useAutoFillCache = ![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider];
+    
     [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
                                                             safe:safe
+                                               openAutoFillCache:useAutoFillCache
                                askAboutTouchIdEnrolIfAppropriate:NO
                                                       completion:^(Model * _Nonnull model) {
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
                                                           }
                                                       }];
-
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -180,5 +212,6 @@
     
     [[self getInitialViewController] showQuickLaunchView];
 }
+    
 
 @end

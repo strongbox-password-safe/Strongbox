@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePassFile : BaseXmlDomainObjectHandler
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren;
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context;
 
 @property (nonatomic, readonly) Meta* meta;
 @property (nonatomic, readonly) Root* root;

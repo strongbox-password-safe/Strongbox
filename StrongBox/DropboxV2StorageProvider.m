@@ -42,13 +42,14 @@
 }
 
 - (void)    create:(NSString *)nickName
+         extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
     [SVProgressHUD show];
 
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
 
     NSString *parentFolderPath = parentFolder ? ((DBFILESFolderMetadata *)parentFolder).pathLower : @"/";
 

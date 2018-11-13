@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SafeTools.h"
+#import "PwSafeSerialization.h"
 #import "Group.h"
 #import "PasswordHistory.h"
 

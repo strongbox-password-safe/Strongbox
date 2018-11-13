@@ -54,6 +54,7 @@
     [self bindShowPasswordOnDetails];
     [self bindAutoLock];
     [self bindAutoAddNewLocalSafes];
+    [self bindShowKeePassCreateOption];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -113,6 +114,18 @@
     Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
     
     [self bindAllowBiometric];
+}
+
+- (IBAction)onShowKeePassCreateOptionChanged:(id)sender {
+    NSLog(@"Setting ShowKeePassCreateOption to %d", self.switchShowKeePassCreateOption.on);
+    
+    Settings.sharedInstance.showKeePassCreateSafeOptions = !self.switchShowKeePassCreateOption.on;
+    
+    [self bindShowKeePassCreateOption];
+}
+
+- (void)bindShowKeePassCreateOption {
+    self.switchShowKeePassCreateOption.on = [[Settings sharedInstance] showKeePassCreateSafeOptions];
 }
 
 - (IBAction)onHowTo:(id)sender {

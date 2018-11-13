@@ -7,23 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "KeyDerivationCipher.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Argon2KdfCipher : NSObject
+@interface Argon2KdfCipher : NSObject<KeyDerivationCipher>
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithParametersDictionary:(NSDictionary<NSString*, NSObject*>*)parameters NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDefaults;
+- (instancetype)initWithParametersDictionary:(NSDictionary<NSString*, VariantObject*>*)parameters;
 
 - (NSData*)deriveKey:(NSData*)data;
 
-@property (nonatomic, readonly) NSData *salt;
-@property (nonatomic, readonly) uint32_t parallelism;
-@property (nonatomic, readonly) uint64_t memory;
-@property (nonatomic, readonly) uint64_t iterations;
-@property (nonatomic, readonly) uint32_t version;
-@property (nonatomic, readonly) NSData *secretKey; // TODO: Used?
-@property (nonatomic, readonly) NSData *assocData; // TODO: Used?
+@property (readonly, nonatomic) KdfParameters* kdfParameters;
 
 @end
 

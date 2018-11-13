@@ -15,10 +15,18 @@
 
 @implementation MiscScratchPadTests
 
-- (void)testNickNameMatchesOldOfflineCacheWithNil {
-    BOOL result = [OfflineCacheNameDetector nickNameMatchesOldOfflineCache:nil];
+- (void)testEmptyBase64StringData {
+    NSData* ret = [[NSData alloc] initWithBase64EncodedString:@"" options:kNilOptions];
 
-    XCTAssertFalse(result);
+    XCTAssertNotNil(ret);
+    XCTAssert(ret.length == 0);
+}
+
+- (void)testNilBase64StringData {
+    NSData* ret = [[NSData alloc] initWithBase64EncodedString:@"" options:kNilOptions];
+    
+    XCTAssertNotNil(ret);
+    XCTAssert(ret.length == 0);
 }
 
 - (void)testNickNameMatchesOldOfflineCacheWithEmpty {

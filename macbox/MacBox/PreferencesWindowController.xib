@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -64,11 +64,11 @@
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="d1S-ha-z7I">
                                 <view key="view" id="0i4-gP-tCE">
-                                    <rect key="frame" x="10" y="33" width="416" height="354"/>
+                                    <rect key="frame" x="10" y="33" width="422" height="488"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AIq-rw-YUd">
-                                            <rect key="frame" x="15" y="321" width="163" height="18"/>
+                                            <rect key="frame" x="15" y="455" width="163" height="18"/>
                                             <buttonCell key="cell" type="check" title="Always Show Password" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="WDq-o0-s5T">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -78,7 +78,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FfB-of-qge">
-                                            <rect key="frame" x="15" y="297" width="261" height="18"/>
+                                            <rect key="frame" x="15" y="431" width="261" height="18"/>
                                             <buttonCell key="cell" type="check" title="Always Show Username in Outline View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="F1L-We-jkz">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>

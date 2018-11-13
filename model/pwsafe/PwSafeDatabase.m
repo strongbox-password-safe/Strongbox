@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "PwSafeDatabase.h"
 #import "Utils.h"
-#import "SafeTools.h"
+#import "PwSafeSerialization.h"
 #import <CommonCrypto/CommonHMAC.h>
 #import "Record.h"
 
@@ -15,8 +15,20 @@
 
 @implementation PwSafeDatabase
 
++ (NSString *)fileExtension {
+    return @"psafe3";
+}
+
+- (NSString *)fileExtension {
+    return [PwSafeDatabase fileExtension];
+}
+
+- (DatabaseFormat)format {
+    return kPasswordSafe;
+}
+
 + (BOOL)isAValidSafe:(NSData *)candidate {
-    return [SafeTools isAValidSafe:candidate];
+    return [PwSafeSerialization isAValidSafe:candidate];
 }
 
 - (instancetype)initNewWithoutPassword {
@@ -29,6 +41,7 @@
         
         _metadata = [[PwSafeMetadata alloc] init];
         _rootGroup = [[Node alloc] initAsRoot:nil];
+        _attachments = [NSMutableArray array];
         
         self.masterPassword = password;
         
@@ -62,7 +75,6 @@
                                                 error:ppError];
 
         if(!records) {
-            NSLog(@"Decrypt Safe failed.");
             return nil;
         }
         
@@ -82,8 +94,10 @@
             return nil;
         }
         
+        _attachments = [NSMutableArray array];
+        
         _metadata = [[PwSafeMetadata alloc] initWithVersion:[self getVersion]];
-        self.metadata.keyStretchIterations = [SafeTools getKeyStretchIterations:safeData];
+        self.metadata.keyStretchIterations = [PwSafeSerialization getKeyStretchIterations:safeData];
         [self syncLastUpdateFieldsFromHeaders];
         
         self.masterPassword = password;
@@ -199,10 +213,10 @@
                          password:(NSString*)password
                           headers:(NSMutableArray<Field*> **)headerFields
                             error:(NSError **)ppError {
-    PasswordSafe3Header header = [SafeTools getHeader:safeData];
+    PasswordSafe3Header header = [PwSafeSerialization getHeader:safeData];
     
     NSData *pBar;
-    if (![SafeTools checkPassword:&header password:password pBar:&pBar]) {
+    if (![PwSafeSerialization checkPassword:&header password:password pBar:&pBar]) {
         NSLog(@"Invalid password!");
         
         if (ppError != nil) {
@@ -215,19 +229,19 @@
     NSData *K;
     NSData *L;
     
-    [SafeTools getKandL:pBar header:header K_p:&K L_p:&L];
+    [PwSafeSerialization getKandL:pBar header:header K_p:&K L_p:&L];
     
-    NSInteger numBlocks = [SafeTools getNumberOfBlocks:safeData];
+    NSInteger numBlocks = [PwSafeSerialization getNumberOfBlocks:safeData];
     
-    NSData *decData = [SafeTools decryptBlocks:K
+    NSData *decData = [PwSafeSerialization decryptBlocks:K
                                             ct:(unsigned char *)&safeData.bytes[SIZE_OF_PASSWORD_SAFE_3_HEADER]
                                             iv:header.iv
                                      numBlocks:numBlocks];
     
     NSMutableArray<Record*> *records = [NSMutableArray array];
-    NSData *dataForHmac = [SafeTools extractDbHeaderAndRecords:decData headerFields_p:headerFields records_p:&records];
+    NSData *dataForHmac = [PwSafeSerialization extractDbHeaderAndRecords:decData headerFields_p:headerFields records_p:&records];
     
-    NSData *computedHmac = [SafeTools calculateRFC2104Hmac:dataForHmac key:L];
+    NSData *computedHmac = [PwSafeSerialization calculateRFC2104Hmac:dataForHmac key:L];
     
     unsigned char *actualHmac[CC_SHA256_DIGEST_LENGTH];
     [safeData getBytes:actualHmac range:NSMakeRange(safeData.length - CC_SHA256_DIGEST_LENGTH, CC_SHA256_DIGEST_LENGTH)];
@@ -370,7 +384,7 @@
     
     for (Field *dbHeaderField in _dbHeaderFields) {
         //NSLog(@"SAVE HDR: %@ -> %@", dbHeaderField.prettyTypeString, dbHeaderField.prettyDataString);
-        NSData* serializedField = [SafeTools serializeField:dbHeaderField];
+        NSData* serializedField = [PwSafeSerialization serializeField:dbHeaderField];
         
         [toBeEncrypted appendData:serializedField];
     }
@@ -378,7 +392,7 @@
     // Write HDR_END
     
     Field *hdrEnd = [[Field alloc] initEmptyDbHeaderField:HDR_END];
-    NSData *serializedField = [SafeTools serializeField:hdrEnd];
+    NSData *serializedField = [PwSafeSerialization serializeField:hdrEnd];
     [toBeEncrypted appendData:serializedField];
     
     return toBeEncrypted;
@@ -389,13 +403,13 @@
     
     for (Record *record in records) {
         for (Field *field in [record getAllFields]) {
-            [toBeEncrypted appendData:[SafeTools serializeField:field]];
+            [toBeEncrypted appendData:[PwSafeSerialization serializeField:field]];
         }
         
         // Write RECORD_END
         
         Field *end = [[Field alloc] initEmptyWithType:FIELD_TYPE_END];
-        [toBeEncrypted appendData:[SafeTools serializeField:end]];
+        [toBeEncrypted appendData:[PwSafeSerialization serializeField:end]];
     }
     
     return toBeEncrypted;
@@ -458,7 +472,7 @@
     NSMutableData *ret = [[NSMutableData alloc] init];
     
     NSData *K, *L;
-    PasswordSafe3Header hdr = [SafeTools generateNewHeader:(int)self.metadata.keyStretchIterations
+    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)self.metadata.keyStretchIterations
                                             masterPassword:self.masterPassword
                                                          K:&K
                                                          L:&L];
@@ -486,7 +500,7 @@
 
     // Encrypt
     
-    NSData *ct = [SafeTools encryptCBC:K ptData:toBeEncrypted iv:hdr.iv];
+    NSData *ct = [PwSafeSerialization encryptCBC:K ptData:toBeEncrypted iv:hdr.iv];
     [ret appendData:ct];
     
     // EOF marker
@@ -496,7 +510,7 @@
     
     // HMAC
     
-    NSData *hmac = [SafeTools calculateRFC2104Hmac:hmacData key:L];
+    NSData *hmac = [PwSafeSerialization calculateRFC2104Hmac:hmacData key:L];
     [ret appendData:hmac];
     
     return ret;

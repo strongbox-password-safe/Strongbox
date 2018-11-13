@@ -7,13 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Cipher.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AesCipher : NSObject
+@interface AesCipher : NSObject<Cipher>
 
-+ (NSData*)decrypt:(NSData *)data iv:(NSData*)iv key:(NSData*)key;
-+ (NSData*)encrypt:(NSData *)data iv:(NSData*)iv key:(NSData*)key;
+- (NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (NSData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (NSData*)generateIv;
 
 @end
 

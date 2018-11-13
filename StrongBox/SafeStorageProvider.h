@@ -23,6 +23,7 @@
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 
 - (void)    create:(NSString *)nickName
+         extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController

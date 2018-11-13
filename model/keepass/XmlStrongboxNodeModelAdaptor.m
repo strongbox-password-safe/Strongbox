@@ -10,11 +10,20 @@
 #import "KeePassXmlParserDelegate.h"
 #import "Utils.h"
 #import "KeePassConstants.h"
+#import "DatabaseAttachment.h"
+
+@interface XmlStrongboxNodeModelAdaptor ()
+
+@property XmlProcessingContext* xmlParsingContext;
+
+@end
 
 @implementation XmlStrongboxNodeModelAdaptor
 
-- (KeePassGroup*)fromModel:(Node*)rootNode error:(NSError**)error {
-    // Strongbox uses the Root Node as a dummy but KeePass the actual root node is not serialized and entries are not allowed
+- (KeePassGroup*)fromModel:(Node*)rootNode context:(XmlProcessingContext*)context error:(NSError**)error {
+    self.xmlParsingContext = context;
+    
+    // Strongbox uses the Root Node as a dummy but KeePass the actual root node is serialized and entries are not allowed
     // to be added to it.
     
     if(rootNode.children.count != 1 || ![rootNode.children objectAtIndex:0].isGroup) {
@@ -54,8 +63,15 @@
 }
 
 - (KeePassGroup*)buildXmlGroup:(Node*)group {
-    KeePassGroup *ret = [[KeePassGroup alloc] init];
+    KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
     KeePassGroup *previousXmlGroup = (KeePassGroup*)group.linkedData;
+    
+    if(group.iconId) {
+        ret.icon = group.iconId;
+    }
+    if(group.customIconUuid){
+        ret.customIcon = group.customIconUuid;
+    }
     
     if(previousXmlGroup) { // Retain unknown attributes/text & child elements
         ret.nonCustomisedXmlTree = previousXmlGroup.nonCustomisedXmlTree;
@@ -76,7 +92,7 @@
 }
 
 - (Entry*)buildXmlEntry:(Node*)entry {
-    Entry *ret = [[Entry alloc] init];
+    Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
     Entry *previousXmlEntry = (Entry*)entry.linkedData;
     
     if(previousXmlEntry) { // Retain unknown attributes/text & child elements
@@ -84,6 +100,13 @@
     }
 
     ret.uuid.uuid = entry.uuid;
+    
+    if(entry.iconId) {
+        ret.icon = entry.iconId;
+    }
+    if(entry.customIconUuid){
+        ret.customIcon = entry.customIconUuid;
+    }
     
     // Times is only partially managed so need to add any customisation from original here.
     
@@ -102,7 +125,7 @@
     // (useful for unit testing in Xml Comparison only at the moment, but I see no harm in doing this). Looks ugly though
     
     for (String* originalString in previousXmlEntry.strings) {
-        String* duplicatedString = [[String alloc] init];
+        String* duplicatedString = [[String alloc] initWithContext:self.xmlParsingContext];
         [duplicatedString setXmlInfo:originalString.nonCustomisedXmlTree.node.xmlElementName
                           attributes:originalString.nonCustomisedXmlTree.node.xmlAttributes
                                 text:originalString.nonCustomisedXmlTree.node.xmlText];
@@ -138,6 +161,25 @@
 
     [ret.strings removeAllObjects];
     [ret.strings addObjectsFromArray:filtered];
+
+    // Binaries
+    
+    for (NodeFileAttachment *attachment in entry.fields.attachments) {
+        Binary *old = (Binary*)attachment.linkedObject;
+        
+        Binary *xmlBinary = [[Binary alloc] initWithContext:self.xmlParsingContext];
+        
+        if(old) { // Copy old attributes/text etc
+            [xmlBinary setXmlInfo:old.nonCustomisedXmlTree.node.xmlElementName attributes:old.nonCustomisedXmlTree.node.xmlAttributes text:old.nonCustomisedXmlTree.node.xmlText];
+            [xmlBinary.key setXmlInfo:old.key.nonCustomisedXmlTree.node.xmlElementName attributes:old.key.nonCustomisedXmlTree.node.xmlAttributes text:old.key.nonCustomisedXmlTree.node.xmlText];
+            [xmlBinary.value setXmlInfo:old.value.nonCustomisedXmlTree.node.xmlElementName attributes:old.value.nonCustomisedXmlTree.node.xmlAttributes text:old.value.nonCustomisedXmlTree.node.xmlText];
+        }
+        
+        xmlBinary.key.text = attachment.filename;
+        [xmlBinary.value setXmlAttribute:kBinaryValueAttributeRef value:[NSString stringWithFormat:@"%d", attachment.index]];
+        
+        [ret.binaries addObject:xmlBinary];
+    }
     
     return ret;
 }
@@ -145,6 +187,10 @@
 - (BOOL)buildGroup:(KeePassGroup*)group parentNode:(Node*)parentNode {
     Node* groupNode = [[Node alloc] initAsGroup:group.name.text parent:parentNode uuid:group.uuid.uuid];
     groupNode.linkedData = group; // Original KeePass Document Group...
+    
+    if(group.customIcon) groupNode.customIconUuid = group.customIcon;
+    if(group.icon) groupNode.iconId = group.icon;
+
     
     for (KeePassGroup *childGroup in group.groups) {
         if(![self buildGroup:childGroup parentNode:groupNode]) {
@@ -154,7 +200,12 @@
     }
 
     for (Entry *childEntry in group.entries) {
-        Node * entryNode = nodeFromEntry(childEntry, groupNode); // Original KeePass Document Group...
+        Node * entryNode = [self nodeFromEntry:childEntry groupNode:groupNode]; // Original KeePass Document Group...
+        
+        if( entryNode == nil ) {
+            NSLog(@"Error building node from Entry: [%@]", childEntry);
+            return NO;
+        }
         
         [groupNode addChild:entryNode];
     }
@@ -164,7 +215,7 @@
     return YES;
 }
 
-static Node *nodeFromEntry(Entry *childEntry, Node *groupNode) {
+- (Node*)nodeFromEntry:(Entry *)childEntry groupNode:(Node*)groupNode {
     NodeFields *fields = [[NodeFields alloc] initWithUsername:childEntry.username
                                                           url:childEntry.url
                                                      password:childEntry.password
@@ -175,12 +226,32 @@ static Node *nodeFromEntry(Entry *childEntry, Node *groupNode) {
     fields.accessed = childEntry.times.lastAccessTime.date;
     fields.modified = childEntry.times.lastModificationTime.date;
     
+    for (Binary* binary in childEntry.binaries) {
+        NSString* binaryRef = [binary.value.nonCustomisedXmlTree.node.xmlAttributes objectForKey:kBinaryValueAttributeRef];
+        
+        if(binaryRef) {
+            int binaryIndex = [binaryRef intValue];
+            
+            NodeFileAttachment* attachment = [[NodeFileAttachment alloc] init];
+            
+            attachment.filename = binary.key.text;
+            attachment.index = binaryIndex;
+            attachment.linkedObject = binary;
+            
+            [fields.attachments addObject:attachment];
+        }
+    }
+    
     Node* entryNode = [[Node alloc] initAsRecord:childEntry.title
                                           parent:groupNode
                                           fields:fields
                                             uuid:childEntry.uuid.uuid]; 
     
     entryNode.linkedData = childEntry;
+    
+    if(childEntry.customIcon) entryNode.customIconUuid = childEntry.customIcon;
+    if(childEntry.icon) entryNode.iconId = childEntry.icon;
+    
     return entryNode;
 }
 

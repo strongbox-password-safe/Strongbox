@@ -12,6 +12,7 @@
 #import "Node.h"
 #import "XmlStrongBoxModelAdaptor.h"
 #import "KeePassConstants.h"
+#import "DatabaseAttachment.h"
 
 @interface KeePassXmlStrongboxModelAdaptorTests : XCTestCase
 
@@ -19,7 +20,7 @@
 
 @implementation KeePassXmlStrongboxModelAdaptorTests
 
--(KeepassMetaDataAndNodeModel*)getModelFromXmlFile:(NSString*)filename key:(NSString*)key {
+-(Node*)getModelFromXmlFile:(NSString*)filename key:(NSString*)key {
     NSString * xml = [CommonTesting getXmlFromBundleFile:filename];
     
     RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:key];
@@ -28,26 +29,17 @@
     XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     NSError *error;
     
-    KeepassMetaDataAndNodeModel *ret = [adaptor fromXmlModelToStrongboxModel:rootObject error:&error];
+    Node *ret = [adaptor fromXmlModelToStrongboxModel:rootObject error:&error];
     
     XCTAssertNotNil(ret);
     return ret;
-}
-
-- (void)testReadNil {
-    XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
-    NSError *error;
-    KeepassMetaDataAndNodeModel *ret = [adaptor fromXmlModelToStrongboxModel:nil error:&error];
-    
-    XCTAssertNotNil(ret);
-    NSLog(@"%@", ret);
 }
 
 - (void)testReadMinimal {
     NSString* file = @"minimal";
     NSString* key = [CommonTesting.testXmlFilesAndKeys objectForKey:file];
     
-    KeepassMetaDataAndNodeModel* strongboxModel = [self getModelFromXmlFile:file key:key];
+    Node* strongboxModel = [self getModelFromXmlFile:file key:key];
 
     XCTAssertNotNil(strongboxModel);
     
@@ -58,7 +50,7 @@
     NSString* file = @"funky";
     NSString* key = [CommonTesting.testXmlFilesAndKeys objectForKey:file];
     
-    KeepassMetaDataAndNodeModel* strongboxModel = [self getModelFromXmlFile:file key:key];
+    Node* strongboxModel = [self getModelFromXmlFile:file key:key];
     
     NSLog(@"%@", strongboxModel);
     
@@ -69,17 +61,15 @@
     NSString* file = @"ladder";
     NSString* key = [CommonTesting.testXmlFilesAndKeys objectForKey:file];
     
-    KeepassMetaDataAndNodeModel* strongboxModel = [self getModelFromXmlFile:file key:key];
+    Node* strongboxModel = [self getModelFromXmlFile:file key:key];
     
     //NSLog(@"%@", strongboxModel);
-    
     XCTAssertNotNil(strongboxModel);
-    XCTAssertNotNil(strongboxModel.rootNode);
-    XCTAssertNotNil(strongboxModel.rootNode.childGroups);
-    XCTAssertNotNil([strongboxModel.rootNode.childGroups objectAtIndex:0]);
-    XCTAssertNotNil([[strongboxModel.rootNode.childGroups objectAtIndex:0].childGroups objectAtIndex:4]);
+    XCTAssertNotNil(strongboxModel.childGroups);
+    XCTAssertNotNil([strongboxModel.childGroups objectAtIndex:0]);
+    XCTAssertNotNil([[strongboxModel.childGroups objectAtIndex:0].childGroups objectAtIndex:4]);
                      
-    Node* newGroupNode = [[strongboxModel.rootNode.childGroups objectAtIndex:0].childGroups objectAtIndex:4];
+    Node* newGroupNode = [[strongboxModel.childGroups objectAtIndex:0].childGroups objectAtIndex:4];
     Node* entry1 = [newGroupNode.childRecords objectAtIndex:0];
     
     NSLog(@"%@", entry1);
@@ -94,7 +84,7 @@
         NSLog(@"=========================================== Testing %@ ====================================================", file);
 
         NSString* key = [CommonTesting.testXmlFilesAndKeys objectForKey:file];
-        KeepassMetaDataAndNodeModel* strongboxModel = [self getModelFromXmlFile:file key:key];
+        Node* strongboxModel = [self getModelFromXmlFile:file key:key];
         
         XCTAssertNotNil(strongboxModel);
         
@@ -107,44 +97,48 @@
     NSString* file = @"ladder-single-entry";
     NSString* key = [CommonTesting.testXmlFilesAndKeys objectForKey:file];
     
-    KeepassMetaDataAndNodeModel* strongboxModel = [self getModelFromXmlFile:file key:key];
+    Node* strongboxModel = [self getModelFromXmlFile:file key:key];
     
     NSLog(@"%@", strongboxModel);
     
     XCTAssertNotNil(strongboxModel);
-    XCTAssertNotNil(strongboxModel.rootNode);
-    XCTAssertNotNil(strongboxModel.rootNode.childGroups);
-    XCTAssertNotNil([strongboxModel.rootNode.childGroups objectAtIndex:0]);
-    XCTAssertNotNil([[strongboxModel.rootNode.childGroups objectAtIndex:0].childRecords objectAtIndex:0]);
+    XCTAssertNotNil(strongboxModel.childGroups);
+    XCTAssertNotNil([strongboxModel.childGroups objectAtIndex:0]);
+    XCTAssertNotNil([[strongboxModel.childGroups objectAtIndex:0].childRecords objectAtIndex:0]);
     
-    Node* foo = [[strongboxModel.rootNode.childGroups objectAtIndex:0].childRecords objectAtIndex:0];
+    Node* foo = [[strongboxModel.childGroups objectAtIndex:0].childRecords objectAtIndex:0];
     
     NSLog(@"%@", foo);
     
     XCTAssert([foo.title isEqualToString:@"Entry 1"]);
 }
 
-- (void)testToXmlModelFromNilFails {
-    XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
-    
-    NSError *error;
-    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:nil existingRootXmlDocument:nil error:&error];
-    
-    XCTAssertNil(ret);
-    
-    NSLog(@"%@", error);
-}
+//- (void)testToXmlModelFromNilFails {
+//    XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
+//    
+//    NSError *error;
+//    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:nil
+//                                                         attachments:[NSArray array]
+//                                             existingRootXmlDocument:nil
+//                                                             context:[XmlProcessingContext standardV3Context]
+//                                                               error:&error];
+//    
+//    XCTAssertNil(ret);
+//    
+//    NSLog(@"%@", error);
+//}
 
 - (void)testToXmlModelFromEmptyFails {
     XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     
-    KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
     Node* node = [[Node alloc] initAsRoot:nil];
     
-    KeepassMetaDataAndNodeModel *foo = [[KeepassMetaDataAndNodeModel alloc] initWithMetadata:metadata nodeModel:node];
-   
     NSError *error;
-    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:foo existingRootXmlDocument:nil error:&error];
+    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
+                                                         customIcons:[NSDictionary dictionary]
+                                             existingRootXmlDocument:nil
+                                                             context:[XmlProcessingContext standardV3Context]
+                                                               error:&error];
     
     XCTAssertNil(ret);
  
@@ -154,16 +148,17 @@
 - (void)testToXmlModelFromMostBasicStrongboxModel {
     XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     
-    KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
 
     Node* node = [[Node alloc] initAsRoot:nil];
     Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node uuid:nil];
     [node addChild:keePassRootGroup];
 
-    KeepassMetaDataAndNodeModel *foo = [[KeepassMetaDataAndNodeModel alloc] initWithMetadata:metadata nodeModel:node];
-    
     NSError *error;
-    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:foo existingRootXmlDocument:nil error:&error];
+    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
+                                                         customIcons:[NSDictionary dictionary]
+                                             existingRootXmlDocument:nil
+                                                             context:[XmlProcessingContext standardV3Context]
+                                                               error:&error];
     
     XCTAssertNotNil(ret);
     XCTAssertNotNil(ret.keePassFile);
@@ -185,8 +180,6 @@
 - (void)testToXmlModelFromStrongboxModelWithAGroupAndAnEntry {
     XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     
-    KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
-    
     Node* node = [[Node alloc] initAsRoot:nil];
     Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node uuid:nil];
     [node addChild:keePassRootGroup];
@@ -198,10 +191,12 @@
     Node* barEntry = [[Node alloc] initAsRecord:@"Bar-Entry" parent:keePassRootGroup fields:fields uuid:nil];
     [keePassRootGroup addChild:barEntry];
     
-    KeepassMetaDataAndNodeModel *foo = [[KeepassMetaDataAndNodeModel alloc] initWithMetadata:metadata nodeModel:node];
-    
     NSError *error;
-    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:foo existingRootXmlDocument:nil error:&error];
+    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
+                                                          customIcons:[NSDictionary dictionary]
+                                             existingRootXmlDocument:nil
+                                                             context:[XmlProcessingContext standardV3Context]
+                                                               error:&error];
     
     XCTAssertNotNil(ret);
     XCTAssertNotNil(ret.keePassFile);
@@ -214,6 +209,60 @@
     XCTAssert([[ret.keePassFile.root.rootGroup.groups objectAtIndex:0].name.text isEqualToString:@"Foo-Group"]);
     XCTAssert([[ret.keePassFile.root.rootGroup.entries objectAtIndex:0].title isEqualToString:@"Bar-Entry"]);
 
+    NSLog(@"%@", ret);
+}
+
+- (void)testToXmlModelWithAttachments {
+    XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
+    
+    Node* node = [[Node alloc] initAsRoot:nil];
+ 
+    // Attachments
+    
+    DatabaseAttachment* databaseAttachment = [[DatabaseAttachment alloc] init];
+    
+    NSString* text = @"Twas the best of times...";
+    databaseAttachment.data = [text dataUsingEncoding:NSUTF8StringEncoding];
+    databaseAttachment.protectedInMemory = YES;
+    databaseAttachment.compressed = YES;
+    
+    NodeFileAttachment* nodeAttachment = [[NodeFileAttachment alloc] init];
+    nodeAttachment.index = 0;
+    nodeAttachment.filename = @"test-attachment.txt";
+    
+    // Nodes
+    
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node uuid:nil];
+    [node addChild:keePassRootGroup];
+    
+    NodeFields *fields = [[NodeFields alloc] init];
+    [fields.attachments addObject:nodeAttachment];
+    
+    Node* nodeWithAttachment = [[Node alloc] initAsRecord:@"Attachments" parent:keePassRootGroup fields:fields uuid:nil];
+    [keePassRootGroup addChild:nodeWithAttachment];
+    
+    
+    NSError *error;
+    RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
+                                                         customIcons:[NSDictionary dictionary]
+                                             existingRootXmlDocument:nil
+                                                             context:[XmlProcessingContext standardV3Context]
+                                                               error:&error];
+    
+    XCTAssertNotNil(ret);
+    XCTAssertNotNil(ret.keePassFile);
+    XCTAssertNotNil(ret.keePassFile.meta);
+    XCTAssertNotNil(ret.keePassFile.meta.generator);
+    
+    XCTAssert([ret.keePassFile.meta.generator.text isEqualToString:@"Strongbox"]);
+    
+    XCTAssertNotNil(ret);
+    XCTAssertNotNil(ret.keePassFile);
+    XCTAssertNotNil(ret.keePassFile.root);
+    XCTAssertNotNil(ret.keePassFile.root.rootGroup);
+    
+    XCTAssert([ret.keePassFile.root.rootGroup.name.text isEqualToString:kDefaultRootGroupName]);
+    
     NSLog(@"%@", ret);
 }
 

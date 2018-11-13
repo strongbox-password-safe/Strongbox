@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSDictionary<NSString*, NSString*>*)testKdbx4FilesAndPasswords;
 + (NSDictionary<NSString*, NSString*>*)testKdbxFilesAndPasswords;
 + (NSDictionary<NSString*, NSString*>*)testXmlFilesAndKeys;
++ (NSDictionary<NSString*, NSString*>*)testKdbFilesAndPasswords;
 
 + (NSData*)getDataFromBundleFile:(NSString*)fileName ofType:(NSString*)ofType;
 + (NSString*)getXmlFromBundleFile:(NSString*)fileName;

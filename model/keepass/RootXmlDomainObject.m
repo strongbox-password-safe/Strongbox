@@ -12,15 +12,15 @@
 
 @implementation RootXmlDomainObject
 
-- (instancetype)init {
-    return self = [super initWithXmlElementName:@"Dummy"];
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
+    return self = [super initWithXmlElementName:@"Dummy" context:context];
 }
 
-- (instancetype)initWithDefaultsAndInstantiatedChildren {
-    self = [self init];
+- (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context {
+    self = [self initWithContext:context];
     
     if(self) {
-        _keePassFile = [[KeePassFile alloc] initWithDefaultsAndInstantiatedChildren];
+        _keePassFile = [[KeePassFile alloc] initWithDefaultsAndInstantiatedChildren:context];
     }
     
     return self;
@@ -28,7 +28,7 @@
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
     if([xmlElementName isEqualToString:kKeePassFileElementName]) {
-        return [[KeePassFile alloc] initWithXmlElementName:kKeePassFileElementName];
+        return [[KeePassFile alloc] initWithXmlElementName:kKeePassFileElementName context:self.context];
     }
     
     return [super getChildHandler:xmlElementName];

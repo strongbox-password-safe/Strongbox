@@ -12,9 +12,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// <String>
+// <Key>Password</Key>
+// <Value Protected="True">5Q==</Value>
+// </String>
+
 @interface String : BaseXmlDomainObjectHandler
 
-- (instancetype)initWithProtectedValue:(BOOL)protected;
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+- (instancetype)initWithProtectedValue:(BOOL)protected context:(XmlProcessingContext*)context;
 
 @property (nonatomic) GenericTextStringElementHandler *key;
 @property (nonatomic) GenericTextStringElementHandler *value;

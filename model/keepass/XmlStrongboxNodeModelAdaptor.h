@@ -10,13 +10,15 @@
 #import "Node.h"
 #import "SerializationData.h"
 #import "KeePassGroup.h"
+#import "DatabaseAttachment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface XmlStrongboxNodeModelAdaptor : NSObject
 
-- (nullable KeePassGroup*)fromModel:(Node*)rootNode error:(NSError**)error;
-- (nullable Node*)toModel:(nullable KeePassGroup*)existingXmlRoot error:(NSError**)error;
+- (nullable KeePassGroup*)fromModel:(Node*)rootNode context:(XmlProcessingContext*)context error:(NSError**)error;
+
+- (Node*)toModel:(KeePassGroup*)existingXmlRoot error:(NSError**)error;
 
 @end
 

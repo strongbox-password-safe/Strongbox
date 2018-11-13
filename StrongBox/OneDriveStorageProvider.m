@@ -82,6 +82,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 }
 
 - (void)    create:(NSString *)nickName
+         extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
@@ -94,7 +95,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         
         [SVProgressHUD show];
         
-        NSString *desiredFilename = [NSString stringWithFormat:@"%@-strongbox.dat", nickName];
+        NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
         
         ODItem* parent = ((ODItem*)parentFolder);
         

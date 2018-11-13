@@ -12,28 +12,22 @@
 #import "PasswordGenerator.h"
 #import "Settings.h"
 
-@interface Model ()
-
-@property (readonly, strong, nonatomic) DatabaseModel *passwordDatabase;
-
-@end
-
 @implementation Model {
     id <SafeStorageProvider> _storageProvider;
-    BOOL _isUsingOfflineCache;
+    BOOL _cacheMode;
     BOOL _isReadOnly;
 }
 
 - (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
-                   usingOfflineCache:(BOOL)usingOfflineCache
+                           cacheMode:(BOOL)cacheMode
                           isReadOnly:(BOOL)isReadOnly {
     if (self = [super init]) {
-        _passwordDatabase = passwordDatabase;
+        _database = passwordDatabase;
         _metadata = metaData;
         _storageProvider = provider;
-        _isUsingOfflineCache = usingOfflineCache;
+        _cacheMode = cacheMode;
         _isReadOnly = isReadOnly;
 
         return self;
@@ -43,40 +37,12 @@
     }
 }
 
-- (Node*)rootGroup {
-    if(self.passwordDatabase.format == kKeePass) {
-        // Hide the root group - Can not add entries and not really useful - Perhaps make this optional?
-    
-        if(self.passwordDatabase.rootGroup.children.count > 0) {
-            return [self.passwordDatabase.rootGroup.children objectAtIndex:0];
-        }
-        else {
-            return self.passwordDatabase.rootGroup; // This should never be able to happen but for safety
-        }
-    }
-    else {
-        return self.passwordDatabase.rootGroup;
-    }
-}
-
-- (NSArray<Node *> *)allNodes {
-    return self.passwordDatabase.allNodes;
-}
-
-- (NSArray<Node *> *)allRecords {
-    return self.passwordDatabase.allRecords;
-}
-
--(NSArray<Node *> *)allGroups {
-    return self.passwordDatabase.allGroups;
-}
-
 - (BOOL)isCloudBasedStorage {
     return _storageProvider.cloudBased;
 }
 
 - (BOOL)isUsingOfflineCache {
-    return _isUsingOfflineCache;
+    return _cacheMode;
 }
 
 - (BOOL)isReadOnly {
@@ -84,7 +50,7 @@
 }
 
 - (void)update:(void (^)(NSError *error))handler {
-    if (!_isUsingOfflineCache && !_isReadOnly) {
+    if (!_cacheMode && !_isReadOnly) {
         [self encrypt:^(NSData * _Nullable updatedSafeData, NSError * _Nullable error) {
             if (updatedSafeData == nil) {
                 handler(error);
@@ -95,6 +61,7 @@
                                 data:updatedSafeData
                           completion:^(NSError *error) {
                               [self updateOfflineCacheWithData:updatedSafeData];
+                              [self updateAutoFillCacheWithData:updatedSafeData];
                               handler(error);
                           }];
         }];
@@ -109,12 +76,52 @@
     }
 }
 
+- (void)updateAutoFillCacheWithData:(NSData *)data {
+    if (self.metadata.autoFillCacheEnabled) {
+        [self saveAutoFillCacheFile:data safe:self.metadata];
+    }
+}
+
+- (void)updateAutoFillCache:(void (^_Nonnull)(void))handler {
+    if (self.metadata.autoFillCacheEnabled) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
+        {
+           NSError *error;
+           NSData *updatedSafeData = [self.database getAsData:&error];
+           
+           dispatch_async(dispatch_get_main_queue(), ^(void) {
+               if (updatedSafeData != nil) {
+                   [self saveAutoFillCacheFile:updatedSafeData safe:self.metadata];
+               }
+               
+               handler();
+           });
+        });
+    }
+}
+
+- (void)disableAndClearAutoFillCache {
+    [[LocalDeviceStorageProvider sharedInstance] deleteAutoFillCache:_metadata completion:^(NSError *error) {
+          self.metadata.autoFillCacheEnabled = NO;
+          self.metadata.autoFillCacheAvailable = NO;
+          
+          [[SafesList sharedInstance] update:self.metadata];
+      }];
+}
+
+- (void)enableAutoFillCache {
+    _metadata.autoFillCacheAvailable = NO;
+    _metadata.autoFillCacheEnabled = YES;
+    
+    [[SafesList sharedInstance] update:self.metadata];
+}
+
 - (void)updateOfflineCache:(void (^)(void))handler {
     if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
         {
             NSError *error;
-            NSData *updatedSafeData = [self.passwordDatabase getAsData:&error];
+            NSData *updatedSafeData = [self.database getAsData:&error];
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (updatedSafeData != nil && self->_metadata.offlineCacheEnabled) {
@@ -156,6 +163,38 @@
     }
 }
 
+- (void)saveAutoFillCacheFile:(NSData *)data
+                         safe:(SafeMetaData *)safe {
+    if (safe.autoFillCacheAvailable) {
+        [[LocalDeviceStorageProvider sharedInstance] updateAutoFillCache:safe
+                                                                        data:data
+                                                              viewController:nil
+                                                                  completion:^(BOOL success) {
+          [self  onStoredAutoFillCacheFile:safe success:success];
+      }];
+    }
+    else {
+        [[LocalDeviceStorageProvider sharedInstance] createAutoFillCache:safe data:data completion:^(BOOL success) {
+            [self onStoredAutoFillCacheFile:safe success:success];
+        }];
+    }
+}
+
+- (void)onStoredAutoFillCacheFile:(SafeMetaData *)safe success:(BOOL)success {
+    if (!success) {
+        NSLog(@"Error updating Autofill Cache file.");
+        
+        safe.autoFillCacheAvailable = NO;
+    }
+    else {
+        NSLog(@"Offline Cache Now Available.");
+        
+        safe.autoFillCacheAvailable = YES;
+    }
+    
+    [[SafesList sharedInstance] update:safe];
+}
+
 - (void)onStoredOfflineCacheFile:(SafeMetaData *)safe success:(BOOL)success {
     if (!success) {
         NSLog(@"Error updating Offline Cache file.");
@@ -191,27 +230,9 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Operations
 
-- (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
-    NSString* password = [self generatePassword];
-    
-    NodeFields* fields = [[NodeFields alloc] initWithUsername:@"user123"
-                                                          url:@"https://strongboxsafe.com"
-                                                     password:password
-                                                        notes:@"Sample Database Record. You can have any text here..."
-                                                        email:@"user@gmail.com"];
-    
-    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:parentGroup fields:fields uuid:nil];
-    
-    if([parentGroup addChild:record]) {
-        return record;
-    }
-    
-    return nil;
-}
-
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title {
     Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup uuid:nil];
-    if( [parentGroup addChild:newGroup]) {
+    if([parentGroup addChild:newGroup]) {
         return newGroup;
     }
 
@@ -222,30 +243,14 @@
     [child.parent removeChild:child];
 }
 
-- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    return [node validateChangeParent:parent];
-}
-
-- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    return [node changeParent:parent];
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (NSString *)masterPassword {
-    return self.passwordDatabase.masterPassword;
-}
-
-- (void)setMasterPassword:(NSString *)value {
-    self.passwordDatabase.masterPassword = value;
-}
 
 -(void)encrypt:(void (^)(NSData* data, NSError* error))completion {
     [SVProgressHUD showWithStatus:@"Encrypting"];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSError* error;
-        NSData* ret = [self.passwordDatabase getAsData:&error];
+        NSData* ret = [self.database getAsData:&error];
 
         dispatch_async(dispatch_get_main_queue(), ^(void){
             [SVProgressHUD dismiss];
@@ -255,48 +260,10 @@
     });
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// Convenience  / Helpers
-
-- (NSSet<NSString*> *)usernameSet {
-    return self.passwordDatabase.usernameSet;
-}
-
-- (NSSet<NSString*> *)passwordSet {
-    return self.passwordDatabase.passwordSet;
-}
-
-- (NSSet<NSString*> *)emailSet {
-    return self.passwordDatabase.emailSet;
-}
-
-- (NSString *)mostPopularEmail {
-    return self.passwordDatabase.mostPopularEmail ? self.passwordDatabase.mostPopularEmail : @"";
-}
-
-- (NSString *)mostPopularUsername {
-    return self.passwordDatabase.mostPopularUsername ? self.passwordDatabase.mostPopularUsername : @"";
-}
-
-- (NSString *)mostPopularPassword {
-    return self.passwordDatabase.mostPopularPassword ? self.passwordDatabase.mostPopularPassword : @"";
-}
-
 - (NSString *)generatePassword {
     PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
     
     return [PasswordGenerator generatePassword:params];
 }
 
-- (NSInteger) numberOfRecords {
-    return self.passwordDatabase.numberOfRecords;
-}
-
-- (NSInteger) numberOfGroups {
-    return self.passwordDatabase.numberOfGroups;
-}
-
--(id<AbstractDatabaseMetadata>)databaseMetadata {
-    return self.passwordDatabase.metadata;
-}
 @end

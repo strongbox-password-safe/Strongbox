@@ -21,15 +21,15 @@
 
 @implementation Times
 
-- (instancetype)init {
-    return [self initWithXmlElementName:kTimesElementName];
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
+    return [self initWithXmlElementName:kTimesElementName context:context];
 }
 
-- (instancetype)initWithXmlElementName:(NSString *)xmlElementName {
-    if(self = [super initWithXmlElementName:kTimesElementName]) {
-        self.lastAccessTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName];
-        self.lastModificationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName];
-        self.creationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName];
+- (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext*)context {
+    if(self = [super initWithXmlElementName:kTimesElementName context:context]) {
+        self.lastAccessTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName context:context];
+        self.lastModificationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName context:context];
+        self.creationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName context:context];
     }
     
     return self;
@@ -37,13 +37,13 @@
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
     if([xmlElementName isEqualToString:kLastModificationTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName];
+        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName context:self.context];
     }
     else if([xmlElementName isEqualToString:kCreationTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName];
+        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName context:self.context];
     }
     else if([xmlElementName isEqualToString:kLastAccessTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName];
+        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName context:self.context];
     }
     
     return [super getChildHandler:xmlElementName];

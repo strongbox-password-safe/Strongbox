@@ -10,8 +10,8 @@
 
 @implementation GenericTextUuidElementHandler
 
-- (instancetype)initWithXmlElementName:(NSString*)xmlElementName {
-    if (self = [super initWithXmlElementName:xmlElementName]) {
+- (instancetype)initWithXmlElementName:(NSString*)xmlElementName context:(XmlProcessingContext*)context {
+    if (self = [super initWithXmlElementName:xmlElementName context:context]) {
         self.uuid = [NSUUID UUID];
     }
     
@@ -19,7 +19,7 @@
 }
 
 - (void)onCompleted {
-    NSData *uuidData = [[NSData alloc] initWithBase64EncodedString:[self getXmlText] options:kNilOptions];
+    NSData *uuidData = [[NSData alloc] initWithBase64EncodedString:[self getXmlText] options:NSDataBase64DecodingIgnoreUnknownCharacters];
     
     if(uuidData && uuidData.length == sizeof(uuid_t)) {
         self.uuid = [[NSUUID alloc] initWithUUIDBytes:uuidData.bytes];

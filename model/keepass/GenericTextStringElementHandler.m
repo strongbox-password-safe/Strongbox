@@ -10,8 +10,8 @@
 
 @implementation GenericTextStringElementHandler
 
-- (instancetype)initWithXmlElementName:(NSString *)xmlElementName {
-    if(self = [super initWithXmlElementName:xmlElementName]) {
+- (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(nonnull XmlProcessingContext *)context {
+    if(self = [super initWithXmlElementName:xmlElementName context:context]) {
         self.text = @"";
     }
     

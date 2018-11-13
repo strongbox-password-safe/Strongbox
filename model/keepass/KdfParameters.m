@@ -7,24 +7,30 @@
 //
 
 #import "KdfParameters.h"
-
-static NSString* const keyUuid = @"$UUID";
+#import "KeePassCiphers.h"
+#import "KeePassConstants.h"
 
 @implementation KdfParameters
 
-- (instancetype)initWithUuid:(NSUUID*)uuid parameters:(NSDictionary<NSString*, NSObject*>*)parameters
+- (instancetype)initWithParameters:(NSDictionary<NSString*, VariantObject*>*)parameters
 {
     self = [super init];
     if (self) {
-        self.uuid = uuid;
-        self.parameters = parameters;
+        VariantObject *variant = (VariantObject*)[parameters objectForKey:kKdfParametersKeyUuid];
+        
+        if(!variant) {
+            NSLog(@"Missing required $UUID Entry!");
+            return nil;
+        }
+        
+        _parameters = parameters;
     }
     return self;
 }
 
-+ (instancetype)fromHeaders:(NSDictionary<NSString*, NSObject*>*)headers {
-    NSData* uuidData = (NSData*)[headers objectForKey:keyUuid];
-    
+-(NSUUID *)uuid {
+    VariantObject *variant = (VariantObject*)[_parameters objectForKey:kKdfParametersKeyUuid];
+    NSData* uuidData = variant ? (NSData*)variant.theObject : nil;
     if(!uuidData) {
         return nil;
     }
@@ -35,7 +41,7 @@ static NSString* const keyUuid = @"$UUID";
         return nil;
     }
     
-    return [[KdfParameters alloc] initWithUuid:uuid parameters:headers];
+    return uuid;
 }
 
 @end

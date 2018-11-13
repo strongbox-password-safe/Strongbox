@@ -7,15 +7,22 @@
 //
 
 #import "KdbxSerializationCommon.h"
-#import "BinaryParsingHelper.h"
+#import "Utils.h"
 #import "VariantDictionary.h"
-#import "SafeTools.h"
+#import "PwSafeSerialization.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
+#import "KeePassConstants.h"
+#import "KeePassCiphers.h"
+#import "KeePassXmlParserDelegate.h"
 
-static const BOOL kLogVerbose = YES;
+static const BOOL kLogVerbose = NO;
 
 @implementation KdbxSerializationCommon
+
+BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion) {
+    return keePassSignatureAndVersionMatch(candidate, majorVersion, minorVersion);
+}
 
 BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion) {
     if(candidate.length < SIZE_OF_KEEPASS_HEADER) {
@@ -52,6 +59,25 @@ BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, 
     }
 
     return YES;
+}
+
+KeepassFileHeader getNewFileHeader(NSString* version) {
+    KeepassFileHeader header;
+    
+    header.signature1[0] = 0x03;
+    header.signature1[1] = 0xD9;
+    header.signature1[2] = 0xA2;
+    header.signature1[3] = 0x9A;
+    header.signature2[0] = 0x67;
+    header.signature2[1] = 0xFB;
+    header.signature2[2] = 0x4B;
+    header.signature2[3] = 0xB5;
+    
+    NSArray<NSString*> *versionComponents = [version componentsSeparatedByString:@"."];
+    header.major = [versionComponents objectAtIndex:0].intValue;
+    header.minor = [versionComponents objectAtIndex:1].intValue;
+    
+    return header;
 }
 
 KeepassFileHeader getKeePassFileHeader(NSData* data) {
@@ -93,8 +119,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             }
             break;
         case MASTERSEED:
-            if(length != 32) {
-                // TODO: Is this true for Kdbx4?
+            if(length != kMasterSeedLength) {
                 NSLog(@"WARN: MASTERSEED entry length != 32. Unexpected. Skipping. Almost certainly lead to issues.");
                 return nil;
             }
@@ -123,6 +148,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             }
             break;
         case KDFPARAMETERS:
+            //NSLog(@"KDFPARAMS (b64): [%@]", [data base64EncodedStringWithOptions:kNilOptions]);
             return [VariantDictionary fromData:data];
             break;
         default:
@@ -192,7 +218,7 @@ NSData *getCompositeKey(NSString * _Nonnull password) {
     
     //NSData *keyFileData = [NSData data];
     
-    NSData *hashedPassword = [SafeTools sha256: [password dataUsingEncoding:NSUTF8StringEncoding]];
+    NSData *hashedPassword = sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
     //NSData *hashedKeyFileData = [SafeTools sha256: keyFileData];
     
     // Concatenate together in one big sha256...
@@ -210,8 +236,6 @@ NSData *getCompositeKey(NSString * _Nonnull password) {
     
     return compositeKey;
 }
-
-// TODO: May not be common... todo
 
 NSData *getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds) {
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -277,6 +301,30 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey) {
     }
     
     return [masterKey copy];
+}
+
+RootXmlDomainObject* parseKeePassXml(uint32_t innerRandomStreamId, NSData* innerRandomStreamKey, XmlProcessingContext* context, NSString* xml, NSError** error) {
+    KeePassXmlParserDelegate *parserDelegate = [[KeePassXmlParserDelegate alloc] initWithProtectedStreamId:innerRandomStreamId
+                                                                                                       key:innerRandomStreamKey
+                                                                                                   context:context];
+    
+    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
+    [parser setDelegate:parserDelegate];
+    [parser parse];
+    NSError* err = [parser parserError];
+    
+    if(err)
+    {
+        NSLog(@"ERROR: %@", err);
+        if(error) {
+            *error = err;
+        }
+        return nil;
+    }
+    
+    RootXmlDomainObject* rootDocument = parserDelegate.rootElement;
+    
+    return rootDocument;
 }
 
 @end

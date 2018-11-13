@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DecryptionParameters.h"
+#import "DatabaseAttachment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *fileVersion;
 @property (nonatomic) NSDictionary<NSNumber *,NSObject *>* extraUnknownHeaders;
 @property (nonatomic) NSString* headerHash;
+@property (nonatomic) NSUUID* cipherId;
 
 @end
 

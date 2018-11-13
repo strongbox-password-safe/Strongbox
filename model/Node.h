@@ -14,6 +14,7 @@
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid;
+- (nonnull instancetype)initAsRoot:(NSUUID*)uuid childRecordsAllowed:(BOOL)childRecordsAllowed;
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent
@@ -28,12 +29,19 @@
                          title:(nonnull NSString*)title
                        isGroup:(BOOL)isGroup
                           uuid:(nullable NSUUID*)uuid
-                        fields:(nullable NodeFields*)fields NS_DESIGNATED_INITIALIZER;
+                        fields:(nullable NodeFields*)fields
+           childRecordsAllowed:(BOOL)childRecordsAllowed NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) BOOL isGroup;
 
+@property (nonatomic, readonly) BOOL childRecordsAllowed;
+
 @property (nonatomic, strong, readonly, nonnull) NSString *title;
 @property (nonatomic, strong, readonly, nonnull) NSUUID *uuid;
+
+@property (nullable) NSNumber* iconId;
+@property (nullable) NSUUID* customIconUuid;
+
 @property (nonatomic, strong, readonly, nonnull) NSString *serializationId; // Must remain save across serializations
 @property (nonatomic, strong, readonly, nonnull) NodeFields *fields;
 @property (nonatomic, strong, readonly, nullable) Node* parent;

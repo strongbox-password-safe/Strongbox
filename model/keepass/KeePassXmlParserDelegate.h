@@ -14,8 +14,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KeePassXmlParserDelegate : NSObject<NSXMLParserDelegate>
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initPlaintext;
-- (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId key:(nullable NSData*)protectedStreamKey NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)initV3Plaintext;
+
+- (instancetype)initV4Plaintext;
+
+- (instancetype)initV3WithProtectedStreamId:(uint32_t)innerRandomStreamId
+                                        key:(nullable NSData*)protectedStreamKey;
+
+- (instancetype)initV4WithProtectedStreamId:(uint32_t)innerRandomStreamId
+                                        key:(nullable NSData*)protectedStreamKey;
+
+- (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
+                                      key:(nullable NSData*)protectedStreamKey
+                                  context:(XmlProcessingContext*)context;
 
 @property (nonatomic, readonly, nullable) RootXmlDomainObject* rootElement;
 

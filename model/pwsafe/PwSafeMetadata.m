@@ -7,7 +7,7 @@
 //
 
 #import "PwSafeMetadata.h"
-#import "SafeTools.h"
+#import "PwSafeSerialization.h"
 
 @implementation PwSafeMetadata
 

@@ -14,10 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Salsa20Stream : NSObject<InnerRandomStream>
 
 -(id)init NS_UNAVAILABLE;
--(id)initWithIv:(const uint8_t*)iv key:(const NSData*)key NS_DESIGNATED_INITIALIZER;
+-(id)initWithKey:(const NSData*)key NS_DESIGNATED_INITIALIZER;
 -(NSData *)xor:(NSData *)ct;
-
-+ (nullable NSData*)generateNewKey;
 
 @property (nonatomic, readonly) NSData* key;
 

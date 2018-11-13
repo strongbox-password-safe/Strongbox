@@ -7,17 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "VariantObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KdfParameters : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithUuid:(NSUUID*)uuid parameters:(NSDictionary<NSString*, NSObject*>*)parameters NS_DESIGNATED_INITIALIZER;
-+ (instancetype)fromHeaders:(NSDictionary<NSString*, NSObject*>*)headers;
-    
-@property (nonatomic) NSUUID* uuid;
-@property (nonatomic) NSDictionary<NSString*, NSObject*>* parameters;
+- (instancetype)initWithParameters:(NSDictionary<NSString*, VariantObject*>*)parameters NS_DESIGNATED_INITIALIZER;
+
+@property (readonly, nonatomic) NSUUID* uuid;
+@property (readonly, nonatomic) NSDictionary<NSString*, VariantObject*>* parameters;
 
 @end
 

@@ -37,7 +37,7 @@
 #ifndef IS_APP_EXTENSION
         return [OneDriveStorageProvider sharedInstance];
 #else
-        NSLog(@"ADAL Onedrive Library doesn't support App Extensions. TODO: Use new ADAL! ");
+        NSLog(@"ADAL Onedrive Library doesn't support App Extensions. FUTURE: Use new ADAL! ");
         return nil;
 #endif
     }

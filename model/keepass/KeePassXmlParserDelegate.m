@@ -9,50 +9,52 @@
 #import "KeePassXmlParserDelegate.h"
 #import "XmlParsingDomainObject.h"
 #import "BaseXmlDomainObjectHandler.h"
-#import "Salsa20Stream.h"
-#import <CommonCrypto/CommonDigest.h>
 #import "KeePassDatabase.h"
+#import "InnerRandomStreamFactory.h"
 
 @interface KeePassXmlParserDelegate ()
 
 @property NSMutableArray<id<XmlParsingDomainObject>> *handlerStack;
 @property (nonatomic) id<InnerRandomStream> innerRandomStream;
 @property (nonatomic) BOOL errorParsing;
+@property XmlProcessingContext* context;
 
 @end
 
 @implementation KeePassXmlParserDelegate
 
-- (instancetype)initPlaintext {
-    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil];
+- (instancetype)initV3Plaintext  {
+    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:[XmlProcessingContext standardV3Context]];
+}
+
+- (instancetype)initV4Plaintext  {
+    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:[XmlProcessingContext standardV4Context]];
+}
+
+- (instancetype)initPlaintext:(XmlProcessingContext*)context  {
+    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:context];
+}
+
+- (instancetype)initV3WithProtectedStreamId:(uint32_t)innerRandomStreamId
+                                      key:(nullable NSData*)protectedStreamKey
+{
+    return [self initWithProtectedStreamId:innerRandomStreamId key:protectedStreamKey context:[XmlProcessingContext standardV3Context]];
+}
+
+- (instancetype)initV4WithProtectedStreamId:(uint32_t)innerRandomStreamId
+                                        key:(nullable NSData*)protectedStreamKey
+{
+    return [self initWithProtectedStreamId:innerRandomStreamId key:protectedStreamKey context:[XmlProcessingContext standardV4Context]];
 }
 
 - (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
-                        key:(nullable NSData*)protectedStreamKey {
+                                      key:(nullable NSData*)protectedStreamKey
+                                  context:(XmlProcessingContext*)context {
     if(self = [super init]) {
-        // TODO: This same code is in XmlTreeSerializer. Move to a common RandomStream Factory
-        if(innerRandomStreamId == kInnerStreamSalsa20) {
-            const uint8_t iv[] = {0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A};
-            self.innerRandomStream = [[Salsa20Stream alloc] initWithIv:iv key:protectedStreamKey];
-        }
-        else if (innerRandomStreamId == kInnerStreamArc4) {
-            // TODO: Support this for older DBs?
-            return nil;
-        }
-        else if (innerRandomStreamId == kInnerChaCha20) {
-            // TODO: believe this is for KDBX 4+ ?
-            return nil;
-        }
-        else if (innerRandomStreamId == kInnerStreamPlainText) {
-            self.innerRandomStream = nil;
-        }
-        else {
-            NSLog(@"Unknown innerRandomStreamId = %d", innerRandomStreamId);
-            return nil;
-        }
-        
+        self.context = context;
+        self.innerRandomStream = [InnerRandomStreamFactory getStream:innerRandomStreamId key:protectedStreamKey];
         self.handlerStack = [NSMutableArray array];
-        [self.handlerStack addObject:[[RootXmlDomainObject alloc] init]];
+        [self.handlerStack addObject:[[RootXmlDomainObject alloc] initWithContext:context]];
     }
 
     return self;
@@ -76,7 +78,7 @@
     id<XmlParsingDomainObject> nextHandler = [[self.handlerStack lastObject] getChildHandler:elementName];
     
     if(!nextHandler) {
-        nextHandler = [[BaseXmlDomainObjectHandler alloc] initWithXmlElementName:elementName];
+        nextHandler = [[BaseXmlDomainObjectHandler alloc] initWithXmlElementName:elementName context:self.context];
     }
     
     [nextHandler setXmlInfo:elementName attributes:attributeDict];
@@ -135,7 +137,7 @@
         return ct;
     }
     
-    NSData *ctData = [[NSData alloc] initWithBase64EncodedString:ct options:kNilOptions];
+    NSData *ctData = [[NSData alloc] initWithBase64EncodedString:ct options:NSDataBase64DecodingIgnoreUnknownCharacters];
     
     NSData* plaintext = [self.innerRandomStream xor:ctData];
     

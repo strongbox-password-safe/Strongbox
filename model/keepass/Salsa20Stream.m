@@ -10,17 +10,30 @@
 #import "sodium.h"
 #import <CommonCrypto/CommonDigest.h>
 
-static const uint32_t kIvSize = 8;
+//static const uint32_t kIvSize = 8;
 static const uint32_t kKeySize = 32;
+static const uint32_t kBlockSize = 64;
+
+static const uint8_t iv[] = {0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A};
 
 @interface Salsa20Stream ()
 
 @property (nonatomic) uint64_t bytesProcessed;
-@property (nonatomic) NSData* iv;
+@property (nonatomic) NSData* hashedKey;
 
 @end
 
 @implementation Salsa20Stream
+
++ (void)initialize {
+    if(self == [Salsa20Stream class]) {
+        int sodium_initialization = sodium_init();
+        
+        if (sodium_initialization == -1) {
+            NSLog(@"Sodium Initialization Failed.");
+        }
+    }
+}
 
 + (NSData*)generateNewKey {
     NSMutableData *newKey = [NSMutableData dataWithLength:kKeySize];
@@ -34,46 +47,37 @@ static const uint32_t kKeySize = 32;
     return newKey;
 }
 
-- (id)initWithIv:(const uint8_t*)iv key:(NSData*)key {
+- (id)initWithKey:(const NSData *)key {
     if(self = [super init]) {
-        int sodium_initialization = sodium_init();
-        
-        if (sodium_initialization == -1) {
-            NSLog(@"Sodium Initialization Failed.");
-            return nil;
+        if(!key) {
+            key = [Salsa20Stream generateNewKey];
         }
+        _key = [key copy];
+    
+
+        NSMutableData* hashedKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
+        CC_SHA256(key.bytes, (CC_LONG)key.length, hashedKey.mutableBytes);
         
         self.bytesProcessed = 0;
-        self.iv = [NSData dataWithBytes:iv length:kIvSize];
-        _key = [NSData dataWithData:key];
+        self.hashedKey = hashedKey;
     }
     
     return self;
 }
 
-static const uint32_t kSalsa20BlockSize = 64;
+-(NSData*)xor:(NSData *)ct {
+    uint32_t currentBlock = (uint32_t)self.bytesProcessed / kBlockSize;
+    int offset = self.bytesProcessed % kBlockSize;
 
--(NSData *)xor:(NSData *)ct {
-    uint64_t currentBlock = self.bytesProcessed / kSalsa20BlockSize;
-    int offset = self.bytesProcessed % kSalsa20BlockSize;
-    
-    NSMutableData *outData = [[NSMutableData alloc] initWithLength:ct.length + kSalsa20BlockSize];
-    uint8_t *foo = (uint8_t*)outData.bytes;
-    
-    NSMutableData *bar = [NSMutableData dataWithLength:ct.length + kSalsa20BlockSize];
-    
+    NSMutableData *xorBlock = [NSMutableData dataWithLength:ct.length + kBlockSize];
     NSRange subRange = NSMakeRange(offset, ct.length);
-    [bar replaceBytesInRange:subRange withBytes:ct.bytes];
-    
-    // NB: KeePass SHA256s the Key...
-    
-    uint8_t hashedKey[CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(self.key.bytes, (CC_LONG)self.key.length, hashedKey);
-    
-    crypto_stream_salsa20_xor_ic(foo, bar.bytes, bar.length, self.iv.bytes, currentBlock, hashedKey);
-    
+    [xorBlock replaceBytesInRange:subRange withBytes:ct.bytes];
+
+    NSMutableData *outData = [[NSMutableData alloc] initWithLength:ct.length + kBlockSize];
+
+    crypto_stream_salsa20_xor_ic(outData.mutableBytes, xorBlock.bytes, xorBlock.length, iv, currentBlock, self.hashedKey.bytes);
+
     self.bytesProcessed += ct.length;
-    
     return [outData subdataWithRange:subRange];
 }
 

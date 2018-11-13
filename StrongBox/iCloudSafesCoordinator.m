@@ -128,7 +128,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSURL *fileURL = [[LocalDeviceStorageProvider sharedInstance] getFileUrl:safe];
     
     NSString * displayName = safe.nickName;
-    NSURL *destURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:displayName]];
+    NSString * extension = [safe.fileName pathExtension];
+    extension = extension ? extension : @"";
+    
+    NSURL *destURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:displayName extension:extension]];
     
     NSError * error;
     BOOL success = [[NSFileManager defaultManager] setUbiquitous:[Settings sharedInstance].iCloudOn itemAtURL:fileURL destinationURL:destURL error:&error];
@@ -152,7 +155,11 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     [fileCoordinator coordinateReadingItemAtURL:[NSURL URLWithString:safe.fileIdentifier] options:NSFileCoordinatorReadingWithoutChanges error:nil byAccessor:^(NSURL *newURL) {
         NSData* data = [NSData dataWithContentsOfURL:newURL];
       
+        NSString* extension = [safe.fileName pathExtension];
+        extension = extension ? extension : @"";
+        
         [[LocalDeviceStorageProvider sharedInstance] create:safe.nickName
+                                                  extension:extension
                                                        data:data
                                                parentFolder:nil
                                              viewController:nil
@@ -290,7 +297,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     return nameExists;
 }
 
--(NSString*)getUniqueICloudFilename:(NSString *)prefix {
+-(NSString*)getUniqueICloudFilename:(NSString *)prefix extension:(NSString*)extension {
     NSInteger docCount = 0;
     NSString* newDocName = nil;
     
@@ -301,10 +308,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         if (first) {
             first = NO;
             newDocName = [NSString stringWithFormat:@"%@.%@",
-                          prefix, kDefaultFileExtension];
+                          prefix, extension];
         } else {
             newDocName = [NSString stringWithFormat:@"%@ %ld.%@",
-                          prefix, (long)docCount, kDefaultFileExtension];
+                          prefix, (long)docCount, extension];
         }
         
         BOOL nameExists = [self fileNameExistsInICloud:newDocName];

@@ -8,6 +8,7 @@
 
 #import "PickCredentialsTableViewController.h"
 #import "regdom.h"
+#import "NodeIconHelper.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -61,9 +62,9 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         [self.searchController.searchBar sizeToFit];
     }
     
-    self.tableView.rowHeight = 75.0f;
+    self.tableView.rowHeight = 60.0f;
     
-    self.items = self.model.allRecords;
+    self.items = self.model.database.allRecords;
     
     [self smartInitializeSearch];
 }
@@ -172,7 +173,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                      searchText, searchText, searchText, searchText, searchText, searchText];
     }
     
-    NSArray<Node*> *foo = [self.model.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*> *foo = [self.model.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup && [predicate evaluateWithObject:node];
     }];
     
@@ -199,7 +200,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     cell.detailTextLabel.text = groupLocation;
     cell.accessoryType = UITableViewCellAccessoryNone;
-    cell.imageView.image = [UIImage imageNamed:@"lock-64.png"];
+    
+    cell.imageView.image = [NodeIconHelper getIconForNode:vm database:self.model.database];
     
     return cell;
 }

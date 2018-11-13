@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Cipher.h"
+#import "RootXmlDomainObject.h"
+#import "XmlProcessingContext.h"
 
 typedef struct _KeepassHeader {
     uint8_t signature1[4];
@@ -35,8 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KdbxSerializationCommon : NSObject
 
-BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion);
+BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion);
+
 KeepassFileHeader getKeePassFileHeader(NSData* data);
+KeepassFileHeader getNewFileHeader(NSString* version);
 
 void dumpHeaderEntries(NSDictionary *headerEntries);
 NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data);
@@ -45,6 +50,8 @@ NSData *getCompositeKey(NSString *password);
 NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
 NSData *getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);
+
+RootXmlDomainObject* parseKeePassXml(uint32_t innerRandomStreamId, NSData* innerRandomStreamKey, XmlProcessingContext* context, NSString* xml, NSError** error);
 
 @end
 

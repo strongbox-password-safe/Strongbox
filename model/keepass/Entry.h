@@ -12,54 +12,23 @@
 #import "GenericTextUuidElementHandler.h"
 #import "Times.h"
 #import "String.h"
-
-// <Entry>
-//    <UUID>Xz38+tBIR4+k30EGYO3lbg==</UUID>
-//    <IconID>0</IconID>
-//    <ForegroundColor />
-//    <BackgroundColor />
-//    <OverrideURL />
-//    <Tags />
-//    <Times />
-//    <String>
-//        <Key>Title</Key>
-//        <Value>Entry 1</Value>
-//    </String>
-//    <String>
-//        <Key>UserName</Key>
-//        <Value />
-//    </String>
-//    <String>
-//        <Key>Password</Key>
-//        <Value Protected="True">h1oBlPCq</Value>
-//    </String>
-//    <String>
-//        <Key>URL</Key>
-//        <Value />
-//    </String>
-//    <String>
-//        <Key>Notes</Key>
-//        <Value />
-//    </String>
-//    <AutoType>
-//        <Enabled>True</Enabled>
-//        <DataTransferObfuscation>0</DataTransferObfuscation>
-//    </AutoType>
-//    <History />
-// </Entry>
-
+#import "Binary.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Entry : BaseXmlDomainObjectHandler
 
+- (instancetype)initWithContext:(XmlProcessingContext*)context;
+
+@property (nonatomic, nullable) GenericTextStringElementHandler* iconId;
+@property (nonatomic, nullable) GenericTextUuidElementHandler* customIconUuid;
 @property (nonatomic) GenericTextUuidElementHandler* uuid;
 @property (nonatomic) Times* times;
 @property (nonatomic) NSMutableArray<String*> *strings;
+@property (nonatomic) NSMutableArray<Binary*> *binaries;
 
-// TODO:
-//    <IconID>0</IconID>
-//    <History />
+@property (nonatomic) NSNumber* icon;
+@property (nonatomic, nullable) NSUUID* customIcon;
 
 // Customized Getters/Setters for well-known fields - basically views on the strings collection
 
@@ -69,7 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString* url;
 @property (nonatomic) NSString* notes;
 
-// TODO: Add Custom Field or Remove? How about edit?
 @property (nonatomic, readonly) NSDictionary<NSString*, NSString*> *customFields;
 
 

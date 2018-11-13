@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AbstractPasswordDatabase.h"
 
 @interface SelectStorageProviderController : UITableViewController
 
 @property (nonatomic) BOOL existing;
+@property (nonatomic) DatabaseFormat format;
 
 @end

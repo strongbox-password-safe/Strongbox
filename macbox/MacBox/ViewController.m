@@ -989,6 +989,11 @@ NSString* trimField(NSTextField* textField) {
 
     Node *newItem = [self.model addNewRecord:parent];
     
+    if(!newItem) {
+        // TODO: Error Message? KeePass1 - Try add record to root group
+        return;
+    }
+    
     [self.outlineView reloadData];
     
     NSInteger row = [self findRowForItemExpandIfNecessary:newItem];

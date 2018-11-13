@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "PasswordHistory.h"
+#import "NodeFileAttachment.h"
 
 @interface NodeFields : NSObject
 
@@ -21,13 +22,14 @@
 
 @property (nonatomic, strong, nonnull) NSString *password;
 @property (nonatomic, strong, nonnull) NSString *username;
-@property (nonatomic, strong, nonnull) NSString *email;     // TODO: Not used by Keepass at all
+@property (nonatomic, strong, nonnull) NSString *email;
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
-@property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // TODO: make pwsafe and KeePass compatible
+@property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // FUTURE: make KeePass compatible
 @property (nonatomic, strong, nullable) NSDate *created;
 @property (nonatomic, strong, nullable) NSDate *modified;
 @property (nonatomic, strong, nullable) NSDate *accessed;
-@property (nonatomic, strong, nullable) NSDate *passwordModified; // TODO: This isn't in Keepass - Find a way to resolve
+@property (nonatomic, strong, nullable) NSDate *passwordModified;
+@property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
 
 @end

@@ -234,10 +234,18 @@ typedef void (^Authenticationcompletion)(NSError *error);
     completion:(void (^)(NSError *error))handler {
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:@"Locating..."];
+    });
+    
     [self findSafeFile:parentFileIdentifier
               fileName:fileName
             completion:^(GTLRDrive_File *file, NSError *error)
     {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+        
         if (!error) {
             if (!file) {
                 handler(error);
@@ -252,10 +260,18 @@ typedef void (^Authenticationcompletion)(NSError *error);
                                                                   fileId:file.identifier
                                                         uploadParameters:uploadParameters];
 
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD showWithStatus:@"Syncing..."];
+                });
+                
                 [self.driveService executeQuery:query
                               completionHandler:^(GTLRServiceTicket *callbackTicket,
                                                                     GTLRDrive_File *uploadedFile,
                                                                     NSError *callbackError) {
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                      [SVProgressHUD dismiss];
+                                  });
+                                  
                                   if (callbackError) {
                                       NSLog(@"%@", callbackError);
                                   }

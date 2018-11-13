@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray*)map:(id (^)(ObjectType obj, NSUInteger idx))block;
 - (nullable ObjectType)firstOrDefault:(BOOL (^)(ObjectType obj))block;
 
+- (NSArray *)flatMap:(NSArray* (^)(ObjectType obj, NSUInteger idx))block;
+
 @end
 
 NS_ASSUME_NONNULL_END

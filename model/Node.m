@@ -33,7 +33,11 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
 };
 
 - (instancetype)initAsRoot:(NSUUID*)uuid {
-    return [self initWithParent:nil title:@"<ROOT>" isGroup:YES uuid:uuid fields:nil];
+    return [self initAsRoot:nil childRecordsAllowed:YES];
+}
+
+- (instancetype)initAsRoot:(NSUUID*)uuid childRecordsAllowed:(BOOL)childRecordsAllowed {
+    return [self initWithParent:nil title:@"<ROOT>" isGroup:YES uuid:uuid fields:nil childRecordsAllowed:childRecordsAllowed];
 }
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
@@ -51,21 +55,22 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         }
     }
     
-    return [self initWithParent:parent title:title isGroup:YES uuid:uuid fields:nil];
+    return [self initWithParent:parent title:title isGroup:YES uuid:uuid fields:nil childRecordsAllowed:YES];
 }
 
 - (instancetype)initAsRecord:(NSString *_Nonnull)title
                                  parent:(Node* _Nonnull)parent
                                  fields:(NodeFields*_Nonnull)fields
                                     uuid:(NSUUID*)uuid {
-    return [self initWithParent:parent title:title isGroup:NO uuid:uuid fields:fields];
+    return [self initWithParent:parent title:title isGroup:NO uuid:uuid fields:fields childRecordsAllowed:NO];
 }
 
 - (instancetype)initWithParent:(Node*)parent
                          title:(nonnull NSString*)title
                        isGroup:(BOOL)isGroup
                           uuid:(NSUUID*)uuid
-                        fields:(NodeFields*)fields {
+                        fields:(NodeFields*)fields
+           childRecordsAllowed:(BOOL)childRecordsAllowed {
     if(self = [super init]) {
         _parent = parent;
         _title = title;
@@ -73,6 +78,7 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         _mutableChildren = [NSMutableArray array];
         _uuid = uuid == nil ?  [[NSUUID alloc] init] : uuid;
         _fields = fields == nil ? [[NodeFields alloc] init] : fields;
+        _childRecordsAllowed = childRecordsAllowed;
         
         return self;
     }
@@ -134,6 +140,9 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
                 return NO;
             }
         }
+    }
+    else {
+        return self.childRecordsAllowed;
     }
     
     return YES;
@@ -298,8 +307,18 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         [ret appendFormat:@"\n%@{\n", indent];
         
         for (Node* child in self.childRecords) {
-            [ret appendFormat:@"%@%@[%@] (username: [%@], password: [%@], url: [%@])\n",
-             indent, baseIndent, child.title, child.fields.username, child.fields.password, child.fields.url];
+            NSString* attachmentString;
+            if(child.fields.attachments.count == 1) {
+                NodeFileAttachment* a = [child.fields.attachments objectAtIndex:0];
+                attachmentString = [NSString stringWithFormat:@"(attachment: [%@] index: %d)", a.filename, a.index];
+            }
+            else {
+                attachmentString = [NSString stringWithFormat:@"(%lu attachments)", (unsigned long)child.fields.attachments.count];
+            }
+            
+            [ret appendFormat:@"%@%@[%@] (username: [%@], password: [%@], url: [%@]) - [%@] - %@\n",
+             indent, baseIndent, child.title, child.fields.username, child.fields.password, child.fields.url,
+             child.fields.created, attachmentString];
         }
 
         for (Node* child in self.childGroups) {
@@ -328,7 +347,8 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         }
     }
     else {
-        return [NSString stringWithFormat:@"{\n[%@] (username: [%@], password: [%@], url: [%@])\n}", self.title, self.fields.username, self.fields.password, self.fields.url];
+        return [NSString stringWithFormat:@"{\n[%@] (username: [%@], password: [%@], url: [%@]) (%lu attachments)\n}",
+                self.title, self.fields.username, self.fields.password, self.fields.url, (unsigned long)self.fields.attachments.count];
     }
 }
 
