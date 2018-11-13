@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable KeePassGroup*)fromModel:(Node*)rootNode context:(XmlProcessingContext*)context error:(NSError**)error;
 
-- (Node*)toModel:(KeePassGroup*)existingXmlRoot error:(NSError**)error;
+- (nullable Node*)toModel:(KeePassGroup*)existingXmlRoot error:(NSError**)error;
 
 @end
 

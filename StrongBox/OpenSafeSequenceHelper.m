@@ -343,7 +343,9 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     if(openedSafe == nil) {
         [Alerts error:viewController title:@"There was a problem opening the safe." error:error];
         completion(nil);
+        return;
     }
+    
     if (error) {
         if (error.code == -2) {
             if(isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.

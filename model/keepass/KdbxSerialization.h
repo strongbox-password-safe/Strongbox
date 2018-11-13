@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError;
 
 - (instancetype)init:(SerializationData*)serializationData;
-- (NSString*)stage1Serialize:(NSString*)password error:(NSError**)error;
+- (nullable NSString*)stage1Serialize:(NSString*)password error:(NSError**)error;
 - (nullable NSData*)stage2Serialize:xml error:(NSError**)error;
 
 @end

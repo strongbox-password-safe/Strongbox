@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VariantDictionary : NSObject
 
-+ (NSDictionary<NSString*, VariantObject*>*)fromData:(NSData*)data;
++ (nullable NSDictionary<NSString*, VariantObject*>*)fromData:(NSData*)data;
 + (NSData*)toData:(NSDictionary<NSString*, VariantObject*>*)dictionary;
 
 @end

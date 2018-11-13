@@ -28,7 +28,7 @@
         
         self.cipherUuid = getCipherUuid(headerEntries);
         NSNumber* num = (NSNumber*)[headerEntries objectForKey:@(COMPRESSIONFLAGS)];
-        self.compressionFlags = num ? num.unsignedIntValue : 0;
+        self.compressionFlags = num != nil ? num.unsignedIntValue : 0;
     }
     return self;
 }

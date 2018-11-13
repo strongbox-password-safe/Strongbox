@@ -15,7 +15,7 @@ static const uint32_t kIvSize = kBlockSize;
 
 @implementation TwoFishCipher
 
-- (nonnull NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
      int err;
     symmetric_key skey;
     
@@ -117,7 +117,7 @@ static const uint32_t kIvSize = kBlockSize;
     return ret;
 }
 
-- (nonnull NSData *)generateIv {
+- (NSData *)generateIv {
     NSMutableData *newKey = [NSMutableData dataWithLength:kIvSize];
     
     if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))

@@ -66,7 +66,7 @@
     KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
     KeePassGroup *previousXmlGroup = (KeePassGroup*)group.linkedData;
     
-    if(group.iconId) {
+    if(group.iconId != nil) {
         ret.icon = group.iconId;
     }
     if(group.customIconUuid){
@@ -101,7 +101,7 @@
 
     ret.uuid.uuid = entry.uuid;
     
-    if(entry.iconId) {
+    if(entry.iconId != nil) {
         ret.icon = entry.iconId;
     }
     if(entry.customIconUuid){
@@ -189,7 +189,7 @@
     groupNode.linkedData = group; // Original KeePass Document Group...
     
     if(group.customIcon) groupNode.customIconUuid = group.customIcon;
-    if(group.icon) groupNode.iconId = group.icon;
+    if(group.icon != nil) groupNode.iconId = group.icon;
 
     
     for (KeePassGroup *childGroup in group.groups) {
@@ -250,7 +250,7 @@
     entryNode.linkedData = childEntry;
     
     if(childEntry.customIcon) entryNode.customIconUuid = childEntry.customIcon;
-    if(childEntry.icon) entryNode.iconId = childEntry.icon;
+    if(childEntry.icon != nil) entryNode.iconId = childEntry.icon;
     
     return entryNode;
 }

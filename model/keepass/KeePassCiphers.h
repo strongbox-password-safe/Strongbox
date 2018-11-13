@@ -30,7 +30,7 @@ NSString* innerEncryptionString(uint32_t innerRandomStreamId);
 NSString* keyDerivationAlgorithmString(NSUUID* uuid);
 NSString* outerEncryptionAlgorithmString(NSUUID* uuid);
 
-id<Cipher> getCipher(NSUUID* cipherUuid);
+id<Cipher>__nullable getCipher(NSUUID* cipherUuid);
 
 @end
 

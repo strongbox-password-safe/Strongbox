@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AesCipher : NSObject<Cipher>
 
-- (NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
-- (NSData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
-- (NSData*)generateIv;
+- (nullable NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (nullable NSData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (nullable NSData*)generateIv;
 
 @end
 

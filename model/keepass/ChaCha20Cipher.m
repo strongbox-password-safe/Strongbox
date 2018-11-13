@@ -53,12 +53,12 @@ static const BOOL kLogVerbose = NO;
     return foo;
 }
 
-- (nonnull NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     return [self decrypt:data iv:iv key:key];
 }
 
 
-- (nonnull NSData *)generateIv {
+- (NSData *)generateIv {
     NSMutableData *newKey = [NSMutableData dataWithLength:kIvSize];
     
     if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))

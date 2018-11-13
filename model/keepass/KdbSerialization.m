@@ -141,6 +141,7 @@ static const BOOL kLogVerbose = NO;
         if(error) {
             *error = [Utils createNSError:@"Unknown Cipher. Cannot open this file." errorCode:-3];
         }
+        return nil;
     }
     
     NSData *pt = [cipher decrypt:ct iv:encryptionIv key:masterKey];
@@ -308,7 +309,7 @@ NSData* writeGroup(KdbGroup* group) {
     if (group.modification) [ret appendData:writeField(0x0004, dateToKeePass1Data(group.modification))];
     if (group.lastAccess) [ret appendData:writeField(0x0005, dateToKeePass1Data(group.lastAccess))];
     if (group.expiry) [ret appendData:writeField(0x0006, dateToKeePass1Data(group.expiry))];
-    if (group.imageId) [ret appendData:writeField(0x0007, Uint32ToLittleEndianData(group.imageId.intValue))];
+    if (group.imageId != nil) [ret appendData:writeField(0x0007, Uint32ToLittleEndianData(group.imageId.intValue))];
     [ret appendData:writeField(0x0008, Uint16ToLittleEndianData(group.level))];
     [ret appendData:writeField(0x0009, Uint32ToLittleEndianData(group.flags))];
     [ret appendData:writeField(0xFFFF, [NSData data])];
@@ -325,7 +326,7 @@ NSData* writeEntry(KdbEntry* entry) {
     [ret appendData:writeField(0x0001, [NSData dataWithBytes:uuid length:sizeof(uuid_t)])];
     [ret appendData:writeField(0x0002, Uint32ToLittleEndianData(entry.groupId))];
     
-    if (entry.imageId) [ret appendData:writeField(0x0003, Uint32ToLittleEndianData(entry.imageId.intValue))];
+    if (entry.imageId != nil) [ret appendData:writeField(0x0003, Uint32ToLittleEndianData(entry.imageId.intValue))];
     
     [ret appendData:writeField(0x0004, stringtoKeePassData(entry.title))];
     [ret appendData:writeField(0x0005, stringtoKeePassData(entry.url))];

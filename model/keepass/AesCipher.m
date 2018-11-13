@@ -20,13 +20,14 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
     // 1. Get Required Buffer Size by Calling with 0 length out buffer
     
     size_t bufferSize;
-    CCCryptorStatus status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
+    //CCCryptorStatus status =
+    CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
                                      data.bytes, data.length, nil, 0, &bufferSize);
 
     // 2. Perform actually with right sized buffer.
     
     NSMutableData *ret = [NSMutableData dataWithLength:bufferSize];
-    status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
+    CCCryptorStatus status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
                      data.bytes, data.length, ret.mutableBytes, ret.length, &bufferSize);
 
     if(status != kCCSuccess) {
@@ -41,15 +42,15 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
 }
 
 
-- (nonnull NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     return [self crypt:kCCDecrypt data:data iv:iv key:key];
 }
 
-- (nonnull NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     return [self crypt:kCCEncrypt data:data iv:iv key:key];
 }
 
-- (nonnull NSData *)generateIv {
+- (NSData *)generateIv {
     NSMutableData *newKey = [NSMutableData dataWithLength:kIvSize];
     
     if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))

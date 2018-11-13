@@ -442,7 +442,7 @@ static DecryptionParameters *getDecryptionParameters(NSDictionary *headerEntries
     decryptionParameters.compressionFlags = (uint32_t)num.integerValue;
     
     num = [headerEntries objectForKey:@(INNERRANDOMSTREAMID)];
-    decryptionParameters.innerRandomStreamId = num ? num.intValue : 0;
+    decryptionParameters.innerRandomStreamId = num != nil ? num.intValue : 0;
     decryptionParameters.protectedStreamKey = [headerEntries objectForKey:@(PROTECTEDSTREAMKEY)];
     
     NSData* cipherData = [headerEntries objectForKey:@(CIPHERID)];

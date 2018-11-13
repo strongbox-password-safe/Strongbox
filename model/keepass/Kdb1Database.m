@@ -150,7 +150,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     [existingGroupIds addObject:@(ret.groupId)];
     
     ret.name = group.title;
-    ret.imageId = group.iconId ? group.iconId : @(48);
+    ret.imageId = group.iconId != nil ? group.iconId : @(48);
     
     if(group.linkedData) {
         KdbGroup* previous = (KdbGroup*)group.linkedData;
@@ -172,7 +172,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     
     ret.uuid = record.uuid;
     ret.groupId = kdbGroup.groupId;
-    ret.imageId = record.iconId ? record.iconId : @(0);
+    ret.imageId = record.iconId != nil ? record.iconId : @(0);
     ret.title = record.title;
     ret.url = record.fields.url;
     ret.username = record.fields.username;
@@ -233,7 +233,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     
     int currentLevel = 0;
     Node* parentNode = ret;
-    Node* lastNode = nil;
+    Node* lastNode = ret;
     
     for (KdbGroup* group in serializationData.groups) {
         if(group.level > currentLevel) {
@@ -304,7 +304,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
 }
 
 - (NSString * _Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords {
-    return nil;
+    return [self description];
 }
 
 -(NSString *)description {

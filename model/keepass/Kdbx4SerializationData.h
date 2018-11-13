@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* fileVersion;
 @property uint32_t compressionFlags;
 @property uint32_t innerRandomStreamId;
-@property NSData* innerRandomStreamKey;
+@property (nullable) NSData* innerRandomStreamKey;
 @property NSDictionary<NSNumber*, NSObject*> *extraUnknownHeaders;
 @property NSString* xml;
 @property KdfParameters *kdfParameters;

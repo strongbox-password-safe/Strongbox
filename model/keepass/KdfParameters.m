@@ -27,7 +27,6 @@
     }
     return self;
 }
-
 -(NSUUID *)uuid {
     VariantObject *variant = (VariantObject*)[_parameters objectForKey:kKdfParametersKeyUuid];
     NSData* uuidData = variant ? (NSData*)variant.theObject : nil;

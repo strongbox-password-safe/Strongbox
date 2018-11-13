@@ -44,14 +44,14 @@ KeepassFileHeader getKeePassFileHeader(NSData* data);
 KeepassFileHeader getNewFileHeader(NSString* version);
 
 void dumpHeaderEntries(NSDictionary *headerEntries);
-NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data);
+NSObject*__nullable getHeaderEntryObject(uint8_t identifier, NSData* data);
 
 NSData *getCompositeKey(NSString *password);
 NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
-NSData *getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);
+NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);
 
-RootXmlDomainObject* parseKeePassXml(uint32_t innerRandomStreamId, NSData* innerRandomStreamKey, XmlProcessingContext* context, NSString* xml, NSError** error);
+RootXmlDomainObject*__nullable parseKeePassXml(uint32_t innerRandomStreamId, NSData* innerRandomStreamKey, XmlProcessingContext* context, NSString* xml, NSError** error);
 
 @end
 

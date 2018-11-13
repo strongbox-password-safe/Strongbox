@@ -15,10 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface XmlStrongBoxModelAdaptor : NSObject
 
-- (Node*)fromXmlModelToStrongboxModel:(RootXmlDomainObject*)existingRootXmlDocument
+- (nullable Node*)fromXmlModelToStrongboxModel:(RootXmlDomainObject*)existingRootXmlDocument
                                 error:(NSError**)error;
 
-- (RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
+- (nullable RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
                                          customIcons:(NSDictionary<NSUUID*, NSData*> *)customIcons
                              existingRootXmlDocument:(nullable RootXmlDomainObject *)existingRootXmlDocument
                                              context:(XmlProcessingContext*)context

@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithParameters:(NSDictionary<NSString*, VariantObject*>*)parameters NS_DESIGNATED_INITIALIZER;
 
-@property (readonly, nonatomic) NSUUID* uuid;
+@property (nullable, readonly, nonatomic) NSUUID* uuid;
 @property (readonly, nonatomic) NSDictionary<NSString*, VariantObject*>* parameters;
 
 @end

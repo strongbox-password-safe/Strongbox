@@ -210,12 +210,12 @@ const static NSSet<NSString*> *wellKnownKeys;
 }
 
 - (void)setIcon:(NSNumber *)icon {
-    if(icon) {
+    if(icon != nil) {
         if(!self.iconId) {
             self.iconId = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:self.context];
         }
         
-        self.iconId.text = icon ? icon.stringValue : nil;
+        self.iconId.text = icon != nil ? icon.stringValue : nil;
     }
     else {
         self.iconId = nil;

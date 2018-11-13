@@ -15,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isAValidSafe:(NSData *)candidate;
 
-+ (KdbSerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError;
-+ (NSData*)serialize:(KdbSerializationData*)serializationData password:(NSString*)password ppError:(NSError**)error;
++ (nullable KdbSerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError;
++ (nullable NSData*)serialize:(KdbSerializationData*)serializationData password:(NSString*)password ppError:(NSError**)error;
 
 @end
 
