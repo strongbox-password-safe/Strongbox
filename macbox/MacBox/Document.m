@@ -91,30 +91,51 @@
     }
 }
 
+- (void)onSaveDone:(void (^ _Nonnull)(NSError * _Nullable))completionHandler errorOrNil:(NSError * _Nullable)errorOrNil {
+    if (!errorOrNil) {
+        self.dirty = NO;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            ViewController *vc = (ViewController*)self.windowController.contentViewController;
+            [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
+        });
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [Alerts error:errorOrNil window:self.windowController.window];
+        });
+        
+        NSLog(@"Error during saveToURL: %@", errorOrNil);
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        completionHandler(errorOrNil);
+    });
+}
+
 - (void)saveToURL:(NSURL *)url
            ofType:(NSString *)typeName
  forSaveOperation:(NSSaveOperationType)saveOperation
 completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
-    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {
-        if (!errorOrNil) {
-            self.dirty = NO;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                ViewController *vc = (ViewController*)self.windowController.contentViewController;
-                [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
-            });
-        }
-        else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts error:errorOrNil window:self.windowController.window];
-            });
-            
-            NSLog(@"Error during saveToURL: %@", errorOrNil);
-        }
+    if (!self.model.masterPasswordIsSet) {
+        self.masterPasswordWindowController = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+        self.masterPasswordWindowController.titleText = @"You must set a Master Password for this Safe";
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(errorOrNil);
-        });
-    }];
+        [self.windowController.window beginSheet:self.masterPasswordWindowController.window
+                               completionHandler:^(NSModalResponse returnCode) {
+                                   if(returnCode == NSModalResponseOK) {
+                                       [self.model setMasterPassword:self.masterPasswordWindowController.confirmedPassword];
+                                       
+                                       [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {
+                                           [self onSaveDone:completionHandler errorOrNil:errorOrNil];
+                                       }];
+                                   }
+                               }];
+    }
+    else {
+        [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {
+            [self onSaveDone:completionHandler errorOrNil:errorOrNil];
+        }];
+    }
 }
 
 - (SafeMetaData*)getSafeMetaData {

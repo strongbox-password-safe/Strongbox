@@ -21,6 +21,6 @@
 
 @property (nonatomic, readonly) NSString* confirmedPassword;
 @property (nonatomic) NSString* titleText;
-@property (nonatomic) BOOL required;
+//@property (nonatomic) BOOL required;
 
 @end

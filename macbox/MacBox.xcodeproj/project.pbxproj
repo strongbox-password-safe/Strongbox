@@ -560,6 +560,8 @@
 			children = (
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
 				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
+				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
+				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -695,8 +697,6 @@
 				4DEAEC271F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.m */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
-				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
-				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
 				4D92C8251F38A03500341A58 /* WindowController.h */,
 				4D92C8261F38A03500341A58 /* WindowController.m */,
 				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,

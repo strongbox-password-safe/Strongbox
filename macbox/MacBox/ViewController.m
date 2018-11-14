@@ -172,7 +172,13 @@
     [self bindStatusPane];
     
     if(!self.model.masterPasswordIsSet) {
-        [self promptForMasterPassword:YES promptToSave:NO]; // New document - Require Master Password Set
+        [self promptForMasterPassword:YES completion:^(BOOL okCancel) {
+//            if(!okCancel) {
+//                // User cancelled out of master password. We should terminate the creation of this new document
+//
+//                NSLog(@"How?");
+//            }
+        }]; // New document - Require Master Password Set
     }
 }
 
@@ -571,23 +577,20 @@
     [self.view.window makeFirstResponder:self.searchField];
 }
 
-- (void)promptForMasterPassword:(BOOL)required promptToSave:(BOOL)promptToSave {
+- (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
     if(self.model && !self.model.locked) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changeMasterPassword = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
-            self.changeMasterPassword.titleText = required ? @"Please set a master password for this new safe" : @"Change Master Password";
-            self.changeMasterPassword.required = required;
-            
+            self.changeMasterPassword.titleText = new ? @"Please Enter the Master Password for this Safe" : @"Change Master Password";
+ 
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
                     [self.model setMasterPassword:self.changeMasterPassword.confirmedPassword];
-                    
-                    if(promptToSave) {
-                        [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-                        
-                        [Alerts info:@"Master Password Changed" window:self.view.window];
-                    }
+                }
+                
+                if(completion) {
+                    completion(returnCode == NSModalResponseOK);
                 }
             }];
         });
@@ -595,7 +598,10 @@
 }
 
 - (IBAction)onChangeMasterPassword:(id)sender {
-    [self promptForMasterPassword:NO promptToSave:YES];
+    [self promptForMasterPassword:NO completion:^(BOOL okCancel) {
+        [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
+        [Alerts info:@"Master Password Changed and Safe Saved" window:self.view.window];
+    }];
 }
 
 - (IBAction)onSearch:(id)sender {
