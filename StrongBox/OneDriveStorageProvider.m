@@ -213,7 +213,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
             
             NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath.path];
             
-            NSLog(@"OneDrive Read %lu bytes.", (unsigned long)data.length);
+            //NSLog(@"OneDrive Read %lu bytes.", (unsigned long)data.length);
             
             completion(data, nil);
         }];
@@ -354,7 +354,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
     NSString* driveId = [dictionary objectForKey:@"driveId"];
     NSString* parentFolderId = [dictionary objectForKey:@"parentFolderId"];
     
-    NSLog(@"Searching for drive:[%@] parent:[%@] name:[%@]", driveId, parentFolderId, metadata.fileName);
+    //NSLog(@"Searching for drive:[%@] parent:[%@] name:[%@]", driveId, parentFolderId, metadata.fileName);
     
     ODChildrenCollectionRequest *request = [[[[self.odClient drives:driveId] items:parentFolderId] children] request];
     
@@ -374,14 +374,12 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         ODItem* foundItem = nil;
         for (ODItem* item in response.value) {
             if([item.name isEqualToString:target]) {
-                NSLog(@"Found!");
                 foundItem = item;
                 break;
             }
         }
         
         if(!foundItem && nr) {
-            NSLog(@"Recursing...");
             [self findItemRecursive:nr target:target completion:completion];
         }
         else {

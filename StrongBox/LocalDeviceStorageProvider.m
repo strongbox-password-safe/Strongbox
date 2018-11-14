@@ -90,7 +90,7 @@
     NSString *desiredFilename = [self getOfflineCacheFileName:safe];
     NSString *path = [self getFilePathFromFileName:desiredFilename offlineCache:YES];
 
-    NSLog(@"Creating offline cache file at: %@", path);
+    //NSLog(@"Creating offline cache file at: %@", path);
     
     if(![data writeToFile:path atomically:YES]) {
         NSLog(@"Error Writing offline Cache file.");
@@ -134,8 +134,6 @@
 }
 
 - (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion {
-    NSLog(@"updateOfflineCachedSafe");
-    
     NSString *path = [self getFilePathFromSafeMetaData:safeMetaData offlineCache:YES];
 
     if(![data writeToFile:path atomically:YES]) {
@@ -282,7 +280,7 @@
 - (void)updateAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion {
     NSString *filePath = getAutoFillFilePath(safeMetaData);
     
-    NSLog(@"Updating AutoFill cache file at: %@", filePath);
+    //NSLog(@"Updating AutoFill cache file at: %@", filePath);
     
     NSError* error;
     if(![data writeToFile:filePath options:NSDataWritingAtomic error:&error]) {
@@ -413,7 +411,7 @@ static NSString* getAutoFillFilePath(SafeMetaData* safeMetaData) {
                     [newSafes addObject:item];
                 }
                 else {
-                    NSLog(@"None Safe File:%@ is a not valid safe", item.name);
+                    //NSLog(@"None Safe File:%@ is a not valid safe", item.name);
                 }
             }
         }

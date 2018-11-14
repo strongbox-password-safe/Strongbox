@@ -187,7 +187,7 @@
         safe.autoFillCacheAvailable = NO;
     }
     else {
-        NSLog(@"Offline Cache Now Available.");
+        //NSLog(@"Offline Cache Now Available.");
         
         safe.autoFillCacheAvailable = YES;
     }
@@ -202,7 +202,7 @@
         safe.offlineCacheAvailable = NO;
     }
     else {
-        NSLog(@"Offline Cache Now Available.");
+        //NSLog(@"Offline Cache Now Available.");
 
         safe.offlineCacheAvailable = YES;
     }

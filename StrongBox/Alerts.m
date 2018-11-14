@@ -53,6 +53,8 @@
                                                     completion(((self.alertController).textFields[0]).text, true);
                                                 }];
 
+    self.defaultAction.enabled = NO;
+    
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
@@ -292,6 +294,38 @@
                                                           handler:^(UIAlertAction *a) {
                                                               completion((self.alertController.textFields[0]).text, true);
                                                           }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) {
+                                                             completion(nil, false);
+                                                         }];
+    
+    [self.alertController addAction:self.defaultAction];
+    [self.alertController addAction:cancelAction];
+    
+    [viewController presentViewController:self.alertController animated:YES completion:nil];
+}
+
+- (void)OkCancelWithPasswordNonEmpty:(UIViewController *)viewController
+                          completion:(void (^) (NSString *password, BOOL response))completion {
+    __weak typeof(self) weakSelf = self;
+    
+    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+        textField.secureTextEntry = YES;
+        [textField addTarget:weakSelf
+                      action:@selector(validateNoneEmpty:)
+            forControlEvents:UIControlEventEditingChanged];
+    }];
+
+    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction *a) {
+                                                    completion((self.alertController.textFields[0]).text, true);
+                                                }];
+    
+    
+    self.defaultAction.enabled = NO;
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel

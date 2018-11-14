@@ -259,6 +259,7 @@
 		4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA12F05219837D10000CEBB /* CustomIcon.m */; };
 		4DA12F0A219860BD0000CEBB /* custom-icon.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4DA12F08219860BC0000CEBB /* custom-icon.kdbx */; };
 		4DA12F0B219860BD0000CEBB /* custom-icon-4.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4DA12F09219860BD0000CEBB /* custom-icon-4.kdbx */; };
+		4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DA2A7DB219C31B0006689E6 /* LICENSE.md */; };
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DAEA41D217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */; };
 		4DAEA41E217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */; };
@@ -630,6 +631,7 @@
 		4DA12F05219837D10000CEBB /* CustomIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomIcon.m; path = model/keepass/CustomIcon.m; sourceTree = "<group>"; };
 		4DA12F08219860BC0000CEBB /* custom-icon.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icon.kdbx"; sourceTree = "<group>"; };
 		4DA12F09219860BD0000CEBB /* custom-icon-4.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icon-4.kdbx"; sourceTree = "<group>"; };
+		4DA2A7DB219C31B0006689E6 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomStorageProviderTableViewCell.h; path = StrongBox/CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomStorageProviderTableViewCell.m; path = StrongBox/CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DAEA41B217CBB1300AC128E /* GenericTextUuidElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextUuidElementHandler.h; path = model/keepass/GenericTextUuidElementHandler.h; sourceTree = SOURCE_ROOT; };
@@ -1153,6 +1155,7 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
@@ -1495,6 +1498,7 @@
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
+				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

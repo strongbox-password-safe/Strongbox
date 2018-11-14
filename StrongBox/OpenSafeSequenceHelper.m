@@ -148,20 +148,19 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
             openAutoFillCache:(BOOL)openAutoFillCache
 askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
                    completion:(void (^)(Model* model))completion {
-    [Alerts OkCancelWithPassword:viewController
-                           title:[NSString stringWithFormat:@"Password for %@", safe.nickName]
-                         message:@"Enter Master Password"
-                      completion:^(NSString *password, BOOL response) {
-                          if (response) {
-                              [self openSafe:viewController
-                                        safe:safe
-                           openAutoFillCache:openAutoFillCache
-                               isTouchIdOpen:NO
-                              masterPassword:password
-                        askAboutTouchIdEnrol:askAboutTouchIdEnrolIfAppropriate
-                                  completion:completion];
-                          }
-                      }];
+    Alerts* prompt =[[Alerts alloc] initWithTitle:[NSString stringWithFormat:@"Password for %@", safe.nickName] message:@"Enter Master Password"];
+     
+    [prompt OkCancelWithPasswordNonEmpty:viewController completion:^(NSString *password, BOOL response) {
+      if (response) {
+          [self openSafe:viewController
+                    safe:safe
+        openAutoFillCache:openAutoFillCache
+           isTouchIdOpen:NO
+          masterPassword:password
+        askAboutTouchIdEnrol:askAboutTouchIdEnrolIfAppropriate
+              completion:completion];
+        }
+    }];
 }
 
 - (void)  openSafe:(UIViewController*)viewController

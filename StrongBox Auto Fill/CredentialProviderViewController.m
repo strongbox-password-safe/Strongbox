@@ -94,6 +94,8 @@
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers
 {
+    NSLog(@"ServiceIdentifiers = %@", serviceIdentifiers);
+    
     self.serviceIdentifiers = serviceIdentifiers;
 }
 

@@ -104,4 +104,7 @@
                         textFieldText:(NSString *)textFieldText
                            completion:(void (^) (NSString *text, BOOL response))completion;
 
+- (void)OkCancelWithPasswordNonEmpty:(UIViewController *)viewController
+                          completion:(void (^) (NSString *password, BOOL response))completion;
+
 @end

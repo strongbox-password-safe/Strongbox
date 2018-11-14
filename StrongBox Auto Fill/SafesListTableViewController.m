@@ -137,8 +137,6 @@
     cell.detailTextLabel.enabled = YES;
     
     if([[self getInitialViewController] autoFillIsPossibleWithSafe:safe]) {
-        id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
-        
         if(![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider]) {
             NSDate* mod = [LocalDeviceStorageProvider.sharedInstance getAutoFillCacheModificationDate:safe];
             
@@ -153,8 +151,17 @@
             cell.detailTextLabel.text = [NSString stringWithFormat:@"[Cached %@]", modDateStr];
         }
         
-        NSString *icon = provider.icon;
-        cell.imageView.image = [UIImage imageNamed:icon];
+        // TODO: When we get OneDrive working use the alternate branch below... :(
+        if(safe.storageProvider == kOneDrive) {
+            UIImage* img = [UIImage imageNamed:@"one-drive-icon-only-32x32"];
+            cell.imageView.image = img;
+        }
+        else {
+            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
+            NSString *icon = provider.icon;
+            UIImage* img = [UIImage imageNamed:icon];
+            cell.imageView.image = img;
+        }
     }
     else {
         cell.imageView.image = [UIImage imageNamed:@"cancel_32"];
