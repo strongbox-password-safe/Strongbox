@@ -27,8 +27,8 @@
         NSError* error;
         NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:file];
         
-        KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:password error:&error];
-
+        id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+        StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
         XCTAssertNotNil(db);
 
         NSLog(@"%@", db);
@@ -39,7 +39,9 @@
 - (void)testInitExistingWithATestFile {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"a" ofType:@"kdbx"];
     NSError* error;
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:@"a" error:&error];
+    
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
     
     XCTAssertNotNil(db);
     
@@ -54,18 +56,21 @@
 - (void)testInitExistingWithCustomAndBinariesFile {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database" ofType:@"kdbx"];
     NSError* error;
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:@"a" error:&error];
+    
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
     
     XCTAssertNotNil(db);
 }
 
 - (void)testInitExistingWithGoogleDriveSafe {
     NSError* error;
-    NSData *safeData = [NSData dataWithContentsOfFile:@"/Users/mark/Google Drive/custom-icon.kdbx" options:kNilOptions error:&error];
+    NSData *safeData = [NSData dataWithContentsOfFile:@"/Users/mark/Google Drive/strongbox/keepass/custom-icon.kdbx" options:kNilOptions error:&error];
 
     XCTAssertNotNil(safeData);
     
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:safeData password:@"a" error:&error];
     
     NSLog(@"%@", db);
     
@@ -73,26 +78,30 @@
 }
 
 - (void)testInitNew {
-    KeePassDatabase* db = [[KeePassDatabase alloc] initNewWithPassword:@"password"];
-
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase* db = [adaptor create:@"password"];
+    
     NSLog(@"%@", db);
     
+    KeePassDatabaseMetadata *metadata = db.metadata;
     XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([db.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(db.metadata.compressionFlags == kGzipCompressionFlag);
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
 }
 
 - (void)testEmptyDbGetAsDataAndReOpenSafeIsTheSame {
-    KeePassDatabase* db = [[KeePassDatabase alloc] initNewWithPassword:@"password"];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase* db = [adaptor create:@"password"];
     
     NSLog(@"%@", db);
     
+    KeePassDatabaseMetadata *metadata = db.metadata;
     XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([db.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(db.metadata.compressionFlags == kGzipCompressionFlag);
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
 
     NSError* error;
-    NSData* data = [db getAsData:&error];
+    NSData* data = [adaptor save:db error:&error];
 
     if(error) {
         NSLog(@"%@", error);
@@ -101,7 +110,7 @@
     XCTAssertNil(error);
     XCTAssertNotNil(data);
  
-    KeePassDatabase *b = [[KeePassDatabase alloc] initExistingWithDataAndPassword:data password:@"password" error:&error];
+    StrongboxDatabase *b = [adaptor open:data password:@"password" error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -111,9 +120,10 @@
  
     NSLog(@"%@", b);
 
+    metadata = b.metadata;
     XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([b.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(b.metadata.compressionFlags == kGzipCompressionFlag);
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
 }
 
 - (void)testChaCha20OuterEnc {
@@ -122,13 +132,14 @@
     NSError* error;
     NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:@"Database-ChCha20-AesKdf"];
     
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:password error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
     
     XCTAssertNotNil(db);
 
     NSLog(@"================================================ Serializing =======================================================================");
 
-    NSData* data = [db getAsData:&error];
+    NSData* data = [adaptor save:db error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -139,8 +150,8 @@
 
     NSLog(@"================================================ Deserializing =======================================================================");
 
-    KeePassDatabase *b = [[KeePassDatabase alloc] initExistingWithDataAndPassword:data password:password error:&error];
-
+    StrongboxDatabase *b = [adaptor open:data password:password error:&error];
+    
     if(error) {
         NSLog(@"%@", error);
     }
@@ -157,14 +168,15 @@
         NSError* error;
         NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:file];
         
-        KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:password error:&error];
+        id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+        StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
         
         XCTAssertNotNil(db);
         
         //NSLog(@"%@", db);
         NSLog(@"=============================================================================================================");
     
-        NSData* data = [db getAsData:&error];
+        NSData* data = [adaptor save:db error:&error];
         
         if(error) {
             NSLog(@"%@", error);
@@ -173,7 +185,7 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        KeePassDatabase *b = [[KeePassDatabase alloc] initExistingWithDataAndPassword:data password:password error:&error];
+        StrongboxDatabase *b = [adaptor open:data password:password error:&error];
         
         if(error) {
             NSLog(@"%@", error);
@@ -186,20 +198,23 @@
 }
 
 - (void)testDbModifyWithEscapeCharacterGetAsDataAndReOpenSafeIsTheSame {
-    KeePassDatabase* db = [[KeePassDatabase alloc] initNewWithPassword:@"password"];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase* db = [adaptor create:@"password"];
     
     NSLog(@"%@", db);
     
     XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([db.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(db.metadata.compressionFlags == kGzipCompressionFlag);
+    
+    KeePassDatabaseMetadata* metadata = db.metadata;
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
     
     NodeFields *fields = [[NodeFields alloc] init];
     Node *childNode = [[Node alloc] initAsRecord:@"Title &<>'\\ Done" parent:[db.rootGroup.childGroups objectAtIndex:0] fields:fields uuid:nil];
     [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode];
     
     NSError* error;
-    NSData* data = [db getAsData:&error];
+    NSData* data = [adaptor save:db error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -208,7 +223,7 @@
     XCTAssertNil(error);
     XCTAssertNotNil(data);
     
-    KeePassDatabase *b = [[KeePassDatabase alloc] initExistingWithDataAndPassword:data password:@"password" error:&error];
+    StrongboxDatabase *b = [adaptor open:data password:@"password" error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -217,61 +232,43 @@
     XCTAssertNotNil(b);
     
     NSLog(@"%@", b);
+
     
+    metadata = b.metadata;
     XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([b.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(b.metadata.compressionFlags == kGzipCompressionFlag);
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
 
     XCTAssert([[[[b.rootGroup.childGroups objectAtIndex:0] childRecords] objectAtIndex:0].title isEqualToString:@"Title &<>'\\ Done"]);
 }
 
 
 - (void)testSmallNewDbWithPasswordGetAsDataAndReOpenSafeIsTheSame {
-    KeePassDatabase* db = [[KeePassDatabase alloc] initNewWithPassword:@"password"];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase* db = [adaptor create:@"password"];
     
+    KeePassDatabaseMetadata* metadata = db.metadata;
     XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([db.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(db.metadata.compressionFlags == kGzipCompressionFlag);
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
     
     Node* keePassRoot = [db.rootGroup.childGroups objectAtIndex:0];
     
-    DatabaseAttachment *attachment1 = [[DatabaseAttachment alloc] init];
-    attachment1.compressed = NO;
     NSData* data1 = [@"This is attachment 1 UTF data" dataUsingEncoding:NSUTF8StringEncoding];
-    attachment1.data = data1;
-    
-    DatabaseAttachment *attachment2 = [[DatabaseAttachment alloc] init];
-    attachment2.compressed = NO;
     NSData *data2 = [@"This is attachment 2 UTF data" dataUsingEncoding:NSUTF8StringEncoding];
-    attachment2.data = data2;
-    
-    [db.attachments addObjectsFromArray:@[attachment1, attachment2]];
-    
-    //
     
     NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username" url:@"url" password:@"ladder" notes:@"notes" email:@"email"];
-    
-    //
-    
-    NodeFileAttachment *nodeAttachment1 = [[NodeFileAttachment alloc] init];
-    nodeAttachment1.index = 0;
-    nodeAttachment1.filename = @"attachment1.txt";
-    
-    NodeFileAttachment *nodeAttachment2 = [[NodeFileAttachment alloc] init];
-    nodeAttachment2.index = 1;
-    nodeAttachment2.filename = @"attachment2.txt";
-    
-    [fields.attachments addObjectsFromArray:@[nodeAttachment1, nodeAttachment2]];
-    
-    //
     
     Node* record = [[Node alloc] initAsRecord:@"Title" parent:keePassRoot fields:fields uuid:nil];
     [keePassRoot addChild:record];
     
-    //NSLog(@"BEFORE: %@", db);
+    [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment1.txt" data:data1]];
+    [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment2.txt" data:data2]];
+     
+     //NSLog(@"BEFORE: %@", db);
     
     NSError* error;
-    NSData* data = [db getAsData:&error];
+    NSData* data = [adaptor save:db error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -280,7 +277,7 @@
     XCTAssertNil(error);
     XCTAssertNotNil(data);
     
-    KeePassDatabase *b = [[KeePassDatabase alloc] initExistingWithDataAndPassword:data password:@"password" error:&error];
+    StrongboxDatabase *b = [adaptor open:data password:@"password" error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -291,8 +288,10 @@
     //NSLog(@"AFTER: %@", b);
     
     XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([b.metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(b.metadata.compressionFlags == kGzipCompressionFlag);
+    
+    metadata = b.metadata;
+    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
     
     Node* bKeePassRoot = b.rootGroup.childGroups[0];
     Node* bRecord = bKeePassRoot.childRecords[0];
@@ -321,7 +320,8 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"TwoFish-with-AesKdf" ofType:@"kdbx"];
     
     NSError* error;
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:@"a" error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
     
     XCTAssertNotNil(db);
     
@@ -338,7 +338,8 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"TwoFish-with-AesKdf" ofType:@"kdbx"];
     
     NSError* error;
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:@"a" error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
     
     XCTAssertNotNil(db);
     
@@ -353,9 +354,8 @@
 
     testNode.title = @"New Entry13333576hg-6sqIXJVO;Q";
     
-    NSData* d = [db getAsData:&error];
-
-    KeePassDatabase *b = [[KeePassDatabase alloc] initExistingWithDataAndPassword:d password:@"a" error:&error];
+    NSData* d = [adaptor save:db error:&error]; // [db getAsData:&error];
+    StrongboxDatabase *b = [adaptor open:d password:@"a" error:&error];
     
     testNode = b.rootGroup.childGroups[0].childRecords[0];
     XCTAssert(testNode);
@@ -398,11 +398,12 @@
 - (void)testRwBinariesFileCompress {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database" ofType:@"kdbx"];
     NSError* error;
-    KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:blob password:@"a" error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
     
-    NSData* b = [db getAsData:&error];
-    
-    KeePassDatabase *a = [[KeePassDatabase alloc] initExistingWithDataAndPassword:b password:@"a" error:&error];
+    NSData* b = [adaptor save:db error:&error]; // [db getAsData:&error];
+
+    StrongboxDatabase *a = [adaptor open:b password:@"a" error:&error];
     
     XCTAssertNotNil(a);
 }

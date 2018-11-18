@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PwSafeMetadata : NSObject<AbstractDatabaseMetadata>
 
+- (instancetype)init;
 - (instancetype)initWithVersion:(NSString*)version NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, nullable) NSDate *lastUpdateTime;

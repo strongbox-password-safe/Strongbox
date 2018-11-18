@@ -17,6 +17,7 @@
 #import "AttachmentsRationalizer.h"
 #import "XmlTreeSerializer.h"
 #import "XmlStrongBoxModelAdaptor.h"
+#import "KeePass2TagPackage.h"
 
 static const uint32_t kKdbx4MajorVersionNumber = 4;
 static const uint32_t kKdbx4MinorVersionNumber = 0;
@@ -24,9 +25,6 @@ static const uint32_t kKdbx4MinorVersionNumber = 0;
 static const BOOL kLogVerbose = NO;
 
 @interface Kdbx4Database ()
-
-@property (nonatomic) RootXmlDomainObject* existingRootXmlDocument;
-@property (nonatomic) NSDictionary<NSNumber *,NSObject *>* existingExtraUnknownHeaders;
 
 @end
 
@@ -44,133 +42,87 @@ static const BOOL kLogVerbose = NO;
     return kKeePass4;
 }
 
-+ (BOOL)isAValidSafe:(NSData * _Nonnull)candidate {
++ (BOOL)isAValidSafe:(NSData *)candidate {
     return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MinorVersionNumber);
 }
 
-- (instancetype)initNewWithoutPassword {
-    return [self initNewWithPassword:nil];
+- (StrongboxDatabase *)create:(NSString *)password {
+    Node* rootGroup = [[Node alloc] initAsRoot:nil];
+    
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup uuid:nil];
+    [rootGroup addChild:keePassRootGroup];
+    
+    KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
+    
+    return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password];
 }
 
-- (instancetype)initNewWithPassword:(NSString *)password {
-    if (self = [super init]) {
-        _rootGroup = [[Node alloc] initAsRoot:nil];
-        
-        Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:_rootGroup uuid:nil];
-        [_rootGroup addChild:keePassRootGroup];
-        
-        _attachments = [NSMutableArray array];
-        _customIcons = [NSMutableDictionary dictionary];
-        _metadata = [[KeePass4DatabaseMetadata alloc] init];
-        
-        self.existingRootXmlDocument = nil;
-        self.existingExtraUnknownHeaders = nil;
-        self.masterPassword = password;
-        
-        return self;
-    }
-    else {
+- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError **)error {
+    // 1. First get XML out of the encrypted binary...
+    
+    Kdbx4SerializationData *serializationData = [Kdbx4Serialization deserialize:data password:password ppError:error];
+    
+    if(serializationData == nil) {
+        NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", *error);
         return nil;
     }
-}
+    
+    // NSLog(@"XML: \n\n%@\n\n", serializationData.xml);
+    
+    // 2. Convert the Xml to a more usable Xml Model
 
-- (instancetype)initExistingWithDataAndPassword:(NSData *)safeData
-                                       password:(NSString *)password
-                                          error:(NSError **)ppError
-{
-    return [self initExistingWithDataAndPassword:safeData password:password ignoreHeaderHash:NO error:ppError];
-}
+    RootXmlDomainObject* xmlDoc = parseKeePassXml(serializationData.innerRandomStreamId,
+                                                   serializationData.innerRandomStreamKey,
+                                                   XmlProcessingContext.standardV4Context,
+                                                   serializationData.xml,
+                                                   error);
+    
+    if(xmlDoc == nil) {
+        NSLog(@"Error in parseKeePassXml: [%@]", *error);
+        return nil;
+    }
 
-- (instancetype)initExistingWithDataAndPassword:(NSData *)safeData
-                                       password:(NSString *)password
-                               ignoreHeaderHash:(BOOL)ignoreHeaderHash
-                                          error:(NSError **)ppError {
-    if (self = [super init]) {
-        // 1. First get XML out of the encrypted binary...
-        
-        Kdbx4SerializationData *serializationData = [Kdbx4Serialization deserialize:safeData password:password ppError:ppError];
-        
-        if(serializationData == nil) {
-            NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", *ppError);
-            return nil;
-        }
-        
-        // NSLog(@"XML: \n\n%@\n\n", serializationData.xml);
-        
-        // 2. Convert the Xml to a more usable Xml Model
-
-        self.existingRootXmlDocument = parseKeePassXml(serializationData.innerRandomStreamId,
-                                                       serializationData.innerRandomStreamKey,
-                                                       XmlProcessingContext.standardV4Context,
-                                                       serializationData.xml,
-                                                       ppError);
-        
-        if(self.existingRootXmlDocument == nil) {
-            NSLog(@"Error in parseKeePassXml: [%@]", *ppError);
-            return nil;
-        }
-
-        // 3. Convert the Xml Model to the Strongbox Model
-        
-        XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-        KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(self.existingRootXmlDocument);
-        _rootGroup = [adaptor toModel:rootXmlGroup error:ppError];
-        
-        if(_rootGroup == nil) {
-            NSLog(@"Error converting Xml model to Strongbox model: [%@]", *ppError);
-            return nil;
-        }
-
-        // 4. Attachments
-
-        _attachments = [serializationData.attachments mutableCopy];
-
-        if(kLogVerbose) {
-            NSLog(@"Attachments: %@", self.attachments);
-        }
-        
-        // 5.
-        
-        _customIcons = safeGetCustomIcons(self.existingRootXmlDocument);
-        
-        // 6. Metadata
-        
-        _metadata = [[KeePass4DatabaseMetadata alloc] init];
-        
-        if(self.existingRootXmlDocument.keePassFile.meta.generator.text) {
-            self.metadata.generator = self.existingRootXmlDocument.keePassFile.meta.generator.text;
-        }
-        
-        self.metadata.cipherUuid = serializationData.cipherUuid;
-        self.metadata.kdfParameters = serializationData.kdfParameters;
-        self.metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
-        self.metadata.compressionFlags = serializationData.compressionFlags;
-        self.metadata.version = serializationData.fileVersion;
-        
-        self.existingExtraUnknownHeaders = serializationData.extraUnknownHeaders;
-        self.masterPassword = password;
+    // 3. Convert the Xml Model to the Strongbox Model
+    
+    XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
+    KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(xmlDoc);
+    Node* rootGroup = [adaptor toModel:rootXmlGroup error:error];
+    
+    if(rootGroup == nil) {
+        NSLog(@"Error converting Xml model to Strongbox model: [%@]", *error);
+        return nil;
     }
     
-    return self;
-}
-
-static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainObject* root) {
-    if(root && root.keePassFile && root.keePassFile.meta && root.keePassFile.meta.customIconList) {
-        if(root.keePassFile.meta.customIconList.icons) {
-            NSArray<CustomIcon*> *icons = root.keePassFile.meta.customIconList.icons;
-            NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
-            for (CustomIcon* icon in icons) {
-                [ret setObject:icon.data forKey:icon.uuid];
-            }
-            return ret;
-        }
+    NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlDoc);
+    
+    // Metadata
+    
+    KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
+    
+    if(xmlDoc.keePassFile.meta.generator.text) {
+        metadata.generator = xmlDoc.keePassFile.meta.generator.text;
     }
     
-    return [NSMutableDictionary dictionary];
+    metadata.cipherUuid = serializationData.cipherUuid;
+    metadata.kdfParameters = serializationData.kdfParameters;
+    metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
+    metadata.compressionFlags = serializationData.compressionFlags;
+    metadata.version = serializationData.fileVersion;
+    
+    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password
+                                                              attachments:serializationData.attachments customIcons:customIcons];
+
+    KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
+    tag.unknownHeaders = serializationData.extraUnknownHeaders;
+    tag.xmlDocument = xmlDoc;
+    
+    ret.adaptorTag = tag;
+    
+    return ret;
 }
 
-- (NSData * _Nullable)getAsData:(NSError **)error {
-    if(!self.masterPassword) {
+- (NSData *)save:(StrongboxDatabase *)database error:(NSError **)error {
+    if(!database.masterPassword) {
         if(error) {
             *error = [Utils createNSError:@"Master Password not set." errorCode:-3];
         }
@@ -178,16 +130,15 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainOb
         return nil;
     }
     
-    // 1. Attachments - Rationalise. This needs to come first in case we change the attachments list / and node references
+    KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
+    RootXmlDomainObject* existingRootXmlDocument = tag ? tag.xmlDocument : nil;
     
-    _attachments = [[AttachmentsRationalizer rationalizeAttachments:self.attachments root:self.rootGroup] mutableCopy];
-    
-    // 2. From Strongbox to Xml Model
+    // 1. From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
-    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:self.rootGroup
-                                                                        customIcons:self.customIcons
-                                                            existingRootXmlDocument:self.existingRootXmlDocument
+    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
+                                                                        customIcons:database.customIcons
+                                                            existingRootXmlDocument:existingRootXmlDocument
                                                                             context:[XmlProcessingContext standardV4Context]
                                                                               error:error];
     
@@ -204,7 +155,8 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainOb
     
     rootXmlDocument.keePassFile.meta.headerHash = nil; // Do not serialize this, we do not calculate it
     
-    XmlTreeSerializer *xmlSerializer = [[XmlTreeSerializer alloc] initWithProtectedStreamId:self.metadata.innerRandomStreamId
+    KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)database.metadata;
+    XmlTreeSerializer *xmlSerializer = [[XmlTreeSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
                                                                                         key:nil // Auto generated new key
                                                                                 prettyPrint:NO];
 
@@ -229,19 +181,21 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainOb
     
     // 3. KDBX serialize this Xml Document...
 
+    NSDictionary* unknownHeaders = tag ? tag.unknownHeaders : @{ };
+    
     Kdbx4SerializationData *serializationData = [[Kdbx4SerializationData alloc] init];
     
-    serializationData.fileVersion = self.metadata.version;
-    serializationData.compressionFlags = self.metadata.compressionFlags;
-    serializationData.innerRandomStreamId = self.metadata.innerRandomStreamId;
+    serializationData.fileVersion = metadata.version;
+    serializationData.compressionFlags = metadata.compressionFlags;
+    serializationData.innerRandomStreamId = metadata.innerRandomStreamId;
     serializationData.innerRandomStreamKey = xmlSerializer.protectedStreamKey;
-    serializationData.extraUnknownHeaders = self.existingExtraUnknownHeaders;
+    serializationData.extraUnknownHeaders = unknownHeaders;
     serializationData.xml = xml;
-    serializationData.kdfParameters = self.metadata.kdfParameters;
-    serializationData.cipherUuid = self.metadata.cipherUuid;
-    serializationData.attachments = self.attachments;
+    serializationData.kdfParameters = metadata.kdfParameters;
+    serializationData.cipherUuid = metadata.cipherUuid;
+    serializationData.attachments = database.attachments;
     
-    NSData *data = [Kdbx4Serialization serialize:serializationData password:self.masterPassword ppError:error];
+    NSData *data = [Kdbx4Serialization serialize:serializationData password:database.masterPassword ppError:error];
     if(!data) {
         NSLog(@"Could not serialize Document to KDBX.");
 
@@ -255,14 +209,6 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainOb
     return data;
 }
 
-- (NSString * _Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords {
-    return self.description;
-}
-
--(NSString *)description {
-    return [NSString stringWithFormat:@"masterPassword = %@, metadata=%@, rootGroup = %@", self.masterPassword, self.metadata, self.rootGroup];
-}
-
 static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
     // Possible that one of these intermediates are nil... safety
     
@@ -271,6 +217,21 @@ static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull 
     KeePassGroup *rootXmlGroup = rootXml == nil ? nil : rootXml.rootGroup;
     
     return rootXmlGroup;
+}
+
+static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainObject* root) {
+    if(root && root.keePassFile && root.keePassFile.meta && root.keePassFile.meta.customIconList) {
+        if(root.keePassFile.meta.customIconList.icons) {
+            NSArray<CustomIcon*> *icons = root.keePassFile.meta.customIconList.icons;
+            NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
+            for (CustomIcon* icon in icons) {
+                [ret setObject:icon.data forKey:icon.uuid];
+            }
+            return ret;
+        }
+    }
+    
+    return [NSMutableDictionary dictionary];
 }
 
 @end

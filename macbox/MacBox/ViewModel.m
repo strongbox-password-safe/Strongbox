@@ -27,14 +27,8 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
 - (instancetype)initNewWithSampleData:(Document*)document; {
     if (self = [super init]) {
-        self.passwordDatabase = [[DatabaseModel alloc] initNewWithoutPassword:kPasswordSafe]; // TODO: Offer Choice
+        self.passwordDatabase = [[DatabaseModel alloc] initNewWithoutPassword:document.format];
         self.lockedSafeInfo = nil;
-        
-        [self addSampleRecord:self.rootGroup];
-        
-        Node* newGroup = [[Node alloc] initAsGroup:kDefaultNewTitle parent:self.rootGroup uuid:nil];
-
-        [self.passwordDatabase.rootGroup addChild:newGroup];
         
         _document = document;
         
@@ -42,10 +36,6 @@ static NSString* kDefaultNewTitle = @"Untitled";
     }
     
     return nil;
-}
-
--(Node*)rootGroup {
-    return self.passwordDatabase.rootGroup;
 }
 
 - (instancetype)initWithData:(NSData*)data document:(Document*)document {
@@ -56,8 +46,28 @@ static NSString* kDefaultNewTitle = @"Untitled";
             return self;
         }
     }
-   
+    
     return nil;
+}
+
+- (NSArray<DatabaseAttachment *> *)attachments {
+    return self.passwordDatabase.attachments;
+}
+
+- (DatabaseFormat)format {
+    return self.passwordDatabase.format;
+}
+
+-(id<AbstractDatabaseMetadata>)metadata {
+    return self.passwordDatabase.metadata;
+}
+
+- (NSDictionary<NSUUID *,NSData *> *)customIcons {
+    return self.passwordDatabase.customIcons;
+}
+
+-(Node*)rootGroup {
+    return self.passwordDatabase.rootGroup;
 }
 
 - (BOOL)locked {
@@ -136,29 +146,6 @@ static NSString* kDefaultNewTitle = @"Untitled";
     return self.document.dirty;
 }
 
-- (Node*)addSampleRecord:(Node* _Nonnull)group {
-    NSString* password = [self generatePassword];
-    
-    NodeFields* fields = [[NodeFields alloc] initWithUsername:@"user123"
-                                              url:@"https://strongboxsafe.com"
-                                         password:password
-                                            notes:@""
-                                            email:@"user@gmail.com"]; // TODO: Keepass
-    
-    Node* record = [[Node alloc] initAsRecord:@"New Untitled Record" parent:group fields:fields uuid:nil];
-    
-    NSDate* date = [NSDate date];
-    record.fields.created = date;
-    record.fields.accessed = date;
-    record.fields.modified = date;
-    
-    if([group addChild:record]) {
-        return record;
-    }
-    
-    return nil;
-}
-
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -209,12 +196,32 @@ static NSString* kDefaultNewTitle = @"Untitled";
     self.document.dirty = YES;
 }
 
-- (void)setItemNotes:(Node*_Nullable)item notes:(NSString*_Nonnull)notes {
+- (void)setItemNotes:(Node*)item notes:(NSString*)notes {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
     item.fields.notes = notes;
+    self.document.dirty = YES;
+}
+
+- (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
+    self.document.dirty = YES;
+}
+
+- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    //[item.fields.attachments addObject:attachment];
+    
+    [self.passwordDatabase addNodeAttachment:item attachment:attachment];
     self.document.dirty = YES;
 }
 
@@ -250,7 +257,6 @@ NSString* getSmartFillUrl() {
     
     return @"";
 }
-
 
 NSString* getSmartFillNotes() {
     NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
@@ -411,10 +417,6 @@ NSString* getSmartFillNotes() {
     PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
     
     return [PasswordGenerator generatePassword:params];
-}
-
-- (NSString*_Nonnull)getDiagnosticDumpString {
-    return [self.passwordDatabase getDiagnosticDumpString:YES];
 }
 
 - (NSSet<NSString*> *)emailSet {

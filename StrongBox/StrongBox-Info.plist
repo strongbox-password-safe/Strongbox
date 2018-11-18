@@ -9,16 +9,16 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Strongbox KeePass 1 Safe</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.markmcguill.strongbox.kdb</string>
 			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleTypeName</key>
-			<string>Strongbox KeePass 1 Safe</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -72,7 +72,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.18.0</string>
+	<string>1.18.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -106,7 +106,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2618</string>
+	<string>2619</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -173,10 +173,10 @@
 			<string>com.markmcguill.strongbox.kdb</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
-				<key>public.mime-type</key>
-				<string>application/strongbox</string>
 				<key>public.filename-extension</key>
 				<string>kdb</string>
+				<key>public.mime-type</key>
+				<string>application/strongbox</string>
 			</dict>
 		</dict>
 		<dict>

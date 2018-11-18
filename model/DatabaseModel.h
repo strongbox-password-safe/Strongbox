@@ -4,8 +4,11 @@
 #import <Foundation/Foundation.h>
 #import "Node.h"
 #import "AbstractDatabaseMetadata.h"
-#import "AbstractPasswordDatabase.h"
+#import "AbstractDatabaseFormatAdaptor.h"
 #import "DatabaseAttachment.h"
+#import "UiAttachment.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseModel : NSObject
 
@@ -18,12 +21,15 @@
 - (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data password:(NSString *_Nonnull)password error:(NSError *_Nonnull*_Nonnull)ppError;
 
 - (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
-- (NSString*_Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords;
+
+- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment;
+- (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
+- (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
-@property (nonatomic, readonly, nonnull) NSMutableArray<DatabaseAttachment*> *attachments;
-@property (nonatomic, readonly, nonnull) NSMutableDictionary<NSUUID*, NSData*>* customIcons;
+@property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
+@property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
@@ -46,3 +52,5 @@
 @end
 
 #endif // ifndef _DatabaseModel_h
+
+NS_ASSUME_NONNULL_END

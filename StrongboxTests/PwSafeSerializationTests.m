@@ -21,7 +21,9 @@
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
     NSError *error;
-    PwSafeDatabase *db = [[PwSafeDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
+
+    StrongboxDatabase *db = [adaptor open:safeData password:@"a" error:&error];
 
     if(!db) {
         NSLog(@"ERROR: %@", error);
@@ -30,7 +32,7 @@
     
     XCTAssertNotNil(db);
     
-    NSLog(@"%@", [db getDiagnosticDumpString:YES]);
+    NSLog(@"%@", db);
 }
 
 - (void)testLargeMemoryConsumption {
@@ -39,7 +41,8 @@
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
     NSError *error;
-    PwSafeDatabase *db = [[PwSafeDatabase alloc] initExistingWithDataAndPassword:safeData password:@"M1cr0s0ft" error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
+    StrongboxDatabase *db = [adaptor open:safeData password:@"M1cr0s0ft" error:&error];
     
     if(!db) {
         NSLog(@"ERROR: %@", error);

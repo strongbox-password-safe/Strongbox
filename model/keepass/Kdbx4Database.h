@@ -7,29 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "AbstractPasswordDatabase.h"
+#import "AbstractDatabaseFormatAdaptor.h"
 #import "KeePass4DatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Kdbx4Database : NSObject<AbstractPasswordDatabase>
+@interface Kdbx4Database : NSObject<AbstractDatabaseFormatAdaptor>
 
-+ (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
++ (BOOL)isAValidSafe:(nullable NSData *)candidate;
 + (NSString *)fileExtension;
 
-- (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype _Nullable )initNewWithoutPassword;
-- (instancetype _Nullable )initNewWithPassword:(NSString *_Nullable)password;
-- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data password:(NSString *_Nonnull)password error:(NSError *_Nonnull*_Nonnull)ppError;
+- (StrongboxDatabase*)create:(nullable NSString *)password;
+- (nullable StrongboxDatabase*)open:(NSData*)data password:(NSString *)password error:(NSError **)error;
+- (nullable NSData*)save:(StrongboxDatabase*)database error:(NSError**)error;
 
-- (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
-- (NSString*_Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords;
-
-@property (nonatomic, readonly, nonnull) Node* rootGroup;
-@property (nonatomic, readonly, nonnull) KeePass4DatabaseMetadata* metadata; 
-@property (nonatomic, retain, nullable) NSString *masterPassword;
-@property (nonatomic, readonly, nonnull) NSMutableArray<DatabaseAttachment*>* attachments;
-@property (nonatomic, readonly, nonnull) NSMutableDictionary<NSUUID*, NSData*>* customIcons;
+@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic, readonly) NSString* fileExtension;
 
 @end
 

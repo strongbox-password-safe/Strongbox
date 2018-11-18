@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AbstractPasswordDatabase.h"
+#import "AbstractDatabaseFormatAdaptor.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

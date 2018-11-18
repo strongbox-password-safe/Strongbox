@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="AttachmentItem">
+            <connections>
+                <outlet property="labelFileSize" destination="Bsw-N9-1HR" id="qcK-zx-UXw"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="40"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <imageView verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6du-gZ-jdO">
+                    <rect key="frame" x="3" y="5" width="30" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="8jh-BO-aw9"/>
+                        <constraint firstAttribute="width" constant="30" id="lEy-lc-Q9a"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="ymK-WN-IuT"/>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="NbX-pw-tkc" userLabel="Filename">
+                    <rect key="frame" x="34" y="19" width="165" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" title="filename.txt" id="ctN-i7-k3f" userLabel="Filename">
+                        <font key="font" metaFont="system" size="12"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Bsw-N9-1HR" userLabel="Size">
+                    <rect key="frame" x="34" y="8" width="165" height="12"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" title="10 KB" id="Aze-hg-VmM" userLabel="Filename">
+                        <font key="font" metaFont="system" size="10"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="6du-gZ-jdO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="1n7-x2-6XH"/>
+                <constraint firstItem="6du-gZ-jdO" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="5" id="1xg-oT-1fg"/>
+                <constraint firstItem="NbX-pw-tkc" firstAttribute="leading" secondItem="6du-gZ-jdO" secondAttribute="trailing" constant="3" id="DXC-Zv-XtT"/>
+                <constraint firstItem="NbX-pw-tkc" firstAttribute="top" secondItem="6du-gZ-jdO" secondAttribute="top" id="Dol-dQ-itp"/>
+                <constraint firstAttribute="bottom" secondItem="6du-gZ-jdO" secondAttribute="bottom" constant="5" id="KuN-sS-GVx"/>
+                <constraint firstItem="Bsw-N9-1HR" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="20" symbolic="YES" id="R2B-Co-IPW"/>
+                <constraint firstAttribute="trailing" secondItem="NbX-pw-tkc" secondAttribute="trailing" constant="3" id="XTB-SF-hrx"/>
+                <constraint firstAttribute="bottom" secondItem="Bsw-N9-1HR" secondAttribute="bottom" constant="8" id="YIL-NL-kD4"/>
+                <constraint firstItem="Bsw-N9-1HR" firstAttribute="leading" secondItem="NbX-pw-tkc" secondAttribute="leading" id="Zto-9a-Vhn"/>
+                <constraint firstItem="6du-gZ-jdO" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="3" id="aAj-2k-ckF"/>
+                <constraint firstItem="Bsw-N9-1HR" firstAttribute="trailing" secondItem="NbX-pw-tkc" secondAttribute="trailing" id="eOh-Fr-iJQ"/>
+            </constraints>
+            <point key="canvasLocation" x="-264" y="58"/>
+        </customView>
+        <collectionViewItem nibName="AttachmentItem" id="Utg-nn-Tf3" customClass="AttachmentItem">
+            <connections>
+                <outlet property="imageView" destination="6du-gZ-jdO" id="oOE-Eg-eFT"/>
+                <outlet property="labelFileSize" destination="Bsw-N9-1HR" id="D31-cE-8n3"/>
+                <outlet property="textField" destination="NbX-pw-tkc" id="rHG-3s-otB"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="DkI-l5-ZEg"/>
+            </connections>
+        </collectionViewItem>
+    </objects>
+</document>

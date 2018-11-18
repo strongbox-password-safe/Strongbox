@@ -69,6 +69,24 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [self smartInitializeSearch];
 }
 
+static NSString *getSearchTermFromDomain(NSString* host) {
+    const char *cStringUrl = [host UTF8String];
+    
+    void *tree = loadTldTree();
+    const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
+    
+    NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"Calculated Domain: %@", domain);
+    
+    NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
+    
+    NSLog(@"%@", parts);
+    
+    NSString *searchTerm =  parts.count ? parts[0] : domain;
+    return searchTerm;
+}
+
 - (void)smartInitializeSearch {
     NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
     
@@ -80,34 +98,27 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = [NSURL URLWithString:serviceId.identifier];
-            
+
             NSLog(@"URL: %@", url);
-            void *tree = loadTldTree();
-            
-            const char *cStringUrl = [url.host UTF8String];
-            const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
-            
-            NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
-        
-            NSLog(@"Calculated Domain: %@", domain);
-            
-            NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
-            
-            NSLog(@"%@", parts);
-            
-            NSString *searchTerm =  parts.count ? parts[0] : domain;
+
+            NSString * searchTerm = getSearchTermFromDomain(url.host);
         
             self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
             [self.searchController.searchBar setText:searchTerm];
             return;
         }
-        else {
-            NSLog(@"Service Identifier Not URL: [%@]", serviceIdentifiers);
+        else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
+            NSString * searchTerm = getSearchTermFromDomain(serviceId.identifier);
+            
+            self.searchController.searchBar.selectedScopeButtonIndex = 0;
+            [self.searchController.searchBar setText:searchTerm];
+        
+            return;
         }
     }
     
-    self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
-    [self.searchController.searchBar setText:@""];
+    //self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
+    //[self.searchController.searchBar setText:@""];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

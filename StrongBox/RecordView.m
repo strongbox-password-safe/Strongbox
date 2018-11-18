@@ -16,6 +16,8 @@
 #import "TextFieldAutoSuggest.h"
 #import "Settings.h"
 #import "FileAttachmentsViewControllerTableViewController.h"
+#import "NSArray+Extensions.h"
+#import "UiAttachment.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -465,15 +467,23 @@ static NSString * trim(NSString *string) {
         UINavigationController *nav = segue.destinationViewController;
         
         FileAttachmentsViewControllerTableViewController* vc = (FileAttachmentsViewControllerTableViewController*)[nav topViewController];
-        vc.nodeAttachments = self.record.fields.attachments;
-        vc.databaseAttachments = self.viewModel.database.attachments;
+        
+        NSArray<UiAttachment*>* attachments = getUiAttachments(self.record, self.viewModel.database.attachments);
+        vc.attachments = attachments;
         vc.format = self.viewModel.database.format;
         
         __weak FileAttachmentsViewControllerTableViewController* weakRef = vc;
         vc.onDoneWithChanges = ^{
-            [self onAttachmentsChanged:weakRef.nodeAttachments databaseAttachments:weakRef.databaseAttachments];
+            [self onAttachmentsChanged:self.record attachments:weakRef.attachments];
         };
     }
+}
+
+static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAttachment*>* dbAttachments) {
+    return [record.fields.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
+        DatabaseAttachment *dbAttachment = dbAttachments[obj.index];
+        return [[UiAttachment alloc] initWithFilename:obj.filename data:dbAttachment.data];
+    }];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -580,13 +590,8 @@ static NSString * trim(NSString *string) {
     }];
 }
 
-- (void)onAttachmentsChanged:(NSArray<NodeFileAttachment*>*)nodeAttachments
-         databaseAttachments:(NSArray<DatabaseAttachment*>*)databaseAttachments {
-    [self.record.fields.attachments removeAllObjects];
-    [self.record.fields.attachments addObjectsFromArray:nodeAttachments];
-    
-    [self.viewModel.database.attachments removeAllObjects];
-    [self.viewModel.database.attachments addObjectsFromArray:databaseAttachments];
+- (void)onAttachmentsChanged:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments {
+    [self.viewModel.database setNodeAttachments:node attachments:attachments];
     
     [self saveChanges:^(NSError *error) {
         if (error != nil) {

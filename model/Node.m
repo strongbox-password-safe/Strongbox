@@ -32,6 +32,9 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     return [Utils finderStringCompare:n1.title string2:n2.title];
 };
 
++ (instancetype)rootGroup {
+    return [[Node alloc] initAsRoot:nil];
+}
 - (instancetype)initAsRoot:(NSUUID*)uuid {
     return [self initAsRoot:nil childRecordsAllowed:YES];
 }

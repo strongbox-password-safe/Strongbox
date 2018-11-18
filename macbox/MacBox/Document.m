@@ -94,10 +94,10 @@
 - (void)onSaveDone:(void (^ _Nonnull)(NSError * _Nullable))completionHandler errorOrNil:(NSError * _Nullable)errorOrNil {
     if (!errorOrNil) {
         self.dirty = NO;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            ViewController *vc = (ViewController*)self.windowController.contentViewController;
-            [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
-        });
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            ViewController *vc = (ViewController*)self.windowController.contentViewController;
+//            [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
+//        });
     }
     else {
         dispatch_async(dispatch_get_main_queue(), ^{

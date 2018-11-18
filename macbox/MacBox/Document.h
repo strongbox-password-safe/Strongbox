@@ -7,10 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "AbstractDatabaseFormatAdaptor.h"
 
 @interface Document : NSDocument
 
 @property (nonatomic) BOOL dirty;
+@property DatabaseFormat format;
 
 @end
 

@@ -54,6 +54,8 @@ uint32_t getRandomUint32(void);
 
 #if TARGET_OS_IPHONE
 UIImage* scaleImage(UIImage* image, CGSize newSize);
+#else
+NSImage* scaleImage(NSImage* image, CGSize newSize);
 #endif
 
 @end

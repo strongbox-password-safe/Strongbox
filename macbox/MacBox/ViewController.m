@@ -18,23 +18,42 @@
 #import "BiometricIdHelper.h"
 #import "PreferencesWindowController.h"
 #import "Csv.h"
+#import "AttachmentItem.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
 @interface ViewController ()
 
 @property (strong, nonatomic) ChangeMasterPasswordWindowController *changeMasterPassword;
-@property (strong, nonatomic) NSImage *folderImage;
-@property (strong, nonatomic) NSImage *strongBox256Image;
-@property (strong, nonatomic) NSImage *smallYellowFolderImage;
-@property (strong, nonatomic) NSImage *smallLockImage;
 @property (nonatomic) BOOL showPassword;
 @property (strong, nonatomic) NSArray<NSString*>* emailAutoCompleteCache;
 @property (strong, nonatomic) NSArray<NSString*>* usernameAutoCompleteCache;
+@property (nonnull, strong, nonatomic) NSArray *attachments;
+@property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
 
 @end
 
+static NSImage* kFolderImage;
+static NSImage* kStrongBox256Image;
+static NSImage* kSmallYellowFolderImage;
+static NSImage* kSmallLockImage;
+static NSImage* kDefaultAttachmentIcon;
+
+static NSArray<NSImage*> *kKeePassIconSet;
+
 @implementation ViewController
+
++ (void)initialize {
+    if(self == [ViewController class]) {
+        kKeePassIconSet = getKeePassIconSet();
+        
+        kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
+        kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
+        kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
+        kSmallLockImage = [NSImage imageNamed:@"lock-48"];
+        kDefaultAttachmentIcon = [NSImage imageNamed:@"document_empty_64"];
+    }
+}
 
 - (void)viewDidAppear {
     [super viewDidAppear];
@@ -54,8 +73,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self loadUIImages];
-    
     [self enableDragDrop];
 
     [self customizeUi];
@@ -78,14 +95,26 @@
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
     
+    // Any Clicks into the Password Field show it for editing
+    self.textFieldPw.onBecomesFirstResponder = ^{
+        self.showPassword = YES;
+        [self showOrHidePassword];
+    };
+    
     self.showPassword = Settings.sharedInstance.alwaysShowPassword;
-}
-
-- (void)loadUIImages {
-    self.folderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
-    self.strongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
-    self.smallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
-    self.smallLockImage = [NSImage imageNamed:@"lock-48"];
+    
+    self.attachments = [NSArray array];
+    self.attachmentsView.dataSource = self;
+    self.attachmentsView.delegate = self;
+    
+    self.attachmentsView.onSpaceBar = self.attachmentsView.onDoubleClick = ^{ // Funky
+        [self onPreviewAttachment:nil];
+    };
+    
+    // Summary Table
+    
+    self.tableViewSummary.dataSource = self;
+    self.tableViewSummary.delegate = self;
 }
 
 - (void)disableFeaturesForLiteVersion {
@@ -115,16 +144,7 @@
 }
 
 -(void)updateDocumentUrl {
-    [self bindStatusPane];
-    
     [self bindDetailsPane];
-}
-
-- (NSString * _Nonnull)bindStatusPane {
-    return self.labelLeftStatus.stringValue = self.model.fileUrl ?
-        //[[[NSFileManager defaultManager] componentsToDisplayForPath:self.model.fileUrl.path] componentsJoinedByString:@"/"]:
-    self.model.fileUrl.path :
-    @"[Not Saved]";
 }
 
 - (BOOL)biometricOpenIsAvailableForSafe {
@@ -164,21 +184,13 @@
     NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
     NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
     col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
-    //self.outlineView.headerView = nil;
+
     [self.outlineView reloadData];
     
     [self bindDetailsPane];
     
-    [self bindStatusPane];
-    
     if(!self.model.masterPasswordIsSet) {
-        [self promptForMasterPassword:YES completion:^(BOOL okCancel) {
-//            if(!okCancel) {
-//                // User cancelled out of master password. We should terminate the creation of this new document
-//
-//                NSLog(@"How?");
-//            }
-        }]; // New document - Require Master Password Set
+        [self promptForMasterPassword:YES completion:nil]; // New document - Require Master Password Set
     }
 }
 
@@ -196,6 +208,11 @@
     }
 }
 
+- (void)refreshAttachments:(Node *)it {
+    self.attachments = [it.fields.attachments copy];
+    [self.attachmentsView reloadData];
+}
+
 - (void)bindDetailsPane {
     Node* it = [self getCurrentSelectedItem];
     
@@ -203,13 +220,17 @@
     
     if(!it) {        
         [self.tabViewRightPane selectTabViewItemAtIndex:2];
-        [self updateSafeSummaryFields];
+        [self.tableViewSummary reloadData];
     }
     else if (it.isGroup) {
         [self.tabViewRightPane selectTabViewItemAtIndex:1];
+        self.imageViewGroupDetails.image = [self getIconForNode:it large:YES];
         self.textFieldSummaryTitle.stringValue = it.title;
     }
     else {
+        self.emailRow.hidden = self.model.format != kPasswordSafe;
+        self.attachmentsRow.hidden = self.model.format == kPasswordSafe;
+        
         self.textFieldTitle.stringValue = it.title;
         self.textFieldPw.stringValue = it.fields.password;
         self.textFieldUrl.stringValue = it.fields.url;
@@ -224,6 +245,10 @@
         else {
             [self concealDetails];
         }
+        
+        // Attachments
+        
+        [self refreshAttachments:it];
         
         self.showPassword = Settings.sharedInstance.alwaysShowPassword;
         [self showOrHidePassword];
@@ -245,6 +270,220 @@
 - (void)concealDetails {
     [self.tabViewRightPane selectTabViewItemAtIndex:3];
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Collection View - Attachments
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return self.attachments.count;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
+    AttachmentItem *item = [self.attachmentsView makeItemWithIdentifier:@"AttachmentItem" forIndexPath:indexPath];
+ 
+    NodeFileAttachment* attachment = self.attachments[indexPath.item];
+    DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
+
+    item.textField.stringValue = attachment.filename;
+    item.imageView.image = kDefaultAttachmentIcon;
+    item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.data.length countStyle:NSByteCountFormatterCountStyleFile];
+    
+    if(self.attachmentsIconCache == nil) {
+        self.attachmentsIconCache = [NSMutableDictionary dictionary];
+        [self buildAttachmentsIconCache];
+    }
+    
+    NSImage* cachedIcon = self.attachmentsIconCache[@(attachment.index)];
+    if(cachedIcon) {
+        item.imageView.image = cachedIcon;
+    }
+    else {
+        NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename];
+        
+        if(img.size.width != 32 || img.size.height != 32) {
+            img = scaleImage(img, CGSizeMake(32, 32));
+        }
+        
+        item.imageView.image = img;
+    }
+    
+    return item;
+}
+
+- (void)buildAttachmentsIconCache {
+    NSArray *workingCopy = [self.model.attachments copy];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        for (int i=0;i<workingCopy.count;i++) {
+            DatabaseAttachment* dbAttachment = workingCopy[i];
+            
+            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.data];
+            if(img) {
+                img = scaleImage(img, CGSizeMake(32, 32));
+                [self.attachmentsIconCache setObject:img forKey:@(i)];
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.attachmentsView reloadData];
+        });
+    });
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView {
+    return 1;
+}
+
+- (IBAction)onPreviewAttachment:(id)sender {
+    NSUInteger index = [self.attachmentsView.selectionIndexes firstIndex];
+    if(index == NSNotFound) {
+        return;
+    }
+    
+    [QLPreviewPanel.sharedPreviewPanel makeKeyAndOrderFront:self];
+}
+
+- (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
+    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
+    if(idx == NSNotFound) {
+        return 0;
+    }
+    
+    return 1;
+}
+
+- (id<QLPreviewItem>)previewPanel:(QLPreviewPanel *)panel previewItemAtIndex:(NSInteger)index {
+    if(index != 0) {
+        return nil;
+    }
+    
+    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
+    if(idx == NSNotFound) {
+        return nil;
+    }
+    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    
+    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
+        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
+        return nil;
+    }
+    
+    DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
+    
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
+    [dbAttachment.data writeToFile:f atomically:YES];
+    NSURL* url = [NSURL fileURLWithPath:f];
+    
+    return url;
+}
+
+- (BOOL)acceptsPreviewPanelControl:(QLPreviewPanel *)panel {
+    return YES;
+}
+
+- (void)beginPreviewPanelControl:(QLPreviewPanel *)panel {
+    panel.dataSource = self;
+    panel.delegate = self;
+}
+
+- (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
+    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+    for (NSString *file in tmpDirectory) {
+        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
+        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+    }
+}
+
+- (IBAction)onSaveAttachment:(id)sender {
+    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
+    if(idx == NSNotFound) {
+        return;
+    }
+    
+    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    
+    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
+        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
+        return;
+    }
+    
+    // Save As Dialog...
+    
+    NSSavePanel * savePanel = [NSSavePanel savePanel];
+    savePanel.nameFieldStringValue = nodeAttachment.filename;
+    
+    [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
+            [dbAttachment.data writeToFile:savePanel.URL.path atomically:YES];
+            [savePanel orderOut:self];
+        }
+    }];
+}
+
+- (IBAction)onRemoveAttachment:(id)sender {
+    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
+    if(idx == NSNotFound) {
+        return;
+    }
+    
+    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    NSString* prompt = [NSString stringWithFormat:@"Are you sure you want to remove the attachment: %@?", nodeAttachment.filename];
+    [Alerts yesNo:prompt window:self.view.window completion:^(BOOL yesNo) {
+        if(yesNo) {
+            Node* node = [self getCurrentSelectedItem];
+            [self.model removeItemAttachment:node atIndex:idx];
+            
+            self.attachmentsIconCache = nil;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self refreshAttachments:node];
+            });
+        }
+    }];
+}
+
+- (IBAction)onAddAttachment:(id)sender {
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            NSLog(@"Add: %@", openPanel.URL);
+
+            Node* node = [self getCurrentSelectedItem];
+            
+            NSError* error;
+            NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
+            
+            if(!data) {
+                NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
+                return;
+            }
+            
+            NSString* filename = openPanel.URL.lastPathComponent;
+            
+            [self.model addItemAttachment:node attachment:[[UiAttachment alloc] initWithFilename:filename data:data]];
+            
+            self.attachmentsIconCache = nil;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self refreshAttachments:node];
+            });
+        }
+    }];
+}
+
+// FUTURE: Drag and Drop attachments to/from
+
+//- (NSDragOperation)collectionView:(NSCollectionView *)collectionView validateDrop:(id<NSDraggingInfo>)draggingInfo proposedIndex:(NSInteger *)proposedDropIndex dropOperation:(NSCollectionViewDropOperation *)proposedDropOperation {
+//
+//}
+//
+//- (BOOL)collectionView:(NSCollectionView *)collectionView acceptDrop:(id<NSDraggingInfo>)draggingInfo index:(NSInteger)index dropOperation:(NSCollectionViewDropOperation)dropOperation {
+//
+//}
+//
+//- (BOOL)collectionView:(NSCollectionView *)collectionView writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths toPasteboard:(NSPasteboard *)pasteboard {
+//
+//}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
@@ -372,7 +611,7 @@
         Node *it = (Node*)item;
         
         cell.textField.stringValue = it.title;
-        cell.imageView.objectValue = it.isGroup ? self.smallYellowFolderImage : self.smallLockImage;
+        cell.imageView.objectValue = [self getIconForNode:it large:NO];
         
         return cell;
     }
@@ -385,6 +624,41 @@
         
         return cell;
     }
+}
+
+- (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
+    NSImage* ret;
+    
+    if(self.model.format == kPasswordSafe) {
+        if(!large) {
+            ret = vm.isGroup ? kSmallYellowFolderImage : kSmallLockImage;
+        }
+        else {
+            ret = vm.isGroup ? kFolderImage : kSmallLockImage;
+        }
+    }
+    else {
+        ret = vm.isGroup ? kKeePassIconSet[48] : kKeePassIconSet[0];
+    }
+    
+    // KeePass Specials
+    
+    if(vm.customIconUuid) {
+        NSData* data = self.model.customIcons[vm.customIconUuid];
+        
+        if(data) {
+            NSImage* img = [[NSImage alloc] initWithData:data]; // FUTURE: Cache
+            if(img) {
+                NSImage *resized = scaleImage(img, CGSizeMake(48, 48)); // FUTURE: Scale up if large? THis is only used on details pane
+                return resized;
+            }
+        }
+    }
+    else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < kKeePassIconSet.count) {
+        ret = kKeePassIconSet[vm.iconId.intValue];
+    }
+    
+    return ret;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
@@ -614,8 +888,8 @@
     
     if( self.searchField.stringValue.length > 0) {
         col.hidden = NO;
-        self.buttonCreateGroup.enabled = NO;
-        self.buttonCreateRecord.enabled = NO;
+        //self.buttonCreateGroup.enabled = NO;
+        //self.buttonCreateRecord.enabled = NO;
         [self.outlineView expandItem:nil expandChildren:YES];
 
         for(int i=0;i < [self.outlineView numberOfRows];i++) {
@@ -631,9 +905,9 @@
     }
     else {
         col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
-        self.buttonCreateGroup.enabled = YES;
-        self.buttonCreateRecord.enabled = YES;
-        [self.outlineView collapseItem:nil collapseChildren:YES];
+        //self.buttonCreateGroup.enabled = YES;
+        //self.buttonCreateRecord.enabled = YES;
+        //[self.outlineView collapseItem:nil collapseChildren:YES];
     }
     
     [self bindDetailsPane];
@@ -657,8 +931,7 @@
     }
     
     if(self.showPassword) {
-        
-        self.textFieldPw.enabled = YES;
+        //self.textFieldPw.enabled = YES;
         self.textFieldPw.stringValue = item.fields.password;
         
         if (@available(macOS 10.13, *)) {
@@ -667,16 +940,11 @@
         } else {
             self.textFieldPw.textColor = [NSColor controlTextColor];
         }
-        
-        //self.buttonShowHidePassword.title = @"Hide Password (⌘P)";
-        self.buttonGeneratePassword.hidden = NO;
     }
     else {
-        self.textFieldPw.enabled = NO;
+        //self.textFieldPw.enabled = NO;
         self.textFieldPw.stringValue = @"***********************";
         self.textFieldPw.textColor = [NSColor disabledControlTextColor];
-        self.buttonGeneratePassword.hidden = YES;
-        //self.buttonShowHidePassword.title = @"Show Password (⌘P)";
     }
 }
 
@@ -996,7 +1264,7 @@ NSString* trimField(NSTextField* textField) {
     Node *newItem = [self.model addNewRecord:parent];
     
     if(!newItem) {
-        // TODO: Error Message? KeePass1 - Try add record to root group
+        [Alerts info:@"You cannot create a new record here. It must be within an existing folder." window:self.view.window];
         return;
     }
     
@@ -1022,6 +1290,8 @@ NSString* trimField(NSTextField* textField) {
     Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
 
     Node *newItem = [self.model addNewGroup:parent];
+    
+    self.searchField.stringValue = @""; // Clear any ongoing search...
     
     [self.outlineView reloadData];
     
@@ -1088,7 +1358,7 @@ NSString* trimField(NSTextField* textField) {
 - (IBAction)onCopyDiagnosticDump:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     
-    NSString *dump = [self.model getDiagnosticDumpString];
+    NSString *dump = [self.model description];
     
     [[NSPasteboard generalPasteboard] setString:dump forType:NSStringPboardType];
 }
@@ -1104,13 +1374,16 @@ NSString* trimField(NSTextField* textField) {
     }
     else if(theAction == @selector(onCreateGroup:) ||
             theAction == @selector(onCreateRecord:)) {
-        return self.model && !self.model.locked && self.searchField.stringValue.length == 0;
+        return self.model && !self.model.locked;
     }
     else if (theAction == @selector(onChangeMasterPassword:) ||
              theAction == @selector(onCopyAsCsv:) ||
              theAction == @selector(onCopyDiagnosticDump:) ||
              theAction == @selector(onImportFromCsvFile:) ||
              theAction == @selector(onLock:)) {
+        return self.model && !self.model.locked;
+    }
+    else if (theAction == @selector(onShowSafeSummary:)) {
         return self.model && !self.model.locked;
     }
     else if (theAction == @selector(onFind:)) {
@@ -1143,6 +1416,15 @@ NSString* trimField(NSTextField* textField) {
         SafeMetaData* metaData = [self getSafeMetaData];
         return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
     }
+    else if (theAction == @selector(onPreviewAttachment:)) {
+        return [self.attachmentsView.selectionIndexes count] != 0;
+    }
+    else if (theAction == @selector(onSaveAttachment:)) {
+        return [self.attachmentsView.selectionIndexes count] != 0;
+    }
+    else if (theAction == @selector(onRemoveAttachment:)) {
+        return [self.attachmentsView.selectionIndexes count] != 0;
+    }
     
     return YES;
 }
@@ -1159,29 +1441,12 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onGenerate:(id)sender {
-    //self.showPassword = YES;
-    //[self showOrHidePassword];
+    self.showPassword = YES;
+    [self showOrHidePassword];
 
     self.textFieldPw.stringValue = [self.model generatePassword];
     
     [self onDetailFieldChange:self.textFieldPw];
-}
-
-- (void)updateSafeSummaryFields {
-    self.textFieldSafeSummaryPath.stringValue = self.model.fileUrl ? self.model.fileUrl.path : @"<Not Saved>";
-    self.testFieldSafeSummaryUniqueUsernames.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.usernameSet.count];
-    self.textFieldSafeSummaryUniquePasswords.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.passwordSet.count];
-    self.textFieldSafeSummaryMostPopularUsername.stringValue = self.model.mostPopularUsername ? self.model.mostPopularUsername : @"<None>";
-    self.textFieldSafeSummaryRecords.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.numberOfRecords];
-    self.textFieldSafeSummaryGroups.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.numberOfGroups];
-    
-    // TODO: KeePass and Password Safe Ordered KVP UI Dictionary Metadat
-//    self.textFieldSafeSummaryKeyStretchIterations.stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.keyStretchIterations];
-//    self.textFieldSafeSummaryVersion.stringValue = self.model.version ? self.model.version : @"<Unknown>";
-//    self.textFieldSafeSummaryLastUpdateUser.stringValue = self.model.lastUpdateUser ? self.model.lastUpdateUser : @"<Unknown>";
-//    self.textFieldSafeSummaryLastUpdateHost.stringValue = self.model.lastUpdateHost ? self.model.lastUpdateHost : @"<Unknown>";
-//    self.textFieldSafeSummaryLastUpdateApp.stringValue = self.model.lastUpdateApp ? self.model.lastUpdateApp : @"<Unknown>";
-//    self.textFieldSafeSummaryLastUpdateTime.stringValue = [self formatDate:self.model.lastUpdateTime];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -1302,5 +1567,122 @@ static NSComparator finderStringComparator = ^(id obj1, id obj2)
 {
     return [Utils finderStringCompare:obj1 string2:obj2];
 };
+
+static NSArray<NSImage*>* getKeePassIconSet() {
+    NSArray<NSString*>* names = @[@"C00_Password",
+                                  @"C01_Package_Network",
+                                  @"C02_MessageBox_Warning",
+                                  @"C03_Server",
+                                  @"C04_Klipper",
+                                  @"C05_Edu_Languages",
+                                  @"C06_KCMDF",
+                                  @"C07_Kate",
+                                  @"C08_Socket",
+                                  @"C09_Identity",
+                                  @"C10_Kontact",
+                                  @"C11_Camera",
+                                  @"C12_IRKickFlash",
+                                  @"C13_KGPG_Key3",
+                                  @"C14_Laptop_Power",
+                                  @"C15_Scanner",
+                                  @"C16_Mozilla_Firebird",
+                                  @"C17_CDROM_Unmount",
+                                  @"C18_Display",
+                                  @"C19_Mail_Generic",
+                                  @"C20_Misc",
+                                  @"C21_KOrganizer",
+                                  @"C22_ASCII",
+                                  @"C23_Icons",
+                                  @"C24_Connect_Established",
+                                  @"C25_Folder_Mail",
+                                  @"C26_FileSave",
+                                  @"C27_NFS_Unmount",
+                                  @"C28_Message",
+                                  @"C29_KGPG_Term",
+                                  @"C30_Konsole",
+                                  @"C31_FilePrint",
+                                  @"C32_FSView",
+                                  @"C33_Run",
+                                  @"C34_Configure",
+                                  @"C35_KRFB",
+                                  @"C36_Ark",
+                                  @"C37_KPercentage",
+                                  @"C38_Samba_Unmount",
+                                  @"C39_History",
+                                  @"C40_Mail_Find",
+                                  @"C41_VectorGfx",
+                                  @"C42_KCMMemory",
+                                  @"C43_Trashcan_Full",
+                                  @"C44_KNotes",
+                                  @"C45_Cancel",
+                                  @"C46_Help",
+                                  @"C47_KPackage",
+                                  @"C48_Folder",
+                                  @"C49_Folder_Blue_Open",
+                                  @"C50_Folder_Tar",
+                                  @"C51_Decrypted",
+                                  @"C52_Encrypted",
+                                  @"C53_Apply",
+                                  @"C54_Signature",
+                                  @"C55_Thumbnail",
+                                  @"C56_KAddressBook",
+                                  @"C57_View_Text",
+                                  @"C58_KGPG",
+                                  @"C59_Package_Development",
+                                  @"C60_KFM_Home",
+                                  @"C61_Services",
+                                  @"C62_Tux",
+                                  @"C63_Feather",
+                                  @"C64_Apple",
+                                  @"C65_W",
+                                  @"C66_Money",
+                                  @"C67_Certificate",
+                                  @"C68_Smartphone"];
+    
+    return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return [NSImage imageNamed:obj];
+    }];
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
+
+    return dictionary.count;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
+
+    BasicOrderedDictionary *dict = getSummaryDictionary(self.model);
+    
+    
+    NSString *key = dict.allKeys[row];
+    NSString *value = [dict objectForKey:key];
+    
+    cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
+    
+    return cell;
+}
+
+static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
+    BasicOrderedDictionary *ret = [[BasicOrderedDictionary alloc] init];
+    
+    for (NSString* key in [model.metadata kvpForUi].allKeys) {
+        NSString *value = [[model.metadata kvpForUi] objectForKey:key];
+        [ret addKey:key andValue:value];
+    }
+    
+    [ret addKey:@"Unique Usernames" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.usernameSet.count]];
+    [ret addKey:@"Unique Passwords" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.passwordSet.count]];
+    [ret addKey:@"Most Popular Username" andValue:model.mostPopularUsername ? model.mostPopularUsername : @"<None>"];
+    [ret addKey:@"Number of Entries" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfRecords]];
+    [ret addKey:@"Number of Folders" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfGroups]];
+    
+    return ret;
+}
+
+- (IBAction)onShowSafeSummary:(id)sender {
+    [self.outlineView deselectAll:nil]; // Funky side effect, no selection -> show safe summary
+}
 
 @end

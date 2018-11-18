@@ -32,7 +32,8 @@
             continue;
         }
         
-        Kdb1Database *db = [[Kdb1Database alloc] initExistingWithDataAndPassword:blob password:password error:&error];
+        id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
+        StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
         
         XCTAssertNotNil(db);
         
@@ -48,7 +49,8 @@
     NSError* error;
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-1"];
     
-    Kdb1Database *db = [[Kdb1Database alloc] initExistingWithDataAndPassword:blob password:password error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
     
     XCTAssertNotNil(db);
     
@@ -62,7 +64,8 @@
     NSError* error;
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-twofish"];
     
-    Kdb1Database *db = [[Kdb1Database alloc] initExistingWithDataAndPassword:blob password:password error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
     
     XCTAssertNotNil(db);
     
@@ -76,16 +79,17 @@
     NSError* error;
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-1"];
     
-    Kdb1Database *db = [[Kdb1Database alloc] initExistingWithDataAndPassword:blob password:password error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
+    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
     
     XCTAssertNotNil(db);
     
     NSLog(@"BEFORE: %@", db);
     
     //db.masterPassword = @"ladder";
-    NSData* rec = [db getAsData:&error];
+    NSData* rec = [adaptor save:db error:&error];
 
-    Kdb1Database *b = [[Kdb1Database alloc] initExistingWithDataAndPassword:rec password:db.masterPassword error:&error];
+    StrongboxDatabase *b = [adaptor open:rec password:db.masterPassword error:&error];
     NSLog(@"AFTER: %@", b);
     
     XCTAssertNotNil(b);

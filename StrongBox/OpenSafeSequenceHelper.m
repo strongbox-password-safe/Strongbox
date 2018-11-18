@@ -100,7 +100,9 @@ askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
 - (void)onTouchIdDone:(UIViewController*)viewController
     openAutoFillCache:(BOOL)openAutoFillCache
               success:(BOOL)success
-                error:(NSError *)error safe:(SafeMetaData *)safe completion:(void (^)(Model* model))completion {
+                error:(NSError *)error
+                 safe:(SafeMetaData *)safe
+           completion:(void (^)(Model* model))completion {
     if (success) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self openSafe:viewController
@@ -172,7 +174,6 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
         completion:(void (^)(Model* model))completion {
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
     
-    // Are we offline for cloud based providers?
     if(openAutoFillCache) {
         [[LocalDeviceStorageProvider sharedInstance] readAutoFillCache:safe
                                                         viewController:viewController
@@ -188,65 +189,17 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
                                     error:error
                                 cacheMode:YES
                      askAboutTouchIdEnrol:NO
-                               completion:completion]; // RO!
+                               completion:completion];
              }
          }];
     }
-    else if (provider.cloudBased &&
-        !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
-        OfflineDetector.sharedInstance.isOffline &&
-        safe.offlineCacheEnabled &&
-        safe.offlineCacheAvailable) {
-        NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
+    else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, safe)) {
+        NSString * modDateStr = getLastCachedDate(safe);
+        NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
         
-        if(modDate == nil) {
-            [Alerts info:viewController
-                   title:@"No Internet Connectivity"
-                 message:@"It looks like you are offline, and no offline cache is available. Please try when back online."];
-            safe.offlineCacheAvailable = NO;
-            [SafesList.sharedInstance update:safe];
-            
-            completion(nil);
-            return;
-        }
-        
-        NSDateFormatter *df = [[NSDateFormatter alloc] init];
-        df.timeStyle = NSDateFormatterShortStyle;
-        df.dateStyle = NSDateFormatterShortStyle;
-        df.doesRelativeDateFormatting = YES;
-        df.locale = NSLocale.currentLocale;
-        
-        NSString *modDateStr = [df stringFromDate:modDate];
-        
-        NSString *message = [NSString stringWithFormat:@"It looks like you are offline. Would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", modDateStr];
-        
-        [Alerts yesNo:viewController
-                title:@"No Internet Connectivity"
-              message:message
-               action:^(BOOL response) {
-                   if (response) {
-                       [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:safe
-                                                                           viewController:viewController
-                                                                               completion:^(NSData *data, NSError *error)
-                        {
-                            if(data != nil) {
-                                [self onProviderReadDone:provider
-                                           isTouchIdOpen:isTouchIdOpen
-                                          viewController:viewController
-                                                    safe:safe
-                                          masterPassword:masterPassword
-                                                    data:data
-                                                   error:error
-                                               cacheMode:YES
-                                    askAboutTouchIdEnrol:NO
-                                              completion:completion]; // RO!
-                            }
-                        }];
-                   }
-                   else {
-                       completion(nil);
-                   }
-               }];
+        [self openWithOfflineCacheFile:viewController safe:safe
+                         isTouchIdOpen:isTouchIdOpen masterPassword:masterPassword
+                               message:message completion:completion];
     }
     else {
         [provider read:safe
@@ -267,7 +220,21 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     }
 }
 
-- (void)onProviderReadDone:(id)provider
+BOOL providerCanFallbackToOfflineCache(id<SafeStorageProvider> provider, SafeMetaData* safe) {
+    BOOL basic = provider && provider.cloudBased &&
+        !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
+        safe.offlineCacheEnabled && safe.offlineCacheAvailable;
+    
+    if(basic) {
+        NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
+    
+        return modDate != nil;
+    }
+    
+    return NO;
+}
+
+- (void)onProviderReadDone:(id<SafeStorageProvider>)provider
              isTouchIdOpen:(BOOL)isTouchIdOpen
             viewController:(UIViewController*)viewController
                       safe:(SafeMetaData *)safe
@@ -279,9 +246,18 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     dispatch_async(dispatch_get_main_queue(), ^{
         if (error != nil || data == nil) {
             NSLog(@"Error: %@", error);
-            [Alerts error:viewController title:@"There was a problem opening the password safe file." error:error completion:^{
-                completion(nil);
-            }];
+            if(providerCanFallbackToOfflineCache(provider, safe)) {
+                NSString * modDateStr = getLastCachedDate(safe);
+                NSString* message = [NSString stringWithFormat:@"There was a problem reading the safe on %@. would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+                
+                [self openWithOfflineCacheFile:viewController safe:safe isTouchIdOpen:isTouchIdOpen
+                                masterPassword:masterPassword message:message completion:completion];
+            }
+            else {
+                [Alerts error:viewController title:@"There was a problem opening the safe." error:error completion:^{
+                    completion(nil);
+                }];
+            }
         }
         else {
             [self openSafeWithData:data
@@ -446,6 +422,55 @@ askAboutTouchIdEnrol:(BOOL)askAboutTouchIdEnrol
     }
     
     completion(viewModel);
+}
+
+static NSString *getLastCachedDate(SafeMetaData *safe) {
+    NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
+
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = NSDateFormatterShortStyle;
+    df.dateStyle = NSDateFormatterShortStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+    
+    NSString *modDateStr = [df stringFromDate:modDate];
+    return modDateStr;
+}
+
+- (void)openWithOfflineCacheFile:(UIViewController*)viewController
+                            safe:(SafeMetaData *)safe
+                   isTouchIdOpen:(BOOL)isTouchIdOpen
+                  masterPassword:(NSString *)masterPassword
+                         message:(NSString *)message
+                      completion:(void (^)(Model* model))completion {
+    [Alerts yesNo:viewController
+            title:@"Use Offline Cache?"
+          message:message
+           action:^(BOOL response) {
+               if (response) {
+                   [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:safe
+                                                                       viewController:viewController
+                                                                           completion:^(NSData *data, NSError *error)
+                    {
+                        if(data != nil) {
+                            [self onProviderReadDone:nil
+                                       isTouchIdOpen:isTouchIdOpen
+                                      viewController:viewController
+                                                safe:safe
+                                      masterPassword:masterPassword
+                                                data:data
+                                               error:error
+                                           cacheMode:YES
+                                askAboutTouchIdEnrol:NO
+                                          completion:completion];
+                        }
+                    }];
+               }
+               else {
+                   completion(nil);
+               }
+           }];
+
 }
 
 @end

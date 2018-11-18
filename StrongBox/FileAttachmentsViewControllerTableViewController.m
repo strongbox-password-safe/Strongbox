@@ -16,8 +16,7 @@
 @interface FileAttachmentsViewControllerTableViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIDocumentPickerDelegate>
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAdd;
 
-@property NSMutableArray<NodeFileAttachment*> *workingNodeAttachments;
-@property NSMutableArray<DatabaseAttachment*> *workingDatabaseAttachments;
+@property NSMutableArray<UiAttachment*> *workingAttachments;
 @property BOOL dirty;
 
 @end
@@ -34,8 +33,7 @@
     
     self.tableView.rowHeight = 55.0f;
     
-    self.workingNodeAttachments = self.nodeAttachments ? [self.nodeAttachments mutableCopy] : [NSMutableArray array];
-    self.workingDatabaseAttachments = self.databaseAttachments ? [self.databaseAttachments mutableCopy] : [NSMutableArray array];
+    self.workingAttachments = self.attachments ? [self.attachments mutableCopy] : [NSMutableArray array];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -48,7 +46,7 @@
 
 - (void)refresh {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.buttonAdd.enabled = self.format != kKeePass1 || self.workingNodeAttachments.count == 0;
+        self.buttonAdd.enabled = self.format != kKeePass1 || self.workingAttachments.count == 0;
         [self.tableView reloadData];
     });
 }
@@ -57,9 +55,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
     
     if(self.onDoneWithChanges && self.dirty) {
-        self.nodeAttachments = self.workingNodeAttachments;
-        self.databaseAttachments = self.workingDatabaseAttachments;
-        
+        self.attachments = self.workingAttachments;
         self.onDoneWithChanges();
     }
 }
@@ -108,8 +104,8 @@
 - (void)removeAttachment:(NSIndexPath*)indexPath {
     [Alerts yesNo:self title:@"Are you sure?" message:@"Are you sure you want to remove this attachment?" action:^(BOOL response) {
         if(response) {
-            NodeFileAttachment* attachment = [self.workingNodeAttachments objectAtIndex:indexPath.row];
-            [self.workingNodeAttachments removeObject:attachment];
+            UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
+            [self.workingAttachments removeObject:attachment];
             
             self.dirty = YES;
             [self refresh];
@@ -118,7 +114,7 @@
 }
 
 - (void)renameAttachment:(NSIndexPath*)indexPath {
-    NodeFileAttachment* attachment = [self.workingNodeAttachments objectAtIndex:indexPath.row];
+    UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
 
     Alerts *x = [[Alerts alloc] initWithTitle:@"Filename" message:@"Enter a filename for this item"];
     
@@ -279,17 +275,9 @@
 }
 
 - (void)addAttachment:(NSString*)filename data:(NSData*)data {
-    DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] init];
-    dbAttachment.data = data;
-    dbAttachment.compressed = YES;
-    dbAttachment.protectedInMemory = YES;
+    UiAttachment* attachment = [[UiAttachment alloc] initWithFilename:filename data:data];
     
-    NodeFileAttachment* nodeAttachment = [[NodeFileAttachment alloc] init];
-    nodeAttachment.filename = filename;
-    nodeAttachment.index = (uint32_t)self.workingDatabaseAttachments.count;
-    
-    [self.workingDatabaseAttachments addObject:dbAttachment];
-    [self.workingNodeAttachments addObject:nodeAttachment];
+    [self.workingAttachments addObject:attachment];
     
     self.dirty = YES;
     
@@ -306,21 +294,14 @@
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
-    return self.workingNodeAttachments.count;
+    return self.workingAttachments.count;
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    NodeFileAttachment* nodeAttachment = [self.workingNodeAttachments objectAtIndex:index];
-
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.workingDatabaseAttachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return nil;
-    }
+    UiAttachment* attachment = [self.workingAttachments objectAtIndex:index];
     
-    DatabaseAttachment* dbAttachment = [self.workingDatabaseAttachments objectAtIndex:nodeAttachment.index];
-
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
-    [dbAttachment.data writeToFile:f atomically:YES];
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:attachment.filename];
+    [attachment.data writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];
    
     return url;
@@ -329,39 +310,31 @@
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.workingNodeAttachments.count;
+    return self.workingAttachments.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FileAttachmentReuseIdentifier" forIndexPath:indexPath];
     
-    NodeFileAttachment* nodeAttachment = [self.workingNodeAttachments objectAtIndex:indexPath.row];
+    UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
     
-    cell.textLabel.text = nodeAttachment.filename;
+    cell.textLabel.text = attachment.filename;
+    cell.detailTextLabel.text = fileSizeString(attachment.data.length);
     
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.workingDatabaseAttachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        cell.detailTextLabel.text = @"Attachment out of bounds. ERROR.";
+    UIImage* img = [UIImage imageWithData:attachment.data];
+    if(img) {
+        @autoreleasepool { // Prevent App Extension Crash
+            UIGraphicsBeginImageContextWithOptions(cell.imageView.bounds.size, NO, 0.0);
+            
+            CGRect imageRect = cell.imageView.bounds;
+            [img drawInRect:imageRect];
+            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+            
+            UIGraphicsEndImageContext();
+        }
     }
     else {
-        DatabaseAttachment* dbAttachment = [self.workingDatabaseAttachments objectAtIndex:nodeAttachment.index];
-        cell.detailTextLabel.text = fileSizeString(dbAttachment.data.length);
-        
-        UIImage* img = [UIImage imageWithData:dbAttachment.data];
-        if(img) {
-            @autoreleasepool { // Prevent App Extension Crash
-                UIGraphicsBeginImageContextWithOptions(cell.imageView.bounds.size, NO, 0.0);
-                
-                CGRect imageRect = cell.imageView.bounds;
-                [img drawInRect:imageRect];
-                cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-                
-                UIGraphicsEndImageContext();
-            }
-        }
-        else {
-            cell.imageView.image = [UIImage imageNamed:@"page_white_text-48x48"];
-        }
+        cell.imageView.image = [UIImage imageNamed:@"page_white_text-48x48"];
     }
     
     return cell;

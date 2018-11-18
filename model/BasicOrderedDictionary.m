@@ -44,6 +44,10 @@
     return [self.kvps objectForKey:key];
 }
 
+-(NSUInteger)count {
+    return [self.kvps count];
+}
+
 - (NSString *)description {
     return [_kvps description];
 }

@@ -8,20 +8,37 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ViewModel.h"
+#import "CustomPasswordTextField.h"
+#import "AttachmentCollectionView.h"
+#import <QuickLook/QuickLook.h>
+#import <Quartz/Quartz.h>
 
-@interface ViewController : NSViewController<NSOutlineViewDelegate, NSOutlineViewDataSource, NSTextViewDelegate, NSComboBoxDataSource>
+@interface ViewController : NSViewController<   NSOutlineViewDelegate,
+                                                NSOutlineViewDataSource,
+                                                NSTextViewDelegate,
+                                                NSComboBoxDataSource,
+                                                NSTableViewDataSource,
+                                                NSTableViewDelegate,
+                                                NSCollectionViewDataSource,
+                                                NSCollectionViewDelegate,
+                                                QLPreviewPanelDataSource,
+                                                QLPreviewPanelDelegate>
 
 @property (strong, nonatomic) ViewModel* model;
 -(void)updateDocumentUrl;
+@property (weak) IBOutlet NSImageView *imageViewGroupDetails;
 
 // App wide fields
+@property (weak) IBOutlet NSTableView *tableViewSummary;
 
+@property (weak) IBOutlet AttachmentCollectionView *attachmentsView;
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSTabView *tabViewLockUnlock;
 @property (weak) IBOutlet NSTabView *tabViewRightPane;
-@property (weak) IBOutlet NSTextField *labelLeftStatus;
 @property (weak) IBOutlet NSButton *buttonCreateGroup;
 @property (weak) IBOutlet NSButton *buttonCreateRecord;
+@property (weak) IBOutlet NSView *emailRow;
+@property (weak) IBOutlet NSView *attachmentsRow;
 
 // Locked Fields
 
@@ -39,7 +56,7 @@
 @property (weak) IBOutlet NSTextField *textFieldTitle;
 @property (weak) IBOutlet NSTextField *textFieldUrl;
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
-@property (weak) IBOutlet NSTextField *textFieldPw;
+@property (weak) IBOutlet CustomPasswordTextField *textFieldPw;
 @property (weak) IBOutlet NSComboBox *comboboxUsername;
 @property (weak) IBOutlet NSComboBox *comboBoxEmail;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
@@ -50,21 +67,6 @@
 - (IBAction)onConcealDetails:(id)sender;
 - (IBAction)onEnterMasterPassword:(id)sender;
 @property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
-
-// Safe Summary Fields
-
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryPath;
-@property (weak) IBOutlet NSTextField *testFieldSafeSummaryUniqueUsernames;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryUniquePasswords;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryMostPopularUsername;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryRecords;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryGroups;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryKeyStretchIterations;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryVersion;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryLastUpdateUser;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryLastUpdateHost;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryLastUpdateApp;
-@property (weak) IBOutlet NSTextField *textFieldSafeSummaryLastUpdateTime;
 
 // Group View Fields
 

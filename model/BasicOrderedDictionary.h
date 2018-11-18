@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addKey:(KeyType)key andValue:(ValueType)value;
 - (NSArray<KeyType>*) allKeys;
 - (nullable ValueType)objectForKey:(KeyType)key;
+- (NSUInteger)count;
 
 @end
 

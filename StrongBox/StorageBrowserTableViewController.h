@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "SafeStorageProvider.h"
-#import "AbstractPasswordDatabase.h"
+#import "AbstractDatabaseFormatAdaptor.h"
 
 @interface StorageBrowserTableViewController : UITableViewController
 

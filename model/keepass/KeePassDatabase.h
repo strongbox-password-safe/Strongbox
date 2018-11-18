@@ -3,30 +3,26 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "AbstractPasswordDatabase.h"
-#import <stdint.h>
+#import "AbstractDatabaseFormatAdaptor.h"
 #import "KeePassDatabaseMetadata.h"
 #import "KeePassConstants.h"
 
-@interface KeePassDatabase : NSObject<AbstractPasswordDatabase>
+NS_ASSUME_NONNULL_BEGIN
 
-+ (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
+@interface KeePassDatabase : NSObject<AbstractDatabaseFormatAdaptor>
+
++ (BOOL)isAValidSafe:(nullable NSData *)candidate;
 + (NSString *)fileExtension;
 
-- (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype _Nullable )initNewWithoutPassword;
-- (instancetype _Nullable )initNewWithPassword:(NSString *_Nullable)password;
-- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data password:(NSString *_Nonnull)password error:(NSError *_Nonnull*_Nonnull)ppError;
+- (StrongboxDatabase*)create:(nullable NSString *)password;
+- (nullable StrongboxDatabase*)open:(NSData*)data password:(NSString *)password error:(NSError **)error;
+- (nullable NSData*)save:(StrongboxDatabase*)database error:(NSError**)error;
 
-- (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
-- (NSString*_Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords;
-
-@property (nonatomic, readonly, nonnull) Node* rootGroup;
-@property (nonatomic, readonly, nonnull) KeePassDatabaseMetadata* metadata;
-@property (nonatomic, retain, nullable) NSString *masterPassword;
-@property (nonatomic, readonly, nonnull) NSMutableArray<DatabaseAttachment*>* attachments;
-@property (nonatomic, readonly, nonnull) NSMutableDictionary<NSUUID*, NSData*>* customIcons;
+@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic, readonly) NSString* fileExtension;
 
 @end
 
 #endif // ifndef _KeypassDatabase_h
+
+NS_ASSUME_NONNULL_END

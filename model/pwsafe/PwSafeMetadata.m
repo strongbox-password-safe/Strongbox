@@ -28,7 +28,7 @@
 - (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
     BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
     
-    [kvps addKey:@"Database Format" andValue:@"Password Safe"];
+    [kvps addKey:@"Database Format" andValue:@"Password Safe 3"];
     [kvps addKey:@"Password Safe File Version" andValue:self.version];
     [kvps addKey:@"Key Stretch Iterations" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)self.keyStretchIterations]];
     [kvps addKey:@"Last Update Time" andValue:[self formatDate:self.lastUpdateTime]];

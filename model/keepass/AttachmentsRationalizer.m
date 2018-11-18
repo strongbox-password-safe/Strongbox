@@ -15,24 +15,53 @@
     NSArray<Node*>* allNodesWithAttachments = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup && node.fields.attachments.count > 0;
     }];
+//
+//    int i = 0;
+//    for (DatabaseAttachment* dbA in attachments) {
+//        NSLog(@"%d => %lu", i++, (unsigned long)dbA.data.length);
+//    }
+
+    NSArray<NodeFileAttachment*> *allNodeAttachments =
+    [allNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.fields.attachments;
+    }];
+
+//    for (NodeFileAttachment* fA in allNodeAttachments) {
+//        NSLog(@"%@ - %d", fA.filename, fA.index);
+//    }
     
     // 1. Node Attachment could point to non existent db attachment = Pretty bad corruption or inconsistency somehow...
     
+    //NSLog(@"Removing Bad References...");
     removeBadReferences(attachments, allNodesWithAttachments);
     
     // 2. There could be duplicate attachment files in the database attachment list. Remove and replace any references to the single
     //    instance.
-    
-    NSArray<NodeFileAttachment*> *allNodeAttachments =
-        [allNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return obj.fields.attachments;
-        }];
-    
+
+    //NSLog(@"Removing Duplicates...");
     remapDuplicates(attachments, allNodeAttachments);
     
     // 3. Database Attachment could be unused by any node
     
-    return removeUnused(attachments, allNodeAttachments);
+    //NSLog(@"Removing Unused...");
+    NSArray* ret = removeUnused(attachments, allNodeAttachments);
+
+//
+//    i = 0;
+//    for (DatabaseAttachment* dbA in ret) {
+//        NSLog(@"%d => %lu", i++, (unsigned long)dbA.data.length);
+//    }
+//
+//    allNodeAttachments =
+//    [allNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+//        return obj.fields.attachments;
+//    }];
+//
+//    for (NodeFileAttachment* fA in allNodeAttachments) {
+//        NSLog(@"%@ - %d", fA.filename, fA.index);
+//    }
+    
+    return ret;
 }
 
 static void removeBadReferences(NSArray<DatabaseAttachment*>* attachments, NSArray<Node*>* aNodes) {
@@ -89,16 +118,21 @@ static void remapDuplicates(NSArray<DatabaseAttachment*> *attachments, NSArray<N
 static NSArray<DatabaseAttachment*>* removeUnused(NSArray<DatabaseAttachment*>* attachments, NSArray<NodeFileAttachment*> *allNodeAttachments) {
     // We need to remove that item and then shift everything referencing above that down 1
     
-    NSArray* allIndices = [allNodeAttachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
+    NSArray<NSNumber*>* allIndices = [allNodeAttachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
         return @(obj.index);
     }];
     
-    NSMutableOrderedSet *usedIndicesSet = [NSMutableOrderedSet orderedSetWithArray:allIndices];
+    NSOrderedSet *usedIndicesSet = [NSOrderedSet orderedSetWithArray:[allIndices sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2];
+    }]];
 
     NSMutableArray<DatabaseAttachment*> *usedAttachments = [NSMutableArray array];
+
+    //NSLog(@"Checking: %@", usedIndicesSet);
     
     int i=0;
     for (NSNumber* index in usedIndicesSet) {
+
         [usedAttachments addObject:attachments[index.intValue]];
         
         // Remap anything with index=index to i

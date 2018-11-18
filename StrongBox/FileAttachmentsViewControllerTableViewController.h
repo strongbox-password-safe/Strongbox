@@ -7,18 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NodeFileAttachment.h"
-#import "DatabaseAttachment.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "DatabaseModel.h"
+#import "UiAttachment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FileAttachmentsViewControllerTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property DatabaseFormat format;
-@property NSArray<NodeFileAttachment*>* nodeAttachments;
-@property NSArray<DatabaseAttachment*>* databaseAttachments;
+@property NSArray<UiAttachment*>* attachments;
 @property (nonatomic, copy) dispatch_block_t onDoneWithChanges;
 
 @end

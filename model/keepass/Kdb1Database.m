@@ -17,8 +17,6 @@ static const BOOL kLogVerbose = NO;
 
 @interface Kdb1Database ()
 
-@property NSArray<KdbEntry*>* existingMetaEntries;
-
 @end
 
 @implementation Kdb1Database
@@ -39,94 +37,90 @@ static const BOOL kLogVerbose = NO;
     return [KdbSerialization isAValidSafe:candidate];
 }
 
-- (instancetype)initNewWithoutPassword {
-    return [self initNewWithPassword:nil];
+- (void)addKeePassDefaultRootGroup:(Node*)rootGroup {
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup uuid:nil];
+    [rootGroup addChild:keePassRootGroup];
 }
 
-- (void)addKeePassDefaultRootGroup {
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:_rootGroup uuid:nil];
-    [_rootGroup addChild:keePassRootGroup];
+- (StrongboxDatabase *)create:(NSString *)password {
+    Node* rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:NO];
+    
+    [self addKeePassDefaultRootGroup:rootGroup];
+    
+    Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
+    
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password];
+    
+    return ret;
 }
 
-- (instancetype)initNewWithPassword:(NSString *)password {
-    if (self = [super init]) {
-        _rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:NO];
-        
-        [self addKeePassDefaultRootGroup];
-        
-        _attachments = [NSMutableArray array];
-        _metadata = [[Kdb1DatabaseMetadata alloc] init];
-        
-        self.existingMetaEntries = [NSArray array];
-        self.masterPassword = password;
-        
-        return self;
-    }
-    else {
+- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError**)error {
+    KdbSerializationData *serializationData = [KdbSerialization deserialize:data password:password ppError:error];
+    
+    if(serializationData == nil) {
+        NSLog(@"Error getting Decrypting KDB binary: [%@]", *error);
         return nil;
     }
-}
 
-- (instancetype _Nullable)initExistingWithDataAndPassword:(NSData * _Nonnull)data password:(NSString * _Nonnull)password error:(NSError *__autoreleasing  _Nonnull * _Nonnull)ppError {
-    if (self = [super init]) {
-        KdbSerializationData *serializationData = [KdbSerialization deserialize:data password:password ppError:ppError];
-        
-        if(serializationData == nil) {
-            NSLog(@"Error getting Decrypting KDB binary: [%@]", *ppError);
-            return nil;
-        }
-
-        if(kLogVerbose) {
-            NSLog(@"KdbSerializationData = [%@]", serializationData);
-        }
-
-        _attachments = [NSMutableArray array];
-        _rootGroup = [self buildStrongboxModel:serializationData];
-
-        if(kLogVerbose) {
-            NSLog(@"Attachments: %@", self.attachments);
-        }
-
-        // Metadata
-
-        _metadata = [[Kdb1DatabaseMetadata alloc] init];
-
-        self.metadata.version = serializationData.version;
-        self.metadata.transformRounds = serializationData.transformRounds;
-        self.metadata.flags = serializationData.flags;
-
-        self.existingMetaEntries = serializationData.metaEntries;
-        self.masterPassword = password;
+    if(kLogVerbose) {
+        NSLog(@"KdbSerializationData = [%@]", serializationData);
     }
+
+
+    NSArray<DatabaseAttachment*>* attachments;
+    Node* rootGroup = [self buildStrongboxModel:serializationData attachments:&attachments];
+
+    if(kLogVerbose) {
+        NSLog(@"Attachments: %@", attachments);
+    }
+
+    // Metadata
+
+    Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
+
+    metadata.version = serializationData.version;
+    metadata.transformRounds = serializationData.transformRounds;
+    metadata.flags = serializationData.flags;
+
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password attachments:attachments];
+    ret.adaptorTag = serializationData.metaEntries;
     
-    return self;
+    return ret;
 }
 
-- (NSData *)getAsData:(NSError **)error {
+- (NSData *)save:(StrongboxDatabase *)database error:(NSError**)error {
     KdbSerializationData *serializationData = [[KdbSerializationData alloc] init];
     
-    if(self.rootGroup.childGroups.count == 0) {
+    if(database.rootGroup.childGroups.count == 0) {
         // KDB1 Requires at least one group at the top
-        [self addKeePassDefaultRootGroup];
+        [self addKeePassDefaultRootGroup:database.rootGroup];
     }
     
     [self nodeModelToGroupsAndEntries:0
-                                group:self.rootGroup
+                                group:database.rootGroup
                     serializationData:serializationData
-                     existingGroupIds:[NSMutableSet<NSNumber*> set]];
+                     existingGroupIds:[NSMutableSet<NSNumber*> set]
+                          attachments:database.attachments];
     
-    serializationData.flags = self.metadata.flags;
-    serializationData.version = self.metadata.version;
-    serializationData.transformRounds = self.metadata.transformRounds;
-    [serializationData.metaEntries addObjectsFromArray:self.existingMetaEntries];
+    Kdb1DatabaseMetadata* metadata = (Kdb1DatabaseMetadata*)database.metadata;
     
-    return [KdbSerialization serialize:serializationData password:self.masterPassword ppError:error];
+    serializationData.flags = metadata.flags;
+    serializationData.version = metadata.version;
+    serializationData.transformRounds = metadata.transformRounds;
+    
+    NSMutableArray<KdbEntry*>* metaEntries = (NSMutableArray<KdbEntry*>*)database.adaptorTag;
+    if(metaEntries) {
+        [serializationData.metaEntries addObjectsFromArray:metaEntries];
+    }
+    
+    return [KdbSerialization serialize:serializationData password:database.masterPassword ppError:error];
 }
 
 -(void)nodeModelToGroupsAndEntries:(int)level
                              group:(Node*)group
                  serializationData:(KdbSerializationData*)serializationData
-                  existingGroupIds:(NSMutableSet<NSNumber*>*)existingGroupIds {
+                  existingGroupIds:(NSMutableSet<NSNumber*>*)existingGroupIds
+                       attachments:(NSArray<DatabaseAttachment*>*)attachments {
     NSArray<Node*>* subGroups = [group childGroups];
     
     for (Node* subGroup in subGroups) {
@@ -134,12 +128,13 @@ static const BOOL kLogVerbose = NO;
         [serializationData.groups addObject:kdbGroup];
 
         NSArray<KdbEntry*> *entries = [[subGroup childRecords] map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return [self recordToKdbEntry:obj kdbGroup:kdbGroup];
+            return [self recordToKdbEntry:obj kdbGroup:kdbGroup attachments:attachments];
         }];
         
         [serializationData.entries addObjectsFromArray:entries];
 
-        [self nodeModelToGroupsAndEntries:level + 1 group:subGroup serializationData:serializationData  existingGroupIds:existingGroupIds];
+        [self nodeModelToGroupsAndEntries:level + 1 group:subGroup serializationData:serializationData
+                         existingGroupIds:existingGroupIds attachments:attachments];
     }
 }
 
@@ -167,7 +162,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     return ret;
 }
 
-- (KdbEntry*)recordToKdbEntry:(Node*)record kdbGroup:(KdbGroup*)kdbGroup {
+- (KdbEntry*)recordToKdbEntry:(Node*)record kdbGroup:(KdbGroup*)kdbGroup attachments:(NSArray<DatabaseAttachment*>*)attachments {
     KdbEntry* ret = [[KdbEntry alloc] init];
     
     ret.uuid = record.uuid;
@@ -186,7 +181,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         NodeFileAttachment *theAttachment = record.fields.attachments[0];
         
         ret.binaryFileName = theAttachment.filename;
-        ret.binaryData = self.attachments[theAttachment.index].data;
+        ret.binaryData = attachments[theAttachment.index].data;
     }
     
     if(record.linkedData) {
@@ -226,8 +221,9 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     }
 }
 
-- (Node*)buildStrongboxModel:(KdbSerializationData *)serializationData {
+- (Node*)buildStrongboxModel:(KdbSerializationData *)serializationData attachments:(NSArray<DatabaseAttachment*>**)attachments {
     Node* ret = [[Node alloc] initAsRoot:nil childRecordsAllowed:NO];
+    NSMutableArray<DatabaseAttachment*> *mutableAttachments = [NSMutableArray array];
     
     normalizeLevels(serializationData.groups);
     
@@ -258,7 +254,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         }];
         
         NSArray<Node*> *childEntries = [entries map:^id (KdbEntry * entry, NSUInteger idx) {
-            return [self kdbEntryToRecordNode:entry parent:node];
+            return [self kdbEntryToRecordNode:entry parent:node attachments:mutableAttachments];
         }];
         
         for (Node* childEntry in childEntries) {
@@ -268,10 +264,11 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         lastNode = node;
     }
     
+    *attachments = mutableAttachments;
     return ret;
 }
 
-- (Node*)kdbEntryToRecordNode:(KdbEntry*)entry parent:(Node*)parent {
+- (Node*)kdbEntryToRecordNode:(KdbEntry*)entry parent:(Node*)parent attachments:(NSMutableArray<DatabaseAttachment*>*)attachments {
     NodeFields* fields = [[NodeFields alloc] initWithUsername:entry.username
                                                           url:entry.url
                                                      password:entry.password
@@ -287,11 +284,11 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         dbAttachment.data = entry.binaryData;
         dbAttachment.compressed = NO;
         dbAttachment.protectedInMemory = NO;
-        [self.attachments addObject:dbAttachment];
+        [attachments addObject:dbAttachment];
         
         NodeFileAttachment *attachment = [[NodeFileAttachment alloc] init];
         attachment.filename = entry.binaryFileName;
-        attachment.index = (uint32_t)self.attachments.count - 1;
+        attachment.index = (uint32_t)attachments.count - 1;
         
         [fields.attachments addObject:attachment];
     }
@@ -301,14 +298,6 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     ret.iconId = entry.imageId;
     
     return ret;
-}
-
-- (NSString * _Nonnull)getDiagnosticDumpString:(BOOL)plaintextPasswords {
-    return [self description];
-}
-
--(NSString *)description {
-    return [NSString stringWithFormat:@"masterPassword = %@, metadata=%@, rootGroup = %@", self.masterPassword, self.metadata, self.rootGroup];
 }
 
 @end

@@ -11,6 +11,8 @@
 
 @interface Node : NSObject
 
++ (instancetype)rootGroup;
+
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid;

@@ -10,57 +10,67 @@
 #import "Document.h"
 #import "Node.h"
 #import "CHCSVParser.h"
+#import "DatabaseModel.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface ViewModel : NSObject
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype _Nullable )initNewWithSampleData:(Document*_Nonnull)document;
-- (instancetype _Nullable )initWithData:(NSData*_Nonnull)data document:(Document*_Nonnull)document;
+- (instancetype _Nullable )initNewWithSampleData:(Document*)document;
+- (instancetype _Nullable )initWithData:(NSData*)data document:(Document*)document;
 
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
-- (BOOL)lock:(NSError*_Nonnull*_Nonnull)error selectedItem:(NSString*_Nullable)selectedItem;
-- (BOOL)unlock:(NSString*_Nonnull)password selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError*_Nonnull*_Nonnull)error;
-- (NSData*_Nullable)getPasswordDatabaseAsData:(NSError*_Nonnull*_Nonnull)error;
+- (BOOL)lock:(NSError**)error selectedItem:(NSString*_Nullable)selectedItem;
+- (BOOL)unlock:(NSString*)password selectedItem:(NSString*_Nullable*)selectedItem error:(NSError**)error;
+- (NSData*_Nullable)getPasswordDatabaseAsData:(NSError**)error;
 
-- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title;
-- (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username;
-- (void)setItemEmail:(Node*_Nonnull)item email:(NSString*_Nonnull)email;
-- (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url;
-- (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password;
-- (void)setItemNotes:(Node*_Nullable)item notes:(NSString*_Nonnull)notes;
+- (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
+- (void)setItemUsername:(Node*)item username:(NSString*)username;
+- (void)setItemEmail:(Node*)item email:(NSString*)email;
+- (void)setItemUrl:(Node*)item url:(NSString*)url;
+- (void)setItemPassword:(Node*)item password:(NSString*)password;
+- (void)setItemNotes:(Node*)item notes:(NSString*)notes;
 
-- (Node*_Nonnull)addNewRecord:(Node *_Nonnull)parentGroup;
-- (Node*_Nonnull)addNewGroup:(Node *_Nonnull)parentGroup;
+- (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
+- (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
 
-- (void)deleteItem:(Node *_Nonnull)child;
+- (Node*)addNewRecord:(Node *)parentGroup;
+- (Node*)addNewGroup:(Node *)parentGroup;
 
-- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node;
-- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node;
+- (void)deleteItem:(Node *)child;
 
-- (Node*_Nullable)getItemFromSerializationId:(NSString*_Nonnull)serializationId;
+- (BOOL)validateChangeParent:(Node *)parent node:(Node *)node;
+- (BOOL)changeParent:(Node *)parent node:(Node *)node;
 
-- (NSString*_Nonnull)generatePassword;
+- (Node*_Nullable)getItemFromSerializationId:(NSString*)serializationId;
 
-- (NSString*_Nonnull)getDiagnosticDumpString;
+- (NSString*)generatePassword;
 
-@property (nonatomic, readonly) Document* _Nonnull document;
+@property (nonatomic, readonly) Document*  document;
 @property (nonatomic, readonly) BOOL dirty;
 @property (nonatomic, readonly) BOOL locked;
-@property (nonatomic, readonly) NSURL* _Nonnull fileUrl;
-@property (nonatomic, readonly) Node* _Nonnull rootGroup;
+@property (nonatomic, readonly) NSURL*  fileUrl;
+@property (nonatomic, readonly) Node*  rootGroup;
 @property (nonatomic, readonly) BOOL masterPasswordIsSet;
+@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic, readonly) id<AbstractDatabaseMetadata> metadata;
+@property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
+@property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 
 @property (nonatomic) NSString* masterPassword;
 
 // Convenience / Summary
 
-@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull usernameSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull emailSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*> *_Nonnull passwordSet;
-@property (nonatomic, readonly) NSString *_Nonnull mostPopularUsername;
-@property (nonatomic, readonly) NSString *_Nonnull mostPopularPassword;
+@property (nonatomic, readonly, copy) NSSet<NSString*> * usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> * emailSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> * passwordSet;
+@property (nonatomic, readonly) NSString * mostPopularUsername;
+@property (nonatomic, readonly) NSString * mostPopularPassword;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
 @end
+
+NS_ASSUME_NONNULL_END
