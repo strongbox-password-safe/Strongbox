@@ -18,9 +18,13 @@ The official PasswordSafe github repository is here:
 
 https://github.com/pwsafe
 
-The official KeePass github repository is here:
+Kudos to Rony Shapiro, Bruce Schneier and all the Password Safe team for their amazing work and the original Password Safe format and applicaiton.
 
-https://github.com/dlech/KeePass2.x
+The official KeePass site is here:
+
+https://keepass.info/
+
+Kudos to Dominik Reichl and all the KeePass team for their incredible technical skill, for coming up with a great format, and their seminal KeePass app. 
 
 I use many different libraries in the app here are just a few:
 
