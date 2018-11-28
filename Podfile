@@ -10,7 +10,7 @@ target 'Strongbox' do'
     pod 'GZIP'
 end
 
-pre_install do |installer|
+pre_install do |instaler|
     pod_targets = installer.pod_targets.flat_map do |pod_target|
         pod_target.name == "SVProgressHUD" ? pod_target.scoped : pod_target
     end
@@ -21,7 +21,7 @@ pre_install do |installer|
     end
 end
 
-abstract_target 'common-ios' do'
+abstracttarget 'common-ios' do'
     project 'Strongbox.xcodeproj'
     platform :ios, '9.2'
     use_frameworks!
