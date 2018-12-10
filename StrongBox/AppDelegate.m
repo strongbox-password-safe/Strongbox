@@ -33,7 +33,7 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application diFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self migrateUserDefaultsToAppGroup]; // iOS Credentials Extension needs access to user settings/safes etc... migrate
     
     [self initializeDropbox];
@@ -145,7 +145,9 @@
     else {
         InitialViewController *tabController = (InitialViewController *)self.window.rootViewController;
 
-        [tabController importFromUrlOrEmailAttachment:url];
+        NSNumber* num = [options objectForKey:UIApplicationOpenURLOptionsOpenInPlaceKey];
+        
+        [tabController import:url canOpenInPlace:num ? num.boolValue : NO];
 
         return YES;
     }

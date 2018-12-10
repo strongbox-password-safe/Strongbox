@@ -15,6 +15,7 @@
 #import "Strongbox.h"
 #import "PreferencesWindowController.h"
 #import "SafesMetaDataViewer.h"
+#import "BiometricIdHelper.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -48,7 +49,9 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self removeUnwantedMenuItems];
     [self removeCopyDiagnosticDumpItem];
+    
     [self removeShowSafesMetaDataItem];
+    //BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
     
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
@@ -152,6 +155,25 @@
     if ([[edit itemAtIndex: [edit numberOfItems] - 1] isSeparatorItem]) {
         [edit removeItemAtIndex: [edit numberOfItems] - 1];
     }
+    
+    NSMenu *fileMenu = NSApp.mainMenu.itemArray[1].submenu;
+    
+    void (^removeItemWithSelector)(SEL) = ^void(SEL selector) {
+        NSInteger idx = [fileMenu indexOfItemWithTarget:nil andAction:selector];
+        if (idx != -1)
+        {
+            [fileMenu removeItemAtIndex:idx];
+        }
+    };
+
+    // FUTURE: Figure out what's wrong with these guys!!`
+    removeItemWithSelector(@selector(duplicateDocument:));
+    removeItemWithSelector(@selector(saveDocumentAs:));
+    
+    //    removeItemWithSelector(@selector(moveDocument:));
+    //    removeItemWithSelector(@selector(renameDocument:));
+
+    [self removeMenuItem:@"File" action:@"saveDocumentAs:"];
 }
 
 - (void)removeShowSafesMetaDataItem {

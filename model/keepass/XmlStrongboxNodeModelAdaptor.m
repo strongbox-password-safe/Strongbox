@@ -125,6 +125,10 @@
     // (useful for unit testing in Xml Comparison only at the moment, but I see no harm in doing this). Looks ugly though
     
     for (String* originalString in previousXmlEntry.strings) {
+        if(![entry.fields.customFields objectForKey:originalString.key.text]) {
+            continue; // This entry must have been removed... skip
+        }
+            
         String* duplicatedString = [[String alloc] initWithContext:self.xmlParsingContext];
         [duplicatedString setXmlInfo:originalString.nonCustomisedXmlTree.node.xmlElementName
                           attributes:originalString.nonCustomisedXmlTree.node.xmlAttributes
@@ -133,34 +137,44 @@
         [duplicatedString.key setXmlInfo:originalString.key.nonCustomisedXmlTree.node.xmlElementName
                               attributes:originalString.key.nonCustomisedXmlTree.node.xmlAttributes
                                     text:originalString.key.nonCustomisedXmlTree.node.xmlText];
-        
+
         duplicatedString.key.text = originalString.key.text;
-        
+
         [duplicatedString.value setXmlInfo:originalString.value.nonCustomisedXmlTree.node.xmlElementName
                                 attributes:originalString.value.nonCustomisedXmlTree.node.xmlAttributes
                                       text:originalString.value.nonCustomisedXmlTree.node.xmlText];
-        
+
         duplicatedString.value.text = originalString.value.text;
-        
+
         [ret.strings addObject:duplicatedString];
     }
-    
+ 
+    // Now Overwrite to maintain any attributes but keep new Strongbox values
+
+    for (NSString* key in entry.fields.customFields.allKeys) {
+        NSString* value = entry.fields.customFields[key];
+        [ret setString:key value:value protected:YES];
+    }
+
     ret.title = entry.title;
     ret.username = entry.fields.username;
     ret.password = entry.fields.password;
     ret.url = entry.fields.url;
     ret.notes = entry.fields.notes;
     
-    // Verify it's ok to strip empty strings. Looks like it is.
-    // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/ 
+    // MMcG: Don't strip emptys, it seems to be useful to allow empty values in the custom fields, or at least the
+    // Windows app allows this
     
-    NSArray<String*>* filtered = [ret.strings filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        String* string = (String*)evaluatedObject;
-        return string.value.text.length;
-    }]];
+//    // Verify it's ok to strip empty strings. Looks like it is.
+//    // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
+//
+//    NSArray<String*>* filtered = [ret.strings filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+//        String* string = (String*)evaluatedObject;
+//        return string.value.text.length;
+//    }]];
 
-    [ret.strings removeAllObjects];
-    [ret.strings addObjectsFromArray:filtered];
+//    [ret.strings removeAllObjects];
+//    [ret.strings addObjectsFromArray:filtered];
 
     // Binaries
     
@@ -240,6 +254,13 @@
             
             [fields.attachments addObject:attachment];
         }
+    }
+    
+    // Custom Fields
+    
+    for (NSString* key in childEntry.customFields.allKeys) {
+        NSString* value = childEntry.customFields[key];
+        [fields.customFields setObject:value forKey:key];
     }
     
     Node* entryNode = [[Node alloc] initAsRecord:childEntry.title

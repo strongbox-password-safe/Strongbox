@@ -6,9 +6,9 @@
 //  Copyright © 2017 Mark McGuill. All rights reserved.
 //
 
-#import "PasswordSafeUIDocument.h"
+#import "StrongboxUIDocument.h"
 
-@implementation PasswordSafeUIDocument
+@implementation StrongboxUIDocument
 
 -(instancetype)initWithFileURL:(NSURL *)url {
     return [super initWithFileURL:url];

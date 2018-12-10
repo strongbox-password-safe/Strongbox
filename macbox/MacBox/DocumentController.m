@@ -9,6 +9,10 @@
 #import "DocumentController.h"
 #import "Document.h"
 #import "AbstractDatabaseFormatAdaptor.h"
+#import "CreateFormatAndSetCredentialsWizard.h"
+#import "DatabaseModel.h"
+
+static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
 @implementation DocumentController
 
@@ -18,37 +22,44 @@
     return [super runModalOpenPanel:openPanel forTypes:nil];
 }
 
-- (IBAction)onNewKeePass1Document:(id)sender {
-    NSString* type = @"Strongbox File (KeePass 1)";
+- (void)newDocument:(id)sender {
+    CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
-    [self newDocumentOfType:type];
-}
-
-- (IBAction)onNewKeePass2ClassicDocument:(id)sender {
-    NSString* type = @"Strongbox File (KeePass 2 Classic)";
+    wizard.titleText = @"Please Enter the Master Credentials for this Safe";
+    wizard.databaseFormat = kKeePass;
+    wizard.createSafeWizardMode = YES;
     
-    [self newDocumentOfType:type];
-}
+    NSModalResponse returnCode = [NSApp runModalForWindow:wizard.window];
 
-- (IBAction)onNewKeePass2AdvancedDocument:(id)sender {
-    NSString* type = @"Strongbox File (KeePass Advanced)";
-    
-    [self newDocumentOfType:type];
-}
-
-- (void)newDocumentOfType:(NSString*)type {
-    NSError* error;
-
-    Document* document = [self makeUntitledDocumentOfType:type error:&error];
-    
-    if(!document) {
-        NSLog(@"Could not create document: %@", error);
+    if(returnCode != NSModalResponseOK) {
         return;
     }
     
-    [self addDocument:document];
-    [document makeWindowControllers];
-    [document showWindows];
+    NSSavePanel *panel = [NSSavePanel savePanel];
+    panel.title = @"Save New Password Database...";
+    panel.prompt = @"Save";
+    panel.message = @"You must save this new database before you can use it";
+    
+    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:wizard.databaseFormat];
+    panel.nameFieldStringValue = [NSString stringWithFormat:@"Untitled.%@", adaptor.fileExtension ];
+    
+    NSInteger modalCode = [panel runModal];
+
+    if (modalCode == NSModalResponseOK) {
+        NSURL *URL = [panel URL];
+
+        Document *document = [[Document alloc] initWithCredentials:wizard.databaseFormat password:wizard.confirmedPassword keyFileDigest:wizard.confirmedKeyFileDigest];
+
+        [document saveToURL:URL ofType:kStrongboxPasswordDatabaseDocumentType forSaveOperation:NSSaveOperation completionHandler:^(NSError * _Nullable errorOrNil) {
+            if(errorOrNil) {
+                return;
+            }
+
+            [self addDocument:document];
+            [document makeWindowControllers];
+            [document showWindows];
+        }];
+    }
 }
 
 @end

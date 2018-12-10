@@ -12,6 +12,9 @@
 
 @property (nonatomic, strong) NSButton* okButton;
 @property (nonatomic) BOOL allowEmptyInput;
+@property NSTextField* simpleInputTextField;
+@property NSTextField* keyTextField;
+@property NSTextField* valueTextField;
 
 @end
 
@@ -106,21 +109,21 @@
     
     [alert addButtonWithTitle:@"Cancel"];
     
-    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
-    [input setStringValue:defaultValue];
-    input.delegate=self;
+    self.simpleInputTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+    [self.simpleInputTextField setStringValue:defaultValue];
+    self.simpleInputTextField.delegate=self;
     
-    [alert setAccessoryView:input];
+    [alert setAccessoryView:self.simpleInputTextField];
     
-    [[alert window] setInitialFirstResponder: input];
+    [[alert window] setInitialFirstResponder: self.simpleInputTextField];
     
     //[input becomeFirstResponder];
     
     NSInteger button = [alert runModal];
     
     if (button == NSAlertFirstButtonReturn) {
-        [input validateEditing];
-        return [input stringValue];
+        [self.simpleInputTextField validateEditing];
+        return [self.simpleInputTextField stringValue];
     } else if (button == NSAlertSecondButtonReturn) {
         return nil;
     }
@@ -128,15 +131,71 @@
     return nil;
 }
 
+- (void)inputKeyValue:(NSString*)prompt completion:(void (^)(BOOL yesNo, NSString* key, NSString* value))completion {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:prompt];
+    //alert.informativeText = @"Informative?";
+    
+    self.okButton = [alert addButtonWithTitle:@"OK"];
+    self.okButton.enabled = NO;
+    [alert addButtonWithTitle:@"Cancel"];
+    
+    // Accessory View
+
+    NSTextField *keyLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 77, 295, 16)];
+    self.keyTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(40, 75, 295, 24)];
+    NSTextField *valueLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 35, 295, 16)];
+    self.valueTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(40, 33, 295, 24)];
+    
+    keyLabel.stringValue = @"Key";
+    [keyLabel setBezeled:NO];
+    [keyLabel setDrawsBackground:NO];
+    [keyLabel setEditable:NO];
+    [keyLabel setSelectable:NO];
+    
+    valueLabel.stringValue = @"Value";
+    [valueLabel setBezeled:NO];
+    [valueLabel setDrawsBackground:NO];
+    [valueLabel setEditable:NO];
+    [valueLabel setSelectable:NO];
+
+    self.keyTextField.delegate = self;
+    self.valueTextField.delegate = self;
+    self.keyTextField.nextKeyView = self.valueTextField;
+    self.valueTextField.nextKeyView = self.keyTextField;
+    
+    NSStackView *stackViewer = [[NSStackView alloc] initWithFrame:NSMakeRect(0,0, 295, 100)];
+
+    [stackViewer addSubview:keyLabel];
+    [stackViewer addSubview:self.keyTextField];
+
+    [stackViewer addSubview:valueLabel];
+    [stackViewer addSubview:self.valueTextField];
+
+    
+    alert.accessoryView = stackViewer;
+    
+    [[alert window] setInitialFirstResponder:self.keyTextField];
+    
+    NSInteger button = [alert runModal];
+    
+    completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue);
+}
+
 - (void)controlTextDidChange:(NSNotification *)notification {
     //NSLog(@"controlTextDidChange");
     
     NSTextField* textField = (NSTextField*)notification.object;
     
-    if(!self.allowEmptyInput && !textField.stringValue.length) {
-        textField.placeholderString = @"Field cannot be empty";
+    if(textField == self.simpleInputTextField) {
+        if(!self.allowEmptyInput && !textField.stringValue.length) {
+            textField.placeholderString = @"Field cannot be empty";
+        }
+        self.okButton.enabled = self.allowEmptyInput || textField.stringValue.length;
     }
-    self.okButton.enabled = self.allowEmptyInput || textField.stringValue.length;// ? YES :NO;
+    else {
+        self.okButton.enabled = self.keyTextField.stringValue.length;
+    }
 }
 
 //- (void)controlTextDidEndEditing:(NSNotification *)notification {

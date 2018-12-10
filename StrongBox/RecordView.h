@@ -30,6 +30,8 @@
 
 @property (strong, nonatomic) IBOutlet UIButton * _Nullable buttonHistory;
 @property (weak, nonatomic) IBOutlet UITableViewCell *tableCellAttachments;
+@property (weak, nonatomic) IBOutlet UILabel *labelCustomFieldsCount;
+@property (weak, nonatomic) IBOutlet UITableViewCell *tableCellCustomFields;
 
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonPasswordGenerationSettings;
 

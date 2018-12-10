@@ -7,7 +7,7 @@
 //
 
 #import "AppleICloudProvider.h"
-#import "PasswordSafeUIDocument.h"
+#import "StrongboxUIDocument.h"
 #import "Strongbox.h"
 #import "Utils.h"
 #import "SafesList.h"
@@ -74,7 +74,7 @@
         [SVProgressHUD showWithStatus:@"Uploading..."];
     });
     
-    PasswordSafeUIDocument * doc = [[PasswordSafeUIDocument alloc] initWithData:data fileUrl:fileURL];
+    StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileURL];
     //NSLog(@"Loaded File URL: %@ in state: [%@]", [doc.fileURL lastPathComponent], [self stringForDocumentState:doc.documentState]);
 
     [doc saveToURL:fileURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
@@ -109,7 +109,7 @@
     viewController:(UIViewController *)viewController
         completion:(void (^)(NSData *data, NSError *error))completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
-    PasswordSafeUIDocument * doc = [[PasswordSafeUIDocument alloc] initWithFileURL:fileUrl];
+    StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD showWithStatus:@"Reading..."];
@@ -146,7 +146,7 @@
           data:(NSData *)data
     completion:(void (^)(NSError *error))completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
-    PasswordSafeUIDocument * doc = [[PasswordSafeUIDocument alloc] initWithData:data fileUrl:fileUrl];
+    StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileUrl];
     
     NSLog(@"Opened File URL: %@ in state: [%@]", [doc.fileURL lastPathComponent], [self stringForDocumentState:doc.documentState]);
 

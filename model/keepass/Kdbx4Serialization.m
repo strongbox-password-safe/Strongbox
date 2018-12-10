@@ -55,6 +55,7 @@ static const BOOL kLogVerbose = NO;
 
 + (NSData *)serialize:(Kdbx4SerializationData *)serializationData
              password:(NSString *)password
+        keyFileDigest:(NSData*)keyFileDigest
               ppError:(NSError **)ppError {
     if(kLogVerbose) {
         NSLog(@"Serializing with [%@] and password [%@]", serializationData, password);
@@ -80,7 +81,7 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    Keys *keys = getKeys(password, serializationData.kdfParameters, masterSeed);
+    Keys *keys = getKeys(password, keyFileDigest, serializationData.kdfParameters, masterSeed);
     
     //NSLog(@"SERIALIZE KEYS: [%@]", keys);
     
@@ -153,7 +154,7 @@ static const BOOL kLogVerbose = NO;
     return ret;
 }
 
-+ (Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError {
++ (Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest ppError:(NSError**)ppError {
     size_t endOfHeadersOffset;
     NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);
     
@@ -173,7 +174,7 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    Keys *keys = getKeys(password, cryptoParams.kdfParameters, cryptoParams.masterSeed);
+    Keys *keys = getKeys(password, keyFileDigest, cryptoParams.kdfParameters, cryptoParams.masterSeed);
     
     //NSLog(@"DESERIALIZE KEYS: [%@]", keys);
 
@@ -194,7 +195,7 @@ static const BOOL kLogVerbose = NO;
 
     if(!checkHeaderHmac(safeData, endOfHeadersOffset, keys.hmacKey)) {
         if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Incorrect Passphrase" errorCode:-3];
+            *ppError = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key)" errorCode:kStrongboxErrorCodeIncorrectCredentials];
         }
         
         return nil;
@@ -462,7 +463,7 @@ static NSData* decryptBlocks(HmacBlockHeader *blockHeader, Keys *keys, CryptoPar
     return [cipher decrypt:dec iv:cryptoParams.iv key:keys.masterKey];
 }
 
-static Keys* getKeys(NSString* password, KdfParameters *kdfParameters, NSData* masterSeed) {
+static Keys* getKeys(NSString* password, NSData* keyFileDigest, KdfParameters *kdfParameters, NSData* masterSeed) {
     Keys *ret = [[Keys alloc] init];
     id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters);
     
@@ -471,7 +472,7 @@ static Keys* getKeys(NSString* password, KdfParameters *kdfParameters, NSData* m
         return nil;
     }
     
-    ret.compositeKey = getCompositeKey(password);
+    ret.compositeKey = getCompositeKey(password, keyFileDigest);
     ret.transformKey = [kdf deriveKey:ret.compositeKey];
     ret.masterKey = getMasterKey(masterSeed, ret.transformKey);
 

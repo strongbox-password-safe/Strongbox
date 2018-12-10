@@ -23,7 +23,7 @@
 @property (nonatomic) StorageProvider storageProvider;
 @property (nonatomic) BOOL isTouchIdEnabled;
 
-- (void)removeTouchIdPassword;
 @property (nonatomic, strong) NSString* touchIdPassword;
+@property (nonatomic, strong) NSData* touchIdKeyFileDigest;
 
 @end

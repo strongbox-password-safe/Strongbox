@@ -17,7 +17,8 @@
 #define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
 #define kAlwaysShowPassword @"alwaysShowPassword"
 
-static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
+static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
+static NSString* const kAutoSave = @"autoSave";
 
 @implementation Settings
 
@@ -175,6 +176,27 @@ static NSString* kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
     
     [[NSUserDefaults standardUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+-(BOOL)autoSave {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    NSObject* autoSave = [userDefaults objectForKey:kAutoSave];
+
+    BOOL ret = TRUE;
+    if(!autoSave) {
+        NSLog(@"No Autosave settings... defaulting to Yes");
+    }
+    else {
+        NSNumber* num = (NSNumber*)autoSave;
+        ret = num.boolValue;
+    }
+
+    return ret;
+}
+
+-(void)setAutoSave:(BOOL)autoSave {
+    [self setBool:kAutoSave value:autoSave];
 }
 
 @end

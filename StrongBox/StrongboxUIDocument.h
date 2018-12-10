@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PasswordSafeUIDocument : UIDocument
+@interface StrongboxUIDocument : UIDocument
 
 - (instancetype _Nonnull)initWithFileURL:(NSURL * _Nonnull)url NS_DESIGNATED_INITIALIZER;
 - (instancetype _Nonnull)initWithData:(NSData* _Nonnull)data fileUrl:(NSURL*_Nonnull)fileUrl NS_DESIGNATED_INITIALIZER;

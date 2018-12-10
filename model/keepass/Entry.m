@@ -29,6 +29,10 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
 }
 
++ (const NSSet<NSString*>*)reservedCustomFieldKeys {
+    return wellKnownKeys;
+}
+
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kEntryElementName context:context]) {
         self.uuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:context];

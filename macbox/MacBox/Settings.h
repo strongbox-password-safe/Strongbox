@@ -28,6 +28,7 @@
 @property (nonatomic) BOOL warnedAboutTouchId;
 
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
+@property (nonatomic) BOOL autoSave;
 
 @end
 

@@ -9,10 +9,13 @@
 #import <Cocoa/Cocoa.h>
 #import "AbstractDatabaseFormatAdaptor.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface Document : NSDocument
 
-@property (nonatomic) BOOL dirty;
-@property DatabaseFormat format;
+- (instancetype)initWithCredentials:(DatabaseFormat)format password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest;
+
+NS_ASSUME_NONNULL_END
 
 @end
 

@@ -9,6 +9,20 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array/>
+			<key>CFBundleTypeName</key>
+			<string>Strongbox KeePass Key File</string>
+			<key>CFBundleTypeRole</key>
+			<string>None</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.markmcguill.strongbox.key</string>
+			</array>
+		</dict>
+		<dict>
 			<key>CFBundleTypeName</key>
 			<string>Strongbox KeePass 1 Safe</string>
 			<key>CFBundleTypeRole</key>
@@ -72,7 +86,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.18.1</string>
+	<string>1.18.4</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -106,7 +120,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2619</string>
+	<string>2623</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -169,6 +183,25 @@
 			<array>
 				<string>public.data</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>Strongbox KeePass Key File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.markmcguill.strongbox.key</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>key</string>
+				<key>public.mime-type</key>
+				<string>application/strongbox</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Strongbox KeePass Safe</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.kdb</string>
 			<key>UTTypeTagSpecification</key>

@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="checkboxAlwaysShowPassword" destination="AIq-rw-YUd" id="Quw-Cn-9aM"/>
                 <outlet property="checkboxAlwaysShowUsernameInOutlineView" destination="FfB-of-qge" id="JfR-B3-7se"/>
+                <outlet property="checkboxAutoSave" destination="xpq-u1-zFL" id="buZ-MR-GjR"/>
                 <outlet property="checkboxUseDigits" destination="nP6-Q0-au2" id="7Em-cA-YHl"/>
                 <outlet property="checkboxUseEasy" destination="2DG-Am-EOz" id="0ta-K5-4jX"/>
                 <outlet property="checkboxUseLower" destination="kF8-9A-1QK" id="gQ8-nK-JvL"/>
@@ -55,11 +56,11 @@
             <rect key="contentRect" x="196" y="240" width="465" height="574"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="465" height="476"/>
+                <rect key="frame" x="0.0" y="0.0" width="465" height="574"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="442" height="436"/>
+                        <rect key="frame" x="13" y="26" width="442" height="534"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="d1S-ha-z7I">
@@ -78,7 +79,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FfB-of-qge">
-                                            <rect key="frame" x="15" y="431" width="261" height="18"/>
+                                            <rect key="frame" x="15" y="427" width="261" height="18"/>
                                             <buttonCell key="cell" type="check" title="Always Show Username in Outline View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="F1L-We-jkz">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -87,12 +88,66 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="a5x-ll-NqI"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xpq-u1-zFL">
+                                            <rect key="frame" x="15" y="357" width="114" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Use Auto Save " bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="t9E-dh-uAI">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="wfI-IY-1Ss"/>
+                                            </connections>
+                                        </button>
+                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="sdt-B3-RKP">
+                                            <rect key="frame" x="17" y="381" width="388" height="5"/>
+                                        </box>
+                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="8is-dF-uw2" userLabel="Top Line">
+                                            <rect key="frame" x="17" y="411" width="388" height="5"/>
+                                        </box>
+                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ZY9-Pg-Tp7">
+                                            <rect key="frame" x="17" y="303" width="388" height="5"/>
+                                        </box>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8Z7-9B-zDB">
+                                            <rect key="frame" x="15" y="388" width="69" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Auto Save" id="T1N-pE-KAB">
+                                                <font key="font" metaFont="systemBold"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HfF-2I-y4w" userLabel="Note 2">
+                                            <rect key="frame" x="35" y="311" width="372" height="40"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="368" id="s4x-Fs-ubH"/>
+                                                <constraint firstAttribute="height" constant="40" id="yST-j1-duG"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" title="NB: You must close and reopen any current documents for this change to take effect" id="UvS-fW-lhO">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="AIq-rw-YUd" firstAttribute="top" secondItem="0i4-gP-tCE" secondAttribute="top" constant="17" id="1SA-0m-Q8E"/>
                                         <constraint firstItem="AIq-rw-YUd" firstAttribute="leading" secondItem="0i4-gP-tCE" secondAttribute="leading" constant="17" id="1qG-os-BJq"/>
-                                        <constraint firstItem="FfB-of-qge" firstAttribute="top" secondItem="AIq-rw-YUd" secondAttribute="bottom" constant="10" id="3fC-LW-rOD"/>
+                                        <constraint firstItem="8is-dF-uw2" firstAttribute="leading" secondItem="8Z7-9B-zDB" secondAttribute="leading" id="4he-at-URk"/>
                                         <constraint firstItem="AIq-rw-YUd" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="5XE-ew-S2n"/>
+                                        <constraint firstItem="xpq-u1-zFL" firstAttribute="top" secondItem="sdt-B3-RKP" secondAttribute="bottom" constant="10" id="8Lf-lM-c7F"/>
+                                        <constraint firstItem="ZY9-Pg-Tp7" firstAttribute="trailing" secondItem="sdt-B3-RKP" secondAttribute="trailing" id="DsC-zM-A1p"/>
+                                        <constraint firstItem="HfF-2I-y4w" firstAttribute="leading" secondItem="xpq-u1-zFL" secondAttribute="leading" constant="20" id="G14-bT-HPn"/>
+                                        <constraint firstItem="8Z7-9B-zDB" firstAttribute="leading" secondItem="sdt-B3-RKP" secondAttribute="leading" id="PrS-Ns-j4t"/>
+                                        <constraint firstItem="ZY9-Pg-Tp7" firstAttribute="leading" secondItem="sdt-B3-RKP" secondAttribute="leading" id="Rzg-88-VDa"/>
+                                        <constraint firstItem="ZY9-Pg-Tp7" firstAttribute="top" secondItem="HfF-2I-y4w" secondAttribute="bottom" constant="5" id="T3l-Ni-SKK"/>
+                                        <constraint firstItem="8is-dF-uw2" firstAttribute="top" secondItem="FfB-of-qge" secondAttribute="bottom" constant="15" id="UBo-a3-1Mj"/>
+                                        <constraint firstItem="8Z7-9B-zDB" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="Xd9-Od-mt7"/>
+                                        <constraint firstItem="FfB-of-qge" firstAttribute="top" secondItem="AIq-rw-YUd" secondAttribute="bottom" constant="14" id="dL3-PI-cKX"/>
+                                        <constraint firstItem="xpq-u1-zFL" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="eJK-9e-Qli"/>
+                                        <constraint firstItem="8Z7-9B-zDB" firstAttribute="top" secondItem="8is-dF-uw2" secondAttribute="bottom" constant="8" id="gIE-oC-csK"/>
+                                        <constraint firstAttribute="trailing" secondItem="sdt-B3-RKP" secondAttribute="trailing" constant="17" id="jLE-Ue-0V6"/>
+                                        <constraint firstItem="sdt-B3-RKP" firstAttribute="top" secondItem="8Z7-9B-zDB" secondAttribute="bottom" constant="4" id="rbQ-a0-Rjd"/>
+                                        <constraint firstItem="8is-dF-uw2" firstAttribute="trailing" secondItem="sdt-B3-RKP" secondAttribute="trailing" id="rmQ-3F-eFA"/>
+                                        <constraint firstItem="HfF-2I-y4w" firstAttribute="top" secondItem="xpq-u1-zFL" secondAttribute="bottom" constant="8" id="uku-P1-fXh"/>
                                     </constraints>
                                 </view>
                             </tabViewItem>
@@ -651,7 +706,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="-352.5" y="69"/>
+            <point key="canvasLocation" x="-606.5" y="69"/>
         </window>
     </objects>
 </document>

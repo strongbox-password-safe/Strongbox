@@ -146,7 +146,17 @@
 - (NSUInteger)getIntegerFromHexCharArray:(char *)array length:(NSUInteger)length {
     NSString* ret = [self getStringFromCharArray:array length:length];
 
-    return strtoul(ret.UTF8String, NULL, 16);
+    if(!ret.length) {
+        return 0;
+    }
+    
+    const char* c = ret.UTF8String;
+
+    if(c == nil) {
+        return 0;
+    }
+    
+    return strtoul(c, NULL, 16);
 }
 
 @end

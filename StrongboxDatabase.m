@@ -16,26 +16,31 @@
 
 @implementation StrongboxDatabase
 
-- (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata masterPassword:(NSString *)masterPassword {
-    return [self initWithRootGroup:[Node rootGroup] metadata:metadata masterPassword:masterPassword];
-}
-
-- (instancetype)initWithRootGroup:(Node *)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(NSString *)masterPassword {
-    return [self initWithRootGroup:rootGroup metadata:metadata masterPassword:masterPassword attachments:[NSArray array]];
+- (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata
+                  masterPassword:(NSString *)masterPassword
+                   keyFileDigest:(NSData*)keyFileDigest {
+    return [self initWithRootGroup:[Node rootGroup] metadata:metadata masterPassword:masterPassword keyFileDigest:nil];
 }
 
 - (instancetype)initWithRootGroup:(Node *)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
                    masterPassword:(NSString *)masterPassword
+                    keyFileDigest:(NSData*)keyFileDigest {
+    return [self initWithRootGroup:rootGroup metadata:metadata masterPassword:masterPassword keyFileDigest:keyFileDigest attachments:[NSArray array]];
+}
+
+- (instancetype)initWithRootGroup:(Node *)rootGroup
+                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                   masterPassword:(NSString *)masterPassword
+                    keyFileDigest:(NSData*)keyFileDigest
                       attachments:(NSArray<DatabaseAttachment *> *)attachments {
-    return [self initWithRootGroup:rootGroup metadata:metadata masterPassword:masterPassword attachments:attachments customIcons:[NSDictionary dictionary]];
+    return [self initWithRootGroup:rootGroup metadata:metadata masterPassword:masterPassword keyFileDigest:keyFileDigest attachments:attachments customIcons:[NSDictionary dictionary]];
 }
 
 - (instancetype)initWithRootGroup:(Node *)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
                    masterPassword:(NSString *)masterPassword
+                    keyFileDigest:(NSData*)keyFileDigest
                       attachments:(NSArray<DatabaseAttachment *> *)attachments
                       customIcons:(NSDictionary<NSUUID *,NSData *> *)customIcons {
     self = [super init];
@@ -44,6 +49,7 @@
         _rootGroup = rootGroup;
         _metadata = metadata;
         _masterPassword = masterPassword;
+        _keyFileDigest = keyFileDigest;
         _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:attachments root:rootGroup] mutableCopy];
         _customIcons = [customIcons mutableCopy];
     }
@@ -56,7 +62,7 @@
 }
 
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex {
-    if(atIndex < 0 || atIndex >= _mutableAttachments.count) {
+    if(atIndex < 0 || atIndex >= node.fields.attachments.count) {
         NSLog(@"WARN: removeNodeAttachment [OUT OF BOUNDS]");
         return;
     }

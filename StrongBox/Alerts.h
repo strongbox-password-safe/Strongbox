@@ -15,6 +15,7 @@
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message NS_DESIGNATED_INITIALIZER;
 
 - (void)OkCancelWithPasswordAndConfirm:(UIViewController *)viewController
+                            allowEmpty:(BOOL)allowEmpty
                             completion:(void (^)(NSString *password, BOOL response))completion;
 
 

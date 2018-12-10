@@ -16,6 +16,7 @@
 @interface ViewController : NSViewController<   NSOutlineViewDelegate,
                                                 NSOutlineViewDataSource,
                                                 NSTextViewDelegate,
+                                                NSTextFieldDelegate,
                                                 NSComboBoxDataSource,
                                                 NSTableViewDataSource,
                                                 NSTableViewDelegate,
@@ -25,11 +26,12 @@
                                                 QLPreviewPanelDelegate>
 
 @property (strong, nonatomic) ViewModel* model;
--(void)updateDocumentUrl;
+//-(void)updateDocumentUrl;
 @property (weak) IBOutlet NSImageView *imageViewGroupDetails;
 
 // App wide fields
 @property (weak) IBOutlet NSTableView *tableViewSummary;
+@property (weak) IBOutlet NSTableView *tableViewCustomFields;
 
 @property (weak) IBOutlet AttachmentCollectionView *attachmentsView;
 @property (weak) IBOutlet NSOutlineView *outlineView;
@@ -39,6 +41,7 @@
 @property (weak) IBOutlet NSButton *buttonCreateRecord;
 @property (weak) IBOutlet NSView *emailRow;
 @property (weak) IBOutlet NSView *attachmentsRow;
+@property (weak) IBOutlet NSView *customFieldsRow;
 
 // Locked Fields
 
@@ -56,7 +59,8 @@
 @property (weak) IBOutlet NSTextField *textFieldTitle;
 @property (weak) IBOutlet NSTextField *textFieldUrl;
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
-@property (weak) IBOutlet CustomPasswordTextField *textFieldPw;
+@property (weak) IBOutlet NSTextField *textFieldPw;
+@property (weak) IBOutlet CustomPasswordTextField *textFieldHiddenPassword;
 @property (weak) IBOutlet NSComboBox *comboboxUsername;
 @property (weak) IBOutlet NSComboBox *comboBoxEmail;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;

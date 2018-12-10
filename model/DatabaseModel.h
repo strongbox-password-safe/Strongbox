@@ -15,10 +15,20 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
 
++ (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
+
 - (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype _Nullable )initNewWithoutPassword:(DatabaseFormat)format;
-- (instancetype _Nullable )initNewWithPassword:(NSString *_Nullable)password format:(DatabaseFormat)format;
-- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data password:(NSString *_Nonnull)password error:(NSError *_Nonnull*_Nonnull)ppError;
+
+- (instancetype)initNewWithPassword:(nullable NSString *)password keyFileDigest:(nullable NSData*)keyFileDigest format:(DatabaseFormat)format;
+
+- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data
+                                                  password:(NSString *_Nonnull)password
+                                                     error:(NSError *_Nonnull*_Nonnull)ppError;
+
+- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data
+                                                  password:(NSString *__nullable)password
+                                             keyFileDigest:(NSData* __nullable)keyFileDigest
+                                                     error:(NSError *_Nonnull*_Nonnull)ppError;
 
 - (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
 
@@ -35,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
 @property (nonatomic, retain, nullable) NSString *masterPassword;
+@property (nonatomic, retain, nullable) NSData *keyFileDigest;
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, readonly, nonnull) NSString* fileExtension;
 

@@ -3,15 +3,14 @@ PODS:
   - Base32 (1.1.2)
   - DynamicBlurView (3.0.1)
   - DZNEmptyDataSet (1.8.1)
-  - GoogleAPIClientForREST/Core (1.3.6):
+  - GoogleAPIClientForREST/Core (1.3.7):
     - GTMSessionFetcher (>= 1.1.7)
-  - GoogleAPIClientForREST/Drive (1.3.6):
+  - GoogleAPIClientForREST/Drive (1.3.7):
     - GoogleAPIClientForREST/Core
     - GTMSessionFetcher (>= 1.1.7)
-  - GoogleSignIn (4.3.0):
+  - GoogleSignIn (4.4.0):
     - "GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)"
     - "GoogleToolboxForMac/NSString+URLArguments (~> 2.1)"
-    - GTMOAuth2 (~> 1.0)
     - GTMSessionFetcher/Core (~> 1.1)
   - GoogleToolboxForMac/DebugUtils (2.1.4):
     - GoogleToolboxForMac/Defines (= 2.1.4)
@@ -21,16 +20,15 @@ PODS:
     - GoogleToolboxForMac/Defines (= 2.1.4)
     - "GoogleToolboxForMac/NSString+URLArguments (= 2.1.4)"
   - "GoogleToolboxForMac/NSString+URLArguments (2.1.4)"
-  - GTMOAuth2 (1.1.6):
-    - GTMSessionFetcher (~> 1.1)
-  - GTMSessionFetcher (1.2.0):
-    - GTMSessionFetcher/Full (= 1.2.0)
-  - GTMSessionFetcher/Core (1.2.0)
-  - GTMSessionFetcher/Full (1.2.0):
-    - GTMSessionFetcher/Core (= 1.2.0)
+  - GTMSessionFetcher (1.2.1):
+    - GTMSessionFetcher/Full (= 1.2.1)
+  - GTMSessionFetcher/Core (1.2.1)
+  - GTMSessionFetcher/Full (1.2.1):
+    - GTMSessionFetcher/Core (= 1.2.1)
   - GZIP (1.1.1)
   - ISMessages (1.3.1)
   - JNKeychain (0.1.4)
+  - KissXML (5.2.3)
   - libsodium (1.0.12)
   - ObjectiveDropboxOfficial (3.9.2)
   - OneDriveSDK (1.3.0):
@@ -52,7 +50,7 @@ PODS:
     - OneDriveSDK/Common
   - OneDriveSDK/OneDriveCoreSDK (1.3.0):
     - OneDriveSDK/Common
-  - PopupDialog (0.9.1):
+  - PopupDialog (0.9.2):
     - DynamicBlurView (~> 3.0.1)
   - Reachability (3.2)
   - SAMKeychain (1.5.3)
@@ -65,6 +63,7 @@ DEPENDENCIES:
   - GZIP
   - ISMessages
   - JNKeychain
+  - KissXML
   - libsodium
   - ObjectiveDropboxOfficial
   - OneDriveSDK
@@ -82,11 +81,11 @@ SPEC REPOS:
     - GoogleAPIClientForREST
     - GoogleSignIn
     - GoogleToolboxForMac
-    - GTMOAuth2
     - GTMSessionFetcher
     - GZIP
     - ISMessages
     - JNKeychain
+    - KissXML
     - libsodium
     - ObjectiveDropboxOfficial
     - OneDriveSDK
@@ -100,22 +99,22 @@ SPEC CHECKSUMS:
   Base32: 163c298644d184e89ca4e00a996bad6bf5166390
   DynamicBlurView: b1df5415f9bd31897549e5d7077e5ec120a4d636
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  GoogleAPIClientForREST: 5b95b38a0fa912e8ac7bdcf9e124578ef1a61bf2
-  GoogleSignIn: 11183592dc63e105475c7305a325045ff95e02b7
+  GoogleAPIClientForREST: 825503f12cb5824601cf526cf06d81a1cea4afd9
+  GoogleSignIn: 7ff245e1a7b26d379099d3243a562f5747e23d39
   GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
-  GTMOAuth2: c77fe325e4acd453837e72d91e3b5f13116857b2
-  GTMSessionFetcher: 0c4baf0a73acd0041bf9f71ea018deedab5ea84e
+  GTMSessionFetcher: 32aeca0aa144acea523e1c8e053089dec2cb98ca
   GZIP: f8beb59597f651e6970a45b816508a9c6d700b77
   ISMessages: 562cddc3e960359de95f934a4e5c4e1f4ea6fd7d
   JNKeychain: fb6cc9ec95959ba46cd95d0ee6f7a05e41da9f42
+  KissXML: 09f88ff8161fd058d67b70740b8b516687b52823
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   ObjectiveDropboxOfficial: aa792e0556ceb7b72955fa29a2709072f6e35fd9
   OneDriveSDK: 90ab8781f0992c37d96b68cc340585f5cf36701f
-  PopupDialog: 03985b669c29802661c187513bf827340db1ae4d
+  PopupDialog: f4bb461bf70ff422be0b56656566424ee9273080
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: 32e117bac20bd2eb6f887997748fedec21b9da58
+PODFILE CHECKSUM: 67c32b7090e814227539256040cd9f5b6c3a2122
 
 COCOAPODS: 1.5.3

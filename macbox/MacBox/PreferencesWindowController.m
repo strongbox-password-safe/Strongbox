@@ -53,6 +53,7 @@
 }
 
 - (void)bindGeneralUiToSettings {
+    self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
     self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
 }
@@ -199,6 +200,7 @@
 - (IBAction)onGeneralSettingsChange:(id)sender {
     Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
     Settings.sharedInstance.alwaysShowUsernameInOutlineView = self.checkboxAlwaysShowUsernameInOutlineView.state == NSOnState;
+    Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
     
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];

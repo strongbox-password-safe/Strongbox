@@ -22,13 +22,9 @@
     [super windowDidLoad];
 }
 
-- (void)setDirty:(BOOL)dirty {
-    [self synchronizeWindowTitleWithDocumentName];
-}
-
 - (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
     NSString* freeTrialLiteSuffix = @"";
-    
+        
     if(![Settings sharedInstance].fullVersion) {
         if (![Settings sharedInstance].freeTrial) {
             freeTrialLiteSuffix = @" - (Pro Upgrade Available)";
@@ -42,8 +38,7 @@
         }
     }
     
-    Document* doc = self.document;
-    return [NSString stringWithFormat:@"%@%@%@", displayName, doc.dirty ? @" [*edited]" : @"", freeTrialLiteSuffix];
+    return [NSString stringWithFormat:@"%@%@", displayName, freeTrialLiteSuffix];
 }
 
 @end

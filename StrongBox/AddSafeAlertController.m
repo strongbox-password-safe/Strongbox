@@ -39,8 +39,8 @@
     validation:(BOOL (^) (NSString *name, NSString *password))validation
     completion:(void (^) (NSString *name, NSString *password, BOOL response))completion {
     _newValidation = validation;
-    _alertController = [UIAlertController alertControllerWithTitle:@"Add New Password Safe"
-                                                           message:@"Enter a title or name for this safe, and a master password"
+    _alertController = [UIAlertController alertControllerWithTitle:@"Add New Safe"
+                                                           message:@"Enter a name for this safe, and a master password"
                                                     preferredStyle:UIAlertControllerStyleAlert];
 
     __weak typeof(self) weakSelf = self;
@@ -56,12 +56,15 @@
                             }
                       }];
 
+    __block UITextField* passwordTextField;
     [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
                           [textField                   addTarget:weakSelf
                                         action:@selector(validateAddNewFieldNotEmpty:)
                               forControlEvents:UIControlEventEditingChanged];
                           textField.placeholder = @"Master Password";
                           textField.secureTextEntry = YES;
+                            passwordTextField = textField;
+                          [textField becomeFirstResponder];
                       }];
 
     _defaultAction = [UIAlertAction actionWithTitle:@"Add Safe"
@@ -80,7 +83,9 @@
     [_alertController addAction:_defaultAction];
     [_alertController addAction:cancelAction];
 
-    [viewController presentViewController:_alertController animated:YES completion:nil];
+    [viewController presentViewController:_alertController animated:YES completion:^{
+        [passwordTextField becomeFirstResponder];
+    }];
 }
 
 - (void)addExisting:(UIViewController *)viewController

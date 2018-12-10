@@ -28,7 +28,11 @@
 }
 
 -(StrongboxDatabase *)create:(NSString *)password {
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] masterPassword:password];
+    return [self create:password keyFileDigest:nil];
+}
+
+-(StrongboxDatabase *)create:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] masterPassword:password keyFileDigest:nil];
     
     [self defaultLastUpdateFieldsToNow:(PwSafeMetadata*)ret.metadata];
     
@@ -36,6 +40,10 @@
 }
 
 - (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError **)error {
+    return [self open:data password:password keyFileDigest:nil error:error];
+}
+
+- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest error:(NSError **)error {
     if (![PwSafeDatabase isAValidSafe:data]) {
         NSLog(@"Not a valid safe!");
         
@@ -72,7 +80,7 @@
 
     [self syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
     
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password keyFileDigest:nil];
     ret.adaptorTag = headerFields;
 
     return ret;
@@ -252,7 +260,7 @@
         NSLog(@"Invalid password!");
         
         if (ppError != nil) {
-            *ppError = [Utils createNSError:@"The password is incorrect." errorCode:-2];
+            *ppError = [Utils createNSError:@"The password is incorrect." errorCode:kStrongboxErrorCodeIncorrectCredentials];
         }
         
         return nil;

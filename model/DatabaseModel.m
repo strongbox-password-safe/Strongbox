@@ -44,7 +44,7 @@
     return @"dat";
 }
 
-- (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format {
++ (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format {
     if(format == kPasswordSafe) {
         return [[PwSafeDatabase alloc] init];
     }
@@ -62,14 +62,10 @@
     return nil;
 }
 
-- (instancetype)initNewWithoutPassword:(DatabaseFormat)format {
-    return [self initNewWithPassword:nil format:format];
-}
-
-- (instancetype)initNewWithPassword:(NSString *)password format:(DatabaseFormat)format {
+- (instancetype)initNewWithPassword:(NSString *)password keyFileDigest:(NSData*)keyFileDigest format:(DatabaseFormat)format {
     if(self = [super init]) {
-        self.adaptor = [self getAdaptor:format];
-        self.theSafe = [self.adaptor create:password];
+        self.adaptor = [DatabaseModel getAdaptor:format];
+        self.theSafe = [self.adaptor create:password keyFileDigest:keyFileDigest];
         
         if (self.theSafe == nil) {
             return nil;
@@ -90,6 +86,14 @@
 - (instancetype)initExistingWithDataAndPassword:(NSData *)safeData
                                        password:(NSString *)password
                                           error:(NSError **)ppError {
+    return [self initExistingWithDataAndPassword:safeData password:password keyFileDigest:nil error:ppError];
+}
+
+- (instancetype)initExistingWithDataAndPassword:(NSData *)safeData
+                                       password:(NSString *)password
+                                  keyFileDigest:(NSData*)keyFileDigest
+                                          error:(NSError **)ppError {
+
     if(self = [super init]) {
         if([PwSafeDatabase isAValidSafe:safeData]) {
             self.adaptor = [[PwSafeDatabase alloc] init];
@@ -107,7 +111,7 @@
             return nil;
         }
 
-        self.theSafe = [self.adaptor open:safeData password:password error:ppError];
+        self.theSafe = [self.adaptor open:safeData password:password keyFileDigest:keyFileDigest error:ppError];
         
         if (self.theSafe == nil) {
             return nil;
@@ -195,6 +199,14 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
 -(void)setMasterPassword:(NSString *)masterPassword {
     self.theSafe.masterPassword = masterPassword;
+}
+
+- (NSData *)keyFileDigest {
+    return self.theSafe.keyFileDigest;
+}
+
+- (void)setKeyFileDigest:(NSData *)keyFileDigest {
+    self.theSafe.keyFileDigest = keyFileDigest;
 }
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment {

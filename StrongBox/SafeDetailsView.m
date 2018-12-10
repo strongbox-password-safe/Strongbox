@@ -15,6 +15,8 @@
 #import "ISMessages.h"
 #import "Utils.h"
 #import "Csv.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import "KeyFileParser.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -22,7 +24,7 @@
 
 @end
 
-@interface SafeDetailsView () <MFMailComposeViewControllerDelegate>
+@interface SafeDetailsView () <MFMailComposeViewControllerDelegate, UIDocumentPickerDelegate>
 
 @end
 
@@ -36,6 +38,7 @@
     [self updateAutoFillCacheButtonText];
 
     self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
+    self.labelChangeKeyFile.enabled = [self canChangeKeyFile];
     self.labelToggleTouchId.enabled = [self canToggleTouchId];
     self.labelToggleOfflineCache.enabled = [self canToggleOfflineCache];
 
@@ -52,21 +55,37 @@
     [self.navigationController setNavigationBarHidden:NO];
 }
 
+static NSString *getLastCachedDate(NSDate *modDate) {
+    if(!modDate) { return @""; }
+    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = NSDateFormatterShortStyle;
+    df.dateStyle = NSDateFormatterShortStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+    
+    NSString *modDateStr = [df stringFromDate:modDate];
+    return [NSString stringWithFormat:@"Last Cached: %@", modDateStr];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.section == 0) {
         if(indexPath.row == 0 && [self canChangeMasterPassword]) { // Change Master Password {
             [self onChangeMasterPassword];
         }
-        else if (indexPath.row == 1 && [self canToggleOfflineCache]) { // Offline Cache
+        if(indexPath.row == 1 && [self canChangeKeyFile]) { // Change Master Password {
+            [self onChangeKeyFile];
+        }
+        else if (indexPath.row == 2 && [self canToggleOfflineCache]) { // Offline Cache
             [self onToggleOfflineCache];
         }
-        else if (indexPath.row == 2) { // Export Safe
+        else if (indexPath.row == 3) { // Export Safe
             [self onExport];
         }
-        else if (indexPath.row == 3  && [self canToggleTouchId]) { // Toggle Touch ID
+        else if (indexPath.row == 4  && [self canToggleTouchId]) { // Toggle Touch ID
             [self onToggleTouchId];
         }
-        else if (indexPath.row == 4) { // Autofill Cache
+        else if (indexPath.row == 5) { // Autofill Cache
             [self onToggleAutoFillCache];
         }
     }
@@ -75,12 +94,15 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     
-    BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
-    if(indexPath.section == 2 && indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
-    {
-        NSString* key = [metadataKvps.allKeys objectAtIndex:indexPath.row];
-        cell.textLabel.text = key;
-        cell.detailTextLabel.text = [metadataKvps objectForKey:key];
+    if(indexPath.section == 2) {
+        BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
+
+        if(indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
+        {
+            NSString* key = [metadataKvps.allKeys objectAtIndex:indexPath.row];
+            cell.textLabel.text = key;
+            cell.detailTextLabel.text = [metadataKvps objectForKey:key];
+        }
     }
     
     return cell;
@@ -97,6 +119,10 @@
     return [super tableView:tableView heightForRowAtIndexPath:indexPath];
 }
 
+- (BOOL)canChangeKeyFile {
+    return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache || self.viewModel.database.format == kPasswordSafe);
+}
+
 - (BOOL)canChangeMasterPassword {
     return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
 }
@@ -107,6 +133,90 @@
 
 - (BOOL)canToggleOfflineCache {
     return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
+}
+
+- (void)onChangeKeyFile {
+    BOOL using = self.viewModel.database.keyFileDigest != nil;
+    
+    if(using) {
+        [Alerts threeOptions:self title:@"Change Key File"
+                     message:nil
+           defaultButtonText:using ? @"Select a new Key File" : @"Start using a Key File"
+            secondButtonText:@"Stop using the Key File"
+             thirdButtonText:@"Cancel" action:^(int response) {
+                 if(response == 0) {
+                     [self onSelectNewKeyFile];
+                 }
+                 else if(response == 1) {
+                     dispatch_async(dispatch_get_main_queue(), ^{
+                         [Alerts yesNo:self title:@"Are you sure?" message:@"Are you sure you want to stop using a Key File?" action:^(BOOL response) {
+                             if(response) {
+                                 [self changeKeyFile:nil];
+                             }
+                         }];
+                     });
+                 }
+             }];
+    }
+    else {
+        [self onSelectNewKeyFile];
+    }
+}
+
+- (void)onSelectNewKeyFile {
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
+    vc.delegate = self;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+//
+//- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+//    //self.completion(nil);
+//}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    //NSLog(@"didPickDocumentsAtURLs: %@", urls);
+
+    NSURL* url = [urls objectAtIndex:0];
+    // NSString *filename = [url.absoluteString lastPathComponent];
+
+    NSError* error;
+    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
+
+    if(!data) {
+        NSLog(@"Error: %@", error);
+        [Alerts error:self title:@"There was an error reading the Key File" error:error completion:nil];
+    }
+    else {
+        NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+        [self changeKeyFile:keyFileDigest];
+    }
+}
+
+- (void)changeKeyFile:(NSData *)keyFileDigest {
+    self.viewModel.database.keyFileDigest = keyFileDigest;
+    
+    [self.viewModel update:^(NSError *error) {
+        if (error == nil) {
+            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
+                self.viewModel.metadata.touchIdKeyFileDigest = self.viewModel.database.keyFileDigest;
+                NSLog(@"Keychain updated on Key File changed for touch id enabled and enrolled safe.");
+            }
+            
+            [ISMessages             showCardAlertWithTitle:@"Key File Changed"
+                                                   message:nil
+                                                  duration:3.f
+                                               hideOnSwipe:YES
+                                                 hideOnTap:YES
+                                                 alertType:ISAlertTypeSuccess
+                                             alertPosition:ISAlertPositionTop
+                                                   didHide:nil];
+        }
+        else {
+            [Alerts             error:self
+                                title:@"Key File NOT Changed!"
+                                error:error];
+        }
+    }];
 }
 
 - (void)changeMasterPassword:(NSString *)password {
@@ -141,6 +251,7 @@
                                            message:@"Enter the new password:"];
     
     [alerts OkCancelWithPasswordAndConfirm:self
+                                allowEmpty:!(self.viewModel.database.format == kKeePass1 || self.viewModel.database.format == kPasswordSafe)
                                 completion:^(NSString *password, BOOL response) {
                                     if (response) {
                                         [self changeMasterPassword:password];
@@ -155,10 +266,16 @@
 
 - (void)updateOfflineCacheButtonText {
     self.labelToggleOfflineCache.text = self.viewModel.metadata.offlineCacheEnabled ? @"Disable Offline Cache" : @"Enable Offline Cache";
+
+    NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
+    self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
 }
 
 - (void)updateAutoFillCacheButtonText {
     self.labelToggleAutoFillCache.text = self.viewModel.metadata.autoFillCacheEnabled ? @"Disable Auto Fill Cache" : @"Enable Auto Fill Cache";
+
+    NSDate* modDate = [[LocalDeviceStorageProvider sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
+    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
 }
 
 - (void)onToggleTouchId {
@@ -178,7 +295,8 @@
                        self.viewModel.metadata.isTouchIdEnabled = NO;
                        self.viewModel.metadata.isEnrolledForTouchId = NO;
                        
-                       [self.viewModel.metadata removeTouchIdPassword];
+                       self.viewModel.metadata.touchIdKeyFileDigest = nil;
+                       self.viewModel.metadata.touchIdPassword = nil;
                        
                        [[SafesList sharedInstance] update:self.viewModel.metadata];
                        [self updateTouchIdButtonText];
@@ -198,7 +316,8 @@
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForTouchId = NO;
 
-        [self.viewModel.metadata removeTouchIdPassword];
+        self.viewModel.metadata.touchIdKeyFileDigest = nil;
+        self.viewModel.metadata.touchIdPassword = nil;
 
         [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
                                    message:[NSString stringWithFormat:@"%@ has been enabled for this safe. You will be asked to enrol the next time you open it.", bIdName]

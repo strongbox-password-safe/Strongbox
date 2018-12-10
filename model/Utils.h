@@ -14,6 +14,10 @@
 #import <Cocoa/Cocoa.h>
 #endif
 
+#define kStrongboxErrorCodeIncorrectCredentials (-241)
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface Utils : NSObject
 
 + (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode;
@@ -57,5 +61,7 @@ UIImage* scaleImage(UIImage* image, CGSize newSize);
 #else
 NSImage* scaleImage(NSImage* image, CGSize newSize);
 #endif
+
+NS_ASSUME_NONNULL_END
 
 @end

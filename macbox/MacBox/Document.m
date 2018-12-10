@@ -11,7 +11,7 @@
 #import "ViewModel.h"
 #import "Utils.h"
 #import "Alerts.h"
-#import "ChangeMasterPasswordWindowController.h"
+#import "CreateFormatAndSetCredentialsWizard.h"
 #import "WindowController.h"
 #import "Settings.h"
 #import "AppDelegate.h"
@@ -23,18 +23,17 @@
 
 @property (strong, nonatomic) ViewModel* model;
 @property WindowController* windowController;
-@property (strong, nonatomic) ChangeMasterPasswordWindowController *masterPasswordWindowController;
+@property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *masterPasswordWindowController;
 
 @end
 
 @implementation Document
 
-- (instancetype)init {
+- (instancetype)initWithCredentials:(DatabaseFormat)format password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest {
     self = [super init];
     
     if (self) {
-        self.model = [[ViewModel alloc] initNewWithSampleData:self];
-        self.dirty = YES;
+        self.model = [[ViewModel alloc] initNewWithSampleData:self format:format password:password keyFileDigest:keyFileDigest];
     }
     
     return self;
@@ -56,85 +55,22 @@
         [Alerts info:@"Cannot save safe while it is locked." window:self.windowController.window];
         return;
     }
-    
-    if(!self.model.masterPasswordIsSet) {
-        self.masterPasswordWindowController = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-        
-        self.masterPasswordWindowController.titleText = @"Set a Master Password for New Safe";
-        
-        [self.windowController.window beginSheet:self.masterPasswordWindowController.window
-                               completionHandler:^(NSModalResponse returnCode) {
-                                   if(returnCode == NSModalResponseOK) {
-                                       [self.model setMasterPassword:self.masterPasswordWindowController.confirmedPassword];
-                                       return [super saveDocument:sender];
-                                   }
-                               }];
-    }
-    else {
-        [super saveDocument:sender];
-    
-        SafeMetaData* safe = [self getSafeMetaData];
-        if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
-            // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
-            // Update Touch Id Password
-            
-            NSLog(@"Updating Touch ID Password in case is has changed");
-            safe.touchIdPassword = self.model.masterPassword;
-        }
-        
-        if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
-            AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-            [appDelegate showUpgradeModal:5];
-        }
-        
-        return;
-    }
-}
 
-- (void)onSaveDone:(void (^ _Nonnull)(NSError * _Nullable))completionHandler errorOrNil:(NSError * _Nullable)errorOrNil {
-    if (!errorOrNil) {
-        self.dirty = NO;
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            ViewController *vc = (ViewController*)self.windowController.contentViewController;
-//            [vc updateDocumentUrl]; // Refresh View to pick up document URL changes
-//        });
-    }
-    else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [Alerts error:errorOrNil window:self.windowController.window];
-        });
+    [super saveDocument:sender];
+
+    SafeMetaData* safe = [self getSafeMetaData];
+    if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
+        // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
+        // Update Touch Id Password
         
-        NSLog(@"Error during saveToURL: %@", errorOrNil);
+        NSLog(@"Updating Touch ID Password in case is has changed");
+        safe.touchIdPassword = self.model.masterPassword;
+        safe.touchIdKeyFileDigest = self.model.masterKeyFileDigest;
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        completionHandler(errorOrNil);
-    });
-}
-
-- (void)saveToURL:(NSURL *)url
-           ofType:(NSString *)typeName
- forSaveOperation:(NSSaveOperationType)saveOperation
-completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
-    if (!self.model.masterPasswordIsSet) {
-        self.masterPasswordWindowController = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-        self.masterPasswordWindowController.titleText = @"You must set a Master Password for this Safe";
-        
-        [self.windowController.window beginSheet:self.masterPasswordWindowController.window
-                               completionHandler:^(NSModalResponse returnCode) {
-                                   if(returnCode == NSModalResponseOK) {
-                                       [self.model setMasterPassword:self.masterPasswordWindowController.confirmedPassword];
-                                       
-                                       [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {
-                                           [self onSaveDone:completionHandler errorOrNil:errorOrNil];
-                                       }];
-                                   }
-                               }];
-    }
-    else {
-        [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError * __nullable errorOrNil) {
-            [self onSaveDone:completionHandler errorOrNil:errorOrNil];
-        }];
+    if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
+        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
+        [appDelegate showUpgradeModal:5];
     }
 }
 
@@ -149,10 +85,24 @@ completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-    return [self.model getPasswordDatabaseAsData:outError];
+//    NSLog(@"Start dataOfType");
+//    NSDate *methodStart = [NSDate date];
+//
+    [self unblockUserInteraction];
+    
+    NSData* ret = [self.model getPasswordDatabaseAsData:outError];
+    
+//    NSDate *methodFinish = [NSDate date];
+//    NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+//    NSLog(@"dataOfType executionTime = %f", executionTime);
+
+    return ret;
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
+    //NSLog(@"Start readFromData");
+    //NSDate *methodStart = [NSDate date];
+
     self.model = [[ViewModel alloc] initWithData:data document:self];
     
     if(!self.model) {
@@ -162,11 +112,13 @@ completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
         
         return NO;
     }
-    
-    self.dirty = NO;
-    
+        
     [self setWindowModel:self.model];
     
+    //NSDate *methodFinish = [NSDate date];
+    //NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+    //NSLog(@"readFromData executionTime = %f", executionTime);
+
     return YES;
 }
 
@@ -176,25 +128,16 @@ completionHandler:(void (^)(NSError * __nullable errorOrNil))completionHandler {
     [vc setModel:self.model];
 }
 
-- (BOOL)isDocumentEdited {
-    return self.dirty;
-}
-
-- (BOOL)hasUnautosavedChanges {
-    return self.dirty;
-}
-
-- (BOOL)hasUndoManager {
-    return NO;
-}
-
 + (BOOL)autosavesInPlace {
-    return NO;
+    return Settings.sharedInstance.autoSave;
 }
 
-- (void)setDirty:(BOOL)dirty {
-    _dirty = dirty;
-    self.windowController.dirty = YES;
+- (BOOL)canAsynchronouslyWriteToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation {
+    return YES;
+}
+
++ (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName {
+    return YES;
 }
 
 @end

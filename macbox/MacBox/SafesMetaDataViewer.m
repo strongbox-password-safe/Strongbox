@@ -38,7 +38,8 @@
         SafeMetaData *safe = [self.safes objectAtIndex:self.tableView.selectedRow];
         [SafesList.sharedInstance remove:safe.uuid];
         
-        [safe removeTouchIdPassword];
+        safe.touchIdPassword = nil;
+        safe.touchIdKeyFileDigest = nil;
         
         self.safes = SafesList.sharedInstance.snapshot;
         [self.tableView reloadData];

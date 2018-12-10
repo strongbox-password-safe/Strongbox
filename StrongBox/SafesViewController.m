@@ -19,10 +19,15 @@
 #import "SafeStorageProviderFactory.h"
 #import "OpenSafeSequenceHelper.h"
 #import "NewSafeFormatController.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import "AddNewSafeHelper.h"
+#import "AddSafeAlertController.h"
+#import "StrongboxUIDocument.h"
 
-@interface SafesViewController ()
+@interface SafesViewController () <UIDocumentPickerDelegate>
 
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
+@property NSURL* temporaryExportUrl;
 
 @end
 
@@ -250,10 +255,10 @@
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
     else {
-        [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
-                                                                safe:safe
-                                   askAboutTouchIdEnrolIfAppropriate:YES
-                                                          completion:^(Model * _Nonnull model) {
+        [OpenSafeSequenceHelper beginSequenceWithViewController:self
+                                                           safe:safe
+                                              canBiometricEnrol:YES
+                                                     completion:^(Model * _Nonnull model) {
         if(model) {
             [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
         }}];
@@ -271,7 +276,15 @@
         [self renameSafe:indexPath];
     }];
 
-    return @[removeAction, renameAction];
+    renameAction.backgroundColor = [UIColor blueColor];
+    
+    UITableViewRowAction *exportAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Export" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self onExportSafe:indexPath];
+    }];
+    
+    exportAction.backgroundColor = [UIColor orangeColor];
+    
+    return @[removeAction, renameAction, exportAction];
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -382,82 +395,158 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Add / Import
 
-- (void)initiateManualImportFromUrl {
-    [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"URL"
-                            title:@"Enter URL"
-                          message:@"Please Enter the URL of the Safe File."
-                       completion:^(NSString *text, BOOL response) {
-                           if (response) {
-                               NSURL *url = [NSURL URLWithString:text];
-                               NSLog(@"URL: %@", url);
-                               
-                               InitialViewController * ivc = [self getInitialViewController];
-                               [ivc importFromUrlOrEmailAttachment:url];
-                           }
-                       }];
-}
-
 - (IBAction)onAddSafe:(id)sender {
     UIAlertController *alertController =
-        [UIAlertController alertControllerWithTitle:@"How Would You Like To Add Your Safe?"
+        [UIAlertController alertControllerWithTitle:@"What would you like to do?"
                                             message:nil
                                       preferredStyle:UIAlertControllerStyleActionSheet];
 
-    NSArray<NSString*>* buttonTitles =
-        @[  @"Create New Safe",
-            @"Add Existing Safe",
-            @"Import Safe from URL",
-            @"Import Email Attachment"];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Add an Existing Safe..."
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction *a) {
+                                                       [self onAddExistingSafe];
+                                                   }];
+    [alertController addAction:action];
     
-    int index = 1;
-    for (NSString *title in buttonTitles) {
-        UIAlertAction *action = [UIAlertAction actionWithTitle:title
-                                                         style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction *a) {
-                                                            [self onAddSafeActionSheetResponse:index];
-                                                       }];
-        [alertController addAction:action];
-        index++;
+    // Create New
+    
+    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:@"Create a New Safe (Advanced)..."
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction *a) {
+                                                       [self onCreateNewSafe];
+                                                   }];
+    [alertController addAction:createNewAction];
+    
+    // Express
+    
+    if(Settings.sharedInstance.iCloudAvailable) {
+        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"⚡ New Safe (Express)"
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction *a) {
+                                                                    [self onNewExpressSafe];
+                                                                }];
+        
+        // [quickAndEasyAction setValue:[UIColor greenColor] forKey:@"titleTextColor"];
+        //[quickAndEasyAction setValue:[UIImage imageNamed:@"fast-forward-2-32"] forKey:@"image"];
+        [alertController addAction:quickAndEasyAction];
     }
+    
+    // Cancel
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             [self onAddSafeActionSheetResponse:0];
-                                                         }];
+                                                         handler:nil];
     [alertController addAction:cancelAction];
     
     alertController.popoverPresentationController.barButtonItem = self.buttonAddSafe;
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)onAddSafeActionSheetResponse:(int)response {
-    if (response == 1) {
-        if(Settings.sharedInstance.showKeePassCreateSafeOptions) {
-            [self performSegueWithIdentifier:@"segueToSelectNewSafeFormat" sender:self];
+- (void)onAddExistingSafe {
+    [Alerts threeOptions:self
+                   title:@"Select your Import Method"
+                 message:@"Strongbox can import from several natively supported providers or alternatively you can browse through the built in Files app which supports many custom options."
+       defaultButtonText:@"Strongbox Local & Cloud..."
+        secondButtonText:@"Files..."
+         thirdButtonText:@"Cancel"
+                  action:^(int response) {
+                      if(response == 0) {
+                          [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];
+                      }
+                      else if(response == 1) {
+                          [self onAddThroughFilesApp];
+                      }
+                  }];
+}
+
+- (void)onCreateNewSafe {
+    [self performSegueWithIdentifier:@"segueToSelectNewSafeFormat" sender:self];
+}
+
+- (void)onNewExpressSafe {
+    AddSafeAlertController* prompt = [[AddSafeAlertController alloc] init];
+
+    [prompt addNew:self
+        validation:^BOOL(NSString *name, NSString *password) {
+            return [[SafesList sharedInstance] isValidNickName:name] && password.length;
+        }
+        completion:^(NSString *name, NSString *password, BOOL response) {
+            if(response) {
+                [AddNewSafeHelper addNewSafeAndPopToRoot:self
+                                                    name:name
+                                                password:password
+                                                provider:AppleICloudProvider.sharedInstance
+                                                  format:kPasswordSafe];
+                
+                [Alerts info:self title:@"New Safe Ready!" message:@"Your new safe is now ready to use! Just tap on it to get started...\n\nNB: It is vitally important that you remember your master password, as without it there is no hope of opening the safe.\n\nYou could consider writing this password down and storing offline in a physically secure location."];
+            }
+    }];
+}
+
+- (void)onAddThroughFilesApp {
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
+    vc.delegate = self;
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    //NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    if(controller.documentPickerMode == UIDocumentPickerModeOpen) {
+        NSURL* url = [urls objectAtIndex:0];
+        [[self getInitialViewController] import:url canOpenInPlace:YES];
+    }
+    else {
+        NSURL* url = [urls objectAtIndex:0];
+        NSError* error;
+        NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
+        
+        if(!data || error) {
+            [Alerts error:self title:@"Error Exporting" error:error];
+            NSLog(@"%@", error);
+            return;
+        }
+        
+        StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
+        
+        [document saveToURL:url forSaveOperation:UIDocumentSaveForCreating | UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+            if(!success) {
+                [Alerts warn:self title:@"Error Exporting" message:@""];
+            }
+            else {
+                [Alerts info:self title:@"Export Successful" message:@"Your Safe was successfully exported."];
+            }
+        }];
+        
+        [document closeWithCompletionHandler:nil];
+    }
+}
+
+- (void)onExportSafe:(NSIndexPath*)indexPath {
+    SafeMetaData* safe = self.collection[indexPath.row];
+    
+    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
+    [provider read:safe viewController:self completion:^(NSData *data, NSError *error) {
+        if(!data || error) {
+            [Alerts error:self title:@"Error Reading Safe" error:error];
         }
         else {
-            [self performSegueWithIdentifier:@"segueToStorageType" sender:@"New"];
+            self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:safe.fileName];
+            
+            NSError* error;
+            [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
+            if(error) {
+                [Alerts error:self title:@"Error Writing Safe" error:error];
+                NSLog(@"error: %@", error);
+                return;
+            }
+
+            UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
+            vc.delegate = self;
+            
+            [self presentViewController:vc animated:YES completion:nil];
         }
-    }
-    else if (response == 2) {
-        [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];
-    }
-    else if (response == 3) {
-        [self initiateManualImportFromUrl];
-    }
-    else if (response == 4) {
-        [Alerts info:self
-               title:@"Importing Via Email"
-             message:  @
-         "1) Send an email to yourself with your safe file attached\n"
-         "2) Ensure this file has a 'dat' or 'psafe3' extension\n"
-         "3) Once the mail has arrived in the Mail app, Tap on the attachment\n"
-         "4) You will be given an option to 'Copy to Strongbox'\n"
-         "\n"
-         "Tapping on this will start the import process."];
-    }
+    }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -550,8 +639,8 @@
 }
 
 - (InitialViewController *)getInitialViewController {
-    InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
-    return ivc;
+InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
+return ivc;
 }
 
 - (IBAction)onSwitchToQuickLaunchView:(id)sender {

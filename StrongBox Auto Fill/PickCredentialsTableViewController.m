@@ -51,7 +51,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
-    self.searchController.searchBar.selectedScopeButtonIndex = 0;
+    self.searchController.searchBar.selectedScopeButtonIndex = 4;
     
     if (@available(iOS 11.0, *)) {
         self.navigationItem.searchController = self.searchController;
@@ -70,8 +70,15 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 static NSString *getSearchTermFromDomain(NSString* host) {
-    const char *cStringUrl = [host UTF8String];
+    if(!host.length) {
+        return @"";
+    }
     
+    const char *cStringUrl = [host UTF8String];
+    if(!cStringUrl || strlen(cStringUrl) == 0) {
+        return @"";
+    }
+       
     void *tree = loadTldTree();
     const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
     
@@ -103,14 +110,14 @@ static NSString *getSearchTermFromDomain(NSString* host) {
 
             NSString * searchTerm = getSearchTermFromDomain(url.host);
         
-            self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
+            //self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
             [self.searchController.searchBar setText:searchTerm];
             return;
         }
         else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
             NSString * searchTerm = getSearchTermFromDomain(serviceId.identifier);
             
-            self.searchController.searchBar.selectedScopeButtonIndex = 0;
+            //self.searchController.searchBar.selectedScopeButtonIndex = 0;
             [self.searchController.searchBar setText:searchTerm];
         
             return;

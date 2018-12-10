@@ -17,4 +17,6 @@
 @property (nonatomic, strong) NSString* biometricIdName;
 @property (nonatomic) BOOL biometricIdAvailable;
 
+@property BOOL dummyMode;
+
 @end

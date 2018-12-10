@@ -17,13 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ViewModel : NSObject
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype _Nullable )initNewWithSampleData:(Document*)document;
+- (instancetype _Nullable )initNewWithSampleData:(Document*)document format:(DatabaseFormat)format password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest;
 - (instancetype _Nullable )initWithData:(NSData*)data document:(Document*)document;
 
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (BOOL)lock:(NSError**)error selectedItem:(NSString*_Nullable)selectedItem;
 - (BOOL)unlock:(NSString*)password selectedItem:(NSString*_Nullable*)selectedItem error:(NSError**)error;
+- (BOOL)unlock:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest selectedItem:(NSString*_Nullable*)selectedItem error:(NSError**)error;
+
 - (NSData*_Nullable)getPasswordDatabaseAsData:(NSError**)error;
 
 - (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
@@ -35,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
 - (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
+
+- (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value;
+- (void)removeCustomField:(Node *)item key:(NSString *)key;
 
 - (Node*)addNewRecord:(Node *)parentGroup;
 - (Node*)addNewGroup:(Node *)parentGroup;
@@ -53,13 +58,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL locked;
 @property (nonatomic, readonly) NSURL*  fileUrl;
 @property (nonatomic, readonly) Node*  rootGroup;
-@property (nonatomic, readonly) BOOL masterPasswordIsSet;
+@property (nonatomic, readonly) BOOL masterCredentialsSet;
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, readonly) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 
-@property (nonatomic) NSString* masterPassword;
+@property (nonatomic, readonly) NSString* masterPassword;
+@property (nonatomic, readonly) NSData* masterKeyFileDigest;
+- (void)setMasterCredentials:(NSString *)masterPassword masterKeyFileDigest:(NSData *)masterKeyFileDigest;
 
 // Convenience / Summary
 
@@ -70,6 +77,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString * mostPopularPassword;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
+
+@property dispatch_block_t onModelChanged;
 
 @end
 

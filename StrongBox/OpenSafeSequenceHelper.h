@@ -14,18 +14,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OpenSafeSequenceHelper : NSObject
 
-+ (OpenSafeSequenceHelper *)sharedInstance;
+- (instancetype)init NS_UNAVAILABLE;
 
-- (void)beginOpenSafeSequence:(UIViewController*)viewController
-                         safe:(SafeMetaData*)safe
-            openAutoFillCache:(BOOL)openAutoFillCache
-askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
-                   completion:(void (^)(Model* model))completion;
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                                   safe:(SafeMetaData*)safe
+      canBiometricEnrol:(BOOL)canBiometricEnrol
+                             completion:(void (^)(Model* model))completion;
 
-- (void)beginOpenSafeSequence:(UIViewController*)viewController
-                         safe:(SafeMetaData*)safe
-askAboutTouchIdEnrolIfAppropriate:(BOOL)askAboutTouchIdEnrolIfAppropriate
-                   completion:(void (^)(Model* model))completion;
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                                   safe:(SafeMetaData*)safe
+                      openAutoFillCache:(BOOL)openAutoFillCache
+      canBiometricEnrol:(BOOL)canBiometricEnrol
+                             completion:(void (^)(Model* model))completion;
 
 @end
 

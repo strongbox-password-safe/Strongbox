@@ -206,28 +206,24 @@ NSString* headerEntryIdentifierString(HeaderEntryIdentifier identifier) {
     }
 }
 
-NSData *getCompositeKey(NSString * _Nonnull password) {
-    //////////////////////////////////////
-    // Get Composite Key
-    // To generate the composite key for a .kdbx file :
-    // 1. You must hash (with SHA-256) all credentials needed (passphrase, key of the keyfile, Windows User Account),
-    // 2. You must then concatenate ALL hashed credentials in this order : passphrase, keyfile, Windows User Account,
-    // 3. You must then hash the result of the concatenation. Even though you have just one credential (for example,
-    //    just a passphrase), you still need to hash it twice (a first one for the step 1, and second one for the step 3).
-    //    The result of the hash is the composite key
-    
-    //NSData *keyFileData = [NSData data];
-    
-    NSData *hashedPassword = sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
-    //NSData *hashedKeyFileData = [SafeTools sha256: keyFileData];
+NSData *getCompositeKey(NSString* password, NSData* keyFileDigest) {
+    NSData *hashedPassword = password != nil ? sha256([password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
+    NSData *hashedKeyFileData = keyFileDigest;
     
     // Concatenate together in one big sha256...
     
     NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
     CC_SHA256_CTX context;
     CC_SHA256_Init(&context);
-    CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
-    //CC_SHA256_Update(&context, hashedKeyFileData.bytes, (CC_LONG)hashedKeyFileData.length);
+    
+    if(hashedPassword) {
+        CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
+    }
+    
+    if(hashedKeyFileData) {
+        CC_SHA256_Update(&context, hashedKeyFileData.bytes, (CC_LONG)hashedKeyFileData.length);
+    }
+    
     CC_SHA256_Final(compositeKey.mutableBytes, &context);
     
     if(kLogVerbose) {

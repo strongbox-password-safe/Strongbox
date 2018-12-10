@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 #import "Alerts.h"
-#import "ChangeMasterPasswordWindowController.h"
+#import "CreateFormatAndSetCredentialsWizard.h"
 #import "Settings.h"
 #import "AppDelegate.h"
 #import "Utils.h"
@@ -19,18 +19,23 @@
 #import "PreferencesWindowController.h"
 #import "Csv.h"
 #import "AttachmentItem.h"
+#import "CustomField.h"
+#import "Entry.h"
+#import "KeyFileParser.h"
+#import "ProgressWindow.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
 @interface ViewController ()
 
-@property (strong, nonatomic) ChangeMasterPasswordWindowController *changeMasterPassword;
+@property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
+@property (strong, nonatomic) ProgressWindow* progressWindow;
 @property (nonatomic) BOOL showPassword;
 @property (strong, nonatomic) NSArray<NSString*>* emailAutoCompleteCache;
 @property (strong, nonatomic) NSArray<NSString*>* usernameAutoCompleteCache;
 @property (nonnull, strong, nonatomic) NSArray *attachments;
 @property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
-
+@property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
 @end
 
 static NSImage* kFolderImage;
@@ -95,8 +100,19 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
     
+
+    // Password
+    
+    if (@available(macOS 10.13, *)) {
+        self.textFieldPw.textColor = [NSColor colorNamed:@"password-field-text-color"];
+
+    } else {
+        self.textFieldPw.textColor = [NSColor controlTextColor];
+    }
+
     // Any Clicks into the Password Field show it for editing
-    self.textFieldPw.onBecomesFirstResponder = ^{
+    
+    self.textFieldHiddenPassword.onBecomesFirstResponder = ^{
         self.showPassword = YES;
         [self showOrHidePassword];
     };
@@ -115,6 +131,13 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     self.tableViewSummary.dataSource = self;
     self.tableViewSummary.delegate = self;
+    
+    // Custom Fields
+    
+    self.customFields = [NSArray array];
+    self.tableViewCustomFields.dataSource = self;
+    self.tableViewCustomFields.delegate = self;
+
 }
 
 - (void)disableFeaturesForLiteVersion {
@@ -140,19 +163,24 @@ static NSArray<NSImage*> *kKeePassIconSet;
 
 -(void)setModel:(ViewModel *)model {
     _model = model;
+    model.onModelChanged = ^{
+        //NSLog(@"OnModelChanged...");
+        [self refreshOutlineAndDetailsPaneNoSelectionChange];
+    };
+    
     [self bindToModel];
 }
 
--(void)updateDocumentUrl {
-    [self bindDetailsPane];
-}
+//-(void)updateDocumentUrl {
+//    [self bindDetailsPane];
+//}
 
 - (BOOL)biometricOpenIsAvailableForSafe {
     SafeMetaData* metaData = [self getSafeMetaData];
     
     return  metaData == nil ||
             !metaData.isTouchIdEnabled ||
-            !metaData.touchIdPassword ||
+            !(metaData.touchIdPassword || metaData.touchIdKeyFileDigest) ||
             !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
     !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
 }
@@ -188,10 +216,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
     [self.outlineView reloadData];
     
     [self bindDetailsPane];
-    
-    if(!self.model.masterPasswordIsSet) {
-        [self promptForMasterPassword:YES completion:nil]; // New document - Require Master Password Set
-    }
 }
 
 - (void)setInitialFocus {
@@ -213,12 +237,31 @@ static NSArray<NSImage*> *kKeePassIconSet;
     [self.attachmentsView reloadData];
 }
 
+- (void)refreshCustomFields:(Node *)it {
+    NSArray<NSString*> *sortedKeys = [it.fields.customFields.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [obj1 compare:obj2];
+    }];
+    
+    NSMutableArray *fields = [NSMutableArray array];
+    for (NSString *key in sortedKeys) {
+        NSString* value = it.fields.customFields[key];
+        
+        CustomField* field = [[CustomField alloc] init];
+        field.key = key;
+        field.value = value;
+        [fields addObject:field];
+    }
+    
+    self.customFields = [fields copy];
+    [self.tableViewCustomFields reloadData];
+}
+
 - (void)bindDetailsPane {
     Node* it = [self getCurrentSelectedItem];
     
     [self updateAutocompleteCaches];
     
-    if(!it) {        
+    if(!it) {
         [self.tabViewRightPane selectTabViewItemAtIndex:2];
         [self.tableViewSummary reloadData];
     }
@@ -230,7 +273,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
     else {
         self.emailRow.hidden = self.model.format != kPasswordSafe;
         self.attachmentsRow.hidden = self.model.format == kPasswordSafe;
+        self.customFieldsRow.hidden = self.model.format == kPasswordSafe || self.model.format == kKeePass1;
         
+        //NSLog(@"Setting Text fields");
         self.textFieldTitle.stringValue = it.title;
         self.textFieldPw.stringValue = it.fields.password;
         self.textFieldUrl.stringValue = it.fields.url;
@@ -246,9 +291,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
             [self concealDetails];
         }
         
-        // Attachments
-        
         [self refreshAttachments:it];
+        
+        [self refreshCustomFields:it];
         
         self.showPassword = Settings.sharedInstance.alwaysShowPassword;
         [self showOrHidePassword];
@@ -325,6 +370,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.attachmentsView reloadData];
+            [self.view setNeedsDisplay:YES];
         });
     });
 }
@@ -550,6 +596,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
         return YES;
     }
     
+    BOOL searchAll = NO;
     NSPredicate *predicate;
     
     NSInteger scope = self.searchSegmentedControl.selectedSegment;
@@ -565,29 +612,44 @@ static NSArray<NSImage*> *kKeePassIconSet;
         predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
     else {
+        searchAll = YES;
         predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@  "
-                     @"OR fields.password contains[c] %@  "
-                     @"OR fields.username contains[c] %@  "
-                     @"OR fields.email contains[c] %@  "
-                     @"OR fields.url contains[c] %@  "
-                     @"OR fields.notes contains[c] %@", searchText, searchText, searchText, searchText, searchText, searchText];
+                 @"OR fields.password contains[c] %@  "
+                 @"OR fields.username contains[c] %@  "
+                 @"OR fields.email contains[c] %@  "
+                 @"OR fields.url contains[c] %@  "
+                 @"OR fields.notes contains[c] %@",
+                     searchText, searchText, searchText, searchText, searchText, searchText];
+    
+        // Future: Attachments?!
     }
 
     if([predicate evaluateWithObject:item]) {
         return YES;
     }
-    else if(item.isGroup && recurse) {
-        for(Node* child in item.children) {
-            if(child.isGroup) {
-                if([[self getSafeItems:child] count] > 0) {
-                    return YES;
-                }
+    else if(searchAll && (self.model.format == kKeePass4 || self.model.format == kKeePass)) {
+        for (NSString* key in item.fields.customFields.allKeys) {
+            NSString* value = item.fields.customFields[key];
+            
+            if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
+               [value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
+                return YES;
             }
-            else {
+        }
+    }
+    
+    if(item.isGroup && recurse) {
+        for(Node* child in item.children) {
+            //if(child.isGroup) {
+                //if([[self getSafeItems:child] count] > 0) {
+                   // return YES;
+                //}
+            //}
+            //else {
                 if([self isSafeItemMatchesSearchCriteria:child recurse:YES]) {
                     return YES;
                 }
-            }
+            //}
         }
     }
     
@@ -657,7 +719,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
     else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < kKeePassIconSet.count) {
         ret = kKeePassIconSet[vm.iconId.intValue];
     }
-    
+
     return ret;
 }
 
@@ -666,32 +728,48 @@ static NSArray<NSImage*> *kKeePassIconSet;
     [self bindDetailsPane];
 }
 
+- (IBAction)onUseKeyFileOnly:(id)sender {
+    [self onUseKeyFileCommon:nil];
+}
+
+- (IBAction)onUseKeyFile:(id)sender {
+    [self onUseKeyFileCommon:self.textFieldMasterPassword.stringValue];
+}
+
+- (void)onUseKeyFileCommon:(NSString*)password {
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            NSLog(@"Open Key File: %@", openPanel.URL);
+            
+            NSError* error;
+            NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
+            
+            if(!data) {
+                NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
+                [Alerts error:@"Could not open key file." error:error window:self.view.window];
+                return;
+            }
+            
+            NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+            [self unlock:password keyFileDigest:keyFileDigest isBiometricOpen:NO];
+        }
+    }];
+}
+
 - (IBAction)onEnterMasterPassword:(id)sender {
-    NSError* error = [self unlock:self.textFieldMasterPassword.stringValue];
-    
-    if(error) {
-        [Alerts error:@"Could not open safe" error:error window:self.view.window];
-    }
+    [self unlock:self.textFieldMasterPassword.stringValue keyFileDigest:nil isBiometricOpen:NO];
 }
 
 - (IBAction)onUnlockWithTouchId:(id)sender {
     if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
         SafeMetaData *safe = [self getSafeMetaData];
         
-        if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
+        if(safe && safe.isTouchIdEnabled && (safe.touchIdPassword || safe.touchIdKeyFileDigest)) {
             [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if(success) {
-                        NSError* error = [self unlock:safe.touchIdPassword];
-                        
-                        if(error) {
-                            [safe removeTouchIdPassword];
-                            [SafesList.sharedInstance remove:safe.uuid];
-
-                            [Alerts error:@"Could not open safe with stored Touch ID Password. The stored password will now be removed from secure storage. You will need to enter the correct password to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
-
-                            [self bindToModel];
-                        }
+                        [self unlock:safe.touchIdPassword keyFileDigest:safe.touchIdKeyFileDigest isBiometricOpen:YES];
                     }
                     else {
                         NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
@@ -707,7 +785,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
         }
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
-            [Alerts info:@"The stored password is unavailable for some reason. Please enter the password manually. Metadata for this safe will be cleared." window:self.view.window];
+            [Alerts info:@"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this safe will be cleared." window:self.view.window];
             if(safe) {
                 [SafesList.sharedInstance remove:safe.uuid];
             }
@@ -725,9 +803,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
     }];
 }
 
-- (void)onSuccessfulUnlock:(NSString *)selectedItemId {
+- (void)onSuccessfulUnlock:(NSString *)selectedItemId password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest {
     if ( BiometricIdHelper.sharedInstance.biometricIdAvailable && (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial)) {
-        NSLog(@"Biometric ID is available on Device. Should we enrol?");
+        //NSLog(@"Biometric ID is available on Device. Should we enrol?");
         
         if(!Settings.sharedInstance.warnedAboutTouchId) {
             Settings.sharedInstance.warnedAboutTouchId = YES;
@@ -752,7 +830,8 @@ static NSArray<NSImage*> *kKeePassIconSet;
                 
                 if(yesNo) {
                     safeMetaData.isTouchIdEnabled = YES;
-                    safeMetaData.touchIdPassword = self.textFieldMasterPassword.stringValue;
+                    safeMetaData.touchIdPassword = password;
+                    safeMetaData.touchIdKeyFileDigest = keyFileDigest;
                 }
                 else {
                     safeMetaData.isTouchIdEnabled = NO;
@@ -785,22 +864,70 @@ static NSArray<NSImage*> *kKeePassIconSet;
     [self setInitialFocus];
 }
 
-- (NSError*)unlock:(NSString*)password {
+- (void)showProgressModal:(NSString*)operationDescription {
+    [self hideProgressModal];
+    
+    self.progressWindow = [[ProgressWindow alloc] initWithWindowNibName:@"ProgressWindow"];
+    self.progressWindow.operationDescription = operationDescription;
+    [self.view.window beginSheet:self.progressWindow.window  completionHandler:nil];
+}
+
+- (void)hideProgressModal {
+    if(self.progressWindow) {
+        [self.view.window endSheet:self.progressWindow.window];
+        self.progressWindow = nil;
+    }
+}
+
+- (void)unlock:(NSString*)password keyFileDigest:(NSData*)keyFileDigest isBiometricOpen:(BOOL)isBiometricOpen {
     if(self.model && self.model.locked) {
-        NSError *error;
-        NSString *selectedItemId;
+        [self showProgressModal:@"Decrypting..."];
         
-        if([self.model unlock:password selectedItem:&selectedItemId error:&error]) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSError *error;
+            NSString *selectedItemId;
+
+            BOOL ret = [self.model unlock:password keyFileDigest:keyFileDigest selectedItem:&selectedItemId error:&error];
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self onSuccessfulUnlock:selectedItemId];
+                [self onUnlockDone:ret selectedItemId:selectedItemId password:password
+                     keyFileDigest:keyFileDigest isBiometricOpen:isBiometricOpen error:error];
             });
+        });
+    }
+}
+
+- (void)onUnlockDone:(BOOL)success
+      selectedItemId:(NSString*)selectedItemId
+            password:(NSString*)password
+       keyFileDigest:(NSData*)keyFileDigest
+     isBiometricOpen:(BOOL)isBiometricOpen
+               error:(NSError*)error {
+    [self hideProgressModal];
+    
+    if(success) {
+        [self onSuccessfulUnlock:selectedItemId password:password keyFileDigest:keyFileDigest];
+    }
+    else {
+        if(!isBiometricOpen) {
+            if(error) {
+                [Alerts error:@"Could not open safe" error:error window:self.view.window];
+            }
         }
         else {
-            return error;
+            if(error) {
+                SafeMetaData *safe = [self getSafeMetaData];
+                
+                safe.touchIdPassword = nil;
+                safe.touchIdKeyFileDigest = nil;
+                [SafesList.sharedInstance remove:safe.uuid];
+                
+                [Alerts error:@"Could not open safe with stored Touch ID Credentials. The stored credentials will now be removed from secure storage. You will need to enter the correct credentials to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
+                
+                [self bindToModel];
+            }
         }
     }
-    
-    return nil;
 }
 
 - (void)onAutoLock:(NSNotification*)notification {
@@ -813,29 +940,54 @@ static NSArray<NSImage*> *kKeePassIconSet;
 
 - (IBAction)onLock:(id)sender {
     if(self.model && !self.model.locked) {
-        if(self.model.dirty) {
-            [Alerts info:@"You cannot lock a safe while changes are pending. Save your changes first." window:self.view.window];
+        NSLog(@"isDocumentEdited: %d", [self.model.document isDocumentEdited]);
+        if([self.model.document isDocumentEdited]) {
+            [Alerts yesNo:@"You cannot lock a safe while changes are pending. Save changes and lock now?" window:self.view.window completion:^(BOOL yesNo) {
+                if(yesNo) {
+                    [self showProgressModal:@"Locking..."];
+                    [self.model.document saveDocumentWithDelegate:self didSaveSelector:@selector(lockSafeContinuation:) contextInfo:nil];
+                }
+                else {
+                    return;
+                }
+            }];
         }
         else {
-            NSError* error;
-            
-            Node* item = [self getCurrentSelectedItem];
-            
-            if(![self.model lock:&error selectedItem:item.serializationId]) {
-                [Alerts error:error window:self.view.window];
-                return;
-            }
-            
-            [self bindToModel];
-            
-            self.textFieldMasterPassword.stringValue = @"";
-            [self setInitialFocus];
-            
-            [self.view setNeedsDisplay:YES];
+            [self showProgressModal:@"Locking..."];
+
+            [self lockSafeContinuation:nil];
         }
     }
 }
 
+- (IBAction)lockSafeContinuation:(id)sender {
+    Node* item = [self getCurrentSelectedItem];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError* error;
+        BOOL lockSuccess = [self.model lock:&error selectedItem:item.serializationId];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onLockDone:lockSuccess error:error];
+        });
+    });
+}
+
+- (void)onLockDone:(BOOL)lockSuccess error:(NSError*)error {
+    [self hideProgressModal];
+
+    if(!lockSuccess) {
+        [Alerts error:error window:self.view.window];
+        return;
+    }
+    
+    [self bindToModel];
+    
+    self.textFieldMasterPassword.stringValue = @"";
+    [self setInitialFocus];
+    
+    [self.view setNeedsDisplay:YES];
+}
+         
 - (IBAction)onOutlineViewDoubleClick:(id)sender {
     Node *item = [sender itemAtRow:[sender clickedRow]];
     
@@ -854,13 +1006,14 @@ static NSArray<NSImage*> *kKeePassIconSet;
 - (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
     if(self.model && !self.model.locked) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.changeMasterPassword = [[ChangeMasterPasswordWindowController alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+            self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
-            self.changeMasterPassword.titleText = new ? @"Please Enter the Master Password for this Safe" : @"Change Master Password";
- 
+            self.changeMasterPassword.titleText = new ? @"Please Enter the Master Credentials for this Safe" : @"Change Master Credentials";
+            self.changeMasterPassword.databaseFormat = self.model.format;
+            
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
-                    [self.model setMasterPassword:self.changeMasterPassword.confirmedPassword];
+                    [self.model setMasterCredentials:self.changeMasterPassword.confirmedPassword masterKeyFileDigest:self.changeMasterPassword.confirmedKeyFileDigest];
                 }
                 
                 if(completion) {
@@ -873,13 +1026,17 @@ static NSArray<NSImage*> *kKeePassIconSet;
 
 - (IBAction)onChangeMasterPassword:(id)sender {
     [self promptForMasterPassword:NO completion:^(BOOL okCancel) {
-        [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-        [Alerts info:@"Master Password Changed and Safe Saved" window:self.view.window];
+        if(okCancel) {
+            [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
+            [Alerts info:@"Master Credentials Changed and Safe Saved" window:self.view.window];
+        }
     }];
 }
 
 - (IBAction)onSearch:(id)sender {
     //NSLog(@"Search For: %@", self.searchField.stringValue);
+    
+    Node* currentSelection = [self getCurrentSelectedItem];
     
     [self.outlineView reloadData];
     
@@ -888,14 +1045,15 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     if( self.searchField.stringValue.length > 0) {
         col.hidden = NO;
-        //self.buttonCreateGroup.enabled = NO;
-        //self.buttonCreateRecord.enabled = NO;
+        
+        // Select first match...
+        
         [self.outlineView expandItem:nil expandChildren:YES];
 
         for(int i=0;i < [self.outlineView numberOfRows];i++) {
             //NSLog(@"Searching: %d", i);
             Node* node = [self.outlineView itemAtRow:i];
-            
+
             if([self isSafeItemMatchesSearchCriteria:node recurse:NO]) {
                 //NSLog(@"Found: %@", node.title);
                 [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: i] byExtendingSelection: NO];
@@ -905,9 +1063,10 @@ static NSArray<NSImage*> *kKeePassIconSet;
     }
     else {
         col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
-        //self.buttonCreateGroup.enabled = YES;
-        //self.buttonCreateRecord.enabled = YES;
-        //[self.outlineView collapseItem:nil collapseChildren:YES];
+        
+        // Search cleared - can we maintain the selection?
+        
+        [self selectItem:currentSelection];
     }
     
     [self bindDetailsPane];
@@ -920,6 +1079,13 @@ static NSArray<NSImage*> *kKeePassIconSet;
 - (IBAction)onToggleShowHidePassword:(id)sender {
     self.showPassword = !self.showPassword;
     
+    if(!self.showPassword) {
+        // Shift Focus out of "Disabled" Password Text Field - otherwise we get a weird setup and passwords can be set to asterisks
+        
+        [self.textFieldPw resignFirstResponder];
+        [self.textFieldTitle becomeFirstResponder];
+    }
+    
     [self showOrHidePassword];
 }
 
@@ -931,20 +1097,12 @@ static NSArray<NSImage*> *kKeePassIconSet;
     }
     
     if(self.showPassword) {
-        //self.textFieldPw.enabled = YES;
-        self.textFieldPw.stringValue = item.fields.password;
-        
-        if (@available(macOS 10.13, *)) {
-            self.textFieldPw.textColor = [NSColor colorNamed:@"password-field-text-color"];
-            
-        } else {
-            self.textFieldPw.textColor = [NSColor controlTextColor];
-        }
+        self.textFieldHiddenPassword.hidden = YES;
+        self.textFieldPw.hidden = NO;
     }
     else {
-        //self.textFieldPw.enabled = NO;
-        self.textFieldPw.stringValue = @"***********************";
-        self.textFieldPw.textColor = [NSColor disabledControlTextColor];
+        self.textFieldHiddenPassword.hidden = NO;
+        self.textFieldPw.hidden = YES;
     }
 }
 
@@ -982,6 +1140,8 @@ static NSArray<NSImage*> *kKeePassIconSet;
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (Node*)getCurrentSelectedItem {
     NSInteger selectedRow = [self.outlineView selectedRow];
     
@@ -989,6 +1149,8 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     return [self.outlineView itemAtRow:selectedRow];
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
@@ -1002,119 +1164,54 @@ static NSArray<NSImage*> *kKeePassIconSet;
     return [src objectAtIndex:index];
 }
 
-- (void)comboBoxSelectionDidChange:(NSNotification *)notification{
-    if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
-        return;
-    }
-    
-    //    NSLog(@"comboBoxSelectionDidChange");
-
-    if(notification.object == self.comboboxUsername) {
-        NSString *strValue = [self.usernameAutoCompleteCache objectAtIndex:[notification.object indexOfSelectedItem]];
-        strValue = [Utils trim:strValue];
-        
-        Node* item = [self getCurrentSelectedItem];
-
-        if(![item.fields.username isEqualToString:strValue]) {
-            [self.model setItemUsername:item username:strValue];
-            item.fields.accessed = [[NSDate alloc] init];
-            item.fields.modified = [[NSDate alloc] init];
-        }
-    }
-    else if(notification.object == self.comboBoxEmail) {
-        NSString *strValue = [self.emailAutoCompleteCache objectAtIndex:[notification.object indexOfSelectedItem]];
-        strValue = [Utils trim:strValue];
-        
-        Node* item = [self getCurrentSelectedItem];
-        
-        if(![item.fields.email isEqualToString:strValue]) {
-            [self.model setItemEmail:item email:strValue];
-            item.fields.accessed = [[NSDate alloc] init];
-            item.fields.modified = [[NSDate alloc] init];
-        }
-    }
-}
-
-- (void)textDidChange:(NSNotification *)notification {
-    if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
-        return;
-    }
-    
-    //    NSLog(@"textDidChange");
+- (void)textDidEndEditing:(NSNotification *)notification {
+    //NSLog(@"textDidEndEditing: %@", notification);
     
     if(notification.object == self.textViewNotes) {
-        Node* item = [self getCurrentSelectedItem];
-        
-        NSString *current = item.fields.notes;
-        NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
-        
-        if(![current isEqualToString:updated]) {
-            [self.model setItemNotes:item notes:updated];
-            item.fields.accessed = [[NSDate alloc] init];
-            item.fields.modified = [[NSDate alloc] init];
-        }
+        [self bindModelToSimpleUiFields];
     }
 }
 
-- (IBAction)controlTextDidChange:(NSNotification *)obj
-{
-    //NSLog(@"controlTextDidChange");
-    [self onDetailFieldChange:obj.object];
+-(void)controlTextDidEndEditing:(NSNotification *)obj {
+   // NSLog(@"controlTextDidEndEditing: %@", obj);
+    
+    [self bindModelToSimpleUiFields];
 }
 
-- (IBAction)onDetailFieldChange:(id)sender {
+- (IBAction)bindModelToSimpleUiFields {
     if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
         return;
     }
     
     Node* item = [self getCurrentSelectedItem];
-    BOOL recordChanged = NO;
-    
-    if(sender == self.textFieldTitle) {
-        if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
-            [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
-            
-            NSInteger row = [self.outlineView selectedRow];
-            [self.outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
-        
-            recordChanged = YES;
-        }
-    }
-    else if(sender == self.comboboxUsername) {
-        if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
-            [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
 
-            NSInteger row = [self.outlineView selectedRow];
-            [self.outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:1]];
+    if(!item || item.isGroup) {
+        return;
+    }
 
-            recordChanged = YES;
-        }
-    }
-    else if(sender == self.comboBoxEmail) {
-        if(![item.fields.email isEqualToString:trimField(self.comboBoxEmail)]) {
-            [self.model setItemEmail:item email:trimField(self.comboBoxEmail)];
-            
-            recordChanged = YES;
-        }
-    }
-    else if(sender == self.textFieldUrl) {
-        if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
-            [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
-        
-            recordChanged = YES;
-        }
-    }
-    else if(sender == self.textFieldPw) {
-        if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
-            [self.model setItemPassword:item password:trimField(self.textFieldPw)];
-        
-            recordChanged = YES;
-        }
+    if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
+        [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
     }
     
-    if(recordChanged) {
-        item.fields.accessed = [[NSDate alloc] init];
-        item.fields.modified = [[NSDate alloc] init];
+    if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
+        [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
+    }
+    
+    if(![item.fields.email isEqualToString:trimField(self.comboBoxEmail)]) {
+        [self.model setItemEmail:item email:trimField(self.comboBoxEmail)];
+    }
+    
+    if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
+        [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
+    }
+    
+    if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
+        [self.model setItemPassword:item password:trimField(self.textFieldPw)];
+    }
+    
+    NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
+    if(![item.fields.notes isEqualToString:updated]) {
+        [self.model setItemNotes:item notes:updated];
     }
 }
 
@@ -1129,18 +1226,26 @@ static NSArray<NSImage*> *kKeePassIconSet;
 
     NSString* newTitle = trimField(textField);
     if(![item.title isEqualToString:newTitle]) {
-        if((item.isGroup && newTitle.length == 0) || ![self.model setItemTitle:item title:newTitle]) {
-            [Alerts info:@"You cannot change the title of this item to this value." window:self.view.window];
-        }
-        
-        [self reloadDataAndSelectItem:item];
-         
-        [self bindDetailsPane];
+        [self.model setItemTitle:item title:newTitle];
     }
     else {
         textField.stringValue = newTitle;
     }
 }
+
+- (IBAction)saveDocument:(id)sender {
+    Node* item = [self getCurrentSelectedItem];
+    
+    if(item && !item.isGroup) {
+        // We could be in process of editing a simple field in the details panel...
+        
+        [self bindModelToSimpleUiFields];
+    }
+    
+    [self.model.document saveDocument:sender];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 NSString* trimField(NSTextField* textField) {
     return [Utils trim:textField.stringValue];
@@ -1244,7 +1349,7 @@ NSString* trimField(NSTextField* textField) {
     Node* sourceItem = [self.model getItemFromSerializationId:itemId];
     Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
     
-    NSLog(@"acceptDrop Move [%@] -> [%@]", sourceItem, destinationItem);
+    //NSLog(@"acceptDrop Move [%@] -> [%@]", sourceItem, destinationItem);
     
     if([self.model changeParent:destinationItem node:sourceItem]) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1267,6 +1372,8 @@ NSString* trimField(NSTextField* textField) {
         [Alerts info:@"You cannot create a new record here. It must be within an existing folder." window:self.view.window];
         return;
     }
+    
+    self.searchField.stringValue = @""; // Clear any ongoing search...
     
     [self.outlineView reloadData];
     
@@ -1425,6 +1532,9 @@ NSString* trimField(NSTextField* textField) {
     else if (theAction == @selector(onRemoveAttachment:)) {
         return [self.attachmentsView.selectionIndexes count] != 0;
     }
+    else if (theAction == @selector(saveDocument:)) {
+        return !self.model.locked;
+    }
     
     return YES;
 }
@@ -1434,7 +1544,9 @@ NSString* trimField(NSTextField* textField) {
     
     if(metaData) {
         [SafesList.sharedInstance remove:metaData.uuid];
-        [metaData removeTouchIdPassword];
+
+        metaData.touchIdKeyFileDigest = nil;
+        metaData.touchIdPassword = nil;
         
         [self bindToModel];
     }
@@ -1446,7 +1558,7 @@ NSString* trimField(NSTextField* textField) {
 
     self.textFieldPw.stringValue = [self.model generatePassword];
     
-    [self onDetailFieldChange:self.textFieldPw];
+    [self bindModelToSimpleUiFields];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -1552,15 +1664,21 @@ NSString* trimField(NSTextField* textField) {
 - (void)onPreferencesChanged:(NSNotification*)notification {
     //NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
     
-    [self refreshViewAndMaintainSelection];
+    [self refreshOutlineAndDetailsPaneNoSelectionChange];
 }
 
-- (void)refreshViewAndMaintainSelection {
-    NSInteger selectedRow = [self.outlineView selectedRow];
+- (void)refreshOutlineAndDetailsPaneNoSelectionChange {
+    //NSInteger selectedRow = [self.outlineView selectedRow];
     
-    [self bindToModel];
+    Node* currentSelection = [self getCurrentSelectedItem];
     
-    [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: selectedRow] byExtendingSelection: NO];
+    [self.outlineView reloadData];
+    
+    self.attachmentsIconCache = nil;
+    [self.attachmentsView reloadData];
+    [self.tableViewCustomFields reloadData];
+    
+    [self selectItem:currentSelection];
 }
 
 static NSComparator finderStringComparator = ^(id obj1, id obj2)
@@ -1644,26 +1762,6 @@ static NSArray<NSImage*>* getKeePassIconSet() {
     }];
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
-
-    return dictionary.count;
-}
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
-
-    BasicOrderedDictionary *dict = getSummaryDictionary(self.model);
-    
-    
-    NSString *key = dict.allKeys[row];
-    NSString *value = [dict objectForKey:key];
-    
-    cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
-    
-    return cell;
-}
-
 static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     BasicOrderedDictionary *ret = [[BasicOrderedDictionary alloc] init];
     
@@ -1683,6 +1781,154 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (IBAction)onShowSafeSummary:(id)sender {
     [self.outlineView deselectAll:nil]; // Funky side effect, no selection -> show safe summary
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    if(tableView == self.tableViewSummary) {
+        BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
+        return dictionary.count;
+    }
+    else {
+        return self.customFields.count;
+    }
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    if(tableView == self.tableViewSummary) {
+        NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
+
+        BasicOrderedDictionary *dict = getSummaryDictionary(self.model);
+        
+        
+        NSString *key = dict.allKeys[row];
+        NSString *value = [dict objectForKey:key];
+        
+        cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
+        
+        return cell;
+    }
+    else {
+        NSString* cellId = [tableColumn.identifier isEqualToString:@"CustomFieldKeyColumn"] ? @"CustomFieldKeyCellIdentifier" : @"CustomFieldValueCellIdentifier";
+        
+        NSTableCellView* cell = [self.tableViewCustomFields makeViewWithIdentifier:cellId owner:nil];
+
+        // NB: Values are set with bindings using objectValueForTableColumn below...
+        
+        return cell;
+    }
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    if(tableView != self.tableViewSummary) {
+        CustomField* field = [self.customFields objectAtIndex:row];
+        return [tableColumn.identifier isEqualToString:@"CustomFieldKeyColumn"] ? field.key : field.value;
+    }
+    else {
+        return nil;
+    }
+}
+
+- (IBAction)onEndCustomFieldKeyCellEditing:(id)sender {
+    NSInteger row = self.tableViewCustomFields.selectedRow;
+    NSTextField* textField = ((NSTextField*)sender);
+    NSString* key = textField.stringValue;
+    CustomField* oldField = self.customFields[row];
+    
+    if([key isEqualToString:oldField.key]) {
+        return;
+    }
+    
+    if(!key.length) {
+        [Alerts info:@"You cannot have an empty Key here. Use the remove button to remove this field if you want." window:self.view.window];
+        textField.stringValue = oldField.key;
+        return;
+    }
+    
+    NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
+        return obj.key;
+    }];
+    
+    NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+    
+    if([existingKeySet containsObject:key]) {
+        [Alerts info:@"You cannot use that Key here as it already exists in custom fields." window:self.view.window];
+        textField.stringValue = oldField.key;
+        return;
+    }
+        
+    if([keePassReserved containsObject:key]) {
+        [Alerts info:@"You cannot use that Key here as it is reserved for standard KeePass fields." window:self.view.window];
+        textField.stringValue = oldField.key;
+        return;
+    }
+    
+    Node* item = [self getCurrentSelectedItem];
+    
+    [self.model removeCustomField:item key:oldField.key];
+    [self.model setCustomField:item key:key value:oldField.value];
+    
+    [self refreshCustomFields:item];
+}
+
+- (IBAction)onEndCustomFieldValueCellEditing:(id)sender {
+    NSInteger row = self.tableViewCustomFields.selectedRow;
+    NSTextField* textField = ((NSTextField*)sender);
+    NSString* value = textField.stringValue;
+    CustomField* oldField = self.customFields[row];
+
+    Node* item = [self getCurrentSelectedItem];
+    
+    [self.model setCustomField:item key:oldField.key value:value];
+    
+    [self refreshCustomFields:item];
+}
+
+- (IBAction)onRemoveCustomField:(id)sender {
+    if(self.tableViewCustomFields.selectedRow != -1) {
+        CustomField *field = self.customFields[self.tableViewCustomFields.selectedRow];
+        
+        [Alerts yesNo:@"Are you sure you want to remove this field?" window:self.view.window completion:^(BOOL yesNo) {
+            if(yesNo) {
+                Node* item = [self getCurrentSelectedItem];
+                
+                [self.model removeCustomField:item key:field.key];
+                
+                [self refreshCustomFields:item];
+            }
+        }];
+    }
+}
+
+- (IBAction)onAddCustomField:(id)sender {
+    Alerts* alert = [[Alerts alloc] init];
+    
+    [alert inputKeyValue:@"Enter New Custom Field" completion:^(BOOL yesNo, NSString *key, NSString *value) {
+        if(yesNo) {
+            NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
+                return obj.key;
+            }];
+            
+            NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+            const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+            
+            if([existingKeySet containsObject:key]) {
+                [Alerts info:@"You cannot use that Key here as it already exists in custom fields." window:self.view.window];
+                return;
+            }
+            
+            if([keePassReserved containsObject:key]) {
+                [Alerts info:@"You cannot use that Key here as it is reserved for standard KeePass fields." window:self.view.window];
+                return;
+            }
+
+            Node* item = [self getCurrentSelectedItem];
+            
+            [self.model setCustomField:item key:key value:value];
+            
+            [self refreshCustomFields:item];
+        }
+    }];
 }
 
 @end

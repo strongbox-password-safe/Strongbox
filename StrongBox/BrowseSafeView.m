@@ -59,14 +59,6 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [super viewWillAppear:animated];
     
     [self refresh];
-    
-    // TODO: Remove once KeePass has been proven solid...
-    
-    if(self.viewModel.database.format != kPasswordSafe && !Settings.sharedInstance.hasShownKeePassBetaWarning) {
-        Settings.sharedInstance.hasShownKeePassBetaWarning = YES;
-    
-        [Alerts warn:self title:@"KeePass Beta Warning!" message:@"Hi, this is your first time opening a KeePass safe. Please remember that Strongbox KeePass support is still in Beta, so it is strongly advised that you backup your KeePass safes before using them with Strongbox. Every effort has been made to ensure KeePass support is solid, but bugs are always possible. Please, please backup your safe! Thanks,\n-Mark"];
-    }
 }
 
 - (void)viewDidLoad {
@@ -187,6 +179,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 
 - (void)filterContentForSearchText:(NSString *)searchText scope:(NSInteger)scope {
     NSPredicate *predicate;
+    BOOL searchAll = NO;
     
     if (scope == 0) {
         predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
@@ -200,6 +193,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
     else {
+        searchAll = YES;
         predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ "
                      @"OR fields.password contains[c] %@  "
                      @"OR fields.username contains[c] %@  "
@@ -210,7 +204,23 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     }
     
     NSArray<Node*> *foo = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return [predicate evaluateWithObject:node];
+        if([predicate evaluateWithObject:node]) {
+            return YES;
+        }
+        else if(searchAll && (self.viewModel.database.format == kKeePass4 || self.viewModel.database.format == kKeePass)) {
+            // Search inside custom fields... can't find easy way to do this by predicate!
+            
+            for (NSString* key in node.fields.customFields.allKeys) {
+                NSString* value = node.fields.customFields[key];
+                
+                if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
+                   [value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
+                    return YES;
+                }
+            }
+        }
+        
+        return NO;
     }];
     
     self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];

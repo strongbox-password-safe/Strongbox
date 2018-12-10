@@ -35,6 +35,7 @@
         self.accessed = [NSDate date];
         self.passwordModified = [NSDate date];
         self.attachments = [NSMutableArray array];
+        self.customFields = [NSMutableDictionary dictionary];
     }
     
     return self;

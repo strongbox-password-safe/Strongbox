@@ -36,6 +36,7 @@
 @property (weak) IBOutlet NSTextField *labelMaximum;
 @property (weak) IBOutlet NSTextField *labelWordcount;
 
+@property (weak) IBOutlet NSButton *checkboxAutoSave;
 @property (weak) IBOutlet NSButton *checkboxAlwaysShowPassword;
 @property (weak) IBOutlet NSButton *checkboxAlwaysShowUsernameInOutlineView;
 @property (weak) IBOutlet NSButton *checkboxAutofillMostPopularUsernameEmail;

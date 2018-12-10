@@ -27,7 +27,9 @@
 }
 
 - (BOOL)biometricIdAvailable {
-    //return YES;
+    if(self.dummyMode) {
+        return YES;
+    }
     
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
@@ -46,8 +48,10 @@
 }
 
 - (void)authorize:(void (^)(BOOL success, NSError *error))completion {
-    //completion(YES, nil);
-    //return;
+    if(self.dummyMode) {
+        completion(YES, nil);
+        return;
+    }
     
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];

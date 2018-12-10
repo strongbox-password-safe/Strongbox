@@ -17,6 +17,10 @@
 
 @implementation NewSafeFormatController
 
+- (void)viewDidLoad {
+    self.tableView.delegate = self;
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     

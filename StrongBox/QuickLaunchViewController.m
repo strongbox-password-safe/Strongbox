@@ -174,10 +174,10 @@
                                                     name:UIApplicationDidBecomeActiveNotification
                                                   object:nil];
     
-    [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
-                                                            safe:safe
-                               askAboutTouchIdEnrolIfAppropriate:YES
-                                                      completion:^(Model * _Nonnull model) {
+    [OpenSafeSequenceHelper beginSequenceWithViewController:self
+                                                       safe:safe
+                                          canBiometricEnrol:YES
+                                                 completion:^(Model * _Nonnull model) {
         // Restore once open sequence is done.
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(onApplicationBecameActive:)

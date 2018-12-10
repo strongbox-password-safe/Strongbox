@@ -54,7 +54,7 @@
     [self bindShowPasswordOnDetails];
     [self bindAutoLock];
     [self bindAutoAddNewLocalSafes];
-    [self bindShowKeePassCreateOption];
+    //[self bindShowKeePassCreateOption];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -116,17 +116,17 @@
     [self bindAllowBiometric];
 }
 
-- (IBAction)onShowKeePassCreateOptionChanged:(id)sender {
-    NSLog(@"Setting ShowKeePassCreateOption to %d", self.switchShowKeePassCreateOption.on);
-    
-    Settings.sharedInstance.showKeePassCreateSafeOptions = !self.switchShowKeePassCreateOption.on;
-    
-    [self bindShowKeePassCreateOption];
-}
+//- (IBAction)onShowKeePassCreateOptionChanged:(id)sender {
+//    NSLog(@"Setting ShowKeePassCreateOption to %d", self.switchShowKeePassCreateOption.on);
+//    
+//    Settings.sharedInstance.showKeePassCreateSafeOptions = !self.switchShowKeePassCreateOption.on;
+//    
+//    [self bindShowKeePassCreateOption];
+//}
 
-- (void)bindShowKeePassCreateOption {
-    self.switchShowKeePassCreateOption.on = [[Settings sharedInstance] showKeePassCreateSafeOptions];
-}
+//- (void)bindShowKeePassCreateOption {
+//    self.switchShowKeePassCreateOption.on = [[Settings sharedInstance] showKeePassCreateSafeOptions];
+//}
 
 - (IBAction)onHowTo:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/how-to-guide"]];

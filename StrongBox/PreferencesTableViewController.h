@@ -31,7 +31,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoAddNewLocalSafes;
 @property (weak, nonatomic) IBOutlet UIButton *buttonAbout;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePassCreateOption;
+//@property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePassCreateOption;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;

@@ -11,57 +11,20 @@
 			<array>
 				<string>psafe3</string>
 				<string>dat</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>AppIcon</string>
-			<key>CFBundleTypeName</key>
-			<string>Strongbox File (Password Safe)</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>PasswordSafeDocument</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
 				<string>kdb</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>AppIcon</string>
-			<key>CFBundleTypeName</key>
-			<string>Strongbox File (KeePass 1)</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>KdbDocument</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
 				<string>kdbx</string>
+				<string>*</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>AppIcon</string>
 			<key>CFBundleTypeName</key>
-			<string>Strongbox File (KeePass 2 Classic)</string>
+			<string>Strongbox Password Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<integer>0</integer>
 			<key>NSDocumentClass</key>
-			<string>Kdbx31Document</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>kdbx</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>AppIcon</string>
-			<key>CFBundleTypeName</key>
-			<string>Strongbox File (KeePass Advanced)</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>Kdbx4Document</string>
+			<string>Document</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -77,9 +40,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.0</string>
+	<string>1.4.0</string>
 	<key>CFBundleVersion</key>
-	<string>2616</string>
+	<string>2618</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>

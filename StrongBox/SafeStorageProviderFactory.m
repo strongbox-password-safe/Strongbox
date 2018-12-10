@@ -11,6 +11,7 @@
 #import "DropboxV2StorageProvider.h"
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
+#import "FilesAppUrlBookmarkProvider.h"
 
 #ifndef IS_APP_EXTENSION
 #import "OneDriveStorageProvider.h"
@@ -40,6 +41,9 @@
         NSLog(@"ADAL Onedrive Library doesn't support App Extensions. FUTURE: Use new ADAL! ");
         return nil;
 #endif
+    }
+    else if(providerId == kFilesAppUrlBookmark) {
+        return FilesAppUrlBookmarkProvider.sharedInstance;
     }
     
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];

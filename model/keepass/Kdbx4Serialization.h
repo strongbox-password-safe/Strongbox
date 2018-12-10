@@ -13,8 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdbx4Serialization : NSObject
 
-+ (nullable Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError;
-+ (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData password:(NSString*)password ppError:(NSError**)ppError;
++ (nullable Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest ppError:(NSError**)ppError;
++ (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest ppError:(NSError**)ppError;
 
 @end
 

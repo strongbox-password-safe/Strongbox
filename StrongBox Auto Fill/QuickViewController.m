@@ -111,10 +111,10 @@
         return;
     }
     
-    [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
-                                                            safe:safe
-                               askAboutTouchIdEnrolIfAppropriate:NO
-                                                      completion:^(Model * _Nonnull model) {
+    [OpenSafeSequenceHelper beginSequenceWithViewController:self
+                                                       safe:safe
+                                          canBiometricEnrol:NO
+                                                 completion:^(Model * _Nonnull model) {
         if(model) {
             [self performSegueWithIdentifier:@"toPickCredentials" sender:model];
         }

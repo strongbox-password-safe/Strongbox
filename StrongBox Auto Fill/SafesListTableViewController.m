@@ -151,7 +151,7 @@
             cell.detailTextLabel.text = [NSString stringWithFormat:@"[Cached %@]", modDateStr];
         }
         
-        // TODO: When we get OneDrive working use the alternate branch below... :(
+        // FUTURE: When we get OneDrive working use the alternate branch below... :(
         if(safe.storageProvider == kOneDrive) {
             UIImage* img = [UIImage imageNamed:@"one-drive-icon-only-32x32"];
             cell.imageView.image = img;
@@ -195,11 +195,11 @@
 
     BOOL useAutoFillCache = ![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider];
     
-    [OpenSafeSequenceHelper.sharedInstance beginOpenSafeSequence:self
-                                                            safe:safe
-                                               openAutoFillCache:useAutoFillCache
-                               askAboutTouchIdEnrolIfAppropriate:NO
-                                                      completion:^(Model * _Nonnull model) {
+    [OpenSafeSequenceHelper beginSequenceWithViewController:self
+                                                        safe:safe
+                                          openAutoFillCache:useAutoFillCache
+                                          canBiometricEnrol:NO
+                                                 completion:^(Model * _Nonnull model) {
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
                                                           }

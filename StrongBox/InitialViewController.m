@@ -23,6 +23,9 @@
 #import "SafeStorageProviderFactory.h"
 #import "ISMessages/ISMessages.h"
 #import <PopupDialog/PopupDialog-Swift.h>
+#import "IOsUtils.h"
+#import "FilesAppUrlBookmarkProvider.h"
+#import "StrongboxUIDocument.h"
 
 @implementation InitialViewController
 
@@ -236,12 +239,44 @@
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-- (void)importFromUrlOrEmailAttachment:(NSURL *)importURL {
+- (void)import:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
     [self.navigationController popToRootViewControllerAnimated:YES];
     
-    NSData *importedData = [NSData dataWithContentsOfURL:importURL];
+    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    [document openWithCompletionHandler:^(BOOL success) {
+        if(!success) {
+            [Alerts warn:self title:@"Error Opening" message:@"Could not access this file."];
+            return;
+        }
+        
+        if([url.pathExtension caseInsensitiveCompare:@"key"] ==  NSOrderedSame) {
+            [self importKey:document url:url];
+        }
+        else {
+            [self importSafe:document url:url canOpenInPlace:canOpenInPlace];
+        }
+    }];
+}
+
+- (void)importKey:(StrongboxUIDocument*)document url:(NSURL*)url  {
+    NSString* filename = url.lastPathComponent;
+    NSString* path = [[IOsUtils applicationDocumentsDirectory].path stringByAppendingPathComponent:filename];
     
-    if (![DatabaseModel isAValidSafe:importedData]) {
+    NSError *error;
+    [document.data writeToFile:path options:kNilOptions error:&error];
+    
+    if(!error) {
+        [Alerts info:self title:@"Key File Copied" message:@"This key file has been copied to Strongbox's local documents directory"];
+    }
+    else {
+        [Alerts error:self title:@"Problem Copying Key File" error:error];
+    }
+    
+    [document closeWithCompletionHandler:nil];
+}
+
+-(void)importSafe:(StrongboxUIDocument*)document url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
+    if (![DatabaseModel isAValidSafe:document.data]) {
         [Alerts warn:self
                title:@"Invalid Safe"
              message:@"This is not a valid Strongbox password safe database file."];
@@ -249,15 +284,32 @@
         return;
     }
     
-    NSString* fileExtension = [DatabaseModel getLikelyFileExtension:importedData];
-    [self promptForImportedSafeNickName:importedData extension:fileExtension];
+    if(canOpenInPlace) {
+        [Alerts threeOptions:self title:@"Edit or Copy?"
+                     message:@"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?"
+           defaultButtonText:@"Edit in Place"
+            secondButtonText:@"Make a Copy"
+             thirdButtonText:@"Cancel"
+                      action:^(int response) {
+                          [document closeWithCompletionHandler:^(BOOL success) {
+                              if(response != 2) {
+                                  [self promptForImportedSafeNickName:document.data url:url editInPlace:response == 0];
+                              }
+                          }];
+                      }];
+    }
+    else {
+        [document closeWithCompletionHandler:^(BOOL success) {
+            [self promptForImportedSafeNickName:document.data url:url editInPlace:NO];
+        }];
+    }
 }
 
-- (void)promptForImportedSafeNickName:(NSData *)data extension:(NSString*)extension {
+- (void)promptForImportedSafeNickName:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
     [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Nickname"
-                            title:@"You are about to import a safe. What nickname would you like to use for it?"
-                          message:@"Please Enter the URL of the Safe File."
+             textFieldPlaceHolder:@"Safe Name"
+                            title:@"Enter a Name"
+                          message:@"What would you like to call this safe?"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                NSString *nickName = [SafesList sanitizeSafeNickName:text];
@@ -267,17 +319,22 @@
                                             title:@"Invalid Nickname"
                                           message:@"That nickname may already exist, or is invalid, please try a different nickname."
                                        completion:^{
-                                           [self promptForImportedSafeNickName:data extension:extension];
+                                           [self promptForImportedSafeNickName:data url:url editInPlace:editInPlace];
                                        }];
                                }
                                else {
-                                   [self addImportedSafe:nickName data:data extension:extension];
+                                   if(editInPlace) {
+                                       [self addExternalFileReferenceSafe:nickName url:url];
+                                   }
+                                   else {
+                                       [self copyAndAddImportedSafe:nickName data:data];
+                                   }
                                }
                            }
                        }];
 }
 
-- (void)addImportedSafe:(NSString *)nickName data:(NSData *)data extension:(NSString*)extension {
+- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data {
     id<SafeStorageProvider> provider;
     
     if(Settings.sharedInstance.iCloudOn) {
@@ -287,6 +344,8 @@
         provider = LocalDeviceStorageProvider.sharedInstance;
     }
     
+    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
+
     [provider create:nickName
            extension:extension
                 data:data
@@ -307,6 +366,37 @@
      }];
 }
 
+- (void)addExternalFileReferenceSafe:(NSString *)nickName url:(NSURL*)url {
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
+    if (!securitySucceeded) {
+        NSLog(@"Could not access secure scoped resource!");
+        return;
+    }
+    
+    NSURLBookmarkCreationOptions options = 0;
+#ifdef NSURLBookmarkCreationWithSecurityScope
+    options |= NSURLBookmarkCreationWithSecurityScope;
+#endif
+    
+    NSError* error;
+    NSData* bookMark = [url bookmarkDataWithOptions:options includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
+    
+    [url stopAccessingSecurityScopedResource];
+    
+    if (error) {
+        [Alerts error:self title:@"Could not bookmark this file" error:error];
+    }
+    
+    NSString* filename = [url lastPathComponent];
+    
+    SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];
+    
+    [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self updateCurrentRootSafesView];
+    });
+}
 
 - (SafeMetaData*)getPrimarySafe {
     SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstObject];

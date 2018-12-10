@@ -7,6 +7,8 @@
 //
 
 #import "Alerts.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+#import "Utils.h"
 
 @interface Alerts ()
 
@@ -27,21 +29,56 @@
     return self;
 }
 
+- (void)OkCancelWithPasswordNonEmpty:(UIViewController *)viewController
+                          completion:(void (^) (NSString *password, BOOL response))completion {
+    __weak typeof(self) weakSelf = self;
+    
+    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+        textField.secureTextEntry = YES;
+        [textField addTarget:weakSelf
+                      action:@selector(validateNoneEmpty:)
+            forControlEvents:UIControlEventEditingChanged];
+    }];
+    
+    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction *a) {
+                                                    completion((self.alertController.textFields[0]).text, true);
+                                                }];
+    
+    
+    self.defaultAction.enabled = NO;
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) {
+                                                             completion(nil, false);
+                                                         }];
+    
+    [self.alertController addAction:self.defaultAction];
+    [self.alertController addAction:cancelAction];
+    
+    [viewController presentViewController:self.alertController animated:YES completion:nil];
+}
+
 - (void)OkCancelWithPasswordAndConfirm:(UIViewController *)viewController
+                            allowEmpty:(BOOL)allowEmpty
                             completion:(void (^) (NSString *password, BOOL response))completion {
     __weak typeof(self) weakSelf = self;
 
+    SEL validation = allowEmpty ? @selector(validatePasswordAndConfirmPassword:) : @selector(validatePasswordAndConfirmPasswordNotEmpty:);
+    
     [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField                   addTarget:weakSelf
-                                        action:@selector(validatePasswordAndConfirmPassword:)
+                          [textField addTarget:weakSelf
+                                        action:validation
                               forControlEvents:UIControlEventEditingChanged];
                           textField.placeholder = @"Password";
                           textField.secureTextEntry = YES;
                       }];
 
     [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField                   addTarget:weakSelf
-                                        action:@selector(validatePasswordAndConfirmPassword:)
+                          [textField addTarget:weakSelf
+                                        action:validation
                               forControlEvents:UIControlEventEditingChanged];
                           textField.placeholder = @"Confirm Password";
                           textField.secureTextEntry = YES;
@@ -52,8 +89,8 @@
                                                 handler:^(UIAlertAction *a) {
                                                     completion(((self.alertController).textFields[0]).text, true);
                                                 }];
-
-    self.defaultAction.enabled = NO;
+    
+    self.defaultAction.enabled = allowEmpty;
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel
@@ -71,7 +108,14 @@
     UITextField *name = _alertController.textFields[0];
     UITextField *password = _alertController.textFields[1];
 
-    (self.defaultAction).enabled = (name.text.length && [name.text isEqualToString:password.text]);
+    (self.defaultAction).enabled = ([name.text isEqualToString:password.text]);
+}
+
+- (void)validatePasswordAndConfirmPasswordNotEmpty:(UITextField *)sender {
+    UITextField *name = _alertController.textFields[0];
+    UITextField *password = _alertController.textFields[1];
+    
+    (self.defaultAction).enabled = name.text.length && ([name.text isEqualToString:password.text]);
 }
 
 + (void)okCancel:(UIViewController *)viewController
@@ -294,38 +338,6 @@
                                                           handler:^(UIAlertAction *a) {
                                                               completion((self.alertController.textFields[0]).text, true);
                                                           }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(nil, false);
-                                                         }];
-    
-    [self.alertController addAction:self.defaultAction];
-    [self.alertController addAction:cancelAction];
-    
-    [viewController presentViewController:self.alertController animated:YES completion:nil];
-}
-
-- (void)OkCancelWithPasswordNonEmpty:(UIViewController *)viewController
-                          completion:(void (^) (NSString *password, BOOL response))completion {
-    __weak typeof(self) weakSelf = self;
-    
-    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-        textField.secureTextEntry = YES;
-        [textField addTarget:weakSelf
-                      action:@selector(validateNoneEmpty:)
-            forControlEvents:UIControlEventEditingChanged];
-    }];
-
-    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction *a) {
-                                                    completion((self.alertController.textFields[0]).text, true);
-                                                }];
-    
-    
-    self.defaultAction.enabled = NO;
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel

@@ -68,7 +68,7 @@ static BOOL kLogVerbose = NO;
     return self;
 }
 
-- (NSString*)stage1Serialize:(NSString*)password error:(NSError**)error {
+- (NSString*)stage1Serialize:(NSString*)password keyFileDigest:(NSData*)keyFileDigest error:(NSError**)error {
     // 1. File Header
     
     KeepassFileHeader header = getNewFileHeader(self.serializationData.fileVersion);
@@ -76,7 +76,7 @@ static BOOL kLogVerbose = NO;
     
     // 2. Generate Encryption Parameters To Be Serialized in the Headers
     
-    NSData* compositeKey = getCompositeKey(password);
+    NSData* compositeKey = getCompositeKey(password, keyFileDigest);
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
     NSData* transformKey = getAesTransformKey(compositeKey, transformSeed, self.serializationData.transformRounds);
     NSData* masterSeed = getRandomData(kMasterSeedLength);
@@ -163,7 +163,7 @@ static BOOL kLogVerbose = NO;
     return ret;
 }
 
-+(SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password ppError:(NSError**)ppError {
++ (SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password keyFileDigest:(NSData *)keyFileDigest ppError:(NSError **)ppError {
     size_t offset;
     NSDictionary *headerEntries = getHeaderEntries3((uint8_t*)safeData.bytes, safeData.length, &offset);
     if(!headerEntries) {
@@ -177,7 +177,7 @@ static BOOL kLogVerbose = NO;
     
     DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
     
-    NSData* compositeKey = getCompositeKey(password);
+    NSData* compositeKey = getCompositeKey(password, keyFileDigest);
     NSData* transformKey = getAesTransformKey(compositeKey, decryptionParameters.transformSeed, decryptionParameters.transformRounds);
     NSData* masterKey = getMasterKey(decryptionParameters.masterSeed, transformKey);
     
@@ -213,7 +213,7 @@ static BOOL kLogVerbose = NO;
     NSData *actualStartStream = [decrypted subdataWithRange:NSMakeRange(0, decryptionParameters.streamStartBytes.length)];
     if(![decryptionParameters.streamStartBytes isEqualToData:actualStartStream]) {
         if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Passphrase Incorrect" errorCode:-6];
+            *ppError = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
         }
         
         return nil;

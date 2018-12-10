@@ -18,6 +18,7 @@
 #import "FileAttachmentsViewControllerTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "UiAttachment.h"
+#import "CustomFieldsViewController.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -201,6 +202,12 @@ static const int kMinNotesCellHeight = 160;
         singleAttachment = [NSString stringWithFormat:@"📎 %@", [self.record.fields.attachments objectAtIndex:0].filename];
     }
     self.labelAttachmentCount.text = count == 0 ? @"📎 None" : count == 1 ? singleAttachment : [NSString stringWithFormat:@"📎 %d Attachments", count];
+    
+    // Custom Fields
+    
+    int customFieldCount = (int)self.record.fields.customFields.count;
+
+    self.labelCustomFieldsCount.text = customFieldCount == 0 ? @"None" : [NSString stringWithFormat:@"%d Field(s)", customFieldCount];
 }
 
 - (void)setEditing:(BOOL)flag animated:(BOOL)animated {
@@ -267,10 +274,13 @@ static const int kMinNotesCellHeight = 160;
     (self.buttonCopyUrl).enabled = !self.isEditing && (self.record != nil && (self.record.fields.url).length);
     (self.buttonCopyAndLaunchUrl).enabled = !self.isEditing;
     
-    // Attachments screen not available in edit mode
+    // Attachments & Custom Fields screen not available in edit mode
     
     self.labelAttachmentCount.textColor = self.editing ? [UIColor grayColor] : [UIColor blueColor];
     self.tableCellAttachments.userInteractionEnabled = !self.editing;
+
+    self.labelCustomFieldsCount.textColor = self.editing ? [UIColor grayColor] : [UIColor blueColor];
+    self.tableCellCustomFields.userInteractionEnabled = !self.editing;
 
     // History only available on Password Safe and non new
 
@@ -477,6 +487,33 @@ static NSString * trim(NSString *string) {
             [self onAttachmentsChanged:self.record attachments:weakRef.attachments];
         };
     }
+    else if ([segue.identifier isEqualToString:@"segueToCustomFields"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        
+        CustomFieldsViewController* vc = (CustomFieldsViewController*)[nav topViewController];
+        
+        
+        NSArray<NSString*> *sortedKeys = [self.record.fields.customFields.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            return [obj1 compare:obj2];
+        }];
+        
+        NSMutableArray<CustomField*> *items = [NSMutableArray array];
+        for (NSString* key in sortedKeys) {
+            CustomField* customField = [[CustomField alloc] init];
+            
+            customField.key = key;
+            customField.value = self.record.fields.customFields[key];
+            
+            [items addObject:customField];
+        }
+        
+        vc.items = items;
+        
+        __weak CustomFieldsViewController* weakRef = vc;
+        vc.onDoneWithChanges = ^{
+            [self onCustomFieldsChanged:self.record items:weakRef.items];
+        };
+    }
 }
 
 static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAttachment*>* dbAttachments) {
@@ -501,6 +538,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     if (section == 4) { // Hide Attachments Section for PasswordSafe
         return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForHeaderInSection:section];
     }
+    else if (section == 5) { // Hide Custom Fields for password safe and keepass 1
+        return self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 : [super tableView:tableView heightForHeaderInSection:section];
+    }
     else if (section == 2) {  // Hide Email Section for KeePass
         return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForHeaderInSection:section] : 0;
     }
@@ -509,13 +549,16 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 5 && indexPath.row == 0) {
+    if (indexPath.section == 6 && indexPath.row == 0) {
         int password = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
         int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
        
         int attachments = self.viewModel.database.format == kPasswordSafe ? 0 :
             [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:4]] + self.tableView.sectionHeaderHeight;
+        
+        int customFields = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 :
+        [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:5]] + self.tableView.sectionHeaderHeight;
         
         int email = self.viewModel.database.format == kPasswordSafe ?
             [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]] + self.tableView.sectionHeaderHeight : 0;
@@ -525,7 +568,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         // Include Header Height (not from cells as they're set to UITableViewAutomaicDimension (-1) so ask for default
         // Tableview section header height then x 3 fixed header
         
-        int otherCellsAndCellHeadersHeight = password + username + email + url + attachments + (3 * self.tableView.sectionHeaderHeight);
+        int otherCellsAndCellHeadersHeight = password + username + email + url + attachments + customFields + (3 * self.tableView.sectionHeaderHeight);
         
         int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int toolBarHeight = self.navigationController.toolbar.frame.size.height;
@@ -548,6 +591,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     }
     else if (indexPath.section == 4 && indexPath.row == 0) { // Hide Attachments Section for Passwprd Safe
         return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
+    }
+    else if (indexPath.section == 5 && indexPath.row == 0) { // Hide Custom Fields Section for Password Safe & KeePass 1
+        return self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
     else if (indexPath.section == 2 && indexPath.row == 0) { // Hide Email Section for KeePass
         return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForRowAtIndexPath:indexPath] : 0;
@@ -592,6 +638,26 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 - (void)onAttachmentsChanged:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments {
     [self.viewModel.database setNodeAttachments:node attachments:attachments];
+    
+    [self saveChanges:^(NSError *error) {
+        if (error != nil) {
+            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
+            NSLog(@"%@", error);
+        }
+        else {
+            [self bindUiToRecord];
+        }
+    }];
+}
+
+- (void)onCustomFieldsChanged:(Node*)node items:(NSArray<CustomField*>*)items {
+    [node.fields.customFields removeAllObjects];
+    
+    for (CustomField *field in items) {
+        [node.fields.customFields setObject:field.value forKey:field.key];
+    }
     
     [self saveChanges:^(NSError *error) {
         if (error != nil) {

@@ -29,21 +29,45 @@ static NSString* kKeychainService = @"Strongbox";
     return self;
 }
 
-- (void)removeTouchIdPassword {
-    [SAMKeychain deletePasswordForService:kKeychainService account:self.uuid];
-}
-
 - (NSString*)touchIdPassword {
     NSError *error;
-    NSString * ret = [SAMKeychain passwordForService:kKeychainService account:self.uuid error:&error];
-
-    return ret;
+    
+    NSData * ret = [SAMKeychain passwordDataForService:kKeychainService account:self.uuid error:&error];
+    
+    if(ret) {
+        return [[NSString alloc] initWithData:ret encoding:NSUTF8StringEncoding];
+    }
+    
+    return nil;
 }
 
 - (void)setTouchIdPassword:(NSString *)touchIdPassword {
-    [SAMKeychain setPassword:touchIdPassword forService:kKeychainService account:self.uuid];
+    if(touchIdPassword) {
+        NSData* data = [touchIdPassword dataUsingEncoding:NSUTF8StringEncoding];
+        [SAMKeychain setPasswordData:data forService:kKeychainService account:self.uuid];
+    }
+    else {
+        [SAMKeychain deletePasswordForService:kKeychainService account:self.uuid];
+    }
 }
 
+- (NSData *)touchIdKeyFileDigest {
+    NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", self.uuid];
+    
+    return [SAMKeychain passwordDataForService:kKeychainService account:account];
+}
+
+- (void)setTouchIdKeyFileDigest:(NSData *)touchIdKeyFileDigest {
+    NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", self.uuid];
+    
+    if(touchIdKeyFileDigest) {
+        [SAMKeychain setPasswordData:touchIdKeyFileDigest forService:kKeychainService account:account];
+    }
+    else {
+        [SAMKeychain deletePasswordForService:kKeychainService account:account];
+    }
+
+}
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"%@ [%u] - [%@-%@]", self.nickName, self.storageProvider, self.fileName, self.fileIdentifier];

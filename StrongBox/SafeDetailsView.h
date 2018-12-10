@@ -21,11 +21,13 @@
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelNumberOfUniqueEmails;
 @property (weak, nonatomic) IBOutlet UILabel * _Nullable labelMostPopularEmail;
 
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelToggleOfflineCache;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelExportByEmail;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelToggleTouchId;
-@property (weak, nonatomic) IBOutlet UILabel * _Nullable labelChangeMasterPassword;
-
+@property (weak, nonatomic) IBOutlet UILabel *labelExportByEmail;
+@property (weak, nonatomic) IBOutlet UILabel *labelChangeMasterPassword;
+@property (weak, nonatomic) IBOutlet UILabel *labelToggleTouchId;
+@property (weak, nonatomic) IBOutlet UILabel *labelToggleOfflineCache;
+@property (weak, nonatomic) IBOutlet UILabel *labelChangeKeyFile;
 @property (weak, nonatomic) IBOutlet UILabel *labelToggleAutoFillCache;
+@property (weak, nonatomic) IBOutlet UILabel *labelAutoFillCacheTime;
+@property (weak, nonatomic) IBOutlet UILabel *labelOfflineCacheTime;
 
 @end

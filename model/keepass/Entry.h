@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Entry : BaseXmlDomainObjectHandler
 
++ (const NSSet<NSString*>*)reservedCustomFieldKeys;
+
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
 @property (nonatomic, nullable) GenericTextStringElementHandler* iconId;
@@ -38,8 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString* url;
 @property (nonatomic) NSString* notes;
 
-@property (nonatomic, readonly) NSDictionary<NSString*, NSString*> *customFields;
+// Safe Custom String setter...
 
+- (void)setString:(NSString*)key value:(NSString*)value protected:(BOOL)protected;
+
+// R/O Handy View
+
+@property (nonatomic, readonly) NSDictionary<NSString*, NSString*> *customFields;
 
 @end
 

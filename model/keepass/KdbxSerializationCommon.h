@@ -46,7 +46,7 @@ KeepassFileHeader getNewFileHeader(NSString* version);
 void dumpHeaderEntries(NSDictionary *headerEntries);
 NSObject*__nullable getHeaderEntryObject(uint8_t identifier, NSData* data);
 
-NSData *getCompositeKey(NSString *password);
+NSData *getCompositeKey(NSString*__nullable password, NSData*__nullable keyFileDigest);
 NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
 NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);

@@ -42,20 +42,28 @@ static const BOOL kLogVerbose = NO;
     [rootGroup addChild:keePassRootGroup];
 }
 
-- (StrongboxDatabase *)create:(NSString *)password {
+- (nonnull StrongboxDatabase *)create:(nullable NSString *)password {
+    return [self create:password keyFileDigest:nil];
+}
+
+- (StrongboxDatabase *)create:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
     Node* rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:NO];
     
     [self addKeePassDefaultRootGroup:rootGroup];
     
     Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
     
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password keyFileDigest:keyFileDigest];
     
     return ret;
 }
 
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError**)error {
-    KdbSerializationData *serializationData = [KdbSerialization deserialize:data password:password ppError:error];
+- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError **)error {
+    return [self open:data password:password keyFileDigest:nil error:error];
+}
+
+- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest error:(NSError **)error {
+    KdbSerializationData *serializationData = [KdbSerialization deserialize:data password:password keyFileDigest:keyFileDigest ppError:error];
     
     if(serializationData == nil) {
         NSLog(@"Error getting Decrypting KDB binary: [%@]", *error);
@@ -82,13 +90,25 @@ static const BOOL kLogVerbose = NO;
     metadata.transformRounds = serializationData.transformRounds;
     metadata.flags = serializationData.flags;
 
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password attachments:attachments];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
+                                                                 metadata:metadata
+                                                           masterPassword:password
+                                                            keyFileDigest:keyFileDigest
+                                                              attachments:attachments];
     ret.adaptorTag = serializationData.metaEntries;
     
     return ret;
 }
 
 - (NSData *)save:(StrongboxDatabase *)database error:(NSError**)error {
+    if(!database.masterPassword.length && !database.keyFileDigest) { // KeePass 1 does not allow empty Password 
+        if(error) {
+            *error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
+        }
+        
+        return nil;
+    }
+    
     KdbSerializationData *serializationData = [[KdbSerializationData alloc] init];
     
     if(database.rootGroup.childGroups.count == 0) {
@@ -113,7 +133,7 @@ static const BOOL kLogVerbose = NO;
         [serializationData.metaEntries addObjectsFromArray:metaEntries];
     }
     
-    return [KdbSerialization serialize:serializationData password:database.masterPassword ppError:error];
+    return [KdbSerialization serialize:serializationData password:database.masterPassword keyFileDigest:database.keyFileDigest ppError:error];
 }
 
 -(void)nodeModelToGroupsAndEntries:(int)level

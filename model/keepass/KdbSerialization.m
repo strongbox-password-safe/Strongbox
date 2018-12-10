@@ -15,6 +15,7 @@
 #import "KdbEntry.h"
 #import "KdbSerializationData.h"
 #import "KeePassConstants.h"
+#import <CommonCrypto/CommonDigest.h>
 
 typedef struct _KdbHeader {
     uint8_t signature1[4];
@@ -73,7 +74,34 @@ static const BOOL kLogVerbose = NO;
     return YES;
 }
 
-+ (KdbSerializationData*)deserialize:(NSData*)data password:(NSString*)password ppError:(NSError**)error {
+static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable keyFileDigest) {
+    if(password.length && !keyFileDigest) {
+        return sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
+    }
+    else if(keyFileDigest && !password.length) {
+        return keyFileDigest;
+    }
+    else {
+        NSData* hashedPassword = sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
+        
+        NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
+        CC_SHA256_CTX context;
+        CC_SHA256_Init(&context);
+        
+        if(hashedPassword) {
+            CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
+        }
+        
+        if(keyFileDigest) {
+            CC_SHA256_Update(&context, keyFileDigest.bytes, (CC_LONG)keyFileDigest.length);
+        }
+        
+        CC_SHA256_Final(compositeKey.mutableBytes, &context);
+        return compositeKey;
+    }
+}
+
++ (KdbSerializationData*)deserialize:(NSData*)data password:(NSString*)password keyFileDigest:(NSData *)keyFileDigest ppError:(NSError**)error {
     if(data.length < SIZE_OF_KDB_HEADER) {
         NSLog(@"Not a valid KDB file. Not long enough.");
         if(error) {
@@ -128,7 +156,9 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    NSData *compositeKey = sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
+    NSData* compositeKey = getComposite(password, keyFileDigest);
+    
+    
     //NSLog(@"DESERIALIZE: COMPOSITE KEY: [%@]", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
     
     NSData *transformKey = getAesTransformKey(compositeKey, transformSeed, transformRounds);
@@ -151,7 +181,7 @@ static const BOOL kLogVerbose = NO;
     if(![sha256(pt) isEqualToData:contentsSha256]) {
         NSLog(@"Actual Database Contents Hash does not match expected. This file is corrupt or the password is incorect.");
         if(error) {
-            *error = [Utils createNSError:@"Incorrect Passphrase or Corrupt File." errorCode:-5];
+            *error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key) or Corrupt File." errorCode:kStrongboxErrorCodeIncorrectCredentials];
         }
         return nil;
     }
@@ -198,7 +228,7 @@ static const BOOL kLogVerbose = NO;
     return ret;
 }
 
-+ (NSData*)serialize:(KdbSerializationData*)serializationData password:(NSString*)password ppError:(NSError**)error {
++ (NSData*)serialize:(KdbSerializationData*)serializationData password:(NSString*)password keyFileDigest:(NSData *)keyFileDigest ppError:(NSError**)error {
     if(kLogVerbose) {
         NSLog(@"SERIALIZE: %@", serializationData);
     }
@@ -227,7 +257,8 @@ static const BOOL kLogVerbose = NO;
     NSData* contentsHash = sha256(pt);
     //NSLog(@"SERIALIZE: [%@] - %lu", [contentsHash base64EncodedStringWithOptions:kNilOptions], (unsigned long)pt.length);
     
-    NSData *compositeKey = sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
+    NSData *compositeKey = getComposite(password, keyFileDigest);
+    
     //NSLog(@"SERIALIZE: COMPOSITE KEY: [%@]", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
     
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);

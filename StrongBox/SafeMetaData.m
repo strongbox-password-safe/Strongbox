@@ -81,16 +81,36 @@
     return self;
 }
 
-- (void)removeTouchIdPassword {
-    [JNKeychain deleteValueForKey:self.uuid];
-}
-
 - (NSString*)touchIdPassword {
     return [JNKeychain loadValueForKey:self.uuid];
 }
 
 - (void)setTouchIdPassword:(NSString *)touchIdPassword {
-    [JNKeychain saveValue:touchIdPassword forKey:self.uuid];
+    if(touchIdPassword) {
+        [JNKeychain saveValue:touchIdPassword forKey:self.uuid];
+    }
+    else {
+        [JNKeychain deleteValueForKey:self.uuid];
+    }
+}
+
+- (NSData *)touchIdKeyFileDigest {
+    NSString *key = [NSString stringWithFormat:@"%@-keyFileDigest", self.uuid];
+    
+    NSData* ret = [JNKeychain loadValueForKey:key];
+
+    return ret;
+}
+
+- (void)setTouchIdKeyFileDigest:(NSData *)touchIdKeyFileDigest {
+    NSString *key = [NSString stringWithFormat:@"%@-keyFileDigest", self.uuid];
+    
+    if(touchIdKeyFileDigest) {
+        [JNKeychain saveValue:touchIdKeyFileDigest forKey:key];
+    }
+    else {
+        [JNKeychain deleteValueForKey:key];
+    }
 }
 
 @end

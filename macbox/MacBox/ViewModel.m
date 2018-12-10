@@ -25,9 +25,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
 @implementation ViewModel
 
-- (instancetype)initNewWithSampleData:(Document*)document; {
+- (instancetype)initNewWithSampleData:(Document *)document format:(DatabaseFormat)format password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
     if (self = [super init]) {
-        self.passwordDatabase = [[DatabaseModel alloc] initNewWithoutPassword:document.format];
+        self.passwordDatabase = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:keyFileDigest format:format];
         self.lockedSafeInfo = nil;
         
         _document = document;
@@ -84,6 +84,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         return NO;
     }
     
+    // Clear the UNDO stack otherwise the operations will fail
+    [self.document.undoManager removeAllActions];
+    
     self.lockedSafeInfo = [[LockedSafeInfo alloc] initWithEncryptedData:data selectedItem:selectedItem];
     self.passwordDatabase = nil;
     
@@ -91,11 +94,15 @@ static NSString* kDefaultNewTitle = @"Untitled";
 }
 
 - (BOOL)unlock:(NSString*)password selectedItem:(NSString**)selectedItem error:(NSError**)error {
+    return [self unlock:password keyFileDigest:nil selectedItem:selectedItem error:error];
+}
+
+- (BOOL)unlock:(NSString*)password keyFileDigest:(NSData*)keyFileDigest selectedItem:(NSString**)selectedItem error:(NSError**)error {
     if(!self.locked) {
         return YES;
     }
     
-    DatabaseModel *model = [[DatabaseModel alloc] initExistingWithDataAndPassword:self.lockedSafeInfo.encryptedData password:password error:error];
+    DatabaseModel *model = [[DatabaseModel alloc] initExistingWithDataAndPassword:self.lockedSafeInfo.encryptedData password:password keyFileDigest:keyFileDigest error:error];
     *selectedItem = self.lockedSafeInfo.selectedItem;
     
     if(model != nil) {
@@ -107,23 +114,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
     return NO;
 }
 
--(NSString*)masterPassword {
-    return self.locked ? nil : self.passwordDatabase.masterPassword;
-}
-
-- (void)setMasterPassword:(NSString *)masterPassword {
-    if(self.locked) {
-        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
-    }
-    
-    [self.passwordDatabase setMasterPassword:masterPassword];
-    
-    self.document.dirty = YES;
-}
-
-- (BOOL)masterPasswordIsSet {
+- (BOOL)masterCredentialsSet {
     if(!self.locked) {
-        return self.passwordDatabase.masterPassword != nil;
+        return !(self.passwordDatabase.masterPassword == nil && self.passwordDatabase.keyFileDigest == nil);
     }
     
     return NO;
@@ -142,76 +135,183 @@ static NSString* kDefaultNewTitle = @"Untitled";
     return [self.document fileURL];
 }
 
-- (BOOL)dirty {
-    return self.document.dirty;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-(NSString*)masterPassword {
+    return self.locked ? nil : self.passwordDatabase.masterPassword;
 }
 
-- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {
+-(NSData *)masterKeyFileDigest {
+    return self.locked ? nil : self.passwordDatabase.keyFileDigest;
+}
+
+- (void)setMasterCredentials:(NSString *)masterPassword masterKeyFileDigest:(NSData *)masterKeyFileDigest {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
+    NSString* original = self.passwordDatabase.masterPassword;
+    NSData* originalKey = self.passwordDatabase.keyFileDigest;
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setMasterCredentials:original masterKeyFileDigest:originalKey];
+    [self.document.undoManager setActionName:@"Change Master Credentials"];
+    
+    [self.passwordDatabase setMasterPassword:masterPassword];
+    [self.passwordDatabase setKeyFileDigest:masterKeyFileDigest];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title
+{
+    return [self setItemTitle:item title:title modified:nil];
+}
+
+- (void)setItemEmail:(Node*_Nonnull)item email:(NSString*_Nonnull)email {
+    [self setItemEmail:item email:email modified:nil];
+}
+
+- (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username {
+    [self setItemUsername:item username:username modified:nil];
+}
+
+- (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url {
+    [self setItemUrl:item url:url modified:nil];
+}
+
+- (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password {
+    [self setItemPassword:item password:password modified:nil];
+}
+
+- (void)setItemNotes:(Node*)item notes:(NSString*)notes {
+    [self setItemNotes:item notes:notes modified:nil];
+}
+
+- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    NSString* old = item.title;
+    NSDate* oldModified = item.fields.modified;
+    
     if([item setTitle:title]) {
-        self.document.dirty = YES;
+        item.fields.modified = modified ? modified : [[NSDate alloc] init];
+        
+        [[self.document.undoManager prepareWithInvocationTarget:self] setItemTitle:item title:old modified:oldModified];
+        [self.document.undoManager setActionName:@"Title Change"];
+
+        [self notifyModelChanged];
+
         return YES;
     }
     
     return NO;
 }
 
-- (void)setItemEmail:(Node*_Nonnull)item email:(NSString*_Nonnull)email {
+- (void)setItemEmail:(Node*_Nonnull)item email:(NSString*_Nonnull)email modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
-    
+
+    NSString* old = item.fields.email;
+    NSDate* oldModified = item.fields.modified;
+
     item.fields.email = email;
-    self.document.dirty = YES;
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemEmail:item email:old modified:oldModified];
+    [self.document.undoManager setActionName:@"Email Change"];
+    
+    [self notifyModelChanged];
 }
 
-- (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username {
+- (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
-    
+
+    NSString* old = item.fields.username;
+    NSDate* oldModified = item.fields.modified;
+
     item.fields.username = username;
-    self.document.dirty = YES;
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemUsername:item username:old modified:oldModified];
+    [self.document.undoManager setActionName:@"Username Change"];
+    
+    [self notifyModelChanged];
 }
 
-- (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url {
+- (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
-    
+
+    NSString* old = item.fields.url;
+    NSDate* oldModified = item.fields.modified;
+
     item.fields.url = url;
-    self.document.dirty = YES;
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemUrl:item url:old modified:oldModified];
+    [self.document.undoManager setActionName:@"URL Change"];
+    
+    [self notifyModelChanged];
 }
 
-- (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password
-{
+- (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
+    NSString* old = item.fields.password;
+    NSDate* oldModified = item.fields.modified;
+
     item.fields.password = password;
-    self.document.dirty = YES;
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemPassword:item password:old modified:oldModified];
+    [self.document.undoManager setActionName:@"Password Change"];
+    
+    [self notifyModelChanged];
 }
 
-- (void)setItemNotes:(Node*)item notes:(NSString*)notes {
+- (void)setItemNotes:(Node*)item notes:(NSString*)notes modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
+    NSString* old = item.fields.notes;
+    NSDate* oldModified = item.fields.modified;
+
     item.fields.notes = notes;
-    self.document.dirty = YES;
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemNotes:item notes:old modified:oldModified];
+    [self.document.undoManager setActionName:@"Notes Change"];
+    
+    [self notifyModelChanged];
 }
 
 - (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
+ 
+    NodeFileAttachment* nodeAttachment = item.fields.attachments[atIndex];
+    DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
+    UiAttachment* old = [[UiAttachment alloc] initWithFilename:nodeAttachment.filename data:dbAttachment.data];
     
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item attachment:old];
+    
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Remove Attachment"];
+    }
+
     [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
-    self.document.dirty = YES;
+
+    [self notifyModelChanged];
 }
 
 - (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment {
@@ -219,63 +319,77 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    //[item.fields.attachments addObject:attachment];
-    
     [self.passwordDatabase addNodeAttachment:item attachment:attachment];
-    self.document.dirty = YES;
-}
 
-NSString* getSmartFillTitle() {
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
+    // To Undo we need to find this attachment's index!
     
-    if(clipboardText) {
-        // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
-
-        NSURL *url = [NSURL URLWithString:clipboardText];
-        
-        if (url && url.scheme && url.host)
-        {
-            return url.host;
+    int i=0;
+    NSUInteger foundIndex = -1;
+    for (NodeFileAttachment* nodeAttachment in item.fields.attachments) {
+        if([nodeAttachment.filename isEqualToString:attachment.filename]) {
+            DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
+            if([dbAttachment.data isEqualToData:attachment.data]) {
+                foundIndex = i;
+                break;
+            }
         }
+        i++;
     }
     
-    return kDefaultNewTitle;
-}
-
-NSString* getSmartFillUrl() {
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
-    
-    if(clipboardText) {
-        NSURL *url = [NSURL URLWithString:clipboardText];
-        if (url && url.scheme && url.host)
-        {
-            return clipboardText;
-        }
+    if(foundIndex == -1) {
+        NSLog(@"WARN: Could not find added Attachment index!");
+        // Something very wrong...
+        return;
     }
     
-    return @"";
-}
-
-NSString* getSmartFillNotes() {
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
+    NSLog(@"found attachment added at: %lu", (unsigned long)foundIndex);
     
-    if(clipboardText) {
-        return clipboardText;
+    [[self.document.undoManager prepareWithInvocationTarget:self] removeItemAttachment:item atIndex:foundIndex];
+    
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Add Attachment"];
     }
     
-    return @"";
+    [self notifyModelChanged];
 }
 
-
--(NSString*) getAutoFillMostPopularUsername {
-    return self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
+- (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    NSString* oldValue = [item.fields.customFields objectForKey:key];
+    
+    [item.fields.customFields setObject:value forKey:key];
+    
+    if(oldValue) {
+        [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue];
+        [self.document.undoManager setActionName:@"Set Custom Field"];
+    }
+    else {
+        [[self.document.undoManager prepareWithInvocationTarget:self] removeCustomField:item key:key];
+        [self.document.undoManager setActionName:@"Add Custom Field"];
+    }
+    
+    [self notifyModelChanged];
 }
 
--(NSString*) getAutoFillMostPopularEmail {
-    return self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
+- (void)removeCustomField:(Node *)item key:(NSString *)key {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    NSString* oldValue = [item.fields.customFields objectForKey:key];
+    [item.fields.customFields removeObjectForKey:key];
+
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue];
+    
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Remove Custom Field"];
+    }
+    
+    [self notifyModelChanged];
 }
 
 - (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
@@ -325,15 +439,72 @@ NSString* getSmartFillNotes() {
     record.fields.accessed = date;
     record.fields.modified = date;
     
-    if([parentGroup addChild:record]) {
-        self.document.dirty = YES;
-        return record;
+    if(![parentGroup validateAddChild:record]) {
+        return nil;
     }
     
-    return nil;
+    return [self addItem:record parent:parentGroup];
+}
+
+- (Node*)addNewGroup:(Node *_Nonnull)parentGroup {
+    NSString *newGroupName = kDefaultNewTitle;
+    
+    NSInteger i = 0;
+    BOOL success = NO;
+    Node* newGroup;
+    do {
+        newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup uuid:nil];
+        success =  newGroup && [parentGroup validateAddChild:newGroup];
+        i++;
+        newGroupName = [NSString stringWithFormat:@"%@ %ld", kDefaultNewTitle, i];
+    }while (!success);
+    
+    return [self addItem:newGroup parent:parentGroup];
+}
+
+- (Node*)addItem:(Node*)item parent:(Node*)parent {
+    [parent addChild:item];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Add Item"];
+    }
+    
+    [self notifyModelChanged];
+    return item;
+}
+
+- (void)deleteItem:(Node *_Nonnull)child {
+    [child.parent removeChild:child];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent];
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Delete Item"];
+    }
+
+    [self notifyModelChanged];
+}
+
+- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
+    if(![node validateChangeParent:parent]) {
+        return NO;
+    }
+
+    Node* old = node.parent;
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] changeParent:old node:node];
+    [self.document.undoManager setActionName:@"Move Item"];
+    
+    BOOL ret = [node changeParent:parent];
+
+    [self notifyModelChanged];
+    
+    return ret;
 }
 
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows {
+    [self.document.undoManager beginUndoGrouping];
+    
     for (CHCSVOrderedDictionary* row  in rows) {
         NSString* actualTitle = [row objectForKey:kCSVHeaderTitle];
         NSString* actualUsername = [row objectForKey:kCSVHeaderUsername];
@@ -348,7 +519,7 @@ NSString* getSmartFillNotes() {
         actualEmail = actualEmail ? actualEmail : @"";
         actualPassword = actualPassword ? actualPassword : @"";
         actualNotes = actualNotes ? actualNotes : @"";
-
+        
         NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
                                                               url:actualUrl
                                                          password:actualPassword
@@ -363,48 +534,75 @@ NSString* getSmartFillNotes() {
         record.fields.accessed = date;
         record.fields.modified = date;
         
-        [self.passwordDatabase.rootGroup addChild:record];
+        [self addItem:record parent:self.passwordDatabase.rootGroup];
     }
     
-    self.document.dirty = YES;
+    [self.document.undoManager setActionName:@"Import Entries from CSV"];
+    [self.document.undoManager endUndoGrouping];
 }
 
-- (Node*)addNewGroup:(Node *_Nonnull)parentGroup {
-    NSString *newGroupName = kDefaultNewTitle;
-    
-    NSInteger i = 0;
-    BOOL success = NO;
-    Node* newGroup;
-    do {
-        newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup uuid:nil];
-        success =  newGroup && [parentGroup addChild:newGroup];
-        i++;
-        newGroupName = [NSString stringWithFormat:@"%@ %ld", kDefaultNewTitle, i];
-    }while (!success);
-    
-    self.document.dirty = YES;
-    
-    return newGroup;
-}
-
-- (void)deleteItem:(Node *_Nonnull)child {
-    [child.parent removeChild:child];
-    
-    self.document.dirty = YES;
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
     return [node validateChangeParent:parent];
 }
 
-- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    if(![node validateChangeParent:parent]) {
-        return NO;
-    }
+- (void)notifyModelChanged {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onModelChanged();
+    });
+}
 
-    self.document.dirty = [node changeParent:parent];
+NSString* getSmartFillTitle() {
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
     
-    return self.document.dirty;
+    if(clipboardText) {
+        // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
+        
+        NSURL *url = [NSURL URLWithString:clipboardText];
+        
+        if (url && url.scheme && url.host)
+        {
+            return url.host;
+        }
+    }
+    
+    return kDefaultNewTitle;
+}
+
+NSString* getSmartFillUrl() {
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
+    
+    if(clipboardText) {
+        NSURL *url = [NSURL URLWithString:clipboardText];
+        if (url && url.scheme && url.host)
+        {
+            return clipboardText;
+        }
+    }
+    
+    return @"";
+}
+
+NSString* getSmartFillNotes() {
+    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
+    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
+    
+    if(clipboardText) {
+        return clipboardText;
+    }
+    
+    return @"";
+}
+
+-(NSString*) getAutoFillMostPopularUsername {
+    return self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
+}
+
+-(NSString*) getAutoFillMostPopularEmail {
+    return self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
 }
 
 - (Node*)getItemFromSerializationId:(NSString*)serializationId {

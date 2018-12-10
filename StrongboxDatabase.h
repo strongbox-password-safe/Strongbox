@@ -18,22 +18,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata
-                  masterPassword:(nullable NSString*)masterPassword;
-
-- (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(nullable NSString*)masterPassword;
+                  masterPassword:(nullable NSString*)masterPassword
+                   keyFileDigest:(nullable NSData*)keyFileDigest;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
                    masterPassword:(nullable NSString*)masterPassword
+                    keyFileDigest:(nullable NSData*)keyFileDigest;
+
+- (instancetype)initWithRootGroup:(Node*)rootGroup
+                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                   masterPassword:(nullable NSString*)masterPassword
+                    keyFileDigest:(nullable NSData*)keyFileDigest
                       attachments:(NSArray<DatabaseAttachment*>*)attachments;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
                    masterPassword:(nullable NSString*)masterPassword
+                    keyFileDigest:(nullable NSData*)keyFileDigest
                       attachments:(NSArray<DatabaseAttachment*>*)attachments
                       customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons NS_DESIGNATED_INITIALIZER;
+
 
 @property (nullable) NSObject* adaptorTag; // Used by the adaptors to keep hold of unmodelled/unused data across loads/saves
 
@@ -42,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly) NSDictionary<NSUUID*, NSData*>* customIcons;
 @property (nonatomic, retain, nullable) NSString *masterPassword;
+@property (nonatomic, retain, nullable) NSData *keyFileDigest;
 
 - (void)removeNodeAttachment:(Node*)node atIndex:(NSUInteger)atIndex;
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment;

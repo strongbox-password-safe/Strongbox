@@ -34,7 +34,7 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
 
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
+    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
@@ -55,7 +55,7 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
+    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
@@ -95,7 +95,7 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
+    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
@@ -118,7 +118,7 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
+    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
