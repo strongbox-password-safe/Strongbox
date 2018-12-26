@@ -65,18 +65,10 @@
 }
 
 - (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider {
-    return storageProvider == kiCloud;
-}
-
-- (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider {
-    return storageProvider == kLocalDevice;
+    return storageProvider == kiCloud || storageProvider == kWebDAV || storageProvider == kSFTP;
 }
 
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
-    if([self isUnsupportedAutoFillProvider:safeMetaData.storageProvider]) {
-        return NO;
-    }
-    
     if([self isLiveAutoFillProvider:safeMetaData.storageProvider]) {
         return YES;
     }
@@ -114,7 +106,7 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
     if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
         Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
         
-        [Alerts info:vc title:@"Welcome to Strongbox Auto Fill" message:@"It should be noted that the following cloud providers do not support live access to your safe from App Extensions:\n\n- Dropbox\n- OneDrive\n- Google Drive\n\nIn these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy the Auto Fill extension!\n-Mark"];
+        [Alerts info:vc title:@"Welcome to Strongbox Auto Fill" message:@"It should be noted that the following storage providers do not support live access to your safe from App Extensions:\n\n- Dropbox\n- OneDrive\n- Google Drive\n- Local Device\n\nIn these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy the Auto Fill extension!\n-Mark"];
     }
 }
 

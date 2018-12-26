@@ -11,8 +11,11 @@
 #import "Alerts.h"
 #import "DatabaseModel.h"
 #import "SafesList.h"
+#import "Utils.h"
 
 @interface StorageBrowserTableViewController ()
+
+@property BOOL listDone;
 
 @end
 
@@ -54,20 +57,35 @@
         [self setToolbarItems:toolbarButtons animated:YES];
     }
 
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    self.tableView.tableFooterView = [UIView new];
+    
     self.navigationItem.prompt = self.existing ? @"Please Select Safe File" : @"Select Folder For New Safe";
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
         [self.safeStorageProvider list:self.parentFolder
                         viewController:self
-                            completion:^(NSArray<StorageBrowserItem *> *items, NSError *error)
-        {
-            [self onList:items error:error];
+                            completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error) {
+                                [self onList:userCancelled items:items error:error];
         }];
     });
 }
 
-- (void)onList:(NSArray<StorageBrowserItem *> *)items error:(NSError *)error {
-    if (error) {
+
+
+- (void)onList:(BOOL)userCancelled items:(NSArray<StorageBrowserItem *> *)items error:(NSError *)error {
+    self.listDone = YES;
+
+    if(userCancelled) {
+        NSLog(@"User Cancelled Listing... Returning to Root");
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self.navigationController popToRootViewControllerAnimated:YES]; 
+        });
+        return;
+    }
+    
+    if(items == nil || error) {
         [Alerts error:self title:@"Problem Listing Files & Folders" error:error completion:^{
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self.navigationController popToRootViewControllerAnimated:YES];
@@ -79,16 +97,35 @@
         {
             return self.existing || ((StorageBrowserItem *)object).folder;
         }]];
-
-        _items = [[NSMutableArray alloc] initWithArray:tmp];
-
+        
+        _items = [[tmp sortedArrayUsingComparator:^NSComparisonResult(StorageBrowserItem*  _Nonnull obj1, StorageBrowserItem*  _Nonnull obj2) {
+            if(obj1.folder && !obj2.folder) {
+                return NSOrderedAscending;
+            }
+            else if(!obj1.folder && obj2.folder) {
+                return NSOrderedDescending;
+            }
+            else {
+                return [Utils finderStringCompare:obj1.name string2:obj2.name];
+            }
+        }] mutableCopy];
+        
         dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self.tableView reloadEmptyDataSet];
             [self.tableView reloadData];
         });
     }
 }
 
 #pragma mark - Table view data source
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+    NSString *text =  self.listDone ? @"No Files or Folders Found" : @"Loading...";
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:17.0f] };
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -239,6 +276,7 @@
     
         vc.parentFolder = file.providerData;
         vc.existing = self.existing;
+        vc.format = self.format;
         vc.safeStorageProvider = self.safeStorageProvider;
     }
 }
@@ -252,6 +290,8 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password {
+    NSLog(@"Create New Safe with Format: %d", self.format);
+    
     DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:nil format:self.format];
  
     NSError *error;

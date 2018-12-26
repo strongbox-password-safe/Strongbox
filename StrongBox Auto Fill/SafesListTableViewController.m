@@ -170,16 +170,11 @@
         cell.textLabel.enabled = NO;
         cell.detailTextLabel.enabled = NO;
         
-        if([[self getInitialViewController] isUnsupportedAutoFillProvider:safe.storageProvider]) {
-            cell.detailTextLabel.text = @"[Autofill Not Supported for Local Device Safes]";
+        if(safe.autoFillCacheEnabled) {
+            cell.detailTextLabel.text = @"[No Auto Fill Cache File Yet]";
         }
         else {
-            if(safe.autoFillCacheEnabled) {
-                cell.detailTextLabel.text = @"[No Auto Fill Cache File Yet]";
-            }
-            else {
-                cell.detailTextLabel.text = @"[Auto Fill Cache Disabled]";
-            }
+            cell.detailTextLabel.text = @"[Auto Fill Cache Disabled]";
         }
     }
     

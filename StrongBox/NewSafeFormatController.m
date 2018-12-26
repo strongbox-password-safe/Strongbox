@@ -46,6 +46,8 @@
             break;
     }
     
+    NSLog(@"Selected: %d", self.selectedFormat);
+    
     [self performSegueWithIdentifier:@"segueToSelectStorage" sender:nil];
 }
 

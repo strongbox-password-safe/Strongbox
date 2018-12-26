@@ -111,13 +111,11 @@ typedef void(^CompletionBlock)(Model* model);
 - (void)onTouchIdDone:(BOOL)success
                 error:(NSError *)error {
     if (success) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.isTouchIdOpen = YES;
-            self.masterPassword = self.safe.touchIdPassword;
-            self.keyFileDigest = self.safe.touchIdKeyFileDigest;
-            
-            [self openSafe];
-        });
+        self.isTouchIdOpen = YES;
+        self.masterPassword = self.safe.touchIdPassword;
+        self.keyFileDigest = self.safe.touchIdKeyFileDigest;
+        
+        [self openSafe];
     }
     else {
         if (error.code == LAErrorAuthenticationFailed) {
@@ -280,25 +278,27 @@ typedef void(^CompletionBlock)(Model* model);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)openSafe {
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
-    
-    if(self.openAutoFillCache) {
-        [[LocalDeviceStorageProvider sharedInstance] readAutoFillCache:self.safe viewController:self.viewController
-                                                            completion:^(NSData *data, NSError *error) {
-            [self onProviderReadDone:provider data:data error:error cacheMode:YES];
-        }];
-    }
-    else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
-        NSString * modDateStr = getLastCachedDate(self.safe);
-        NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
         
-        [self openWithOfflineCacheFile:message];
-    }
-    else {
-        [provider read:self.safe viewController:self.viewController completion:^(NSData *data, NSError *error) {
-             [self onProviderReadDone:provider data:data error:error cacheMode:NO];
-         }];
-    }
+        if(self.openAutoFillCache) {
+            [[LocalDeviceStorageProvider sharedInstance] readAutoFillCache:self.safe viewController:self.viewController
+                                                                completion:^(NSData *data, NSError *error) {
+                [self onProviderReadDone:provider data:data error:error cacheMode:YES];
+            }];
+        }
+        else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
+            NSString * modDateStr = getLastCachedDate(self.safe);
+            NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+            
+            [self openWithOfflineCacheFile:message];
+        }
+        else {
+            [provider read:self.safe viewController:self.viewController completion:^(NSData *data, NSError *error) {
+                [self onProviderReadDone:provider data:data error:error cacheMode:NO];
+             }];
+        }
+    });
 }
 
 - (void)onProviderReadDone:(id<SafeStorageProvider>)provider

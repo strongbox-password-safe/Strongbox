@@ -23,6 +23,7 @@
 #import "AddNewSafeHelper.h"
 #import "AddSafeAlertController.h"
 #import "StrongboxUIDocument.h"
+#import "SVProgressHUD.h"
 
 @interface SafesViewController () <UIDocumentPickerDelegate>
 

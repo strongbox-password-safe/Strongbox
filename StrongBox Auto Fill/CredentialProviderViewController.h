@@ -17,7 +17,6 @@
 - (SafeMetaData*)getPrimarySafe;
 
 - (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider;
-- (BOOL)isUnsupportedAutoFillProvider:(StorageProvider)storageProvider;
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers;

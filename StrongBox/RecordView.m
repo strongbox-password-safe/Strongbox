@@ -82,12 +82,14 @@ static const int kMinNotesCellHeight = 160;
 
 - (void)setInitialTextFieldBordersAndColors {
     self.textFieldPassword.borderStyle = UITextBorderStyleRoundedRect;
+    self.textFieldHidden.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldEmail.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldUrl.borderStyle = UITextBorderStyleRoundedRect;
     
     self.textViewNotes.layer.borderWidth = 1.0f;
     self.textFieldPassword.layer.borderWidth = 1.0f;
+    self.textFieldHidden.layer.borderWidth = 1.0f;
     self.textFieldUrl.layer.borderWidth = 1.0f;
     self.textFieldUsername.layer.borderWidth = 1.0f;
     self.textFieldEmail.layer.borderWidth = 1.0f;
@@ -96,12 +98,14 @@ static const int kMinNotesCellHeight = 160;
     
     self.textViewNotes.layer.cornerRadius = 5;
     self.textFieldPassword.layer.cornerRadius = 5;
+    self.textFieldHidden.layer.cornerRadius = 5;
     self.textFieldUrl.layer.cornerRadius = 5;
     self.textFieldUsername.layer.cornerRadius = 5;
     self.textFieldEmail.layer.cornerRadius = 5;
     
     self.textViewNotes.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldPassword.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.textFieldHidden.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldUrl.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldUsername.layer.borderColor = [UIColor lightGrayColor].CGColor;
     self.textFieldEmail.layer.borderColor = [UIColor lightGrayColor].CGColor;
@@ -434,21 +438,13 @@ static NSString * trim(NSString *string) {
 
 - (IBAction)onHide:(id)sender {
     _hidePassword = !_hidePassword;
-    
     [self hideOrShowPassword:_hidePassword];
 }
 
 - (void)hideOrShowPassword:(BOOL)hide {
-    if (hide) {
-        [self.textFieldPassword setTextColor:[UIColor lightGrayColor]];
-        self.textFieldPassword.text = @"****************";
-        [self.buttonHidePassword setTitle:@"Show" forState:UIControlStateNormal];
-    }
-    else {
-        [self.textFieldPassword setTextColor:[UIColor purpleColor]];
-        self.textFieldPassword.text = self.record.fields.password;
-        [self.buttonHidePassword setTitle:@"Hide" forState:UIControlStateNormal];
-    }
+    self.textFieldPassword.hidden = hide;
+    self.textFieldHidden.hidden = !hide;
+    [self.buttonHidePassword setTitle:hide ? @"Show" : @"Hide" forState:UIControlStateNormal];
 }
 
 - (void)onCancelBarButton {

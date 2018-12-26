@@ -44,7 +44,9 @@ typedef void (^Authenticationcompletion)(NSError *error);
         
         authenticationcompletion = nil;
         
-        [signIn signInSilently];
+        dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main queue
+            [signIn signInSilently];
+        });
     }
     
     return self;
@@ -80,7 +82,9 @@ typedef void (^Authenticationcompletion)(NSError *error);
 
     authenticationcompletion = completion;
 
-    [signIn signIn];
+    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main queue
+        [signIn signIn];
+    });
 }
 
 - (void)      signIn:(GIDSignIn *)signIn

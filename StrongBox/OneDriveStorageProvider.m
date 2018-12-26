@@ -268,10 +268,10 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
-            completion(nil, error);
+            completion(NO, nil, error);
             return;
         }
         
@@ -295,12 +295,12 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 - (void)listRecursive:(ODChildrenCollectionRequest *)request
       error:(NSError *)error
       existingItems:(NSMutableArray<StorageBrowserItem*>*)existingItems
- completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion
+ completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion
 {
     [request getWithCompletion:^(ODCollection *response, ODChildrenCollectionRequest *nr, NSError *error) {
         if(error) {
             NSLog(@"%@", error);
-            completion(nil, error);
+            completion(NO, nil, error);
             return;
         }
 
@@ -312,7 +312,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         }
         else {
             NSLog(@"Got all items: [%lu]", (unsigned long)existingItems.count);
-            completion([NSArray arrayWithArray:existingItems], nil);
+            completion(NO, [NSArray arrayWithArray:existingItems], nil);
         }
     }];
 }

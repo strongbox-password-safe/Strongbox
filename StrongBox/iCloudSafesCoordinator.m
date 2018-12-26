@@ -242,13 +242,18 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     for (NSMetadataItem * result in queryResults) {
         [self logAllCloudStorageKeysForMetadataItem:result];
         
-        // Don't include hidden files
+        // Don't include hidden files or directories
         
         NSNumber * hidden = nil;
         NSURL * fileURL = [result valueForAttribute:NSMetadataItemURLKey];
-        [fileURL getResourceValue:&hidden forKey:NSURLIsHiddenKey error:nil];
+        BOOL success = [fileURL getResourceValue:&hidden forKey:NSURLIsHiddenKey error:nil];
+        BOOL isHidden = (success && [hidden boolValue]);
         
-        if (hidden == nil || ![hidden boolValue]) {
+        NSNumber *isDirectory;
+        success = [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+        BOOL isDir = (success && [isDirectory boolValue]);
+        
+        if (!isHidden && !isDir) {
             NSString* displayName = [result valueForAttribute:NSMetadataItemDisplayNameKey];
             NSString* dn = displayName ? displayName : [self displayNameFromUrl:fileURL];
             

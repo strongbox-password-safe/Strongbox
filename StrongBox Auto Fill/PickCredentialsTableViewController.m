@@ -9,6 +9,7 @@
 #import "PickCredentialsTableViewController.h"
 #import "regdom.h"
 #import "NodeIconHelper.h"
+#import "BrowseSafeEntryTableViewCell.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -207,21 +208,28 @@ static NSString *getSearchTermFromDomain(NSString* host) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-    Node *vm = [self getDataSource][indexPath.row];
-    
-    NSString *groupLocation = (self.searchController.isActive ? [self getGroupPathDisplayString:vm] : vm.fields.username);
-    
-    cell.textLabel.text = vm.isGroup ? vm.title :
-    (self.searchController.isActive ? [NSString stringWithFormat:@"%@%@", vm.title, vm.fields.username.length ? [NSString stringWithFormat:@" [%@]" ,vm.fields.username] : @""] :
-     vm.title);
-    
-    cell.detailTextLabel.text = groupLocation;
-    cell.accessoryType = UITableViewCellAccessoryNone;
-    
-    cell.imageView.image = [NodeIconHelper getIconForNode:vm database:self.model.database];
-    
-    return cell;
+    Node *node = [self getDataSource][indexPath.row];
+    if(node.isGroup) {
+        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"FolderCell" forIndexPath:indexPath];
+        cell.textLabel.text = node.title;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.imageView.image = [NodeIconHelper getIconForNode:node database:self.model.database];
+
+        return cell;
+    }
+    else {
+        BrowseSafeEntryTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
+        
+        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+        
+        cell.title.text = node.title;
+        cell.username.text = node.fields.username;
+        cell.path.text = groupLocation;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.icon.image = [NodeIconHelper getIconForNode:node database:self.model.database];
+        
+        return cell;
+    }
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {

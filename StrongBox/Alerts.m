@@ -179,7 +179,7 @@
    completion:(void (^)(void))completion
 {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:error.localizedDescription
+                                                                             message:error ? error.localizedDescription : @"Unknown Error"
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
     UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"

@@ -9,4 +9,10 @@
 #import "StorageBrowserItem.h"
 
 @implementation StorageBrowserItem
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ [folder: %d] - providerData = [%@]", self.name, self.folder, self.providerData];
+}
+
 @end

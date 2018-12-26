@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "SafeStorageProvider.h"
 #import "AbstractDatabaseFormatAdaptor.h"
+#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
-@interface StorageBrowserTableViewController : UITableViewController
+@interface StorageBrowserTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property (nonatomic) NSObject *parentFolder;
 @property (nonatomic) BOOL existing;

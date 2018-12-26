@@ -18,6 +18,7 @@
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 #import "NodeIconHelper.h"
+#import "BrowseSafeEntryTableViewCell.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -235,20 +236,29 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
     Node *node = [self getDataSource][indexPath.row];
-    
-    NSString *groupLocation = (self.searchController.isActive ? [self getGroupPathDisplayString:node] : node.isGroup ? @"" : node.fields.username);
-    
-    cell.textLabel.text = node.isGroup ? node.title :
-    (self.searchController.isActive ? [NSString stringWithFormat:@"%@%@", node.title, node.fields.username.length ? [NSString stringWithFormat:@" [%@]" , node.fields.username] : @""] :
-         node.title);
-    
-    cell.detailTextLabel.text = groupLocation;
-    cell.accessoryType = node.isGroup ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
-    cell.imageView.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
-    
-    return cell;
+    if(node.isGroup) {
+        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"FolderCell" forIndexPath:indexPath];
+        cell.textLabel.text = node.title;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.imageView.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+        
+        return cell;
+    }
+    else {
+        BrowseSafeEntryTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
+
+        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+        
+        cell.title.text = node.title;
+        cell.username.text = node.fields.username;
+        cell.path.text = groupLocation;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+        cell.flags.text = node.fields.attachments.count > 0 ? @"📎" : @"";
+        
+        return cell;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

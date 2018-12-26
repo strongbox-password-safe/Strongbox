@@ -34,8 +34,6 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [self migrateUserDefaultsToAppGroup]; // iOS Credentials Extension needs access to user settings/safes etc... migrate
-    
     [self initializeDropbox];
 
     [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -46,82 +44,10 @@
         Settings.sharedInstance.installDate = [NSDate date];
     }
  
-    // TODO: Remove me after a while. 27-Oct-2018
-    
-    [self cleanupOldOfflineCacheFiles];
-    
     return YES;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)cleanupOldOfflineCacheFiles {
-    NSUserDefaults *groupDefaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
-    static NSString* const kDidCleanUpOldOfflineCacheFiles = @"DidCleanUpOldOfflineCacheFiles";
-    
-    if(groupDefaults != nil) {
-        if (![groupDefaults boolForKey:kDidCleanUpOldOfflineCacheFiles]) {
-            [groupDefaults setBool:YES forKey:kDidCleanUpOldOfflineCacheFiles];
-            [groupDefaults synchronize];
-            
-            NSLog(@"Try once to cleanup offline cache files...");
-            
-            NSArray<SafeMetaData*> *oldOfflineCacheFiles = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                if(obj.storageProvider == kLocalDevice) {
-                    BOOL result = [OfflineCacheNameDetector nickNameMatchesOldOfflineCache:obj.nickName];
-                
-                    NSLog(@"Local Safe Nickname [%@] Matches Old Offline Cache: [%d]", obj.nickName, result);
-                    
-                    return result;
-                }
-                return NO;
-            }];
-            
-            for (SafeMetaData* oldCacheFile in oldOfflineCacheFiles) {
-                NSLog(@"Found Old Offline Cache File in Safes Collection: [%@]", oldCacheFile);
-                
-                [LocalDeviceStorageProvider.sharedInstance delete:oldCacheFile completion:^(NSError *error) {
-                    if(!error) {
-                        NSLog(@"Successfully removed Old Offline Cache File Safe. [%@]", oldCacheFile);
-                    }
-                    else {
-                        NSLog(@"Error Removing Old Offline Cache File: %@", error);
-                    }
-                }];
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)migrateUserDefaultsToAppGroup {
-    NSUserDefaults *userDefaults = NSUserDefaults.standardUserDefaults;
-    
-    NSUserDefaults *groupDefaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
-    
-    static NSString* const kDidMigrateSafesToAppGroups = @"DidMigrateToAppGroups";
-    
-    if(groupDefaults != nil) {
-        if (![groupDefaults boolForKey:kDidMigrateSafesToAppGroups]) {
-            for(NSString *key in [[userDefaults dictionaryRepresentation] allKeys]) {
-                NSLog(@"Migrating Setting: %@", key);
-                [groupDefaults setObject:[userDefaults objectForKey:key] forKey:key];
-            }
-            
-            [groupDefaults setBool:YES forKey:kDidMigrateSafesToAppGroups];
-            [groupDefaults synchronize];
-            
-            NSLog(@"Successfully migrated defaults");
-        }
-        else {
-            NSLog(@"No need to migrate defaults, already done.");
-        }
-    }
-    else {
-        NSLog(@"Unable to create NSUserDefaults with given app group");
-    }
-}
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {

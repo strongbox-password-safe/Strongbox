@@ -67,7 +67,9 @@
                                    fileIdentifier:json];
 }
 
-- (void)list:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(NSArray<StorageBrowserItem *> *, NSError *))completion {
+- (void)list:(NSObject *)parentFolder
+viewController:(UIViewController *)viewController
+  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
     // NOTIMPL
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     return;

@@ -41,7 +41,7 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion;
+        completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion;
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController

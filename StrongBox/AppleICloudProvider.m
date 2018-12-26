@@ -220,7 +220,7 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
     // NOTIMPL
     NSLog(@"NOTIMPL: list");
 }

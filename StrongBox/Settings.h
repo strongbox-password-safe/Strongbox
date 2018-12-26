@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "PasswordGenerationParameters.h"
 #import "AutoFillNewRecordSettings.h"
+#import "SFTPSessionConfiguration.h"
 
 static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 
@@ -72,5 +73,7 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property (nonatomic) BOOL showKeePassCreateSafeOptions;
 @property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
 @property (nonatomic) BOOL hasShownKeePassBetaWarning;
+
+// @property SFTPSessionConfiguration* sFTPSessionConfiguration;
 
 @end

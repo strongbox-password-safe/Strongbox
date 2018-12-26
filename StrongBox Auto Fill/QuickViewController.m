@@ -110,15 +110,18 @@
         
         return;
     }
-    
+
+    BOOL useAutoFillCache = ![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider];
+
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
+                                          openAutoFillCache:useAutoFillCache
                                           canBiometricEnrol:NO
                                                  completion:^(Model * _Nonnull model) {
-        if(model) {
-            [self performSegueWithIdentifier:@"toPickCredentials" sender:model];
-        }
-    }];
+                                                     if(model) {
+                                                         [self performSegueWithIdentifier:@"toPickCredentials" sender:model];
+                                                     }
+                                                 }];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

@@ -19,6 +19,7 @@
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldEmail;
 @property (weak, nonatomic, nullable) IBOutlet UITextView *textViewNotes;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldPassword;
+@property (weak, nonatomic) IBOutlet UITextField *textFieldHidden;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldUsername;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldUrl;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonHidePassword;

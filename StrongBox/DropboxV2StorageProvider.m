@@ -173,17 +173,15 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
-    [self performTaskWithAuthorizationIfNecessary:viewController
-                                             task:^(NSError *error) {
-                                                 if (error) {
-                                                 completion(nil, error);
-                                                 }
-                                                 else {
-                                                 [self listFolder:parentFolder
-                                                 completion:completion];
-                                                 }
-                                             }];
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+    [self performTaskWithAuthorizationIfNecessary:viewController task:^(NSError *error) {
+        if (error) {
+            completion(NO, nil, error);
+        }
+        else {
+            [self listFolder:parentFolder completion:completion];
+        }
+    }];
 }
 
 - (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
@@ -207,8 +205,7 @@
             else {
                 NSLog(@"Not Linked");
                 NSLog(@"Error: %@", authResult);
-                task([Utils createNSError:@"Could not create link to Dropbox."
-                                errorCode:-1]);
+                task([Utils createNSError:@"Could not create link to Dropbox." errorCode:-1]);
             }
         }];
 
@@ -232,7 +229,7 @@
 }
 
 - (void)listFolder:(NSObject *)parentFolder
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+        completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion {
     [SVProgressHUD show];
 
     NSMutableArray<StorageBrowserItem *> *items = [[NSMutableArray alloc] init];
@@ -259,7 +256,7 @@
                     [SVProgressHUD dismiss];
                 });
 
-                completion(items, nil);
+                completion(NO, items, nil);
             }
          }
          else {
@@ -269,15 +266,14 @@
                 [SVProgressHUD dismiss];
             });
 
-            completion(nil, [Utils createNSError:message
-                                       errorCode:-1]);
+            completion(NO, nil, [Utils createNSError:message errorCode:-1]);
          }
      }];
 }
 
 - (void)listFolderContinue:(NSString *)cursor
                      items:(NSMutableArray<StorageBrowserItem *> *)items
-                completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+                completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion {
     DBUserClient *client = DBClientsManager.authorizedClient;
 
     [[client.filesRoutes listFolderContinue:cursor]
@@ -300,7 +296,7 @@
                     [SVProgressHUD dismiss];
                 });
 
-                completion(items, nil);
+                completion(NO, items, nil);
             }
          }
          else {
@@ -309,8 +305,7 @@
                 [SVProgressHUD dismiss];
             });
 
-            completion(nil, [Utils createNSError:message
-                                       errorCode:-1]);
+            completion(NO, nil, [Utils createNSError:message errorCode:-1]);
          }
      }];
 }

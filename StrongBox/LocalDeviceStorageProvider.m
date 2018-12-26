@@ -189,11 +189,11 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
     NSError* error;
     NSArray<StorageBrowserItem *> *items = [self listRoot:&error];
 
-    completion(items, error);
+    completion(NO, items, error);
 }
 
 - (NSArray<StorageBrowserItem*>*)listRoot:(NSError**)ppError {

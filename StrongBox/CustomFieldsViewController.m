@@ -113,12 +113,62 @@
 - (void)editItem:(NSIndexPath*)indexPath {
     CustomField* item = [self.workingItems objectAtIndex:indexPath.row];
 
-    [Alerts OkCancelWithTextField:self textFieldText:item.value title:@"Edit Value" message:@"Enter a new value for this item" completion:^(NSString *text, BOOL response) {
-        if(response) {
-            item.value = text;
-            self.dirty = YES;
-            [self refresh];
-        }}];
+    self.alertController = [UIAlertController alertControllerWithTitle:@"Edit Custom field"
+                                                               message:nil
+                                                        preferredStyle:UIAlertControllerStyleAlert];
+    
+    __weak typeof(self) weakSelf = self;
+    
+    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+        [textField addTarget:weakSelf
+                      action:@selector(validateNewCustomField:)
+            forControlEvents:UIControlEventEditingChanged];
+        
+        textField.text = item.key;
+    }];
+    
+    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+        [textField addTarget:weakSelf
+                      action:@selector(validateNewCustomField:)
+            forControlEvents:UIControlEventEditingChanged];
+        
+        textField.text = item.value;
+    }];
+    
+    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction *a) {
+                                                    NSString* key = weakSelf.alertController.textFields[0].text;
+                                                    NSString* value = weakSelf.alertController.textFields[1].text;
+
+                                                    if(![key isEqualToString:item.key]) {
+                                                        NSArray<NSString*>* existingKeys = [self.workingItems map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
+                                                            return obj.key;
+                                                        }];
+                                                        
+                                                        NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+                                                        
+                                                        if([existingKeySet containsObject:key]) {
+                                                            [Alerts warn:self title:@"Conflict" message:@"Cannot change key to this value as this key already exists."];
+                                                            return;
+                                                        }
+                                                    }
+                                                    
+                                                    item.key = key;
+                                                    item.value = value;
+                                                    self.dirty = YES;
+                                                    [self refresh];
+                                                }];
+    self.defaultAction.enabled = YES;
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil];
+    
+    [self.alertController addAction:self.defaultAction];
+    [self.alertController addAction:cancelAction];
+    
+    [self presentViewController:self.alertController animated:YES completion:nil];
 }
 
 - (IBAction)onAddCustomField:(id)sender {
@@ -163,7 +213,7 @@
     [self presentViewController:self.alertController animated:YES completion:nil];
 }
 
-- (void)validateNewCustomField:(UITextField *)sender {
+- (void)validateEditCustomField:(UITextField *)sender {
     UITextField *keyField = _alertController.textFields[0];
     NSString* key = keyField.text;
     
@@ -175,6 +225,20 @@
     const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
     
     (self.defaultAction).enabled = ![existingKeySet containsObject:key] && ![keePassReserved containsObject:key] && key.length;
+}
+
+- (void)validateNewCustomField:(UITextField *)sender {
+    UITextField *keyField = _alertController.textFields[0];
+    NSString* key = keyField.text;
+    
+    NSArray<NSString*>* existingKeys = [self.workingItems map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
+        return obj.key;
+    }];
+    
+    NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+    
+    (self.defaultAction).enabled = ![keePassReserved containsObject:key] && key.length;
 }
 
 - (void)addNewField:(NSString*)key value:(NSString*)value {

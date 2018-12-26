@@ -12,6 +12,8 @@
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
 
 #ifndef IS_APP_EXTENSION
 #import "OneDriveStorageProvider.h"
@@ -44,6 +46,12 @@
     }
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
+    }
+    else if(providerId == kSFTP) {
+        return SFTPStorageProvider.sharedInstance;
+    }
+    else if(providerId == kWebDAV) {
+        return WebDAVStorageProvider.sharedInstance;
     }
     
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];

@@ -21,6 +21,8 @@
 #import "SafesList.h"
 #import "OneDriveStorageProvider.h"
 #import "AddNewSafeHelper.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
 
 @interface SelectStorageProviderController ()
 
@@ -46,10 +48,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    SFTPStorageProvider* sftpProviderWithFastListing = [[SFTPStorageProvider alloc] init];
+    sftpProviderWithFastListing.maintainSessionForListing = YES;
+
+    WebDAVStorageProvider* webDavProvider = [[WebDAVStorageProvider alloc] init];
+    webDavProvider.maintainSessionForListings = YES;
+    
     if(self.existing) {
         self.providers = @[[GoogleDriveStorageProvider sharedInstance],
                            [DropboxV2StorageProvider sharedInstance],
                            [OneDriveStorageProvider sharedInstance],
+                           webDavProvider,
+                           sftpProviderWithFastListing,
                            [LocalDeviceStorageProvider sharedInstance]];
     }
     else {
@@ -58,12 +68,16 @@
                                [GoogleDriveStorageProvider sharedInstance],
                                [DropboxV2StorageProvider sharedInstance],
                                [OneDriveStorageProvider sharedInstance],
+                               webDavProvider,
+                               sftpProviderWithFastListing,
                                [LocalDeviceStorageProvider sharedInstance]];
         }
         else {
             self.providers = @[[GoogleDriveStorageProvider sharedInstance],
                                [DropboxV2StorageProvider sharedInstance],
                                [OneDriveStorageProvider sharedInstance],
+                               webDavProvider,
+                               sftpProviderWithFastListing,
                                [LocalDeviceStorageProvider sharedInstance]];
         }
     }
@@ -137,6 +151,9 @@
         StorageBrowserTableViewController *vc = segue.destinationViewController;
         
         vc.existing = self.existing;
+        
+        NSLog(@"Setting Storage Browser FOrmat: %d", self.format);
+        
         vc.format = self.format;
         vc.safeStorageProvider = sender;
         vc.parentFolder = nil;

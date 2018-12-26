@@ -115,7 +115,8 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSArray<StorageBrowserItem *> *items, NSError *error))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+
     GTLRDrive_File *parent = (GTLRDrive_File *)parentFolder;
     NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
 
@@ -144,12 +145,12 @@
 
             [driveFiles addObjectsFromArray:sorted];
 
-            completion([self mapToStorageBrowserItems:driveFiles], nil);
+            completion(NO, [self mapToStorageBrowserItems:driveFiles], nil);
         }
         else {
             [[GoogleDriveManager sharedInstance] signout];
             
-            completion(nil, error);
+            completion(NO, nil, error);
         }
     }];
 }
