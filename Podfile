@@ -1,7 +1,7 @@
 workspace 'StrongBox'
 
 target 'Strongbox' do
-    project 'macbox/MacBox.xcodeproj'
+    project 'macbox/MacBox.codeproj'
     platform :osx, '10.9'
     use_frameworks!
 
@@ -23,7 +23,7 @@ pre_install do |installer|
 end
 
 abstract_target 'common-ios' do
-    project 'Strongbox.xcodeproj'
+    project 'Strongbox.codeproj'
     platform :ios, '9.2'
     use_frameworks!
 
