@@ -18,13 +18,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
-      canBiometricEnrol:(BOOL)canBiometricEnrol
+      canConvenienceEnrol:(BOOL)canBiometricEnrol
                              completion:(void (^)(Model* model))completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                       openAutoFillCache:(BOOL)openAutoFillCache
-      canBiometricEnrol:(BOOL)canBiometricEnrol
+      canConvenienceEnrol:(BOOL)canBiometricEnrol
                              completion:(void (^)(Model* model))completion;
 
 @end

@@ -17,6 +17,9 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "KeyFileParser.h"
 #import "Utils.h"
+#import "PinEntryController.h"
+#import "AppleICloudProvider.h"
+#import "DuressDummyStorageProvider.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -31,10 +34,10 @@ typedef void(^CompletionBlock)(Model* model);
 @property (nonatomic, strong) UITextField* textFieldPassword;
 @property (nonnull) UIViewController* viewController;
 @property (nonnull) SafeMetaData* safe;
-@property BOOL canBiometricEnrol;
+@property BOOL canConvenienceEnrol;
 @property BOOL openAutoFillCache;
 @property (nonnull) CompletionBlock completion;
-@property BOOL isTouchIdOpen;
+@property BOOL isConvenienceUnlock;
 @property NSString* masterPassword;
 @property NSData* keyFileDigest;
 
@@ -45,20 +48,20 @@ typedef void(^CompletionBlock)(Model* model);
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
-                      canBiometricEnrol:(BOOL)canBiometricEnrol
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                              completion:(void (^)(Model* model))completion {
-    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController safe:safe openAutoFillCache:NO canBiometricEnrol:canBiometricEnrol completion:completion];
+    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController safe:safe openAutoFillCache:NO canConvenienceEnrol:canConvenienceEnrol completion:completion];
 }
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                       openAutoFillCache:(BOOL)openAutoFillCache
-      canBiometricEnrol:(BOOL)canBiometricEnrol
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                              completion:(void (^)(Model* model))completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                       safe:safe
                                          openAutoFillCache:openAutoFillCache
-                                         canBiometricEnrol:canBiometricEnrol
+                                         canConvenienceEnrol:canConvenienceEnrol
                                                 completion:completion];
     
     [helper beginSequence];
@@ -67,14 +70,14 @@ typedef void(^CompletionBlock)(Model* model);
 - (instancetype)initWithViewController:(UIViewController*)viewController
                           safe:(SafeMetaData*)safe
              openAutoFillCache:(BOOL)openAutoFillCache
-             canBiometricEnrol:(BOOL)canBiometricEnrol
+             canConvenienceEnrol:(BOOL)canConvenienceEnrol
                     completion:(void (^)(Model* model))completion {
     self = [super init];
     if (self) {
         self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
         self.viewController = viewController;
         self.safe = safe;
-        self.canBiometricEnrol = canBiometricEnrol;
+        self.canConvenienceEnrol = canConvenienceEnrol;
         self.openAutoFillCache = openAutoFillCache;
         self.completion = completion;
     }
@@ -83,12 +86,17 @@ typedef void(^CompletionBlock)(Model* model);
 }
 
 - (void)beginSequence {
-    if (!Settings.sharedInstance.disallowAllBiometricId &&
-        self.safe.isTouchIdEnabled &&
-        [IOsUtils isTouchIDAvailable] &&
-        self.safe.isEnrolledForTouchId &&
-        ([[Settings sharedInstance] isProOrFreeTrial])) {
-        [self showTouchIDAuthentication];
+    if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
+        BOOL biometricPossible = !Settings.sharedInstance.disallowAllBiometricId && self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
+        if(biometricPossible) {
+            [self showBiometricAuthentication];
+        }
+        else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
+            [self promptForConveniencePin];
+        }
+        else {
+            [self promptForManualCredentials];
+        }
     }
     else {
         [self promptForManualCredentials];
@@ -97,23 +105,133 @@ typedef void(^CompletionBlock)(Model* model);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)showTouchIDAuthentication {
-    LAContext *localAuthContext = [[LAContext alloc] init];
-    localAuthContext.localizedFallbackTitle = @"Manual Authentication...";
+- (void)promptForConveniencePin {
+    const int maxFailedPinAttempts = 3;
     
-    [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                     localizedReason:@"Identify to login"
-                               reply:^(BOOL success, NSError *error) {
-                                   [self  onTouchIdDone:success error:error];
-                               } ];
+    PinEntryController *vc = [[PinEntryController alloc] init];
+    vc.info = @"Please enter your PIN to Unlock Safe";
+    vc.showFallbackOption = YES;
+    
+    if(self.safe.failedPinAttempts > 0) {
+        vc.warning = [NSString stringWithFormat:@"%d attempts remaining before PIN is disabled", maxFailedPinAttempts - self.safe.failedPinAttempts];
+    }
+    
+    vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+        [self.viewController dismissViewControllerAnimated:YES completion:^{
+            if(response == kOk) {
+                if([pin isEqualToString:self.safe.conveniencePin]) {
+                    self.isConvenienceUnlock = YES;
+                    self.masterPassword = self.safe.convenienceMasterPassword;
+                    self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
+                    self.safe.failedPinAttempts = 0;
+                    
+                    [SafesList.sharedInstance update:self.safe];
+                    
+                    [self openSafe];
+                }
+                else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
+                    [self performDuressAction];
+                }
+                else {
+                    self.safe.failedPinAttempts++;
+                    [SafesList.sharedInstance update:self.safe];
+
+                    if (self.safe.failedPinAttempts >= maxFailedPinAttempts) {
+                        self.safe.failedPinAttempts = 0;
+                        self.safe.conveniencePin = nil;
+                        [SafesList.sharedInstance update:self.safe];
+
+                        [Alerts warn:self.viewController
+                               title:@"Too Many Incorrect PINs"
+                             message:@"You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this safe."];
+                    }
+                    else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self promptForConveniencePin];
+                        });
+                    }
+                }
+            }
+            else if (response == kFallback) {
+                [self promptForManualCredentials];
+            }
+            else {
+                self.completion(nil);
+            }
+        }];
+    };
+         
+     [self.viewController presentViewController:vc animated:YES completion:nil];
 }
 
-- (void)onTouchIdDone:(BOOL)success
+-(void)performDuressAction {
+    if (self.safe.duressAction == kOpenDummy) {
+        SafeMetaData* metadata = [DuressDummyStorageProvider.sharedInstance getSafeMetaData:self.safe.nickName filename:self.safe.fileName fileIdentifier:self.safe.fileIdentifier];
+        
+        Model *viewModel = [[Model alloc] initWithSafeDatabase:DuressDummyStorageProvider.sharedInstance.database
+                                                      metaData:metadata
+                                               storageProvider:DuressDummyStorageProvider.sharedInstance
+                                                     cacheMode:NO
+                                                    isReadOnly:NO];
+        
+        self.completion(viewModel);
+    }
+    else if (self.safe.duressAction == kPresentError) {
+        NSError *error = [Utils createNSError:@"There was a technical error opening the safe." errorCode:-1729];
+        [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
+            self.completion(nil);
+        }];
+    }
+    else if (self.safe.duressAction == kRemoveDatabase) {
+        [self removeOrDeleteSafe];
+        NSError *error = [Utils createNSError:@"There was a technical error opening the safe." errorCode:-1729];
+        [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
+            self.completion(nil);
+        }];
+    }
+    else {
+        self.completion(nil);
+    }
+}
+
+- (void)removeOrDeleteSafe {
+    if (self.safe.storageProvider == kLocalDevice) {
+        [[LocalDeviceStorageProvider sharedInstance] delete:self.safe completion:nil];
+    }
+    else if (self.safe.storageProvider == kiCloud) {
+        [[AppleICloudProvider sharedInstance] delete:self.safe completion:nil];
+    }
+    
+    if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable)
+    {
+        [[LocalDeviceStorageProvider sharedInstance] deleteOfflineCachedSafe:self.safe
+                                                                  completion:nil];
+    }
+    
+    if (self.safe.autoFillCacheEnabled && self.safe.autoFillCacheAvailable)
+    {
+        [[LocalDeviceStorageProvider sharedInstance] deleteAutoFillCache:self.safe completion:nil];
+    }
+    
+    [[SafesList sharedInstance] remove:self.safe.uuid];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)showBiometricAuthentication {
+    [Settings.sharedInstance requestBiometricId:@"Identify to Login"
+                                  fallbackTitle:@"Manual Authentication..."
+                                     completion:^(BOOL success, NSError * _Nullable error) {
+        [self onBiometricAuthenticationDone:success error:error];
+    }];
+}
+
+- (void)onBiometricAuthenticationDone:(BOOL)success
                 error:(NSError *)error {
     if (success) {
-        self.isTouchIdOpen = YES;
-        self.masterPassword = self.safe.touchIdPassword;
-        self.keyFileDigest = self.safe.touchIdKeyFileDigest;
+        self.isConvenienceUnlock = YES;
+        self.masterPassword = self.safe.convenienceMasterPassword;
+        self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
         
         [self openSafe];
     }
@@ -149,7 +267,7 @@ typedef void(^CompletionBlock)(Model* model);
 }
 
 - (void)promptForManualCredentials {
-    self.isTouchIdOpen = NO;
+    self.isConvenienceUnlock = NO;
     [self promptForPasswordAndOrKeyFile];
 }
 
@@ -363,16 +481,16 @@ typedef void(^CompletionBlock)(Model* model);
             return;
         }
         else if (error.code == kStrongboxErrorCodeIncorrectCredentials) {
-            if(self.isTouchIdOpen) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
-                self.safe.isEnrolledForTouchId = NO;
-                self.safe.touchIdPassword = nil;
-                self.safe.touchIdKeyFileDigest = nil;
+            if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
+                self.safe.isEnrolledForConvenience = NO;
+                self.safe.convenienceMasterPassword = nil;
+                self.safe.convenenienceKeyFileDigest = nil;
                 
                 [SafesList.sharedInstance update:self.safe];
                 
                 [Alerts info:self.viewController
                        title:@"Could not open safe"
-                     message:[NSString stringWithFormat:@"The %@ Password or Key File were incorrect for this safe. This safe has been unlinked from %@.", self.biometricIdName, self.biometricIdName]] ;
+                     message:[NSString stringWithFormat:@"The Convenience Password or Key File were incorrect for this safe. Convenience Unlock Disabled."]] ;
             }
             else {
                 [Alerts info:self.viewController
@@ -387,56 +505,158 @@ typedef void(^CompletionBlock)(Model* model);
         self.completion(nil);
     }
     else {
-        if (self.canBiometricEnrol && !cacheMode && self.safe.isTouchIdEnabled && !self.safe.isEnrolledForTouchId &&
-            [IOsUtils isTouchIDAvailable] && [[Settings sharedInstance] isProOrFreeTrial]) {
-            
-            [Alerts yesNo:self.viewController
-                    title:[NSString stringWithFormat:@"Use %@ to Open Safe?", self.biometricIdName]
-                  message:[NSString stringWithFormat:@"Would you like to use %@ to open this safe?", self.biometricIdName]
-                   action:^(BOOL response) {
-                       if (response) {
-                           self.safe.isEnrolledForTouchId = YES;
-                           [self.safe setTouchIdPassword:openedSafe.masterPassword];
-                           [self.safe setTouchIdKeyFileDigest:openedSafe.keyFileDigest];
-                           
-                           [SafesList.sharedInstance update:self.safe];
-
-#ifndef IS_APP_EXTENSION
-                           [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enrol Successful", self.biometricIdName]
-                                                      message:[NSString stringWithFormat:@"You can now use %@ with this safe. Opening...", self.biometricIdName]
-                                                     duration:0.75f
-                                                  hideOnSwipe:YES
-                                                    hideOnTap:YES
-                                                    alertType:ISAlertTypeSuccess
-                                                alertPosition:ISAlertPositionTop
-                                                      didHide:^(BOOL finished) {
-                                                          [self onSuccessfulSafeOpen:cacheMode
-                                                                            provider:provider
-                                                                          openedSafe:openedSafe
-                                                                                data:data];
-                                                      }];
-#else
-                           [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-#endif
-                       }
-                       else{
-                           self.safe.isTouchIdEnabled = NO;
-                           self.safe.touchIdKeyFileDigest = nil;
-                           self.safe.touchIdPassword = nil;
-                           
-                           [SafesList.sharedInstance update:self.safe];
-                           
-                           [self onSuccessfulSafeOpen:cacheMode
-                                             provider:provider
-                                           openedSafe:openedSafe
-                                                 data:data];
-                       }
-                   }];
-        }
-        else {
+        if (!self.canConvenienceEnrol || cacheMode || self.safe.isEnrolledForConvenience || ![[Settings sharedInstance] isProOrFreeTrial] || self.safe.hasBeenPromptedForConvenience) {
+            // Can't or shouldn't Convenience Enrol...
             [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
         }
+        else {
+            BOOL biometricPossible = Settings.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
+            BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
+
+            if(!biometricPossible && !pinPossible) {
+                // Can enrol but no methods possible
+                [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+            }
+            else {
+                // Convenience Enrol!
+                [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible openedSafe:openedSafe cacheMode:cacheMode provider:provider data:data];
+            }
+        }
     }
+}
+
+- (void)promptForConvenienceEnrolAndOpen:(BOOL)biometricPossible
+                             pinPossible:(BOOL)pinPossible
+                              openedSafe:(DatabaseModel*)openedSafe
+                               cacheMode:(BOOL)cacheMode
+                                provider:(id)provider
+                                    data:(NSData *)data {
+    NSString *title;
+    NSString *message;
+    
+    if(biometricPossible && pinPossible) {
+        title = [NSString stringWithFormat:@"Convenience Unlock: Use %@ or PIN Code in Future?", self.biometricIdName];
+        message = [NSString stringWithFormat:@"You can use either %@ or a convenience PIN Code to unlock this safe. While this is convenient, it may reduce the security of the safe on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
+    }
+    else if (biometricPossible) {
+        title = [NSString stringWithFormat:@"Convenience Unlock: Use %@ to Unlock in Future?", self.biometricIdName];
+        message = [NSString stringWithFormat:@"You can use %@ to unlock this safe. While this is convenient, it may reduce the security of the safe on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
+    }
+    else if (pinPossible) {
+        title = @"Convenience Unlock: Use a PIN Code to Unlock in Future?";
+        message = @"You can use a convenience PIN Code to unlock this safe. While this is convenient, it may reduce the security of the safe on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password";
+    }
+    
+    
+    if (!Settings.sharedInstance.isPro) {
+        message = [message stringByAppendingFormat:@"\n\nNB: Convenience Unlock is a Pro feature"];
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                             message:message
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    if(biometricPossible) {
+        UIAlertAction *biometricAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Use %@", self.biometricIdName]
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) {
+                                                                self.safe.isTouchIdEnabled = YES;
+                                                                self.safe.isEnrolledForConvenience = YES;
+                                                                self.safe.convenienceMasterPassword = openedSafe.masterPassword;
+                                                                self.safe.convenenienceKeyFileDigest = openedSafe.keyFileDigest;
+                                                                self.safe.hasBeenPromptedForConvenience = YES;
+                                                                
+                                                                [SafesList.sharedInstance update:self.safe];
+                                                                
+                                                                [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                                                            }];
+        [alertController addAction:biometricAction];
+    }
+    
+    if (pinPossible) {
+        UIAlertAction *pinCodeAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Use a PIN Code..."]
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+                                                              [self setupConveniencePinAndOpen:openedSafe cacheMode:cacheMode provider:provider data:data];
+                                                          }];
+        [alertController addAction:pinCodeAction];
+    }
+    
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No"
+                                                       style:UIAlertActionStyleCancel
+                                                     handler:^(UIAlertAction *a) {
+                                                         self.safe.isTouchIdEnabled = NO;
+                                                         self.safe.conveniencePin = nil;
+                                                         
+                                                         self.safe.convenienceMasterPassword = nil;
+                                                         self.safe.convenenienceKeyFileDigest = nil;
+                                                         self.safe.isEnrolledForConvenience = NO;
+                                                         self.safe.hasBeenPromptedForConvenience = YES;
+                                                         
+                                                         [SafesList.sharedInstance update:self.safe];
+                                                         
+                                                         [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                                                     }];
+    
+
+    [alertController addAction:noAction];
+    
+    [self.viewController presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)setupConveniencePinAndOpen:(DatabaseModel*)openedSafe
+                         cacheMode:(BOOL)cacheMode
+                          provider:(id)provider
+                              data:(NSData *)data {
+    PinEntryController *vc1 = [[PinEntryController alloc] init];
+    vc1.info = @"Please Enter a Convenience PIN";
+    vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+        [self.viewController dismissViewControllerAnimated:YES completion:^{
+            if(response == kOk) {
+                PinEntryController *vc2 = [[PinEntryController alloc] init];
+                vc2.info = @"Please Confirm Your New Convenience PIN";
+                vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
+                    [self.viewController dismissViewControllerAnimated:YES completion:^{
+                        if(response2 == kOk) {
+                            if ([pin isEqualToString:confirmPin]) {
+                                if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
+                                    self.safe.conveniencePin = pin;
+                                    self.safe.isEnrolledForConvenience = YES;
+                                    self.safe.convenienceMasterPassword = openedSafe.masterPassword;
+                                    self.safe.convenenienceKeyFileDigest = openedSafe.keyFileDigest;
+                                    self.safe.hasBeenPromptedForConvenience = YES;
+                                        
+                                    [SafesList.sharedInstance update:self.safe];
+                                    
+                                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                                }
+                                else {
+                                    [Alerts warn:self.viewController title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please configure in the Safe Settings" completion:^{
+                                        [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                                    }];
+                                }
+                            }
+                            else {
+                                [Alerts warn:self.viewController title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Safe Settings." completion:^{
+                                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                                }];
+                            }
+                        }
+                        else {
+                            [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                        }
+                    }];
+                };
+                
+                [self.viewController presentViewController:vc2 animated:YES completion:nil];
+            }
+            else {
+                [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+            }
+        }];
+    };
+    
+    [self.viewController presentViewController:vc1 animated:YES completion:nil];
 }
 
 -(void)onSuccessfulSafeOpen:(BOOL)cacheMode
@@ -447,7 +667,7 @@ typedef void(^CompletionBlock)(Model* model);
                                                   metaData:self.safe
                                            storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
                                                  cacheMode:cacheMode
-                                                isReadOnly:NO]; // ![[Settings sharedInstance] isProOrFreeTrial]
+                                                isReadOnly:NO]; 
     
     if (!cacheMode) {
         if(self.safe.offlineCacheEnabled) {

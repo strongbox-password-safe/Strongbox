@@ -23,6 +23,7 @@
 #import "AddNewSafeHelper.h"
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
+#import "InitialViewController.h"
 
 @interface SelectStorageProviderController ()
 
@@ -88,40 +89,51 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.providers.count;
+    return self.providers.count + (self.existing ? 1 : 0);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CustomStorageProviderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"storageProviderReuseIdentifier" forIndexPath:indexPath];
     
-    id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
+    if(indexPath.row == self.providers.count) {
+        cell.text.text = @"Copy from URL...";
+        cell.image.image =  [UIImage imageNamed:@"Disconnect-32x32"];
+    }
+    else {
+        id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
 
-    cell.text.text = provider.displayName;
-    cell.image.image = [UIImage imageNamed:provider.icon];
+        cell.text.text = provider.displayName;
+        cell.image.image = [UIImage imageNamed:provider.icon];
+    }
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
-    if (provider.storageId == kLocalDevice && !self.existing) {
-        [Alerts yesNo:self
-                title:@"Local Device Safe Caveat"
-              message:@"Since a local safe is only stored on this device, any loss of this device will lead to the loss of "
-         "all passwords stored within this safe. You may want to consider using a cloud storage provider, such as the ones "
-         "supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
-         "a local device safe?"
-               action:^(BOOL response) {
-                   if (response) {
-                       [self segueToBrowserOrAdd:provider];
-                   }
-                   else {
-                       [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-                   }
-               }];
+    if(indexPath.row == self.providers.count) {
+        [self initiateManualImportFromUrl];
     }
     else {
-        [self segueToBrowserOrAdd:provider];
+        id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
+        if (provider.storageId == kLocalDevice && !self.existing) {
+            [Alerts yesNo:self
+                    title:@"Local Device Safe Caveat"
+                  message:@"Since a local safe is only stored on this device, any loss of this device will lead to the loss of "
+             "all passwords stored within this safe. You may want to consider using a cloud storage provider, such as the ones "
+             "supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
+             "a local device safe?"
+                   action:^(BOOL response) {
+                       if (response) {
+                           [self segueToBrowserOrAdd:provider];
+                       }
+                       else {
+                           [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+                       }
+                   }];
+        }
+        else {
+            [self segueToBrowserOrAdd:provider];
+        }
     }
 }
 
@@ -159,5 +171,99 @@
         vc.parentFolder = nil;
     }
 }
+
+- (void)initiateManualImportFromUrl {
+    [Alerts OkCancelWithTextField:self
+             textFieldPlaceHolder:@"URL"
+                            title:@"Enter URL"
+                          message:@"Please Enter the URL of the Safe File."
+                       completion:^(NSString *text, BOOL response) {
+                           if (response) {
+                               NSURL *url = [NSURL URLWithString:text];
+                               NSLog(@"URL: %@", url);
+                               
+                               [self importFromManualUiUrl:url];
+                           }
+                       }];
+}
+
+- (void)importFromManualUiUrl:(NSURL *)importURL {
+    NSError* error;
+    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];
+    
+    if(error) {
+        [Alerts error:self title:@"Error Reading from URL" error:error];
+        return;
+    }
+    
+    
+    if (![DatabaseModel isAValidSafe:importedData]) {
+        [Alerts warn:self
+               title:@"Invalid Safe"
+             message:@"This is not a valid Strongbox password safe database file."];
+        
+        return;
+    }
+    
+    [self promptForImportedSafeNickName:importedData];
+}
+
+- (void)promptForImportedSafeNickName:(NSData *)data {
+    [Alerts OkCancelWithTextField:self
+             textFieldPlaceHolder:@"Safe Name"
+                            title:@"Enter a Name"
+                          message:@"What would you like to call this safe?"
+                       completion:^(NSString *text, BOOL response) {
+                           if (response) {
+                               NSString *nickName = [SafesList sanitizeSafeNickName:text];
+                               
+                               if (![[SafesList sharedInstance] isValidNickName:nickName]) {
+                                   [Alerts   info:self
+                                            title:@"Invalid Nickname"
+                                          message:@"That nickname may already exist, or is invalid, please try a different nickname."
+                                       completion:^{
+                                           [self promptForImportedSafeNickName:data];
+                                       }];
+                               }
+                               else {
+                                   [self copyAndAddImportedSafe:nickName data:data];
+                               }
+                           }
+                       }];
+}
+
+- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data {
+    id<SafeStorageProvider> provider;
+    
+    if(Settings.sharedInstance.iCloudOn) {
+        provider = AppleICloudProvider.sharedInstance;
+    }
+    else {
+        provider = LocalDeviceStorageProvider.sharedInstance;
+    }
+    
+    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
+    
+    [provider create:nickName
+           extension:extension
+                data:data
+        parentFolder:nil
+      viewController:self
+          completion:^(SafeMetaData *metadata, NSError *error)
+     {
+         dispatch_async(dispatch_get_main_queue(), ^(void)
+                        {
+                            if (error == nil) {
+                                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+                            }
+                            else {
+                                [Alerts error:self title:@"Error Importing Safe" error:error];
+                            }
+                            
+                            [self.navigationController popToRootViewControllerAnimated:YES];
+                        });
+     }];
+}
+
 
 @end

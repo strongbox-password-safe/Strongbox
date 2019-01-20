@@ -15,9 +15,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface InitialViewController : UITabBarController
 
+- (void)importFromManualUiUrl:(NSURL *)importURL;
 - (void)import:(NSURL *)importURL canOpenInPlace:(BOOL)openInPlace;
+
 - (void)showQuickLaunchView;
 - (void)showSafesListView;
+
+- (void)appResignActive;
+- (void)appBecameActive;
+
+//- (void)showLockView;
+//- (void)unlockAndShowPreviousTab;
+
 - (BOOL)isInQuickLaunchViewMode;
 - (nullable SafeMetaData* )getPrimarySafe;
 - (void)checkICloudAvailability;

@@ -26,8 +26,136 @@
 #import "IOsUtils.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "StrongboxUIDocument.h"
+#import "QuickLaunchViewController.h"
+#import "StorageBrowserTableViewController.h"
+#import "UpgradeViewController.h"
+#import "LockViewController.h"
+
+@interface InitialViewController ()
+
+@property (nonatomic, strong) NSDate *enterBackgroundTime;
+@property (nonatomic, strong) LockViewController *lockScreen;
+@property BOOL lockScreenSuppressedForBiometricAuth;
+@property BOOL isDisplayingStartupLockScreen; // Special behaviour for initial launch from viewDidLoad... no auto cancel - must enter creds
+@property BOOL hasAppearedOnce;
+
+@end
 
 @implementation InitialViewController
+
+- (void)showLockScreen {
+    if(self.lockScreen != nil) {
+        return; // Already displayed
+    }
+    
+    __weak InitialViewController* weakSelf = self;
+    self.lockScreen = [[LockViewController alloc] init];
+    self.lockScreen.onUnlockSuccessful = ^{
+        [weakSelf hideLockScreen];
+    };
+    
+    [self presentViewController:self.lockScreen animated:NO completion:nil];
+}
+
+- (void)hideLockScreen { 
+    if(self.lockScreen == nil) {
+        return;
+    }
+    
+    [self dismissViewControllerAnimated:NO completion:nil];
+    self.lockScreen = nil;
+    self.isDisplayingStartupLockScreen = NO;
+    
+    if([self isInQuickLaunchViewMode]) {
+        [self openQuickLaunchPrimarySafe];
+    }
+}
+
+- (void)openQuickLaunchPrimarySafe {
+    UINavigationController* nav = [self selectedViewController];
+    QuickLaunchViewController* quickLaunch = (QuickLaunchViewController*)nav.viewControllers[0];
+    NSLog(@"Found Quick Launch = %@", quickLaunch);
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [quickLaunch openPrimarySafe];
+    });
+}
+
+- (void)appResignActive {
+    NSLog(@"appResignActive");
+
+    self.lockScreenSuppressedForBiometricAuth = NO;
+    if(Settings.sharedInstance.biometricAuthInProgress) {
+        NSLog(@"appResignActive biometricAuthInProgress... suppressing privacy and lock screens");
+        self.lockScreenSuppressedForBiometricAuth = YES;
+        return;
+    }
+    
+    self.enterBackgroundTime = [[NSDate alloc] init];
+    
+    UINavigationController* nav = [self selectedViewController];
+    NSString* className = NSStringFromClass([nav.visibleViewController class]);
+
+    NSLog(@"Presenting Privacy Screen over: [%@]", className);
+
+    if (![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]] && // Google Sign In Broken without this... sigh
+        ![className isEqualToString:@"SFAuthenticationViewController"] && // Google Sign In Broken without this... sigh. This is kinda brittle but I see no other way around it.
+        ![className isEqualToString:@"ODAuthenticationViewController"] && // OneDrive Personal
+        ![className isEqualToString:@"ADAuthenticationViewController"] && // OneDrive Biz
+        ![className isEqualToString:@"DBMobileSafariViewController"]) // OneDrive too ]
+    {
+        [self showLockScreen];
+    }
+}
+
+- (void)appBecameActive {
+    NSLog(@"appBecameActive: %d", Settings.sharedInstance.biometricAuthInProgress);
+    
+    // User may have just switched to our app after updating iCloud settings...
+    [self checkICloudAvailability];
+    
+    if(self.lockScreenSuppressedForBiometricAuth) {
+        NSLog(@"App Active but Privacy and Lock Suppressed... Nothing to do");
+        return;
+    }
+
+    [self lockAnyOpenSafesIfAppropriate];
+
+    if (self.lockScreen && !self.isDisplayingStartupLockScreen) {
+        BOOL timeToLock = NO;
+        if (self.enterBackgroundTime) {
+            NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
+            
+            if (secondsBetween > Settings.sharedInstance.appLockDelay)
+            {
+                timeToLock = YES;
+            }
+        }
+
+        NSLog(@"Time To Lock: %d", timeToLock);
+
+        if(Settings.sharedInstance.appLockMode == kNoLock || !timeToLock) {
+            [self hideLockScreen];
+        }
+    }
+    
+    self.enterBackgroundTime = nil;
+}
+
+- (void)lockAnyOpenSafesIfAppropriate {
+    if (self.enterBackgroundTime) {
+        NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
+        NSNumber *seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
+        
+        if (seconds.longValue != -1  && secondsBetween > seconds.longValue) // -1 = never
+        {
+            NSLog(@"Autolock Time [%@s] exceeded, locking safe.", seconds);
+            
+            UINavigationController* nav = [self selectedViewController];
+            [nav popToRootViewControllerAnimated:NO];
+        }
+    }
+}
 
 - (void)showQuickLaunchView {
     self.selectedIndex = 1;
@@ -37,25 +165,20 @@
     self.selectedIndex = 0;
 }
 
-- (BOOL)isInQuickLaunchViewMode {
-    return self.selectedIndex == 1;
-}
-
-- (void)updateCurrentRootSafesView {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        if(self.selectedIndex == 0) {
-            UINavigationController* navController = self.selectedViewController;
-            SafesViewController* safesList = (SafesViewController*)navController.viewControllers[0];
-            [safesList reloadSafes];
-        }
-    });
+- (void)showConfiguredInitialView {
+    if(Settings.sharedInstance.useQuickLaunchAsRootView) {
+        [self showQuickLaunchView];
+    }
+    else {
+        [self showSafesListView];
+    }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     self.tabBar.hidden = YES;
-    self.selectedIndex = Settings.sharedInstance.useQuickLaunchAsRootView ? 1 : 0;
+    
+    [self showConfiguredInitialView];
     
     // Pro or Free?
     
@@ -91,20 +214,47 @@
     [iCloudSafesCoordinator sharedInstance].onSafesCollectionUpdated = ^{
         [self updateCurrentRootSafesView];
     };
+}
 
-    // User may have just switched to our app after updating iCloud settings...
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+- (BOOL)isInQuickLaunchViewMode { 
+    return self.selectedIndex == 1;
+}
+
+- (void)updateCurrentRootSafesView {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        if(self.selectedIndex == 0) {
+            UINavigationController* nav = [self selectedViewController];
+            SafesViewController* safesList = (SafesViewController*)nav.viewControllers[0];
+            [safesList reloadSafes];
+        }
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self checkICloudAvailability];    
+    self.tabBar.hidden = YES;
+    
+    [self checkICloudAvailability];
 }
 
-- (void)didBecomeActive:(NSNotification *)notification {
-    [self checkICloudAvailability];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if(!self.hasAppearedOnce) {
+        if (Settings.sharedInstance.appLockMode != kNoLock)
+        {
+            self.isDisplayingStartupLockScreen = YES;
+            [self showLockScreen];
+        }
+        else {
+            if([self isInQuickLaunchViewMode]) {
+                [self openQuickLaunchPrimarySafe];
+            }
+        }
+    }
+    
+    self.hasAppearedOnce = YES;
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
@@ -239,8 +389,23 @@
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+- (void)importFromManualUiUrl:(NSURL *)importURL {
+    NSData *importedData = [NSData dataWithContentsOfURL:importURL];
+    
+    if (![DatabaseModel isAValidSafe:importedData]) {
+        [Alerts warn:self
+               title:@"Invalid Safe"
+             message:@"This is not a valid Strongbox password safe database file."];
+        
+        return;
+    }
+    
+    [self promptForImportedSafeNickName:importedData url:importURL editInPlace:NO];
+}
+
 - (void)import:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
-    [self.navigationController popToRootViewControllerAnimated:YES];
+    UINavigationController* nav = [self selectedViewController];
+    [nav popToRootViewControllerAnimated:YES];
     
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     [document openWithCompletionHandler:^(BOOL success) {

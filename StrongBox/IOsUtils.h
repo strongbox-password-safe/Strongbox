@@ -12,9 +12,6 @@
 
 + (NSURL *)applicationDocumentsDirectory;
 + (NSURL *)applicationSupportDirectory;
-
-+ (BOOL)   isTouchIDAvailable;
-
 + (NSString*)nameFromDeviceName;
 
 @end

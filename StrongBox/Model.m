@@ -28,7 +28,7 @@
         _metadata = metaData;
         _storageProvider = provider;
         _cacheMode = cacheMode;
-        _isReadOnly = isReadOnly;
+        _isReadOnly = isReadOnly || metaData.readOnly;
 
         return self;
     }
@@ -68,7 +68,7 @@
     }
     else {
         if(_isReadOnly) {
-            handler([Utils createNSError:@"You are in read-only mode. You will need to upgrade Strongbox to write to safes." errorCode:-1]);
+            handler([Utils createNSError:@"You are in read-only mode. Cannot Write!" errorCode:-1]);
         }
         else {
             handler([Utils createNSError:@"You are currently in offline mode. The safe cannot be modified." errorCode:-1]);

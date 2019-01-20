@@ -10,12 +10,15 @@
 #import "PasswordGenerationParameters.h"
 #import "AutoFillNewRecordSettings.h"
 #import "SFTPSessionConfiguration.h"
+#import "AppLockMode.h"
 
 static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 
 @interface Settings : NSObject
 
 + (Settings *)sharedInstance;
+
+- (NSUserDefaults*)getUserDefaults;
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen;
 - (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value;
@@ -67,6 +70,7 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 
 - (void)clearInstallDate;
 
+@property (nonatomic) BOOL disallowAllPinCodeOpens;
 @property (nonatomic) BOOL disallowAllBiometricId;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
 @property (nonatomic) BOOL useQuickLaunchAsRootView;
@@ -74,6 +78,19 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
 @property (nonatomic) BOOL hasShownKeePassBetaWarning;
 
-// @property SFTPSessionConfiguration* sFTPSessionConfiguration;
+@property (nonatomic) BOOL showKeePass1BackupGroup;
+@property (nonatomic) BOOL hideTips;
+
+@property BOOL clearClipboardEnabled;
+@property NSInteger clearClipboardAfterSeconds;
+
+@property AppLockMode appLockMode;
+@property NSString* appLockPin;
+@property NSInteger appLockDelay;
+
+- (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion;
+- (void)requestBiometricId:(NSString*)reason fallbackTitle:(NSString*)fallbackTitle completion:(void(^)(BOOL success, NSError * __nullable error))completion;
+@property BOOL biometricAuthInProgress;
++ (BOOL)isBiometricIdAvailable;
 
 @end

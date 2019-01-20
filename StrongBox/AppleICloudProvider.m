@@ -183,8 +183,11 @@
         return;
     }
  
-    NSURL *url = [NSURL URLWithString:safeMetaData.fileIdentifier];
-    
+//    NSURL *url = [NSURL URLWithString:safeMetaData.fileIdentifier];
+//    NSURL *ubiq = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
+//    NSURL *ubiquitousPackage = [ubiq URLByAppendingPathComponent:safeMetaData.fileName];
+    NSURL * url = [self getFullICloudURLWithFileName:safeMetaData.fileName];
+
     // Wrap in file coordinator
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
@@ -193,7 +196,11 @@
                                               error:nil
                                          byAccessor:^(NSURL* writingURL) {
                                              NSFileManager* fileManager = [[NSFileManager alloc] init];
-                                             [fileManager removeItemAtURL:url error:nil];
+                                             NSError *error2;
+                                             [fileManager removeItemAtURL:writingURL error:&error2];
+                                             if(completion) {
+                                                 completion(error2);
+                                             }
                                          }];
     });
 }

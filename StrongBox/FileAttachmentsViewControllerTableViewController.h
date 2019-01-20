@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property DatabaseFormat format;
 @property NSArray<UiAttachment*>* attachments;
 @property (nonatomic, copy) dispatch_block_t onDoneWithChanges;
+@property BOOL readOnly;
 
 @end
 

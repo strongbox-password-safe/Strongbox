@@ -45,27 +45,12 @@
     singleTap.numberOfTapsRequired = 1;
     self.imageViewLogo.userInteractionEnabled = YES;
     [self.imageViewLogo addGestureRecognizer:singleTap];
-    
-    //
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onApplicationBecameActive:)
-                                                 name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
     self.gradient.frame = self.view.bounds;
-}
-
-- (void)onApplicationBecameActive:(NSNotification *)notification {
-    NSLog(@"onApplicationBecameActive");
-
-    if([[self getInitialViewController] isInQuickLaunchViewMode] &&
-       self.navigationController.visibleViewController == self) {
-        [self openPrimarySafe];
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -78,6 +63,12 @@
     [self segueToNagScreenIfAppropriate];
     
     [[self getInitialViewController] checkICloudAvailability];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self refreshView];
 }
 
 - (void)segueToNagScreenIfAppropriate {
@@ -127,9 +118,7 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
+- (void)refreshView {
     SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
     
     if(!primary) {
@@ -160,6 +149,13 @@
 }
 
 - (void)openPrimarySafe {
+    // Only do this if we are top of the nav stack
+    
+    if(self.navigationController.topViewController != self) {
+        NSLog(@"Not opening Primary safe as not at top of the Nav Stack");
+        return;
+    }
+       
     SafeMetaData* safe = [[self getInitialViewController] getPrimarySafe];
     
     if(!safe) {
@@ -168,24 +164,15 @@
         return;
     }
     
-    // Turn off active notifications during open as touch id causes actice/resign
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIApplicationDidBecomeActiveNotification
-                                                  object:nil];
-    
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
-                                          canBiometricEnrol:YES
+                                          canConvenienceEnrol:YES
                                                  completion:^(Model * _Nonnull model) {
-        // Restore once open sequence is done.
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(onApplicationBecameActive:)
-                                                     name:UIApplicationDidBecomeActiveNotification object:nil];
-        
         if(model) {
             [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];
         }
+                                                     
+        [self refreshView]; // Duress might have removed the safe
     }];
 }
 

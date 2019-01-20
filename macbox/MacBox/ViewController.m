@@ -100,7 +100,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
     
-
     // Password
     
     if (@available(macOS 10.13, *)) {
@@ -110,6 +109,13 @@ static NSArray<NSImage*> *kKeePassIconSet;
         self.textFieldPw.textColor = [NSColor controlTextColor];
     }
 
+    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
+    NSLog(@"Loaded Font: %@", ft);
+    if(ft) {
+        self.textFieldPw.font = ft;
+        self.textFieldHiddenPassword.font = ft;
+    }
+    
     // Any Clicks into the Password Field show it for editing
     
     self.textFieldHiddenPassword.onBecomesFirstResponder = ^{
@@ -1802,6 +1808,8 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         
         NSString *key = dict.allKeys[row];
         NSString *value = [dict objectForKey:key];
+        
+        value = value == nil ? @"" : value; // Safety Only
         
         cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
         

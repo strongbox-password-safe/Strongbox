@@ -32,6 +32,12 @@
 
     NSString* host = [self.textFieldRootUrl.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
 
+    // Trim trailing Slash as library doesn't like it...
+    
+    if([host hasSuffix:@"/"]) {
+        host = [host substringToIndex:host.length - 1];
+    }
+    
     self.configuration.host = [NSURL URLWithString:host];
     self.configuration.username = self.textFieldUsername.text;
     self.configuration.password = self.textFieldPassword.text;

@@ -299,6 +299,14 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     }
 }
 
+- (BOOL)contains:(Node*)test {
+    Node* match = [self findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        return node == test;
+    }];
+    
+    return match != nil;
+}
+
 - (NSString*)recursiveTreeDescription:(uint32_t)indentLevel {
     NSMutableString *ret = [NSMutableString string];
     

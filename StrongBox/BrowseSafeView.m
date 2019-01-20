@@ -19,6 +19,7 @@
 #import "Utils.h"
 #import "NodeIconHelper.h"
 #import "BrowseSafeEntryTableViewCell.h"
+#import "BrowseGroupTableViewCell.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -79,7 +80,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsSelectionDuringEditing = YES;
     
-    if (!self.currentGroup || self.currentGroup.parent == nil) {
+    if(Settings.sharedInstance.hideTips) {
+        self.navigationItem.prompt = nil;
+    }
+    if (!Settings.sharedInstance.hideTips && (!self.currentGroup || self.currentGroup.parent == nil)) {
         if(arc4random_uniform(100) < 50) {
             [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
                                        message:@"Tap and hold entry for fast password copy"
@@ -224,6 +228,22 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         return NO;
     }];
     
+    // Filter out any results from the KDB root 'Backup' group/folder if configured so...
+    
+    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
+        if (self.viewModel.database.format == kKeePass1) {
+            Node* backupGroup = [self.viewModel.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+                return [node.title isEqualToString:@"Backup"];
+            }];
+            
+            if(backupGroup) {
+                foo = [foo filter:^BOOL(Node * _Nonnull obj) {
+                    return (obj != backupGroup && ![backupGroup contains:obj]);
+                }];
+            }
+        }
+    }
+    
     self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
 }
 
@@ -238,10 +258,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
     if(node.isGroup) {
-        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"FolderCell" forIndexPath:indexPath];
-        cell.textLabel.text = node.title;
+        BrowseGroupTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"GroupCell" forIndexPath:indexPath];
+        cell.title.text = node.title;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        cell.imageView.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+        cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
         
         return cell;
     }
@@ -299,7 +319,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 
 - (void)tapOnCell:(NSIndexPath *)indexPath  {
     if (!self.editing) {
-        Node *item = [self getDataSource][indexPath.row];
+        NSArray* arr = [self getDataSource];
+        
+        if(indexPath.row >= arr.count) {
+            return;
+        }
+        
+        Node *item = arr[indexPath.row];
 
         if (!item.isGroup) {
             [self performSegueWithIdentifier:@"segueToRecord" sender:item];
@@ -329,8 +355,26 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                                  self.viewModel.metadata.nickName : self.currentGroup.title,
                                  self.viewModel.isUsingOfflineCache ? @" [Offline]" : @"",
                                  self.viewModel.isReadOnly ? @" [Read Only]" : @""];
-    
+
     self.items = [[NSMutableArray alloc] initWithArray:self.currentGroup.children];
+
+    // Filter KeePass1 Backup Group if so configured...
+    
+    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
+        if (self.viewModel.database.format == kKeePass1) {
+            Node* backupGroup = [self.viewModel.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+                return [node.title isEqualToString:@"Backup"];
+            }];
+            
+            if(backupGroup) {
+                if([self.currentGroup contains:backupGroup]) {
+                    self.items = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
+                        return obj != backupGroup;
+                    }];
+                }
+            }
+        }
+    }
     
     // Display
     

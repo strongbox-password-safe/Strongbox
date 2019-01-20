@@ -69,7 +69,7 @@
 + (void)error:(NSError*)error window:(NSWindow*)window {
     NSAlert *alert = [[NSAlert alloc] init];
     
-    [alert setMessageText:error.localizedDescription];
+    [alert setMessageText:error ? error.localizedDescription : @"Unknown Error (nil)"];
     [alert setAlertStyle:NSAlertStyleWarning];
     [alert addButtonWithTitle:@"OK"];
     

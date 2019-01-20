@@ -74,6 +74,8 @@
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
+		4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */; };
+		4D88AD5021E654EA00B49149 /* SourceSansPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
 		4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
@@ -288,6 +290,8 @@
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UpgradeWindowController.xib; path = MacBox/UpgradeWindowController.xib; sourceTree = "<group>"; };
+		4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Regular.ttf"; sourceTree = "<group>"; };
+		4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Bold.ttf"; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WindowController.h; path = MacBox/WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WindowController.m; path = MacBox/WindowController.m; sourceTree = "<group>"; };
 		4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = ../model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = "<group>"; };
@@ -693,6 +697,15 @@
 			name = View;
 			sourceTree = "<group>";
 		};
+		4D88AD5121E657F700B49149 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */,
+				4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
@@ -800,6 +813,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D88AD5121E657F700B49149 /* Fonts */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
@@ -991,11 +1005,13 @@
 				4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */,
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
 				4D553B54219DD2CE00AA4BAB /* AttachmentItem.xib in Resources */,
+				4D88AD5021E654EA00B49149 /* SourceSansPro-Regular.ttf in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				4D524D13219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
+				4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
 				4D559F9F20750C2C009856E3 /* SafesMetaDataViewer.xib in Resources */,

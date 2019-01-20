@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSArray<CustomField*> *items;
 @property (nonatomic, copy) dispatch_block_t onDoneWithChanges;
+@property BOOL readOnly;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAdd;
 
 @end
 

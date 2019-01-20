@@ -29,24 +29,6 @@
                                                   inDomains:NSUserDomainMask].lastObject;
 }
 
-+ (BOOL)isTouchIDAvailable {
-    LAContext *localAuthContext = [[LAContext alloc] init];
-
-    if (localAuthContext == nil) {
-        return NO;
-    }
-
-    NSError *error;
-    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
-
-    if (error) {
-        //NSLog(@"Error with biometrics authentication");
-        return NO;
-    }
-
-    return YES;
-}
-
 // https://stackoverflow.com/questions/8261961/better-way-to-get-the-users-name-from-device
 
 + (NSString*)nameFromDeviceName {

@@ -16,18 +16,12 @@
 #import "Settings.h"
 #import "InitialViewController.h"
 #import "SafesViewController.h"
-#import "QuickLaunchViewController.h"
-#import "StorageBrowserTableViewController.h"
-#import "UpgradeViewController.h"
 #import "OfflineDetector.h"
 #import "real-secrets.h"
 #import "NSArray+Extensions.h"
 #import "OfflineCacheNameDetector.h"
 
 @interface AppDelegate ()
-
-@property (nonatomic, strong) NSDate *enterBackgroundTime;
-@property (nonatomic, strong) UIViewController *lockView;
 
 @end
 
@@ -44,7 +38,18 @@
         Settings.sharedInstance.installDate = [NSDate date];
     }
  
+    [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
+
+    [self registerForClipboardClearingNotifications];
+    
     return YES;
+}
+
+- (void)registerForClipboardClearingNotifications {
+    [NSNotificationCenter.defaultCenter addObserverForName:UIPasteboardChangedNotification object:nil queue:nil
+                                                usingBlock:^(NSNotification * _Nonnull note) {
+        [self startClearClipboardBackgroundTask];
+    }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,60 +86,52 @@
     return NO;
 }
 
+- (InitialViewController *)getInitialViewController {
+    InitialViewController *ivc = (InitialViewController*)self.window.rootViewController;
+    return ivc;
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application {
-    UITabBarController *tab = (UITabBarController*)self.window.rootViewController;
-    UINavigationController *nav = tab.selectedViewController;
-
-    NSString* className = NSStringFromClass([nav.visibleViewController class]);
-    
-    NSLog(@"Presenting Lockview over: [%@]", className);
-    
-    if (![nav.visibleViewController isKindOfClass:[SafesViewController class]] && // Don't show lock screen for these two initial screens as Touch ID/Face ID causes a weird effect of present lock screen while waiting authentication
-        ![nav.visibleViewController isKindOfClass:[QuickLaunchViewController class]] &&
-        ![nav.visibleViewController isKindOfClass:[UpgradeViewController class]] &&
-        ![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]] && // Google Sign In Broken without this... sigh
-        ![className isEqualToString:@"SFAuthenticationViewController"] && // Google Sign In Broken without this... sigh. This is kinda brittle but I see no other way around it.
-        ![className isEqualToString:@"ODAuthenticationViewController"] && // OneDrive Personal
-        ![className isEqualToString:@"ADAuthenticationViewController"] && // OneDrive Biz
-        ![className isEqualToString:@"DBMobileSafariViewController"]) // OneDrive too
-    {
-        self.enterBackgroundTime = [[NSDate alloc] init];
-
-        UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        self.lockView = [mainStoryboard instantiateViewControllerWithIdentifier:@"LockScreen"];
-
-        [self.lockView.view layoutIfNeeded];
-        [tab presentViewController:self.lockView animated:NO completion:nil];
-    }
-    else {
-        self.lockView = nil;
-    }
+    [[self getInitialViewController] appResignActive];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    if (self.lockView) {
-        [self.window.rootViewController dismissViewControllerAnimated:NO completion:nil];
-        self.lockView = nil;
-    }
-    
-    if (self.enterBackgroundTime) {
-        NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
-        NSNumber *seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
-
-        if (seconds.longValue != -1  && secondsBetween > seconds.longValue) { // -1 = never
-            NSLog(@"Autolock Time [%@s] exceeded, locking safe.", seconds);
-
-            UITabBarController *tabController = (UITabBarController *)self.window.rootViewController;
-            UINavigationController* nav = [tabController selectedViewController];
-            [nav popToRootViewControllerAnimated:NO];
-        }
-        
-        self.enterBackgroundTime = nil;
-    }
+    [[self getInitialViewController] appBecameActive];
 }
 
 - (void)initializeDropbox {
     [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
+}
+
+- (void)startClearClipboardBackgroundTask {
+    if(Settings.sharedInstance.clearClipboardEnabled)
+    {
+        if(![UIPasteboard.generalPasteboard hasStrings] &&
+           ![UIPasteboard.generalPasteboard hasImages] &&
+           ![UIPasteboard.generalPasteboard hasURLs]) {
+            return;
+        }
+        
+        NSInteger clipboardChangeCount = UIPasteboard.generalPasteboard.changeCount;
+        
+        UIApplication* app = [UIApplication sharedApplication];
+        __block UIBackgroundTaskIdentifier task = [app beginBackgroundTaskWithExpirationHandler:^{
+            [app endBackgroundTask:task];
+            task = UIBackgroundTaskInvalid;
+        }];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
+                       dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+           if(clipboardChangeCount == UIPasteboard.generalPasteboard.changeCount) {
+               [UIPasteboard.generalPasteboard setStrings:@[]];
+               [UIPasteboard.generalPasteboard setImages:@[]];
+               [UIPasteboard.generalPasteboard setURLs:@[]];
+           }
+           
+           [app endBackgroundTask:task];
+           task = UIBackgroundTaskInvalid;
+       });
+    }
 }
 
 @end

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "StorageProvider.h"
+#import "DuressAction.h"
 
 @interface SafeMetaData : NSObject
 
@@ -16,22 +17,32 @@
                         fileName:(NSString*)fileName
                   fileIdentifier:(NSString*)fileIdentifier;
 
-@property (nonatomic, strong) NSString* touchIdPassword;
-@property (nonatomic, strong) NSData* touchIdKeyFileDigest;
-
 @property (nonatomic, strong) NSString *uuid;
 @property (nonatomic, strong) NSString *nickName;
 @property (nonatomic, strong) NSString *fileName;
 @property (nonatomic, strong) NSString *fileIdentifier;
 @property (nonatomic) StorageProvider storageProvider;
+
+@property (nonatomic) BOOL hasBeenPromptedForConvenience;
+@property (nonatomic) BOOL isEnrolledForConvenience;
+@property (nonatomic, strong) NSString* convenienceMasterPassword;
+@property (nonatomic, strong) NSData* convenenienceKeyFileDigest;
+
 @property (nonatomic) BOOL isTouchIdEnabled;
-@property (nonatomic) BOOL isEnrolledForTouchId;
+
+@property (nonatomic, strong) NSString* conveniencePin;
+@property (nonatomic, strong) NSString* duressPin;
+@property (nonatomic) DuressAction duressAction;
+@property (nonatomic) int failedPinAttempts;
+
 @property (nonatomic) BOOL offlineCacheEnabled;
 @property (nonatomic) BOOL offlineCacheAvailable;
-@property (nonatomic) BOOL hasUnresolvedConflicts;
 
 @property (nonatomic) BOOL autoFillCacheEnabled;
 @property (nonatomic) BOOL autoFillCacheAvailable;
+
+@property (nonatomic) BOOL readOnly;
+@property (nonatomic) BOOL hasUnresolvedConflicts;
 
 @end
 

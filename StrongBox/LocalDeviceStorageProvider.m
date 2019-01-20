@@ -152,7 +152,9 @@
 
     [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
 
-    completion(error);
+    if(completion != nil) {
+        completion(error);
+    }
 }
 
 - (void)deleteOfflineCachedSafe:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
@@ -162,7 +164,9 @@
 
     [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
 
-    completion(error);
+    if(completion != nil) {
+        completion(error);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,7 +303,10 @@
     NSLog(@"Deleting AutoFill cache file at: %@", filePath);
     
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
-    completion(error);
+
+    if(completion != nil) {
+        completion(error);
+    }
 }
 
 - (NSDate *)getAutoFillCacheModificationDate:(SafeMetaData *)safeMetadata {
@@ -471,7 +478,36 @@ static NSString* getAutoFillFilePath(SafeMetaData* safeMetaData) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)excludeDirectoriesFromBackup {
+    NSString* path = [IOsUtils applicationDocumentsDirectory].path;
+    [self excludeFromBackup:path];
+    
+    path = [IOsUtils applicationSupportDirectory].path;
+    [self excludeFromBackup:path];
+    
+//    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL];
+//
+//    for (int count = 0; count < (int)[directoryContent count]; count++)
+//    {
+//        NSLog(@"File %d: %@", (count + 1), [directoryContent objectAtIndex:count]);
+//
+//        NSString *file = [path stringByAppendingPathComponent:[directoryContent objectAtIndex:count]];
+//
+//        [self excludeFromBackup:file];
+//    }
+}
 
+- (void)excludeFromBackup:(NSString*)path {
+    NSError *error = nil;
+    
+    NSURL* URL = [NSURL fileURLWithPath:path];
+    
+    BOOL success = [URL setResourceValue:[NSNumber numberWithBool:YES]
+                                  forKey:NSURLIsExcludedFromBackupKey
+                                   error:&error];
+    if(!success){
+        NSLog(@"Error excluding %@ from backup %@", [URL lastPathComponent], error);
+    }
+}
 
 @end

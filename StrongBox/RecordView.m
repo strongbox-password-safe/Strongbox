@@ -477,6 +477,7 @@ static NSString * trim(NSString *string) {
         NSArray<UiAttachment*>* attachments = getUiAttachments(self.record, self.viewModel.database.attachments);
         vc.attachments = attachments;
         vc.format = self.viewModel.database.format;
+        vc.readOnly = self.viewModel.isReadOnly;
         
         __weak FileAttachmentsViewControllerTableViewController* weakRef = vc;
         vc.onDoneWithChanges = ^{
@@ -487,7 +488,7 @@ static NSString * trim(NSString *string) {
         UINavigationController *nav = segue.destinationViewController;
         
         CustomFieldsViewController* vc = (CustomFieldsViewController*)[nav topViewController];
-        
+        vc.readOnly = self.viewModel.isReadOnly;
         
         NSArray<NSString*> *sortedKeys = [self.record.fields.customFields.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
             return [obj1 compare:obj2];

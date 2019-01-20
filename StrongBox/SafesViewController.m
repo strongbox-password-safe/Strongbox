@@ -258,11 +258,14 @@
     else {
         [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                            safe:safe
-                                              canBiometricEnrol:YES
+                                              canConvenienceEnrol:YES
                                                      completion:^(Model * _Nonnull model) {
-        if(model) {
-            [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
-        }}];
+            if(model) {
+                [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
+            }
+                                                         
+            [self reloadSafes]; // Duress might have remove a safe
+         }];
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -542,10 +545,12 @@
                 return;
             }
 
-            UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
-            vc.delegate = self;
-            
-            [self presentViewController:vc animated:YES completion:nil];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
+                vc.delegate = self;
+                
+                [self presentViewController:vc animated:YES completion:nil];
+            });
         }
     }];
 }
@@ -596,7 +601,9 @@
 }
 
 -(void)bindProOrFreeTrialUi {
+    self.navigationController.toolbarHidden =  [[Settings sharedInstance] isPro];
     self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
+    [self.navigationController setToolbarHidden:[[Settings sharedInstance] isPro]];
     
     //[self.buttonTogglePro setTitle:(![[Settings sharedInstance] isProOrFreeTrial] ? @"Go Pro" : @"Go Free")];
     //[self.buttonTogglePro setEnabled:NO];
@@ -640,8 +647,8 @@
 }
 
 - (InitialViewController *)getInitialViewController {
-InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
-return ivc;
+    InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
+    return ivc;
 }
 
 - (IBAction)onSwitchToQuickLaunchView:(id)sender {

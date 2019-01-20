@@ -32,8 +32,10 @@
         [self.keys removeObject:key];
     }
 
-    [self.keys addObject:key];
-    [self.kvps setValue:value forKey:key];
+    if(value != nil) {
+        [self.keys addObject:key];
+        [self.kvps setValue:value forKey:key];
+    }
 }
 
 - (NSArray<id>*) allKeys {

@@ -24,6 +24,7 @@
 - (IBAction)onFaq:(id)sender;
 - (IBAction)onPrivacyPolicy:(id)sender;
 - (IBAction)onAutoAddNewLocalSafesChanged:(id)sender;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchLongTouchCopy;
@@ -40,5 +41,10 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonSignoutOneDrive;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAutoLock;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePass1BackupFolder;
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideTips;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAutoClearClipboard;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLockDelay;
 
 @end

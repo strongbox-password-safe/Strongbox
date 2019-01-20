@@ -25,7 +25,7 @@ static const uint64_t kDefaultIterations = 2;
 static const uint64_t kDefaultMemory = 1024 * 1024;
 static const uint32_t kDefaultParallelism = 2;
 static const uint32_t kDefaultVersion = 19;
-static const uint32_t kDefaultSaltLength = 16;
+static const uint32_t kDefaultSaltLength = 32;
 
 static const uint32_t kBlockSize = 1024;
 

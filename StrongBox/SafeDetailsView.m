@@ -17,6 +17,7 @@
 #import "Csv.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "KeyFileParser.h"
+#import "PinsConfigurationController.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -36,6 +37,7 @@
     [self updateTouchIdButtonText];
     [self updateOfflineCacheButtonText];
     [self updateAutoFillCacheButtonText];
+    [self bindReadOnly];
 
     self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
     self.labelChangeKeyFile.enabled = [self canChangeKeyFile];
@@ -128,7 +130,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 }
 
 - (BOOL)canToggleTouchId {
-    return [IOsUtils isTouchIDAvailable] && !self.viewModel.isReadOnly;
+    return Settings.isBiometricIdAvailable && !self.viewModel.isReadOnly;
 }
 
 - (BOOL)canToggleOfflineCache {
@@ -197,8 +199,8 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     
     [self.viewModel update:^(NSError *error) {
         if (error == nil) {
-            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
-                self.viewModel.metadata.touchIdKeyFileDigest = self.viewModel.database.keyFileDigest;
+            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
+                self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
                 NSLog(@"Keychain updated on Key File changed for touch id enabled and enrolled safe.");
             }
             
@@ -224,8 +226,8 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     
     [self.viewModel update:^(NSError *error) {
         if (error == nil) {
-            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForTouchId) {
-                [self.viewModel.metadata setTouchIdPassword:self.viewModel.database.masterPassword];
+            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
+                self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
                 NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
             }
             
@@ -282,21 +284,22 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     NSString* bIdName = [[Settings sharedInstance] getBiometricIdName];
     
     if (self.viewModel.metadata.isTouchIdEnabled) {
-        NSString *message = self.viewModel.metadata.isEnrolledForTouchId ?
-        @"Disabling %@ for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-        @"Are you sure you want to disable %@ for this safe?";
+        NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
+            @"Disabling %@ for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+            @"Are you sure you want to disable %@ for this safe?";
         
-
         [Alerts yesNo:self
                 title:[NSString stringWithFormat:@"Disable %@?", bIdName]
               message:[NSString stringWithFormat:message, bIdName]
                action:^(BOOL response) {
                    if (response) {
                        self.viewModel.metadata.isTouchIdEnabled = NO;
-                       self.viewModel.metadata.isEnrolledForTouchId = NO;
-                       
-                       self.viewModel.metadata.touchIdKeyFileDigest = nil;
-                       self.viewModel.metadata.touchIdPassword = nil;
+
+                       if(self.viewModel.metadata.conveniencePin == nil) {
+                           self.viewModel.metadata.isEnrolledForConvenience = NO;
+                           self.viewModel.metadata.convenienceMasterPassword = nil;
+                           self.viewModel.metadata.convenenienceKeyFileDigest = nil;
+                       }
                        
                        [[SafesList sharedInstance] update:self.viewModel.metadata];
                        [self updateTouchIdButtonText];
@@ -314,13 +317,12 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     }
     else {
         self.viewModel.metadata.isTouchIdEnabled = YES;
-        self.viewModel.metadata.isEnrolledForTouchId = NO;
-
-        self.viewModel.metadata.touchIdKeyFileDigest = nil;
-        self.viewModel.metadata.touchIdPassword = nil;
+        self.viewModel.metadata.isEnrolledForConvenience = YES;
+        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
+        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
 
         [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
-                                   message:[NSString stringWithFormat:@"%@ has been enabled for this safe. You will be asked to enrol the next time you open it.", bIdName]
+                                   message:[NSString stringWithFormat:@"%@ has been enabled for this safe.", bIdName]
                                   duration:3.f
                                hideOnSwipe:YES
                                  hideOnTap:YES
@@ -483,6 +485,27 @@ static NSString *getLastCachedDate(NSDate *modDate) {
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:^{ }];
+}
+
+- (void)bindReadOnly {
+    self.switchReadOnly.on = self.viewModel.metadata.readOnly;
+}
+
+- (IBAction)onReadOnly:(id)sender {
+    self.viewModel.metadata.readOnly = self.switchReadOnly.on;
+    
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+
+    [self bindReadOnly];
+    
+    [Alerts info:self title:@"Re-Open Required" message:@"Please re open this safe for this read only change to take effect."];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if([segue.identifier isEqualToString:@"segueToPinsConfiguration"]) {
+        PinsConfigurationController* vc = (PinsConfigurationController*)segue.destinationViewController;
+        vc.viewModel = self.viewModel;
+    }
 }
 
 @end

@@ -60,6 +60,17 @@
     }
 }
 
+- (void)refreshView {
+    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
+    
+    if(primary && [[self getInitialViewController] autoFillIsPossibleWithSafe:primary]) {
+        self.labelSafeName.text = primary.nickName;
+    }
+    else {
+        self.labelSafeName.text = @"No Primary Safe";
+    }
+}
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
@@ -116,11 +127,13 @@
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
                                           openAutoFillCache:useAutoFillCache
-                                          canBiometricEnrol:NO
+                                          canConvenienceEnrol:NO
                                                  completion:^(Model * _Nonnull model) {
                                                      if(model) {
                                                          [self performSegueWithIdentifier:@"toPickCredentials" sender:model];
                                                      }
+                                                     
+                                                     [self refreshView];
                                                  }];
 }
 

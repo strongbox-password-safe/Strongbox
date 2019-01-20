@@ -18,6 +18,7 @@ typedef NS_ENUM (unsigned int, StorageProvider) {
     kFilesAppUrlBookmark,
     kSFTP,
     kWebDAV,
+    kDuressDummy,
 };
 
 #endif /* StorageProvider_h */

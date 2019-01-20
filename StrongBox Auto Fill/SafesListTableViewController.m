@@ -27,26 +27,33 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.safes = SafesList.sharedInstance.snapshot;
+ 
+    [self refreshSafes];
 
-    SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
-
-    if(primary && [[self getInitialViewController] autoFillIsPossibleWithSafe:primary]) {
-        [self.barButtonShowQuickView setEnabled:YES];
-        [self.barButtonShowQuickView setTintColor:nil];
-    }
-    else {
-        [self.barButtonShowQuickView setEnabled:NO];
-        [self.barButtonShowQuickView setTintColor: [UIColor clearColor]];
-    }
-    
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
     
     self.tableView.rowHeight = 65.0f;
     
     [SVProgressHUD setViewForExtension:self.view];
+}
+
+- (void)refreshSafes {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        self.safes = SafesList.sharedInstance.snapshot;
+        [self.tableView reloadData];
+        
+        SafeMetaData* primary = [[self getInitialViewController] getPrimarySafe];
+
+        if(primary && [[self getInitialViewController] autoFillIsPossibleWithSafe:primary]) {
+            [self.barButtonShowQuickView setEnabled:YES];
+            [self.barButtonShowQuickView setTintColor:nil];
+        }
+        else {
+            [self.barButtonShowQuickView setEnabled:NO];
+            [self.barButtonShowQuickView setTintColor: [UIColor clearColor]];
+        }
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -193,11 +200,12 @@
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                         safe:safe
                                           openAutoFillCache:useAutoFillCache
-                                          canBiometricEnrol:NO
+                                          canConvenienceEnrol:NO
                                                  completion:^(Model * _Nonnull model) {
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
                                                           }
+                                                     [self refreshSafes]; // Duress may have removed one
                                                       }];
 }
 

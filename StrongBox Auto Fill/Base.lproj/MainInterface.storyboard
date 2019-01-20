@@ -120,7 +120,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="lock-48" translatesAutoresizingMaskIntoConstraints="NO" id="34G-mi-Kzb" userLabel="Icon">
-                                            <rect key="frame" x="16" y="-2.3333333333333321" width="48" height="48.333333333333329"/>
+                                            <rect key="frame" x="16" y="3.3333333333333321" width="48" height="48"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="48" id="Ioc-wm-DO2"/>
                                                 <constraint firstAttribute="height" constant="48" id="zbV-q1-thn"/>
@@ -363,6 +363,6 @@
         <image name="product32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="KJn-mB-IUo"/>
+        <segue reference="hje-2v-miH"/>
     </inferredMetricsTieBreakers>
 </document>

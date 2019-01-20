@@ -39,10 +39,8 @@ static NSString* const kSafesList = @"safesList";
     return self;
 }
 
-static NSUserDefaults *getUserDefaults() {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
-    
-    return defaults;
+static NSUserDefaults* getUserDefaults() {
+    return [Settings.sharedInstance getUserDefaults];
 }
 
 - (NSMutableArray<SafeMetaData*>*)load {

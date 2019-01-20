@@ -15,6 +15,7 @@
 #import <MessageUI/MessageUI.h>
 #import "SafesList.h"
 #import "OneDriveStorageProvider.h"
+#import "PinEntryController.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -22,6 +23,8 @@
 
 @implementation PreferencesTableViewController {
     NSDictionary<NSNumber*, NSNumber*> *_autoLockList;
+    NSDictionary<NSNumber*, NSNumber*> *_appLockDelayList;
+    NSDictionary<NSNumber*, NSNumber*> *_autoClearClipboardIndex;
 }
 
 - (void)viewDidLoad {
@@ -37,6 +40,15 @@
                         @0 : @1,
                         @60 : @2,
                         @600 :@3 };
+
+    _appLockDelayList = @{ @0 : @0,
+                           @60 : @1,
+                           @600 :@2 };
+    
+    _autoClearClipboardIndex = @{   @0 : @0,
+                                    @30 : @1,
+                                    @60 : @2,
+                                    @120 :@3 };
     
     [self.buttonUnlinkDropbox setTitle:@"(No Current Dropbox Session)" forState:UIControlStateDisabled];
     [self.buttonUnlinkDropbox setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
@@ -50,11 +62,21 @@
     [self bindUseICloud];
     [self bindAboutButton];
     [self bindLongTouchCopy];
+    [self bindAllowPinCodeOpen];
     [self bindAllowBiometric];
     [self bindShowPasswordOnDetails];
     [self bindAutoLock];
     [self bindAutoAddNewLocalSafes];
-    //[self bindShowKeePassCreateOption];
+    [self bindShowKeePass1BackupFolder];
+    [self bindHideTips];
+    [self bindClearClipboard];
+    [self bindAppLock];
+    
+    [self customizeAppLockSectionFooter];
+}
+
+- (void)customizeAppLockSectionFooter {
+    [self.segmentAppLock setTitle:[Settings.sharedInstance getBiometricIdName] forSegmentAtIndex:2];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -108,6 +130,12 @@
     [self bindLongTouchCopy];
 }
 
+- (IBAction)onAllowPinCodeOpen:(id)sender {
+    Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+    
+    [self bindAllowPinCodeOpen];
+}
+
 - (IBAction)onAllowBiometric:(id)sender {
     NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
     
@@ -116,17 +144,26 @@
     [self bindAllowBiometric];
 }
 
-//- (IBAction)onShowKeePassCreateOptionChanged:(id)sender {
-//    NSLog(@"Setting ShowKeePassCreateOption to %d", self.switchShowKeePassCreateOption.on);
-//    
-//    Settings.sharedInstance.showKeePassCreateSafeOptions = !self.switchShowKeePassCreateOption.on;
-//    
-//    [self bindShowKeePassCreateOption];
-//}
+- (void)bindShowKeePass1BackupFolder {
+    self.switchShowKeePass1BackupFolder.on = [[Settings sharedInstance] showKeePass1BackupGroup];
+}
 
-//- (void)bindShowKeePassCreateOption {
-//    self.switchShowKeePassCreateOption.on = [[Settings sharedInstance] showKeePassCreateSafeOptions];
-//}
+- (IBAction)onShowKeePass1BackupFolder:(id)sender {
+    NSLog(@"Setting ShowKeePass1BackupFolder to %d", self.switchShowKeePass1BackupFolder.on);
+
+    Settings.sharedInstance.showKeePass1BackupGroup = !self.switchShowKeePass1BackupFolder.on;
+
+    [self bindShowKeePass1BackupFolder];
+}
+
+- (void)bindHideTips {
+    self.switchHideTips.on = Settings.sharedInstance.hideTips;
+}
+
+- (IBAction)onHideTips:(id)sender {
+    Settings.sharedInstance.hideTips = self.switchHideTips.on;
+    [self bindHideTips];
+}
 
 - (IBAction)onHowTo:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/how-to-guide"]];
@@ -138,6 +175,10 @@
 
 - (IBAction)onPrivacyPolicy:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/privacy-policy"]];
+}
+
+- (void)bindAllowPinCodeOpen {
+    self.switchAllowPinCodeOpen.on = !Settings.sharedInstance.disallowAllPinCodeOpens;
 }
 
 - (void)bindAllowBiometric {
@@ -185,6 +226,96 @@
     NSNumber* index = [_autoLockList objectForKey:seconds];
     [self.segmentAutoLock setSelectedSegmentIndex:index.integerValue];
 }
+
+- (IBAction)onSegmentClearClipboardChanged:(id)sender {
+    NSArray<NSNumber *> *keys = [_autoClearClipboardIndex allKeysForObject:@(self.segmentAutoClearClipboard.selectedSegmentIndex)];
+    NSNumber *seconds = keys[0];
+    
+    Settings.sharedInstance.clearClipboardEnabled = seconds.integerValue != 0;
+    Settings.sharedInstance.clearClipboardAfterSeconds = seconds.integerValue;
+    
+    [self bindClearClipboard];
+}
+
+- (void)bindClearClipboard {
+    NSInteger seconds = Settings.sharedInstance.clearClipboardAfterSeconds;
+    BOOL enabled = Settings.sharedInstance.clearClipboardEnabled;
+
+    NSLog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
+    
+    if(!enabled) {
+        seconds = 0;
+    }
+    
+    NSNumber* index = [_autoClearClipboardIndex objectForKey:@(seconds)];
+    index = index == nil ? @(2) : index;
+    [self.segmentAutoClearClipboard setSelectedSegmentIndex:index.integerValue];
+}
+
+- (IBAction)onAppLockChanged:(id)sender {
+    if(self.segmentAppLock.selectedSegmentIndex == kPinCode) {
+        PinEntryController *vc1 = [[PinEntryController alloc] init];
+        vc1.info = @"Please Enter a PIN";
+        vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(response == kOk) {
+                    PinEntryController *vc2 = [[PinEntryController alloc] init];
+                    vc2.info = @"Please Confirm Your PIN";
+                    vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
+                        [self dismissViewControllerAnimated:YES completion:^{
+                            if(response2 == kOk) {
+                                if ([pin isEqualToString:confirmPin]) {
+                                    Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+                                    Settings.sharedInstance.appLockPin = pin;
+                                    [self bindAppLock];
+                                }
+                                else {
+                                    [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Safe Settings." completion:nil];
+                                    [self bindAppLock];
+                                }
+                            }
+                            else {
+                                [self bindAppLock];
+                            }
+                        }];
+                    };
+                    
+                    [self presentViewController:vc2 animated:YES completion:nil];
+                }
+                else {
+                    [self bindAppLock];
+                }
+            }];
+        };
+        
+        [self presentViewController:vc1 animated:YES completion:nil];
+    }
+    else {
+        Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+        [self bindAppLock];
+    }
+}
+
+- (IBAction)onAppLockDelayChanged:(id)sender {
+    NSArray<NSNumber *> *keys = [_appLockDelayList allKeysForObject:@(self.segmentAppLockDelay.selectedSegmentIndex)];
+    NSNumber *seconds = keys[0];
+    
+    Settings.sharedInstance.appLockDelay = seconds.integerValue;
+    
+    [self bindAppLock];
+}
+
+- (void)bindAppLock {
+    NSInteger mode = Settings.sharedInstance.appLockMode;
+    NSNumber* seconds = @(Settings.sharedInstance.appLockDelay);
+    NSNumber* index = [_appLockDelayList objectForKey:seconds];
+    
+    [self.segmentAppLock setSelectedSegmentIndex:mode];
+    [self.segmentAppLockDelay setSelectedSegmentIndex:index.integerValue];
+    
+    NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
+}
+
 
 - (IBAction)onUnlinkDropbox:(id)sender {
     if (DBClientsManager.authorizedClient) {
@@ -297,7 +428,7 @@
                               safe.fileIdentifier,
                               safe.storageProvider,
                               safe.isTouchIdEnabled,
-                              safe.isEnrolledForTouchId,
+                              safe.isEnrolledForConvenience,
                               safe.offlineCacheEnabled,
                               safe.offlineCacheAvailable];
         
@@ -337,6 +468,10 @@
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (IBAction)onBecomeAPatron:(id)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.patreon.com/strongboxpasswordsafe"]];
 }
 
 @end

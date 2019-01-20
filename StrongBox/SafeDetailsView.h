@@ -29,5 +29,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelToggleAutoFillCache;
 @property (weak, nonatomic) IBOutlet UILabel *labelAutoFillCacheTime;
 @property (weak, nonatomic) IBOutlet UILabel *labelOfflineCacheTime;
+@property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 
 @end

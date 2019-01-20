@@ -32,6 +32,8 @@
     self.tableView.rowHeight = 55.0f;
     
     self.workingItems = self.items ? [self.items mutableCopy] : [NSMutableArray array];
+    
+    self.buttonAdd.enabled = !self.readOnly;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -87,6 +89,10 @@
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    if(self.readOnly) {
+        return @[];
+    }
+    
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeItem:indexPath];
     }];
@@ -129,7 +135,7 @@
     
     [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
         [textField addTarget:weakSelf
-                      action:@selector(validateNewCustomField:)
+                      action:@selector(validateEditCustomField:)
             forControlEvents:UIControlEventEditingChanged];
         
         textField.text = item.value;
@@ -216,15 +222,10 @@
 - (void)validateEditCustomField:(UITextField *)sender {
     UITextField *keyField = _alertController.textFields[0];
     NSString* key = keyField.text;
-    
-    NSArray<NSString*>* existingKeys = [self.workingItems map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
-        return obj.key;
-    }];
-    
-    NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+
     const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
     
-    (self.defaultAction).enabled = ![existingKeySet containsObject:key] && ![keePassReserved containsObject:key] && key.length;
+    (self.defaultAction).enabled = ![keePassReserved containsObject:key] && key.length;
 }
 
 - (void)validateNewCustomField:(UITextField *)sender {
@@ -237,8 +238,8 @@
     
     NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
     const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
-    
-    (self.defaultAction).enabled = ![keePassReserved containsObject:key] && key.length;
+
+    (self.defaultAction).enabled = ![existingKeySet containsObject:key] && ![keePassReserved containsObject:key] && key.length;
 }
 
 - (void)addNewField:(NSString*)key value:(NSString*)value {

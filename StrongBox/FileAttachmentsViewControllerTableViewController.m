@@ -46,7 +46,7 @@
 
 - (void)refresh {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.buttonAdd.enabled = self.format != kKeePass1 || self.workingAttachments.count == 0;
+        self.buttonAdd.enabled = !self.readOnly && (self.format != kKeePass1 || self.workingAttachments.count == 0);
         [self.tableView reloadData];
     });
 }
@@ -90,6 +90,10 @@
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    if(self.readOnly) {
+        return @[];
+    }
+    
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeAttachment:indexPath];
     }];

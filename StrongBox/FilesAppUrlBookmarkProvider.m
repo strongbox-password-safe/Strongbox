@@ -88,6 +88,7 @@ viewController:(UIViewController *)viewController
     if(error || !url) {
         NSLog(@"%@", error);
         completion(nil, error);
+        return;
     }
 
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];

@@ -32,6 +32,14 @@ static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
 static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
 static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
+static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1BackupGroupInSearchResults";
+static NSString* const kHideTips = @"hideTips";
+static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
+static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
+static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
+static NSString* const kAppLockMode = @"appLockMode";
+static NSString* const kAppLockPin = @"appLockPin";
+static NSString* const kAppLockDelay = @"appLockDelay";
 
 @implementation Settings
 
@@ -46,7 +54,7 @@ static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarnin
     return sharedInstance;
 }
 
-static NSUserDefaults *getUserDefaults() {
+- (NSUserDefaults*)getUserDefaults {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
     
     return defaults;
@@ -55,22 +63,22 @@ static NSUserDefaults *getUserDefaults() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)hasShownKeePassBetaWarning {
-    return [getUserDefaults() boolForKey:kHasShownKeePassBetaWarning];
+    return [[self getUserDefaults] boolForKey:kHasShownKeePassBetaWarning];
 }
 
 - (void)setHasShownKeePassBetaWarning:(BOOL)hasShownKeePassBetaWarning {
-    [getUserDefaults() setBool:hasShownKeePassBetaWarning forKey:kHasShownKeePassBetaWarning];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:hasShownKeePassBetaWarning forKey:kHasShownKeePassBetaWarning];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
    
     return [userDefaults boolForKey:kShowPasswordByDefaultOnEditScreen];
 }
 
 - (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setBool:value forKey:kShowPasswordByDefaultOnEditScreen];
     
@@ -83,7 +91,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (void)setPro:(BOOL)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setBool:value forKey:kIsProKey];
     
@@ -92,13 +100,13 @@ static NSUserDefaults *getUserDefaults() {
 
 - (BOOL)isPro
 {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     return [userDefaults boolForKey:kIsProKey];
 }
 
 - (void)setHavePromptedAboutFreeTrial:(BOOL)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setBool:value forKey:kIsHavePromptedAboutFreeTrial];
     
@@ -106,7 +114,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (BOOL)isHavePromptedAboutFreeTrial {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     return [userDefaults boolForKey:kIsHavePromptedAboutFreeTrial];
 }
@@ -128,7 +136,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (NSDate*)getEndFreeTrialDate {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     //[userDefaults removeObjectForKey:kEndFreeTrialDate];
     
@@ -136,7 +144,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (void)setEndFreeTrialDate:(NSDate*)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setObject:value forKey:kEndFreeTrialDate];
 
@@ -146,7 +154,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (NSInteger)getFreeTrialDaysRemaining {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     NSDate* date = [userDefaults objectForKey:kEndFreeTrialDate];
     
@@ -167,18 +175,18 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (NSDate*)installDate {
-    return [getUserDefaults() objectForKey:kInstallDate];
+    return [[self getUserDefaults] objectForKey:kInstallDate];
 }
 
 - (void)setInstallDate:(NSDate *)installDate {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setObject:installDate forKey:kInstallDate];
     [userDefaults synchronize];
 }
 
 - (void)clearInstallDate {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults removeObjectForKey:kInstallDate];
     [userDefaults synchronize];
@@ -205,7 +213,7 @@ static NSUserDefaults *getUserDefaults() {
 
 - (NSInteger)getLaunchCount
 {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     NSInteger launchCount = [userDefaults integerForKey:kLaunchCountKey];
     
@@ -213,7 +221,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (void)resetLaunchCount {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults removeObjectForKey:kLaunchCountKey];
     
@@ -227,7 +235,7 @@ static NSUserDefaults *getUserDefaults() {
     
     NSLog(@"Application has been launched %ld times", (long)launchCount);
     
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
     
     [userDefaults synchronize];
@@ -235,7 +243,7 @@ static NSUserDefaults *getUserDefaults() {
 
 -(NSNumber*)getAutoLockTimeoutSeconds
 {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
 
     NSNumber *seconds = [userDefaults objectForKey:kAutoLockTimeSeconds];
 
@@ -247,7 +255,7 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 -(void)setAutoLockTimeoutSeconds:(NSNumber*)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setObject:value forKey:kAutoLockTimeSeconds];
     
@@ -255,13 +263,13 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (NSInteger)isUserHasBeenPromptedForReview {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
  
     return [userDefaults integerForKey:kPromptedForReview];
 }
 
 - (void)setUserHasBeenPromptedForReview:(NSInteger)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setInteger:value forKey:kPromptedForReview];
 
@@ -269,13 +277,13 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (BOOL)isHasPromptedForCopyPasswordGesture {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
 
     return [userDefaults boolForKey:kPromptedForCopyPasswordGesture];
 }
 
 - (void)setHasPromptedForCopyPasswordGesture:(BOOL)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setBool:value forKey:kPromptedForCopyPasswordGesture];
 
@@ -283,13 +291,13 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (BOOL)isCopyPasswordOnLongPress {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
 
     return [userDefaults boolForKey:kCopyPasswordOnLongPress];
 }
 
 - (void)setCopyPasswordOnLongPress:(BOOL)value {
-    NSUserDefaults *userDefaults = getUserDefaults();
+    NSUserDefaults *userDefaults = [self getUserDefaults];
     
     [userDefaults setBool:value forKey:kCopyPasswordOnLongPress];
     
@@ -297,45 +305,45 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (void)setNeverShowForMacAppMessage:(BOOL)neverShowForMacAppMessage {
-    [getUserDefaults() setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
+    [[self getUserDefaults] setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
     
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)neverShowForMacAppMessage {
-    return [getUserDefaults() boolForKey:kNeverShowForMacAppMessage];
+    return [[self getUserDefaults] boolForKey:kNeverShowForMacAppMessage];
 }
 
 
 - (BOOL)iCloudOn {
-    return [getUserDefaults() boolForKey:kiCloudOn];
+    return [[self getUserDefaults] boolForKey:kiCloudOn];
 }
 
 - (void)setICloudOn:(BOOL)iCloudOn {
-    [getUserDefaults() setBool:iCloudOn forKey:kiCloudOn];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:iCloudOn forKey:kiCloudOn];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)iCloudWasOn {
-    return [getUserDefaults() boolForKey:kiCloudWasOn];
+    return [[self getUserDefaults] boolForKey:kiCloudWasOn];
 }
 
 -(void)setICloudWasOn:(BOOL)iCloudWasOn {
-    [getUserDefaults() setBool:iCloudWasOn forKey:kiCloudWasOn];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:iCloudWasOn forKey:kiCloudWasOn];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)iCloudPrompted {
-    return [getUserDefaults() boolForKey:kiCloudPrompted];
+    return [[self getUserDefaults] boolForKey:kiCloudPrompted];
 }
 
 - (void)setICloudPrompted:(BOOL)iCloudPrompted {
-    [getUserDefaults() setBool:iCloudPrompted forKey:kiCloudPrompted];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:iCloudPrompted forKey:kiCloudPrompted];
+    [[self getUserDefaults] synchronize];
 }
 
 - (PasswordGenerationParameters *)passwordGenerationParameters {
-    NSUserDefaults *defaults = getUserDefaults();
+    NSUserDefaults *defaults = [self getUserDefaults];
     NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
     
     if(encodedObject == nil) {
@@ -352,7 +360,7 @@ static NSUserDefaults *getUserDefaults() {
 
 -(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
-    NSUserDefaults *defaults = getUserDefaults();
+    NSUserDefaults *defaults = [self getUserDefaults];
     [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
     [defaults synchronize];
 }
@@ -376,6 +384,43 @@ static NSUserDefaults *getUserDefaults() {
     self.iCloudAvailable];
 }
 
++ (BOOL)isBiometricIdAvailable {
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    
+    if (localAuthContext == nil) {
+        return NO;
+    }
+    
+    NSError *error;
+    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
+    
+    if (error) {
+        //NSLog(@"Error with biometrics authentication");
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion {
+    [self requestBiometricId:reason fallbackTitle:nil completion:completion];
+}
+
+- (void)requestBiometricId:(NSString*)reason fallbackTitle:(NSString*)fallbackTitle completion:(void(^)(BOOL success, NSError * __nullable error))completion {
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    if(fallbackTitle) {
+        localAuthContext.localizedFallbackTitle = fallbackTitle;
+    }
+    
+    self.biometricAuthInProgress = YES;
+    [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+                     localizedReason:reason
+                               reply:^(BOOL success, NSError *error) {
+                                   completion(success, error);
+                                    self.biometricAuthInProgress = NO;
+                               }];
+}
+
 - (NSString*)getBiometricIdName {
     NSString* biometricIdName = @"Touch ID";
     
@@ -394,34 +439,34 @@ static NSUserDefaults *getUserDefaults() {
 }
 
 - (BOOL)safesMigratedToNewSystem {
-    return [getUserDefaults() boolForKey:kSafesMigratedToNewSystem];
+    return [[self getUserDefaults] boolForKey:kSafesMigratedToNewSystem];
 }
 
 - (void)setSafesMigratedToNewSystem:(BOOL)safesMigratedToNewSystem {
-    [getUserDefaults() setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)disallowAllBiometricId {
-    return [getUserDefaults() boolForKey:kDisallowBiometricId];
+    return [[self getUserDefaults] boolForKey:kDisallowBiometricId];
 }
 
 - (void)setDisallowAllBiometricId:(BOOL)disallowAllBiometricId {
-    [getUserDefaults() setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)doNotAutoAddNewLocalSafes {
-    return [getUserDefaults() boolForKey:kDoNotAutoAddNewLocalSafes];
+    return [[self getUserDefaults] boolForKey:kDoNotAutoAddNewLocalSafes];
 }
 
 - (void)setDoNotAutoAddNewLocalSafes:(BOOL)doNotAutoAddNewLocalSafes {
-    [getUserDefaults() setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
+    [[self getUserDefaults] synchronize];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
-    NSData *data = [getUserDefaults() objectForKey:kAutoFillNewRecordSettings];
+    NSData *data = [[self getUserDefaults] objectForKey:kAutoFillNewRecordSettings];
     
     if(data) {
         return (AutoFillNewRecordSettings *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -433,35 +478,111 @@ static NSUserDefaults *getUserDefaults() {
 - (void)setAutoFillNewRecordSettings:(AutoFillNewRecordSettings *)autoFillNewRecordSettings {
     NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
     
-    [getUserDefaults() setObject:encoded forKey:kAutoFillNewRecordSettings];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)useQuickLaunchAsRootView {
-    return [getUserDefaults() boolForKey:kUseQuickLaunchAsRootView];
+    return [[self getUserDefaults] boolForKey:kUseQuickLaunchAsRootView];
 }
 
 - (void)setUseQuickLaunchAsRootView:(BOOL)useQuickLaunchAsRootView {
-    [getUserDefaults() setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)showKeePassCreateSafeOptions {
-    return [getUserDefaults() boolForKey:kShowKeePassCreateSafeOptions];
+    return [[self getUserDefaults] boolForKey:kShowKeePassCreateSafeOptions];
 }
 
 - (void)setShowKeePassCreateSafeOptions:(BOOL)showKeePassCreateSafeOptions {
-    [getUserDefaults() setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
+    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)hasShownAutoFillLaunchWelcome {
-    return [getUserDefaults() boolForKey:kHasShownAutoFillLaunchWelcome];
+    return [[self getUserDefaults] boolForKey:kHasShownAutoFillLaunchWelcome];
 }
 
 - (void)setHasShownAutoFillLaunchWelcome:(BOOL)hasShownAutoFillLaunchWelcome {
-    [getUserDefaults() setBool:hasShownAutoFillLaunchWelcome forKey:kHasShownAutoFillLaunchWelcome];
-    [getUserDefaults() synchronize];
+    [[self getUserDefaults] setBool:hasShownAutoFillLaunchWelcome forKey:kHasShownAutoFillLaunchWelcome];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)showKeePass1BackupGroup {
+    return [[self getUserDefaults] boolForKey:kShowKeePass1BackupGroupInSearchResults];
+}
+
+- (void)setShowKeePass1BackupGroup:(BOOL)showKeePass1BackupGroupInSearchResults {
+    [[self getUserDefaults] setBool:showKeePass1BackupGroupInSearchResults forKey:kShowKeePass1BackupGroupInSearchResults];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)hideTips {
+    return [[self getUserDefaults] boolForKey:kHideTips];
+}
+
+- (void)setHideTips:(BOOL)hideTips {
+    [[self getUserDefaults] setBool:hideTips forKey:kHideTips];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)disallowAllPinCodeOpens {
+    return [[self getUserDefaults] boolForKey:kDisallowAllPinCodeOpens];
+}
+
+- (void)setDisallowAllPinCodeOpens:(BOOL)disallowAllPinCodeOpens {
+    [[self getUserDefaults] setBool:disallowAllPinCodeOpens forKey:kDisallowAllPinCodeOpens];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)clearClipboardEnabled {
+    return [[self getUserDefaults] boolForKey:kClearClipboardEnabled];
+}
+
+- (void)setClearClipboardEnabled:(BOOL)clearClipboardEnabled {
+    [[self getUserDefaults] setBool:clearClipboardEnabled forKey:kClearClipboardEnabled];
+    [[self getUserDefaults] synchronize];
+}
+
+static const NSInteger kDefaultClearClipboardTimeout = 60;
+- (NSInteger)clearClipboardAfterSeconds {
+    NSInteger ret =  [[self getUserDefaults] integerForKey:kClearClipboardAfterSeconds];
+
+    return ret == 0 ? kDefaultClearClipboardTimeout : ret;
+}
+
+-(void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
+    [[self getUserDefaults] setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
+    [[self getUserDefaults] synchronize];
+}
+
+- (AppLockMode)appLockMode {
+    return [[self getUserDefaults] integerForKey:kAppLockMode];
+}
+
+- (void)setAppLockMode:(AppLockMode)appLockMode {
+    [[self getUserDefaults] setInteger:appLockMode forKey:kAppLockMode];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSString *)appLockPin {
+    return [[self getUserDefaults] objectForKey:kAppLockPin];
+}
+
+-(void)setAppLockPin:(NSString *)appLockPin {
+    [[self getUserDefaults] setObject:appLockPin forKey:kAppLockPin];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSInteger)appLockDelay {
+    NSInteger ret =  [[self getUserDefaults] integerForKey:kAppLockDelay];
+    return ret;
+}
+
+-(void)setAppLockDelay:(NSInteger)appLockDelay {
+    [[self getUserDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
+    [[self getUserDefaults] synchronize];
 }
 
 @end

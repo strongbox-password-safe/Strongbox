@@ -52,6 +52,7 @@
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childGroups;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childRecords;
 
+- (BOOL)contains:(Node*)test;
 - (BOOL)setTitle:(NSString*_Nonnull)title;
 - (BOOL)validateAddChild:(Node* _Nonnull)node;
 - (BOOL)addChild:(Node* _Nonnull)node;

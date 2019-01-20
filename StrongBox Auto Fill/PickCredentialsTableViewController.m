@@ -10,6 +10,8 @@
 #import "regdom.h"
 #import "NodeIconHelper.h"
 #import "BrowseSafeEntryTableViewCell.h"
+#import "Settings.h"
+#import "NSArray+Extensions.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -67,10 +69,30 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     self.items = self.model.database.allRecords;
     
+    // Filter KeePass1 Backup Group if so configured...
+    
+    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
+        if (self.model.database.format == kKeePass1) {
+            Node* backupGroup = [self.model.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+                return [node.title isEqualToString:@"Backup"];
+            }];
+            
+            if(backupGroup) {
+                self.items = [self.model.database.allRecords filter:^BOOL(Node * _Nonnull obj) {
+                    return ![backupGroup contains:obj];
+                }];
+            }
+        }
+    }
+    
     [self smartInitializeSearch];
 }
 
 static NSString *getSearchTermFromDomain(NSString* host) {
+    if(host == nil) {
+        return @"";
+    }
+    
     if(!host.length) {
         return @"";
     }
@@ -82,6 +104,10 @@ static NSString *getSearchTermFromDomain(NSString* host) {
        
     void *tree = loadTldTree();
     const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
+    
+    if(result == NULL) {
+        return @"";
+    }
     
     NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
     
@@ -196,6 +222,22 @@ static NSString *getSearchTermFromDomain(NSString* host) {
         return !node.isGroup && [predicate evaluateWithObject:node];
     }];
     
+    // Filter out any results from the KDB root 'Backup' group/folder if configured so...
+    
+    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
+        if (self.model.database.format == kKeePass1) {
+            Node* backupGroup = [self.model.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+                return [node.title isEqualToString:@"Backup"];
+            }];
+            
+            if(backupGroup) {
+                foo = [foo filter:^BOOL(Node * _Nonnull obj) {
+                    return (obj != backupGroup && ![backupGroup contains:obj]);
+                }];
+            }
+        }
+    }
+
     self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
 }
 

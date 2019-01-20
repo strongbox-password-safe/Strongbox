@@ -57,4 +57,6 @@
 - (void)updateAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion;
 - (NSDate *)getAutoFillCacheModificationDate:(SafeMetaData *)safeMetadata;
 
+- (void)excludeDirectoriesFromBackup;
+
 @end

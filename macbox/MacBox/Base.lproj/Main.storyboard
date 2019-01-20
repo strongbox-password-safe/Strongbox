@@ -797,7 +797,7 @@ DQ
                                                                                                         </textFieldCell>
                                                                                                     </textField>
                                                                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgA-Bj-Esc">
-                                                                                                        <rect key="frame" x="72" y="2" width="332" height="22"/>
+                                                                                                        <rect key="frame" x="72" y="2" width="303" height="22"/>
                                                                                                         <constraints>
                                                                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="tmk-f3-JrH"/>
                                                                                                         </constraints>
@@ -810,14 +810,30 @@ DQ
                                                                                                             <outlet property="delegate" destination="5gI-5U-AMq" id="jHS-MT-dfN"/>
                                                                                                         </connections>
                                                                                                     </textField>
+                                                                                                    <button toolTip="Copy Title" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iKL-Zj-Xlx" userLabel="Copy Title">
+                                                                                                        <rect key="frame" x="384" y="3" width="20" height="20"/>
+                                                                                                        <constraints>
+                                                                                                            <constraint firstAttribute="height" constant="20" id="Myo-V2-Yqu"/>
+                                                                                                            <constraint firstAttribute="width" constant="20" id="h0M-T1-uYu"/>
+                                                                                                        </constraints>
+                                                                                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="copy_64" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="FiE-Vw-lP8">
+                                                                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                                            <font key="font" metaFont="system"/>
+                                                                                                        </buttonCell>
+                                                                                                        <connections>
+                                                                                                            <action selector="onCopyTitle:" target="5gI-5U-AMq" id="5Xi-MA-1BH"/>
+                                                                                                        </connections>
+                                                                                                    </button>
                                                                                                 </subviews>
                                                                                                 <constraints>
                                                                                                     <constraint firstItem="vgA-Bj-Esc" firstAttribute="leading" secondItem="43q-4M-4ro" secondAttribute="trailing" constant="8" id="2Q4-ao-Fcp"/>
                                                                                                     <constraint firstItem="43q-4M-4ro" firstAttribute="centerY" secondItem="gcf-rW-kD3" secondAttribute="centerY" id="4WF-1H-s8L"/>
                                                                                                     <constraint firstItem="vgA-Bj-Esc" firstAttribute="leading" secondItem="gcf-rW-kD3" secondAttribute="leading" constant="72" id="BSI-rO-KNk"/>
-                                                                                                    <constraint firstAttribute="trailing" secondItem="vgA-Bj-Esc" secondAttribute="trailing" id="HLM-gu-tLK"/>
+                                                                                                    <constraint firstItem="iKL-Zj-Xlx" firstAttribute="leading" secondItem="vgA-Bj-Esc" secondAttribute="trailing" constant="9" id="HLM-gu-tLK"/>
                                                                                                     <constraint firstItem="vgA-Bj-Esc" firstAttribute="centerY" secondItem="gcf-rW-kD3" secondAttribute="centerY" id="SkJ-pn-VgB"/>
+                                                                                                    <constraint firstItem="iKL-Zj-Xlx" firstAttribute="centerY" secondItem="gcf-rW-kD3" secondAttribute="centerY" id="TP1-Ob-JF6"/>
                                                                                                     <constraint firstAttribute="height" constant="25" id="Zy5-fj-48D"/>
+                                                                                                    <constraint firstAttribute="trailing" secondItem="iKL-Zj-Xlx" secondAttribute="trailing" id="cNb-Ah-yTY"/>
                                                                                                     <constraint firstItem="43q-4M-4ro" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="gcf-rW-kD3" secondAttribute="leading" constant="20" symbolic="YES" id="mPJ-4a-VdU"/>
                                                                                                 </constraints>
                                                                                             </customView>
@@ -1906,7 +1922,7 @@ DQ
         <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSRevealFreestandingTemplate" width="14" height="14"/>
-        <image name="NSUser" width="128" height="128"/>
+        <image name="NSUser" width="32" height="32"/>
         <image name="StrongBox-256x256" width="256" height="256"/>
         <image name="arrow_64" width="64" height="64"/>
         <image name="blue-folder-cropped-256" width="256" height="208"/>

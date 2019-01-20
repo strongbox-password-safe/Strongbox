@@ -16,7 +16,7 @@
 @interface Model : NSObject
 
 @property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
-@property (readonly, strong, nonatomic) DatabaseModel *database;
+@property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;
 @property (nonatomic, readonly) BOOL isCloudBasedStorage;
 @property (nonatomic, readonly) BOOL isUsingOfflineCache;
 @property (nonatomic, readonly) BOOL isReadOnly;
