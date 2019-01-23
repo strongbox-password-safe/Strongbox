@@ -12,12 +12,16 @@
 #import "BrowseSafeEntryTableViewCell.h"
 #import "Settings.h"
 #import "NSArray+Extensions.h"
+#import "Node+OTPToken.h"
+#import "OTPToken+Generation.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
 @property (strong, nonatomic) NSArray<Node*> *searchResults;
 @property (strong, nonatomic) NSArray<Node*> *items;
 @property (strong, nonatomic) UISearchController *searchController;
+
+@property NSTimer* timerRefreshOtp;
 
 @end
 
@@ -155,11 +159,34 @@ static NSString *getSearchTermFromDomain(NSString* host) {
     //[self.searchController.searchBar setText:@""];
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+}
+
+- (IBAction)updateOtpCodes:(id)sender {
+    [self.tableView reloadData];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     [self.navigationController setNavigationBarHidden:NO];
     [self.navigationController setToolbarHidden:NO];
+    
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+    
+    if(!Settings.sharedInstance.hideTotpInBrowse) {
+        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -269,7 +296,26 @@ static NSString *getSearchTermFromDomain(NSString* host) {
         cell.path.text = groupLocation;
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.model.database];
+        cell.flags.text = node.fields.attachments.count > 0 ? @"📎" : @"";
         
+        if(!Settings.sharedInstance.hideTotpInAutoFill && node.otpToken) {
+            uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
+            
+            cell.otpCode.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+            cell.otpCode.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+            
+            cell.otpCode.alpha = 1;
+            
+            if(remainingSeconds < 16) {
+                [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+                    cell.otpCode.alpha = 0.5;
+                } completion:nil];
+            }
+        }
+        else {
+            cell.otpCode.text = @"";
+        }
+
         return cell;
     }
 }

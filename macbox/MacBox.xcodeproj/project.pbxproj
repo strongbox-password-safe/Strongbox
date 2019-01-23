@@ -76,6 +76,14 @@
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
 		4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */; };
 		4D88AD5021E654EA00B49149 /* SourceSansPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */; };
+		4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */; };
+		4D8DE9BB21F898470043DDC0 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */; };
+		4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AF21F898460043DDC0 /* OTPToken+Serialization.m */; };
+		4D8DE9BD21F898470043DDC0 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B221F898460043DDC0 /* OTPTokenType.m */; };
+		4D8DE9BE21F898470043DDC0 /* OTPToken+Persistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B321F898460043DDC0 /* OTPToken+Persistence.m */; };
+		4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */; };
+		4D8DE9C021F898470043DDC0 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B521F898470043DDC0 /* OTPToken.m */; };
+		4D8DE9C121F898470043DDC0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B821F898470043DDC0 /* Info.plist */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
 		4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
@@ -292,6 +300,22 @@
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UpgradeWindowController.xib; path = MacBox/UpgradeWindowController.xib; sourceTree = "<group>"; };
 		4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Regular.ttf"; sourceTree = "<group>"; };
 		4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Bold.ttf"; sourceTree = "<group>"; };
+		4D8DE9AA21F898460043DDC0 /* OTPToken+Persistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Persistence.h"; path = "../lib/OneTimePassword/OTPToken+Persistence.h"; sourceTree = "<group>"; };
+		4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+QueryItems.m"; path = "../lib/OneTimePassword/NSURL+QueryItems.m"; sourceTree = "<group>"; };
+		4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OTPToken+Generation.m"; path = "../lib/OneTimePassword/OTPToken+Generation.m"; sourceTree = "<group>"; };
+		4D8DE9AD21F898460043DDC0 /* OTPTokenType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OTPTokenType.h; path = ../lib/OneTimePassword/OTPTokenType.h; sourceTree = "<group>"; };
+		4D8DE9AE21F898460043DDC0 /* OTPToken+Serialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Serialization.h"; path = "../lib/OneTimePassword/OTPToken+Serialization.h"; sourceTree = "<group>"; };
+		4D8DE9AF21F898460043DDC0 /* OTPToken+Serialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OTPToken+Serialization.m"; path = "../lib/OneTimePassword/OTPToken+Serialization.m"; sourceTree = "<group>"; };
+		4D8DE9B021F898460043DDC0 /* OneTimePassword.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OneTimePassword.h; path = ../lib/OneTimePassword/OneTimePassword.h; sourceTree = "<group>"; };
+		4D8DE9B121F898460043DDC0 /* OTPAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OTPAlgorithm.h; path = ../lib/OneTimePassword/OTPAlgorithm.h; sourceTree = "<group>"; };
+		4D8DE9B221F898460043DDC0 /* OTPTokenType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OTPTokenType.m; path = ../lib/OneTimePassword/OTPTokenType.m; sourceTree = "<group>"; };
+		4D8DE9B321F898460043DDC0 /* OTPToken+Persistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OTPToken+Persistence.m"; path = "../lib/OneTimePassword/OTPToken+Persistence.m"; sourceTree = "<group>"; };
+		4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OTPAlgorithm.m; path = ../lib/OneTimePassword/OTPAlgorithm.m; sourceTree = "<group>"; };
+		4D8DE9B521F898470043DDC0 /* OTPToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OTPToken.m; path = ../lib/OneTimePassword/OTPToken.m; sourceTree = "<group>"; };
+		4D8DE9B621F898470043DDC0 /* OTPToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OTPToken.h; path = ../lib/OneTimePassword/OTPToken.h; sourceTree = "<group>"; };
+		4D8DE9B721F898470043DDC0 /* OTPToken+Generation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Generation.h"; path = "../lib/OneTimePassword/OTPToken+Generation.h"; sourceTree = "<group>"; };
+		4D8DE9B821F898470043DDC0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../lib/OneTimePassword/Info.plist; sourceTree = "<group>"; };
+		4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+QueryItems.h"; path = "../lib/OneTimePassword/NSURL+QueryItems.h"; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WindowController.h; path = MacBox/WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WindowController.m; path = MacBox/WindowController.m; sourceTree = "<group>"; };
 		4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = ../model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = "<group>"; };
@@ -706,6 +730,29 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		4D8DE9A921F898240043DDC0 /* OneTimePassword */ = {
+			isa = PBXGroup;
+			children = (
+				4D8DE9B821F898470043DDC0 /* Info.plist */,
+				4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */,
+				4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */,
+				4D8DE9B021F898460043DDC0 /* OneTimePassword.h */,
+				4D8DE9B121F898460043DDC0 /* OTPAlgorithm.h */,
+				4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */,
+				4D8DE9B621F898470043DDC0 /* OTPToken.h */,
+				4D8DE9B521F898470043DDC0 /* OTPToken.m */,
+				4D8DE9B721F898470043DDC0 /* OTPToken+Generation.h */,
+				4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */,
+				4D8DE9AA21F898460043DDC0 /* OTPToken+Persistence.h */,
+				4D8DE9B321F898460043DDC0 /* OTPToken+Persistence.m */,
+				4D8DE9AE21F898460043DDC0 /* OTPToken+Serialization.h */,
+				4D8DE9AF21F898460043DDC0 /* OTPToken+Serialization.m */,
+				4D8DE9AD21F898460043DDC0 /* OTPTokenType.h */,
+				4D8DE9B221F898460043DDC0 /* OTPTokenType.m */,
+			);
+			name = OneTimePassword;
+			sourceTree = "<group>";
+		};
 		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
@@ -813,6 +860,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D8DE9A921F898240043DDC0 /* OneTimePassword */,
 				4D88AD5121E657F700B49149 /* Fonts */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
@@ -1010,6 +1058,7 @@
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				4D524D13219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
+				4D8DE9C121F898470043DDC0 /* Info.plist in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,
@@ -1047,6 +1096,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Base32-macOS/Base32.framework",
 				"${BUILT_PRODUCTS_DIR}/GZIP-macOS/GZIP.framework",
 				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework",
@@ -1054,6 +1104,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GZIP.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SAMKeychain.framework",
@@ -1091,6 +1142,8 @@
 				4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */,
 				4D524CBC219B479900C22CB4 /* Kdb1Database.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,
+				4D8DE9BB21F898470043DDC0 /* OTPToken+Generation.m in Sources */,
+				4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
 				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
@@ -1098,6 +1151,7 @@
 				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
+				4D8DE9BE21F898470043DDC0 /* OTPToken+Persistence.m in Sources */,
 				4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */,
 				4D524CBD219B479900C22CB4 /* KdbGroup.m in Sources */,
@@ -1109,6 +1163,7 @@
 				4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */,
 				4D524D28219B4B2A00C22CB4 /* ref.c in Sources */,
 				4D524D02219B48D300C22CB4 /* KdbxSerializationCommon.m in Sources */,
+				4D8DE9C021F898470043DDC0 /* OTPToken.m in Sources */,
 				4D524CC1219B479900C22CB4 /* KdbSerializationData.m in Sources */,
 				4D524D07219B48D300C22CB4 /* V3BinariesList.m in Sources */,
 				4D559FA520750D1D009856E3 /* SafeMetaData.m in Sources */,
@@ -1173,6 +1228,7 @@
 				4D524D27219B4B2A00C22CB4 /* blake2b.c in Sources */,
 				4DC46D0C219EDCD800D6C462 /* AttachmentCollectionView.m in Sources */,
 				4D9E098321825108007BA1E7 /* Times.m in Sources */,
+				4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */,
 				4D524CEC219B481200C22CB4 /* ChaCha20Cipher.m in Sources */,
 				4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
@@ -1191,7 +1247,9 @@
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
+				4D8DE9BD21F898470043DDC0 /* OTPTokenType.m in Sources */,
 				4D524CA5219B458B00C22CB4 /* BiometricIdHelper.m in Sources */,
+				4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

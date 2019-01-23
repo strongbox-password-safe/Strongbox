@@ -40,6 +40,9 @@ static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSecond
 static NSString* const kAppLockMode = @"appLockMode";
 static NSString* const kAppLockPin = @"appLockPin";
 static NSString* const kAppLockDelay = @"appLockDelay";
+static NSString* const kHideTotp = @"hideTotp";
+static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
+static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
 
 @implementation Settings
 
@@ -558,7 +561,8 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 }
 
 - (AppLockMode)appLockMode {
-    return [[self getUserDefaults] integerForKey:kAppLockMode];
+    return kNoLock;
+    //return [[self getUserDefaults] integerForKey:kAppLockMode];
 }
 
 - (void)setAppLockMode:(AppLockMode)appLockMode {
@@ -582,6 +586,33 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 -(void)setAppLockDelay:(NSInteger)appLockDelay {
     [[self getUserDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
+    [[self getUserDefaults] synchronize];
+}
+
+-(BOOL)hideTotp {
+    return [[self getUserDefaults] boolForKey:kHideTotp];
+}
+
+- (void)setHideTotp:(BOOL)hideTotp {
+    [[self getUserDefaults] setBool:hideTotp forKey:kHideTotp];
+    [[self getUserDefaults] synchronize];
+}
+
+-(BOOL)hideTotpInBrowse {
+    return [[self getUserDefaults] boolForKey:kHideTotpInBrowse];
+}
+
+-(void)setHideTotpInBrowse:(BOOL)hideTotpInBrowse {
+    [[self getUserDefaults] setBool:hideTotpInBrowse forKey:kHideTotpInBrowse];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)hideTotpInAutoFill {
+    return [[self getUserDefaults] boolForKey:kHideTotpInAutoFill];
+}
+
+- (void)setHideTotpInAutoFill:(BOOL)hideTotpInAutoFill {
+    [[self getUserDefaults] setBool:hideTotpInAutoFill forKey:kHideTotpInAutoFill];
     [[self getUserDefaults] synchronize];
 }
 

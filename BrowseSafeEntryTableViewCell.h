@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel *path;
 @property (weak, nonatomic) IBOutlet UIImageView *icon;
 @property (weak, nonatomic) IBOutlet UILabel *flags;
+@property (weak, nonatomic) IBOutlet UILabel *otpCode;
 
 @end
 

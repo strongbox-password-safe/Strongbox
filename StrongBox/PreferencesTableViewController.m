@@ -71,8 +71,8 @@
     [self bindHideTips];
     [self bindClearClipboard];
     [self bindAppLock];
-    
-    [self customizeAppLockSectionFooter];
+    [self bindHideTotp];
+    //[self customizeAppLockSectionFooter];
 }
 
 - (void)customizeAppLockSectionFooter {
@@ -472,6 +472,20 @@
 
 - (IBAction)onBecomeAPatron:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.patreon.com/strongboxpasswordsafe"]];
+}
+
+- (void)bindHideTotp {
+    self.switchHideTotp.on = Settings.sharedInstance.hideTotp;
+    self.switchHideTotpBrowseView.on = Settings.sharedInstance.hideTotpInBrowse;
+    self.switchHideTotpAutoFill.on = Settings.sharedInstance.hideTotpInAutoFill;
+}
+
+- (IBAction)onChangeHideTotp:(id)sender {
+    Settings.sharedInstance.hideTotp = self.switchHideTotp.on;
+    Settings.sharedInstance.hideTotpInBrowse = self.switchHideTotpBrowseView.on;
+    Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
+
+    [self bindHideTotp];
 }
 
 @end

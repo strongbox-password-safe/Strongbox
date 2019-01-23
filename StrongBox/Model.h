@@ -40,7 +40,7 @@
 - (void)disableAndClearOfflineCache;
 - (void)enableOfflineCache;
 
-- (void)updateAutoFillCacheWithData:(NSData *)data;
+- (void)updateAutoFillCacheWithData:(NSData *_Nonnull)data;
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler;
 - (void)disableAndClearAutoFillCache;
 - (void)enableAutoFillCache;
@@ -51,6 +51,6 @@
 - (void)deleteItem:(Node *_Nonnull)child;
 
 -(void)encrypt:(void (^_Nullable)(NSData* _Nullable data, NSError* _Nullable error))completion;
-- (NSString *)generatePassword;
+- (NSString *_Nonnull)generatePassword;
 
 @end

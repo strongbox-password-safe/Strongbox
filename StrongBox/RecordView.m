@@ -19,6 +19,9 @@
 #import "NSArray+Extensions.h"
 #import "UiAttachment.h"
 #import "CustomFieldsViewController.h"
+#import "Node+OtpToken.h"
+#import "OTPToken+Generation.h"
+#import "QRCodeScannerViewController.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -32,6 +35,8 @@ static const int kMinNotesCellHeight = 160;
 @property BOOL editingNewRecord;
 @property UIBarButtonItem *navBack;
 @property BOOL hidePassword;
+@property BOOL showOtp;
+@property NSTimer* timerRefreshOtp;
 
 @end
 
@@ -159,6 +164,25 @@ static const int kMinNotesCellHeight = 160;
     if (@available(iOS 11.0, *)) {
         self.navigationController.navigationBar.prefersLargeTitles = NO;
     }
+
+    [self showHideOtpCode];
+    [self refreshOtpCode:nil];
+
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+    self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -212,6 +236,11 @@ static const int kMinNotesCellHeight = 160;
     int customFieldCount = (int)self.record.fields.customFields.count;
 
     self.labelCustomFieldsCount.text = customFieldCount == 0 ? @"None" : [NSString stringWithFormat:@"%d Field(s)", customFieldCount];
+
+    // OTP?
+
+    [self showHideOtpCode];
+    [self refreshOtpCode:nil];
 }
 
 - (void)setEditing:(BOOL)flag animated:(BOOL)animated {
@@ -273,11 +302,12 @@ static const int kMinNotesCellHeight = 160;
     [self.buttonGeneratePassword setImage:btnImage forState:UIControlStateNormal];
     (self.buttonGeneratePassword).enabled = self.editing || (!self.isEditing && (self.record != nil && (self.record.fields.password).length));
     
-    (self.buttonCopyUsername).enabled = !self.isEditing && (self.record != nil && (self.record.fields.username).length);
-    (self.buttonCopyEmail).enabled = !self.isEditing && (self.record != nil && (self.record.fields.email).length);
-    (self.buttonCopyUrl).enabled = !self.isEditing && (self.record != nil && (self.record.fields.url).length);
+    (self.buttonCopyUsername).enabled = !self.isEditing && self.record.fields.username.length;
+    (self.buttonCopyEmail).enabled = !self.isEditing && self.record.fields.email.length;
+    (self.buttonCopyUrl).enabled = !self.isEditing && self.record.fields.url.length;
     (self.buttonCopyAndLaunchUrl).enabled = !self.isEditing;
-    
+    (self.buttonCopyTotp).enabled = !self.isEditing && self.labelOtp.text.length;
+
     // Attachments & Custom Fields screen not available in edit mode
     
     self.labelAttachmentCount.textColor = self.editing ? [UIColor grayColor] : [UIColor blueColor];
@@ -294,6 +324,11 @@ static const int kMinNotesCellHeight = 160;
     
     [self hideOrShowPassword:self.isEditing ? NO : _hidePassword];
     (self.buttonHidePassword).enabled = !self.isEditing;
+    
+    // Edit OTP
+    
+    self.buttonSetOtp.hidden = Settings.sharedInstance.hideTotp || self.isEditing;
+    self.buttonSetOtp.enabled = !self.isEditing;
 }
 
 - (void)setTitleTextFieldUIValidationIndicator {
@@ -411,6 +446,10 @@ static NSString * trim(NSString *string) {
 
 - (IBAction)onCopyUsername:(id)sender {
     [self copyToClipboard:self.record.fields.username message:@"Username Copied"];
+}
+
+- (IBAction)onCopyTotp:(id)sender {
+    [self copyToClipboard:self.labelOtp.text message:@"One Time Password Copied"];
 }
 
 - (IBAction)onCopyAndLaunchUrl:(id)sender {
@@ -546,8 +585,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 6 && indexPath.row == 0) {
-        int password = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    if (indexPath.section == 0 && indexPath.row == 0) {
+        return self.showOtp ? 162 : 95; // [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    }
+    else if (indexPath.section == 6 && indexPath.row == 0) { // Notes should fill whatever is left
+        int password = self.showOtp ? 162 : 95; //[super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
         int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
        
@@ -693,6 +735,97 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             completion(error);
         });
     }];
+}
+
+- (IBAction)refreshOtpCode:(id)sender
+{
+    if(self.showOtp && self.record.otpToken) {
+        //NSLog(@"Token: [%@] - Password: %@", self.record.otpToken, self.record.otpToken.password);
+
+        uint64_t remainingSeconds = self.record.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.record.otpToken.period);
+        
+        self.labelOtp.text = [NSString stringWithFormat:@"%@", self.record.otpToken.password];
+        self.labelOtp.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+        self.otpProgress.tintColor = self.labelOtp.textColor;
+        
+        // Flash...
+        
+        self.labelOtp.alpha = 1;
+        
+        if(remainingSeconds < 4) {
+            [UIView animateWithDuration:0.9 delay:0.0 options:kNilOptions animations:^{
+                self.labelOtp.alpha = 0.2;
+            } completion:nil];
+        }
+        
+        self.otpProgress.progress = remainingSeconds / self.record.otpToken.period;
+
+        self.labelOtp.hidden = NO;
+        self.otpProgress.hidden = NO;
+        self.buttonCopyTotp.hidden = NO;
+    }
+    else {
+        self.labelOtp.hidden = YES;
+        self.otpProgress.hidden = YES;
+        self.buttonCopyTotp.hidden = YES;
+    }
+}
+
+- (IBAction)onSetTotp:(id)sender {
+    [Alerts threeOptions:self title:@"How would you like to setup TOTP?" message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL" defaultButtonText:@"QR Code..." secondButtonText:@"Manually..." thirdButtonText:@"Cancel" action:^(int response) {
+        if(response == 0){
+            QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
+            vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
+                [self dismissViewControllerAnimated:YES completion:nil];
+                if(response) {
+                    BOOL success = [self.record setTotpWithString:string appendUrlToNotes:self.viewModel.database.format == kPasswordSafe];
+                    if(!success) {
+                        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
+                    }
+                    else {
+                        [self saveAfterTotpSet];
+                    }
+                }
+            };
+            
+            [self presentViewController:vc animated:YES completion:nil];
+        }
+        else if(response == 1) {
+            [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Secret or OTPAuth URL" title:@"Please enter the secret or an OTPAuth URL" message:@"" completion:^(NSString *text, BOOL response) {
+                if(response) {
+                    BOOL success = [self.record setTotpWithString:text appendUrlToNotes:self.viewModel.database.format == kPasswordSafe];
+                    if(!success) {
+                        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
+                    }
+                    else {
+                        [self saveAfterTotpSet];
+                    }
+                }
+            }];
+        }
+    }];
+}
+
+- (void)saveAfterTotpSet {
+    [self.viewModel update:^(NSError *error) {
+        if(error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts error:self title:@"Error While Saving" error:error];
+            });
+        }
+        
+        [self showHideOtpCode];
+        [self bindUiToRecord];
+    }];
+}
+
+- (void)showHideOtpCode {
+    self.showOtp = !Settings.sharedInstance.hideTotp && self.record.otpToken != nil;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+    });
 }
 
 @end

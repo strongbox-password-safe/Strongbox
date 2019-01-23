@@ -47,4 +47,8 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLockDelay;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideTotp;
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpAutoFill;
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpBrowseView;
+
 @end

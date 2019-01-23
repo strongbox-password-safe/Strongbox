@@ -1293,14 +1293,6 @@ NSString* trimField(NSTextField* textField) {
     
     return itemIndex;
 }
-
-- (void)reloadDataAndSelectItem:(Node*)item {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.outlineView reloadData];
-        
-        [self selectItem:item];
-    });
-}
                    
 - (void)selectItem:(Node*)item {
     if(item) {

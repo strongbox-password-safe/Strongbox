@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "NodeFields.h"
+#import "OTPToken.h"
 
 @interface Node : NSObject
 
@@ -35,7 +36,6 @@
            childRecordsAllowed:(BOOL)childRecordsAllowed NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) BOOL isGroup;
-
 @property (nonatomic, readonly) BOOL childRecordsAllowed;
 
 @property (nonatomic, strong, readonly, nonnull) NSString *title;

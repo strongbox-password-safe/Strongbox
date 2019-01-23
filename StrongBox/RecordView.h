@@ -28,6 +28,7 @@
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyUrl;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyAndLaunchUrl;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyEmail;
+@property (weak, nonatomic) IBOutlet UIButton *buttonCopyTotp;
 
 @property (strong, nonatomic) IBOutlet UIButton * _Nullable buttonHistory;
 @property (weak, nonatomic) IBOutlet UITableViewCell *tableCellAttachments;
@@ -42,5 +43,9 @@
 - (IBAction)onHide:(id _Nullable)sender;
 - (IBAction)onCopyAndLaunchUrl:(id _Nullable)sender;
 - (IBAction)onCopyEmail:(id _Nullable)sender;
+
+@property (weak, nonatomic) IBOutlet UILabel *labelOtp;
+@property (weak, nonatomic) IBOutlet UIProgressView *otpProgress;
+@property (weak, nonatomic) IBOutlet UIButton *buttonSetOtp;
 
 @end

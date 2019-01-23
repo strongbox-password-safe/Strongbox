@@ -34,38 +34,143 @@
 @interface InitialViewController ()
 
 @property (nonatomic, strong) NSDate *enterBackgroundTime;
-@property (nonatomic, strong) LockViewController *lockScreen;
-@property BOOL lockScreenSuppressedForBiometricAuth;
-@property BOOL isDisplayingStartupLockScreen; // Special behaviour for initial launch from viewDidLoad... no auto cancel - must enter creds
-@property BOOL hasAppearedOnce;
+//@property (nonatomic, strong) LockViewController *privacyScreen;
+@property BOOL privacyScreenSuppressedForBiometricAuth;
+
+//@property BOOL hasAppearedOnce;
+//@property BOOL isAppStartupLaunchOfPrivacyScreen;
+@property UIImageView *imageView;
 
 @end
 
 @implementation InitialViewController
 
-- (void)showLockScreen {
-    if(self.lockScreen != nil) {
-        return; // Already displayed
-    }
+- (void)showPrivacyScreen {
+    // TODO: Position this more in line with Splash Screen
     
-    __weak InitialViewController* weakSelf = self;
-    self.lockScreen = [[LockViewController alloc] init];
-    self.lockScreen.onUnlockSuccessful = ^{
-        [weakSelf hideLockScreen];
-    };
-    
-    [self presentViewController:self.lockScreen animated:NO completion:nil];
+    self.imageView = [[UIImageView alloc] initWithFrame:self.view.window.frame];
+    self.imageView.image = [UIImage imageNamed:@"Strongbox-1024x1024-new"];
+    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.imageView.opaque = NO;
+    self.imageView.backgroundColor = [UIColor whiteColor];
+    [self.view.window addSubview:self.imageView];
 }
 
-- (void)hideLockScreen { 
-    if(self.lockScreen == nil) {
+- (void)hidePrivacyScreen {
+    if(self.imageView) {
+        [self.imageView removeFromSuperview];
+    }
+    self.imageView = nil;
+}
+
+//- (void)showPrivacyScreenOld {
+//    if(self.privacyScreen != nil) {
+//        NSLog(@"Privacy screen is already displayed.. not displaying again");
+//        return; // Already displayed
+//    }
+//
+//    if([self presentedViewController]) {
+//        NSLog(@"An existing view controller is already being presented, not displaying privacy screen");
+//        return; // Already displayed
+//    }
+//
+//    UINavigationController* nav = [self selectedViewController];
+//    NSString* className = NSStringFromClass([nav.visibleViewController class]);
+//
+//    if (![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]] && // Google Sign In Broken without this... sigh
+//        ![className isEqualToString:@"SFAuthenticationViewController"] && // Google Sign In Broken without this... sigh. This is kinda brittle but I see no other way around it.
+//        ![className isEqualToString:@"ODAuthenticationViewController"] && // OneDrive Personal
+//        ![className isEqualToString:@"ADAuthenticationViewController"] && // OneDrive Biz
+//        ![className isEqualToString:@"DBMobileSafariViewController"]) // OneDrive too ]
+//    {
+//        NSLog(@"Presenting Privacy Screen over: [%@]", className);
+//
+//        __weak InitialViewController* weakSelf = self;
+//        self.privacyScreen = [[LockViewController alloc] init];
+//        self.privacyScreen.onUnlockSuccessful = ^{
+//            weakSelf.isAppStartupLaunchOfPrivacyScreen = NO;
+//            [weakSelf hidePrivacyScreen];
+//        };
+//
+//        [self presentViewController:self.privacyScreen animated:NO completion:nil];
+//    }
+//    else {
+//        NSLog(@"Not Presenting Privacy Screen over Predefined Class: [%@]", className);
+//    }
+//}
+//
+//- (void)hidePrivacyScreenOld {
+//    if(self.privacyScreen == nil) {
+//        NSLog(@"Hiding Privacy Screen = Not Present so nothing to do...");
+//        return;
+//    }
+//
+//    BOOL startupLock = NO;
+//    BOOL timeBasedLock = NO;
+//
+//    if(Settings.sharedInstance.appLockMode != kNoLock) {
+//        startupLock = self.isAppStartupLaunchOfPrivacyScreen;
+//
+//        if (self.enterBackgroundTime) {
+//            NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
+//            if (secondsBetween > Settings.sharedInstance.appLockDelay)
+//            {
+//                timeBasedLock = YES;
+//            }
+//        }
+//    }
+//
+//    NSLog(@"Hiding Privacy Screen... => startupLock = %d, timeBasedLock = %d", startupLock, timeBasedLock);
+//
+//    if(/* DISABLES CODE */ (YES)) { // !startupLock && !timeBasedLock) {
+//        if(self.presentedViewController == self.privacyScreen) {
+//            [self dismissViewControllerAnimated:NO completion:^{
+//                if([self isInQuickLaunchViewMode]) {
+//                    [self openQuickLaunchPrimarySafe];
+//                }
+//            }];
+//        }
+//        self.privacyScreen = nil;
+//    }
+//    else {
+//        NSLog(@"Could not Hide Privacy Screen because require lock...");
+//    }
+//}
+
+- (void)appResignActive {
+    NSLog(@"appResignActive");
+
+    self.privacyScreenSuppressedForBiometricAuth = NO;
+    if(Settings.sharedInstance.biometricAuthInProgress)
+    {
+        NSLog(@"appResignActive biometricAuthInProgress... suppressing privacy and lock screens");
+        self.privacyScreenSuppressedForBiometricAuth = YES;
         return;
     }
+
+    self.enterBackgroundTime = [[NSDate alloc] init];
     
-    [self dismissViewControllerAnimated:NO completion:nil];
-    self.lockScreen = nil;
-    self.isDisplayingStartupLockScreen = NO;
+    [self showPrivacyScreen];
+}
+
+- (void)appBecameActive {
+    NSLog(@"appBecameActive");
     
+    // User may have just switched to our app after updating iCloud settings...
+    [self checkICloudAvailability];
+    
+    if(self.privacyScreenSuppressedForBiometricAuth) {
+        NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
+        self.privacyScreenSuppressedForBiometricAuth = NO;
+        return;
+    }
+
+    [self lockAnyOpenSafesIfAppropriate];
+
+    [self hidePrivacyScreen];
+    
+    self.enterBackgroundTime = nil;
+
     if([self isInQuickLaunchViewMode]) {
         [self openQuickLaunchPrimarySafe];
     }
@@ -79,67 +184,6 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [quickLaunch openPrimarySafe];
     });
-}
-
-- (void)appResignActive {
-    NSLog(@"appResignActive");
-
-    self.lockScreenSuppressedForBiometricAuth = NO;
-    if(Settings.sharedInstance.biometricAuthInProgress) {
-        NSLog(@"appResignActive biometricAuthInProgress... suppressing privacy and lock screens");
-        self.lockScreenSuppressedForBiometricAuth = YES;
-        return;
-    }
-    
-    self.enterBackgroundTime = [[NSDate alloc] init];
-    
-    UINavigationController* nav = [self selectedViewController];
-    NSString* className = NSStringFromClass([nav.visibleViewController class]);
-
-    NSLog(@"Presenting Privacy Screen over: [%@]", className);
-
-    if (![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]] && // Google Sign In Broken without this... sigh
-        ![className isEqualToString:@"SFAuthenticationViewController"] && // Google Sign In Broken without this... sigh. This is kinda brittle but I see no other way around it.
-        ![className isEqualToString:@"ODAuthenticationViewController"] && // OneDrive Personal
-        ![className isEqualToString:@"ADAuthenticationViewController"] && // OneDrive Biz
-        ![className isEqualToString:@"DBMobileSafariViewController"]) // OneDrive too ]
-    {
-        [self showLockScreen];
-    }
-}
-
-- (void)appBecameActive {
-    NSLog(@"appBecameActive: %d", Settings.sharedInstance.biometricAuthInProgress);
-    
-    // User may have just switched to our app after updating iCloud settings...
-    [self checkICloudAvailability];
-    
-    if(self.lockScreenSuppressedForBiometricAuth) {
-        NSLog(@"App Active but Privacy and Lock Suppressed... Nothing to do");
-        return;
-    }
-
-    [self lockAnyOpenSafesIfAppropriate];
-
-    if (self.lockScreen && !self.isDisplayingStartupLockScreen) {
-        BOOL timeToLock = NO;
-        if (self.enterBackgroundTime) {
-            NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
-            
-            if (secondsBetween > Settings.sharedInstance.appLockDelay)
-            {
-                timeToLock = YES;
-            }
-        }
-
-        NSLog(@"Time To Lock: %d", timeToLock);
-
-        if(Settings.sharedInstance.appLockMode == kNoLock || !timeToLock) {
-            [self hideLockScreen];
-        }
-    }
-    
-    self.enterBackgroundTime = nil;
 }
 
 - (void)lockAnyOpenSafesIfAppropriate {
@@ -241,20 +285,20 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    if(!self.hasAppearedOnce) {
-        if (Settings.sharedInstance.appLockMode != kNoLock)
-        {
-            self.isDisplayingStartupLockScreen = YES;
-            [self showLockScreen];
-        }
-        else {
-            if([self isInQuickLaunchViewMode]) {
-                [self openQuickLaunchPrimarySafe];
-            }
-        }
-    }
+//    if(!self.hasAppearedOnce) {
+//        if (Settings.sharedInstance.appLockMode != kNoLock)
+//        {
+//            self.isAppStartupLaunchOfPrivacyScreen = YES;
+//            [self showPrivacyScreen];
+//        }
+//        else {
+//            if([self isInQuickLaunchViewMode]) {
+//                [self openQuickLaunchPrimarySafe];
+//            }
+//        }
+//    }
     
-    self.hasAppearedOnce = YES;
+//    self.hasAppearedOnce = YES;
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {

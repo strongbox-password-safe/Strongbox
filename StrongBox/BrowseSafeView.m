@@ -20,6 +20,8 @@
 #import "NodeIconHelper.h"
 #import "BrowseSafeEntryTableViewCell.h"
 #import "BrowseGroupTableViewCell.h"
+#import "Node+OTPToken.h"
+#import "OTPToken+Generation.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -32,6 +34,8 @@
 @property (nonatomic) NSInteger tapCount;
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
+
+@property NSTimer* timerRefreshOtp;
 
 @end
 
@@ -61,6 +65,29 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [super viewWillAppear:animated];
     
     [self refresh];
+    
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+    
+    if(!Settings.sharedInstance.hideTotpInBrowse) {
+        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+}
+
+- (IBAction)updateOtpCodes:(id)sender {
+    [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {
@@ -277,6 +304,23 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
         cell.flags.text = node.fields.attachments.count > 0 ? @"📎" : @"";
         
+        if(!Settings.sharedInstance.hideTotpInBrowse && node.otpToken) {
+            uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
+
+            cell.otpCode.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+            cell.otpCode.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+        
+            cell.otpCode.alpha = 1;
+            
+            if(remainingSeconds < 16) {
+                [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+                    cell.otpCode.alpha = 0.5;
+                } completion:nil];
+            }
+        }
+        else {
+            cell.otpCode.text = @"";
+        }
         return cell;
     }
 }

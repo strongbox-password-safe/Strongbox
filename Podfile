@@ -9,6 +9,7 @@ target 'Strongbox' do
     pod 'SAMKeychain'
     pod 'libsodium'
     pod 'GZIP'
+    pod 'Base32'
 end
 
 pre_install do |installer|
@@ -37,12 +38,14 @@ abstract_target 'common-ios' do
     pod 'GZIP'
     pod 'libsodium'    
     pod 'KissXML'
+    pod 'Base32'
 
     target 'Strongbox-iOS' do
         pod 'ISMessages' 
         pod 'PopupDialog'
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
+        pod 'MTBBarcodeScanner'
     end
 
     target 'Strongbox Auto Fill' do

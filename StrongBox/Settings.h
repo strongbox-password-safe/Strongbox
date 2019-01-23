@@ -12,13 +12,20 @@
 #import "SFTPSessionConfiguration.h"
 #import "AppLockMode.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 
 @interface Settings : NSObject
 
 + (Settings *)sharedInstance;
-
 - (NSUserDefaults*)getUserDefaults;
+
+- (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion;
+- (void)requestBiometricId:(NSString  *)reason fallbackTitle:(NSString*_Nullable)fallbackTitle completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
+@property BOOL biometricAuthInProgress;
++ (BOOL)isBiometricIdAvailable;
+
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen;
 - (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value;
@@ -88,9 +95,10 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property NSString* appLockPin;
 @property NSInteger appLockDelay;
 
-- (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion;
-- (void)requestBiometricId:(NSString*)reason fallbackTitle:(NSString*)fallbackTitle completion:(void(^)(BOOL success, NSError * __nullable error))completion;
-@property BOOL biometricAuthInProgress;
-+ (BOOL)isBiometricIdAvailable;
+@property BOOL hideTotp;
+@property BOOL hideTotpInBrowse;
+@property BOOL hideTotpInAutoFill;
+
+NS_ASSUME_NONNULL_END
 
 @end

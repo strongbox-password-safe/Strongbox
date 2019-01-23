@@ -230,10 +230,20 @@ typedef void(^CompletionBlock)(Model* model);
                 error:(NSError *)error {
     if (success) {
         self.isConvenienceUnlock = YES;
-        self.masterPassword = self.safe.convenienceMasterPassword;
-        self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
         
-        [self openSafe];
+        // Do we also have a PIN?
+        
+        if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self promptForConveniencePin];
+            });
+        }
+        else {
+            self.masterPassword = self.safe.convenienceMasterPassword;
+            self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
+
+            [self openSafe];
+        }
     }
     else {
         if (error.code == LAErrorAuthenticationFailed) {
