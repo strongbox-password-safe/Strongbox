@@ -52,15 +52,12 @@
     
     [self removeShowSafesMetaDataItem];
     //BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
-
+    
     if(![Settings sharedInstance].fullVersion) {
-        [self getValidIapProducts];
-
+        [self getValidIapProductsAndMessageForUpgrade];
+    
         if([Settings sharedInstance].endFreeTrialDate == nil) {
             [self initializeFreeTrialAndShowWelcomeMessage];
-        }
-        else if(![Settings sharedInstance].freeTrial){
-            [self randomlyShowUpgradeMessage];
         }
     }
     else {
@@ -117,7 +114,9 @@
     }
 }
 
-- (void)getValidIapProducts {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)getValidIapProductsAndMessageForUpgrade {
     NSSet *productIdentifiers = [NSSet setWithObjects:kIapFullVersionStoreId, nil];
     self.productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     self.productsRequest.delegate = self;
@@ -127,17 +126,50 @@
 -(void)productsRequest:(SKProductsRequest *)request
     didReceiveResponse:(SKProductsResponse *)response
 {
-    NSUInteger count = [response.products count];
-    if (count > 0) {
-        self.validProducts = response.products;
-        for (SKProduct *validProduct in self.validProducts) {
-            NSLog(@"%@", validProduct.productIdentifier);
-            NSLog(@"%@", validProduct.localizedTitle);
-            NSLog(@"%@", validProduct.localizedDescription);
-            NSLog(@"%@", validProduct.price);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self appStoreProductRequestCompleted:response.products error:nil];
+    });
+}
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self appStoreProductRequestCompleted:nil error:error];
+    });
+}
+
+- (void)appStoreProductRequestCompleted:(NSArray<SKProduct *> *)products error:(NSError*)error {
+    if(products) {
+        NSUInteger count = [products count];
+        if (count > 0) {
+            self.validProducts = products;
+            for (SKProduct *validProduct in self.validProducts) {
+                NSLog(@"%@", validProduct.productIdentifier);
+                NSLog(@"%@", validProduct.localizedTitle);
+                NSLog(@"%@", validProduct.localizedDescription);
+                NSLog(@"%@", validProduct.price);
+            }
+        }
+
+        if(![Settings sharedInstance].freeTrial){
+            [self randomlyShowUpgradeMessage];
         }
     }
+    else {
+        [Alerts error:@"Error Contacting App Store for Upgrade Info" error:error window:[NSApplication sharedApplication].mainWindow];
+    }
 }
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+    SEL theAction = [anItem action];
+    
+    if (theAction == @selector(onUpgradeToFullVersion:)) {
+        return self.validProducts != nil;
+    }
+
+    return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)removeUnwantedMenuItems {
     // Remove Start Dictation and Emoji menu Items

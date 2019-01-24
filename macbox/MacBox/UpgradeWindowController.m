@@ -27,7 +27,9 @@
     windowController.product = product;
     windowController.cancelDelay = cancelDelay;
     
-    if ([NSApp runModalForWindow:windowController.window]) {
+    NSModalResponse response = [NSApp runModalForWindow:windowController.window];
+    
+    if (response) {
         return YES; 
     }
     
@@ -161,6 +163,8 @@
 }
 
 - (void) startNoThanksCountdown {
+    NSLog(@"Starting No Thanks Countdown with %ld delay", (long)self.cancelDelay);
+    
     [self.buttonNoThanks setEnabled:NO];
     [self.buttonNoThanks setTitle:[NSString stringWithFormat:@"No Thanks (%ld)", (long)self.cancelDelay]];
     
@@ -172,6 +176,7 @@
         
         if(secondsRemaining < 1) {
             [self.buttonNoThanks setTitle:@"No Thanks"];
+            [self.buttonNoThanks setEnabled:YES];
             [timer invalidate];
         }
         else {
@@ -180,10 +185,6 @@
     }];
     
     [[NSRunLoop currentRunLoop] addTimer:y forMode:NSModalPanelRunLoopMode];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, self.cancelDelay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self.buttonNoThanks setEnabled:YES];
-    });
 }
 
 - (void)showProgressIndicator {

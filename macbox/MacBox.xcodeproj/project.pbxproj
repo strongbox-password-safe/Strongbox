@@ -83,7 +83,6 @@
 		4D8DE9BE21F898470043DDC0 /* OTPToken+Persistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B321F898460043DDC0 /* OTPToken+Persistence.m */; };
 		4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */; };
 		4D8DE9C021F898470043DDC0 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B521F898470043DDC0 /* OTPToken.m */; };
-		4D8DE9C121F898470043DDC0 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B821F898470043DDC0 /* Info.plist */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
 		4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
@@ -314,7 +313,6 @@
 		4D8DE9B521F898470043DDC0 /* OTPToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OTPToken.m; path = ../lib/OneTimePassword/OTPToken.m; sourceTree = "<group>"; };
 		4D8DE9B621F898470043DDC0 /* OTPToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OTPToken.h; path = ../lib/OneTimePassword/OTPToken.h; sourceTree = "<group>"; };
 		4D8DE9B721F898470043DDC0 /* OTPToken+Generation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Generation.h"; path = "../lib/OneTimePassword/OTPToken+Generation.h"; sourceTree = "<group>"; };
-		4D8DE9B821F898470043DDC0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../lib/OneTimePassword/Info.plist; sourceTree = "<group>"; };
 		4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+QueryItems.h"; path = "../lib/OneTimePassword/NSURL+QueryItems.h"; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WindowController.h; path = MacBox/WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WindowController.m; path = MacBox/WindowController.m; sourceTree = "<group>"; };
@@ -733,7 +731,6 @@
 		4D8DE9A921F898240043DDC0 /* OneTimePassword */ = {
 			isa = PBXGroup;
 			children = (
-				4D8DE9B821F898470043DDC0 /* Info.plist */,
 				4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */,
 				4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */,
 				4D8DE9B021F898460043DDC0 /* OneTimePassword.h */,
@@ -1058,7 +1055,6 @@
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				4D524D13219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
-				4D8DE9C121F898470043DDC0 /* Info.plist in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,

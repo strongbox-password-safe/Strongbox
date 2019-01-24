@@ -88,10 +88,14 @@ typedef void(^CompletionBlock)(Model* model);
 - (void)beginSequence {
     if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = !Settings.sharedInstance.disallowAllBiometricId && self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
-        if(biometricPossible) {
+        
+        // Show biometric if possible... unless BOTH Bio & PIN are configured but PIN has been disabled, then fall back to full master credentials
+        if(biometricPossible && !(self.safe.conveniencePin != nil && Settings.sharedInstance.disallowAllPinCodeOpens)) {
             [self showBiometricAuthentication];
         }
-        else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
+        // Only show PIN code now if it is enabled exclusively (i.e. not also with Touch ID) because if for some
+        // other reason biometric is disabled we want to fallback to master credentials
+        else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil && !self.safe.isTouchIdEnabled) {
             [self promptForConveniencePin];
         }
         else {

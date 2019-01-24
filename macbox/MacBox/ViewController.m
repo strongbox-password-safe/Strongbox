@@ -144,6 +144,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
     self.tableViewCustomFields.dataSource = self;
     self.tableViewCustomFields.delegate = self;
 
+    self.buttonUnlockWithTouchId.hidden = YES;
 }
 
 - (void)disableFeaturesForLiteVersion {
@@ -174,7 +175,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
         [self refreshOutlineAndDetailsPaneNoSelectionChange];
     };
     
-    [self bindToModel];
+    //dispatch_async(dispatch_get_main_queue(), ^{
+        [self bindToModel];
+    //});
 }
 
 //-(void)updateDocumentUrl {
@@ -184,11 +187,13 @@ static NSArray<NSImage*> *kKeePassIconSet;
 - (BOOL)biometricOpenIsAvailableForSafe {
     SafeMetaData* metaData = [self getSafeMetaData];
     
-    return  metaData == nil ||
+    BOOL ret =  (metaData == nil ||
             !metaData.isTouchIdEnabled ||
             !(metaData.touchIdPassword || metaData.touchIdKeyFileDigest) ||
             !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
-    !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
+    !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
+
+    return !ret;
 }
 
 - (void)bindToModel {
@@ -201,7 +206,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
     if(self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
         
-        if([self biometricOpenIsAvailableForSafe]) {
+        if(![self biometricOpenIsAvailableForSafe]) {
             self.buttonUnlockWithTouchId.hidden = YES;
             [self.buttonUnlockWithTouchId setKeyEquivalent:@""];
             [self.buttonUnlockWithPassword setKeyEquivalent:@"\r"];
@@ -211,7 +216,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
             [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
             [self.buttonUnlockWithPassword setKeyEquivalent:@""];        }
     }
-    else {        
+    else {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
     }
     
@@ -223,18 +228,12 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     [self bindDetailsPane];
 }
-
+                   
 - (void)setInitialFocus {
     if(self.model == nil || self.model.locked) {
         if([self biometricOpenIsAvailableForSafe]) {
-            [self.view.window makeFirstResponder:self.textFieldMasterPassword];
-        }
-        else {
             [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
         }
-    }
-    else {
-        [self.view.window makeFirstResponder:self.outlineView];
     }
 }
 
@@ -859,15 +858,17 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)openSafeForDisplayAfterUnlock:(NSString *)selectedItemId {
-    [self bindToModel];
-    
-    self.textFieldMasterPassword.stringValue = @"";
-    
-    Node* selectedItem = [self.model getItemFromSerializationId:selectedItemId];
-    
-    [self selectItem:selectedItem];
-    
-    [self setInitialFocus];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self bindToModel];
+        
+        self.textFieldMasterPassword.stringValue = @"";
+        
+        Node* selectedItem = [self.model getItemFromSerializationId:selectedItemId];
+        
+        [self selectItem:selectedItem];
+        
+        [self setInitialFocus];
+    });
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
@@ -1350,9 +1351,7 @@ NSString* trimField(NSTextField* textField) {
     //NSLog(@"acceptDrop Move [%@] -> [%@]", sourceItem, destinationItem);
     
     if([self.model changeParent:destinationItem node:sourceItem]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.outlineView reloadData];
-        });
+        [self.outlineView reloadData];
         
         return YES;
     }
@@ -1668,16 +1667,31 @@ NSString* trimField(NSTextField* textField) {
 - (void)refreshOutlineAndDetailsPaneNoSelectionChange {
     //NSInteger selectedRow = [self.outlineView selectedRow];
     
-    Node* currentSelection = [self getCurrentSelectedItem];
-    
-    [self.outlineView reloadData];
-    
-    self.attachmentsIconCache = nil;
-    [self.attachmentsView reloadData];
-    [self.tableViewCustomFields reloadData];
-    
-    [self selectItem:currentSelection];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        Node* currentSelection = [self getCurrentSelectedItem];
+        
+        [self.outlineView reloadData];
+        
+        self.attachmentsIconCache = nil;
+        [self.attachmentsView reloadData];
+        [self.tableViewCustomFields reloadData];
+        
+        [self selectItem:currentSelection];
+    });
 }
+
+//- (void)reloadOutlineViewSingleChokePoint {
+//    // An abortive attempt to solve a very mysterious crash definitely related to the reloadData call on outline view...
+//    // Every update (update: not actually, some are tied too tightly to other updates to do this) should go through here
+//    // and we place them on the main queue, in case it's something to do
+//    // with multiple simultaneous updates or non main thread updates...
+//
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        NSIndexSet* rows = self.outlineView.selectedRowIndexes;
+//        [self.outlineView reloadData];
+//        [self.outlineView selectRowIndexes:rows byExtendingSelection:NO];
+//    });
+//}
 
 static NSComparator finderStringComparator = ^(id obj1, id obj2)
 {
