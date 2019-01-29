@@ -20,12 +20,16 @@ static const BOOL kLogVerbose = NO;
 
 @implementation KdbxSerializationCommon
 
-BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion) {
-    return keePassSignatureAndVersionMatch(candidate, majorVersion, minorVersion);
+BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
+    return keePassSignatureAndVersionMatch(candidate, majorVersion, minorVersion, error);
 }
 
-BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion) {
+BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
     if(candidate.length < SIZE_OF_KEEPASS_HEADER) {
+        if(error) {
+            *error = [Utils createNSError:@"candidate.length < SIZE_OF_KEEPASS_HEADER" errorCode:-1];
+        }
+
         return NO;
     }
     
@@ -40,6 +44,10 @@ BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, 
         header.signature1[2] != 0xA2 ||
         header.signature1[3] != 0x9A) {
         //NSLog(@"No Keepass magic");
+        if(error) {
+            *error = [Utils createNSError:@"No Keepass magic [0x03,0xD9,0xA2,0x9A]" errorCode:-1];
+        }
+        
         return NO;
     }
     
@@ -51,10 +59,18 @@ BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, 
         header.signature2[2] != 0x4B ||
         header.signature2[3] != 0xB5) {
         //NSLog(@"No Keepass magic 2");
+        if(error) {
+            *error = [Utils createNSError:@"No Keepass magic: 0xB54BFB67" errorCode:-1];
+        }
+        
         return NO;
     }
     
     if(header.major != majorVersion || header.minor != minorVersion) {
+        if(error) {
+            *error = [Utils createNSError:@"KeePass Version MisMatch" errorCode:-1];
+        }
+        
         return NO;
     }
 

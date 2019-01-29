@@ -50,5 +50,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpBrowseView;
+@property (weak, nonatomic) IBOutlet UISwitch *switchNoSortingKeePassInBrowse;
 
 @end

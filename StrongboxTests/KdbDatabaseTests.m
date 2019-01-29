@@ -27,7 +27,7 @@
         NSError* error;
         NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:file];
         
-        if(![Kdb1Database isAValidSafe:blob]) {
+        if(![Kdb1Database isAValidSafe:blob error:&error]) {
             XCTAssert(NO);
             continue;
         }

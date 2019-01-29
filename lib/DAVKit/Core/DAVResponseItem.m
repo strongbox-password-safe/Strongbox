@@ -28,7 +28,7 @@
 }
 
 - (NSComparisonResult)compare:(DAVResponseItem *)item {
-	return [self.href compare:item.href];
+	return [self.href.absoluteString compare:item.href.absoluteString];
 }
 
 @end

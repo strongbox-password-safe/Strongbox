@@ -23,8 +23,8 @@
     return kPasswordSafe;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return [PwSafeSerialization isAValidSafe:candidate];
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    return [PwSafeSerialization isAValidSafe:candidate error:error];
 }
 
 -(StrongboxDatabase *)create:(NSString *)password {
@@ -44,7 +44,7 @@
 }
 
 - (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest error:(NSError **)error {
-    if (![PwSafeDatabase isAValidSafe:data]) {
+    if (![PwSafeDatabase isAValidSafe:data error:error]) {
         NSLog(@"Not a valid safe!");
         
         if (error != nil) {
@@ -343,9 +343,9 @@
 }
 
 - (NSArray<Group*>*)getMinimalEmptyGroupObjectsFromModel:(Node*)rootGroup {
-    NSArray<Node*> *emptyGroups = [rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*> *emptyGroups = [[rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return node.isGroup && node.children.count == 0;
-    }];
+    }] sortedArrayUsingComparator:finderStyleNodeComparator];
     
     NSMutableArray<Group*>* groups = [NSMutableArray array];
     for(Node* emptyGroup in emptyGroups) {
@@ -369,9 +369,9 @@
 }
 
 - (NSArray<Record*>* _Nonnull)getRecordsForSerialization:(Node*)rootGroup {
-    NSArray<Node*> *recordNodes = [rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*> *recordNodes = [[rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
-    }];
+    }] sortedArrayUsingComparator:finderStyleNodeComparator];
     
     NSMutableArray<Record*> *records = [NSMutableArray array];
     

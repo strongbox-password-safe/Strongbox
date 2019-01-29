@@ -65,7 +65,7 @@
 
 - (void)testInitExistingWithGoogleDriveSafe {
     NSError* error;
-    NSData *safeData = [NSData dataWithContentsOfFile:@"/Users/mark/Google Drive/strongbox/keepass/custom-icon.kdbx" options:kNilOptions error:&error];
+    NSData *safeData = [NSData dataWithContentsOfFile:@"/Users/mark/Google Drive/strongbox/keepass/custom-ordering.kdbx" options:kNilOptions error:&error];
 
     XCTAssertNotNil(safeData);
     

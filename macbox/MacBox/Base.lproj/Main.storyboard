@@ -1081,7 +1081,7 @@ DQ
                                                                                                             <outlet property="delegate" destination="5gI-5U-AMq" id="5QJ-d5-Oj5"/>
                                                                                                         </connections>
                                                                                                     </textField>
-                                                                                                    <textField verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="bw6-tX-Yv0" userLabel="Text Field Hidden Pw" customClass="CustomPasswordTextField">
+                                                                                                    <textField verticalHuggingPriority="750" verticalCompressionResistancePriority="751" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bw6-tX-Yv0" userLabel="Text Field Hidden Pw" customClass="CustomPasswordTextField">
                                                                                                         <rect key="frame" x="72" y="5" width="304" height="25"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="*******************" drawsBackground="YES" id="4Jw-Ps-PG5">
                                                                                                             <font key="font" size="14" name="Arial-BoldMT"/>
@@ -1403,7 +1403,7 @@ DQ
                                                                                                             <rect key="frame" x="1" y="1" width="387" height="98"/>
                                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                             <subviews>
-                                                                                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsUndo="YES" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
+                                                                                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
                                                                                                                     <rect key="frame" x="0.0" y="0.0" width="387" height="98"/>
                                                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>

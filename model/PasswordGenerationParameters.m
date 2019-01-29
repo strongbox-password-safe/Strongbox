@@ -22,6 +22,9 @@
         self.maximumLength = 24;
         self.xkcdWordCount = 4;
         
+        self.wordSeparator = @"";
+        self.xKcdWordList = kXcdGoogle;
+        
         return self;
     }
     
@@ -38,6 +41,9 @@
     [encoder encodeInteger:self.minimumLength forKey:@"minimumLength"];
     [encoder encodeInteger:self.maximumLength forKey:@"maximumLength"];
     [encoder encodeInteger:self.xkcdWordCount forKey:@"xkcdWordCount"];
+    
+    [encoder encodeInteger:self.xKcdWordList forKey:@"wordList"];
+    [encoder encodeObject:self.wordSeparator forKey:@"wordSeparator"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -51,6 +57,14 @@
         self.minimumLength = (int)[decoder decodeIntegerForKey:@"minimumLength"];
         self.maximumLength = (int)[decoder decodeIntegerForKey:@"maximumLength"];
         self.xkcdWordCount = (int)[decoder decodeIntegerForKey:@"xkcdWordCount"];
+    
+        if([decoder containsValueForKey:@"wordList"]) {
+            self.xKcdWordList = (int)[decoder decodeIntegerForKey:@"wordList"];
+        }
+
+        if([decoder containsValueForKey:@"wordSeparator"]) {
+            self.wordSeparator = [decoder decodeObjectForKey:@"wordSeparator"];
+        }
     }
 
     return self;

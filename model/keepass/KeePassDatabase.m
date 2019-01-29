@@ -33,8 +33,8 @@
     return kKeePass;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return [KdbxSerialization isAValidSafe:candidate];
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    return [KdbxSerialization isAValidSafe:candidate error:error];
 }
 
 - (StrongboxDatabase *)create:(NSString *)password {

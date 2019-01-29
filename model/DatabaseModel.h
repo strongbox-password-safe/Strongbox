@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseModel : NSObject
 
-+ (BOOL)isAValidSafe:(NSData *_Nonnull)candidate;
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
 
 + (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;

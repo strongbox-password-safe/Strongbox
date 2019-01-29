@@ -95,7 +95,7 @@
 }
 
 - (id)resultForData:(NSData *)data {
-	DAVListingParser *p = [[DAVListingParser alloc] initWithData:data];
+    DAVListingParser *p = [[DAVListingParser alloc] initWithData:data rootUrl:self.rootURL];
 	
 	NSError *error = nil;
 	NSArray *items = [p parse:&error];

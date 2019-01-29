@@ -259,13 +259,17 @@
     return ret;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
     PasswordSafe3Header header = [PwSafeSerialization getHeader:candidate];
     
     if (header.tag[0] != 'P' ||
         header.tag[1] != 'W' ||
         header.tag[2] != 'S' ||
         header.tag[3] != '3') {
+        if(error) {
+            *error = [Utils createNSError:@"NO PWS3" errorCode:-1];
+        }
+        
         return NO;
     }
 
@@ -273,12 +277,18 @@
     
     if (endOfData == NSNotFound) {
         NSLog(@"Invalid Password Safe. No End of File marker magic");
+        if(error) {
+            *error = [Utils createNSError:@"Invalid Password Safe. No End of File marker magic" errorCode:-1];
+        }
         return NO;
     }
 
     NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
     if (recordsLength <= 0) {
         NSLog(@"Invalid Password Safe. Negative or zero record length");
+        if(error) {
+            *error = [Utils createNSError:@"Invalid Password Safe. Negative or zero record length" errorCode:-1];
+        }
         return NO;
     }
 
@@ -287,6 +297,9 @@
 
     if (numBlocks <= 0 || rem != 0) {
         NSLog(@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks.");
+        if(error) {
+            *error = [Utils createNSError:@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks." errorCode:-1];
+        }
         return NO;
     }
 

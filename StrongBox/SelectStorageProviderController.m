@@ -196,11 +196,10 @@
         return;
     }
     
-    
-    if (![DatabaseModel isAValidSafe:importedData]) {
-        [Alerts warn:self
-               title:@"Invalid Safe"
-             message:@"This is not a valid Strongbox password safe database file."];
+    if (![DatabaseModel isAValidSafe:importedData error:&error]) {
+        [Alerts error:self
+                title:@"Invalid Safe"
+                error:error];
         
         return;
     }

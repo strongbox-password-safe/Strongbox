@@ -24,6 +24,9 @@
                                   uuid:(nullable NSUUID*)uuid;
 
 - (nonnull instancetype)initAsRecord:(NSString *_Nonnull)title
+                              parent:(Node* _Nonnull)parent;
+
+- (nonnull instancetype)initAsRecord:(NSString *_Nonnull)title
                                  parent:(Node* _Nonnull)parent
                                  fields:(NodeFields*_Nonnull)fields
                                    uuid:(nullable NSUUID*)uuid;
@@ -74,5 +77,7 @@
 // KeePass to store a link back to the original Xml element so we retain unknown attributes/text/elements
 
 @property (nonatomic, strong, nullable) NSObject *linkedData;
+
+extern NSComparator finderStyleNodeComparator;
 
 @end

@@ -16,6 +16,7 @@
 #import "SafesList.h"
 #import "OneDriveStorageProvider.h"
 #import "PinEntryController.h"
+#import "NSArray+Extensions.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -72,6 +73,7 @@
     [self bindClearClipboard];
     [self bindAppLock];
     [self bindHideTotp];
+    [self bindKeePassNoSorting];
     //[self customizeAppLockSectionFooter];
 }
 
@@ -131,17 +133,76 @@
 }
 
 - (IBAction)onAllowPinCodeOpen:(id)sender {
-    Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
-    
-    [self bindAllowPinCodeOpen];
+    if(self.switchAllowPinCodeOpen.on) {
+        Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+        [self bindAllowPinCodeOpen];
+    }
+    else {
+        [Alerts yesNo:self title:@"Clear PIN Codes" message:@"This will clear any existing safes with stored Master Credentials that are backed by PIN Codes" action:^(BOOL response) {
+            if(response) {
+                Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+                
+                // Clear any Convenience Enrolled PIN Using Safes
+                
+                NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+                    return obj.conveniencePin != nil && obj.isEnrolledForConvenience;
+                }];
+                
+                for (SafeMetaData* safe in clear) {
+                    safe.isEnrolledForConvenience = NO;
+                    safe.isTouchIdEnabled = NO;
+                    safe.convenienceMasterPassword = nil;
+                    safe.convenenienceKeyFileDigest = nil;
+                    safe.conveniencePin = nil;
+                    safe.duressPin = nil;
+                    safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
+                    
+                    [SafesList.sharedInstance update:safe];
+                }
+                
+                [self bindAllowPinCodeOpen];
+            }
+        }];
+    }
 }
 
 - (IBAction)onAllowBiometric:(id)sender {
-    NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
-    
-    Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
-    
-    [self bindAllowBiometric];
+    if(self.switchAllowBiometric.on) {
+        NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
+        
+        Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+        
+        [self bindAllowBiometric];
+    }
+    else {
+        [Alerts yesNo:self title:@"Clear Biometrics" message:@"This will clear any existing safes with stored Master Credentials that are backed by Biometric Open. Are you sure?" action:^(BOOL response) {
+            if(response) {
+                NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
+                
+                Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+                
+                // Clear any Convenience Enrolled Biometric Using Safes
+                
+                NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+                    return obj.isTouchIdEnabled && obj.isEnrolledForConvenience;
+                }];
+                
+                for (SafeMetaData* safe in clear) {
+                    safe.isEnrolledForConvenience = NO;
+                    safe.convenienceMasterPassword = nil;
+                    safe.convenenienceKeyFileDigest = nil;
+                    safe.conveniencePin = nil;
+                    safe.isTouchIdEnabled = NO;
+                    safe.duressPin = nil;
+                    safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
+
+                    [SafesList.sharedInstance update:safe];
+                }
+                
+                [self bindAllowBiometric];
+            }
+        }];
+    }
 }
 
 - (void)bindShowKeePass1BackupFolder {
@@ -486,6 +547,16 @@
     Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
 
     [self bindHideTotp];
+}
+
+- (void)bindKeePassNoSorting {
+    self.switchNoSortingKeePassInBrowse.on = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
+}
+
+- (IBAction)onKeePassNoSortingChanged:(id)sender {
+    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
+    
+    [self bindKeePassNoSorting];
 }
 
 @end

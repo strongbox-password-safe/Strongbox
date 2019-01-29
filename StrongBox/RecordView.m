@@ -328,7 +328,7 @@ static const int kMinNotesCellHeight = 160;
     // Edit OTP
     
     self.buttonSetOtp.hidden = Settings.sharedInstance.hideTotp || self.isEditing;
-    self.buttonSetOtp.enabled = !self.isEditing;
+    self.buttonSetOtp.enabled = !self.isEditing && !self.viewModel.isReadOnly;
 }
 
 - (void)setTitleTextFieldUIValidationIndicator {

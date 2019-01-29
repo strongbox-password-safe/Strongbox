@@ -68,7 +68,7 @@
 //
 //    XCTAssertNotNil(token);
 
-    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil] fields:nil uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
     BOOL ret = [node setTotpWithString:@"otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase" appendUrlToNotes:YES];
     
@@ -86,7 +86,7 @@
     //
     //    XCTAssertNotNil(token);
     
-    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil] fields:nil uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
     BOOL ret = [node setTotpWithString:@"otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=8&period=31" appendUrlToNotes:YES];
     
@@ -104,7 +104,7 @@
     //
     //    XCTAssertNotNil(token);
     
-    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil] fields:nil uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
     BOOL ret = [node setTotpWithString:@"" appendUrlToNotes:YES];
     
@@ -122,7 +122,7 @@
     //
     //    XCTAssertNotNil(token);
     
-    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil] fields:nil uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
     BOOL ret = [node setTotpWithString:nil appendUrlToNotes:YES];
     
@@ -136,11 +136,11 @@
 - (void)testSetWithOtpUrlWithRubbish {
     //    OTPToken* token = [Node getOtpTokenFromRecord:@""
     //                                           fields:@{}
-    //                                            notes:@"This are some notes containing an OTP Url like this: otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase which is kind of cool"];
+    //                                            notes:@"This are some notes containing an OTP Url like this: otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2g&issuer=Coinbase which is kind of cool"];
     //
     //    XCTAssertNotNil(token);
     
-    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil] fields:nil uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
     BOOL ret = [node setTotpWithString:@"Absolute Garbage GIGO" appendUrlToNotes:YES];
     
@@ -158,7 +158,7 @@
     //
     //    XCTAssertNotNil(token);
     
-    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil] fields:nil uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
     BOOL ret = [node setTotpWithString:@"2gqegflxxubjqelc" appendUrlToNotes:YES];
     

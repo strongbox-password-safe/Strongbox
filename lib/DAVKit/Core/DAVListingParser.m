@@ -21,17 +21,21 @@
 
 @implementation DAVListingParser
 
-- (id)initWithData:(NSData *)data {
+- (id)initWithData:(NSData *)data rootUrl:(NSURL *)rootUrl {
 	NSParameterAssert(data != nil);
 	
 	self = [super init];
 	if (self) {
 		_items = [[NSMutableArray alloc] init];
-		
+        _rootUrl = rootUrl;
 		_parser = [[NSXMLParser alloc] initWithData:data];
 		[_parser setDelegate:self];
 		[_parser setShouldProcessNamespaces:YES];
+        
+        //NSString* xml = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        //NSLog(@"WebDAV Listing Response: [%@]", xml);
 	}
+    
 	return self;
 }
 
@@ -75,8 +79,8 @@
   namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
 	
 	if ([elementName isEqualToString:@"href"]) {
-		_currentItem.href = [_currentString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	}
+        _currentItem.href = [self normaliseHref:_currentString];
+    }
 	else if ([elementName isEqualToString:@"getcontentlength"]) {
 		_currentItem.contentLength = [_currentString longLongValue];
 	}
@@ -105,6 +109,26 @@
 	}
 	
 	_currentString = nil;
+}
+
+- (NSURL*)normaliseHref:(NSString*)href {
+    // Absolutize the href if it's not absolute... needs to be relative to the rootUrl
+    
+    NSURL* testHref = [NSURL URLWithString:href];
+    if(!testHref) {
+        NSLog(@"Not a valid href: %@", href);
+        return nil;
+    }
+    else if([testHref scheme] == nil) {
+        NSURL *baseURL = [[NSURL URLWithString:@"/" relativeToURL:_rootUrl] absoluteURL];
+        NSURL* ret = [NSURL URLWithString:href relativeToURL:baseURL];
+        //NSLog(@"Determined URL for request: [%@]", ret.absoluteString);
+        
+        return ret;
+    }
+    else {
+        return testHref;
+    }
 }
 
 @end

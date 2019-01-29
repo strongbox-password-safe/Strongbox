@@ -63,80 +63,6 @@
     self.imageView = nil;
 }
 
-//- (void)showPrivacyScreenOld {
-//    if(self.privacyScreen != nil) {
-//        NSLog(@"Privacy screen is already displayed.. not displaying again");
-//        return; // Already displayed
-//    }
-//
-//    if([self presentedViewController]) {
-//        NSLog(@"An existing view controller is already being presented, not displaying privacy screen");
-//        return; // Already displayed
-//    }
-//
-//    UINavigationController* nav = [self selectedViewController];
-//    NSString* className = NSStringFromClass([nav.visibleViewController class]);
-//
-//    if (![nav.visibleViewController isKindOfClass:[StorageBrowserTableViewController class]] && // Google Sign In Broken without this... sigh
-//        ![className isEqualToString:@"SFAuthenticationViewController"] && // Google Sign In Broken without this... sigh. This is kinda brittle but I see no other way around it.
-//        ![className isEqualToString:@"ODAuthenticationViewController"] && // OneDrive Personal
-//        ![className isEqualToString:@"ADAuthenticationViewController"] && // OneDrive Biz
-//        ![className isEqualToString:@"DBMobileSafariViewController"]) // OneDrive too ]
-//    {
-//        NSLog(@"Presenting Privacy Screen over: [%@]", className);
-//
-//        __weak InitialViewController* weakSelf = self;
-//        self.privacyScreen = [[LockViewController alloc] init];
-//        self.privacyScreen.onUnlockSuccessful = ^{
-//            weakSelf.isAppStartupLaunchOfPrivacyScreen = NO;
-//            [weakSelf hidePrivacyScreen];
-//        };
-//
-//        [self presentViewController:self.privacyScreen animated:NO completion:nil];
-//    }
-//    else {
-//        NSLog(@"Not Presenting Privacy Screen over Predefined Class: [%@]", className);
-//    }
-//}
-//
-//- (void)hidePrivacyScreenOld {
-//    if(self.privacyScreen == nil) {
-//        NSLog(@"Hiding Privacy Screen = Not Present so nothing to do...");
-//        return;
-//    }
-//
-//    BOOL startupLock = NO;
-//    BOOL timeBasedLock = NO;
-//
-//    if(Settings.sharedInstance.appLockMode != kNoLock) {
-//        startupLock = self.isAppStartupLaunchOfPrivacyScreen;
-//
-//        if (self.enterBackgroundTime) {
-//            NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
-//            if (secondsBetween > Settings.sharedInstance.appLockDelay)
-//            {
-//                timeBasedLock = YES;
-//            }
-//        }
-//    }
-//
-//    NSLog(@"Hiding Privacy Screen... => startupLock = %d, timeBasedLock = %d", startupLock, timeBasedLock);
-//
-//    if(/* DISABLES CODE */ (YES)) { // !startupLock && !timeBasedLock) {
-//        if(self.presentedViewController == self.privacyScreen) {
-//            [self dismissViewControllerAnimated:NO completion:^{
-//                if([self isInQuickLaunchViewMode]) {
-//                    [self openQuickLaunchPrimarySafe];
-//                }
-//            }];
-//        }
-//        self.privacyScreen = nil;
-//    }
-//    else {
-//        NSLog(@"Could not Hide Privacy Screen because require lock...");
-//    }
-//}
-
 - (void)appResignActive {
     NSLog(@"appResignActive");
 
@@ -436,10 +362,11 @@
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSData *importedData = [NSData dataWithContentsOfURL:importURL];
     
-    if (![DatabaseModel isAValidSafe:importedData]) {
-        [Alerts warn:self
-               title:@"Invalid Safe"
-             message:@"This is not a valid Strongbox password safe database file."];
+    NSError* error;
+    if (![DatabaseModel isAValidSafe:importedData error:&error]) {
+        [Alerts error:self
+                title:@"Invalid Safe"
+                error:error];
         
         return;
     }
@@ -485,10 +412,11 @@
 }
 
 -(void)importSafe:(StrongboxUIDocument*)document url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
-    if (![DatabaseModel isAValidSafe:document.data]) {
-        [Alerts warn:self
-               title:@"Invalid Safe"
-             message:@"This is not a valid Strongbox password safe database file."];
+    NSError* error;
+    if (![DatabaseModel isAValidSafe:document.data error:&error]) {
+        [Alerts error:self
+                title:@"Invalid Safe"
+                error:error];
         
         return;
     }

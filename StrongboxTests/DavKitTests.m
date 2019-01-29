@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import "WebDAVStorageProvider.h"
+#import "WebDAVProviderData.h"
 
 @interface DavKitTests : XCTestCase
 
@@ -19,9 +20,10 @@
 
 static WebDAVStorageProvider* getSession() {
     WebDAVSessionConfiguration* config = [[WebDAVSessionConfiguration alloc] init];
-    config.host = [NSURL URLWithString:@"https://192.168.1.18:8080"];
-    config.username = @"mark";
-    config.password = @"ladder";
+    //config.host = [NSURL URLWithString:@"https://demo.nextcloud.com/admin/remote.php/webdav"]; //
+    config.host = [NSURL URLWithString:@"https://192.168.20.185:8080"];
+    config.username = @"admin";
+    config.password = @"admin";
     config.allowUntrustedCertificate = YES;
     
     WebDAVStorageProvider.sharedInstance.unitTestSessionConfiguration = config;
@@ -33,7 +35,10 @@ static WebDAVStorageProvider* getSession() {
     WebDAVStorageProvider* provider = getSession();
 
     [provider list:nil viewController:nil completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error) {
-        NSLog(@"%@ - %@", items, error);
+        //NSLog(@"%@ - %@", items, error);
+        for(StorageBrowserItem* sbi in items) {
+            NSLog(@"[%@]", sbi.providerData);
+        }
         self.done = YES;
     }];
     
@@ -93,6 +98,36 @@ static WebDAVStorageProvider* getSession() {
                   }];
               }
           }];
+    
+    [self waitUntilDone];
+}
+
+- (void)testReadFromNextCloud {
+    WebDAVStorageProvider* provider = getSession();
+    
+    WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
+    pd.href = @"https://demo.nextcloud.com/admin/remote.php/webdav/Nextcloud%20Manual.pdf";
+    pd.sessionConfiguration = provider.unitTestSessionConfiguration;
+    
+    [provider readWithProviderData:pd viewController:nil completion:^(NSData *data, NSError *error) {
+        NSLog(@"Read: %lu bytes - Error: %@",(unsigned long)data.length, error);
+        self.done = YES;
+    }];
+    
+    [self waitUntilDone];
+}
+
+- (void)testReadFromNextCloudRelative {
+    WebDAVStorageProvider* provider = getSession();
+    
+    WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
+    pd.href = @"Nextcloud Manual.pdf";
+    pd.sessionConfiguration = provider.unitTestSessionConfiguration;
+    
+    [provider readWithProviderData:pd viewController:nil completion:^(NSData *data, NSError *error) {
+        NSLog(@"Read: %lu bytes - Error: %@",(unsigned long)data.length, error);
+        self.done = YES;
+    }];
     
     [self waitUntilDone];
 }

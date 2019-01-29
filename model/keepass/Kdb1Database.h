@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdb1Database : NSObject<AbstractDatabaseFormatAdaptor>
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate;
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString *)fileExtension;
 
 - (StrongboxDatabase *)create:(nullable NSString *)password keyFileDigest:(nullable NSData *)keyFileDigest;

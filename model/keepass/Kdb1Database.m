@@ -33,8 +33,8 @@ static const BOOL kLogVerbose = NO;
     return kKeePass1;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return [KdbSerialization isAValidSafe:candidate];
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    return [KdbSerialization isAValidSafe:candidate error:error];
 }
 
 - (void)addKeePassDefaultRootGroup:(Node*)rootGroup {

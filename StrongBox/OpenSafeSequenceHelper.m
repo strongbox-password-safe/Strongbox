@@ -87,15 +87,13 @@ typedef void(^CompletionBlock)(Model* model);
 
 - (void)beginSequence {
     if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
-        BOOL biometricPossible = !Settings.sharedInstance.disallowAllBiometricId && self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
+        BOOL biometricPossible = self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
+        BOOL biometricAllowed = !Settings.sharedInstance.disallowAllBiometricId;
         
-        // Show biometric if possible... unless BOTH Bio & PIN are configured but PIN has been disabled, then fall back to full master credentials
-        if(biometricPossible && !(self.safe.conveniencePin != nil && Settings.sharedInstance.disallowAllPinCodeOpens)) {
+        if(biometricPossible && biometricAllowed) {
             [self showBiometricAuthentication];
         }
-        // Only show PIN code now if it is enabled exclusively (i.e. not also with Touch ID) because if for some
-        // other reason biometric is disabled we want to fallback to master credentials
-        else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil && !self.safe.isTouchIdEnabled) {
+        else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
             [self promptForConveniencePin];
         }
         else {
@@ -142,7 +140,12 @@ typedef void(^CompletionBlock)(Model* model);
 
                     if (self.safe.failedPinAttempts >= maxFailedPinAttempts) {
                         self.safe.failedPinAttempts = 0;
+                        self.safe.isTouchIdEnabled = NO;
                         self.safe.conveniencePin = nil;
+                        self.safe.isEnrolledForConvenience = NO;
+                        self.safe.convenienceMasterPassword = nil;
+                        self.safe.convenenienceKeyFileDigest = nil;
+                        
                         [SafesList.sharedInstance update:self.safe];
 
                         [Alerts warn:self.viewController
@@ -627,49 +630,29 @@ typedef void(^CompletionBlock)(Model* model);
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
-                PinEntryController *vc2 = [[PinEntryController alloc] init];
-                vc2.info = @"Please Confirm Your New Convenience PIN";
-                vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
-                    [self.viewController dismissViewControllerAnimated:YES completion:^{
-                        if(response2 == kOk) {
-                            if ([pin isEqualToString:confirmPin]) {
-                                if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
-                                    self.safe.conveniencePin = pin;
-                                    self.safe.isEnrolledForConvenience = YES;
-                                    self.safe.convenienceMasterPassword = openedSafe.masterPassword;
-                                    self.safe.convenenienceKeyFileDigest = openedSafe.keyFileDigest;
-                                    self.safe.hasBeenPromptedForConvenience = YES;
-                                        
-                                    [SafesList.sharedInstance update:self.safe];
-                                    
-                                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-                                }
-                                else {
-                                    [Alerts warn:self.viewController title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please configure in the Safe Settings" completion:^{
-                                        [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-                                    }];
-                                }
-                            }
-                            else {
-                                [Alerts warn:self.viewController title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Safe Settings." completion:^{
-                                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-                                }];
-                            }
-                        }
-                        else {
-                            [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-                        }
+                if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
+                    self.safe.conveniencePin = pin;
+                    self.safe.isEnrolledForConvenience = YES;
+                    self.safe.convenienceMasterPassword = openedSafe.masterPassword;
+                    self.safe.convenenienceKeyFileDigest = openedSafe.keyFileDigest;
+                    self.safe.hasBeenPromptedForConvenience = YES;
+                    
+                    [SafesList.sharedInstance update:self.safe];
+                    
+                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                }
+                else {
+                    [Alerts warn:self.viewController title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please configure in the Safe Settings" completion:^{
+                        [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                     }];
-                };
-                
-                [self.viewController presentViewController:vc2 animated:YES completion:nil];
+                }
             }
             else {
                 [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
             }
         }];
     };
-    
+
     [self.viewController presentViewController:vc1 animated:YES completion:nil];
 }
 

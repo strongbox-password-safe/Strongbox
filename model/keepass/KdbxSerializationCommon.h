@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KdbxSerializationCommon : NSObject
 
-BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion);
+BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error);
 
 KeepassFileHeader getKeePassFileHeader(NSData* data);
 KeepassFileHeader getNewFileHeader(NSString* version);

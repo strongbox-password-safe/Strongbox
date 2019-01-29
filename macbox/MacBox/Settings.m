@@ -16,6 +16,7 @@
 #define kWarnedAboutTouchId @"warnedAboutTouchId"
 #define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
 #define kAlwaysShowPassword @"alwaysShowPassword"
+#define kUiDoNotSortKeePassNodesInBrowseView @"uiDoNotSortKeePassNodesInBrowseView"
 
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kAutoSave = @"autoSave";
@@ -197,6 +198,14 @@ static NSString* const kAutoSave = @"autoSave";
 
 -(void)setAutoSave:(BOOL)autoSave {
     [self setBool:kAutoSave value:autoSave];
+}
+
+- (BOOL)uiDoNotSortKeePassNodesInBrowseView {
+    return [self getBool:kUiDoNotSortKeePassNodesInBrowseView];
+}
+
+- (void)setUiDoNotSortKeePassNodesInBrowseView:(BOOL)uiDoNotSortKeePassNodesInBrowseView {
+    [self setBool:kUiDoNotSortKeePassNodesInBrowseView value:uiDoNotSortKeePassNodesInBrowseView];
 }
 
 @end

@@ -14,7 +14,7 @@ typedef enum {
 
 @interface DAVResponseItem : NSObject {
   @private
-	NSString *href;
+	NSURL *href;
 	NSDate *modificationDate;
 	long long contentLength;
 	NSString *contentType;
@@ -22,7 +22,7 @@ typedef enum {
 	DAVResourceType resourceType;
 }
 
-@property (copy) NSString *href;
+@property (copy) NSURL *href;
 @property (strong) NSDate *modificationDate;
 @property (assign) long long contentLength;
 @property (strong) NSString *contentType;

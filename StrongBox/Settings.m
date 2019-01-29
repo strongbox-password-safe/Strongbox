@@ -43,6 +43,7 @@ static NSString* const kAppLockDelay = @"appLockDelay";
 static NSString* const kHideTotp = @"hideTotp";
 static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
 static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
+static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
 
 @implementation Settings
 
@@ -613,6 +614,15 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setHideTotpInAutoFill:(BOOL)hideTotpInAutoFill {
     [[self getUserDefaults] setBool:hideTotpInAutoFill forKey:kHideTotpInAutoFill];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)uiDoNotSortKeePassNodesInBrowseView {
+    return [[self getUserDefaults] boolForKey:kUiDoNotSortKeePassNodesInBrowseView];
+}
+
+- (void)setUiDoNotSortKeePassNodesInBrowseView:(BOOL)uiDoNotSortKeePassNodesInBrowseView {
+    [[self getUserDefaults] setBool:uiDoNotSortKeePassNodesInBrowseView forKey:kUiDoNotSortKeePassNodesInBrowseView];
     [[self getUserDefaults] synchronize];
 }
 

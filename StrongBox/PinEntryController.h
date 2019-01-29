@@ -22,6 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* warning;
 @property BOOL showFallbackOption;
 
+@property (weak, nonatomic) IBOutlet UIButton *buttonOK;
+@property (weak, nonatomic) IBOutlet UIButton *buttonMasterFallback;
+
 @end
 
 NS_ASSUME_NONNULL_END

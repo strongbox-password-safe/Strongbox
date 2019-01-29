@@ -413,7 +413,7 @@ static NSString* getAutoFillFilePath(SafeMetaData* safeMetaData) {
                 
                 NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
                 
-                if([DatabaseModel isAValidSafe:data]) {
+                if([DatabaseModel isAValidSafe:data error:&error]) {
                     NSLog(@"New File:%@ is a valid safe", item.name);
                     [newSafes addObject:item];
                 }

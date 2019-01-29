@@ -17,21 +17,6 @@
 
 @implementation Node
 
-static NSComparator compareNodes = ^(id obj1, id obj2)
-{
-    Node* n1 = (Node*)obj1;
-    Node* n2 = (Node*)obj2;
-    
-    if(n1.isGroup && !n2.isGroup) {
-        return NSOrderedAscending;
-    }
-    else if(!n1.isGroup && n2.isGroup) {
-        return NSOrderedDescending;
-    }
-
-    return [Utils finderStringCompare:n1.title string2:n2.title];
-};
-
 + (instancetype)rootGroup {
     return [[Node alloc] initAsRoot:nil];
 }
@@ -59,6 +44,11 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     }
     
     return [self initWithParent:parent title:title isGroup:YES uuid:uuid fields:nil childRecordsAllowed:YES];
+}
+
+- (instancetype)initAsRecord:(NSString *_Nonnull)title
+                      parent:(Node* _Nonnull)parent {
+    return [self initWithParent:parent title:title isGroup:NO uuid:nil fields:nil childRecordsAllowed:NO];
 }
 
 - (instancetype)initAsRecord:(NSString *_Nonnull)title
@@ -122,13 +112,7 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     
     _title = title;
     
-    [self.parent sortChildren];
-    
     return YES;
-}
-
-- (void)sortChildren {
-    [_mutableChildren sortUsingComparator:compareNodes];
 }
 
 - (BOOL)validateAddChild:(Node* _Nonnull)node {
@@ -156,13 +140,8 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
         return NO;
     }
 
-    NSUInteger newIndex = [_mutableChildren indexOfObject:node
-                                 inSortedRange:(NSRange){0, [_mutableChildren count]}
-                                       options:NSBinarySearchingInsertionIndex
-                               usingComparator:compareNodes];
+    [_mutableChildren addObject:node];
     
-    [_mutableChildren insertObject:node atIndex:newIndex];
-
     return YES;
 }
 
@@ -186,7 +165,6 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
     _parent = parent;
     
     if([parent addChild:self]) {
-        [parent sortChildren];
         return YES;
     }
     
@@ -362,5 +340,21 @@ static NSComparator compareNodes = ^(id obj1, id obj2)
                 self.title, self.fields.username, self.fields.password, self.fields.url, (unsigned long)self.fields.attachments.count];
     }
 }
+
+NSComparator finderStyleNodeComparator = ^(id obj1, id obj2)
+{
+    Node* n1 = (Node*)obj1;
+    Node* n2 = (Node*)obj2;
+    
+    if(n1.isGroup && !n2.isGroup) {
+        return NSOrderedAscending;
+    }
+    else if(!n1.isGroup && n2.isGroup) {
+        return NSOrderedDescending;
+    }
+    
+    return [Utils finderStringCompare:n1.title string2:n2.title];
+};
+
 
 @end

@@ -22,7 +22,7 @@
 
 NSString *const DAVClientErrorDomain = @"com.MattRajca.DAVKit.error";
 
-#define DEFAULT_TIMEOUT 8 // seconds
+#define DEFAULT_TIMEOUT 30 // seconds
 
 @synthesize path = _path;
 @synthesize delegate = _delegate;
@@ -38,8 +38,14 @@ NSString *const DAVClientErrorDomain = @"com.MattRajca.DAVKit.error";
 
 - (NSURL *)concatenatedURLWithPath:(NSString *)aPath {
 	NSParameterAssert(aPath != nil);
-	
-	return [self.rootURL URLByAppendingPathComponent:aPath];
+
+    NSURL* testHref = [NSURL URLWithString:aPath];
+    if([testHref scheme] == nil) {
+        testHref = [self.rootURL URLByAppendingPathComponent:aPath];
+    }
+    
+    //NSLog(@"Determined URL: [%@]", testHref.absoluteString);
+    return testHref;
 }
 
 - (BOOL)isConcurrent {
@@ -137,24 +143,25 @@ NSString *const DAVClientErrorDomain = @"com.MattRajca.DAVKit.error";
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-	if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-		if (self.allowUntrustedCertificate)
-			[challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]
-				 forAuthenticationChallenge:challenge];
-		
-		[challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
-	} else {
-		if ([challenge previousFailureCount] == 0) {
-			NSURLCredential *credential = [NSURLCredential credentialWithUser:self.credentials.username
-																	 password:self.credentials.password
-																  persistence:NSURLCredentialPersistenceNone];
-			
-			[[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
-		} else {
-			// Wrong login/password
-			[[challenge sender] cancelAuthenticationChallenge:challenge];
-		}
-	}
+    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+        if (self.allowUntrustedCertificate) {
+            [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]
+                 forAuthenticationChallenge:challenge];
+        }
+        
+        [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+    } else {
+        if ([challenge previousFailureCount] == 0) {
+            NSURLCredential *credential = [NSURLCredential credentialWithUser:self.credentials.username
+                                                                     password:self.credentials.password
+                                                                  persistence:NSURLCredentialPersistenceNone];
+            
+            [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+        } else {
+            // Wrong login/password
+            [[challenge sender] cancelAuthenticationChallenge:challenge];
+        }
+    }
 }
 
 - (void)didFail:(NSError *)error {
@@ -187,7 +194,6 @@ NSString *const DAVClientErrorDomain = @"com.MattRajca.DAVKit.error";
 }
 
 @end
-
 
 @implementation DAVRequest (Private)
 

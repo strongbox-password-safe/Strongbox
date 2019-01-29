@@ -40,7 +40,8 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
 - (instancetype)initWithData:(NSData*)data document:(Document*)document {
     if (self = [super init]) {
-        if([DatabaseModel isAValidSafe:data]) {
+        NSError* error;
+        if([DatabaseModel isAValidSafe:data error:&error]) {
             self.lockedSafeInfo = [[LockedSafeInfo alloc] initWithEncryptedData:data selectedItem:nil];
             _document = document;
             return self;
@@ -201,7 +202,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [[self.document.undoManager prepareWithInvocationTarget:self] setItemTitle:item title:old modified:oldModified];
         [self.document.undoManager setActionName:@"Title Change"];
 
-        [self notifyModelChanged];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.onItemTitleChanged(item);
+        });
 
         return YES;
     }
@@ -222,8 +225,10 @@ static NSString* kDefaultNewTitle = @"Untitled";
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemEmail:item email:old modified:oldModified];
     [self.document.undoManager setActionName:@"Email Change"];
-    
-    [self notifyModelChanged];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onItemEmailChanged(item);
+    });
 }
 
 - (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username modified:(NSDate*)modified {
@@ -240,7 +245,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemUsername:item username:old modified:oldModified];
     [self.document.undoManager setActionName:@"Username Change"];
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onItemUsernameChanged(item);
+    });
 }
 
 - (void)setItemUrl:(Node*_Nonnull)item url:(NSString*_Nonnull)url modified:(NSDate*)modified {
@@ -257,7 +264,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemUrl:item url:old modified:oldModified];
     [self.document.undoManager setActionName:@"URL Change"];
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onItemUrlChanged(item);
+    });
 }
 
 - (void)setItemPassword:(Node*_Nonnull)item password:(NSString*_Nonnull)password modified:(NSDate*)modified {
@@ -274,7 +283,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemPassword:item password:old modified:oldModified];
     [self.document.undoManager setActionName:@"Password Change"];
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onItemPasswordChanged(item);
+    });
 }
 
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes modified:(NSDate*)modified {
@@ -291,7 +302,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemNotes:item notes:old modified:oldModified];
     [self.document.undoManager setActionName:@"Notes Change"];
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onItemNotesChanged(item);
+    });
 }
 
 - (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex {
@@ -311,7 +324,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
     [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
 
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onAttachmentsChanged(item);
+    });
 }
 
 - (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment {
@@ -350,7 +365,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [self.document.undoManager setActionName:@"Add Attachment"];
     }
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onAttachmentsChanged(item);
+    });
 }
 
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value {
@@ -371,7 +388,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [self.document.undoManager setActionName:@"Add Custom Field"];
     }
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onCustomFieldsChanged(item);
+    });
 }
 
 - (void)removeCustomField:(Node *)item key:(NSString *)key {
@@ -389,10 +408,12 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [self.document.undoManager setActionName:@"Remove Custom Field"];
     }
     
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onCustomFieldsChanged(item);
+    });
 }
 
-- (Node*)addNewRecord:(Node *_Nonnull)parentGroup {
+- (BOOL)addNewRecord:(Node *_Nonnull)parentGroup {
     AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
     
     // Title
@@ -440,13 +461,15 @@ static NSString* kDefaultNewTitle = @"Untitled";
     record.fields.modified = date;
     
     if(![parentGroup validateAddChild:record]) {
-        return nil;
+        return NO;
     }
     
-    return [self addItem:record parent:parentGroup];
+    [self addItem:record parent:parentGroup];
+    
+    return YES;
 }
 
-- (Node*)addNewGroup:(Node *_Nonnull)parentGroup {
+- (void)addNewGroup:(Node *_Nonnull)parentGroup {
     NSString *newGroupName = kDefaultNewTitle;
     
     NSInteger i = 0;
@@ -459,10 +482,10 @@ static NSString* kDefaultNewTitle = @"Untitled";
         newGroupName = [NSString stringWithFormat:@"%@ %ld", kDefaultNewTitle, i];
     }while (!success);
     
-    return [self addItem:newGroup parent:parentGroup];
+    [self addItem:newGroup parent:parentGroup];
 }
 
-- (Node*)addItem:(Node*)item parent:(Node*)parent {
+- (void)addItem:(Node*)item parent:(Node*)parent {
     [parent addChild:item];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
@@ -470,8 +493,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [self.document.undoManager setActionName:@"Add Item"];
     }
     
-    [self notifyModelChanged];
-    return item;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onNewItemAdded(item);
+    });
 }
 
 - (void)deleteItem:(Node *_Nonnull)child {
@@ -482,7 +506,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [self.document.undoManager setActionName:@"Delete Item"];
     }
 
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onDeleteItem(child);
+    });
 }
 
 - (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
@@ -497,7 +523,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
     
     BOOL ret = [node changeParent:parent];
 
-    [self notifyModelChanged];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onChangeParent(node);
+    });
     
     return ret;
 }
@@ -545,12 +573,6 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
 - (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
     return [node validateChangeParent:parent];
-}
-
-- (void)notifyModelChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.onModelChanged();
-    });
 }
 
 NSString* getSmartFillTitle() {

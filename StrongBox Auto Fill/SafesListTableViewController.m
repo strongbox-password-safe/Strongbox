@@ -205,7 +205,7 @@
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
                                                           }
-                                                     [self refreshSafes]; // Duress may have removed one
+                                                          [self refreshSafes]; // Duress may have removed one
                                                       }];
 }
 

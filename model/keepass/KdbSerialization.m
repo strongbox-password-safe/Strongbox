@@ -48,7 +48,7 @@ static const BOOL kLogVerbose = NO;
 
 @implementation KdbSerialization
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
     if(candidate.length < SIZE_OF_KDB_HEADER) {
         return NO;
     }
@@ -60,6 +60,9 @@ static const BOOL kLogVerbose = NO;
         header->signature1[2] != 0xA2 ||
         header->signature1[3] != 0x9A) {
         //NSLog(@"No Keepass magic");
+        if(error) {
+            *error = [Utils createNSError:@"No Keepass magic" errorCode:-1];
+        }
         return NO;
     }
     
@@ -67,6 +70,11 @@ static const BOOL kLogVerbose = NO;
         header->signature2[1] != 0xFB ||
         header->signature2[2] != 0x4B ||
         header->signature2[3] != 0xB5) {
+
+        if(error) {
+            *error = [Utils createNSError:@"No Keepass magic (2)" errorCode:-1];
+        }
+
         //NSLog(@"No Keepass magic 2");
         return NO;
     }

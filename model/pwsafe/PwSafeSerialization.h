@@ -38,7 +38,7 @@ typedef struct _FieldHeader {
 
 @interface PwSafeSerialization : NSObject
 
-+ (BOOL)isAValidSafe:(NSData *)candidate;
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (PasswordSafe3Header)getHeader:(NSData*)data;
 + (NSInteger)getKeyStretchIterations:(NSData*)data;
 + (NSInteger)getNumberOfBlocks:(NSData*)candidate;

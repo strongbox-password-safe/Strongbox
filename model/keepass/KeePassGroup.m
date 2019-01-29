@@ -97,19 +97,19 @@
 
     // To Try make comparison of XML easier
     
-    NSArray<KeePassGroup*>* sortedByName = [self.groups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        return [((KeePassGroup*)obj1).uuid.uuid.UUIDString compare:((KeePassGroup*)obj2).uuid.uuid.UUIDString];
-    }];
+//    NSArray<KeePassGroup*>* sortedByName = [self.groups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+//        return [((KeePassGroup*)obj1).uuid.uuid.UUIDString compare:((KeePassGroup*)obj2).uuid.uuid.UUIDString];
+//    }];
     
-    for (KeePassGroup *group in sortedByName) {
+    for (KeePassGroup *group in self.groups) {
         [ret.children addObject:[group generateXmlTree]];
     }
     
-    NSArray<Entry*>* entriesSortedByName = [self.entries sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        return [((Entry*)obj1).uuid.uuid.UUIDString compare:((Entry*)obj2).uuid.uuid.UUIDString];
-    }];
+//    NSArray<Entry*>* entriesSortedByName = [self.entries sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+//        return [((Entry*)obj1).uuid.uuid.UUIDString compare:((Entry*)obj2).uuid.uuid.UUIDString];
+//    }];
     
-    for (Entry *entry in entriesSortedByName) {
+    for (Entry *entry in self.entries) {
         [ret.children addObject:[entry generateXmlTree]];
     }
     

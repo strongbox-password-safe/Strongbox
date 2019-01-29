@@ -51,7 +51,7 @@
     [self removeCopyDiagnosticDumpItem];
     
     [self removeShowSafesMetaDataItem];
-    //BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
+    //    BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
     
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProductsAndMessageForUpgrade];

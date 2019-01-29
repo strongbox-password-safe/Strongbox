@@ -134,8 +134,13 @@ viewController:(UIViewController *)viewController
             configuration:(WebDAVSessionConfiguration*)configuration
                completion:(void (^)(SafeMetaData *, NSError *))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
-    NSString *dir = getPathFromParentFolderObject(parentFolder);
-    NSString *path = [NSString pathWithComponents:@[dir, desiredFilename]];
+    
+    //NSString *dir = getPathFromParentFolderObject(parentFolder);
+    //NSString *path = [NSString pathWithComponents:@[dir, desiredFilename]];
+    
+    WebDAVProviderData* providerData = (WebDAVProviderData*)parentFolder;
+    NSString* root = providerData ? (providerData.href.length ? providerData.href : @"/") : @"/";
+    NSString* path = [[NSURL URLWithString:root] URLByAppendingPathComponent:desiredFilename].absoluteString;
     
     DAVPutRequest *request = [[DAVPutRequest alloc] initWithPath:path];
     request.data = data;
@@ -162,11 +167,11 @@ viewController:(UIViewController *)viewController
     [session enqueueRequest:request];
 }
 
-static NSString *getPathFromParentFolderObject(NSObject *parentFolder) {
-    WebDAVProviderData* providerData = (WebDAVProviderData*)parentFolder;
-    NSString* path = providerData ? (providerData.href.length ? providerData.href : @"/") : @"/";
-    return path;
-}
+//static NSString *getPathFromParentFolderObject(NSObject *parentFolder) {
+//    WebDAVProviderData* providerData = (WebDAVProviderData*)parentFolder;
+//    NSString* path = providerData ? (providerData.href.length ? providerData.href : @"/") : @"/";
+//    return path;
+//}
 
 - (void)list:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
@@ -204,49 +209,51 @@ viewController:(UIViewController *)viewController
            parentFolder:(NSObject*)parentFolder
           configuration:(WebDAVSessionConfiguration*)configuration
              completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
-        NSString *path = getPathFromParentFolderObject(parentFolder);
-        DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
-    
-        listingRequest.allowUntrustedCertificate = YES;
-        listingRequest.delegate = self;
-    
-        listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
-            if(error) {
-                completion(NO, nil, error);
-                return;
-            }
-            else {
-                NSArray<DAVResponseItem*>* files = result;
-                
-                NSURL *parentUrl = [NSURL URLWithString:path relativeToURL:configuration.host];
-                files = [files filter:^BOOL(DAVResponseItem * _Nonnull obj) {
-                    NSURL *thisUrl = [NSURL URLWithString:obj.href relativeToURL:configuration.host];
+    WebDAVProviderData* providerData = (WebDAVProviderData*)parentFolder;
+    NSString* path = providerData ? (providerData.href.length ? providerData.href : @"/") : @"/";
+    DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
 
-                    return ![parentUrl.path isEqualToString:thisUrl.path]; // Filter out back link to ourselves
-                }];
-                
-                NSArray<StorageBrowserItem*>* browserItems = [files map:^id _Nonnull(DAVResponseItem * _Nonnull obj, NSUInteger idx) {
-                    StorageBrowserItem* sbi = [[StorageBrowserItem alloc] init];
-                    sbi.name = [obj.href lastPathComponent];
-                    sbi.folder = obj.resourceType == DAVResourceTypeCollection;
-                    sbi.providerData = makeProviderData(obj.href, configuration);
-                
-                    return sbi;
-                }];
-                
-                
-                completion(NO, browserItems, nil);
-            }
-        };
-
+    listingRequest.delegate = self;
+    listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:@"Listing..."];
+            [SVProgressHUD dismiss];
         });
-    
-        [session enqueueRequest:listingRequest];
+        if(error) {
+            completion(NO, nil, error);
+            return;
+        }
+        else {
+            NSArray<DAVResponseItem*>* files = result;
+            
+
+            NSURL *parentUrl = [NSURL URLWithString:path];
+            if([parentUrl scheme] == nil) {
+                parentUrl = [configuration.host URLByAppendingPathComponent:path];
+            }
+
+            files = [files filter:^BOOL(DAVResponseItem * _Nonnull obj) {
+                return obj.href && ![parentUrl.absoluteString isEqualToString:obj.href.absoluteString];
+            }];
+            
+            NSArray<StorageBrowserItem*>* browserItems = [files map:^id _Nonnull(DAVResponseItem * _Nonnull obj, NSUInteger idx) {
+                StorageBrowserItem* sbi = [[StorageBrowserItem alloc] init];
+                sbi.name = [[obj.href lastPathComponent] stringByRemovingPercentEncoding];
+                sbi.folder = obj.resourceType == DAVResourceTypeCollection;
+                sbi.providerData = makeProviderData(obj.href.absoluteString, configuration);
+            
+                return sbi;
+            }];
+            
+            
+            completion(NO, browserItems, nil);
+        }
+    };
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:@"Listing..."];
+    });
+
+    [session enqueueRequest:listingRequest];
 }
         
 
@@ -345,7 +352,7 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     
     return [[SafeMetaData alloc] initWithNickName:nickName
                                   storageProvider:self.storageId
-                                         fileName:[foo.href lastPathComponent]
+                                         fileName:[[foo.href lastPathComponent] stringByRemovingPercentEncoding]
                                    fileIdentifier:json];
 }
 

@@ -98,6 +98,7 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property BOOL hideTotp;
 @property BOOL hideTotpInBrowse;
 @property BOOL hideTotpInAutoFill;
+@property BOOL uiDoNotSortKeePassNodesInBrowseView;
 
 NS_ASSUME_NONNULL_END
 

@@ -216,7 +216,8 @@
 
 - (void)readForValidationDone:(StorageBrowserItem *)file data:(NSData *)data error:(NSError *)error {
     if (error == nil) {
-        if ([DatabaseModel isAValidSafe:data]) {
+        NSError* err;
+        if ([DatabaseModel isAValidSafe:data error:&err]) {
             AddSafeAlertController *controller = [[AddSafeAlertController alloc] init];
 
             [controller addExisting:self
@@ -233,9 +234,9 @@
                          }];
         }
         else {
-            [Alerts warn:self
-                   title:@"Invalid Safe File"
-                 message:@"This is not a valid safe!"];
+            [Alerts error:self
+                    title:@"Invalid Safe File"
+                    error:err];
         }
     }
     else {

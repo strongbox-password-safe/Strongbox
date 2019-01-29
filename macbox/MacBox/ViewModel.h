@@ -41,8 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
 
-- (Node*)addNewRecord:(Node *)parentGroup;
-- (Node*)addNewGroup:(Node *)parentGroup;
+- (BOOL)addNewRecord:(Node *)parentGroup;
+- (void)addNewGroup:(Node *)parentGroup;
 
 - (void)deleteItem:(Node *)child;
 
@@ -78,7 +78,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-@property dispatch_block_t onModelChanged;
+@property (nonatomic, copy) void (^onNewItemAdded)(Node* node);
+@property (nonatomic, copy) void (^onItemTitleChanged)(Node* node);
+@property (nonatomic, copy) void (^onItemUsernameChanged)(Node* node);
+@property (nonatomic, copy) void (^onItemEmailChanged)(Node* node);
+@property (nonatomic, copy) void (^onItemUrlChanged)(Node* node);
+@property (nonatomic, copy) void (^onItemPasswordChanged)(Node* node);
+@property (nonatomic, copy) void (^onItemNotesChanged)(Node* node);
+@property (nonatomic, copy) void (^onAttachmentsChanged)(Node* node);
+@property (nonatomic, copy) void (^onCustomFieldsChanged)(Node* node);
+@property (nonatomic, copy) void (^onDeleteItem)(Node* node);
+@property (nonatomic, copy) void (^onChangeParent)(Node* node);
 
 @end
 

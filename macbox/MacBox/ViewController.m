@@ -110,7 +110,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
     }
 
     NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
-    NSLog(@"Loaded Font: %@", ft);
+    //NSLog(@"Loaded Font: %@", ft);
     if(ft) {
         self.textFieldPw.font = ft;
         self.textFieldHiddenPassword.font = ft;
@@ -168,21 +168,116 @@ static NSArray<NSImage*> *kKeePassIconSet;
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Basic MVC Setup
+
 -(void)setModel:(ViewModel *)model {
     _model = model;
-    model.onModelChanged = ^{
-        //NSLog(@"OnModelChanged...");
-        [self refreshOutlineAndDetailsPaneNoSelectionChange];
+    
+    model.onNewItemAdded = ^(Node * _Nonnull node) {
+        [self onNewItemAdded:node];
+    };
+    model.onItemTitleChanged = ^(Node * _Nonnull node) {
+        [self onItemTitleChanged:node];
+    };
+    model.onItemUsernameChanged = ^(Node * _Nonnull node) {
+        [self onItemUsernameChanged:node];
+    };
+    model.onItemEmailChanged = ^(Node * _Nonnull node) {
+        [self onItemEmailChanged:node];
+    };
+    model.onItemUrlChanged = ^(Node * _Nonnull node) {
+        [self onItemUrlChanged:node];
+    };
+    model.onItemPasswordChanged = ^(Node * _Nonnull node) {
+        [self onItemPasswordChanged:node];
+    };
+    model.onItemNotesChanged = ^(Node * _Nonnull node) {
+        [self onItemNotesChanged:node];
+    };
+    model.onAttachmentsChanged = ^(Node * _Nonnull node) {
+        [self onAttachmentsChanged:node];
+    };
+    model.onCustomFieldsChanged = ^(Node * _Nonnull node) {
+        [self onCustomFieldsChanged:node];
+    };
+    model.onDeleteItem = ^(Node * _Nonnull node) {
+        [self onDeleteItem:node];
+    };
+    model.onChangeParent = ^(Node * _Nonnull node) {
+        [self onChangeParent:node];
     };
     
-    //dispatch_async(dispatch_get_main_queue(), ^{
-        [self bindToModel];
-    //});
+    [self bindToModel];
 }
 
-//-(void)updateDocumentUrl {
-//    [self bindDetailsPane];
-//}
+- (void)onItemTitleChanged:(Node*)node {
+    [self.outlineView reloadItem:node];
+    if([self getCurrentSelectedItem] == node) {
+        self.textFieldSummaryTitle.stringValue = node.title;
+        self.textFieldTitle.stringValue = node.title;
+    }
+}
+
+- (void)onItemUsernameChanged:(Node*)node {
+    self.usernameAutoCompleteCache = self.model ? [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
+    [self.outlineView reloadItem:node];
+    
+    if([self getCurrentSelectedItem] == node) {
+        self.comboboxUsername.stringValue = node.fields.username;
+    }
+}
+
+- (void)onItemEmailChanged:(Node*)node {
+    self.emailAutoCompleteCache = self.model ? [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
+    
+    if([self getCurrentSelectedItem] == node) {
+        self.comboBoxEmail.stringValue = node.fields.email;
+    }
+}
+
+- (void)onItemUrlChanged:(Node*)node {
+    if([self getCurrentSelectedItem] == node) {
+        self.textFieldUrl.stringValue = node.fields.url;
+    }
+}
+
+- (void)onItemPasswordChanged:(Node*)node {
+    if([self getCurrentSelectedItem] == node) {
+        self.textFieldPw.stringValue = node.fields.password;
+    }
+}
+
+- (void)onItemNotesChanged:(Node*)node {
+    if([self getCurrentSelectedItem] == node) {
+        self.textViewNotes.string = node.fields.notes;
+    }
+}
+
+- (void)onAttachmentsChanged:(Node*)node {
+    if([self getCurrentSelectedItem] == node) {
+        self.attachmentsIconCache = nil; // TODO: what?
+        [self refreshAttachments:node];
+    }
+}
+
+- (void)onCustomFieldsChanged:(Node*)node {
+    if([self getCurrentSelectedItem] == node) {
+        [self refreshCustomFields:node];
+    }
+}
+
+- (void)onDeleteItem:(Node*)node {
+    [self.outlineView reloadData];
+    [self bindDetailsPane];
+}
+
+- (void)onChangeParent:(Node*)node {
+    [self.outlineView reloadData];
+    [self bindDetailsPane];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)biometricOpenIsAvailableForSafe {
     SafeMetaData* metaData = [self getSafeMetaData];
@@ -197,6 +292,8 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)bindToModel {
+    [self updateAutocompleteCaches];
+    
     if(self.model == nil) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:2];
         [self.outlineView reloadData];
@@ -264,8 +361,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
 - (void)bindDetailsPane {
     Node* it = [self getCurrentSelectedItem];
     
-    [self updateAutocompleteCaches];
-    
     if(!it) {
         [self.tabViewRightPane selectTabViewItemAtIndex:2];
         [self.tableViewSummary reloadData];
@@ -288,7 +383,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
         self.comboBoxEmail.stringValue = it.fields.email;
         self.textViewNotes.string = it.fields.notes;
         self.textFieldSummaryTitle.stringValue = it.title;
-
+        
         if([Settings sharedInstance].revealDetailsImmediately) {
             [self revealDetails];
         }
@@ -297,7 +392,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
         }
         
         [self refreshAttachments:it];
-        
         [self refreshCustomFields:it];
         
         self.showPassword = Settings.sharedInstance.alwaysShowPassword;
@@ -483,11 +577,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
         if(yesNo) {
             Node* node = [self getCurrentSelectedItem];
             [self.model removeItemAttachment:node atIndex:idx];
-            
-            self.attachmentsIconCache = nil;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self refreshAttachments:node];
-            });
         }
     }];
 }
@@ -511,11 +600,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
             NSString* filename = openPanel.URL.lastPathComponent;
             
             [self.model addItemAttachment:node attachment:[[UiAttachment alloc] initWithFilename:filename data:data]];
-            
-            self.attachmentsIconCache = nil;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self refreshAttachments:node];
-            });
         }
     }];
 }
@@ -589,7 +673,10 @@ static NSArray<NSImage*> *kKeePassIconSet;
         return @[];
     }
     
-    return [parentGroup.children filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+    BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.model.format == kPasswordSafe;
+    NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
+    
+    return [sorted filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [self isSafeItemMatchesSearchCriteria:evaluatedObject recurse:YES];
     }]];
 }
@@ -645,16 +732,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     if(item.isGroup && recurse) {
         for(Node* child in item.children) {
-            //if(child.isGroup) {
-                //if([[self getSafeItems:child] count] > 0) {
-                   // return YES;
-                //}
-            //}
-            //else {
-                if([self isSafeItemMatchesSearchCriteria:child recurse:YES]) {
-                    return YES;
-                }
-            //}
+            if([self isSafeItemMatchesSearchCriteria:child recurse:YES]) {
+                return YES;
+            }
         }
     }
     
@@ -1097,6 +1177,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)showOrHidePassword {
+    // TODO: This is pointless? could be part of the bug?
     Node* item = [self getCurrentSelectedItem];
     if(!item)
     {
@@ -1105,10 +1186,12 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     if(self.showPassword) {
         self.textFieldHiddenPassword.hidden = YES;
+        self.textFieldHiddenPassword.enabled = NO;
         self.textFieldPw.hidden = NO;
     }
     else {
         self.textFieldHiddenPassword.hidden = NO;
+        self.textFieldHiddenPassword.enabled = YES;
         self.textFieldPw.hidden = YES;
     }
 }
@@ -1351,8 +1434,6 @@ NSString* trimField(NSTextField* textField) {
     //NSLog(@"acceptDrop Move [%@] -> [%@]", sourceItem, destinationItem);
     
     if([self.model changeParent:destinationItem node:sourceItem]) {
-        [self.outlineView reloadData];
-        
         return YES;
     }
     
@@ -1363,43 +1444,25 @@ NSString* trimField(NSTextField* textField) {
     Node *item = [self getCurrentSelectedItem];
     Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
 
-    Node *newItem = [self.model addNewRecord:parent];
-    
-    if(!newItem) {
+    if(![self.model addNewRecord:parent]) {
         [Alerts info:@"You cannot create a new record here. It must be within an existing folder." window:self.view.window];
         return;
-    }
-    
-    self.searchField.stringValue = @""; // Clear any ongoing search...
-    
-    [self.outlineView reloadData];
-    
-    NSInteger row = [self findRowForItemExpandIfNecessary:newItem];
-    if(row < 0) {
-        NSLog(@"Could not find newly added item?");
-    }
-    else {
-        [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
-
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            self.showPassword = YES;
-            [self showOrHidePassword];
-            [self.view.window makeFirstResponder:self.textFieldTitle];
-        });
     }
 }
 
 - (IBAction)onCreateGroup:(id)sender {
     Node *item = [self getCurrentSelectedItem];
     Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
-
-    Node *newItem = [self.model addNewGroup:parent];
     
+    [self.model addNewGroup:parent];
+}
+
+- (void)onNewItemAdded:(Node*)node {
     self.searchField.stringValue = @""; // Clear any ongoing search...
     
     [self.outlineView reloadData];
     
-    NSInteger row = [self findRowForItemExpandIfNecessary:newItem];
+    NSInteger row = [self findRowForItemExpandIfNecessary:node];
     
     if(row < 0) {
         NSLog(@"Could not find newly added item?");
@@ -1408,9 +1471,21 @@ NSString* trimField(NSTextField* textField) {
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
-            if ([cellView.textField acceptsFirstResponder]) {
-                [cellView.window makeFirstResponder:cellView.textField];
+            if(!node.isGroup) {
+                [self revealDetails];
+                
+                self.showPassword = YES;
+                
+                [self showOrHidePassword];
+                if([self.textFieldTitle acceptsFirstResponder]) {
+                    [self.view.window makeFirstResponder:self.textFieldTitle];
+                }
+            }
+            else{
+                NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
+                if ([cellView.textField acceptsFirstResponder]) {
+                    [cellView.window makeFirstResponder:cellView.textField];
+                }
             }
         });
     }
@@ -1426,10 +1501,6 @@ NSString* trimField(NSTextField* textField) {
     [Alerts yesNo:@"Are you sure you want to delete this item?" window:self.view.window completion:^(BOOL yesNo) {
         if(yesNo) {
             [self.model deleteItem:item];
-            
-            [self.outlineView reloadData];
-            
-            [self bindDetailsPane];
         }
     }];
 }
@@ -1550,12 +1621,16 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onGenerate:(id)sender {
+    Node* item = [self getCurrentSelectedItem];
+    
+    [self.model setItemPassword:item password:[self.model generatePassword]];
+
     self.showPassword = YES;
     [self showOrHidePassword];
 
-    self.textFieldPw.stringValue = [self.model generatePassword];
-    
-    [self bindModelToSimpleUiFields];
+//    self.textFieldPw.stringValue = [];
+//
+//    [self bindModelToSimpleUiFields];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -1660,38 +1735,15 @@ NSString* trimField(NSTextField* textField) {
 
 - (void)onPreferencesChanged:(NSNotification*)notification {
     //NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
-    
-    [self refreshOutlineAndDetailsPaneNoSelectionChange];
-}
 
-- (void)refreshOutlineAndDetailsPaneNoSelectionChange {
-    //NSInteger selectedRow = [self.outlineView selectedRow];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         Node* currentSelection = [self getCurrentSelectedItem];
         
         [self.outlineView reloadData];
         
-        self.attachmentsIconCache = nil;
-        [self.attachmentsView reloadData];
-        [self.tableViewCustomFields reloadData];
-        
         [self selectItem:currentSelection];
     });
 }
-
-//- (void)reloadOutlineViewSingleChokePoint {
-//    // An abortive attempt to solve a very mysterious crash definitely related to the reloadData call on outline view...
-//    // Every update (update: not actually, some are tied too tightly to other updates to do this) should go through here
-//    // and we place them on the main queue, in case it's something to do
-//    // with multiple simultaneous updates or non main thread updates...
-//
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        NSIndexSet* rows = self.outlineView.selectedRowIndexes;
-//        [self.outlineView reloadData];
-//        [self.outlineView selectRowIndexes:rows byExtendingSelection:NO];
-//    });
-//}
 
 static NSComparator finderStringComparator = ^(id obj1, id obj2)
 {
@@ -1881,8 +1933,6 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     [self.model removeCustomField:item key:oldField.key];
     [self.model setCustomField:item key:key value:oldField.value];
-    
-    [self refreshCustomFields:item];
 }
 
 - (IBAction)onEndCustomFieldValueCellEditing:(id)sender {
@@ -1894,8 +1944,6 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     Node* item = [self getCurrentSelectedItem];
     
     [self.model setCustomField:item key:oldField.key value:value];
-    
-    [self refreshCustomFields:item];
 }
 
 - (IBAction)onRemoveCustomField:(id)sender {
@@ -1907,8 +1955,6 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
                 Node* item = [self getCurrentSelectedItem];
                 
                 [self.model removeCustomField:item key:field.key];
-                
-                [self refreshCustomFields:item];
             }
         }];
     }
@@ -1939,8 +1985,6 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             Node* item = [self getCurrentSelectedItem];
             
             [self.model setCustomField:item key:key value:value];
-            
-            [self refreshCustomFields:item];
         }
     }];
 }

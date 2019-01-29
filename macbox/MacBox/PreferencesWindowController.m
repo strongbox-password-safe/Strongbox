@@ -50,7 +50,7 @@
     [self.labelSamplePassword addGestureRecognizer:click];
 
     NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
-    NSLog(@"Loaded Font: %@", ft);
+    //NSLog(@"Loaded Font: %@", ft);
     if(ft) {
         self.labelSamplePassword.font = ft;
     }
@@ -62,6 +62,7 @@
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
     self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
+    self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
 }
 
 -(void) bindAutoFillToSettings {
@@ -207,6 +208,7 @@
     Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
     Settings.sharedInstance.alwaysShowUsernameInOutlineView = self.checkboxAlwaysShowUsernameInOutlineView.state == NSOnState;
     Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
+    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
     
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];

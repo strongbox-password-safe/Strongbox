@@ -10,8 +10,17 @@
 
 typedef enum {
     kBasic,
-    kXkcd,
+    kXkcd
 } PasswordGenerationAlgorithm;
+
+typedef enum {
+    kXcdGoogle,
+    kOriginal,
+    kBeale,
+    kEffLarge,
+    kEffShort,
+    kEffShortUniqueTriplet
+} WordList;
 
 @interface PasswordGenerationParameters : NSObject
 
@@ -27,5 +36,7 @@ typedef enum {
 @property (nonatomic) int maximumLength;
 
 @property (nonatomic) int xkcdWordCount;
+@property (nonatomic) NSString* wordSeparator;
+@property (nonatomic) WordList xKcdWordList;
 
 @end

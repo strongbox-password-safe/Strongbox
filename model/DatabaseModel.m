@@ -20,24 +20,41 @@
 
 @implementation DatabaseModel
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return  [PwSafeDatabase isAValidSafe:candidate] ||
-            [KeePassDatabase isAValidSafe:candidate] ||
-            [Kdbx4Database isAValidSafe:candidate] ||
-            [Kdb1Database isAValidSafe:candidate];
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    
+    NSError *pw, *k1, *k2, *k3;
+    
+    BOOL ret = [PwSafeDatabase isAValidSafe:candidate error:&pw] ||
+          [KeePassDatabase isAValidSafe:candidate error:&k1] ||
+          [Kdbx4Database isAValidSafe:candidate error:&k2] ||
+          [Kdb1Database isAValidSafe:candidate error:&k3];
+
+    if(error) {
+        NSString* errorSummary = @"Could not recognise this a valid safe:\n";
+        
+        errorSummary = [errorSummary stringByAppendingFormat:@"- Password Safe: %@\n", pw.localizedDescription];
+        errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass Classic: %@\n", k1.localizedDescription];
+        errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass Advanced: %@\n", k2.localizedDescription];
+        errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass 1: %@\n", k3.localizedDescription];
+        
+        *error = [Utils createNSError:errorSummary errorCode:-1];
+    }
+    
+    return ret;
 }
 
 + (NSString*)getLikelyFileExtension:(NSData *)candidate {
-    if([PwSafeDatabase isAValidSafe:candidate]) {
+    NSError* error;
+    if([PwSafeDatabase isAValidSafe:candidate error:&error]) {
         return [PwSafeDatabase fileExtension];
     }
-    else if ([KeePassDatabase isAValidSafe:candidate]) {
+    else if ([KeePassDatabase isAValidSafe:candidate error:&error]) {
         return [KeePassDatabase fileExtension];
     }
-    else if([Kdbx4Database isAValidSafe:candidate]) {
+    else if([Kdbx4Database isAValidSafe:candidate error:&error]) {
         return [Kdbx4Database fileExtension];
     }
-    else if([Kdb1Database isAValidSafe:candidate]) {
+    else if([Kdb1Database isAValidSafe:candidate error:&error]) {
         return [Kdb1Database fileExtension];
     }
     
@@ -95,16 +112,16 @@
                                           error:(NSError **)ppError {
 
     if(self = [super init]) {
-        if([PwSafeDatabase isAValidSafe:safeData]) {
+        if([PwSafeDatabase isAValidSafe:safeData error:ppError]) {
             self.adaptor = [[PwSafeDatabase alloc] init];
         }
-        else if([KeePassDatabase isAValidSafe:safeData]) {
+        else if([KeePassDatabase isAValidSafe:safeData error:ppError]) {
             self.adaptor = [[KeePassDatabase alloc] init];
         }
-        else if([Kdbx4Database isAValidSafe:safeData]) {
+        else if([Kdbx4Database isAValidSafe:safeData error:ppError]) {
             self.adaptor = [[Kdbx4Database alloc] init];
         }
-        else if([Kdb1Database isAValidSafe:safeData]) {
+        else if([Kdb1Database isAValidSafe:safeData error:ppError]) {
             self.adaptor = [[Kdb1Database alloc] init];
         }
         else {

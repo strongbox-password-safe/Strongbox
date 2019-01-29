@@ -23,7 +23,7 @@ typedef enum {
 
 @protocol AbstractDatabaseFormatAdaptor <NSObject>
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate;
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString *)fileExtension;
 
 - (StrongboxDatabase*)create:(nullable NSString *)password;

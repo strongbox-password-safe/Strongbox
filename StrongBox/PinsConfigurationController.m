@@ -165,45 +165,31 @@
 - (void)getNewPin:(BOOL)duressPin {
     PinEntryController *vc1 = [[PinEntryController alloc] init];
     vc1.info = duressPin ? @"Please Enter a new Duress PIN" : @"Please Enter a new PIN";
-    
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
-                PinEntryController *vc2 = [[PinEntryController alloc] init];
-                vc2.info = duressPin ? @"Please Confirm Your New Duress PIN" : @"Please Confirm Your New PIN";
-                vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
-                    [self dismissViewControllerAnimated:YES completion:^{
-                        if(response2 == kOk) {
-                            if ([pin isEqualToString:confirmPin]) {
-                                NSString* otherPin = duressPin ? self.viewModel.metadata.conveniencePin : self.viewModel.metadata.duressPin;
-                                
-                                if(!(otherPin != nil && [pin isEqualToString:otherPin])) {
-                                    if(duressPin) {
-                                        self.viewModel.metadata.duressPin = pin;
-                                    } else {
-                                        self.viewModel.metadata.conveniencePin = pin;
-                                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
-                                        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
-                                        self.viewModel.metadata.isEnrolledForConvenience = YES;
-                                    }
-                                    
-                                    [[SafesList sharedInstance] update:self.viewModel.metadata];
-                                    [self bindUiToModel];
-                                }
-                                else {
-                                    [Alerts warn:self title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please select another."];
-                                }
-                            }
-                            else {
-                                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. Please try again."];
-                            }
-                        }
-                    }];
-                };
+                NSString* otherPin = duressPin ? self.viewModel.metadata.conveniencePin : self.viewModel.metadata.duressPin;
                 
-                [self presentViewController:vc2 animated:YES completion:nil];
+                if(!(otherPin != nil && [pin isEqualToString:otherPin])) {
+                    if(duressPin) {
+                        self.viewModel.metadata.duressPin = pin;
+                    } else {
+                        self.viewModel.metadata.conveniencePin = pin;
+                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
+                        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
+                        self.viewModel.metadata.isEnrolledForConvenience = YES;
+                    }
+                    
+                    [[SafesList sharedInstance] update:self.viewModel.metadata];
+                    [self bindUiToModel];
+                }
+                else {
+                    [Alerts warn:self title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please select another."];
+                }
             }
-        }];
+            else {
+                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. Please try again."];
+            }}];
     };
     
     [self presentViewController:vc1 animated:YES completion:nil];

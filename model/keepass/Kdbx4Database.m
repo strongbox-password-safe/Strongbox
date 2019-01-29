@@ -42,8 +42,8 @@ static const BOOL kLogVerbose = NO;
     return kKeePass4;
 }
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MinorVersionNumber);
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MinorVersionNumber, error);
 }
 
 - (StrongboxDatabase *)create:(NSString *)password {

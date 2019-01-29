@@ -30,6 +30,8 @@
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
 @property (nonatomic) BOOL autoSave;
 
+@property BOOL uiDoNotSortKeePassNodesInBrowseView;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

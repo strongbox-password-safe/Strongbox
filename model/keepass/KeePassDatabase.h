@@ -11,7 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePassDatabase : NSObject<AbstractDatabaseFormatAdaptor>
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate;
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
+
 + (NSString *)fileExtension;
 
 - (StrongboxDatabase*)create:(nullable NSString *)password;

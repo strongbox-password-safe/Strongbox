@@ -54,8 +54,8 @@ static BOOL kLogVerbose = NO;
 
 @implementation KdbxSerialization
 
-+ (BOOL)isAValidSafe:(NSData *)candidate {
-    return keePass2SignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber);
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    return keePass2SignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber, error);
 }
 
 - (instancetype)init:(SerializationData*)serializationData {

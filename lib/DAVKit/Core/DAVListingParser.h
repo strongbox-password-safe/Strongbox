@@ -11,6 +11,7 @@
 
 @interface DAVListingParser : NSObject < NSXMLParserDelegate > {
   @private
+    NSURL* _rootUrl;
 	NSXMLParser *_parser;
 	NSMutableString *_currentString;
 	NSMutableArray *_items;
@@ -18,7 +19,7 @@
 	BOOL _inResponseType;
 }
 
-- (id)initWithData:(NSData *)data;
+- (id)initWithData:(NSData *)data rootUrl:(NSURL*)rootUrl;
 
 - (NSArray *)parse:(NSError **)error;
 

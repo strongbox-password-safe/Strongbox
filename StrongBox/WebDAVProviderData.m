@@ -26,4 +26,8 @@
     return pd;
 }
 
+-(NSString *)description {
+    return [NSString stringWithFormat:@"href: [%@]", self.href];
+}
+
 @end

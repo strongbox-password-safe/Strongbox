@@ -397,8 +397,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                                  self.viewModel.isUsingOfflineCache ? @" [Offline]" : @"",
                                  self.viewModel.isReadOnly ? @" [Read Only]" : @""];
 
-    self.items = [[NSMutableArray alloc] initWithArray:self.currentGroup.children];
-
+    NSMutableArray* unsorted = [[NSMutableArray alloc] initWithArray:self.currentGroup.children];
+    BOOL sortNodes = self.viewModel.database.format == kPasswordSafe || !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
+    if(sortNodes) {
+        [unsorted sortUsingComparator:finderStyleNodeComparator];
+    }
+    self.items = unsorted;
+    
     // Filter KeePass1 Backup Group if so configured...
     
     if(!Settings.sharedInstance.showKeePass1BackupGroup) {

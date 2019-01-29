@@ -13,4 +13,8 @@
 
 + (NSString *)generatePassword:(PasswordGenerationParameters*)parameters;
 
++ (NSString*)generateDicewareStylePassword:(NSString*)wordSeparator
+                                  wordList:(WordList)xKcdWordList
+                                 wordCount:(int)wordCount;
+
 @end
