@@ -36,6 +36,13 @@
 @property (nonnull, strong, nonatomic) NSArray *attachments;
 @property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
 @property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
+
+// MMcG: 31-Jan-2019 - Sometimes during new record creation or title editing we don't want to immediately conceal
+// details (with a selection change, selection change is though unavoidable because the outline view needs to be
+// reloaded and the selection/moved/maintained to a new row... unavoidable)
+
+@property BOOL suppressConcealDetailsOnSelectionUpdateNextTime;
+
 @end
 
 static NSImage* kFolderImage;
@@ -212,10 +219,14 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)onItemTitleChanged:(Node*)node {
-    [self.outlineView reloadItem:node];
-    if([self getCurrentSelectedItem] == node) {
-        self.textFieldSummaryTitle.stringValue = node.title;
-        self.textFieldTitle.stringValue = node.title;
+    Node* selectionToMaintain = [self getCurrentSelectedItem];
+    [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
+    NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
+    
+    if(row != -1) {
+        self.suppressConcealDetailsOnSelectionUpdateNextTime = YES;
+        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        // This selection change will lead to a full reload of the details pane via selectionDidChange
     }
 }
 
@@ -384,12 +395,13 @@ static NSArray<NSImage*> *kKeePassIconSet;
         self.textViewNotes.string = it.fields.notes;
         self.textFieldSummaryTitle.stringValue = it.title;
         
-        if([Settings sharedInstance].revealDetailsImmediately) {
+        if(self.suppressConcealDetailsOnSelectionUpdateNextTime || [Settings sharedInstance].revealDetailsImmediately) {
             [self revealDetails];
         }
         else {
             [self concealDetails];
         }
+        self.suppressConcealDetailsOnSelectionUpdateNextTime = NO; // Toggle off - back to normal selection change behaviour
         
         [self refreshAttachments:it];
         [self refreshCustomFields:it];
@@ -675,6 +687,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
     
     BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.model.format == kPasswordSafe;
     NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
+    NSLog(@"Sorting: %d-%d", sort, Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView);
     
     return [sorted filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [self isSafeItemMatchesSearchCriteria:evaluatedObject recurse:YES];
@@ -1155,8 +1168,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
         
         [self selectItem:currentSelection];
     }
-    
-    [self bindDetailsPane];
 }
 
 - (IBAction)onCheckboxRevealDetailsImmediately:(id)sender {
@@ -1272,6 +1283,8 @@ static NSArray<NSImage*> *kKeePassIconSet;
     if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
         return;
     }
+    
+    //NSLog(@"bindModelToSimpleUiFields");
     
     Node* item = [self getCurrentSelectedItem];
 
@@ -1468,12 +1481,11 @@ NSString* trimField(NSTextField* textField) {
         NSLog(@"Could not find newly added item?");
     }
     else {
+        self.suppressConcealDetailsOnSelectionUpdateNextTime = YES;
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if(!node.isGroup) {
-                [self revealDetails];
-                
                 self.showPassword = YES;
                 
                 [self showOrHidePassword];
@@ -1896,6 +1908,13 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (IBAction)onEndCustomFieldKeyCellEditing:(id)sender {
     NSInteger row = self.tableViewCustomFields.selectedRow;
+    
+    if(row == -1) {
+        NSLog(@"No edited Row Key?");
+        return;
+    }
+    //NSLog(@"Row: %ld", (long)row);
+
     NSTextField* textField = ((NSTextField*)sender);
     NSString* key = textField.stringValue;
     CustomField* oldField = self.customFields[row];
@@ -1937,6 +1956,13 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (IBAction)onEndCustomFieldValueCellEditing:(id)sender {
     NSInteger row = self.tableViewCustomFields.selectedRow;
+
+    if(row == -1) {
+        NSLog(@"No edited Row Value?");
+        return;
+    }
+    //NSLog(@"Row: %ld", (long)row);
+    
     NSTextField* textField = ((NSTextField*)sender);
     NSString* value = textField.stringValue;
     CustomField* oldField = self.customFields[row];
