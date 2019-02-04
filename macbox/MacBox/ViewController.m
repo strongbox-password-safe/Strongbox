@@ -42,6 +42,7 @@
 // reloaded and the selection/moved/maintained to a new row... unavoidable)
 
 @property BOOL suppressConcealDetailsOnSelectionUpdateNextTime;
+@property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *safeItemsCache;
 
 @end
 
@@ -219,6 +220,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)onItemTitleChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     Node* selectionToMaintain = [self getCurrentSelectedItem];
     [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
     NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
@@ -231,6 +233,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)onItemUsernameChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     self.usernameAutoCompleteCache = self.model ? [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
     [self.outlineView reloadItem:node];
     
@@ -240,6 +243,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)onItemEmailChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     self.emailAutoCompleteCache = self.model ? [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
     
     if([self getCurrentSelectedItem] == node) {
@@ -248,24 +252,28 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)onItemUrlChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     if([self getCurrentSelectedItem] == node) {
         self.textFieldUrl.stringValue = node.fields.url;
     }
 }
 
 - (void)onItemPasswordChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     if([self getCurrentSelectedItem] == node) {
         self.textFieldPw.stringValue = node.fields.password;
     }
 }
 
 - (void)onItemNotesChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     if([self getCurrentSelectedItem] == node) {
         self.textViewNotes.string = node.fields.notes;
     }
 }
 
 - (void)onAttachmentsChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     if([self getCurrentSelectedItem] == node) {
         self.attachmentsIconCache = nil; // TODO: what?
         [self refreshAttachments:node];
@@ -273,17 +281,20 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)onCustomFieldsChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     if([self getCurrentSelectedItem] == node) {
         [self refreshCustomFields:node];
     }
 }
 
 - (void)onDeleteItem:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     [self.outlineView reloadData];
     [self bindDetailsPane];
 }
 
 - (void)onChangeParent:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     [self.outlineView reloadData];
     [self bindDetailsPane];
 }
@@ -303,6 +314,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)bindToModel {
+    self.safeItemsCache = nil; // Clear safe items cache
     [self updateAutocompleteCaches];
     
     if(self.model == nil) {
@@ -685,9 +697,29 @@ static NSArray<NSImage*> *kKeePassIconSet;
         return @[];
     }
     
+    if(self.safeItemsCache == nil) {
+        self.safeItemsCache = [NSMutableDictionary dictionary];
+    }
+    
+    if(self.safeItemsCache[parentGroup.uuid] == nil) {
+        NSArray<Node*>* items = [self loadSafeItems:parentGroup];
+        self.safeItemsCache[parentGroup.uuid] = items;
+    }
+    
+    return self.safeItemsCache[parentGroup.uuid];
+}
+
+-(NSArray<Node*>*)loadSafeItems:(Node*)parentGroup {
+    //NSLog(@"loadSafeItems for [%@]", parentGroup.uuid);
+    
     BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.model.format == kPasswordSafe;
     NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
-    NSLog(@"Sorting: %d-%d", sort, Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView);
+    //NSLog(@"Sorting: %d-%d", sort, Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView);
+    
+    NSString* searchText = self.searchField.stringValue;
+    if(![searchText length]) {
+        return sorted;
+    }
     
     return [sorted filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [self isSafeItemMatchesSearchCriteria:evaluatedObject recurse:YES];
@@ -1134,7 +1166,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (IBAction)onSearch:(id)sender {
-    //NSLog(@"Search For: %@", self.searchField.stringValue);
+    NSLog(@"Search For: %@", self.searchField.stringValue);
+    
+    self.safeItemsCache = nil; // Clear safe items cache
     
     Node* currentSelection = [self getCurrentSelectedItem];
     
@@ -1471,8 +1505,8 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (void)onNewItemAdded:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
     self.searchField.stringValue = @""; // Clear any ongoing search...
-    
     [self.outlineView reloadData];
     
     NSInteger row = [self findRowForItemExpandIfNecessary:node];

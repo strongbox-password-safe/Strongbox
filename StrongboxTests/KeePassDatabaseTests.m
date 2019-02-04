@@ -197,6 +197,33 @@
     }
 }
 
+- (void)testDbModifyCreateLarge {
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase* db = [adaptor create:@"password"];
+    
+    NSLog(@"%@", db);
+    
+    for(int i=0;i<1000;i++) {
+        NodeFields *fields = [[NodeFields alloc] init];
+        Node *childNode = [[Node alloc] initAsRecord:[NSString stringWithFormat:@"Title %d", i] parent:[db.rootGroup.childGroups objectAtIndex:0] fields:fields uuid:nil];
+        [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode];
+    }
+    
+    NSError* error;
+    NSData* data = [adaptor save:db error:&error];
+    
+    if(error) {
+        NSLog(@"%@", error);
+    }
+    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+    
+    [data writeToFile:@"/Users/mark/Desktop/large.kdbx" options:kNilOptions error:&error];
+    
+    NSLog(@"%@", error);
+}
+
 - (void)testDbModifyWithEscapeCharacterGetAsDataAndReOpenSafeIsTheSame {
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     StrongboxDatabase* db = [adaptor create:@"password"];

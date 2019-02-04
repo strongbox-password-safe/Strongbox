@@ -38,6 +38,14 @@
                BlueprintName = "StrongboxTests"
                ReferencedContainer = "container:Strongbox.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "DavKitTests">
+               </Test>
+               <Test
+                  Identifier = "SFTPTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
          <TestableReference
             skipped = "NO">

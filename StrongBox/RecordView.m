@@ -248,6 +248,8 @@ static const int kMinNotesCellHeight = 160;
     
     if (flag == YES) {
         self.navBack = self.navigationItem.leftBarButtonItem;
+        NSLog(@"EDIT: Yes: Setting Nav Back: %@", self.navBack);
+        
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
         [self enableDisableUiForEditing];
         self.editButtonItem.enabled = [self recordCanBeSaved];
@@ -258,6 +260,7 @@ static const int kMinNotesCellHeight = 160;
             [self onDoneWithChanges];
         }
         else {
+            NSLog(@"Setting Nav Back: %@", self.navBack);
             self.navigationItem.leftBarButtonItem = self.navBack;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;

@@ -135,6 +135,21 @@ static NSArray<DatabaseAttachment*>* removeUnused(NSArray<DatabaseAttachment*>* 
 
         [usedAttachments addObject:attachments[index.intValue]];
         
+        // TODO: This has crashed in a report from Apple, probably a corrupt file, but best not to crash...
+        
+//        2   CoreFoundation                    0x19cb2402c _CFThrowFormattedException + 116 (CFObject.m:1958)
+//        3   CoreFoundation                    0x19caa5624 -[__NSArrayM objectAtIndexedSubscript:] + 228 (NSArrayM.m:291)
+//        4   Strongbox                         0x104f1b298 +[AttachmentsRationalizer rationalizeAttachments:root:] + 2320 (AttachmentsRationalizer.m:136)
+//        5   Strongbox                         0x104e8282c -[StrongboxDatabase initWithRootGroup:metadata:masterPassword:keyFileDigest:attachments:customIco... + 276 (StrongboxDatabase.m:53)
+//                                                            6   Strongbox                         0x104ecf5d8 -[KeePassDatabase open:password:keyFileDigest:error:] + 3564 (KeePassDatabase.m:142)
+//                                                            7   Strongbox                         0x104eec564 -[DatabaseModel initExistingWithDataAndPassword:password:keyFileDigest:error:] + 376 (DatabaseModel.m:131)
+//                                                            8   Strongbox                         0x104e7c8e8 __62-[OpenSafeSequenceHelper openSafeWithData:provider:cacheMode:]_block_invoke + 144 (OpenSafeSequenceHelper.m:472)
+//                                                            9   libdispatch.dylib                 0x19c5b3d58 _dispatch_call_block_and_release + 32 (init.c:1372)
+//                                                            10  libdispatch.dylib                 0x19c5b52f0 _dispatch_client_callout + 20 (object.m:511)
+//                                                            11  libdispatch.dylib                 0x19c5b7f20 _dispatch_queue_override_invoke + 668 (inline_internal.h:2441)
+//                                                            12  libdispatch.dylib                 0x19c5c40d4 _dispatch_root_queue_drain + 348 (inline_internal.h:2482)
+//                                                            13  libdispatch.dylib                 0x19c5c4940 _dispatch_worker_thread2 + 120 (queue.c:6072)
+//                                                            14  libsystem_pthread.dylib           0x19c7b4bc0 _pthread_wqthread 
         // Remap anything with index=index to i
         
         if(index.intValue != i) {
