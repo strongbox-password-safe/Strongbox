@@ -67,9 +67,9 @@
     XCTAssertNotNil(strongboxModel);
     XCTAssertNotNil(strongboxModel.childGroups);
     XCTAssertNotNil([strongboxModel.childGroups objectAtIndex:0]);
-    XCTAssertNotNil([[strongboxModel.childGroups objectAtIndex:0].childGroups objectAtIndex:4]);
+    XCTAssertNotNil([[strongboxModel.childGroups objectAtIndex:0].childGroups objectAtIndex:5]);
                      
-    Node* newGroupNode = [[strongboxModel.childGroups objectAtIndex:0].childGroups objectAtIndex:4];
+    Node* newGroupNode = [[strongboxModel.childGroups objectAtIndex:0].childGroups objectAtIndex:5];
     Node* entry1 = [newGroupNode.childRecords objectAtIndex:0];
     
     NSLog(@"%@", entry1);

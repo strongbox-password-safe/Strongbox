@@ -10,6 +10,7 @@
 #import "StorageProvider.h"
 #import "SafeMetaData.h"
 
+API_AVAILABLE(ios(12.0))
 @interface CredentialProviderViewController : ASCredentialProviderViewController
 
 - (void)showQuickLaunchView;

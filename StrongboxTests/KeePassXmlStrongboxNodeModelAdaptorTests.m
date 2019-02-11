@@ -39,7 +39,7 @@
 - (void)test_single_entry_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"password-ladder" b64Key:@"JvrWpyQom2y63klo6iNBsIIjnt/dRKV2rbu7VRaX+cw="]; //: b64key:@];
     
-    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
+    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:0];
     XCTAssert([singleEntry.fields.password isEqualToString:@"ladder"]);
     
     NSLog(@"%@", singleEntry);
@@ -49,10 +49,10 @@
 - (void)test_two_entries_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"password-two-entries-ladder" b64Key:@"N0gYzFpyRtD8VC/FjMTUN/ehg8tDYydOMWcLWe3rdJI="];
 
-    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
+    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:0];
     XCTAssert([singleEntry.fields.password isEqualToString:@"ladder"]);
 
-    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:1];
+    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:1];
     XCTAssert([secondEntry.fields.password isEqualToString:@"ladder"]);
 
     //Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
@@ -63,10 +63,10 @@
 - (void)test_three_entries_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"password-three-entries-ladder" b64Key:@"2+0LT4H8KD86L76Umi+eu2T0AM0Dr7/d+oFbFTlLgxk="];
     
-    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
+    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:0];
     XCTAssert([singleEntry.fields.password isEqualToString:@"ladder"]);
     
-    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:1];
+    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:1];
     XCTAssert([secondEntry.fields.password isEqualToString:@"ladder"]);
     
     //Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
@@ -78,10 +78,10 @@
 - (void)test_five_entries_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"password-five-entries-ladder" b64Key:@"VId5gvqpc1umKBTk16bND/3VGKotVVOTygiw6nGTBYI="];
     
-    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
+    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:0];
     XCTAssert([singleEntry.fields.password isEqualToString:@"ladder"]);
     
-    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:1];
+    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:1];
     XCTAssert([secondEntry.fields.password isEqualToString:@"ladder"]);
     
     //Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
@@ -92,10 +92,10 @@
 - (void)test_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"ladder" b64Key:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ="];
 
-    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
+    Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:0];
     XCTAssert([singleEntry.fields.password isEqualToString:@"ladder"]);
     
-    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:1];
+    Node* secondEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:1];
     XCTAssert([secondEntry.fields.password isEqualToString:@"ladde"]);
     
     //Node* singleEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
@@ -107,7 +107,7 @@
     Node * ret = [self getModelFromXmlFile:@"ladder" b64Key:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ="];
     XCTAssertNotNil(ret);
     
-    Node* firstEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:4].children objectAtIndex:0];
+    Node* firstEntry = [[[ret.children objectAtIndex:0].children objectAtIndex:5].children objectAtIndex:0];
     NSLog(@"%@", firstEntry);
     
     XCTAssert([firstEntry.title isEqualToString:@"Entry 1"]);

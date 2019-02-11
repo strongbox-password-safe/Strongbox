@@ -28,7 +28,6 @@
 #import "StrongboxUIDocument.h"
 #import "QuickLaunchViewController.h"
 #import "StorageBrowserTableViewController.h"
-#import "UpgradeViewController.h"
 #import "LockViewController.h"
 
 @interface InitialViewController ()

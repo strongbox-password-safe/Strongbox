@@ -539,7 +539,9 @@ static NSArray<NSImage*> *kKeePassIconSet;
     DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
     
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
-    [dbAttachment.data writeToFile:f atomically:YES];
+
+    NSError* error;
+    BOOL success =[dbAttachment.data writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -1222,13 +1224,6 @@ static NSArray<NSImage*> *kKeePassIconSet;
 }
 
 - (void)showOrHidePassword {
-    // TODO: This is pointless? could be part of the bug?
-    Node* item = [self getCurrentSelectedItem];
-    if(!item)
-    {
-        return;
-    }
-    
     if(self.showPassword) {
         self.textFieldHiddenPassword.hidden = YES;
         self.textFieldHiddenPassword.enabled = NO;
@@ -1784,6 +1779,8 @@ NSString* trimField(NSTextField* textField) {
 
     dispatch_async(dispatch_get_main_queue(), ^{
         Node* currentSelection = [self getCurrentSelectedItem];
+        
+        self.safeItemsCache = nil; // Clear safe items cache
         
         [self.outlineView reloadData];
         

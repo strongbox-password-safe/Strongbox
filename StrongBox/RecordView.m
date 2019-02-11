@@ -587,12 +587,15 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     return [super tableView:tableView heightForHeaderInSection:section];
 }
 
+-(int)getPasswordRowHeight {
+    return self.showOtp ? 186 : 119;
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0 && indexPath.row == 0) {
-        return self.showOtp ? 162 : 95; // [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+        return [self getPasswordRowHeight]; // [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     }
     else if (indexPath.section == 6 && indexPath.row == 0) { // Notes should fill whatever is left
-        int password = self.showOtp ? 162 : 95; //[super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
         int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
         int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
        
@@ -610,7 +613,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         // Include Header Height (not from cells as they're set to UITableViewAutomaicDimension (-1) so ask for default
         // Tableview section header height then x 3 fixed header
         
-        int otherCellsAndCellHeadersHeight = password + username + email + url + attachments + customFields + (3 * self.tableView.sectionHeaderHeight);
+        int otherCellsAndCellHeadersHeight = [self getPasswordRowHeight] + username + email + url + attachments + customFields + (3 * self.tableView.sectionHeaderHeight);
         
         int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int toolBarHeight = self.navigationController.toolbar.frame.size.height;

@@ -14,12 +14,15 @@
 #import "NSArray+Extensions.h"
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
+#import "CreateCredentialTableViewController.h"
+#import "Alerts.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
 @property (strong, nonatomic) NSArray<Node*> *searchResults;
 @property (strong, nonatomic) NSArray<Node*> *items;
 @property (strong, nonatomic) UISearchController *searchController;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddCredential;
 
 @property NSTimer* timerRefreshOtp;
 
@@ -50,6 +53,11 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    
+    self.buttonAddCredential.enabled = [self canCreateNewCredential];
+    
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.definesPresentationContext = YES;
     
@@ -68,9 +76,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         self.tableView.tableHeaderView = self.searchController.searchBar;
         [self.searchController.searchBar sizeToFit];
     }
-    
-    self.tableView.rowHeight = 60.0f;
-    
+        
     self.items = self.model.database.allRecords;
     
     // Filter KeePass1 Backup Group if so configured...
@@ -339,5 +345,89 @@ static NSString *getSearchTermFromDomain(NSString* host) {
         NSLog(@"WARN: DidSelectRow with no Record?!");
     }
 }
+
+- (IBAction)onAddCredential:(id)sender {
+    [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if([segue.identifier isEqualToString:@"segueToAdd"]) {
+        CreateCredentialTableViewController *vc = segue.destinationViewController;
+        
+        vc.viewModel = self.model;
+        vc.rootViewController = self.rootViewController;
+
+        NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
+        ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+        if(serviceId) {
+            if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
+                NSURL* url = [NSURL URLWithString:serviceId.identifier];
+                if(url && url.host.length) {
+                    NSString* foo = getSearchTermFromDomain(url.host);
+                    vc.suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+                    vc.suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
+                }
+                else {
+                    vc.suggestedUrl = serviceId.identifier;
+                }
+                return;
+            }
+            else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
+                NSString* foo = getSearchTermFromDomain(serviceId.identifier);
+                vc.suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+                vc.suggestedUrl = serviceId.identifier;
+                return;
+            }
+        }
+    }
+}
+
+- (BOOL)canCreateNewCredential {
+    return [self.rootViewController isLiveAutoFillProvider:self.model.metadata.storageProvider];
+}
+
+- (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
+    if([self canCreateNewCredential]) {
+        [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
+    }
+    else {
+        [Alerts info:self title:@"Unsupported Storage" message:@"This database is stored on a Storage Provider that does not support Live editing in App Extensions. Cannot Create New Record."];
+    }
+}
+
+- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
+    NSDictionary *attributes = @{
+                                 NSFontAttributeName: [UIFont systemFontOfSize:16.0f],
+                                 NSForegroundColorAttributeName: [UIColor blueColor]
+                                 };
+    
+    return [[NSAttributedString alloc] initWithString: @"Create New Record..." attributes:attributes];
+}
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = self.searchController.isActive ? @"No Matching Records" : @"Empty Database";
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
+                                 NSForegroundColorAttributeName: [UIColor darkGrayColor]};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
+{
+    NSString *text = self.searchController.isActive ? @"Could not find any matching records" : @"It appears your database is empty";
+    
+    NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
+    paragraph.lineBreakMode = NSLineBreakByWordWrapping;
+    paragraph.alignment = NSTextAlignmentCenter;
+    
+    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14.0f],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor],
+                                 NSParagraphStyleAttributeName: paragraph};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
 
 @end

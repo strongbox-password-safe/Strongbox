@@ -46,6 +46,8 @@ abstract_target 'common-ios' do
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
+	pod 'RMStore'
+	#pod 'RMStore/AppReceiptVerificator'
     end
 
     target 'Strongbox Auto Fill' do

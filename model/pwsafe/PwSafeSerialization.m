@@ -175,19 +175,19 @@
     NSData *pw = [NSData dataWithData:[masterPassword dataUsingEncoding:NSUTF8StringEncoding]];
 
     CC_SHA256_CTX context;
-    NSMutableData *hash = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
+    
+    uint8_t digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
+
     CC_SHA256_Init(&context);
     CC_SHA256_Update(&context, pw.bytes, (CC_LONG)pw.length);
     CC_SHA256_Update(&context, salt.bytes, (CC_LONG)salt.length);
-    CC_SHA256_Final(hash.mutableBytes, &context);
-
-    NSData *pBarData = [NSData dataWithData:hash];
+    CC_SHA256_Final(digest, &context);
 
     for (int i = 0; i < keyStretchIterations; i++) {
-        NSData *tmp = sha256(pBarData);
-        pBarData = [NSData dataWithData:tmp];
+        CC_SHA256(digest, CC_SHA256_DIGEST_LENGTH, digest);
     }
-
+    NSData* pBarData = [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
+    
     // hPbar => We now have P' we need H(P') so one more sha256!
 
     NSData *hPBar = sha256(pBarData);

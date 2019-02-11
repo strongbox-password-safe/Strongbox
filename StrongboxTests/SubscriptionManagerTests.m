@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "SubscriptionManager.h"
+#import "ProUpgradeIAPManager.h"
 
 @interface SubscriptionManagerTests : XCTestCase
 
@@ -18,7 +18,7 @@
 @implementation SubscriptionManagerTests
 
 - (void)testGetAvailableSubscriptions {
-    SubscriptionManager* mgr =  [[SubscriptionManager alloc] init];
+    ProUpgradeIAPManager* mgr =  [[ProUpgradeIAPManager alloc] init];
     
     [mgr getAvailableSubscriptions:^(NSError * _Nonnull error, NSArray<SubscriptionOption *> * _Nonnull options) {
         NSLog(@"completion: %@-[%@]", error, options);
@@ -29,7 +29,7 @@
 }
 
 - (void)testCreatePayment {
-    SubscriptionManager* mgr =  [[SubscriptionManager alloc] init];
+    ProUpgradeIAPManager* mgr =  [[ProUpgradeIAPManager alloc] init];
     
     [mgr getAvailableSubscriptions:^(NSError * _Nonnull error, NSArray<SubscriptionOption *> * _Nonnull options) {
         NSLog(@"completion: %@-[%@]", error, options);

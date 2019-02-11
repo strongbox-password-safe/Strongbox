@@ -412,12 +412,12 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 }
 
 - (void)onExport {
-    [Alerts threeOptions:self title:@"How would you like to export your safe?"
-                 message:@"You can export your encrypted safe by email, or you can copy your safe in plaintext format (CSV) to the clipboard."
-       defaultButtonText:@"Export (Encrypted) by Email"
-        secondButtonText:@"Export as CSV by Email"
-         thirdButtonText:@"Copy CSV to Clipboard"
-                  action:^(int response) {
+    [Alerts threeOptionsWithCancel:self title:@"How would you like to export your safe?"
+                           message:@"You can export your encrypted safe by email, or you can copy your safe in plaintext format (CSV) to the clipboard."
+                 defaultButtonText:@"Export (Encrypted) by Email"
+                  secondButtonText:@"Export as CSV by Email"
+                   thirdButtonText:@"Copy CSV to Clipboard"
+                            action:^(int response) {
         if(response == 0) {
             [self exportEncryptedSafeByEmail];
         }

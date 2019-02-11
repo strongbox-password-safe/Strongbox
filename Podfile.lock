@@ -55,6 +55,9 @@ PODS:
   - PopupDialog (0.9.2):
     - DynamicBlurView (~> 3.0.1)
   - Reachability (3.2)
+  - RMStore (0.7.1):
+    - RMStore/Core (= 0.7.1)
+  - RMStore/Core (0.7.1)
   - SAMKeychain (1.5.3)
   - SVProgressHUD (2.2.5)
 
@@ -74,6 +77,7 @@ DEPENDENCIES:
   - OneDriveSDK
   - PopupDialog
   - Reachability
+  - RMStore
   - SAMKeychain
   - SVProgressHUD
 
@@ -98,6 +102,7 @@ SPEC REPOS:
     - OneDriveSDK
     - PopupDialog
     - Reachability
+    - RMStore
     - SAMKeychain
     - SVProgressHUD
 
@@ -121,9 +126,10 @@ SPEC CHECKSUMS:
   OneDriveSDK: 90ab8781f0992c37d96b68cc340585f5cf36701f
   PopupDialog: f4bb461bf70ff422be0b56656566424ee9273080
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  RMStore: 64ba13a9c040e3b7572765d169f77175cd3243e5
   SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: 3f1cd8839904ba424ce3fe54562547b841c0fa14
+PODFILE CHECKSUM: 5e4cdd9533efd2c11f9c8ecf595787f58c4946f7
 
 COCOAPODS: 1.5.3

@@ -134,8 +134,6 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"All Fields"];
     self.searchController.searchBar.selectedScopeButtonIndex = 3;
-    
-    self.tableView.rowHeight = 55.0f;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {

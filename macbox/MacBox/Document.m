@@ -140,4 +140,15 @@
     return YES;
 }
 
+- (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
+    if(fileWrapper.isDirectory) { // Strongbox crashes unless we check if someone is trying to open a package/wrapper...
+        if(outError != nil) {
+            *outError = [Utils createNSError:@"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please dorectly select a KeePass or Password Safe database file." errorCode:-1];
+        }
+        return NO;
+    }
+    
+    return [super readFromFileWrapper:fileWrapper ofType:typeName error:outError];
+}
+
 @end

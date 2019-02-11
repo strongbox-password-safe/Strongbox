@@ -20,6 +20,7 @@
 #import "real-secrets.h"
 #import "NSArray+Extensions.h"
 #import "OfflineCacheNameDetector.h"
+#import "ProUpgradeIAPManager.h"
 
 @interface AppDelegate ()
 
@@ -41,6 +42,8 @@
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
 
     [self registerForClipboardClearingNotifications];
+
+    [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
     
     return YES;
 }

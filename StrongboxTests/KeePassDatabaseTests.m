@@ -49,8 +49,8 @@
 
     XCTAssert(db.rootGroup.childGroups.count == 1);
     XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:@"General"]);
-    XCTAssert([[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:4].title isEqualToString:@"New Group"]);
-    XCTAssert([[[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:4].childRecords objectAtIndex:0].fields.password isEqualToString:@"ladder"]);
+    XCTAssert([[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:5].title isEqualToString:@"New Group"]);
+    XCTAssert([[[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:5].childRecords objectAtIndex:0].fields.password isEqualToString:@"ladder"]);
 }
 
 - (void)testInitExistingWithCustomAndBinariesFile {

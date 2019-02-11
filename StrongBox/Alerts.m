@@ -270,6 +270,44 @@
     [viewController presentViewController:alertController animated:YES completion:nil];
 }
 
++ (void) threeOptionsWithCancel:(UIViewController *)viewController
+                          title:(NSString *)title
+                        message:(NSString *)message
+              defaultButtonText:(NSString *)defaultButtonText
+               secondButtonText:(NSString *)secondButtonText
+                thirdButtonText:(NSString *)thirdButtonText
+                         action:(void (^) (int response))action {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                             message:message
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    // this is the center of the screen currently but it can be any point in the view
+    
+    
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) { action(0); }];
+    
+    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
+                                                           style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction *a) { action(1); }];
+    
+    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:thirdButtonText
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction *a) { action(2); }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) { action(3); }];
+    
+    [alertController addAction:defaultAction];
+    [alertController addAction:secondAction];
+    [alertController addAction:thirdAction];
+    [alertController addAction:cancelAction];
+    
+    [viewController presentViewController:alertController animated:YES completion:nil];
+}
+
 + (void)OkCancelWithPassword:(UIViewController *)viewController
                        title:(NSString *)title
                      message:(NSString *)message
