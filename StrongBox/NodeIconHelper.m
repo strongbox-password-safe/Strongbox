@@ -116,6 +116,7 @@ static NSArray<UIImage*>* getKeePassIconSet() {
         NSData* data = database.customIcons[vm.customIconUuid];
         
         if(data) {
+            //NSLog(@"Custom: [%@]", [data base64EncodedStringWithOptions:kNilOptions]);
             UIImage* img = [UIImage imageWithData:data];
             if(img) {
                 UIImage *resized = scaleImage(img, CGSizeMake(48, 48));
@@ -128,6 +129,10 @@ static NSArray<UIImage*>* getKeePassIconSet() {
     }
     
     return ret;
+}
+
++ (NSArray<UIImage*>*)iconSet {
+    return kKeePassIconSet;
 }
 
 @end

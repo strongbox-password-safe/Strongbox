@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:StrongBox/FavIcon/FavIcon.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:macbox/MacBox.xcodeproj">
    </FileRef>
    <FileRef

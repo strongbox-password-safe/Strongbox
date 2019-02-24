@@ -7,7 +7,6 @@
 //
 
 #import "PickCredentialsTableViewController.h"
-#import "regdom.h"
 #import "NodeIconHelper.h"
 #import "BrowseSafeEntryTableViewCell.h"
 #import "Settings.h"
@@ -16,6 +15,7 @@
 #import "OTPToken+Generation.h"
 #import "CreateCredentialTableViewController.h"
 #import "Alerts.h"
+#import "Utils.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -96,39 +96,6 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     }
     
     [self smartInitializeSearch];
-}
-
-static NSString *getSearchTermFromDomain(NSString* host) {
-    if(host == nil) {
-        return @"";
-    }
-    
-    if(!host.length) {
-        return @"";
-    }
-    
-    const char *cStringUrl = [host UTF8String];
-    if(!cStringUrl || strlen(cStringUrl) == 0) {
-        return @"";
-    }
-       
-    void *tree = loadTldTree();
-    const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
-    
-    if(result == NULL) {
-        return @"";
-    }
-    
-    NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"Calculated Domain: %@", domain);
-    
-    NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
-    
-    NSLog(@"%@", parts);
-    
-    NSString *searchTerm =  parts.count ? parts[0] : domain;
-    return searchTerm;
 }
 
 - (void)smartInitializeSearch {

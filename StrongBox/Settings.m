@@ -44,6 +44,7 @@ static NSString* const kHideTotp = @"hideTotp";
 static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
 static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
 static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
+static NSString* const kTryDownloadFavIconForNewRecord = @"tryDownloadFavIconForNewRecord";
 
 @implementation Settings
 
@@ -623,6 +624,15 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setUiDoNotSortKeePassNodesInBrowseView:(BOOL)uiDoNotSortKeePassNodesInBrowseView {
     [[self getUserDefaults] setBool:uiDoNotSortKeePassNodesInBrowseView forKey:kUiDoNotSortKeePassNodesInBrowseView];
+    [[self getUserDefaults] synchronize];
+}
+
+-(BOOL)tryDownloadFavIconForNewRecord {
+    return [[self getUserDefaults] boolForKey:kTryDownloadFavIconForNewRecord];
+}
+
+- (void)setTryDownloadFavIconForNewRecord:(BOOL)tryDownloadFavIconForNewRecord {
+    [[self getUserDefaults] setBool:tryDownloadFavIconForNewRecord forKey:kTryDownloadFavIconForNewRecord];
     [[self getUserDefaults] synchronize];
 }
 

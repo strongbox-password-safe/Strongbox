@@ -41,8 +41,9 @@ abstract_target 'common-ios' do
     pod 'Base32'
 
     target 'Strongbox-iOS' do
+	use_frameworks!
+
         pod 'ISMessages' 
-        pod 'PopupDialog'
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
@@ -50,9 +51,9 @@ abstract_target 'common-ios' do
 	#pod 'RMStore/AppReceiptVerificator'
     end
 
-    target 'Strongbox Auto Fill' do
-        pod 'SVProgressHUD'
-    end
+   target 'Strongbox Auto Fill' do
+       pod 'SVProgressHUD'
+   end
 end
 
 post_install do |installer|

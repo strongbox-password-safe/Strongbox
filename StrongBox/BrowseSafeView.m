@@ -22,6 +22,7 @@
 #import "BrowseGroupTableViewCell.h"
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
+#import "SetNodeIconUiHelper.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -36,6 +37,7 @@
 @property (strong, nonatomic) NSTimer *tapTimer;
 
 @property NSTimer* timerRefreshOtp;
+@property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 
 @end
 
@@ -171,6 +173,40 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
            }];
 }
 
+- (void)onSetIconForItem:(NSIndexPath * _Nonnull)indexPath {
+    Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+
+    self.sni = [[SetNodeIconUiHelper alloc] init];
+    
+    NSString* urlHint;
+    if(!item.isGroup) {
+        urlHint = item.fields.url;
+        if(!urlHint.length) {
+            urlHint = item.title;
+        }
+    }    
+    
+    [self.sni changeIcon:self urlHint:urlHint format:self.viewModel.database.format completion:^(BOOL goNoGo, NSNumber* userSelectedNewIconIndex, UIImage* userSelectedNewCustomIcon) {
+        NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
+        if(goNoGo) {
+            if(userSelectedNewCustomIcon) {
+                [self.viewModel.database setNodeCustomIcon:item icon:userSelectedNewCustomIcon];
+            }
+            else if(userSelectedNewIconIndex) {
+                if(userSelectedNewIconIndex.intValue == -1) {
+                    item.iconId = !item.isGroup ? @(0) : @(48); // Default
+                }
+                else {
+                    item.iconId = userSelectedNewIconIndex;
+                }
+                item.customIconUuid = nil;
+            }
+            
+            [self saveChangesToSafeAndRefreshView];
+        }
+    }];
+}
+
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onDeleteSingleItem:indexPath];
@@ -179,8 +215,15 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Rename" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onRenameItem:indexPath];
     }];
+    renameAction.backgroundColor = UIColor.blueColor;
     
-    return @[removeAction, renameAction];
+    UITableViewRowAction *setIconAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Set Icon" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self onSetIconForItem:indexPath];
+    }];
+    
+    setIconAction.backgroundColor = UIColor.purpleColor;
+
+    return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction] : @[removeAction, renameAction];
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
@@ -448,7 +491,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     self.navigationController.toolbarHidden = NO;
     self.navigationController.toolbar.hidden = NO;
+    
     [self.navigationController setNavigationBarHidden:NO];
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationController.navigationBarHidden = NO;
     
     // Any OTPs we should start a refresh timer if so...
     

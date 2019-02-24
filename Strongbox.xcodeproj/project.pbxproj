@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03E0BBBD5993702720D6A527 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
 		4D004CDA21F4C26700E2B194 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCC21F4C26600E2B194 /* OTPToken+Serialization.m */; };
 		4D004CDB21F4C26700E2B194 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
@@ -26,7 +25,6 @@
 		4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD021F4C26700E2B194 /* OTPAlgorithm.m */; };
 		4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
 		4D06943922083E5200FB826C /* ProUpgradeIAPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */; };
-		4D06943B22083E7300FB826C /* SubscriptionManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D06943A22083E7300FB826C /* SubscriptionManagerTests.m */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
@@ -262,6 +260,14 @@
 		4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D74B92C218C438800FC369E /* V3BinariesList.m */; };
 		4D758F2C21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D758F2B21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.m */; };
 		4D758F2D21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D758F2B21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.m */; };
+		4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D4E22204E0A00AEF439 /* IconCellView.xib */; };
+		4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D4E22204E0A00AEF439 /* IconCellView.xib */; };
+		4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5222204E4A00AEF439 /* IconViewCell.m */; };
+		4D766D5422204E4A00AEF439 /* IconViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5222204E4A00AEF439 /* IconViewCell.m */; };
+		4D766D5F22204EED00AEF439 /* IconsCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */; };
+		4D766D6022204EED00AEF439 /* IconsCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */; };
+		4D766D6122204EED00AEF439 /* IconsCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */; };
+		4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */; };
 		4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */; };
 		4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
 		4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
@@ -272,6 +278,7 @@
 		4D8144B42199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B62199B7790044E617 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
+		4D87569C2222B46B00D6B8EA /* CustomNavigationItemTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */; };
 		4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B3E21AC30BA00805DED /* CustomFieldsViewController.m */; };
 		4D876B4321AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
 		4D876B4421AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
@@ -330,6 +337,7 @@
 		4D9E09AA218251BE007BA1E7 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A6218251BE007BA1E7 /* KeePassDatabase.m */; };
 		4D9E09AD218251D0007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09AC218251D0007BA1E7 /* Salsa20Stream.m */; };
 		4D9E09AE218251D0007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09AC218251D0007BA1E7 /* Salsa20Stream.m */; };
+		4DA00AE1222180EE004C0C63 /* SetNodeIconUiHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA00AE0222180EE004C0C63 /* SetNodeIconUiHelper.m */; };
 		4DA12EFF219834B90000CEBB /* custom-icon.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DA12EFE219834B90000CEBB /* custom-icon.xml */; };
 		4DA12F02219837830000CEBB /* CustomIconList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA12F01219837830000CEBB /* CustomIconList.m */; };
 		4DA12F03219837830000CEBB /* CustomIconList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA12F01219837830000CEBB /* CustomIconList.m */; };
@@ -338,6 +346,7 @@
 		4DA12F0A219860BD0000CEBB /* custom-icon.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4DA12F08219860BC0000CEBB /* custom-icon.kdbx */; };
 		4DA12F0B219860BD0000CEBB /* custom-icon-4.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4DA12F09219860BD0000CEBB /* custom-icon-4.kdbx */; };
 		4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DA2A7DB219C31B0006689E6 /* LICENSE.md */; };
+		4DA5F8F72221DABE00B6C650 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; };
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DAEA41D217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */; };
 		4DAEA41E217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */; };
@@ -367,6 +376,7 @@
 		4DCC3F8E2177C08400FB13C2 /* ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F8D2177C08400FB13C2 /* ladder.xml */; };
 		4DCF5FBC1F7294A800011756 /* StrongboxUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* StrongboxUIDocument.m */; };
 		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
+		4DD127AA2221F7BE008F3039 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4DD41FBA2182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD41FB92182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m */; };
 		4DD41FBD2182FCCB00FDDBB5 /* basic.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4DD41FBC2182FCCB00FDDBB5 /* basic.kdbx */; };
 		4DD59F541D3A5A7300F864ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757A21C8361D200E6356F /* main.m */; };
@@ -391,6 +401,10 @@
 		4DEF7B97216FC74A00A3EE12 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
 		4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
 		4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
+		4DF3A3CC2214BA5B00DE1F8F /* Montserrat-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4DF3A3CA2214BA5A00DE1F8F /* Montserrat-Bold.otf */; };
+		4DF3A3CD2214BA5B00DE1F8F /* Montserrat-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4DF3A3CA2214BA5A00DE1F8F /* Montserrat-Bold.otf */; };
+		4DF3A3CE2214BA5B00DE1F8F /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4DF3A3CB2214BA5A00DE1F8F /* Montserrat-Regular.otf */; };
+		4DF3A3CF2214BA5B00DE1F8F /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4DF3A3CB2214BA5A00DE1F8F /* Montserrat-Regular.otf */; };
 		4DF972B221BFD78700F384C9 /* SFTPTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B121BFD78700F384C9 /* SFTPTests.m */; };
 		4DF972B521BFD81800F384C9 /* SFTPStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B421BFD81800F384C9 /* SFTPStorageProvider.m */; };
 		4DF972B621BFD81800F384C9 /* SFTPStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B421BFD81800F384C9 /* SFTPStorageProvider.m */; };
@@ -429,6 +443,7 @@
 		4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */; };
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
+		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 /* End PBXBuildFile section */
 
@@ -461,6 +476,17 @@
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4DD127AB2221F7BE008F3039 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4DD127AA2221F7BE008F3039 /* FavIcon.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -487,7 +513,6 @@
 		4D004CE521F4F67D00E2B194 /* OtpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OtpTests.m; path = StrongboxTests/OtpTests.m; sourceTree = "<group>"; };
 		4D06943722083E5200FB826C /* ProUpgradeIAPManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProUpgradeIAPManager.h; path = StrongBox/ProUpgradeIAPManager.h; sourceTree = "<group>"; };
 		4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProUpgradeIAPManager.m; path = StrongBox/ProUpgradeIAPManager.m; sourceTree = "<group>"; };
-		4D06943A22083E7300FB826C /* SubscriptionManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SubscriptionManagerTests.m; path = StrongboxTests/SubscriptionManagerTests.m; sourceTree = "<group>"; };
 		4D076F21215FC08600B9C284 /* MSAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MSAL.framework; path = Carthage/Build/iOS/MSAL.framework; sourceTree = "<group>"; };
 		4D076F22215FC08600B9C284 /* MSGraphMSALAuthProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MSGraphMSALAuthProvider.framework; path = Carthage/Build/iOS/MSGraphMSALAuthProvider.framework; sourceTree = "<group>"; };
 		4D076F26215FC3BF00B9C284 /* MSGraphCoreSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MSGraphCoreSDK.framework; path = Carthage/Build/iOS/MSGraphCoreSDK.framework; sourceTree = "<group>"; };
@@ -738,6 +763,12 @@
 		4D74B92C218C438800FC369E /* V3BinariesList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = V3BinariesList.m; path = model/keepass/V3BinariesList.m; sourceTree = "<group>"; };
 		4D758F2A21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BrowseSafeEntryTableViewCell.h; sourceTree = "<group>"; };
 		4D758F2B21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BrowseSafeEntryTableViewCell.m; sourceTree = "<group>"; };
+		4D766D4E22204E0A00AEF439 /* IconCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = IconCellView.xib; path = StrongBox/IconCellView.xib; sourceTree = "<group>"; };
+		4D766D5122204E4A00AEF439 /* IconViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IconViewCell.h; path = StrongBox/IconViewCell.h; sourceTree = "<group>"; };
+		4D766D5222204E4A00AEF439 /* IconViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconViewCell.m; path = StrongBox/IconViewCell.m; sourceTree = "<group>"; };
+		4D766D5C22204EED00AEF439 /* IconsCollectionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IconsCollectionViewController.h; path = StrongBox/IconsCollectionViewController.h; sourceTree = "<group>"; };
+		4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconsCollectionViewController.m; path = StrongBox/IconsCollectionViewController.m; sourceTree = "<group>"; };
+		4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = IconsCollectionViewController.xib; path = StrongBox/IconsCollectionViewController.xib; sourceTree = "<group>"; };
 		4D77A0B5216651C1003CB5CB /* AutoFillNewRecordSettingsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillNewRecordSettingsController.h; path = StrongBox/AutoFillNewRecordSettingsController.h; sourceTree = "<group>"; };
 		4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillNewRecordSettingsController.m; path = StrongBox/AutoFillNewRecordSettingsController.m; sourceTree = "<group>"; };
 		4D77A0B82166598B003CB5CB /* AutoFillNewRecordSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillNewRecordSettings.h; path = StrongBox/AutoFillNewRecordSettings.h; sourceTree = "<group>"; };
@@ -755,6 +786,8 @@
 		4D7C21D12180EAC200458A5B /* funky.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = funky.xml; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
 		4D8144B32199B4A80044E617 /* NodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
+		4D87569A2222B46A00D6B8EA /* CustomNavigationItemTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomNavigationItemTitleView.h; path = StrongBox/CustomNavigationItemTitleView.h; sourceTree = "<group>"; };
+		4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomNavigationItemTitleView.m; path = StrongBox/CustomNavigationItemTitleView.m; sourceTree = "<group>"; };
 		4D876B3D21AC30BA00805DED /* CustomFieldsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldsViewController.h; path = StrongBox/CustomFieldsViewController.h; sourceTree = "<group>"; };
 		4D876B3E21AC30BA00805DED /* CustomFieldsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldsViewController.m; path = StrongBox/CustomFieldsViewController.m; sourceTree = "<group>"; };
 		4D876B4121AC36F800805DED /* CustomField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomField.h; path = StrongBox/CustomField.h; sourceTree = "<group>"; };
@@ -823,6 +856,8 @@
 		4D9E09A6218251BE007BA1E7 /* KeePassDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabase.m; path = model/keepass/KeePassDatabase.m; sourceTree = SOURCE_ROOT; };
 		4D9E09AB218251D0007BA1E7 /* Salsa20Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Salsa20Stream.h; path = model/keepass/Salsa20Stream.h; sourceTree = SOURCE_ROOT; };
 		4D9E09AC218251D0007BA1E7 /* Salsa20Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Salsa20Stream.m; path = model/keepass/Salsa20Stream.m; sourceTree = SOURCE_ROOT; };
+		4DA00ADF222180EE004C0C63 /* SetNodeIconUiHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SetNodeIconUiHelper.h; path = StrongBox/SetNodeIconUiHelper.h; sourceTree = "<group>"; };
+		4DA00AE0222180EE004C0C63 /* SetNodeIconUiHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SetNodeIconUiHelper.m; path = StrongBox/SetNodeIconUiHelper.m; sourceTree = "<group>"; };
 		4DA12EFE219834B90000CEBB /* custom-icon.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "custom-icon.xml"; sourceTree = "<group>"; };
 		4DA12F00219837830000CEBB /* CustomIconList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomIconList.h; path = model/keepass/CustomIconList.h; sourceTree = "<group>"; };
 		4DA12F01219837830000CEBB /* CustomIconList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomIconList.m; path = model/keepass/CustomIconList.m; sourceTree = "<group>"; };
@@ -831,6 +866,7 @@
 		4DA12F08219860BC0000CEBB /* custom-icon.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icon.kdbx"; sourceTree = "<group>"; };
 		4DA12F09219860BD0000CEBB /* custom-icon-4.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icon-4.kdbx"; sourceTree = "<group>"; };
 		4DA2A7DB219C31B0006689E6 /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
+		4DA5F8F62221DABE00B6C650 /* FavIcon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FavIcon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomStorageProviderTableViewCell.h; path = StrongBox/CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomStorageProviderTableViewCell.m; path = StrongBox/CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DAEA41B217CBB1300AC128E /* GenericTextUuidElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextUuidElementHandler.h; path = model/keepass/GenericTextUuidElementHandler.h; sourceTree = SOURCE_ROOT; };
@@ -898,6 +934,8 @@
 		4DED20C52168B63200A5800A /* QuickLaunchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickLaunchViewController.m; path = StrongBox/QuickLaunchViewController.m; sourceTree = "<group>"; };
 		4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetector.h; path = StrongBox/OfflineDetector.h; sourceTree = "<group>"; };
 		4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OfflineDetector.m; path = StrongBox/OfflineDetector.m; sourceTree = "<group>"; };
+		4DF3A3CA2214BA5A00DE1F8F /* Montserrat-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Bold.otf"; sourceTree = "<group>"; };
+		4DF3A3CB2214BA5A00DE1F8F /* Montserrat-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Regular.otf"; sourceTree = "<group>"; };
 		4DF972B121BFD78700F384C9 /* SFTPTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPTests.m; path = StrongboxTests/SFTPTests.m; sourceTree = "<group>"; };
 		4DF972B321BFD81800F384C9 /* SFTPStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPStorageProvider.h; path = StrongBox/SFTPStorageProvider.h; sourceTree = "<group>"; };
 		4DF972B421BFD81800F384C9 /* SFTPStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPStorageProvider.m; path = StrongBox/SFTPStorageProvider.m; sourceTree = "<group>"; };
@@ -939,15 +977,15 @@
 		4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModelTests.m; path = StrongboxTests/PwSafeModelTests.m; sourceTree = "<group>"; };
 		4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BasicOrderedDictionary.h; path = model/BasicOrderedDictionary.h; sourceTree = SOURCE_ROOT; };
 		4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BasicOrderedDictionary.m; path = model/BasicOrderedDictionary.m; sourceTree = SOURCE_ROOT; };
-		5184D51882C3500AD4B06058 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; sourceTree = "<group>"; };
 		63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox-iOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; sourceTree = "<group>"; };
 		A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StrongBox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS.release.xcconfig"; sourceTree = "<group>"; };
-		BCAA22B47662A2E87BBB8B20 /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; sourceTree = "<group>"; };
+		C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; sourceTree = "<group>"; };
 		CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -963,6 +1001,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DA5F8F72221DABE00B6C650 /* FavIcon.framework in Frameworks */,
 				4DDB4AAA2177A72B00A06A73 /* AuthenticationServices.framework in Frameworks */,
 				4D93FD771EDB7A520076BBAA /* StoreKit.framework in Frameworks */,
 				E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
@@ -975,7 +1014,7 @@
 			files = (
 				4D5F5B96218B828600A0739A /* QuickLook.framework in Frameworks */,
 				4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */,
-				03E0BBBD5993702720D6A527 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
+				9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -989,10 +1028,10 @@
 				CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */,
 				69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */,
 				4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */,
-				5184D51882C3500AD4B06058 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */,
-				BCAA22B47662A2E87BBB8B20 /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */,
 				A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */,
 				AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */,
+				A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */,
+				C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1085,7 +1124,6 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				4D06943A22083E7300FB826C /* SubscriptionManagerTests.m */,
 				4D9A6B9C21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m */,
 				4D004CE521F4F67D00E2B194 /* OtpTests.m */,
 				4DF972B121BFD78700F384C9 /* SFTPTests.m */,
@@ -1205,12 +1243,12 @@
 				4DED20C72168BF1800A5800A /* Root */,
 				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
 				4D1757901C8361D200E6356F /* BrowseSafeView.m */,
+				4D4C49021EDEC0B900EB857D /* RecordView.h */,
+				4D4C49031EDEC0B900EB857D /* RecordView.m */,
 				4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */,
 				4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */,
 				4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */,
 				4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */,
-				4D4C49021EDEC0B900EB857D /* RecordView.h */,
-				4D4C49031EDEC0B900EB857D /* RecordView.m */,
 				4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */,
 				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
 				4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */,
@@ -1247,6 +1285,16 @@
 				4DE9A60221F5FEF700128560 /* QRCodeScannerViewController.h */,
 				4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */,
 				4DE9A60421F5FEF700128560 /* QRCodeScannerViewController.xib */,
+				4D766D4E22204E0A00AEF439 /* IconCellView.xib */,
+				4D766D5122204E4A00AEF439 /* IconViewCell.h */,
+				4D766D5222204E4A00AEF439 /* IconViewCell.m */,
+				4D766D5C22204EED00AEF439 /* IconsCollectionViewController.h */,
+				4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */,
+				4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */,
+				4DA00ADF222180EE004C0C63 /* SetNodeIconUiHelper.h */,
+				4DA00AE0222180EE004C0C63 /* SetNodeIconUiHelper.m */,
+				4D87569A2222B46A00D6B8EA /* CustomNavigationItemTitleView.h */,
+				4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -1532,18 +1580,17 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
-				4D2BF3F221EFA2EB00E39EBB /* AppLockMode.h */,
-				4D2BF3E821EE3ECD00E39EBB /* PinEntryResponse.h */,
+				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D25675021EBD094006260B7 /* LaunchScreen.storyboard */,
-				4D25673321E8B45B006260B7 /* DuressAction.h */,
+				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
+				4D3652162184A34600A56519 /* AppDelegate.m */,
+				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
+				4DF3A3CA2214BA5A00DE1F8F /* Montserrat-Bold.otf */,
+				4DF3A3CB2214BA5A00DE1F8F /* Montserrat-Regular.otf */,
 				4D2F45C621D6300B002B9144 /* SourceSansPro-Bold.ttf */,
 				4D2F45C521D6300B002B9144 /* SourceSansPro-Regular.ttf */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
-				4D3652162184A34600A56519 /* AppDelegate.m */,
-				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
-				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
-				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
 				4D446813216D2EC100F6358D /* Cartfile */,
 				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
@@ -1578,6 +1625,9 @@
 		4DBE5B341C8356C700C310BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4D2BF3F221EFA2EB00E39EBB /* AppLockMode.h */,
+				4D2BF3E821EE3ECD00E39EBB /* PinEntryResponse.h */,
+				4D25673321E8B45B006260B7 /* DuressAction.h */,
 				4D0BA7D61F23B844009243C9 /* Settings.h */,
 				4D0BA7D71F23B844009243C9 /* Settings.m */,
 				4DCF5FBA1F7294A800011756 /* StrongboxUIDocument.h */,
@@ -1741,6 +1791,7 @@
 		C28E68E855D68D8BECCE3B5B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4DA5F8F62221DABE00B6C650 /* FavIcon.framework */,
 				4D5F5B95218B828500A0739A /* QuickLook.framework */,
 				4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */,
 				4D076F26215FC3BF00B9C284 /* MSGraphCoreSDK.framework */,
@@ -1789,6 +1840,7 @@
 				E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */,
 				4D076F25215FC09200B9C284 /* ShellScript */,
 				4D67FDF0216F3FA2005C0E12 /* Embed App Extensions */,
+				4DD127AB2221F7BE008F3039 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1804,11 +1856,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DE48A63216F54A300C9C991 /* Build configuration list for PBXNativeTarget "Strongbox Auto Fill" */;
 			buildPhases = (
-				CE4A93D8B155871E23C05CC0 /* [CP] Check Pods Manifest.lock */,
+				C02A3952148B9EA3F8B5512D /* [CP] Check Pods Manifest.lock */,
 				4DE48A51216F54A300C9C991 /* Sources */,
 				4DE48A52216F54A300C9C991 /* Frameworks */,
 				4DE48A53216F54A300C9C991 /* Resources */,
-				5572FCEBBEEC84914A1FEDA9 /* [CP] Copy Pods Resources */,
+				38B2EE2731DB86953C435F18 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1954,6 +2006,8 @@
 			files = (
 				4D446814216D2EC100F6358D /* Cartfile in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
+				4DF3A3CC2214BA5B00DE1F8F /* Montserrat-Bold.otf in Resources */,
+				4D766D6122204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4D10155021F7315400D2F711 /* LockViewController.xib in Resources */,
 				4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
@@ -1963,6 +2017,7 @@
 				4D9A6BA021FF73D300F003B2 /* beale.wordlist.txt in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */,
+				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D9A6BA221FF73D300F003B2 /* diceware.wordlist.txt in Resources */,
 				4D2F45C721D6300B002B9144 /* SourceSansPro-Regular.ttf in Resources */,
 				4D9A6BAB21FF744800F003B2 /* eff_short_wordlist_1.txt in Resources */,
@@ -1970,6 +2025,7 @@
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D41D9FD21C15BFB007D982B /* WebDAVConfigurationViewController.xib in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
+				4DF3A3CE2214BA5B00DE1F8F /* Montserrat-Regular.otf in Resources */,
 				4D2F45C921D6300B002B9144 /* SourceSansPro-Bold.ttf in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
 			);
@@ -1979,6 +2035,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DF3A3CD2214BA5B00DE1F8F /* Montserrat-Bold.otf in Resources */,
 				4D41D9FE21C15BFB007D982B /* WebDAVConfigurationViewController.xib in Resources */,
 				4D25674F21E8C65D006260B7 /* PinEntryController.xib in Resources */,
 				4D9A6BA121FF73D300F003B2 /* beale.wordlist.txt in Resources */,
@@ -1989,18 +2046,43 @@
 				4D5F5B87218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4D2F45C821D6300B002B9144 /* SourceSansPro-Regular.ttf in Resources */,
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
+				4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4D9A6BA321FF73D300F003B2 /* diceware.wordlist.txt in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
 				4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D9A6BAD21FF746500F003B2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D9A6BA821FF744800F003B2 /* eff_short_wordlist_2_0.txt in Resources */,
+				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D2F45CA21D6300B002B9144 /* SourceSansPro-Bold.ttf in Resources */,
+				4DF3A3CF2214BA5B00DE1F8F /* Montserrat-Regular.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		38B2EE2731DB86953C435F18 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2039,28 +2121,6 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n# /usr/local/bin/carthage copy-frameworks\n";
 		};
-		5572FCEBBEEC84914A1FEDA9 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2074,7 +2134,6 @@
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
-				"${BUILT_PRODUCTS_DIR}/DynamicBlurView/DynamicBlurView.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
@@ -2084,7 +2143,6 @@
 				"${BUILT_PRODUCTS_DIR}/NMSSH/NMSSH.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/PopupDialog/PopupDialog.framework",
 				"${BUILT_PRODUCTS_DIR}/RMStore/RMStore.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/SVProgressHUD-Pods-common-ios-Strongbox-iOS/SVProgressHUD.framework",
@@ -2097,7 +2155,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DynamicBlurView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
@@ -2107,7 +2164,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NMSSH.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PopupDialog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RMStore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
@@ -2117,7 +2173,7 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CE4A93D8B155871E23C05CC0 /* [CP] Check Pods Manifest.lock */ = {
+		C02A3952148B9EA3F8B5512D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2167,7 +2223,6 @@
 				4D9A6B9D21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m in Sources */,
 				4D983445217749F700731FFC /* KeePassXmlStrongboxNodeModelAdaptorTests.m in Sources */,
 				4DD41FBA2182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m in Sources */,
-				4D06943B22083E7300FB826C /* SubscriptionManagerTests.m in Sources */,
 				4D19679F217F4E760057DF06 /* KeePassXmlStrongboxModelAdaptorTests.m in Sources */,
 				4D004CE621F4F67D00E2B194 /* OtpTests.m in Sources */,
 				4DC5B9BE217B31F100FE9DD9 /* CommonTesting.m in Sources */,
@@ -2215,6 +2270,7 @@
 				4DA12F02219837830000CEBB /* CustomIconList.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
 				4D3AC31F219072C90010CFCD /* VariantObject.m in Sources */,
+				4D87569C2222B46B00D6B8EA /* CustomNavigationItemTitleView.m in Sources */,
 				4D196797217F1C190057DF06 /* PwSafeMetadata.m in Sources */,
 				4D67B1E12191DA5A00B0D29A /* NewSafeFormatController.m in Sources */,
 				4DB1B7DC2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */,
@@ -2227,6 +2283,7 @@
 				4D3E149921832C3000A41CA0 /* thread.c in Sources */,
 				4D8C14902074F5F900CE9CAE /* PasswordHistory.m in Sources */,
 				4D2F6C3A21807C7E007931E4 /* Times.m in Sources */,
+				4DA00AE1222180EE004C0C63 /* SetNodeIconUiHelper.m in Sources */,
 				4DF97F2C21BF10EB0090A55E /* ISO8601DateFormatter.m in Sources */,
 				4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
@@ -2273,6 +2330,7 @@
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DF972B521BFD81800F384C9 /* SFTPStorageProvider.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
+				4D766D5F22204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
 				4D3E1484218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
@@ -2287,6 +2345,7 @@
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
+				4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */,
 				4D004CE321F4F58300E2B194 /* Node+OtpToken.m in Sources */,
 				4D06943922083E5200FB826C /* ProUpgradeIAPManager.m in Sources */,
 				4DF97F1E21BF101B0090A55E /* DAVResponseItem.m in Sources */,
@@ -2392,6 +2451,7 @@
 				4D5F5B7C218B4C3500A0739A /* OpenSafeSequenceHelper.m in Sources */,
 				4D5B1EA82194AAAF00ECAF0D /* KdbEntry.m in Sources */,
 				4D2F6C1821807C07007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
+				4D766D6022204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
 				4D3E1485218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D2F6C2721807C53007931E4 /* XmlItem.m in Sources */,
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
@@ -2478,6 +2538,7 @@
 				4DF972C821C01ABF00F384C9 /* DAVCredentials.m in Sources */,
 				4DD696A8218F38EC0082DC08 /* AttachmentsRationalizer.m in Sources */,
 				4DF972CE21C01ABF00F384C9 /* DAVSession.m in Sources */,
+				4D766D5422204E4A00AEF439 /* IconViewCell.m in Sources */,
 				4D2F6C1721807C04007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4D27D74D21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
 				4D1884CC21709CF1001AE6B0 /* DatabaseModel.m in Sources */,
@@ -2776,7 +2837,7 @@
 		};
 		4DE48A64216F54A300C9C991 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5184D51882C3500AD4B06058 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */;
+			baseConfigurationReference = A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -2814,7 +2875,7 @@
 		};
 		4DE48A65216F54A300C9C991 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BCAA22B47662A2E87BBB8B20 /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */;
+			baseConfigurationReference = C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;

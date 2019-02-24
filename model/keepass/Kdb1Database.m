@@ -175,7 +175,6 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         ret.lastAccess = previous.lastAccess;
         ret.expiry = previous.expiry;
         ret.flags = previous.flags;
-        ret.imageId = previous.imageId;
     }
     
     ret.level = level;
@@ -206,7 +205,6 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     
     if(record.linkedData) {
         KdbEntry* previous = (KdbEntry*)record.linkedData;
-        ret.imageId = previous.imageId;
         ret.expired = previous.expired;
     }
     

@@ -238,6 +238,16 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     [self.theSafe setNodeAttachments:node attachments:attachments];
 }
 
+#if TARGET_OS_IPHONE
+- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon {
+    [self.theSafe setNodeCustomIcon:node icon:icon];
+}
+#else
+- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon {
+    [self.theSafe setNodeCustomIcon:node icon:icon];
+}
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience
 

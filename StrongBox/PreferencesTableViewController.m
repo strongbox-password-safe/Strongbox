@@ -19,6 +19,7 @@
 #import "NSArray+Extensions.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
 
 @end
 
@@ -74,6 +75,7 @@
     [self bindAppLock];
     [self bindHideTotp];
     [self bindKeePassNoSorting];
+    [self bindAutoFavIcon];
     //[self customizeAppLockSectionFooter];
 }
 
@@ -203,6 +205,18 @@
             }
         }];
     }
+}
+
+- (void)bindAutoFavIcon {
+    self.switchAutoFavIcon.on = [[Settings sharedInstance] tryDownloadFavIconForNewRecord];
+}
+
+- (IBAction)onAutoFavIcon:(id)sender {
+    NSLog(@"Setting tryDownloadFavIconForNewRecord to %d", self.switchAutoFavIcon.on);
+    
+    Settings.sharedInstance.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
+    
+    [self bindAutoFavIcon];
 }
 
 - (void)bindShowKeePass1BackupFolder {
@@ -377,7 +391,6 @@
     NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
 }
 
-
 - (IBAction)onUnlinkDropbox:(id)sender {
     if (DBClientsManager.authorizedClient) {
         [Alerts yesNo:self
@@ -531,9 +544,9 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)onBecomeAPatron:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.patreon.com/strongboxpasswordsafe"]];
-}
+//- (IBAction)onBecomeAPatron:(id)sender {
+//    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.patreon.com/strongboxpasswordsafe"]];
+//}
 
 - (void)bindHideTotp {
     self.switchHideTotp.on = Settings.sharedInstance.hideTotp;

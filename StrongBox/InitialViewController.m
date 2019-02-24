@@ -22,7 +22,6 @@
 #import "OfflineDetector.h"
 #import "SafeStorageProviderFactory.h"
 #import "ISMessages/ISMessages.h"
-#import <PopupDialog/PopupDialog-Swift.h>
 #import "IOsUtils.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "StrongboxUIDocument.h"
@@ -566,14 +565,7 @@
 }
 
 - (void)showStartupMessaging {
-    NSUInteger random = arc4random_uniform(2);
-    
-    if(random == 0) {
-        [self maybeMessageAboutMacApp];
-    }
-    else {
-        [self maybeAskForReview];
-    }
+    [self maybeAskForReview];
 }
 
 - (void)maybeAskForReview {
@@ -582,20 +574,11 @@
     
     if (launchCount > 20) {
         if (@available( iOS 10.3,*)) {
-            [SKStoreReviewController requestReview];
+            // TODO: [SKStoreReviewController requestReview];
         }
         else if(launchCount % 10 == 0 && promptedForReview == 0) {
             [self oldAskForReview];
         }
-    }
-}
-
-- (void)maybeMessageAboutMacApp {
-    NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
-    BOOL neverShow = [Settings sharedInstance].neverShowForMacAppMessage;
-    
-    if (launchCount > 20 && (launchCount % 5 == 0) && !neverShow) {
-        [self showMacAppMessage];
     }
 }
 
@@ -615,29 +598,6 @@
                            [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
                        }
                    }];
-}
-
-- (void) showMacAppMessage {
-    PopupDialog *popup = [[PopupDialog alloc] initWithTitle:@"Available Now"
-                                                    message:@"Strongbox is now available in the Mac App Store. I hope you'll find it just as useful there!\n\nSearch 'Strongbox Password Safe' on the Mac App Store."
-                                                      image:[UIImage imageNamed:@"strongbox-for-mac-promo"]
-                                            buttonAlignment:UILayoutConstraintAxisVertical
-                                            transitionStyle:PopupDialogTransitionStyleBounceUp
-                                             preferredWidth:340
-                                        tapGestureDismissal:YES
-                                        panGestureDismissal:YES
-                                              hideStatusBar:NO
-                                                 completion:nil];
-    
-    DefaultButton *ok = [[DefaultButton alloc] initWithTitle:@"Cool!" height:50 dismissOnTap:YES action:nil];
-    
-    CancelButton *later = [[CancelButton alloc] initWithTitle:@"Got It! Never Remind Me Again!" height:50 dismissOnTap:YES action:^{
-        [[Settings sharedInstance] setNeverShowForMacAppMessage:YES];
-    }];
-    
-    [popup addButtons: @[ok, later]];
-    
-    [self presentViewController:popup animated:YES completion:nil];
 }
 
 @end

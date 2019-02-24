@@ -38,7 +38,7 @@
     if(Settings.sharedInstance.installDate == nil) {
         Settings.sharedInstance.installDate = [NSDate date];
     }
- 
+    
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
 
     [self registerForClipboardClearingNotifications];

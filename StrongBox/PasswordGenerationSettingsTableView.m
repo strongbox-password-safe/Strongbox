@@ -28,6 +28,13 @@
     [self onGenerate:nil];
 }
 
+-(void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    self.navigationController.navigationBar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+}
+
 - (IBAction)onChangeSettings:(id)sender {
     PasswordGenerationParameters *params = [[PasswordGenerationParameters alloc] init];
     

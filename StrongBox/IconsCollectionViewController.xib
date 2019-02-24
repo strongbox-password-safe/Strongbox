@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="IconsCollectionViewController">
+            <connections>
+                <outlet property="collectionView" destination="a4O-Vn-GMY" id="UJo-Az-xeJ"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="a4O-Vn-GMY">
+                    <rect key="frame" x="16" y="53" width="343" height="548"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="u1h-nx-ndy">
+                        <size key="itemSize" width="60" height="60"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                </collectionView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6fG-XC-Kw4">
+                    <rect key="frame" x="278" y="617" width="81" height="30"/>
+                    <state key="normal" title="Use Default"/>
+                    <connections>
+                        <action selector="onUseDefault:" destination="-1" eventType="touchUpInside" id="D8A-VY-l19"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please select the icon you would like to use" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Auy-hb-ZOc">
+                    <rect key="frame" x="48" y="28" width="279.5" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kCY-nc-B0L">
+                    <rect key="frame" x="16" y="617" width="48" height="30"/>
+                    <state key="normal" title="Cancel"/>
+                    <connections>
+                        <action selector="onCancel:" destination="-1" eventType="touchUpInside" id="ceP-rH-nJe"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="a4O-Vn-GMY" secondAttribute="trailing" constant="16" id="5pe-OG-Vqv"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="6fG-XC-Kw4" secondAttribute="trailing" constant="16" id="C2f-tT-psZ"/>
+                <constraint firstItem="Auy-hb-ZOc" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="KAr-W9-GbY"/>
+                <constraint firstItem="a4O-Vn-GMY" firstAttribute="top" secondItem="Auy-hb-ZOc" secondAttribute="bottom" constant="8" id="PeG-nM-7is"/>
+                <constraint firstItem="Auy-hb-ZOc" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="8" id="Pn2-Tg-PeJ"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="kCY-nc-B0L" secondAttribute="bottom" constant="20" id="QSg-SN-Uex"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="6fG-XC-Kw4" secondAttribute="bottom" constant="20" id="QtN-UE-mUB"/>
+                <constraint firstItem="a4O-Vn-GMY" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="16" id="kfJ-T2-g3q"/>
+                <constraint firstItem="kCY-nc-B0L" firstAttribute="top" secondItem="a4O-Vn-GMY" secondAttribute="bottom" constant="16" id="pg8-sc-WcC"/>
+                <constraint firstItem="kCY-nc-B0L" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="16" id="q5j-sZ-ENO"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <point key="canvasLocation" x="132" y="154.27286356821591"/>
+        </view>
+    </objects>
+</document>

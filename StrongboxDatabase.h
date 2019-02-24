@@ -11,6 +11,12 @@
 #import "DatabaseAttachment.h"
 #import "UiAttachment.h"
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#else
+#import <Cocoa/Cocoa.h>
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface StrongboxDatabase : NSObject
@@ -52,7 +58,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeNodeAttachment:(Node*)node atIndex:(NSUInteger)atIndex;
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
-    
+
+#if TARGET_OS_IPHONE
+- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon;
+#else
+- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon;
+#endif
+
 @end
 
 NS_ASSUME_NONNULL_END

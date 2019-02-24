@@ -27,7 +27,7 @@
 
 typedef void(^CompletionBlock)(Model* model);
 
-@interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate>
+@interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property (nonatomic, strong) NSString* biometricIdName;
 @property (nonatomic, strong) UIAlertController *alertController;
@@ -379,10 +379,63 @@ typedef void(^CompletionBlock)(Model* model);
 }
 
 - (void)onUseKeyFile:(UIViewController*)parentVc {
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
-    vc.delegate = self;
-    
-    [parentVc presentViewController:vc animated:YES completion:nil];
+    [Alerts threeOptions:self.viewController
+                   title:@"Key File Source"
+                 message:@"Select where you would like to choose your Key File from"
+       defaultButtonText:@"Files..."
+        secondButtonText:@"Photo Library..."
+         thirdButtonText:@"Cancel"
+                  action:^(int response) {
+                     if(response == 0) {
+                         UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
+                         vc.delegate = self;
+                         [parentVc presentViewController:vc animated:YES completion:nil];
+                     }
+                     else if (response == 1) {
+                         UIImagePickerController *vc = [[UIImagePickerController alloc] init];
+                         vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
+                         vc.delegate = self;
+                         BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
+                         
+                         if(!available) {
+                             [Alerts info:self.viewController title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"];
+                             self.completion(nil);
+                             return;
+                         }
+                         
+                         vc.mediaTypes = @[(NSString*)kUTTypeImage];
+                         vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+                         
+                         [self.viewController presentViewController:vc animated:YES completion:nil];
+                     }
+                     else {
+                         self.completion(nil);
+                     }
+                 }];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
+    [picker dismissViewControllerAnimated:YES completion:^{
+         NSError* error;
+         NSData* data = [Utils getImageDataFromPickedImage:info error:&error];
+
+         if(!data) {
+             NSLog(@"Error: %@", error);
+             [Alerts error:self.viewController title:@"Error Reading Image" error:error];
+             self.completion(nil);
+         }
+         else {
+             self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+             [self openSafe];
+         }
+     }];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:^
+     {
+         self.completion(nil);
+     }];
 }
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {

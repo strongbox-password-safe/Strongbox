@@ -42,9 +42,8 @@ I use many different libraries in the app here are just a few:
 - Reachability
 - ISMessages
 - libsodium
-- PopupDialog
 - DZNEmptyDataSet
 - XWSI
 - DAVKit
 - NMSSH
-
+- FavIcon 

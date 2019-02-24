@@ -8,6 +8,8 @@
 
 #import "Utils.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import "regdom.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 @implementation Utils
 
@@ -345,6 +347,81 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
     //}
 }
 #endif
+
+NSString *getDomain(NSString* host) {
+    if(host == nil) {
+        return @"";
+    }
+    
+    if(!host.length) {
+        return @"";
+    }
+    
+    const char *cStringUrl = [host UTF8String];
+    if(!cStringUrl || strlen(cStringUrl) == 0) {
+        return @"";
+    }
+    
+    void *tree = loadTldTree();
+    const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
+    
+    if(result == NULL) {
+        return @"";
+    }
+    
+    NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"Calculated Domain: %@", domain);
+
+    return domain;
+}
+
+NSString *getSearchTermFromDomain(NSString* host) {
+    NSString* domain = getDomain(host);
+    
+    if(!domain.length) {
+        return domain;
+    }
+    
+    NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
+    
+    NSLog(@"%@", parts);
+    
+    NSString *searchTerm =  parts.count ? parts[0] : domain;
+    return searchTerm;
+}
+
++ (NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error {
+    NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    BOOL isImage = UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage) != 0;
+    
+    NSURL *url;
+    NSData* data;
+    
+    if(isImage) {
+        if (@available(iOS 11.0, *)) {
+            url =  [info objectForKey:UIImagePickerControllerImageURL];
+        } else {
+            UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
+            
+            if(!image) {
+                *error = [Utils createNSError:@"Could not read the data for this item" errorCode:-1];
+                return nil;
+            }
+            
+            data = UIImagePNGRepresentation(image);
+        }
+    }
+    else {
+        url =  [info objectForKey:UIImagePickerControllerMediaURL];
+    }
+    
+    if(url) {
+        data = [NSData dataWithContentsOfURL:url options:kNilOptions error:error];
+    }
+    
+    return data;
+}
 
 //    [[Settings sharedInstance] setPro:NO];
 //    [[Settings sharedInstance] setEndFreeTrialDate:nil];

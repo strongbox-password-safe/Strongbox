@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NodeIconHelper : NSObject
 
 + (UIImage*)getIconForNode:(Node*)vm database:(DatabaseModel*)database;
++ (NSArray<UIImage*>*)iconSet;
 
 @end
 

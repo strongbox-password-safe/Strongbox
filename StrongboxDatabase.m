@@ -7,10 +7,12 @@
 
 #import "StrongboxDatabase.h"
 #import "AttachmentsRationalizer.h"
+#import "NSArray+Extensions.h"
 
 @interface StrongboxDatabase ()
 
 @property (nonatomic, readonly) NSMutableArray<DatabaseAttachment*> *mutableAttachments;
+@property (nonatomic) NSMutableDictionary<NSUUID*, NSData*>* mutableCustomIcons;
 
 @end
 
@@ -51,14 +53,21 @@
         _masterPassword = masterPassword;
         _keyFileDigest = keyFileDigest;
         _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:attachments root:rootGroup] mutableCopy];
-        _customIcons = [customIcons mutableCopy];
+        
+        self.mutableCustomIcons = [customIcons mutableCopy];
+        [self rationalizeCustomIcons];
     }
     
     return self;
 }
 
+- (NSDictionary<NSUUID *,NSData *> *)customIcons {
+    [self rationalizeCustomIcons];
+    return [self.mutableCustomIcons copy];
+}
+
 - (NSArray<DatabaseAttachment *> *)attachments {
-    return [NSArray arrayWithArray:_mutableAttachments];
+    return [self.mutableAttachments copy];
 }
 
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex {
@@ -101,6 +110,58 @@
     }
 
     _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:_mutableAttachments root:self.rootGroup] mutableCopy];
+}
+
+#if TARGET_OS_IPHONE
+- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon {
+    NSUUID *uuid = [NSUUID UUID];
+    node.customIconUuid = uuid;
+    NSData *data = UIImagePNGRepresentation(icon);
+    self.mutableCustomIcons[uuid] = data;
+    
+    //NSLog(@"Set Node Icon with UUID: [%@] and data: [%@]", uuid, data);
+    [self rationalizeCustomIcons];
+}
+#else
+- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon {
+    NSUUID *uuid = [NSUUID UUID];
+    node.customIconUuid = uuid;
+
+    
+    CGImageRef cgRef = [icon CGImageForProposedRect:NULL
+                                            context:nil
+                                              hints:nil];
+    
+    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+    NSData *pngData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+    
+    self.mutableCustomIcons[uuid] = pngData;
+    [self rationalizeCustomIcons];
+}
+#endif
+
+- (void)rationalizeCustomIcons {
+    //NSLog(@"Before Rationalization: [%@]", self.mutableCustomIcons.allKeys);
+    
+    NSArray<Node*>* customIconNodes = [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return node.customIconUuid != nil;
+    }];
+    
+    NSMutableDictionary<NSUUID*, NSData*>* fresh = [NSMutableDictionary dictionaryWithCapacity:customIconNodes.count];
+    for (Node* node in customIconNodes) {
+        NSUUID* key = node.customIconUuid;
+        if(self.mutableCustomIcons[key]) {
+            fresh[key] = self.mutableCustomIcons[key];
+        }
+        else {
+            NSLog(@"Removed bad Custom Icon reference [%@]-[%@]", node, key);
+            node.customIconUuid = nil;
+        }
+    }
+    
+    //NSLog(@"Rationalized: [%@]", fresh.allKeys);
+    
+    self.mutableCustomIcons = fresh;
 }
 
 -(NSString *)description {

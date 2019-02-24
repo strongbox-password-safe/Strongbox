@@ -22,25 +22,91 @@
 #import "Node+OtpToken.h"
 #import "OTPToken+Generation.h"
 #import "QRCodeScannerViewController.h"
+#import "NodeIconHelper.h"
+#import "IconsCollectionViewController.h"
+#import "Utils.h"
+#import "SetNodeIconUiHelper.h"
 
 static const int kMinNotesCellHeight = 160;
 
-@interface RecordView ()
+@interface RecordView () <UITextViewDelegate, UITextFieldDelegate>
 
 @property (nonatomic, strong) TextFieldAutoSuggest *passwordAutoSuggest;
 @property (nonatomic, strong) TextFieldAutoSuggest *usernameAutoSuggest;
 @property (nonatomic, strong) TextFieldAutoSuggest *emailAutoSuggest;
-@property (nonatomic, strong) UITextField *textFieldTitle;
 @property (weak, nonatomic) IBOutlet UILabel *labelAttachmentCount;
+
 @property BOOL editingNewRecord;
-@property UIBarButtonItem *navBack;
+@property NSNumber* userSelectedNewIconIndex;
+@property UIImage* userSelectedNewCustomIcon;
 @property BOOL hidePassword;
 @property BOOL showOtp;
 @property NSTimer* timerRefreshOtp;
 
+@property (weak, nonatomic) IBOutlet UIView *iconAndTitleView;
+@property (weak, nonatomic) IBOutlet UITextField *textFieldTitle;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewIcon;
+@property UIBarButtonItem *navBack;
+@property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
+
 @end
 
 @implementation RecordView
+
+- (void)onChangeIcon {
+    self.sni = [[SetNodeIconUiHelper alloc] init];
+    
+    NSString* urlHint = trim(self.textFieldUrl.text);
+    if(!urlHint.length) {
+        urlHint = trim(self.textFieldTitle.text);
+    }
+    
+    [self.sni changeIcon:self urlHint:urlHint format:self.viewModel.database.format completion:^(BOOL goNoGo, NSNumber* userSelectedNewIconIndex, UIImage* userSelectedNewCustomIcon) {
+        //NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
+        if(goNoGo) {
+            self.userSelectedNewIconIndex = userSelectedNewIconIndex;
+            self.userSelectedNewCustomIcon = userSelectedNewCustomIcon;
+
+            if(self.userSelectedNewCustomIcon) {
+                self.imageViewIcon.image = self.userSelectedNewCustomIcon;
+            }
+            else if(self.userSelectedNewIconIndex) {
+                if(self.userSelectedNewIconIndex.intValue == -1) {
+                    self.imageViewIcon.image = [NodeIconHelper iconSet][0]; // Default
+                }
+                else {
+                    self.imageViewIcon.image = [NodeIconHelper iconSet][self.userSelectedNewIconIndex.intValue];
+                }
+            }
+            
+            self.editButtonItem.enabled = [self recordCanBeSaved];
+        }
+    }];
+}
+
+- (IBAction)onEdit:(id)sender {
+    [self setEditing:!self.tableView.isEditing];
+}
+
+- (IBAction)onCancel:(id)sender {
+    if(self.isEditing) {
+        if(!self.editingNewRecord) {
+            self.userSelectedNewIconIndex = nil;
+            self.userSelectedNewCustomIcon = nil;
+            [self bindUiToRecord];
+            [self setEditing:NO animated:YES];
+        }
+        else {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+    }
+}
+
+- (IBAction)onBack:(id)sender {
+    if(!self.isEditing) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
 
 - (void)setupAutoComplete {
     self.passwordAutoSuggest = [[TextFieldAutoSuggest alloc]
@@ -85,7 +151,7 @@ static const int kMinNotesCellHeight = 160;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)setInitialTextFieldBordersAndColors {
+- (void)setupUi {
     self.textFieldPassword.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldHidden.borderStyle = UITextBorderStyleRoundedRect;
     self.textFieldUsername.borderStyle = UITextBorderStyleRoundedRect;
@@ -116,21 +182,17 @@ static const int kMinNotesCellHeight = 160;
     self.textFieldEmail.layer.borderColor = [UIColor lightGrayColor].CGColor;
     
     self.textViewNotes.delegate = self;
-    
-    self.textFieldTitle = [[UITextField alloc] initWithFrame:CGRectMake(self.view.bounds.origin.x, 7, self.view.bounds.size.width, 31)];
-    
-    self.textFieldTitle.backgroundColor = [UIColor clearColor];
-    self.textFieldTitle.textAlignment = NSTextAlignmentCenter;
-    self.textFieldTitle.borderStyle = UITextBorderStyleNone;
-    self.textFieldTitle.font = [UIFont boldSystemFontOfSize:20];
+
     self.textFieldTitle.autocorrectionType = UITextAutocorrectionTypeNo;
-    self.textFieldTitle.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    self.textFieldTitle.layer.masksToBounds = NO;
-    self.textFieldTitle.enabled = NO;
     self.textFieldTitle.layer.shadowColor = [UIColor whiteColor].CGColor;
     self.textFieldTitle.layer.shadowOpacity = 0;
     self.textFieldTitle.layer.cornerRadius = 5;
     self.textFieldTitle.tag = 1;
+    
+    self.imageViewIcon.layer.borderWidth = 1.0f;
+    self.imageViewIcon.layer.masksToBounds = YES;
+    self.imageViewIcon.layer.cornerRadius = 5;
+    self.imageViewIcon.layer.borderColor = [UIColor blueColor].CGColor;
     
     [self.textFieldTitle addTarget:self
                             action:@selector(textViewDidChange:)
@@ -151,20 +213,70 @@ static const int kMinNotesCellHeight = 160;
     [self.textFieldUrl addTarget:self
                           action:@selector(textViewDidChange:)
                 forControlEvents:UIControlEventEditingChanged];
+
+    //
     
-    self.navigationItem.titleView = self.textFieldTitle;
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onChangeIcon)];
+    singleTap.numberOfTapsRequired = 1;
+    [self.imageViewIcon addGestureRecognizer:singleTap];
+
+    // Required to allow taps in the area, otherwise autolayout sizes it to 0 and cannot tap
+    
+    if (@available(iOS 11.0, *)) {
+        // NOP
+    }
+    else {
+        // Older devices do not layout properly using intrinsic content size
+        [self.iconAndTitleView.widthAnchor constraintEqualToConstant:250].active = YES;
+        [self.iconAndTitleView.heightAnchor constraintEqualToConstant:44].active = YES;
+    }
+    
+    self.navigationItem.titleView = self.iconAndTitleView;
+    
+    // Show / Hide Password Button
+    
+    // For Actual Password Text Field
+    
+    UIButton *checkbox = [UIButton buttonWithType:UIButtonTypeCustom];
+    checkbox.frame = CGRectMake(0.0, 0.0, 28 + 14.0, 28);
+    checkbox.contentMode = UIViewContentModeCenter;
+    [checkbox addTarget:self action:@selector(togglePasswordVisibility:) forControlEvents:UIControlEventTouchUpInside];
+    [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [checkbox setImage:[UIImage imageNamed:@"hide.png"] forState:UIControlStateNormal];
+    [checkbox setAdjustsImageWhenHighlighted:TRUE];
+    
+    // For Hidden/Masked Password Text Field
+    
+    UIButton *checkboxMasked = [UIButton buttonWithType:UIButtonTypeCustom];
+    checkboxMasked.frame = CGRectMake(0.0, 0.0, 28 + 14.0, 28);
+    checkboxMasked.contentMode = UIViewContentModeCenter;
+    [checkboxMasked addTarget:self action:@selector(togglePasswordVisibility:) forControlEvents:UIControlEventTouchUpInside];
+    [checkboxMasked.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [checkboxMasked setImage:[UIImage imageNamed:@"show.png"] forState:UIControlStateNormal];
+    [checkboxMasked setAdjustsImageWhenHighlighted:TRUE];
+    
+    [self.textFieldPassword setRightViewMode:UITextFieldViewModeAlways];
+    [self.textFieldPassword setRightView:checkbox];
+    self.textFieldPassword.delegate = self;
+    
+    [self.textFieldHidden setRightViewMode:UITextFieldViewModeAlways];
+    [self.textFieldHidden setRightView:checkboxMasked];
+    self.textFieldHidden.delegate = self;
+}
+
+- (IBAction)togglePasswordVisibility:(id)sender {
+    _hidePassword = !_hidePassword;
+    [self hideOrShowPassword:_hidePassword];
+}
+
+- (void)hideOrShowPassword:(BOOL)hide {
+    self.textFieldPassword.hidden = hide;
+    self.textFieldHidden.hidden = !hide;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.navigationController.toolbar.hidden = YES;
-    self.navigationController.navigationBar.hidden = NO;
-    
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-
     [self showHideOtpCode];
     [self refreshOtpCode:nil];
 
@@ -174,6 +286,15 @@ static const int kMinNotesCellHeight = 160;
     }
     self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+
+    self.navigationController.toolbar.hidden = YES;
+    self.navigationController.navigationBar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
+    self.navigationController.navigationBarHidden = NO;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -188,7 +309,7 @@ static const int kMinNotesCellHeight = 160;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
     if(self.editingNewRecord) {
         [self.textFieldTitle becomeFirstResponder];
         [self.textFieldTitle selectAll:nil];
@@ -198,11 +319,12 @@ static const int kMinNotesCellHeight = 160;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setInitialTextFieldBordersAndColors];
+    [self setupUi];
     [self setupAutoComplete];
     
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
+    self.userSelectedNewIconIndex = nil;
     self.hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
 
     if(!self.record) {
@@ -241,17 +363,22 @@ static const int kMinNotesCellHeight = 160;
 
     [self showHideOtpCode];
     [self refreshOtpCode:nil];
+    
+    // Icon
+    
+    UIImage* icon = [NodeIconHelper getIconForNode:self.record database:self.viewModel.database];
+    [self.imageViewIcon setImage:icon];
 }
 
 - (void)setEditing:(BOOL)flag animated:(BOOL)animated {
     [super setEditing:flag animated:animated];
-    
+
     if (flag == YES) {
         self.navBack = self.navigationItem.leftBarButtonItem;
-        NSLog(@"EDIT: Yes: Setting Nav Back: %@", self.navBack);
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
         
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancelBarButton)];
         [self enableDisableUiForEditing];
+        
         self.editButtonItem.enabled = [self recordCanBeSaved];
         [self.textFieldTitle becomeFirstResponder];
     }
@@ -260,15 +387,24 @@ static const int kMinNotesCellHeight = 160;
             [self onDoneWithChanges];
         }
         else {
-            NSLog(@"Setting Nav Back: %@", self.navBack);
             self.navigationItem.leftBarButtonItem = self.navBack;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
             self.navBack = nil;
-        
             [self enableDisableUiForEditing];
         }
     }
+}
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    if (textField == self.textFieldPassword) {
+        return self.editing;
+    }
+    else if (textField == self.textFieldHidden) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (void)enableDisableUiForEditing {
@@ -276,8 +412,10 @@ static const int kMinNotesCellHeight = 160;
     self.textFieldTitle.layer.borderWidth = self.editing ? 1.0f : 0.0f;
     self.textFieldTitle.borderStyle = self.editing ? UITextBorderStyleRoundedRect : UITextBorderStyleNone;
     [self setTitleTextFieldUIValidationIndicator];
-    
-    self.textFieldPassword.enabled = self.editing;
+
+    self.imageViewIcon.userInteractionEnabled = self.editing && self.viewModel.database.format != kPasswordSafe;
+    self.imageViewIcon.layer.borderWidth = (self.editing && self.viewModel.database.format != kPasswordSafe) ? 1.5f : 0.0f;
+        
     self.textFieldPassword.layer.borderColor = self.editing ? [UIColor darkGrayColor].CGColor : [UIColor lightGrayColor].CGColor;
     self.textFieldPassword.backgroundColor = [UIColor whiteColor];
     
@@ -326,8 +464,13 @@ static const int kMinNotesCellHeight = 160;
     // Show / Hide Password
     
     [self hideOrShowPassword:self.isEditing ? NO : _hidePassword];
-    (self.buttonHidePassword).enabled = !self.isEditing;
+    [self.textFieldPassword setRightViewMode:self.isEditing ? UITextFieldViewModeNever : UITextFieldViewModeAlways];
     
+    if(!self.isEditing) {
+        // Remove focus if we have it from self.textFieldPassword - supposed to be disabled
+        [self.textFieldPassword resignFirstResponder];
+    }
+        
     // Edit OTP
     
     self.buttonSetOtp.hidden = Settings.sharedInstance.hideTotp || self.isEditing;
@@ -354,7 +497,7 @@ static const int kMinNotesCellHeight = 160;
 - (BOOL)recordCanBeSaved {
     BOOL ret =  ([self uiEditsPresent] || self.editingNewRecord) && [self uiIsValid];
 
-    //NSLog(@"validEditsPresent: %d", ret);
+    //NSLog(@"recordCanBeSaved: %d", ret);
     
     return ret;
 }
@@ -370,6 +513,24 @@ static const int kMinNotesCellHeight = 160;
         return YES;
     }
     
+    //NSLog(@"userSelectedNewIconIndex: [%@]", self.userSelectedNewIconIndex);
+
+    BOOL userSetIconIsSameAsRecordIcon = YES;
+    BOOL userHasNotSetIcon = (self.userSelectedNewIconIndex == nil && self.userSelectedNewCustomIcon == nil);
+    
+    if(!userHasNotSetIcon) {
+        if(self.userSelectedNewCustomIcon != nil) {
+            userSetIconIsSameAsRecordIcon = NO;
+        }
+        else {
+            userSetIconIsSameAsRecordIcon = (self.record.iconId.intValue == self.userSelectedNewIconIndex.intValue);
+        }
+    }
+    
+    BOOL iconClean =    self.viewModel.database.format == kPasswordSafe ||
+                        userHasNotSetIcon ||
+                        userSetIconIsSameAsRecordIcon;
+    
     BOOL notesClean = [self.textViewNotes.text isEqualToString:self.record.fields.notes];
     BOOL passwordClean = [trim(self.textFieldPassword.text) isEqualToString:self.record.fields.password];
     BOOL titleClean = [trim(self.textFieldTitle.text) isEqualToString:self.record.title];
@@ -382,7 +543,7 @@ static const int kMinNotesCellHeight = 160;
 
     //NSLog(@"[%@] != [%@]", trim(self.textFieldPassword.text), self.record.fields.password);
     
-    return !(notesClean && passwordClean && titleClean && urlClean && emailClean && usernameClean);
+    return !(notesClean && passwordClean && titleClean && urlClean && emailClean && usernameClean && iconClean);
 }
 
 - (Node*)createNewRecord {
@@ -478,28 +639,6 @@ static NSString * trim(NSString *string) {
     [self copyToClipboard:self.record.fields.email message:@"Email Copied"];
 }
 
-- (IBAction)onHide:(id)sender {
-    _hidePassword = !_hidePassword;
-    [self hideOrShowPassword:_hidePassword];
-}
-
-- (void)hideOrShowPassword:(BOOL)hide {
-    self.textFieldPassword.hidden = hide;
-    self.textFieldHidden.hidden = !hide;
-    [self.buttonHidePassword setTitle:hide ? @"Show" : @"Hide" forState:UIControlStateNormal];
-}
-
-- (void)onCancelBarButton {
-    if (self.editingNewRecord) {
-        // Back to safe view if we just cancelled out of a new record
-        [self.navigationController popViewControllerAnimated:YES];
-    }
-    else {
-        [self bindUiToRecord];
-        [self setEditing:NO animated:YES];
-    }
-}
-
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil))
     {
@@ -574,13 +713,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (section == 4) { // Hide Attachments Section for PasswordSafe
+    if (section == 5) { // Hide Attachments Section for PasswordSafe
         return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForHeaderInSection:section];
     }
-    else if (section == 5) { // Hide Custom Fields for password safe and keepass 1
+    else if (section == 6) { // Hide Custom Fields for password safe and keepass 1
         return self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 : [super tableView:tableView heightForHeaderInSection:section];
     }
-    else if (section == 2) {  // Hide Email Section for KeePass
+    else if (section == 3) {  // Hide Email Section for KeePass
         return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForHeaderInSection:section] : 0;
     }
     
@@ -593,36 +732,40 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0 && indexPath.row == 0) {
+        return 0; // Always hide the dummy header / Icon & Title cell
+    }
+    else if (indexPath.section == 1 && indexPath.row == 0) {
         return [self getPasswordRowHeight]; // [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     }
-    else if (indexPath.section == 6 && indexPath.row == 0) { // Notes should fill whatever is left
-        int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:1]];
-        int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]];
+    else if (indexPath.section == 7 && indexPath.row == 0) { // Notes should fill whatever is left
+        int titleIcon = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+        int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]];
+        int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:4]];
        
         int attachments = self.viewModel.database.format == kPasswordSafe ? 0 :
-            [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:4]] + self.tableView.sectionHeaderHeight;
+            [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:5]] + self.tableView.sectionHeaderHeight;
         
         int customFields = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 :
-        [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:5]] + self.tableView.sectionHeaderHeight;
+        [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:6]] + self.tableView.sectionHeaderHeight;
         
         int email = self.viewModel.database.format == kPasswordSafe ?
-            [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]] + self.tableView.sectionHeaderHeight : 0;
+            [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]] + self.tableView.sectionHeaderHeight : 0;
 
         //NSLog(@"Cells: %d-%d-%d-%d-%d", password, username, email, url, attachments);
 
         // Include Header Height (not from cells as they're set to UITableViewAutomaicDimension (-1) so ask for default
         // Tableview section header height then x 3 fixed header
         
-        int otherCellsAndCellHeadersHeight = [self getPasswordRowHeight] + username + email + url + attachments + customFields + (3 * self.tableView.sectionHeaderHeight);
+        int otherCellsAndCellHeadersHeight = titleIcon + [self getPasswordRowHeight] + username + email + url + attachments + customFields + (3 * self.tableView.sectionHeaderHeight);
         
         int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int toolBarHeight = self.navigationController.toolbar.frame.size.height;
-        int navBarHeight = self.navigationController.navigationBar.frame.size.height;
+        //int navBarHeight = self.navigationController.navigationBar.frame.size.height;
         
         //NSLog(@"Bars: %d-%d-%d", statusBarHeight, navBarHeight, toolBarHeight);
 
         //NSLog(@"Total Height: %f", self.tableView.bounds.size.height);
-        int totalVisibleHeight = self.tableView.bounds.size.height - statusBarHeight - navBarHeight - toolBarHeight;
+        int totalVisibleHeight = self.tableView.bounds.size.height - statusBarHeight - toolBarHeight;
         
         //NSLog(@"Total Visible Height: %d", totalVisibleHeight);
         
@@ -634,13 +777,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         
         return availableHeight;
     }
-    else if (indexPath.section == 4 && indexPath.row == 0) { // Hide Attachments Section for Passwprd Safe
+    else if (indexPath.section == 5 && indexPath.row == 0) { // Hide Attachments Section for Passwprd Safe
         return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
-    else if (indexPath.section == 5 && indexPath.row == 0) { // Hide Custom Fields Section for Password Safe & KeePass 1
+    else if (indexPath.section == 6 && indexPath.row == 0) { // Hide Custom Fields Section for Password Safe & KeePass 1
         return self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
-    else if (indexPath.section == 2 && indexPath.row == 0) { // Hide Email Section for KeePass
+    else if (indexPath.section == 3 && indexPath.row == 0) { // Hide Email Section for KeePass
         return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForRowAtIndexPath:indexPath] : 0;
     }
     else {
@@ -659,25 +802,6 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(error);
         });
-    }];
-}
-
-- (void)onDoneWithChanges {
-    [self saveChanges:^(NSError *error) {
-        self.navigationItem.leftBarButtonItem = self.navBack;
-        self.editButtonItem.enabled = YES;
-        self.navBack = nil;
-        
-        if (error != nil) {
-            [Alerts error:self title:@"Problem Saving" error:error completion:^{
-                [self.navigationController popToRootViewControllerAnimated:YES];
-            }];
-            NSLog(@"%@", error);
-        }
-        else {
-            [self bindUiToRecord];
-            [self enableDisableUiForEditing];
-        }
     }];
 }
 
@@ -717,31 +841,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     }];
 }
 
-- (void)saveChanges:(void (^)(NSError *))completion {
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
-    self.record.fields.notes = self.textViewNotes.text;
-    self.record.fields.password = trim(self.textFieldPassword.text);
-    self.record.title = trim(self.textFieldTitle.text);
-    self.record.fields.url = trim(self.textFieldUrl.text);
-    self.record.fields.username = trim(self.textFieldUsername.text);
-    self.record.fields.email = trim(self.textFieldEmail.text);
-
-    if (self.editingNewRecord) {
-        self.record.fields.created = [[NSDate alloc] init];
-        [self.parentGroup addChild:self.record];
-    }
-
-    [self.viewModel update:^(NSError *error) {
-        if(!error) {
-            self.editingNewRecord = NO;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            completion(error);
-        });
-    }];
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// OTP
 
 - (IBAction)refreshOtpCode:(id)sender
 {
@@ -832,6 +933,101 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
     });
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)onDoneWithChanges {
+    self.editButtonItem.enabled = NO;
+
+    [self saveChanges:^(NSError *error) {
+        self.navigationItem.leftBarButtonItem = self.navBack;
+        self.editButtonItem.enabled = YES;
+        self.navBack = nil;
+        
+        if (error != nil) {
+            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
+            NSLog(@"%@", error);
+        }
+        else {
+            [self bindUiToRecord];
+            [self enableDisableUiForEditing];
+        }
+    }];
+}
+
+- (void)saveChanges:(void (^)(NSError *))completion {
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+    self.record.fields.notes = self.textViewNotes.text;
+    self.record.fields.password = trim(self.textFieldPassword.text);
+    self.record.title = trim(self.textFieldTitle.text);
+    self.record.fields.url = trim(self.textFieldUrl.text);
+    self.record.fields.username = trim(self.textFieldUsername.text);
+    self.record.fields.email = trim(self.textFieldEmail.text);
+    
+    if (self.editingNewRecord) {
+        self.record.fields.created = [[NSDate alloc] init];
+        [self.parentGroup addChild:self.record];
+    }
+    
+    // Custom Icon addition must be done after node has been added to parent, because otherwise the custom icon rationalizer
+    // will pick up the new custom icon as a bad reference (not on a node within the root group)...
+    
+    if(self.userSelectedNewCustomIcon) {
+        [self.viewModel.database setNodeCustomIcon:self.record icon:self.userSelectedNewCustomIcon];
+    }
+    else if(self.userSelectedNewIconIndex) {
+        if(self.userSelectedNewIconIndex.intValue == -1) {
+            self.record.iconId = @(0); // Default
+        }
+        else {
+            self.record.iconId = self.userSelectedNewIconIndex;
+        }
+        self.record.customIconUuid = nil;
+    }
+    else if(self.editingNewRecord) {
+        // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
+        // grab a FavIcon?
+        
+        if(Settings.sharedInstance.isProOrFreeTrial && Settings.sharedInstance.tryDownloadFavIconForNewRecord &&
+           (self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4)) {
+            NSString* urlHint = trim(self.textFieldUrl.text);
+            if(!urlHint.length) {
+                urlHint = trim(self.textFieldTitle.text);
+            }
+            
+            self.sni = [[SetNodeIconUiHelper alloc] init];
+            [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, UIImage * _Nullable userSelectedNewCustomIcon) {
+                if(goNoGo && userSelectedNewCustomIcon) {
+                    [self.viewModel.database setNodeCustomIcon:self.record icon:userSelectedNewCustomIcon];
+                }
+                
+                [self sync:completion];
+            }];
+            return;
+        }
+    }
+    
+    [self sync:completion];
+}
+
+- (void)sync:(void (^)(NSError *))completion {
+//    NSLog(@"Syncing...");
+    [self.viewModel update:^(NSError *error) {
+//        NSLog(@"Syncing Done: [%@]...", error);
+        if(!error) {
+            self.editingNewRecord = NO;
+            self.userSelectedNewCustomIcon = nil;
+            self.userSelectedNewIconIndex = nil;
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            completion(error);
+        });
+    }];
 }
 
 @end

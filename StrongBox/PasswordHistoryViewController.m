@@ -25,6 +25,17 @@
     [self bindToModel];
 }
 
+-(void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+
+    self.navigationController.navigationBar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+}
+
 - (IBAction)onMaxEntriesStepper:(id)sender {
     _model.maximumSize = (int)self.uiStepper.value;
 

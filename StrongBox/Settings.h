@@ -99,6 +99,7 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property BOOL hideTotpInBrowse;
 @property BOOL hideTotpInAutoFill;
 @property BOOL uiDoNotSortKeePassNodesInBrowseView;
+@property BOOL tryDownloadFavIconForNewRecord;
 
 NS_ASSUME_NONNULL_END
 

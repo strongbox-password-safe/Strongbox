@@ -10,7 +10,7 @@
 #import "Record.h"
 #import "Model.h"
 
-@interface RecordView : UITableViewController <UITextViewDelegate>
+@interface RecordView : UITableViewController
 
 @property (nonatomic, strong, nullable) Node *record;
 @property (nonatomic, strong, nullable) Node *parentGroup;
@@ -22,7 +22,6 @@
 @property (weak, nonatomic) IBOutlet UITextField *textFieldHidden;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldUsername;
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldUrl;
-@property (weak, nonatomic, nullable) IBOutlet UIButton *buttonHidePassword;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonGeneratePassword;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyUsername;
 @property (weak, nonatomic, nullable) IBOutlet UIButton *buttonCopyUrl;
@@ -40,7 +39,6 @@
 - (IBAction)onGenerateOrCopyPassword:(id _Nullable )sender;
 - (IBAction)onCopyUsername:(id _Nullable)sender;
 - (IBAction)onCopyUrl:(id _Nullable)sender;
-- (IBAction)onHide:(id _Nullable)sender;
 - (IBAction)onCopyAndLaunchUrl:(id _Nullable)sender;
 - (IBAction)onCopyEmail:(id _Nullable)sender;
 

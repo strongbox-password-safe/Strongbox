@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSUUID* uuid;
 @property (nonatomic) NSData* data;
 
-
 @end
 
 NS_ASSUME_NONNULL_END

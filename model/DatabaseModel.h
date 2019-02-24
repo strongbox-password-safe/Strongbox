@@ -36,6 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 
+#if TARGET_OS_IPHONE
+- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon;
+#else
+- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon;
+#endif
+
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
