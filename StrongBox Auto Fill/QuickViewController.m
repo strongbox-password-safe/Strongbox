@@ -130,7 +130,7 @@
                                           canConvenienceEnrol:NO
                                                  completion:^(Model * _Nonnull model) {
                                                      if(model) {
-                                                         [self performSegueWithIdentifier:@"toPickCredentials" sender:model];
+                                                         [self performSegueWithIdentifier:@"toPickCredentialsFromQuickLaunch" sender:model];
                                                      }
                                                      
                                                      [self refreshView];
@@ -138,7 +138,7 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"toPickCredentials"]) {
+    if ([segue.identifier isEqualToString:@"toPickCredentialsFromQuickLaunch"]) {
         PickCredentialsTableViewController *vc = segue.destinationViewController;
         vc.model = (Model *)sender;
         vc.rootViewController = self.rootViewController;

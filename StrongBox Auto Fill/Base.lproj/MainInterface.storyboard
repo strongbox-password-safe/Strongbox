@@ -338,7 +338,7 @@
                     <connections>
                         <outlet property="imageViewLogo" destination="MIf-Kg-59w" id="Jsf-Br-f7x"/>
                         <outlet property="labelSafeName" destination="QwD-TW-iTr" id="vbp-go-PM8"/>
-                        <segue destination="tum-o5-Per" kind="show" id="Ale-OO-C6r"/>
+                        <segue destination="tum-o5-Per" kind="show" identifier="toPickCredentialsFromQuickLaunch" id="Ale-OO-C6r"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yz6-ie-lB9" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -643,6 +643,6 @@
         <image name="product32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ghf-rN-99S"/>
+        <segue reference="Ale-OO-C6r"/>
     </inferredMetricsTieBreakers>
 </document>

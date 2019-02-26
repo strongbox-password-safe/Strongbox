@@ -574,7 +574,7 @@
     
     if (launchCount > 20) {
         if (@available( iOS 10.3,*)) {
-            // TODO: [SKStoreReviewController requestReview];
+            [SKStoreReviewController requestReview];
         }
         else if(launchCount % 10 == 0 && promptedForReview == 0) {
             [self oldAskForReview];
