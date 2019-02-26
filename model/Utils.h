@@ -62,10 +62,9 @@ UIImage* scaleImage(UIImage* image, CGSize newSize);
 NSImage* scaleImage(NSImage* image, CGSize newSize);
 #endif
 
-NSString *getDomain(NSString* host);
-NSString *getSearchTermFromDomain(NSString* host);
-
+#if TARGET_OS_IPHONE
 + (NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error;
+#endif
 
 NS_ASSUME_NONNULL_END
 

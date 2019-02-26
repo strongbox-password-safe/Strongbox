@@ -14,6 +14,10 @@
 
 @interface PreferencesWindowController ()
 
+@property (weak) IBOutlet NSButton *switchAutoClearClipboard;
+@property (weak) IBOutlet NSSlider *sliderAutoClearClipboardTimeout;
+@property (weak) IBOutlet NSTextField *labelClearClipboardTimeout;
+
 @end
 
 @implementation PreferencesWindowController
@@ -45,6 +49,7 @@
     [self bindGeneralUiToSettings];
     [self bindAutoFillToSettings];
     [self bindAutoLockToSettings];
+    [self bindAutoClearClipboard];
     
     NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
     [self.labelSamplePassword addGestureRecognizer:click];
@@ -365,6 +370,34 @@
             NSLog(@"Ruh ROh... ");
             break;
     }
+}
+
+- (void)bindAutoClearClipboard {
+    self.switchAutoClearClipboard.state = Settings.sharedInstance.clearClipboardEnabled ? NSOnState : NSOffState;
+    self.sliderAutoClearClipboardTimeout.integerValue = Settings.sharedInstance.clearClipboardAfterSeconds;
+    self.labelClearClipboardTimeout.stringValue = [NSString stringWithFormat:@"%ld Seconds", Settings.sharedInstance.clearClipboardAfterSeconds];
+
+    self.sliderAutoClearClipboardTimeout.enabled = Settings.sharedInstance.clearClipboardEnabled;
+}
+
+- (IBAction)onAutoClearClipboard:(id)sender {
+    NSLog(@"onAutoClearClipboard: [%d]", self.switchAutoClearClipboard.state == NSOnState);
+    
+    Settings.sharedInstance.clearClipboardEnabled = self.switchAutoClearClipboard.state == NSOnState;
+    
+    [self bindAutoClearClipboard];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onAutoClearClipboardSlider:(id)sender {
+    NSLog(@"onAutoClearClipboardSlider: [%d]", self.sliderAutoClearClipboardTimeout.intValue);
+    
+    Settings.sharedInstance.clearClipboardAfterSeconds = self.sliderAutoClearClipboardTimeout.integerValue;
+    
+    [self bindAutoClearClipboard];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
 @end

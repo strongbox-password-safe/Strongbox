@@ -113,6 +113,23 @@
 		4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
 		4DAC95FA21A0699E00E59D53 /* HierarchyOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC95F921A0699E00E59D53 /* HierarchyOutlineView.m */; };
+		4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
+		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
+		4DBCE223222414A100A2AFA2 /* SelectPredefinedIconController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DBCE221222414A100A2AFA2 /* SelectPredefinedIconController.xib */; };
+		4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */; };
+		4DBCE22822241D6700A2AFA2 /* PredefinedKeePassIcon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DBCE22622241D6700A2AFA2 /* PredefinedKeePassIcon.xib */; };
+		4DBCE22B2224207000A2AFA2 /* KeePassPredefinedIcons.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */; };
+		4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */; };
+		4DBF493D22232A3200F48182 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492622232A3200F48182 /* DAVRequestGroup.m */; };
+		4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492722232A3200F48182 /* DAVResponseItem.m */; };
+		4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492922232A3200F48182 /* DAVCredentials.m */; };
+		4DBF494022232A3200F48182 /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493022232A3200F48182 /* DAVRequest.m */; };
+		4DBF494122232A3200F48182 /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493122232A3200F48182 /* DAVBaseRequest.m */; };
+		4DBF494222232A3200F48182 /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493222232A3200F48182 /* DAVSession.m */; };
+		4DBF494322232A3200F48182 /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493522232A3200F48182 /* DAVRequests.m */; };
+		4DBF494422232A3200F48182 /* DAVListingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493622232A3200F48182 /* DAVListingParser.m */; };
+		4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493822232A3200F48182 /* NSDateRFC1123.m */; };
+		4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */; };
 		4DC46D0C219EDCD800D6C462 /* AttachmentCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC46D0B219EDCD800D6C462 /* AttachmentCollectionView.m */; };
 		4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
@@ -376,6 +393,40 @@
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4DAC95F821A0699E00E59D53 /* HierarchyOutlineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HierarchyOutlineView.h; sourceTree = "<group>"; };
 		4DAC95F921A0699E00E59D53 /* HierarchyOutlineView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HierarchyOutlineView.m; sourceTree = "<group>"; };
+		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
+		4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableImageView.m; path = MacBox/ClickableImageView.m; sourceTree = "<group>"; };
+		4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectPredefinedIconController.h; path = MacBox/SelectPredefinedIconController.h; sourceTree = "<group>"; };
+		4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectPredefinedIconController.m; path = MacBox/SelectPredefinedIconController.m; sourceTree = "<group>"; };
+		4DBCE221222414A100A2AFA2 /* SelectPredefinedIconController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SelectPredefinedIconController.xib; path = MacBox/SelectPredefinedIconController.xib; sourceTree = "<group>"; };
+		4DBCE22422241D6700A2AFA2 /* PredefinedKeePassIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PredefinedKeePassIcon.h; path = MacBox/PredefinedKeePassIcon.h; sourceTree = "<group>"; };
+		4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PredefinedKeePassIcon.m; path = MacBox/PredefinedKeePassIcon.m; sourceTree = "<group>"; };
+		4DBCE22622241D6700A2AFA2 /* PredefinedKeePassIcon.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PredefinedKeePassIcon.xib; path = MacBox/PredefinedKeePassIcon.xib; sourceTree = "<group>"; };
+		4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassPredefinedIcons.h; path = MacBox/KeePassPredefinedIcons.h; sourceTree = "<group>"; };
+		4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassPredefinedIcons.m; path = MacBox/KeePassPredefinedIcons.m; sourceTree = "<group>"; };
+		4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KSPasswordField.m; path = ../lib/KSPasswordField/KSPasswordField.m; sourceTree = "<group>"; };
+		4DBCE22D2224438800A2AFA2 /* KSPasswordField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KSPasswordField.h; path = ../lib/KSPasswordField/KSPasswordField.h; sourceTree = "<group>"; };
+		4DBF492522232A3200F48182 /* DAVRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVRequest.h; sourceTree = "<group>"; };
+		4DBF492622232A3200F48182 /* DAVRequestGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVRequestGroup.m; sourceTree = "<group>"; };
+		4DBF492722232A3200F48182 /* DAVResponseItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVResponseItem.m; sourceTree = "<group>"; };
+		4DBF492822232A3200F48182 /* DAVKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVKit.h; sourceTree = "<group>"; };
+		4DBF492922232A3200F48182 /* DAVCredentials.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVCredentials.m; sourceTree = "<group>"; };
+		4DBF492A22232A3200F48182 /* DAVSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVSession.h; sourceTree = "<group>"; };
+		4DBF492B22232A3200F48182 /* DAVBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVBaseRequest.h; sourceTree = "<group>"; };
+		4DBF492C22232A3200F48182 /* DAVRequests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVRequests.h; sourceTree = "<group>"; };
+		4DBF492D22232A3200F48182 /* DAVListingParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVListingParser.h; sourceTree = "<group>"; };
+		4DBF492E22232A3200F48182 /* DAVResponseItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVResponseItem.h; sourceTree = "<group>"; };
+		4DBF492F22232A3200F48182 /* DAVRequestGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVRequestGroup.h; sourceTree = "<group>"; };
+		4DBF493022232A3200F48182 /* DAVRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVRequest.m; sourceTree = "<group>"; };
+		4DBF493122232A3200F48182 /* DAVBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVBaseRequest.m; sourceTree = "<group>"; };
+		4DBF493222232A3200F48182 /* DAVSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVSession.m; sourceTree = "<group>"; };
+		4DBF493322232A3200F48182 /* DAVCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DAVCredentials.h; sourceTree = "<group>"; };
+		4DBF493422232A3200F48182 /* DAVRequest+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DAVRequest+Private.h"; sourceTree = "<group>"; };
+		4DBF493522232A3200F48182 /* DAVRequests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVRequests.m; sourceTree = "<group>"; };
+		4DBF493622232A3200F48182 /* DAVListingParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DAVListingParser.m; sourceTree = "<group>"; };
+		4DBF493822232A3200F48182 /* NSDateRFC1123.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDateRFC1123.m; sourceTree = "<group>"; };
+		4DBF493922232A3200F48182 /* NSDateRFC1123.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDateRFC1123.h; sourceTree = "<group>"; };
+		4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ISO8601DateFormatter.m; sourceTree = "<group>"; };
+		4DBF493C22232A3200F48182 /* ISO8601DateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISO8601DateFormatter.h; sourceTree = "<group>"; };
 		4DC225701F558D47000B0FBB /* StrongBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrongBox.entitlements; sourceTree = "<group>"; };
 		4DC46D0A219EDCD800D6C462 /* AttachmentCollectionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AttachmentCollectionView.h; path = MacBox/AttachmentCollectionView.h; sourceTree = "<group>"; };
 		4DC46D0B219EDCD800D6C462 /* AttachmentCollectionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentCollectionView.m; path = MacBox/AttachmentCollectionView.m; sourceTree = "<group>"; };
@@ -698,8 +749,6 @@
 			isa = PBXGroup;
 			children = (
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
-				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
-				4D58A45B207368B10061E046 /* PreferencesWindowController.xib */,
 				4DF59F651F30DB7A00D68BFE /* Info.plist */,
 				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
 				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
@@ -715,6 +764,12 @@
 				4DDCE1C821BBFF7800D1DE09 /* ProgressWindow.h */,
 				4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */,
 				4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */,
+				4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */,
+				4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */,
+				4DBCE221222414A100A2AFA2 /* SelectPredefinedIconController.xib */,
+				4DBCE22422241D6700A2AFA2 /* PredefinedKeePassIcon.h */,
+				4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */,
+				4DBCE22622241D6700A2AFA2 /* PredefinedKeePassIcon.xib */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -771,6 +826,62 @@
 				4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */,
 			);
 			name = KeePass;
+			sourceTree = "<group>";
+		};
+		4DBF492322232A1100F48182 /* DAVKit */ = {
+			isa = PBXGroup;
+			children = (
+				4DBF492422232A3200F48182 /* Core */,
+				4DBF493A22232A3200F48182 /* ISO8601 */,
+				4DBF493722232A3200F48182 /* RFC1123 */,
+			);
+			name = DAVKit;
+			sourceTree = "<group>";
+		};
+		4DBF492422232A3200F48182 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				4DBF492522232A3200F48182 /* DAVRequest.h */,
+				4DBF492622232A3200F48182 /* DAVRequestGroup.m */,
+				4DBF492722232A3200F48182 /* DAVResponseItem.m */,
+				4DBF492822232A3200F48182 /* DAVKit.h */,
+				4DBF492922232A3200F48182 /* DAVCredentials.m */,
+				4DBF492A22232A3200F48182 /* DAVSession.h */,
+				4DBF492B22232A3200F48182 /* DAVBaseRequest.h */,
+				4DBF492C22232A3200F48182 /* DAVRequests.h */,
+				4DBF492D22232A3200F48182 /* DAVListingParser.h */,
+				4DBF492E22232A3200F48182 /* DAVResponseItem.h */,
+				4DBF492F22232A3200F48182 /* DAVRequestGroup.h */,
+				4DBF493022232A3200F48182 /* DAVRequest.m */,
+				4DBF493122232A3200F48182 /* DAVBaseRequest.m */,
+				4DBF493222232A3200F48182 /* DAVSession.m */,
+				4DBF493322232A3200F48182 /* DAVCredentials.h */,
+				4DBF493422232A3200F48182 /* DAVRequest+Private.h */,
+				4DBF493522232A3200F48182 /* DAVRequests.m */,
+				4DBF493622232A3200F48182 /* DAVListingParser.m */,
+			);
+			name = Core;
+			path = ../lib/DAVKit/Core;
+			sourceTree = "<group>";
+		};
+		4DBF493722232A3200F48182 /* RFC1123 */ = {
+			isa = PBXGroup;
+			children = (
+				4DBF493822232A3200F48182 /* NSDateRFC1123.m */,
+				4DBF493922232A3200F48182 /* NSDateRFC1123.h */,
+			);
+			name = RFC1123;
+			path = ../lib/DAVKit/RFC1123;
+			sourceTree = "<group>";
+		};
+		4DBF493A22232A3200F48182 /* ISO8601 */ = {
+			isa = PBXGroup;
+			children = (
+				4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */,
+				4DBF493C22232A3200F48182 /* ISO8601DateFormatter.h */,
+			);
+			name = ISO8601;
+			path = ../lib/DAVKit/ISO8601;
 			sourceTree = "<group>";
 		};
 		4DF347D52074FA1D00148741 /* PwSafe */ = {
@@ -857,9 +968,12 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4DBF492322232A1100F48182 /* DAVKit */,
 				4D8DE9A921F898240043DDC0 /* OneTimePassword */,
 				4D88AD5121E657F700B49149 /* Fonts */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
+				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
+				4D58A45B207368B10061E046 /* PreferencesWindowController.xib */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
 				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
@@ -899,6 +1013,8 @@
 		4DF59F531F30DB7A00D68BFE /* MacBox */ = {
 			isa = PBXGroup;
 			children = (
+				4DBCE22D2224438800A2AFA2 /* KSPasswordField.h */,
+				4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */,
 				4DF59F571F30DB7A00D68BFE /* Supporting Files */,
 				4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */,
 				4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */,
@@ -917,6 +1033,10 @@
 				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
 				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
 				4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */,
+				4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */,
+				4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */,
+				4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */,
+				4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */,
 			);
 			name = MacBox;
 			sourceTree = "<group>";
@@ -1049,8 +1169,10 @@
 			files = (
 				4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */,
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
+				4DBCE223222414A100A2AFA2 /* SelectPredefinedIconController.xib in Resources */,
 				4D553B54219DD2CE00AA4BAB /* AttachmentItem.xib in Resources */,
 				4D88AD5021E654EA00B49149 /* SourceSansPro-Regular.ttf in Resources */,
+				4DBCE22822241D6700A2AFA2 /* PredefinedKeePassIcon.xib in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
@@ -1142,6 +1264,7 @@
 				4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
 				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
+				4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */,
 				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
@@ -1166,6 +1289,7 @@
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */,
+				4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */,
 				4D524D0A219B490100C22CB4 /* NodeFileAttachment.m in Sources */,
 				4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */,
 				4D29664121ADAC0B009B7936 /* CustomField.m in Sources */,
@@ -1174,6 +1298,7 @@
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,
 				4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */,
 				4D524D25219B4B2A00C22CB4 /* core.c in Sources */,
+				4DBF494322232A3200F48182 /* DAVRequests.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
 				4D524CF1219B481200C22CB4 /* CryptoParameters.m in Sources */,
@@ -1184,23 +1309,30 @@
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
+				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
+				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
 				4DF348022074FA6C00148741 /* NodeFields.m in Sources */,
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,
 				4D9E098921825108007BA1E7 /* String.m in Sources */,
 				4D524CC0219B479900C22CB4 /* Kdb1DatabaseMetadata.m in Sources */,
+				4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */,
 				4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */,
 				4D9E098521825108007BA1E7 /* XmlTree.m in Sources */,
+				4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */,
 				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4D524CF0219B481200C22CB4 /* ChaCha20Stream.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
+				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
 				4D44680C216CE08B00F6358D /* Csv.m in Sources */,
 				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
 				4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */,
 				4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */,
 				4D524CD5219B47DB00C22CB4 /* Kdbx4SerializationData.m in Sources */,
 				4D524D06219B48D300C22CB4 /* XmlProcessingContext.m in Sources */,
+				4DBF494122232A3200F48182 /* DAVBaseRequest.m in Sources */,
 				4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */,
 				4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */,
+				4DBF494422232A3200F48182 /* DAVListingParser.m in Sources */,
 				4DAC95FA21A0699E00E59D53 /* HierarchyOutlineView.m in Sources */,
 				4D524CEF219B481200C22CB4 /* TwoFishCipher.m in Sources */,
 				4D553B49219DB2E400AA4BAB /* CustomPasswordTextField.m in Sources */,
@@ -1210,21 +1342,25 @@
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,
+				4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
 				4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
+				4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */,
 				4D524D01219B48D300C22CB4 /* CustomIconList.m in Sources */,
 				4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */,
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4DF348042074FA6C00148741 /* PasswordGenerator.m in Sources */,
 				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				4DBF494022232A3200F48182 /* DAVRequest.m in Sources */,
 				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
 				4D524D27219B4B2A00C22CB4 /* blake2b.c in Sources */,
 				4DC46D0C219EDCD800D6C462 /* AttachmentCollectionView.m in Sources */,
 				4D9E098321825108007BA1E7 /* Times.m in Sources */,
 				4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */,
+				4DBCE22B2224207000A2AFA2 /* KeePassPredefinedIcons.m in Sources */,
 				4D524CEC219B481200C22CB4 /* ChaCha20Cipher.m in Sources */,
 				4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
@@ -1242,6 +1378,7 @@
 				4D9E098821825108007BA1E7 /* SerializationData.m in Sources */,
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
+				4DBF493D22232A3200F48182 /* DAVRequestGroup.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
 				4D8DE9BD21F898470043DDC0 /* OTPTokenType.m in Sources */,
 				4D524CA5219B458B00C22CB4 /* BiometricIdHelper.m in Sources */,

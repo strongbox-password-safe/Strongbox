@@ -59,11 +59,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 
-#if TARGET_OS_IPHONE
-- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon;
-#else
-- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon;
-#endif
+- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data;
+
+//#if TARGET_OS_IPHONE
+//- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon;
+//#else
+//- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon;
+//#endif
 
 @end
 

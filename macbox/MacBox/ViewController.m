@@ -23,11 +23,14 @@
 #import "Entry.h"
 #import "KeyFileParser.h"
 #import "ProgressWindow.h"
+#import "SelectPredefinedIconController.h"
+#import "KeePassPredefinedIcons.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
 @interface ViewController ()
 
+@property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) ProgressWindow* progressWindow;
 @property (nonatomic) BOOL showPassword;
@@ -52,14 +55,10 @@ static NSImage* kSmallYellowFolderImage;
 static NSImage* kSmallLockImage;
 static NSImage* kDefaultAttachmentIcon;
 
-static NSArray<NSImage*> *kKeePassIconSet;
-
 @implementation ViewController
 
 + (void)initialize {
     if(self == [ViewController class]) {
-        kKeePassIconSet = getKeePassIconSet();
-        
         kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
         kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
         kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
@@ -151,8 +150,16 @@ static NSArray<NSImage*> *kKeePassIconSet;
     self.customFields = [NSArray array];
     self.tableViewCustomFields.dataSource = self;
     self.tableViewCustomFields.delegate = self;
-
     self.buttonUnlockWithTouchId.hidden = YES;
+    
+    //
+    
+    self.imageViewShowHidePassword.clickable = YES;
+    self.imageViewShowHidePassword.showClickableBorder = NO;
+    self.imageViewShowHidePassword.onClick = ^{
+        self.textFieldMasterPassword.showsText = !self.textFieldMasterPassword.showsText;
+        self.imageViewShowHidePassword.image = !self.textFieldMasterPassword.showsText ? [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
+    };
 }
 
 - (void)disableFeaturesForLiteVersion {
@@ -215,8 +222,19 @@ static NSArray<NSImage*> *kKeePassIconSet;
     model.onChangeParent = ^(Node * _Nonnull node) {
         [self onChangeParent:node];
     };
-    
+    model.onItemIconChanged = ^(Node * _Nonnull node) {
+        [self onItemIconChanged:node];
+    };
     [self bindToModel];
+}
+
+- (void)onItemIconChanged:(Node*)node {
+    self.safeItemsCache = nil; // Clear safe items cache
+    [self.outlineView reloadItem:node];
+    if([self getCurrentSelectedItem] == node) {
+        self.imageViewIcon.image = [self getIconForNode:node large:NO];
+        self.imageViewGroupDetails.image = [self getIconForNode:node large:NO];
+    }
 }
 
 - (void)onItemTitleChanged:(Node*)node {
@@ -391,6 +409,10 @@ static NSArray<NSImage*> *kKeePassIconSet;
     else if (it.isGroup) {
         [self.tabViewRightPane selectTabViewItemAtIndex:1];
         self.imageViewGroupDetails.image = [self getIconForNode:it large:YES];
+        self.imageViewGroupDetails.clickable = self.model.format != kPasswordSafe;
+        self.imageViewGroupDetails.showClickableBorder = YES;
+        self.imageViewGroupDetails.onClick = ^{ [self onEditNodeIcon:it]; };
+
         self.textFieldSummaryTitle.stringValue = it.title;
     }
     else {
@@ -406,6 +428,11 @@ static NSArray<NSImage*> *kKeePassIconSet;
         self.comboBoxEmail.stringValue = it.fields.email;
         self.textViewNotes.string = it.fields.notes;
         self.textFieldSummaryTitle.stringValue = it.title;
+        
+        self.imageViewIcon.image = [self getIconForNode:it large:NO];
+        self.imageViewIcon.clickable = self.model.format != kPasswordSafe;
+        self.imageViewIcon.onClick = ^{ [self onEditNodeIcon:it]; };
+        self.imageViewIcon.showClickableBorder = YES;
         
         if(self.suppressConcealDetailsOnSelectionUpdateNextTime || [Settings sharedInstance].revealDetailsImmediately) {
             [self revealDetails];
@@ -541,7 +568,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
 
     NSError* error;
-    BOOL success =[dbAttachment.data writeToFile:f options:kNilOptions error:&error];
+    BOOL success = [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -832,7 +859,7 @@ static NSArray<NSImage*> *kKeePassIconSet;
         }
     }
     else {
-        ret = vm.isGroup ? kKeePassIconSet[48] : kKeePassIconSet[0];
+        ret = vm.isGroup ? KeePassPredefinedIcons.icons[48] : KeePassPredefinedIcons.icons[0];
     }
     
     // KeePass Specials
@@ -848,8 +875,8 @@ static NSArray<NSImage*> *kKeePassIconSet;
             }
         }
     }
-    else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < kKeePassIconSet.count) {
-        ret = kKeePassIconSet[vm.iconId.intValue];
+    else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < KeePassPredefinedIcons.icons.count) {
+        ret = KeePassPredefinedIcons.icons[vm.iconId.intValue];
     }
 
     return ret;
@@ -1539,7 +1566,7 @@ NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    [Alerts yesNo:@"Are you sure you want to delete this item?" window:self.view.window completion:^(BOOL yesNo) {
+    [Alerts yesNo:[NSString stringWithFormat:@"Are you sure you want to delete '%@'?", item.title] window:self.view.window completion:^(BOOL yesNo) {
         if(yesNo) {
             [self.model deleteItem:item];
         }
@@ -1643,6 +1670,9 @@ NSString* trimField(NSTextField* textField) {
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.model.locked;
+    }
+    else if (theAction == @selector(onSetItemIcon:)) {
+        return item != nil && self.model.format != kPasswordSafe;
     }
     
     return YES;
@@ -1792,82 +1822,6 @@ static NSComparator finderStringComparator = ^(id obj1, id obj2)
 {
     return [Utils finderStringCompare:obj1 string2:obj2];
 };
-
-static NSArray<NSImage*>* getKeePassIconSet() {
-    NSArray<NSString*>* names = @[@"C00_Password",
-                                  @"C01_Package_Network",
-                                  @"C02_MessageBox_Warning",
-                                  @"C03_Server",
-                                  @"C04_Klipper",
-                                  @"C05_Edu_Languages",
-                                  @"C06_KCMDF",
-                                  @"C07_Kate",
-                                  @"C08_Socket",
-                                  @"C09_Identity",
-                                  @"C10_Kontact",
-                                  @"C11_Camera",
-                                  @"C12_IRKickFlash",
-                                  @"C13_KGPG_Key3",
-                                  @"C14_Laptop_Power",
-                                  @"C15_Scanner",
-                                  @"C16_Mozilla_Firebird",
-                                  @"C17_CDROM_Unmount",
-                                  @"C18_Display",
-                                  @"C19_Mail_Generic",
-                                  @"C20_Misc",
-                                  @"C21_KOrganizer",
-                                  @"C22_ASCII",
-                                  @"C23_Icons",
-                                  @"C24_Connect_Established",
-                                  @"C25_Folder_Mail",
-                                  @"C26_FileSave",
-                                  @"C27_NFS_Unmount",
-                                  @"C28_Message",
-                                  @"C29_KGPG_Term",
-                                  @"C30_Konsole",
-                                  @"C31_FilePrint",
-                                  @"C32_FSView",
-                                  @"C33_Run",
-                                  @"C34_Configure",
-                                  @"C35_KRFB",
-                                  @"C36_Ark",
-                                  @"C37_KPercentage",
-                                  @"C38_Samba_Unmount",
-                                  @"C39_History",
-                                  @"C40_Mail_Find",
-                                  @"C41_VectorGfx",
-                                  @"C42_KCMMemory",
-                                  @"C43_Trashcan_Full",
-                                  @"C44_KNotes",
-                                  @"C45_Cancel",
-                                  @"C46_Help",
-                                  @"C47_KPackage",
-                                  @"C48_Folder",
-                                  @"C49_Folder_Blue_Open",
-                                  @"C50_Folder_Tar",
-                                  @"C51_Decrypted",
-                                  @"C52_Encrypted",
-                                  @"C53_Apply",
-                                  @"C54_Signature",
-                                  @"C55_Thumbnail",
-                                  @"C56_KAddressBook",
-                                  @"C57_View_Text",
-                                  @"C58_KGPG",
-                                  @"C59_Package_Development",
-                                  @"C60_KFM_Home",
-                                  @"C61_Services",
-                                  @"C62_Tux",
-                                  @"C63_Feather",
-                                  @"C64_Apple",
-                                  @"C65_W",
-                                  @"C66_Money",
-                                  @"C67_Certificate",
-                                  @"C68_Smartphone"];
-    
-    return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return [NSImage imageNamed:obj];
-    }];
-}
 
 static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     BasicOrderedDictionary *ret = [[BasicOrderedDictionary alloc] init];
@@ -2044,6 +1998,79 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             [self.model setCustomField:item key:key value:value];
         }
     }];
+}
+
+- (IBAction)onSetItemIcon:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    
+    if(!item) {
+        return;
+    }
+    
+    [self onEditNodeIcon:item];
+}
+
+- (void)onEditNodeIcon:(Node*)item {
+    if(self.model.format == kPasswordSafe) {
+        return;
+    }
+    
+    __weak id weakSelf = self;
+    self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
+    self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
+    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data) {
+        [weakSelf onSelectedNewIcon:item index:index data:data];
+    };
+    
+    [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
+}
+
+const int kMaxRecommendCustomIconSize = 128*1024;
+const int kMaxCustomIconDimension = 256;
+
+- (void)onSelectedNewIcon:(Node*)item index:(NSNumber*)index data:(NSData*)data {
+    if(index == nil) {
+        NSImage* icon = [[NSImage alloc] initWithData:data];
+        if(icon) {
+            if(data.length > kMaxRecommendCustomIconSize) {
+                NSImage* rescaled = scaleImage(icon, CGSizeMake(kMaxCustomIconDimension, kMaxCustomIconDimension));
+                CGImageRef cgRef = [rescaled CGImageForProposedRect:NULL context:nil hints:nil];
+                NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+                NSData *compressed = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+                NSInteger saving = data.length - compressed.length;
+                if(saving < 0) {
+                    NSLog(@"Not much saving from PNG trying JPG...");
+                    compressed = [newRep representationUsingType:NSBitmapImageFileTypeJPEG properties:@{ }];
+                    saving = data.length - compressed.length;
+                }
+                
+                if(saving > (32 * 1024)) {
+                    NSString* savingStr = [[[NSByteCountFormatter alloc] init] stringFromByteCount:saving];
+                    NSString* message = [NSString stringWithFormat:@"This is a large image to use as an icon. Would you like to use a scaled down version to save %@?", savingStr];
+                    [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
+                        if(yesNo) {
+                            [self.model setItemIcon:item index:index custom:compressed];
+                        }
+                        else {
+                            [self.model setItemIcon:item index:index custom:data];
+                        }
+                    }];
+                }
+                else {
+                    [self.model setItemIcon:item index:index custom:data];
+                }
+            }
+            else {
+                [self.model setItemIcon:item index:index custom:data];
+            }
+        }
+        else {
+            [Alerts info:@"This is not a valid image file." window:self.view.window];
+        }
+    }
+    else {
+        [self.model setItemIcon:item index:index custom:nil];
+    }
 }
 
 @end

@@ -32,6 +32,9 @@
 
 @property BOOL uiDoNotSortKeePassNodesInBrowseView;
 
+@property BOOL clearClipboardEnabled;
+@property NSInteger clearClipboardAfterSeconds;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

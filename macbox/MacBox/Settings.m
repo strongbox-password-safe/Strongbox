@@ -20,6 +20,10 @@
 
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kAutoSave = @"autoSave";
+static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
+static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
+
+static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 @implementation Settings
 
@@ -206,6 +210,30 @@ static NSString* const kAutoSave = @"autoSave";
 
 - (void)setUiDoNotSortKeePassNodesInBrowseView:(BOOL)uiDoNotSortKeePassNodesInBrowseView {
     [self setBool:kUiDoNotSortKeePassNodesInBrowseView value:uiDoNotSortKeePassNodesInBrowseView];
+}
+
+- (BOOL)clearClipboardEnabled {
+    return [self getBool:kClearClipboardEnabled];
+}
+
+- (void)setClearClipboardEnabled:(BOOL)clearClipboardEnabled {
+    [self setBool:kClearClipboardEnabled value:clearClipboardEnabled];
+}
+
+- (NSInteger)clearClipboardAfterSeconds {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSInteger ret = [userDefaults integerForKey:kClearClipboardAfterSeconds];
+
+    return ret == 0 ? kDefaultClearClipboardTimeout : ret;
+}
+
+
+- (void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
+    
+    [userDefaults synchronize];
 }
 
 @end

@@ -16,6 +16,7 @@
 #import "PreferencesWindowController.h"
 #import "SafesMetaDataViewer.h"
 #import "BiometricIdHelper.h"
+//#import "DAVKit.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -28,6 +29,8 @@
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
 @property (strong, nonatomic) SafesMetaDataViewer *safesMetaDataViewer;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
+@property NSTimer* clipboardChangeWatcher;
+@property NSInteger currentClipboardVersion;
 
 @end
 
@@ -65,6 +68,12 @@
     }
     
     self.applicationHasFinishedLaunching = YES;
+
+//
+//
+//    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
+//    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -309,6 +318,86 @@
                   window:[NSApplication sharedApplication].mainWindow
               completion:nil];
         }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Clipboard Clearing
+
+- (void)onPreferencesChanged:(NSNotification*)notification {
+    NSLog(@"Preferences Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
+
+    [self initializeClipboardWatchingTask];
+}
+
+- (void)applicationWillBecomeActive:(NSNotification *)notification {
+    NSLog(@"applicationWillBecomeActive");
+
+    [self initializeClipboardWatchingTask];
+}
+
+- (void)initializeClipboardWatchingTask {
+    [self killClipboardWatchingTask];
+    
+    if(Settings.sharedInstance.clearClipboardEnabled) {
+        [self startClipboardWatchingTask];
+    }
+}
+
+- (void)applicationWillResignActive:(NSNotification *)notification {
+    NSLog(@"applicationWillResignActive");
+    [self killClipboardWatchingTask];
+}
+
+- (void)startClipboardWatchingTask {
+    NSLog(@"startClipboardWatchingTask...");
+    self.currentClipboardVersion = -1;
+    self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [self checkClipboardForChangesAndNotify];
+    }];
+}
+
+- (void)killClipboardWatchingTask {
+    NSLog(@"killClipboardWatchingTask...");
+    
+    self.currentClipboardVersion = -1;
+    
+    if(self.clipboardChangeWatcher != nil) {
+        [self.clipboardChangeWatcher invalidate];
+        self.clipboardChangeWatcher = nil;
+    }
+}
+
+- (void)checkClipboardForChangesAndNotify {
+    //NSLog(@"Checking Clipboard = [%ld]", (long)NSPasteboard.generalPasteboard.changeCount);
+    
+    if(self.currentClipboardVersion == -1) { // Initial Watch - Record the current count and watch for changes from this
+        self.currentClipboardVersion = NSPasteboard.generalPasteboard.changeCount;
+    }
+    
+    if(self.currentClipboardVersion != NSPasteboard.generalPasteboard.changeCount) {
+        [self onApplicationDidChangeClipboard];
+        self.currentClipboardVersion = NSPasteboard.generalPasteboard.changeCount;
+    }
+}
+
+- (void)onApplicationDidChangeClipboard {
+    NSLog(@"onApplicationDidChangeClipboard...");
+    
+    if(Settings.sharedInstance.clearClipboardEnabled) {
+        NSInteger clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
+        NSLog(@"Clipboard Changed and Clear Clipboard Enabled... Recording Change Count as [%ld]", (long)clipboardChangeCount);
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
+           dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+               if(clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount) {
+                   NSLog(@"Clipboard change count matches after time delay... Clearing Clipboard");
+                   [NSPasteboard.generalPasteboard clearContents];
+               }
+               else {
+                   NSLog(@"Clipboard change count DOES NOT matches after time delay... NOP");
+               }
+           });
     }
 }
 

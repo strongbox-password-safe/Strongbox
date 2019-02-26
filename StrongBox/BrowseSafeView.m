@@ -190,7 +190,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
         if(goNoGo) {
             if(userSelectedNewCustomIcon) {
-                [self.viewModel.database setNodeCustomIcon:item icon:userSelectedNewCustomIcon];
+                NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
+                [self.viewModel.database setNodeCustomIcon:item data:data];
             }
             else if(userSelectedNewIconIndex) {
                 if(userSelectedNewIconIndex.intValue == -1) {

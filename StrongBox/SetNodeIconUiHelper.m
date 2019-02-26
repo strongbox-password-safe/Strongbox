@@ -17,7 +17,7 @@
 
 @import FavIcon;
 
-static const int kMaxRecommendedCustomIconDimension = 256; // TODO: Setting?
+static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
@@ -185,7 +185,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // TODO: Setting?
         //NSLog(@"%ld", (long)selectedIndex);
         
         if(response) {
-            self.completionBlock(YES, @(selectedIndex), nil); // TODO: Verify clients convert to correct default
+            self.completionBlock(YES, @(selectedIndex), nil);
         }
         else {
             self.completionBlock(NO, nil, nil);

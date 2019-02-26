@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="SelectPredefinedIconController">
+            <connections>
+                <outlet property="buttonSelectFile" destination="STV-Hs-hOA" id="Zod-kT-C1U"/>
+                <outlet property="collectionView" destination="lFk-kt-54F" id="267-cG-cBa"/>
+                <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="570" height="424"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="570" height="424"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nCr-GA-F2s">
+                        <rect key="frame" x="20" y="61" width="530" height="307"/>
+                        <clipView key="contentView" ambiguous="YES" id="CaZ-8e-QHd">
+                            <rect key="frame" x="1" y="1" width="528" height="305"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <collectionView selectable="YES" id="lFk-kt-54F">
+                                    <rect key="frame" x="0.0" y="0.0" width="528" height="158"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                    <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="QyG-3a-gal">
+                                        <size key="itemSize" width="56" height="56"/>
+                                    </collectionViewFlowLayout>
+                                    <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </collectionView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="txs-RG-7JO">
+                            <rect key="frame" x="1" y="144" width="233" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="QYu-tY-hFG">
+                            <rect key="frame" x="234" y="1" width="15" height="143"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="k4b-DX-DI0">
+                        <rect key="frame" x="14" y="13" width="82" height="32"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VlM-Fp-vdd">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="onCancel:" target="-2" id="7zp-1P-cGw"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="guW-A7-hbt">
+                        <rect key="frame" x="445" y="13" width="111" height="32"/>
+                        <buttonCell key="cell" type="push" title="Use Default" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ejM-65-Jfn">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="onUseDefault:" target="-2" id="dP1-LB-VEJ"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="STV-Hs-hOA">
+                        <rect key="frame" x="299" y="13" width="146" height="32"/>
+                        <buttonCell key="cell" type="push" title="Select from File..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CV6-Vm-rAt">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="onSelectFromFile:" target="-2" id="ivg-4T-Exa"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZYx-hs-rzI">
+                        <rect key="frame" x="171" y="387" width="229" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Please select a new icon for this item" id="ys3-kg-5ag">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="ZYx-hs-rzI" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="Bxz-0y-9oD"/>
+                    <constraint firstItem="ZYx-hs-rzI" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" id="IPB-9k-ZP9"/>
+                    <constraint firstItem="guW-A7-hbt" firstAttribute="leading" secondItem="STV-Hs-hOA" secondAttribute="trailing" constant="12" id="IYY-St-zyw"/>
+                    <constraint firstAttribute="trailing" secondItem="guW-A7-hbt" secondAttribute="trailing" constant="20" id="Mmm-oj-WUO"/>
+                    <constraint firstItem="k4b-DX-DI0" firstAttribute="centerY" secondItem="STV-Hs-hOA" secondAttribute="centerY" id="RGJ-hN-td2"/>
+                    <constraint firstAttribute="trailing" secondItem="nCr-GA-F2s" secondAttribute="trailing" constant="20" id="RhI-8g-fYy"/>
+                    <constraint firstItem="lFk-kt-54F" firstAttribute="top" secondItem="ZYx-hs-rzI" secondAttribute="bottom" constant="20" id="SbY-wW-MOr"/>
+                    <constraint firstItem="k4b-DX-DI0" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="ZZO-Xk-kXs"/>
+                    <constraint firstItem="guW-A7-hbt" firstAttribute="top" secondItem="CaZ-8e-QHd" secondAttribute="bottom" constant="20" id="dps-gk-aP9"/>
+                    <constraint firstAttribute="bottom" secondItem="guW-A7-hbt" secondAttribute="bottom" constant="20" id="fva-BT-A2T"/>
+                    <constraint firstItem="STV-Hs-hOA" firstAttribute="centerY" secondItem="guW-A7-hbt" secondAttribute="centerY" id="myR-qw-Edx"/>
+                    <constraint firstItem="guW-A7-hbt" firstAttribute="top" secondItem="nCr-GA-F2s" secondAttribute="bottom" constant="20" id="oEM-eZ-u4q"/>
+                    <constraint firstItem="nCr-GA-F2s" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="yOp-dc-2b7"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+            </connections>
+            <point key="canvasLocation" x="-2" y="26"/>
+        </window>
+    </objects>
+</document>

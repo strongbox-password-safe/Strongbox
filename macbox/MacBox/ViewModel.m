@@ -188,6 +188,10 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [self setItemNotes:item notes:notes modified:nil];
 }
 
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData*)custom {
+    [self setItemIcon:item index:index custom:custom modified:nil];
+}
+
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -304,6 +308,34 @@ static NSString* kDefaultNewTitle = @"Untitled";
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.onItemNotesChanged(item);
+    });
+}
+
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData*)custom modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    NSNumber *oldIndex = item.iconId;
+    NSData* oldCustom = nil;
+    if(item.customIconUuid) {
+        oldCustom = self.passwordDatabase.customIcons[item.customIconUuid];
+    }
+    NSDate* oldModified = item.fields.modified;
+    
+    if(index && index.intValue == -1) {
+        index = item.isGroup ? @(48) : @(0);
+    }
+    
+    item.iconId = index;
+    [self.passwordDatabase setNodeCustomIcon:item data:custom];
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex custom:oldCustom modified:oldModified];
+    [self.document.undoManager setActionName:@"Icon Change"];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onItemIconChanged(item);
     });
 }
 

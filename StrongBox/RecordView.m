@@ -977,7 +977,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     // will pick up the new custom icon as a bad reference (not on a node within the root group)...
     
     if(self.userSelectedNewCustomIcon) {
-        [self.viewModel.database setNodeCustomIcon:self.record icon:self.userSelectedNewCustomIcon];
+        NSData *data = UIImagePNGRepresentation(self.userSelectedNewCustomIcon);
+        [self.viewModel.database setNodeCustomIcon:self.record data:data];
     }
     else if(self.userSelectedNewIconIndex) {
         if(self.userSelectedNewIconIndex.intValue == -1) {
@@ -1000,9 +1001,10 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             }
             
             self.sni = [[SetNodeIconUiHelper alloc] init];
-            [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, UIImage * _Nullable userSelectedNewCustomIcon) {
+            [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, NSNumber * userSelectedNewIconIndex, UIImage *userSelectedNewCustomIcon) {
                 if(goNoGo && userSelectedNewCustomIcon) {
-                    [self.viewModel.database setNodeCustomIcon:self.record icon:userSelectedNewCustomIcon];
+                    NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
+                    [self.viewModel.database setNodeCustomIcon:self.record data:data];
                 }
                 
                 [self sync:completion];

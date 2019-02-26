@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setItemUrl:(Node*)item url:(NSString*)url;
 - (void)setItemPassword:(Node*)item password:(NSString*)password;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData* _Nullable)custom;
 
 - (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
 - (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
@@ -85,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^onItemUrlChanged)(Node* node);
 @property (nonatomic, copy) void (^onItemPasswordChanged)(Node* node);
 @property (nonatomic, copy) void (^onItemNotesChanged)(Node* node);
+@property (nonatomic, copy) void (^onItemIconChanged)(Node* node);
 @property (nonatomic, copy) void (^onAttachmentsChanged)(Node* node);
 @property (nonatomic, copy) void (^onCustomFieldsChanged)(Node* node);
 @property (nonatomic, copy) void (^onDeleteItem)(Node* node);

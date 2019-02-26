@@ -8,8 +8,10 @@
 
 #import "Utils.h"
 #import <CommonCrypto/CommonCrypto.h>
-#import "regdom.h"
+
+#if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>
+#endif
 
 @implementation Utils
 
@@ -348,49 +350,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
 }
 #endif
 
-NSString *getDomain(NSString* host) {
-    if(host == nil) {
-        return @"";
-    }
-    
-    if(!host.length) {
-        return @"";
-    }
-    
-    const char *cStringUrl = [host UTF8String];
-    if(!cStringUrl || strlen(cStringUrl) == 0) {
-        return @"";
-    }
-    
-    void *tree = loadTldTree();
-    const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
-    
-    if(result == NULL) {
-        return @"";
-    }
-    
-    NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"Calculated Domain: %@", domain);
-
-    return domain;
-}
-
-NSString *getSearchTermFromDomain(NSString* host) {
-    NSString* domain = getDomain(host);
-    
-    if(!domain.length) {
-        return domain;
-    }
-    
-    NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
-    
-    NSLog(@"%@", parts);
-    
-    NSString *searchTerm =  parts.count ? parts[0] : domain;
-    return searchTerm;
-}
-
+#if TARGET_OS_IPHONE
 + (NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error {
     NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
     BOOL isImage = UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage) != 0;
@@ -422,6 +382,7 @@ NSString *getSearchTermFromDomain(NSString* host) {
     
     return data;
 }
+#endif
 
 //    [[Settings sharedInstance] setPro:NO];
 //    [[Settings sharedInstance] setEndFreeTrialDate:nil];

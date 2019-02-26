@@ -112,33 +112,18 @@
     _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:_mutableAttachments root:self.rootGroup] mutableCopy];
 }
 
-#if TARGET_OS_IPHONE
-- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon {
-    NSUUID *uuid = [NSUUID UUID];
-    node.customIconUuid = uuid;
-    NSData *data = UIImagePNGRepresentation(icon);
-    self.mutableCustomIcons[uuid] = data;
+- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data {
+    if(data == nil) {
+        node.customIconUuid = nil;
+    }
+    else {
+        NSUUID *uuid = [NSUUID UUID];
+        node.customIconUuid = uuid;
+        self.mutableCustomIcons[uuid] = data;
+    }
     
-    //NSLog(@"Set Node Icon with UUID: [%@] and data: [%@]", uuid, data);
     [self rationalizeCustomIcons];
 }
-#else
-- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon {
-    NSUUID *uuid = [NSUUID UUID];
-    node.customIconUuid = uuid;
-
-    
-    CGImageRef cgRef = [icon CGImageForProposedRect:NULL
-                                            context:nil
-                                              hints:nil];
-    
-    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-    NSData *pngData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
-    
-    self.mutableCustomIcons[uuid] = pngData;
-    [self rationalizeCustomIcons];
-}
-#endif
 
 - (void)rationalizeCustomIcons {
     //NSLog(@"Before Rationalization: [%@]", self.mutableCustomIcons.allKeys);

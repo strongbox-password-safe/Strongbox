@@ -12,6 +12,8 @@
 #import "AttachmentCollectionView.h"
 #import <QuickLook/QuickLook.h>
 #import <Quartz/Quartz.h>
+#import "ClickableImageView.h"
+#import "KSPasswordField.h"
 
 @interface ViewController : NSViewController<   NSOutlineViewDelegate,
                                                 NSOutlineViewDataSource,
@@ -27,7 +29,7 @@
 
 @property (strong, nonatomic) ViewModel* model;
 //-(void)updateDocumentUrl;
-@property (weak) IBOutlet NSImageView *imageViewGroupDetails;
+@property (weak) IBOutlet ClickableImageView *imageViewGroupDetails;
 
 // App wide fields
 @property (weak) IBOutlet NSTableView *tableViewSummary;
@@ -45,7 +47,7 @@
 
 // Locked Fields
 
-@property (weak) IBOutlet NSSecureTextField *textFieldMasterPassword;
+@property (weak) IBOutlet KSPasswordField *textFieldMasterPassword;
 
 // Record Fields
 
@@ -64,6 +66,8 @@
 @property (weak) IBOutlet NSComboBox *comboboxUsername;
 @property (weak) IBOutlet NSComboBox *comboBoxEmail;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
+@property (weak) IBOutlet ClickableImageView *imageViewIcon;
+@property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
 
 - (IBAction)onSearch:(id)sender;
 - (IBAction)onOutlineViewDoubleClick:(id)sender;
