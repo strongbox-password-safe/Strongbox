@@ -245,7 +245,7 @@
 
     if (SecRandomCopyBytes(kSecRandomDefault, SIZE_OF_PASSWORD_SAFE_3_HEADER_IV, hdr.iv)) {
         NSLog(@"Could not do securely copy password safe header ok");
-        [Utils createNSError:@"Could not do securely copy password safe header ok" errorCode:-1];
+        [Utils createNSError:@"Could not do securely copy Password Safe 3 header ok" errorCode:-1];
     }
 
     return hdr;
@@ -278,16 +278,16 @@
     if (endOfData == NSNotFound) {
         NSLog(@"Invalid Password Safe. No End of File marker magic");
         if(error) {
-            *error = [Utils createNSError:@"Invalid Password Safe. No End of File marker magic" errorCode:-1];
+            *error = [Utils createNSError:@"Invalid Password Safe 3 File. No End of File marker magic" errorCode:-1];
         }
         return NO;
     }
 
     NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
     if (recordsLength <= 0) {
-        NSLog(@"Invalid Password Safe. Negative or zero record length");
+        NSLog(@"Invalid Password Safe 3 File. Negative or zero record length");
         if(error) {
-            *error = [Utils createNSError:@"Invalid Password Safe. Negative or zero record length" errorCode:-1];
+            *error = [Utils createNSError:@"Invalid Password Safe 3 File. Negative or zero record length" errorCode:-1];
         }
         return NO;
     }
@@ -298,7 +298,7 @@
     if (numBlocks <= 0 || rem != 0) {
         NSLog(@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks.");
         if(error) {
-            *error = [Utils createNSError:@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks." errorCode:-1];
+            *error = [Utils createNSError:@"Invalid Password Safe 3 File. Zero blocks found or Non zero remainder in blocks." errorCode:-1];
         }
         return NO;
     }

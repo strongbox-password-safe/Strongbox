@@ -210,7 +210,7 @@ static const BOOL kLogVerbose = NO;
     NSData* decrypted = decryptBlocks(blockHeader, keys, cryptoParams, eof);
     if(!decrypted){
         if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Could not decrypt this safe, either due to corruption or unknown Cipher." errorCode:-4];
+            *ppError = [Utils createNSError:@"Could not decrypt this database, either due to corruption or unknown Cipher." errorCode:-4];
         }
 
         return nil;

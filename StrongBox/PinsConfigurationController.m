@@ -117,8 +117,8 @@
 - (IBAction)onPinOnOff:(id)sender {
     if(self.viewModel.metadata.conveniencePin != nil) {
         NSString *message = self.viewModel.metadata.isEnrolledForConvenience && !self.viewModel.metadata.isTouchIdEnabled ?
-            @"Turning the PIN Off for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-            @"Are you sure you want to turn off the PIN for this safe?";
+            @"Turning the PIN Off for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+            @"Are you sure you want to turn off the PIN for this database?";
         
         [Alerts yesNo:self
                 title:@"Turn off PIN?"
@@ -206,7 +206,7 @@
         else if (indexPath.row == 2) {
             BOOL delete = self.viewModel.metadata.storageProvider == kLocalDevice || self.viewModel.metadata.storageProvider == kiCloud;
             
-            [Alerts warn:self title:@"Warning" message:delete ? @"This will permanently delete the safe file." : @"This will remove the safe from Strongbox but the underlying file will remain on cloud storage"];
+            [Alerts warn:self title:@"Warning" message:delete ? @"This will permanently delete the database file." : @"This will remove the database from Strongbox but the underlying file will remain on cloud storage"];
             self.viewModel.metadata.duressAction = kRemoveDatabase;
         }
 

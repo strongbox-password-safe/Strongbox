@@ -39,6 +39,8 @@
 @property NSTimer* timerRefreshOtp;
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 
+@property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
+
 @end
 
 @implementation BrowseSafeView
@@ -142,6 +144,33 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     return !self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly;
 }
 
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+    if(![sourceIndexPath isEqual:destinationIndexPath]) {
+        NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
+        
+        if(self.reorderItemOperations == nil) {
+            self.reorderItemOperations = [NSMutableArray array];
+        }
+        [self.reorderItemOperations addObject:@[@(sourceIndexPath.row), @(destinationIndexPath.row)]];
+
+        [self enableDisableToolbarButtons]; // Disable moving/deletion if there's been a move
+    }
+}
+
+- (IBAction)onSortItems:(id)sender {
+    self.reorderItemOperations = nil; // Discard existing reordering ops...
+    
+    [self.currentGroup sortChildren];
+    
+    [self saveChangesToSafeAndRefreshView];
+}
+
 - (void)onRenameItem:(NSIndexPath * _Nonnull)indexPath {
     Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
     
@@ -164,11 +193,11 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
           message:@"Are you sure you want to delete this item?"
            action:^(BOOL response) {
                if (response) {
-                   Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
-                   
-                   [self.viewModel deleteItem:item];
-                   
-                   [self saveChangesToSafeAndRefreshView];
+                    Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+
+                    [self.viewModel deleteItem:item];
+
+                    [self saveChangesToSafeAndRefreshView];
                }
            }];
 }
@@ -427,8 +456,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     (self.buttonAddRecord).enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
     (self.buttonSafeSettings).enabled = !self.isEditing;
-    (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
-    (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0;
+    (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
+    (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
+    (self.buttonSortItems).enabled = !ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
+
     (self.buttonAddGroup).enabled = !ro && !self.isEditing;
 }
 
@@ -639,14 +670,32 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)setEditing:(BOOL)editing animated:(BOOL)animate {
     [super setEditing:editing animated:animate];
     
+    NSLog(@"setEditing: %d", editing);
+    
     [self enableDisableToolbarButtons];
     
     //NSLog(@"setEditing: %hhd", editing);
     
     if (!editing) {
         self.navigationItem.leftBarButtonItem = self.savedOriginalNavButton;
+        if(self.reorderItemOperations) {
+            // Do the reordering
+            NSLog(@"Reordering");
+            
+            for (NSArray<NSNumber*>* moveOp in self.reorderItemOperations) {
+                NSUInteger src = moveOp[0].unsignedIntegerValue;
+                NSUInteger dest = moveOp[1].unsignedIntegerValue;
+                NSLog(@"Move: %lu -> %lu", (unsigned long)src, (unsigned long)dest);
+                [self.currentGroup moveChild:src to:dest];
+            }
+            
+            self.reorderItemOperations = nil;
+            [self saveChangesToSafeAndRefreshView];
+        }
     }
     else {
+        self.reorderItemOperations = nil;
+        
         UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                                                                       target:self
                                                                                       action:@selector(cancelEditing)];
@@ -657,6 +706,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (void)cancelEditing {
+    self.reorderItemOperations = nil;
     [self setEditing:false];
 }
 

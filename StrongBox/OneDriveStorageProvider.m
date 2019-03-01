@@ -158,7 +158,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
                 
                 if(error || !item) {
                     if(!item) {
-                        error = [Utils createNSError:@"Could not locate the safe file. Has it been renamed or moved?" errorCode:45];
+                        error = [Utils createNSError:@"Could not locate the database file. Has it been renamed or moved?" errorCode:45];
                     }
                     
                     NSLog(@"OneDrive Read: %@", error);
@@ -240,7 +240,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
             
             if(error || !item) {
                 if(!item) {
-                    error = [Utils createNSError:@"Could not locate the safe file. Has it been renamed or moved?" errorCode:45];
+                    error = [Utils createNSError:@"Could not locate the database file. Has it been renamed or moved?" errorCode:45];
                 }
                 
                 NSLog(@"OneDrive Read: %@", error);

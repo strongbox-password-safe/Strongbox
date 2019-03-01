@@ -25,7 +25,7 @@
         NSLog(@"Could not build node model from xml root document.");
         
         if (error != nil) {
-            *error = [Utils createNSError:@"Could not parse this safe." errorCode:-1];
+            *error = [Utils createNSError:@"Could not parse this database." errorCode:-1];
         }
         
         return nil;

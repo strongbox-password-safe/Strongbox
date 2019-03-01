@@ -61,7 +61,7 @@
     self.tableView.emptyDataSetDelegate = self;
     self.tableView.tableFooterView = [UIView new];
     
-    self.navigationItem.prompt = self.existing ? @"Please Select Safe File" : @"Select Folder For New Safe";
+    self.navigationItem.prompt = self.existing ? @"Please Select Database File" : @"Select Folder For New Database";
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
         [self.safeStorageProvider list:self.parentFolder
@@ -197,7 +197,7 @@
         }
         
         if([existing containsObject:file.name]) {
-            [Alerts warn:self title:@"Safe Already Present" message:@"This file is already in your existing set of safes. No need to add it again, it will automatically pick up any updates made via iTunes File Sharing etc."];
+            [Alerts warn:self title:@"Database Already Present" message:@"This file is already in your existing set of databases. No need to add it again, it will automatically pick up any updates made via iTunes File Sharing etc."];
             
             [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
             
@@ -235,14 +235,14 @@
         }
         else {
             [Alerts error:self
-                    title:@"Invalid Safe File"
+                    title:@"Invalid Database File"
                     error:err];
         }
     }
     else {
         NSLog(@"%@", error);
 
-        [Alerts error:self title:@"Error Reading Safe File" error:error];
+        [Alerts error:self title:@"Error Reading Database File" error:error];
     }
 }
 
@@ -251,7 +251,7 @@
 
     if (file.folder) {
         if(self.safeStorageProvider.rootFolderOnly) {
-            [Alerts info:self title:@"Root Folder Only" message:@"You can only have safes in the Root folder for this storage type."];
+            [Alerts info:self title:@"Root Folder Only" message:@"You can only have databases in the Root folder for this storage type."];
             [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
         }
         else {
@@ -291,7 +291,7 @@
 }
 
 - (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password {
-    NSLog(@"Create New Safe with Format: %d", self.format);
+    NSLog(@"Create New Database with Format: %d", self.format);
     
     DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:nil format:self.format];
  
@@ -300,7 +300,7 @@
 
     if (data == nil) {
         [Alerts error:self
-                title:@"Error Saving Safe"
+                title:@"Error Saving Database"
                 error:error];
 
         return;
@@ -329,7 +329,7 @@
                 NSLog(@"An error occurred: %@", error);
 
                 [Alerts error:self
-                        title:@"Error Saving Safe"
+                        title:@"Error Saving Database"
                         error:error];
             }
 

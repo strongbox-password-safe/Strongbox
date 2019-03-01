@@ -45,7 +45,7 @@
 // reloaded and the selection/moved/maintained to a new row... unavoidable)
 
 @property BOOL suppressConcealDetailsOnSelectionUpdateNextTime;
-@property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *safeItemsCache;
+@property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *itemsCache;
 
 @end
 
@@ -229,7 +229,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onItemIconChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     [self.outlineView reloadItem:node];
     if([self getCurrentSelectedItem] == node) {
         self.imageViewIcon.image = [self getIconForNode:node large:NO];
@@ -238,7 +238,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onItemTitleChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     Node* selectionToMaintain = [self getCurrentSelectedItem];
     [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
     NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
@@ -251,7 +251,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onItemUsernameChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     self.usernameAutoCompleteCache = self.model ? [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
     [self.outlineView reloadItem:node];
     
@@ -261,7 +261,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onItemEmailChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     self.emailAutoCompleteCache = self.model ? [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
     
     if([self getCurrentSelectedItem] == node) {
@@ -270,28 +270,28 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onItemUrlChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     if([self getCurrentSelectedItem] == node) {
         self.textFieldUrl.stringValue = node.fields.url;
     }
 }
 
 - (void)onItemPasswordChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     if([self getCurrentSelectedItem] == node) {
         self.textFieldPw.stringValue = node.fields.password;
     }
 }
 
 - (void)onItemNotesChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     if([self getCurrentSelectedItem] == node) {
         self.textViewNotes.string = node.fields.notes;
     }
 }
 
 - (void)onAttachmentsChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     if([self getCurrentSelectedItem] == node) {
         self.attachmentsIconCache = nil; // TODO: what?
         [self refreshAttachments:node];
@@ -299,20 +299,20 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onCustomFieldsChanged:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     if([self getCurrentSelectedItem] == node) {
         [self refreshCustomFields:node];
     }
 }
 
 - (void)onDeleteItem:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     [self.outlineView reloadData];
     [self bindDetailsPane];
 }
 
 - (void)onChangeParent:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     [self.outlineView reloadData];
     [self bindDetailsPane];
 }
@@ -320,7 +320,7 @@ static NSImage* kDefaultAttachmentIcon;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)biometricOpenIsAvailableForSafe {
-    SafeMetaData* metaData = [self getSafeMetaData];
+    SafeMetaData* metaData = [self getDatabaseMetaData];
     
     BOOL ret =  (metaData == nil ||
             !metaData.isTouchIdEnabled ||
@@ -332,7 +332,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)bindToModel {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     [self updateAutocompleteCaches];
     
     if(self.model == nil) {
@@ -680,7 +680,7 @@ static NSImage* kDefaultAttachmentIcon;
     }
     
     if(item == nil) {
-        NSArray<Node*> *items = [self getSafeItems:self.model.rootGroup];
+        NSArray<Node*> *items = [self getItems:self.model.rootGroup];
         
         return items.count > 0;
     }
@@ -688,7 +688,7 @@ static NSImage* kDefaultAttachmentIcon;
         Node *it = (Node*)item;
         
         if(it.isGroup) {
-            NSArray<Node*> *items = [self getSafeItems:it];
+            NSArray<Node*> *items = [self getItems:it];
             
             return items.count > 0;
         }
@@ -706,7 +706,7 @@ static NSImage* kDefaultAttachmentIcon;
     
     Node* group = (item == nil) ? self.model.rootGroup : ((Node*)item);
     
-    NSArray<Node*> *items = [self getSafeItems:group];
+    NSArray<Node*> *items = [self getItems:group];
     
     return items.count;
 }
@@ -715,30 +715,30 @@ static NSImage* kDefaultAttachmentIcon;
 {
     Node* group = (item == nil) ? self.model.rootGroup : ((Node*)item);
     
-    NSArray<Node*> *items = [self getSafeItems:group];
+    NSArray<Node*> *items = [self getItems:group];
     
     return items[index];
 }
 
-- (NSArray<Node*> *)getSafeItems:(Node*)parentGroup {
+- (NSArray<Node*> *)getItems:(Node*)parentGroup {
     if(!self.model || self.model.locked) {
         NSLog(@"Request for safe items while model nil or locked!");
         return @[];
     }
     
-    if(self.safeItemsCache == nil) {
-        self.safeItemsCache = [NSMutableDictionary dictionary];
+    if(self.itemsCache == nil) {
+        self.itemsCache = [NSMutableDictionary dictionary];
     }
     
-    if(self.safeItemsCache[parentGroup.uuid] == nil) {
-        NSArray<Node*>* items = [self loadSafeItems:parentGroup];
-        self.safeItemsCache[parentGroup.uuid] = items;
+    if(self.itemsCache[parentGroup.uuid] == nil) {
+        NSArray<Node*>* items = [self loadItems:parentGroup];
+        self.itemsCache[parentGroup.uuid] = items;
     }
     
-    return self.safeItemsCache[parentGroup.uuid];
+    return self.itemsCache[parentGroup.uuid];
 }
 
--(NSArray<Node*>*)loadSafeItems:(Node*)parentGroup {
+-(NSArray<Node*>*)loadItems:(Node*)parentGroup {
     //NSLog(@"loadSafeItems for [%@]", parentGroup.uuid);
     
     BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.model.format == kPasswordSafe;
@@ -922,13 +922,13 @@ static NSImage* kDefaultAttachmentIcon;
 
 - (IBAction)onUnlockWithTouchId:(id)sender {
     if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-        SafeMetaData *safe = [self getSafeMetaData];
+        SafeMetaData *metadata = [self getDatabaseMetaData];
         
-        if(safe && safe.isTouchIdEnabled && (safe.touchIdPassword || safe.touchIdKeyFileDigest)) {
+        if(metadata && metadata.isTouchIdEnabled && (metadata.touchIdPassword || metadata.touchIdKeyFileDigest)) {
             [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if(success) {
-                        [self unlock:safe.touchIdPassword keyFileDigest:safe.touchIdKeyFileDigest isBiometricOpen:YES];
+                        [self unlock:metadata.touchIdPassword keyFileDigest:metadata.touchIdKeyFileDigest isBiometricOpen:YES];
                     }
                     else {
                         NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
@@ -944,15 +944,15 @@ static NSImage* kDefaultAttachmentIcon;
         }
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
-            [Alerts info:@"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this safe will be cleared." window:self.view.window];
-            if(safe) {
-                [SafesList.sharedInstance remove:safe.uuid];
+            [Alerts info:@"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared." window:self.view.window];
+            if(metadata) {
+                [SafesList.sharedInstance remove:metadata.uuid];
             }
         }
     }
 }
 
-- (SafeMetaData*)getSafeMetaData {
+- (SafeMetaData*)getDatabaseMetaData {
     if(!self.model || !self.model.fileUrl) {
         return nil;
     }
@@ -973,12 +973,12 @@ static NSImage* kDefaultAttachmentIcon;
                   window:self.view.window];
         }
         
-        SafeMetaData* metaData = [self getSafeMetaData];
+        SafeMetaData* metaData = [self getDatabaseMetaData];
         
         if(!metaData) {
             // First Time? Display Touch ID Caveat
             
-            NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this safe in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
+            NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this database in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
             
             [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
                 NSURL* url = self.model.fileUrl;
@@ -1072,18 +1072,18 @@ static NSImage* kDefaultAttachmentIcon;
     else {
         if(!isBiometricOpen) {
             if(error) {
-                [Alerts error:@"Could not open safe" error:error window:self.view.window];
+                [Alerts error:@"Could not open database" error:error window:self.view.window];
             }
         }
         else {
             if(error) {
-                SafeMetaData *safe = [self getSafeMetaData];
+                SafeMetaData *safe = [self getDatabaseMetaData];
                 
                 safe.touchIdPassword = nil;
                 safe.touchIdKeyFileDigest = nil;
                 [SafesList.sharedInstance remove:safe.uuid];
                 
-                [Alerts error:@"Could not open safe with stored Touch ID Credentials. The stored credentials will now be removed from secure storage. You will need to enter the correct credentials to unlock the safe, and enrol again for Touch ID." error:error window:self.view.window];
+                [Alerts error:@"Could not open database with stored Touch ID Credentials. The stored credentials will now be removed from secure storage. You will need to enter the correct credentials to unlock the database, and enrol again for Touch ID." error:error window:self.view.window];
                 
                 [self bindToModel];
             }
@@ -1103,7 +1103,7 @@ static NSImage* kDefaultAttachmentIcon;
     if(self.model && !self.model.locked) {
         NSLog(@"isDocumentEdited: %d", [self.model.document isDocumentEdited]);
         if([self.model.document isDocumentEdited]) {
-            [Alerts yesNo:@"You cannot lock a safe while changes are pending. Save changes and lock now?" window:self.view.window completion:^(BOOL yesNo) {
+            [Alerts yesNo:@"You cannot lock a database while changes are pending. Save changes and lock now?" window:self.view.window completion:^(BOOL yesNo) {
                 if(yesNo) {
                     [self showProgressModal:@"Locking..."];
                     [self.model.document saveDocumentWithDelegate:self didSaveSelector:@selector(lockSafeContinuation:) contextInfo:nil];
@@ -1169,7 +1169,7 @@ static NSImage* kDefaultAttachmentIcon;
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
-            self.changeMasterPassword.titleText = new ? @"Please Enter the Master Credentials for this Safe" : @"Change Master Credentials";
+            self.changeMasterPassword.titleText = new ? @"Please Enter the Master Credentials for this Database" : @"Change Master Credentials";
             self.changeMasterPassword.databaseFormat = self.model.format;
             
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
@@ -1189,7 +1189,7 @@ static NSImage* kDefaultAttachmentIcon;
     [self promptForMasterPassword:NO completion:^(BOOL okCancel) {
         if(okCancel) {
             [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-            [Alerts info:@"Master Credentials Changed and Safe Saved" window:self.view.window];
+            [Alerts info:@"Master Credentials Changed and Database Saved" window:self.view.window];
         }
     }];
 }
@@ -1197,7 +1197,7 @@ static NSImage* kDefaultAttachmentIcon;
 - (IBAction)onSearch:(id)sender {
     NSLog(@"Search For: %@", self.searchField.stringValue);
     
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     
     Node* currentSelection = [self getCurrentSelectedItem];
     
@@ -1527,7 +1527,7 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (void)onNewItemAdded:(Node*)node {
-    self.safeItemsCache = nil; // Clear safe items cache
+    self.itemsCache = nil; // Clear items cache
     self.searchField.stringValue = @""; // Clear any ongoing search...
     [self.outlineView reloadData];
     
@@ -1656,7 +1656,7 @@ NSString* trimField(NSTextField* textField) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
     else if (theAction == @selector(onClearTouchId:)) {
-        SafeMetaData* metaData = [self getSafeMetaData];
+        SafeMetaData* metaData = [self getDatabaseMetaData];
         return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
     }
     else if (theAction == @selector(onPreviewAttachment:)) {
@@ -1679,7 +1679,7 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onClearTouchId:(id)sender {
-    SafeMetaData* metaData = [self getSafeMetaData];
+    SafeMetaData* metaData = [self getDatabaseMetaData];
     
     if(metaData) {
         [SafesList.sharedInstance remove:metaData.uuid];
@@ -1810,7 +1810,7 @@ NSString* trimField(NSTextField* textField) {
     dispatch_async(dispatch_get_main_queue(), ^{
         Node* currentSelection = [self getCurrentSelectedItem];
         
-        self.safeItemsCache = nil; // Clear safe items cache
+        self.itemsCache = nil; // Clear items cache
         
         [self.outlineView reloadData];
         

@@ -111,7 +111,7 @@ typedef void(^CompletionBlock)(Model* model);
     const int maxFailedPinAttempts = 3;
     
     PinEntryController *vc = [[PinEntryController alloc] init];
-    vc.info = @"Please enter your PIN to Unlock Safe";
+    vc.info = @"Please enter your PIN to Unlock Database";
     vc.showFallbackOption = YES;
     
     if(self.safe.failedPinAttempts > 0) {
@@ -150,7 +150,7 @@ typedef void(^CompletionBlock)(Model* model);
 
                         [Alerts warn:self.viewController
                                title:@"Too Many Incorrect PINs"
-                             message:@"You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this safe."];
+                             message:@"You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this database."];
                     }
                     else {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -184,14 +184,14 @@ typedef void(^CompletionBlock)(Model* model);
         self.completion(viewModel);
     }
     else if (self.safe.duressAction == kPresentError) {
-        NSError *error = [Utils createNSError:@"There was a technical error opening the safe." errorCode:-1729];
+        NSError *error = [Utils createNSError:@"There was a technical error opening the database." errorCode:-1729];
         [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
             self.completion(nil);
         }];
     }
     else if (self.safe.duressAction == kRemoveDatabase) {
         [self removeOrDeleteSafe];
-        NSError *error = [Utils createNSError:@"There was a technical error opening the safe." errorCode:-1729];
+        NSError *error = [Utils createNSError:@"There was a technical error opening the database." errorCode:-1729];
         [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
             self.completion(nil);
         }];
@@ -257,7 +257,7 @@ typedef void(^CompletionBlock)(Model* model);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self.viewController
                          title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
-                       message:[NSString stringWithFormat:@"%@ Authentication Failed. You must now enter your password manually to open the safe.", self.biometricIdName]
+                       message:[NSString stringWithFormat:@"%@ Authentication Failed. You must now enter your password manually to open the database.", self.biometricIdName]
                     completion:^{
                         [self promptForManualCredentials];
                     }];
@@ -274,7 +274,7 @@ typedef void(^CompletionBlock)(Model* model);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self.viewController
                          title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
-                       message:[NSString stringWithFormat:@"%@ has not been setup or system has cancelled. You must now enter your password manually to open the safe.", self.biometricIdName]
+                       message:[NSString stringWithFormat:@"%@ has not been setup or system has cancelled. You must now enter your password manually to open the database.", self.biometricIdName]
                     completion:^{
                         [self promptForManualCredentials];
                     }];
@@ -477,7 +477,7 @@ typedef void(^CompletionBlock)(Model* model);
         }
         else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
             NSString * modDateStr = getLastCachedDate(self.safe);
-            NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+            NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
             
             [self openWithOfflineCacheFile:message];
         }
@@ -497,12 +497,12 @@ typedef void(^CompletionBlock)(Model* model);
             NSLog(@"Error: %@", error);
             if(providerCanFallbackToOfflineCache(provider, self.safe)) {
                 NSString * modDateStr = getLastCachedDate(self.safe);
-                NSString* message = [NSString stringWithFormat:@"There was a problem reading the safe on %@. would you like to use a read-only offline cache version of this safe instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+                NSString* message = [NSString stringWithFormat:@"There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
                 
                 [self openWithOfflineCacheFile:message];
             }
             else {
-                [Alerts error:self.viewController title:@"There was a problem opening the safe." error:error completion:^{
+                [Alerts error:self.viewController title:@"There was a problem opening the database." error:error completion:^{
                     self.completion(nil);
                 }];
             }
@@ -546,7 +546,7 @@ typedef void(^CompletionBlock)(Model* model);
     
     if (openedSafe == nil) {
         if(!error) {
-            [Alerts error:self.viewController title:@"There was a problem opening the safe." error:error];
+            [Alerts error:self.viewController title:@"There was a problem opening the database." error:error];
             self.completion(nil);
             return;
         }
@@ -559,17 +559,17 @@ typedef void(^CompletionBlock)(Model* model);
                 [SafesList.sharedInstance update:self.safe];
                 
                 [Alerts info:self.viewController
-                       title:@"Could not open safe"
-                     message:[NSString stringWithFormat:@"The Convenience Password or Key File were incorrect for this safe. Convenience Unlock Disabled."]] ;
+                       title:@"Could not open database"
+                     message:[NSString stringWithFormat:@"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled."]] ;
             }
             else {
                 [Alerts info:self.viewController
                        title:@"Incorrect Credentials"
-                     message:@"The credentials were incorrect for this safe."];
+                     message:@"The credentials were incorrect for this database."];
             }
         }
         else {
-            [Alerts error:self.viewController title:@"There was a problem opening the safe." error:error];
+            [Alerts error:self.viewController title:@"There was a problem opening the database." error:error];
         }
         
         self.completion(nil);
@@ -606,15 +606,15 @@ typedef void(^CompletionBlock)(Model* model);
     
     if(biometricPossible && pinPossible) {
         title = [NSString stringWithFormat:@"Convenience Unlock: Use %@ or PIN Code in Future?", self.biometricIdName];
-        message = [NSString stringWithFormat:@"You can use either %@ or a convenience PIN Code to unlock this safe. While this is convenient, it may reduce the security of the safe on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
+        message = [NSString stringWithFormat:@"You can use either %@ or a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
     }
     else if (biometricPossible) {
         title = [NSString stringWithFormat:@"Convenience Unlock: Use %@ to Unlock in Future?", self.biometricIdName];
-        message = [NSString stringWithFormat:@"You can use %@ to unlock this safe. While this is convenient, it may reduce the security of the safe on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
+        message = [NSString stringWithFormat:@"You can use %@ to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
     }
     else if (pinPossible) {
         title = @"Convenience Unlock: Use a PIN Code to Unlock in Future?";
-        message = @"You can use a convenience PIN Code to unlock this safe. While this is convenient, it may reduce the security of the safe on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password";
+        message = @"You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password";
     }
     
     
@@ -695,7 +695,7 @@ typedef void(^CompletionBlock)(Model* model);
                     [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                 }
                 else {
-                    [Alerts warn:self.viewController title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please configure in the Safe Settings" completion:^{
+                    [Alerts warn:self.viewController title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please configure in the Database Settings" completion:^{
                         [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                     }];
                 }

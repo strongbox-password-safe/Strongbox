@@ -52,7 +52,7 @@
 - (IBAction)saveDocument:(id)sender
 {
     if(self.model.locked) {
-        [Alerts info:@"Cannot save safe while it is locked." window:self.windowController.window];
+        [Alerts info:@"Cannot save database while it is locked." window:self.windowController.window];
         return;
     }
 

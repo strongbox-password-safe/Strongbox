@@ -21,12 +21,12 @@
     NSString* name = [IOsUtils nameFromDeviceName];
     
     if(name.length > 0) {
-        NSString *suggestion = [NSString stringWithFormat:@"%@'s Safe", name];
+        NSString *suggestion = [NSString stringWithFormat:@"%@'s Database", name];
         
         int attempt = 2;
   
         while(![[SafesList sharedInstance] isValidNickName:suggestion] && attempt < 50) {
-            suggestion = [NSString stringWithFormat:@"%@'s Safe %d", name, attempt++];
+            suggestion = [NSString stringWithFormat:@"%@'s Database %d", name, attempt++];
         }
         
         return [[SafesList sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
@@ -39,8 +39,8 @@
     validation:(BOOL (^) (NSString *name, NSString *password))validation
     completion:(void (^) (NSString *name, NSString *password, BOOL response))completion {
     _newValidation = validation;
-    _alertController = [UIAlertController alertControllerWithTitle:@"Add New Safe"
-                                                           message:@"Enter a name for this safe, and a master password"
+    _alertController = [UIAlertController alertControllerWithTitle:@"Add New Database"
+                                                           message:@"Enter a name for this database, and a master password"
                                                     preferredStyle:UIAlertControllerStyleAlert];
 
     __weak typeof(self) weakSelf = self;
@@ -52,7 +52,7 @@
                                 textField.text = suggestedName;
                             }
                             else {
-                                textField.placeholder = @"Safe Name";
+                                textField.placeholder = @"Database Name";
                             }
                       }];
 
@@ -67,7 +67,7 @@
                           [textField becomeFirstResponder];
                       }];
 
-    _defaultAction = [UIAlertAction actionWithTitle:@"Add Safe"
+    _defaultAction = [UIAlertAction actionWithTitle:@"Add Database"
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *a) {
                                                 completion((self->_alertController.textFields[0]).text, (self->_alertController.textFields[1]).text, true);
@@ -92,13 +92,13 @@
          validation:(BOOL (^) (NSString *name))validation
          completion:(void (^) (NSString *name, BOOL response))completion {
     _existingValidation = validation;
-    _alertController = [UIAlertController alertControllerWithTitle:@"Add Password Safe"
-                                                           message:@"Enter a title or name for this safe"
+    _alertController = [UIAlertController alertControllerWithTitle:@"Add Database"
+                                                           message:@"Enter a title or name for this database"
                                                     preferredStyle:UIAlertControllerStyleAlert];
 
     NSString *suggestedName = [self getSuggestedSafeName];
     
-    _defaultAction = [UIAlertAction actionWithTitle:@"Add Safe"
+    _defaultAction = [UIAlertAction actionWithTitle:@"Add Database"
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *a) {
                                                 completion((self->_alertController.textFields[0]).text, true);
@@ -114,7 +114,7 @@
                                 textField.text = suggestedName;
                             }
                             else {
-                                textField.placeholder = @"Safe Name";
+                                textField.placeholder = @"Database Name";
                             }
                       }];
 

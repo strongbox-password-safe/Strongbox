@@ -140,7 +140,7 @@
         [self bindAllowPinCodeOpen];
     }
     else {
-        [Alerts yesNo:self title:@"Clear PIN Codes" message:@"This will clear any existing safes with stored Master Credentials that are backed by PIN Codes" action:^(BOOL response) {
+        [Alerts yesNo:self title:@"Clear PIN Codes" message:@"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes" action:^(BOOL response) {
             if(response) {
                 Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
                 
@@ -177,7 +177,7 @@
         [self bindAllowBiometric];
     }
     else {
-        [Alerts yesNo:self title:@"Clear Biometrics" message:@"This will clear any existing safes with stored Master Credentials that are backed by Biometric Open. Are you sure?" action:^(BOOL response) {
+        [Alerts yesNo:self title:@"Clear Biometrics" message:@"This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?" action:^(BOOL response) {
             if(response) {
                 NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
                 
@@ -345,7 +345,8 @@
                                     [self bindAppLock];
                                 }
                                 else {
-                                    [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Safe Settings." completion:nil];
+                                    // TODO: Believe this message string is incorrect copy/pasta mistaje
+                                    [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Database Settings." completion:nil];
                                     [self bindAppLock];
                                 }
                             }
@@ -444,7 +445,7 @@
     NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
     if([self hasLocalOrICloudSafes]) {
         [Alerts yesNo:self title:@"Master Password Warning"
-              message:[NSString stringWithFormat:@"It is very important that you know your master password for your safes, and that you are not relying entirely on %@.\n"
+              message:[NSString stringWithFormat:@"It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\n"
                      @"The migration and importation process makes every effort to maintain %@ data but it is not guaranteed. "
                      @"In any case it is important that you always know your master passwords.\n\n"
                      @"Do you want to continue changing iCloud usage settings?", biometricIdName, biometricIdName]
@@ -494,7 +495,7 @@
     }
     
     int i=0;
-    NSString *safesMessage = @"Safes Collection<br />----------------<br />";
+    NSString *safesMessage = @"Databases Collection<br />----------------<br />";
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%d%d%d%d%d]<br />", i++,
                               safe.nickName,
@@ -517,7 +518,7 @@
     NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
     
-    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox Password Safe... <br /><br />"
+    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox... <br /><br />"
                          @"Please include as much detail as possible and screenshots if appropriate...<br /><br />"
                          @"Here is some debug information which might help:<br />"
                          @"%@<br />"

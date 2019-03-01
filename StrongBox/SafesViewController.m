@@ -157,7 +157,7 @@
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"No Safes Here Yet";
+    NSString *text = @"No Password Databases Here Yet";
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
                                  NSForegroundColorAttributeName: [UIColor darkGrayColor]};
@@ -296,8 +296,8 @@
     
     [Alerts OkCancelWithTextField:self
                     textFieldText:safe.nickName
-                            title:@"Rename Safe"
-                          message:@"Please enter a new name for this safe"
+                            title:@"Rename Database"
+                          message:@"Please enter a new name for this database"
                        completion:^(NSString *text, BOOL response) {
         if(response) {
             if([SafesList.sharedInstance isValidNickName:text]) {
@@ -318,12 +318,12 @@
     NSString *message;
     
     if(safe.storageProvider == kiCloud && [Settings sharedInstance].iCloudOn) {
-        message = @"This will remove the safe from all your iCloud enabled devices.\n\n"
-                    @"Are you sure you want to remove this safe from Strongbox and iCloud?";
+        message = @"This will remove the database from all your iCloud enabled devices.\n\n"
+                    @"Are you sure you want to remove this database from Strongbox and iCloud?";
     }
     else {
-        message = [NSString stringWithFormat:@"Are you sure you want to remove this safe from Strongbox?%@",
-                         (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : @" (NB: The underlying safe data file will not be deleted)"];
+        message = [NSString stringWithFormat:@"Are you sure you want to remove this database from Strongbox?%@",
+                         (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : @" (NB: The underlying database file will not be deleted)"];
     }
     
     [Alerts yesNo:self
@@ -352,7 +352,7 @@
         [[AppleICloudProvider sharedInstance] delete:safe completion:^(NSError *error) {
             if(error) {
                 NSLog(@"%@", error);
-                [Alerts error:self title:@"Error Deleting iCloud Safe" error:error];
+                [Alerts error:self title:@"Error Deleting iCloud Database" error:error];
                 return;
             }
             else {
@@ -405,7 +405,7 @@
                                             message:nil
                                       preferredStyle:UIAlertControllerStyleActionSheet];
 
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Add an Existing Safe..."
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Add Existing Database..."
                                                      style:UIAlertActionStyleDefault
                                                    handler:^(UIAlertAction *a) {
                                                        [self onAddExistingSafe];
@@ -414,7 +414,7 @@
     
     // Create New
     
-    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:@"Create a New Safe (Advanced)..."
+    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:@"Create New Database (Advanced)..."
                                                      style:UIAlertActionStyleDefault
                                                    handler:^(UIAlertAction *a) {
                                                        [self onCreateNewSafe];
@@ -424,7 +424,7 @@
     // Express
     
     if(Settings.sharedInstance.iCloudAvailable) {
-        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"⚡ New Safe (Express)"
+        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"⚡ New Database (Express)"
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
                                                                     [self onNewExpressSafe];
@@ -480,9 +480,9 @@
                                                     name:name
                                                 password:password
                                                 provider:AppleICloudProvider.sharedInstance
-                                                  format:kPasswordSafe];
+                                                  format:kKeePass];
                 
-                [Alerts info:self title:@"New Safe Ready!" message:@"Your new safe is now ready to use! Just tap on it to get started...\n\nNB: It is vitally important that you remember your master password, as without it there is no hope of opening the safe.\n\nYou could consider writing this password down and storing offline in a physically secure location."];
+                [Alerts info:self title:@"New Database Ready!" message:@"Your new database is now ready to use! Just tap on it to get started...\n\nNB: It is VITALLY important that you remember your master password, as without it there is no hope of opening the database.\n\nYou could consider writing this password down and storing offline in a physically secure location."];
             }
     }];
 }
@@ -518,7 +518,7 @@
                 [Alerts warn:self title:@"Error Exporting" message:@""];
             }
             else {
-                [Alerts info:self title:@"Export Successful" message:@"Your Safe was successfully exported."];
+                [Alerts info:self title:@"Export Successful" message:@"Your Database was successfully exported."];
             }
         }];
         
@@ -532,7 +532,7 @@
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
     [provider read:safe viewController:self completion:^(NSData *data, NSError *error) {
         if(!data || error) {
-            [Alerts error:self title:@"Error Reading Safe" error:error];
+            [Alerts error:self title:@"Error Reading Database" error:error];
         }
         else {
             self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:safe.fileName];
@@ -540,7 +540,7 @@
             NSError* error;
             [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
             if(error) {
-                [Alerts error:self title:@"Error Writing Safe" error:error];
+                [Alerts error:self title:@"Error Writing Database" error:error];
                 NSLog(@"error: %@", error);
                 return;
             }
@@ -613,10 +613,10 @@
     [self removeToolbarButton:self.buttonTogglePro];
     
     if([[Settings sharedInstance] isProOrFreeTrial]) {
-        [self.navItemHeader setTitle:@"Safes"];
+        [self.navItemHeader setTitle:@"Databases"];
     }
     else {
-        [self.navItemHeader setTitle:@"Safes [Lite Version]"];
+        [self.navItemHeader setTitle:@"Databases [Lite Version]"];
     }
     
     if(![[Settings sharedInstance] isPro]) {

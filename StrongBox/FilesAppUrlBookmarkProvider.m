@@ -168,7 +168,7 @@ viewController:(UIViewController *)viewController
     
     if(bookmarkIsStale) {
         url = nil;
-        error = [Utils createNSError:@"Strongbox's reference to this external file is stale. Please remove and re-add this safe." errorCode:-45];   
+        error = [Utils createNSError:@"Strongbox's reference to this external file is stale. Please remove and re-add this database." errorCode:-45];   
     }
     
     if(error) {

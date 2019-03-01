@@ -222,7 +222,7 @@
 }
 
 - (void)removeCopyDiagnosticDumpItem {
-    [self removeMenuItem:@"Safe" action:@"onCopyDiagnosticDump:"];
+    [self removeMenuItem:@"Database" action:@"onCopyDiagnosticDump:"];
 }
 
 - (void)removeUpgradeMenuItem {

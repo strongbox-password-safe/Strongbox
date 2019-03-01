@@ -59,9 +59,11 @@
 - (BOOL)setTitle:(NSString*_Nonnull)title;
 - (BOOL)validateAddChild:(Node* _Nonnull)node;
 - (BOOL)addChild:(Node* _Nonnull)node;
+- (void)moveChild:(NSUInteger)from to:(NSUInteger)to;
 - (void)removeChild:(Node* _Nonnull)node;
 - (BOOL)validateChangeParent:(Node*_Nonnull)parent;
 - (BOOL)changeParent:(Node*_Nonnull)parent;
+- (void)sortChildren;
 
 - (NSArray<NSString*>*_Nonnull)getTitleHierarchy;
 

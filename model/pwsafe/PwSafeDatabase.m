@@ -48,7 +48,7 @@
         NSLog(@"Not a valid safe!");
         
         if (error != nil) {
-            *error = [Utils createNSError:@"This is not a valid Password Safe (Invalid Format)." errorCode:-1];
+            *error = [Utils createNSError:@"This is not a valid Password Safe 3 File (Invalid Format)." errorCode:-1];
         }
         
         return nil;
@@ -70,7 +70,7 @@
     if(!rootGroup) {
         NSLog(@"Could not build model from records and headers?!");
         if (error != nil) {
-            *error = [Utils createNSError:@"Could not parse this safe." errorCode:-1];
+            *error = [Utils createNSError:@"Could not parse this Password Safe File." errorCode:-1];
         }
         return nil;
     }

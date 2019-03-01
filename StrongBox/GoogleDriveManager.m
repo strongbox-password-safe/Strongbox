@@ -145,7 +145,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
 
         GTLRDrive_File *metadata = [GTLRDrive_File object];
         metadata.name = fileName;
-        metadata.descriptionProperty = @"Strongbox Password Safe";
+        metadata.descriptionProperty = @"Strongbox Database";
         metadata.mimeType = kMimeType;
         metadata.parents = @[ parentFolderIdentifier ];
 
@@ -220,7 +220,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
         else {
             if (!file) {
                 NSLog(@"Google Drive: No such file found...");
-                error = [Utils createNSError:@"Your safe file could not be found on Google Drive. Try removing the safe and re-adding it." errorCode:-1];
+                error = [Utils createNSError:@"Your database file could not be found on Google Drive. Try removing the database and re-adding it." errorCode:-1];
                 handler(nil, error);
                 return;
             }

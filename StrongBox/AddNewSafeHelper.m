@@ -19,7 +19,7 @@
     NSData *data = [newSafe getAsData:&error];
     
     if (data == nil) {
-        [Alerts error:vc title:@"Error Saving Safe" error:error];
+        [Alerts error:vc title:@"Error Saving Database" error:error];
         return;
     }
     
@@ -52,7 +52,7 @@
              NSLog(@"An error occurred: %@", error);
              
              [Alerts error:vc
-                     title:@"Error Saving Safe"
+                     title:@"Error Saving Database"
                      error:error];
          }
          

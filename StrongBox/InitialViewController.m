@@ -153,7 +153,7 @@
     if(![[Settings sharedInstance] isPro]) {
         if([[Settings sharedInstance] getEndFreeTrialDate] == nil) {
             NSCalendar *cal = [NSCalendar currentCalendar];
-            NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
+            NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:3 toDate:[NSDate date] options:0];
             [[Settings sharedInstance] setEndFreeTrialDate:date];
         }
         
@@ -164,7 +164,7 @@
         else if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 6) {
             if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
                 [Alerts info:self title:@"Strongbox Pro"
-                     message:@"Hi there!\nYou are currently using Strongbox Pro. You can evaluate this version over the next two months. I hope you like it.\n\nAfter this I would ask you to contribute to its development. If you choose not to support the app, you will then be transitioned to a little bit more limited version. You won't lose any of your safes or passwords.\n\nTo find out more you can tap the Upgrade button at anytime below. I hope you enjoy the app, and will choose to support it!\n-Mark"];
+                     message:@"Hi there!\nYou are currently using Strongbox Pro. You can evaluate this version over the next three months. I hope you like it.\n\nAfter this I would ask you to contribute to its development. If you choose not to support the app, you will then be transitioned to a little bit more limited version. You won't lose any of your databases or passwords.\n\nTo find out more you can tap the Upgrade button at anytime below. I hope you enjoy the app, and will choose to support it!\n-Mark"];
                 
                 [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
             }
@@ -258,7 +258,7 @@
            if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
                [Alerts warn:self
                       title:@"iCloud no longer available"
-                    message:@"Some safes were removed from this device because iCloud has become unavailable, but they remain stored in iCloud."];
+                    message:@"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud."];
                
                [self removeAllICloudSafes];
            }
@@ -276,9 +276,9 @@
                BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
                
                NSString *message = existingLocalDeviceSafes ?
-               (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local safes be migrated to iCloud and available on all your devices? (NB: Your existing cloud safes will not be affected)" :
-                @"You can now use iCloud with Strongbox. Should your current local safes be migrated to iCloud and available on all your devices?") :
-               (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud safes will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your safes available on all your devices?");
+               (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
+                @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
+               (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
                
                [Alerts twoOptions:self
                             title:@"iCloud is Now Available"
@@ -314,7 +314,7 @@
 - (void)continueICloudAvailableProcedure {
    // If iCloud newly switched on, move local docs to iCloud
    if ([Settings sharedInstance].iCloudOn && ![Settings sharedInstance].iCloudWasOn && [self getLocalDeviceSafes].count) {
-       [Alerts twoOptions:self title:@"iCloud Available" message:@"Would you like to migrate your current local device safes to iCloud?"
+       [Alerts twoOptions:self title:@"iCloud Available" message:@"Would you like to migrate your current local device databases to iCloud?"
         defaultButtonText:@"Migrate to iCloud"
          secondButtonText:@"Keep Local" action:^(BOOL response) {
              if(response) {
@@ -329,7 +329,7 @@
    if (![Settings sharedInstance].iCloudOn && [Settings sharedInstance].iCloudWasOn && [self getICloudSafes].count) {
        [Alerts threeOptions:self
                       title:@"iCloud Unavailable"
-                    message:@"What would you like to do with the safes currently on this device?"
+                    message:@"What would you like to do with the databases currently on this device?"
           defaultButtonText:@"Remove them, Keep on iCloud Only"
            secondButtonText:@"Make Local Copies"
             thirdButtonText:@"Switch iCloud Back On"
@@ -363,7 +363,7 @@
     NSError* error;
     if (![DatabaseModel isAValidSafe:importedData error:&error]) {
         [Alerts error:self
-                title:@"Invalid Safe"
+                title:@"Invalid Database"
                 error:error];
         
         return;
@@ -413,7 +413,7 @@
     NSError* error;
     if (![DatabaseModel isAValidSafe:document.data error:&error]) {
         [Alerts error:self
-                title:@"Invalid Safe"
+                title:@"Invalid Database"
                 error:error];
         
         return;
@@ -442,9 +442,9 @@
 
 - (void)promptForImportedSafeNickName:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
     [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Safe Name"
+             textFieldPlaceHolder:@"Database Name"
                             title:@"Enter a Name"
-                          message:@"What would you like to call this safe?"
+                          message:@"What would you like to call this database?"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                NSString *nickName = [SafesList sanitizeSafeNickName:text];
@@ -495,7 +495,7 @@
                                 [self updateCurrentRootSafesView];
                             }
                             else {
-                                [Alerts error:self title:@"Error Importing Safe" error:error];
+                                [Alerts error:self title:@"Error Importing Database" error:error];
                             }
                         });
      }];

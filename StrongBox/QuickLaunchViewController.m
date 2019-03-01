@@ -159,7 +159,7 @@
     SafeMetaData* safe = [[self getInitialViewController] getPrimarySafe];
     
     if(!safe) {
-        [Alerts warn:self title:@"No Primary Safe" message:@"Strongbox could not determine your primary safe. Switch back to the Safes List View and ensure that there is at least one safe present."];
+        [Alerts warn:self title:@"No Primary Database" message:@"Strongbox could not determine your primary database. Switch back to the Databases List View and ensure that there is at least one database present."];
         
         return;
     }

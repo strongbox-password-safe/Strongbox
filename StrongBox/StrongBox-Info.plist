@@ -24,7 +24,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Strongbox KeePass 1 Safe</string>
+			<string>Strongbox KeePass 1 Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -36,7 +36,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Strongbox KeePass 2 Safe</string>
+			<string>Strongbox KeePass 2 Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -48,7 +48,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Strongbox Password Safe</string>
+			<string>Strongbox Password Safe 3 Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -60,7 +60,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Strongbox Password Safe</string>
+			<string>Strongbox Password Safe 3 Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -86,7 +86,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.22.1</string>
+	<string>1.22.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -120,7 +120,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2638</string>
+	<string>2639</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -138,7 +138,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Can Strongbox use the camera to scan QR Codes?</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Strongbox can use Face ID to open your safes and lock the application. Would you like to allow Strongbox to do this?</string>
+	<string>Strongbox can use Face ID to open your databases and lock the application. Would you like to allow Strongbox to do this?</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Required to Save Attachments</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -210,7 +210,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox KeePass Safe</string>
+			<string>Strongbox KeePass Database</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.kdb</string>
 			<key>UTTypeTagSpecification</key>
@@ -227,7 +227,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox KeePass Safe</string>
+			<string>Strongbox KeePass Database</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.kdbx</string>
 			<key>UTTypeTagSpecification</key>
@@ -244,7 +244,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox Password Safe</string>
+			<string>Strongbox Password Safe Database</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.dat</string>
 			<key>UTTypeTagSpecification</key>
@@ -261,7 +261,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox Password Safe</string>
+			<string>Strongbox Password Safe Database</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.psafe3</string>
 			<key>UTTypeTagSpecification</key>

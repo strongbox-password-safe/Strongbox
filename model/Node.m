@@ -145,8 +145,25 @@
     return YES;
 }
 
+- (void)moveChild:(NSUInteger)from to:(NSUInteger)to {
+    NSLog(@"moveChild: %lu > %lu", (unsigned long)from, (unsigned long)to);
+    if(from == to || from >= _mutableChildren.count || to >= _mutableChildren.count || from < 0 || to < 0) {
+        return;
+    }
+    
+    NSLog(@"moveChild Ok: %lu > %lu", (unsigned long)from, (unsigned long)to);
+    
+    Node* node = _mutableChildren[from];
+    [_mutableChildren removeObjectAtIndex:from];
+    [_mutableChildren insertObject:node atIndex:to];
+}
+
 - (void)removeChild:(Node* _Nonnull)node {
     [_mutableChildren removeObject:node];
+}
+
+- (void)sortChildren {
+    _mutableChildren = [[_mutableChildren sortedArrayUsingComparator:finderStyleNodeComparator] mutableCopy];
 }
 
 - (BOOL)validateChangeParent:(Node*)parent {

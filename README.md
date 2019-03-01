@@ -1,4 +1,4 @@
-# Strongbox Password Safe
+# Strongbox
 A Personal Password Manager for iOS & OSX that can be found on the Apple App Store here: 
 
 https://itunes.apple.com/us/app/strongbox-password-safe/id897283731

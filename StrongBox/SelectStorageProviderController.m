@@ -37,10 +37,10 @@
     [super viewWillAppear:animated];
     
     if(self.existing) {
-        [self.navigationItem setPrompt:@"Select where your existing safe is stored"];
+        [self.navigationItem setPrompt:@"Select where your existing database is stored"];
     }
     else {
-        [self.navigationItem setPrompt:@"Select where you would like to store your new safe"];
+        [self.navigationItem setPrompt:@"Select where you would like to store your new database"];
     }
 
     self.navigationController.toolbar.hidden = YES;
@@ -117,11 +117,11 @@
         id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
         if (provider.storageId == kLocalDevice && !self.existing) {
             [Alerts yesNo:self
-                    title:@"Local Device Safe Caveat"
-                  message:@"Since a local safe is only stored on this device, any loss of this device will lead to the loss of "
-             "all passwords stored within this safe. You may want to consider using a cloud storage provider, such as the ones "
+                    title:@"Local Device Database Caveat"
+                  message:@"Since a local database is only stored on this device, any loss of this device will lead to the loss of "
+             "all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones "
              "supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
-             "a local device safe?"
+             "a local device database?"
                    action:^(BOOL response) {
                        if (response) {
                            [self segueToBrowserOrAdd:provider];
@@ -176,7 +176,7 @@
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:@"URL"
                             title:@"Enter URL"
-                          message:@"Please Enter the URL of the Safe File."
+                          message:@"Please Enter the URL of the Database File."
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                NSURL *url = [NSURL URLWithString:text];
@@ -198,7 +198,7 @@
     
     if (![DatabaseModel isAValidSafe:importedData error:&error]) {
         [Alerts error:self
-                title:@"Invalid Safe"
+                title:@"Invalid Database"
                 error:error];
         
         return;
@@ -209,9 +209,9 @@
 
 - (void)promptForImportedSafeNickName:(NSData *)data {
     [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Safe Name"
+             textFieldPlaceHolder:@"Database Name"
                             title:@"Enter a Name"
-                          message:@"What would you like to call this safe?"
+                          message:@"What would you like to call this database?"
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                NSString *nickName = [SafesList sanitizeSafeNickName:text];
@@ -256,7 +256,7 @@
                                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
                             }
                             else {
-                                [Alerts error:self title:@"Error Importing Safe" error:error];
+                                [Alerts error:self title:@"Error Importing Database" error:error];
                             }
                             
                             [self.navigationController popToRootViewControllerAnimated:YES];

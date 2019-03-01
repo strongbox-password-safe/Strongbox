@@ -59,7 +59,7 @@
         NSError *authError;
         if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
             [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                             localizedReason:@"Identify to Open Safe"
+                             localizedReason:@"Identify to Open Database"
                                        reply:^(BOOL success, NSError *error) {
                                            completion(success, error);
                                        }];

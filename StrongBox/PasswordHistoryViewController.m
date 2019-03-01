@@ -72,7 +72,7 @@
 - (void)save {
     self.saveFunction(self.model, ^(NSError *error) {
         if (error) {
-            [Alerts error:self title:@"Problem Saving Safe" error:error];
+            [Alerts error:self title:@"Problem Saving Database" error:error];
         }
         
         [self bindToModel];

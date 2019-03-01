@@ -30,7 +30,7 @@
           [Kdb1Database isAValidSafe:candidate error:&k3];
 
     if(error) {
-        NSString* errorSummary = @"Could not recognise this a valid safe:\n";
+        NSString* errorSummary = @"Could not recognise this a valid Database:\n";
         
         errorSummary = [errorSummary stringByAppendingFormat:@"- Password Safe: %@\n", pw.localizedDescription];
         errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass Classic: %@\n", k1.localizedDescription];

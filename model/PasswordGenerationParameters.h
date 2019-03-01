@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef enum {
     kBasic,
     kXkcd
@@ -38,5 +40,7 @@ typedef enum {
 @property (nonatomic) int xkcdWordCount;
 @property (nonatomic) NSString* wordSeparator;
 @property (nonatomic) WordList xKcdWordList;
+
+NS_ASSUME_NONNULL_END
 
 @end

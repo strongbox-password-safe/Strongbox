@@ -102,7 +102,7 @@
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"You Have No Strongbox Safes :(";
+    NSString *text = @"You Have No Strongbox Databases :(";
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
                                  NSForegroundColorAttributeName: [UIColor darkGrayColor]};
@@ -112,7 +112,7 @@
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"To use Strongbox for Password Autofill you need to add a safe. You can do this in the Strongbox App.";
+    NSString *text = @"To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App.";
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;

@@ -71,7 +71,7 @@
             handler([Utils createNSError:@"You are in read-only mode. Cannot Write!" errorCode:-1]);
         }
         else {
-            handler([Utils createNSError:@"You are currently in offline mode. The safe cannot be modified." errorCode:-1]);
+            handler([Utils createNSError:@"You are currently in offline mode. The database cannot be modified." errorCode:-1]);
         }
     }
 }

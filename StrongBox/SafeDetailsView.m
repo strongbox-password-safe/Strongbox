@@ -324,8 +324,8 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     
     if (self.viewModel.metadata.isTouchIdEnabled) {
         NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
-            @"Disabling %@ for this safe will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-            @"Are you sure you want to disable %@ for this safe?";
+            @"Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+            @"Are you sure you want to disable %@ for this database?";
         
         [Alerts yesNo:self
                 title:[NSString stringWithFormat:@"Disable %@?", bIdName]
@@ -344,7 +344,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
                        [self updateTouchIdButtonText];
                        
                        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
-                                                  message:[NSString stringWithFormat:@"%@ for this safe has been disabled.", bIdName]
+                                                  message:[NSString stringWithFormat:@"%@ for this database has been disabled.", bIdName]
                                                  duration:3.f
                                               hideOnSwipe:YES
                                                 hideOnTap:YES
@@ -361,7 +361,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
         self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
 
         [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
-                                   message:[NSString stringWithFormat:@"%@ has been enabled for this safe.", bIdName]
+                                   message:[NSString stringWithFormat:@"%@ has been enabled for this database.", bIdName]
                                   duration:3.f
                                hideOnSwipe:YES
                                  hideOnTap:YES
@@ -378,7 +378,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     if (self.viewModel.metadata.offlineCacheEnabled) {
         [Alerts yesNo:self
                 title:@"Disable Offline Cache?"
-              message:@"Disabling Offline Cache for this safe will remove the offline cache and you will not be able to access the safe when offline. Are you sure you want to do this?"
+              message:@"Disabling Offline Cache for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?"
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearOfflineCache];
@@ -416,7 +416,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     if (self.viewModel.metadata.autoFillCacheEnabled) {
         [Alerts yesNo:self
                 title:@"Disable Autofill Cache?"
-              message:@"Disabling the Autofill Cache will remove the autofill cache and you will not be able to access the safe for use during autofill. Are you sure you want to do this?"
+              message:@"Disabling the Autofill Cache will remove the autofill cache and you will not be able to access the database for use during autofill. Are you sure you want to do this?"
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearAutoFillCache];
@@ -451,8 +451,8 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 }
 
 - (void)onExport {
-    [Alerts threeOptionsWithCancel:self title:@"How would you like to export your safe?"
-                           message:@"You can export your encrypted safe by email, or you can copy your safe in plaintext format (CSV) to the clipboard."
+    [Alerts threeOptionsWithCancel:self title:@"How would you like to export your database?"
+                           message:@"You can export your encrypted database by email, or you can copy your database in plaintext format (CSV) to the clipboard."
                  defaultButtonText:@"Export (Encrypted) by Email"
                   secondButtonText:@"Export as CSV by Email"
                    thirdButtonText:@"Copy CSV to Clipboard"
@@ -472,7 +472,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
             UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
             pasteboard.string = newStr;
             
-            [ISMessages showCardAlertWithTitle:@"Safe Copied to Clipboard"
+            [ISMessages showCardAlertWithTitle:@"Database Copied to Clipboard"
                                        message:nil
                                       duration:3.f
                                    hideOnSwipe:YES
@@ -487,7 +487,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 - (void)exportEncryptedSafeByEmail {
     [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
         if(!safeData) {
-            [Alerts error:self title:@"Could not get safe data" error:error];
+            [Alerts error:self title:@"Could not get database data" error:error];
             return;
         }
       
@@ -502,19 +502,19 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
                title:@"Email Not Available"
-             message:@"It looks like email is not setup on this device and so the safe cannot be exported by email."];
+             message:@"It looks like email is not setup on this device and so the database cannot be exported by email."];
         
         return;
     }
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     
-    [picker setSubject:[NSString stringWithFormat:@"Strongbox Safe: '%@'", self.viewModel.metadata.nickName]];
+    [picker setSubject:[NSString stringWithFormat:@"Strongbox Database: '%@'", self.viewModel.metadata.nickName]];
     
     [picker addAttachmentData:data mimeType:mimeType fileName:attachmentName];
     
     [picker setToRecipients:[NSArray array]];
-    [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox password safe.", self.viewModel.metadata.nickName] isHTML:NO];
+    [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox Database.", self.viewModel.metadata.nickName] isHTML:NO];
     picker.mailComposeDelegate = self;
     
     [self presentViewController:picker animated:YES completion:^{ }];
@@ -537,7 +537,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 
     [self bindReadOnly];
     
-    [Alerts info:self title:@"Re-Open Required" message:@"Please re open this safe for this read only change to take effect."];
+    [Alerts info:self title:@"Re-Open Required" message:@"Please re open this database for this read only change to take effect."];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

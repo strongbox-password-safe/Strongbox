@@ -25,7 +25,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 - (void)newDocument:(id)sender {
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
-    wizard.titleText = @"Please Enter the Master Credentials for this Safe";
+    wizard.titleText = @"Please Enter the Master Credentials for this Database";
     wizard.databaseFormat = kKeePass;
     wizard.createSafeWizardMode = YES;
     
