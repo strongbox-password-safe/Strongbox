@@ -369,7 +369,7 @@
         return;
     }
     
-    [self promptForImportedSafeNickName:importedData url:importURL editInPlace:NO];
+    [self checkForLocalFileOverwriteOrGetNickname:importedData url:importURL editInPlace:NO];
 }
 
 - (void)import:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
@@ -407,6 +407,7 @@
     }
     
     [document closeWithCompletionHandler:nil];
+    [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
 }
 
 -(void)importSafe:(StrongboxUIDocument*)document url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
@@ -415,7 +416,10 @@
         [Alerts error:self
                 title:@"Invalid Database"
                 error:error];
-        
+
+        [document closeWithCompletionHandler:nil];
+        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
+
         return;
     }
     
@@ -428,19 +432,59 @@
                       action:^(int response) {
                           [document closeWithCompletionHandler:^(BOOL success) {
                               if(response != 2) {
-                                  [self promptForImportedSafeNickName:document.data url:url editInPlace:response == 0];
+                                  [self checkForLocalFileOverwriteOrGetNickname:document.data url:url editInPlace:response == 0];
                               }
+                              [document closeWithCompletionHandler:nil];
+                              [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
                           }];
                       }];
     }
     else {
         [document closeWithCompletionHandler:^(BOOL success) {
-            [self promptForImportedSafeNickName:document.data url:url editInPlace:NO];
+            [self checkForLocalFileOverwriteOrGetNickname:document.data url:url editInPlace:NO];
+            
+            [document closeWithCompletionHandler:nil];
+            [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
         }];
     }
 }
 
-- (void)promptForImportedSafeNickName:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
+- (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
+    if(editInPlace == NO) {
+        NSString* filename = url.lastPathComponent;
+        if([LocalDeviceStorageProvider.sharedInstance fileNameExists:filename] && Settings.sharedInstance.iCloudOn == NO) {
+            [Alerts twoOptionsWithCancel:self
+                                   title:@"Update Existing Database?"
+                                 message:@"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?"
+                       defaultButtonText:@"Update Existing Database"
+                        secondButtonText:@"Create a New Database"
+                                  action:^(int response) {
+                            if(response == 0) {
+                                NSString *suggestedFilename = url.lastPathComponent;
+                                BOOL updated = [LocalDeviceStorageProvider.sharedInstance writeWithFilename:suggestedFilename overwrite:YES data:data];
+                                
+                                if(!updated) {
+                                    [Alerts warn:self title:@"Error updating file." message:@"Could not update local file."];
+                                }
+                                else {
+                                    NSLog(@"Updated...");
+                                }
+                            }
+                            else if (response == 1){
+                                [self promptForNickname:data url:url editInPlace:editInPlace];
+                            }
+                        }];
+        }
+        else {
+            [self promptForNickname:data url:url editInPlace:editInPlace];
+        }
+    }
+    else {
+        [self promptForNickname:data url:url editInPlace:editInPlace];
+    }
+}
+
+- (void)promptForNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:@"Database Name"
                             title:@"Enter a Name"
@@ -454,7 +498,7 @@
                                             title:@"Invalid Nickname"
                                           message:@"That nickname may already exist, or is invalid, please try a different nickname."
                                        completion:^{
-                                           [self promptForImportedSafeNickName:data url:url editInPlace:editInPlace];
+                                           [self promptForNickname:data url:url editInPlace:editInPlace];
                                        }];
                                }
                                else {
@@ -462,43 +506,60 @@
                                        [self addExternalFileReferenceSafe:nickName url:url];
                                    }
                                    else {
-                                       [self copyAndAddImportedSafe:nickName data:data];
+                                       [self copyAndAddImportedSafe:nickName data:data url:url];
                                    }
                                }
                            }
                        }];
 }
 
-- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data {
+- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {
     id<SafeStorageProvider> provider;
-    
-    if(Settings.sharedInstance.iCloudOn) {
-        provider = AppleICloudProvider.sharedInstance;
-    }
-    else {
-        provider = LocalDeviceStorageProvider.sharedInstance;
-    }
     
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
 
-    [provider create:nickName
-           extension:extension
-                data:data
-        parentFolder:nil
-      viewController:self
-          completion:^(SafeMetaData *metadata, NSError *error)
-     {
-         dispatch_async(dispatch_get_main_queue(), ^(void)
-                        {
-                            if (error == nil) {
-                                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                                [self updateCurrentRootSafesView];
-                            }
-                            else {
-                                [Alerts error:self title:@"Error Importing Database" error:error];
-                            }
-                        });
-     }];
+    if(Settings.sharedInstance.iCloudOn) {
+        provider = AppleICloudProvider.sharedInstance;
+
+        [provider create:nickName
+               extension:extension
+                    data:data
+            parentFolder:nil
+          viewController:self
+              completion:^(SafeMetaData *metadata, NSError *error)
+         {
+             dispatch_async(dispatch_get_main_queue(), ^(void)
+                            {
+                                if (error == nil) {
+                                    [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+                                    [self updateCurrentRootSafesView];
+                                }
+                                else {
+                                    [Alerts error:self title:@"Error Importing Database" error:error];
+                                }
+                            });
+         }];
+    }
+    else {
+        // Try to keep the filename the same... but don't overwrite any existing, will have asked previously above if the user wanted to
+        
+        NSString *suggestedFilename = url.lastPathComponent;
+        [LocalDeviceStorageProvider.sharedInstance create:nickName
+                                                extension:extension
+                                                     data:data
+                                        suggestedFilename:suggestedFilename
+                                               completion:^(SafeMetaData *metadata, NSError *error) {
+                                                   dispatch_async(dispatch_get_main_queue(), ^(void) {
+                if (error == nil) {
+                    [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+                    [self updateCurrentRootSafesView];
+                }
+                else {
+                    [Alerts error:self title:@"Error Importing Database" error:error];
+                }
+            });
+        }];
+    }
 }
 
 - (void)addExternalFileReferenceSafe:(NSString *)nickName url:(NSURL*)url {

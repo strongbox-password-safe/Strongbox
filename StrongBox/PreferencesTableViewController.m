@@ -19,7 +19,9 @@
 #import "NSArray+Extensions.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoDetectKeyFiles;
 
 @end
 
@@ -76,6 +78,7 @@
     [self bindHideTotp];
     [self bindKeePassNoSorting];
     [self bindAutoFavIcon];
+    [self bindAutoDetectKeyFiles];
     //[self customizeAppLockSectionFooter];
 }
 
@@ -120,6 +123,18 @@
     
     self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ? @"Use iCloud" : @"Use iCloud (Unavailable)";
     self.labelUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
+}
+
+- (void)bindAutoDetectKeyFiles {
+    self.switchAutoDetectKeyFiles.on = !Settings.sharedInstance.doNotAutoDetectKeyFiles;
+}
+
+- (IBAction)onAutoDetectKeyFiles:(id)sender {
+    NSLog(@"Setting autoDetectKeyFiles to %d", self.switchAutoDetectKeyFiles.on);
+    
+    Settings.sharedInstance.doNotAutoDetectKeyFiles = !self.switchAutoDetectKeyFiles.on;
+
+    [self bindAutoDetectKeyFiles];
 }
 
 - (void)bindLongTouchCopy {

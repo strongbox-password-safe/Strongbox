@@ -63,7 +63,8 @@
 - (void)removeChild:(Node* _Nonnull)node;
 - (BOOL)validateChangeParent:(Node*_Nonnull)parent;
 - (BOOL)changeParent:(Node*_Nonnull)parent;
-- (void)sortChildren;
+
+- (void)sortChildren:(BOOL)ascending;
 
 - (NSArray<NSString*>*_Nonnull)getTitleHierarchy;
 

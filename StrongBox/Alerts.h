@@ -57,6 +57,13 @@
        message:(NSString *)message
     completion:(void (^)(void))completion;
 
++ (void)   twoOptionsWithCancel:(UIViewController *)viewController
+                    title:(NSString *)title
+                  message:(NSString *)message
+        defaultButtonText:(NSString *)defaultButtonText
+         secondButtonText:(NSString *)secondButtonText
+                   action:(void (^) (int response))action;
+
 + (void)   twoOptions:(UIViewController *)viewController
                 title:(NSString *)title
               message:(NSString *)message

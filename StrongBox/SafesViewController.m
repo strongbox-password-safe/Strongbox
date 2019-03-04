@@ -288,7 +288,28 @@
     
     exportAction.backgroundColor = [UIColor orangeColor];
     
-    return @[removeAction, renameAction, exportAction];
+    UITableViewRowAction *removeKeyFileAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Remove Local Key File" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self removeLocalKeyFile:indexPath];
+    }];
+    
+    removeKeyFileAction.backgroundColor = [UIColor magentaColor];
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    BOOL hasKeyFile = [OpenSafeSequenceHelper findAssociatedLocalKeyFile:safe.fileName] != nil;
+    
+    return hasKeyFile ? @[removeAction, renameAction, exportAction, removeKeyFileAction] : @[removeAction, renameAction, exportAction];
+}
+
+- (void)removeLocalKeyFile:(NSIndexPath * _Nonnull)indexPath {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    NSString* fileName = [OpenSafeSequenceHelper getExpectedAssociatedLocalKeyFileName:safe.fileName];
+    
+    if([LocalDeviceStorageProvider.sharedInstance deleteWithCaseInsensitiveFilename:fileName]) {
+        [Alerts info:self title:@"Key File Removed" message:@"The associated local key file was removed."];
+    }
+    else {
+        [Alerts info:self title:@"Key File Not Removed" message:@"The associated local key file could not be removed. Either it was not found or there was an issue deleting. Try using iTunes File Sharing to remove or check if present."];
+    }
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {

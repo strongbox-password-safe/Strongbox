@@ -27,6 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
       canConvenienceEnrol:(BOOL)canBiometricEnrol
                              completion:(void (^)(Model* model))completion;
 
++ (NSData*)findAssociatedLocalKeyFile:(NSString*)filename;
++ (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename;
+
 @end
 
 NS_ASSUME_NONNULL_END

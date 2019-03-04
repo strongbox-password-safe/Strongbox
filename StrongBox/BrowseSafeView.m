@@ -40,6 +40,7 @@
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 
 @property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
+@property BOOL sortOrderDescending;
 
 @end
 
@@ -166,7 +167,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (IBAction)onSortItems:(id)sender {
     self.reorderItemOperations = nil; // Discard existing reordering ops...
     
-    [self.currentGroup sortChildren];
+    self.sortOrderDescending = !self.sortOrderDescending;
+    [self.currentGroup sortChildren:self.sortOrderDescending];
     
     [self saveChangesToSafeAndRefreshView];
 }
@@ -458,8 +460,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     (self.buttonSafeSettings).enabled = !self.isEditing;
     (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
     (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
+    
     (self.buttonSortItems).enabled = !ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-
+    [self.buttonSortItems setImage:self.sortOrderDescending ? [UIImage imageNamed:@"sort-32-descending"] : [UIImage imageNamed:@"sort-32"]];
+        
     (self.buttonAddGroup).enabled = !ro && !self.isEditing;
 }
 
@@ -654,6 +658,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (void)saveChangesToSafeAndRefreshView {
+    [self refresh];
+    
     [self.viewModel update:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self setEditing:NO animated:YES];

@@ -68,21 +68,94 @@
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
-    NSString *path = [self getFilePathFromFileName:desiredFilename offlineCache:NO];
+    [self create:nickName extension:extension data:data suggestedFilename:desiredFilename completion:completion];
+}
+
+- (void)        create:(NSString *)nickName
+             extension:(NSString *)extension
+                  data:(NSData *)data
+     suggestedFilename:(NSString*)suggestedFilename
+            completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+    // Is the suggested a valid file name?
+    // YES -> Does it exist
+    //     Yes -> Are we allow to overwrite
+    //        Yes -> Overwirte
+    //        No -> Come up with new File Name and Write
+    //     No -> Write
+    // NO -> Come up with new File Name and Write
     
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        path = [Utils insertTimestampInFilename:path];
+    if(![self writeWithFilename:suggestedFilename overwrite:NO data:data]) {
+        suggestedFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
+        while(![self writeWithFilename:suggestedFilename overwrite:NO data:data]) {
+            suggestedFilename = [Utils insertTimestampInFilename:suggestedFilename];
+        }
     }
-
-    [data writeToFile:path atomically:YES];
-
+    
+    NSString *path = [self getFilePathFromFileName:suggestedFilename offlineCache:NO];
     SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:self.storageId fileName:path.lastPathComponent fileIdentifier:path.lastPathComponent];
-
     metadata.offlineCacheEnabled = NO;
-
     completion(metadata, nil);
 }
+
+- (BOOL)writeWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data {
+    NSLog(@"Trying to write local file with filename [%@]", filename);
+    NSString *path = [self getFilePathFromFileName:filename offlineCache:NO];
+
+    // Does it exist?
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        //     Yes -> Are we allow to overwrite
+        if(overwrite) {
+            //        Yes -> Write
+            return [self write:data path:path overwrite:overwrite];
+        }
+        else {
+            //        No -> Come up with new File Name and Write
+            NSLog(@"File [%@] but not allowed to overwrite...", filename);
+            return NO;
+        }
+    }
+    else {
+        // No -> Write
+        return [self write:data path:path overwrite:overwrite];
+    }
+}
+
+- (void)deleteAllInboxItems {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    NSURL* url = [[IOsUtils applicationDocumentsDirectory] URLByAppendingPathComponent:@"Inbox"];
+    
+    NSString *directory = url.path;
+    NSError *error = nil;
+    for (NSString *file in [fm contentsOfDirectoryAtPath:directory error:&error]) {
+        NSString* path = [NSString pathWithComponents:@[directory, file]];
+        
+        NSLog(@"Removing Inbox File: [%@]", path);
+        
+        BOOL success = [fm removeItemAtPath:path error:&error];
+        if (!success || error) {
+            NSLog(@"Failed to remove [%@]: [%@]", file, error);
+        }
+    }
+}
+
+- (BOOL)write:(NSData*)data path:(NSString*)path overwrite:(BOOL)overwrite {
+    NSError* error;
+    NSUInteger flags = kNilOptions;
+    if(!overwrite) {
+        flags = NSDataWritingWithoutOverwriting;
+    }
+    
+    BOOL ret = [data writeToFile:path options:flags error:&error];
+
+    if(!ret) {
+        NSLog(@"tryWrite Failed: [%@]", error);
+    }
+    
+    return ret;
+}
+
 
 - (void)createOfflineCacheFile:(SafeMetaData *)safe
                           data:(NSData *)data
@@ -109,6 +182,49 @@
     NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
 
     completion(data, nil);
+}
+
+- (BOOL)deleteWithCaseInsensitiveFilename:(NSString *)filename {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *directory = [IOsUtils applicationDocumentsDirectory].path;
+    NSError* error;
+    
+    for (NSString *file in [fm contentsOfDirectoryAtPath:directory error:&error]) {
+        if([file caseInsensitiveCompare:filename] == NSOrderedSame) {
+            NSString *path = [self getFilePathFromFileName:file offlineCache:NO];
+            
+            NSLog(@"Deleteing Local at: %@", path);
+     
+            [fm removeItemAtPath:path error:&error];
+            
+            if(error) {
+                NSLog(@"Error Deleting: [%@]", error);
+                return NO;
+            }
+            
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
+-(NSData *)readWithCaseInsensitiveFilename:(NSString *)filename {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *directory = [IOsUtils applicationDocumentsDirectory].path;
+    NSError* error;
+    
+    for (NSString *file in [fm contentsOfDirectoryAtPath:directory error:&error]) {
+        if([file caseInsensitiveCompare:filename] == NSOrderedSame) {
+            NSString *path = [self getFilePathFromFileName:file offlineCache:NO];
+            
+            NSLog(@"Local Reading at: %@", path);
+            
+            return [[NSFileManager defaultManager] contentsAtPath:path];
+        }
+    }
+    
+    return nil;
 }
 
 - (void)readOfflineCachedSafe:(SafeMetaData *)safeMetaData
@@ -434,6 +550,13 @@ static NSString* getAutoFillFilePath(SafeMetaData* safeMetaData) {
     NSString *fullPath = [self getFilePathFromSafeMetaData:metaData offlineCache:NO];
     return [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
 }
+
+- (BOOL)fileNameExists:(NSString*)filename {
+    NSString *fullPath = [self getFilePathFromFileName:filename offlineCache:NO];
+    
+    return [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

@@ -45,6 +45,7 @@ static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
 static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
 static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
 static NSString* const kTryDownloadFavIconForNewRecord = @"tryDownloadFavIconForNewRecord";
+static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles";
 
 @implementation Settings
 
@@ -633,6 +634,15 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setTryDownloadFavIconForNewRecord:(BOOL)tryDownloadFavIconForNewRecord {
     [[self getUserDefaults] setBool:tryDownloadFavIconForNewRecord forKey:kTryDownloadFavIconForNewRecord];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)doNotAutoDetectKeyFiles {
+    return [[self getUserDefaults] boolForKey:kDoNotAutoDetectKeyFiles];
+}
+
+- (void)setDoNotAutoDetectKeyFiles:(BOOL)doNotAutoDetectKeyFiles {
+    [[self getUserDefaults] setBool:doNotAutoDetectKeyFiles forKey:kDoNotAutoDetectKeyFiles];
     [[self getUserDefaults] synchronize];
 }
 

@@ -40,6 +40,7 @@ typedef void(^CompletionBlock)(Model* model);
 @property BOOL isConvenienceUnlock;
 @property NSString* masterPassword;
 @property NSData* keyFileDigest;
+@property BOOL keyFileSelectionModeAskForPasswordBeforeOpen;
 
 @end
 
@@ -80,6 +81,7 @@ typedef void(^CompletionBlock)(Model* model);
         self.canConvenienceEnrol = canConvenienceEnrol;
         self.openAutoFillCache = openAutoFillCache;
         self.completion = completion;
+        self.keyFileSelectionModeAskForPasswordBeforeOpen = NO;
     }
     
     return self;
@@ -290,26 +292,45 @@ typedef void(^CompletionBlock)(Model* model);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)promptForPasswordAndOrKeyFile {
++ (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
+    NSString* veryLastFilename = [filename lastPathComponent];
+    NSString* filenameOnly = [veryLastFilename stringByDeletingPathExtension];
+    NSString* expectedKeyFileName = [filenameOnly stringByAppendingPathExtension:@"key"];
+
+    return  expectedKeyFileName;
+}
+
++ (NSData*)findAssociatedLocalKeyFile:(NSString*)filename {
+    if(Settings.sharedInstance.doNotAutoDetectKeyFiles) {
+        return nil;
+    }
+    
+    NSString* expectedKeyFileName = [OpenSafeSequenceHelper getExpectedAssociatedLocalKeyFileName:filename];
+
+    NSLog(@"Looking for key file: [%@] in local documents directory:", expectedKeyFileName);
+    
+    NSData* fileData = [LocalDeviceStorageProvider.sharedInstance readWithCaseInsensitiveFilename:expectedKeyFileName];
+
+    return [KeyFileParser getKeyFileDigestFromFileData:fileData];
+}
+
+- (UIAlertController*)getAlertControllerWithPasswordField {
     NSString *title = [NSString stringWithFormat:@"Password for %@", self.safe.nickName];
     
-    self.alertController = [UIAlertController alertControllerWithTitle:title
-                                                               message:@"Please Provide Credentials"
-                                                        preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController* ret = [UIAlertController alertControllerWithTitle:title
+                                        message:@"Please Provide Credentials"
+                                 preferredStyle:UIAlertControllerStyleAlert];
     
-    // Establish the weak self reference
     __weak OpenSafeSequenceHelper *weakSelf = self;
-
-    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+    
+    [ret addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
         weakSelf.textFieldPassword = textField;
-        
-        ///////////////////
         
         // Create button
         UIButton *checkbox = [UIButton buttonWithType:UIButtonTypeCustom];
         [checkbox setFrame:CGRectMake(2 , 2, 18, 18)];  // Not sure about size
         [checkbox setTag:1];
-        [checkbox addTarget:weakSelf action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        [checkbox addTarget:weakSelf action:@selector(toggleShowHidePasswordText:) forControlEvents:UIControlEventTouchUpInside];
         
         // Setup image for button
         [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
@@ -325,33 +346,55 @@ typedef void(^CompletionBlock)(Model* model);
         
         // Setup Tag so the textfield can be identified
         [textField setTag:-1];
-        //[textField setDelegate:weakSelf];
-        
-        // Setup textfield
-        //[textField setText:@"Essential"];  // Could be place holder text
-
         textField.secureTextEntry = YES;
     }];
+
+    return ret;
+}
+
+- (void)promptForPasswordAndOrKeyFile {
+    NSData* autoDetectedKeyFileDigest = [OpenSafeSequenceHelper findAssociatedLocalKeyFile:self.safe.fileName];
     
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    self.alertController = [self getAlertControllerWithPasswordField];
+    self.alertController.message = autoDetectedKeyFileDigest == nil ? @"Please Provide Credentials" : @"Please Provide Credentials\n\n(*Key File has been auto-detected)";
+    
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"Unlock"
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
                                                               self.masterPassword = self.alertController.textFields[0].text;
+                                                              self.keyFileDigest = autoDetectedKeyFileDigest;
                                                               [self openSafe];
                                                           }];
     
-    UIAlertAction *keyFileAction = [UIAlertAction actionWithTitle:@"Use a Key File & Password..."
-                                                            style:kNilOptions
-                                                          handler:^(UIAlertAction *a) {
-                                                              self.masterPassword = self.alertController.textFields[0].text;
-                                                              [self onUseKeyFile:self.viewController];
-                                                          }];
-
-    UIAlertAction *keyFileOnlyAction = [UIAlertAction actionWithTitle:@"Use a Key File only..."
+    UIAlertAction *keyFileOnlyAction = [UIAlertAction actionWithTitle:autoDetectedKeyFileDigest ? @"No Password (Use Key File Only)" : @"Advanced Options..."
                                                             style:kNilOptions
                                                           handler:^(UIAlertAction *a) {
                                                               self.masterPassword = nil;
-                                                              [self onUseKeyFile:self.viewController];
+                                                              if(autoDetectedKeyFileDigest) {
+                                                                  self.keyFileDigest = autoDetectedKeyFileDigest;
+                                                                  [self openSafe];
+                                                              }
+                                                              else {
+                                                                  __weak OpenSafeSequenceHelper *weakSelf = self;
+                                                                  
+                                                                  [Alerts twoOptionsWithCancel:weakSelf.viewController
+                                                                                         title:@"Advanced Unlock"
+                                                                                       message:@"Select an advanced Unlock method"
+                                                                             defaultButtonText:@"Password & Key File..."
+                                                                              secondButtonText:@"No Password, Just a Key File..."
+                                                                                        action:^(int response) {
+                                                                                            if(response == 0) {
+                                                                                                self.keyFileSelectionModeAskForPasswordBeforeOpen = YES;
+                                                                                                [self onUseKeyFile:weakSelf.viewController];
+                                                                                            }
+                                                                                            else if(response == 1) {
+                                                                                                [self onUseKeyFile:weakSelf.viewController];
+                                                                                            }
+                                                                                            else {
+                                                                                                weakSelf.completion(nil);
+                                                                                            }
+                                                                                        }];
+                                                              }
                                                           }];
 
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
@@ -361,14 +404,13 @@ typedef void(^CompletionBlock)(Model* model);
                                                          }];
     
     [self.alertController addAction:defaultAction];
-    [self.alertController addAction:keyFileAction];
     [self.alertController addAction:keyFileOnlyAction];
     [self.alertController addAction:cancelAction];
     
     [self.viewController presentViewController:self.alertController animated:YES completion:nil];
 }
 
-- (IBAction)buttonPressed:(UIButton*)sender {
+- (IBAction)toggleShowHidePasswordText:(UIButton*)sender {
     if(sender.selected){
         [sender setSelected:FALSE];
     } else {
@@ -466,6 +508,37 @@ typedef void(^CompletionBlock)(Model* model);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)openSafe {
+    if(self.keyFileSelectionModeAskForPasswordBeforeOpen) {
+        [self requestPasswordAfterKeySelectionAndOpenSafe];
+    }
+    else {
+        [self actuallyOpenSafe];
+    }
+}
+
+- (void)requestPasswordAfterKeySelectionAndOpenSafe {
+    self.alertController = [self getAlertControllerWithPasswordField];
+    
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"Unlock"
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+                                                              self.masterPassword = self.alertController.textFields[0].text;
+                                                              [self actuallyOpenSafe];
+                                                          }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) {
+                                                             self.completion(nil);
+                                                         }];
+    
+    [self.alertController addAction:defaultAction];
+    [self.alertController addAction:cancelAction];
+    
+    [self.viewController presentViewController:self.alertController animated:YES completion:nil];
+}
+
+- (void)actuallyOpenSafe {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
         

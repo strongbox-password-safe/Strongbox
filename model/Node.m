@@ -162,8 +162,8 @@
     [_mutableChildren removeObject:node];
 }
 
-- (void)sortChildren {
-    _mutableChildren = [[_mutableChildren sortedArrayUsingComparator:finderStyleNodeComparator] mutableCopy];
+- (void)sortChildren:(BOOL)ascending {
+    _mutableChildren = [[_mutableChildren sortedArrayUsingComparator:ascending ? finderStyleNodeComparator : reverseFinderStyleNodeComparator] mutableCopy];
 }
 
 - (BOOL)validateChangeParent:(Node*)parent {
@@ -371,6 +371,21 @@ NSComparator finderStyleNodeComparator = ^(id obj1, id obj2)
     }
     
     return [Utils finderStringCompare:n1.title string2:n2.title];
+};
+
+NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
+{
+    Node* n1 = (Node*)obj1;
+    Node* n2 = (Node*)obj2;
+    
+    if(n1.isGroup && !n2.isGroup) {
+        return NSOrderedAscending;
+    }
+    else if(!n1.isGroup && n2.isGroup) {
+        return NSOrderedDescending;
+    }
+    
+    return [Utils finderStringCompare:n2.title string2:n1.title];
 };
 
 
