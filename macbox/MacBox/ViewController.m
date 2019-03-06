@@ -116,12 +116,14 @@ static NSImage* kDefaultAttachmentIcon;
         self.textFieldPw.textColor = [NSColor controlTextColor];
     }
 
-    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
-    //NSLog(@"Loaded Font: %@", ft);
-    if(ft) {
-        self.textFieldPw.font = ft;
-        self.textFieldHiddenPassword.font = ft;
-    }
+    // Using Menlo for the moment seems to be clearer
+    //
+    //    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
+    //    //NSLog(@"Loaded Font: %@", ft);
+    //    if(ft) {
+    //        self.textFieldPw.font = ft;
+    //        self.textFieldHiddenPassword.font = ft;
+    //    }
     
     // Any Clicks into the Password Field show it for editing
     

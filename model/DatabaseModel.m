@@ -20,8 +20,20 @@
 
 @implementation DatabaseModel
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    
++ (BOOL)    isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    if(candidate == nil) {
+        if(error) {
+            *error = [Utils createNSError:@"Database Data is Nil" errorCode:-1];
+        }
+        return NO;
+    }
+    if(candidate.length == 0) {
+        if(error) {
+            *error = [Utils createNSError:@"Database Data is zero length" errorCode:-1];
+        }
+        return NO;
+    }
+
     NSError *pw, *k1, *k2, *k3;
     
     BOOL ret = [PwSafeDatabase isAValidSafe:candidate error:&pw] ||

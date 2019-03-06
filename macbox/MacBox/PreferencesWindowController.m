@@ -54,11 +54,13 @@
     NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
     [self.labelSamplePassword addGestureRecognizer:click];
 
-    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
-    //NSLog(@"Loaded Font: %@", ft);
-    if(ft) {
-        self.labelSamplePassword.font = ft;
-    }
+    // Using Menlo instead 
+    //
+    //    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
+    //    //NSLog(@"Loaded Font: %@", ft);
+    //    if(ft) {
+    //        self.labelSamplePassword.font = ft;
+    //    }
     
     [self refreshSamplePassword];
 }

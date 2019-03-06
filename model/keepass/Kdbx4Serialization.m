@@ -14,7 +14,7 @@
 #import "KeePassCiphers.h"
 #import "Argon2KdfCipher.h"
 #import "ChaCha20Cipher.h"
-#import "GZIP.h" 
+#import "NSData+GZIP.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import "CryptoParameters.h"
 #import "Kdbx4SerializationData.h"

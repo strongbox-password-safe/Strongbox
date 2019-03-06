@@ -10,13 +10,14 @@
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 #import "Settings.h"
-#import <RMStore/RMStore.h>
+#import "RMStore.h"
+#import "RMStoreAppReceiptVerifier.h"
 
 @interface ProUpgradeIAPManager ()
 
 @property (nonatomic) UpgradeManagerState readyState;
 @property (nonatomic, strong) NSDictionary<NSString*, SKProduct *> *products;
-
+@property (nonatomic) RMStoreAppReceiptVerifier* receiptVerifier;
 @end
 
 @implementation ProUpgradeIAPManager
@@ -43,10 +44,10 @@
 //    } failure:^(NSError *error) {
 //        NSLog(@"Something went wrong");
 //    }];
-
-    // TODO: Requires OpenSLL and Cocoapod is broken at the moment... write one of these ourselves
-    //[RMStore defaultStore].receiptVerifier = [[RMStoreAppReceiptVerifier alloc] init];
-    
+    self.receiptVerifier = [[RMStoreAppReceiptVerifier alloc] init];
+    //RMStore.defaultStore.receiptVerifier = self.receiptVerifier;
+        
+    //return YES;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self loadAppStoreProducts];

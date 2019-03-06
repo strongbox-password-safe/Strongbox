@@ -71,7 +71,8 @@ static NSString* const kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
     NSMutableString *randomString = [NSMutableString stringWithCapacity:len];
     
     for (int i = 0; i < len; i++) {
-        [randomString appendFormat:@"%C", [pool characterAtIndex:arc4random_uniform((u_int32_t)pool.length)]];
+        uint32_t index = arc4random_uniform((u_int32_t)pool.length);
+        [randomString appendFormat:@"%C", [pool characterAtIndex:index]];
     }
     
     return randomString;

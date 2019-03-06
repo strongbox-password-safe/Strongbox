@@ -8,7 +8,6 @@ target 'Strongbox' do
     pod 'KissXML'
     pod 'SAMKeychain'
     pod 'libsodium'
-    pod 'GZIP'
     pod 'Base32'
 end
 
@@ -28,14 +27,13 @@ abstract_target 'common-ios' do
     platform :ios, '9.2'
     use_frameworks!
 
-    pod 'NMSSH'
+    #pod 'NMSSH'
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'JNKeychain'
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
     pod 'Reachability'
-    pod 'GZIP'
     pod 'libsodium'    
     pod 'KissXML'
     pod 'Base32'
@@ -47,8 +45,6 @@ abstract_target 'common-ios' do
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
-	pod 'RMStore'
-	#pod 'RMStore/AppReceiptVerificator'
     end
 
    target 'Strongbox Auto Fill' do

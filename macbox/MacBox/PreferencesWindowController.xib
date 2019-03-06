@@ -356,8 +356,9 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="58" id="FOq-sT-K0p"/>
                                             </constraints>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Password1234Password1234Password1234Password1234Password1234" id="dGP-pz-89c">
-                                                <font key="font" size="14" name="Futura-Medium"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="dGP-pz-89c">
+                                                <font key="font" size="14" name="Menlo-Regular"/>
+                                                <string key="title">Password1234Password1234Password1234Password1234Password12340Oo1lIi|ord1234Password1234Password1234Password1234Password12340Oo1lIi|</string>
                                                 <color key="textColor" name="systemPinkColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>

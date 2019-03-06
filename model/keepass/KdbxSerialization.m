@@ -14,7 +14,7 @@
 #import "DecryptionParameters.h"
 #import "PwSafeSerialization.h"
 #import "Utils.h"
-#import "GZIP.h"
+#import "NSData+GZIP.h"
 #import "KeePassConstants.h"
 #import "AesCipher.h"
 #import "KdbxSerializationCommon.h"

@@ -414,7 +414,7 @@
     NSError* error;
     if (![DatabaseModel isAValidSafe:document.data error:&error]) {
         [Alerts error:self
-                title:@"Invalid Database"
+                title:[NSString stringWithFormat:@"Invalid Database - [%@]", url.lastPathComponent]
                 error:error];
 
         [document closeWithCompletionHandler:nil];

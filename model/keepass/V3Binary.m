@@ -8,7 +8,7 @@
 
 #import "V3Binary.h"
 #import "KeePassConstants.h"
-#import "GZIP.h"
+#import "NSData+GZIP.h"
 
 @implementation V3Binary
 

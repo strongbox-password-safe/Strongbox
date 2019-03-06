@@ -74,6 +74,7 @@
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
+		4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87F8AB22304A04006A6320 /* NSData+GZIP.m */; };
 		4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */; };
 		4D88AD5021E654EA00B49149 /* SourceSansPro-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */; };
 		4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */; };
@@ -314,6 +315,8 @@
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UpgradeWindowController.xib; path = MacBox/UpgradeWindowController.xib; sourceTree = "<group>"; };
+		4D87F8AB22304A04006A6320 /* NSData+GZIP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+GZIP.m"; path = "../lib/GZIP/NSData+GZIP.m"; sourceTree = "<group>"; };
+		4D87F8AC22304A04006A6320 /* NSData+GZIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+GZIP.h"; path = "../lib/GZIP/NSData+GZIP.h"; sourceTree = "<group>"; };
 		4D88AD4D21E654C800B49149 /* SourceSansPro-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Regular.ttf"; sourceTree = "<group>"; };
 		4D88AD4E21E654C800B49149 /* SourceSansPro-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Bold.ttf"; sourceTree = "<group>"; };
 		4D8DE9AA21F898460043DDC0 /* OTPToken+Persistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Persistence.h"; path = "../lib/OneTimePassword/OTPToken+Persistence.h"; sourceTree = "<group>"; };
@@ -774,6 +777,15 @@
 			name = View;
 			sourceTree = "<group>";
 		};
+		4D87F8AA223049EB006A6320 /* GZIP */ = {
+			isa = PBXGroup;
+			children = (
+				4D87F8AC22304A04006A6320 /* NSData+GZIP.h */,
+				4D87F8AB22304A04006A6320 /* NSData+GZIP.m */,
+			);
+			name = GZIP;
+			sourceTree = "<group>";
+		};
 		4D88AD5121E657F700B49149 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -968,6 +980,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D87F8AA223049EB006A6320 /* GZIP */,
 				4DBF492322232A1100F48182 /* DAVKit */,
 				4D8DE9A921F898240043DDC0 /* OneTimePassword */,
 				4D88AD5121E657F700B49149 /* Fonts */,
@@ -1215,7 +1228,6 @@
 			inputPaths = (
 				"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Base32-macOS/Base32.framework",
-				"${BUILT_PRODUCTS_DIR}/GZIP-macOS/GZIP.framework",
 				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
@@ -1223,7 +1235,6 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GZIP.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SAMKeychain.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
@@ -1264,6 +1275,7 @@
 				4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
 				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
+				4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */,
 				4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */,
