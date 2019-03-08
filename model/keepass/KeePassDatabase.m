@@ -74,6 +74,8 @@
     // 2. Convert the Xml to a more usable Xml Model
     
     //NSLog(@"%@", serializationData.xml);
+    //[[serializationData.xml dataUsingEncoding:NSUTF8StringEncoding] writeToFile:@"/Users/mark/Desktop/keepass.xml" atomically:NO];
+    
     
     RootXmlDomainObject* xmlDoc = parseKeePassXml(  serializationData.innerRandomStreamId,
                                                            serializationData.protectedStreamKey,
@@ -128,7 +130,13 @@
     if(xmlDoc.keePassFile.meta.generator.text) {
         metadata.generator = xmlDoc.keePassFile.meta.generator.text;
     }
-    
+    if(xmlDoc.keePassFile.meta.historyMaxItems) {
+        metadata.historyMaxItems = xmlDoc.keePassFile.meta.historyMaxItems.integer;
+    }
+    if(xmlDoc.keePassFile.meta.historyMaxSize) {
+        metadata.historyMaxSize = xmlDoc.keePassFile.meta.historyMaxSize.integer;
+    }
+
     metadata.transformRounds = serializationData.transformRounds;
     metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
     metadata.compressionFlags = serializationData.compressionFlags;
@@ -160,6 +168,10 @@
     }
     
     KeePass2TagPackage* adaptorTag = (KeePass2TagPackage*)database.adaptorTag;
+    
+    // 1. Trim KeePass History
+    
+    [database trimKeePassHistory];
     
     // 2. From Strongbox to Xml Model
     
@@ -202,7 +214,7 @@
     KeePassDatabaseMetadata *metadata = (KeePassDatabaseMetadata*)database.metadata;
     XmlTreeSerializer *xmlSerializer = [[XmlTreeSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
                                                                                         key:nil // Auto generated new key
-                                                                                prettyPrint:NO];
+                                                                                prettyPrint:YES];
     
     SerializationData *serializationData = [[SerializationData alloc] init];
     

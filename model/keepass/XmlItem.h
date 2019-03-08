@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isXmlEquivalent:(XmlItem*)other;
 
+@property BOOL doNotTrimWhitespaceText;
+
 @end
 
 NS_ASSUME_NONNULL_END

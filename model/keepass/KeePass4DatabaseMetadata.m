@@ -29,6 +29,9 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
         self.innerRandomStreamId = kDefaultInnerRandomStreamId;
         self.kdfParameters = [[Argon2KdfCipher alloc] initWithDefaults].kdfParameters;
         self.cipherUuid = chaCha20CipherUuid();
+        self.historyMaxItems = kDefaultHistoryMaxItems;
+        self.historyMaxSize = kDefaultHistoryMaxSize;
+
     }
     
     return self;
@@ -44,7 +47,11 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
     [kvps addKey:@"Outer Encryption" andValue:outerEncryptionAlgorithmString(self.cipherUuid)];
     [kvps addKey:@"Compressed"  andValue:self.compressionFlags == kGzipCompressionFlag ? @"Yes (GZIP)" : @"No"];
     [kvps addKey:@"Inner Encryption" andValue:innerEncryptionString(self.innerRandomStreamId)];
-    
+    [kvps addKey:@"Max History Items" andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
+
+    NSString* size = [NSByteCountFormatter stringFromByteCount:self.historyMaxSize countStyle:NSByteCountFormatterCountStyleFile];
+    [kvps addKey:@"Max History Size" andValue:size];
+
     return kvps;
 }
 

@@ -40,13 +40,10 @@
 
 @property (nonatomic, readonly) BOOL isGroup;
 @property (nonatomic, readonly) BOOL childRecordsAllowed;
-
 @property (nonatomic, strong, readonly, nonnull) NSString *title;
 @property (nonatomic, strong, readonly, nonnull) NSUUID *uuid;
-
 @property (nullable) NSNumber* iconId;
 @property (nullable) NSUUID* customIconUuid;
-
 @property (nonatomic, strong, readonly, nonnull) NSString *serializationId; // Must remain save across serializations
 @property (nonatomic, strong, readonly, nonnull) NodeFields *fields;
 @property (nonatomic, strong, readonly, nullable) Node* parent;
@@ -54,6 +51,7 @@
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* children;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childGroups;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childRecords;
+@property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildRecords;
 
 - (BOOL)contains:(Node*)test;
 - (BOOL)setTitle:(NSString*_Nonnull)title;
@@ -63,6 +61,7 @@
 - (void)removeChild:(Node* _Nonnull)node;
 - (BOOL)validateChangeParent:(Node*_Nonnull)parent;
 - (BOOL)changeParent:(Node*_Nonnull)parent;
+- (Node* _Nonnull)cloneForHistory;
 
 - (void)sortChildren:(BOOL)ascending;
 

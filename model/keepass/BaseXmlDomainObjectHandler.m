@@ -77,7 +77,6 @@
     self.nonCustomisedXmlTree.node.xmlText = [NSString stringWithFormat:@"%@%@", self.nonCustomisedXmlTree.node.xmlText,text];
 }
 
-
 - (nonnull NSString *)getXmlText {
     return self.nonCustomisedXmlTree.node.xmlText;
 }

@@ -101,8 +101,6 @@ static NSString* RMASN1ReadIA5SString(const uint8_t **pp, long omax)
     return RMASN1ReadString(pp, omax, V_ASN1_IA5STRING, NSASCIIStringEncoding);
 }
 
-static NSURL *_appleRootCertificateURL = nil;
-
 @implementation RMAppReceipt
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data
@@ -155,6 +153,7 @@ static NSURL *_appleRootCertificateURL = nil;
 {
     for (RMAppReceiptIAP *purchase in _inAppPurchases)
     {
+//        NSLog(@"Checking: %@ == %@", purchase.productIdentifier, productIdentifier);
         if ([purchase.productIdentifier isEqualToString:productIdentifier]) return YES;
     }
     return NO;
@@ -184,6 +183,8 @@ static NSURL *_appleRootCertificateURL = nil;
     unsigned char uuidBytes[16];
     [uuid getUUIDBytes:uuidBytes];
     
+    NSLog(@"Device ID: [%@]", uuid.UUIDString);
+    
     // Order taken from: https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html#//apple_ref/doc/uid/TP40010573-CH1-SW5
     NSMutableData *data = [NSMutableData data];
     [data appendBytes:uuidBytes length:sizeof(uuidBytes)];
@@ -193,7 +194,11 @@ static NSURL *_appleRootCertificateURL = nil;
     NSMutableData *expectedHash = [NSMutableData dataWithLength:SHA_DIGEST_LENGTH];
     SHA1((const uint8_t*)data.bytes, data.length, (uint8_t*)expectedHash.mutableBytes); // Explicit casting to avoid errors when compiling as Objective-C++
     
-    return [expectedHash isEqualToData:self.receiptHash];
+    BOOL ret = [expectedHash isEqualToData:self.receiptHash];
+
+    NSLog(@"Receipt Hash OK: [%d]", ret);
+    
+    return ret;
 }
 
 + (RMAppReceipt*)bundleReceipt
@@ -210,11 +215,6 @@ static NSURL *_appleRootCertificateURL = nil;
     return receipt;
 }
 
-+ (void)setAppleRootCertificateURL:(NSURL*)url
-{
-    _appleRootCertificateURL = url;
-}
-
 #pragma mark - Utils
 
 + (NSData*)dataFromPCKS7Path:(NSString*)path
@@ -229,8 +229,13 @@ static NSURL *_appleRootCertificateURL = nil;
     if (!p7) return nil;
     
     NSData *data;
-    NSURL *certificateURL = _appleRootCertificateURL ? : [[NSBundle mainBundle] URLForResource:@"AppleIncRootCertificate" withExtension:@"cer"];
-    NSData *certificateData = [NSData dataWithContentsOfURL:certificateURL];
+    NSString *certificatePath = [[NSBundle mainBundle] pathForResource:@"apple" ofType:@"cer"];
+    
+    NSError* error;
+    NSData *certificateData = [NSData dataWithContentsOfFile:certificatePath options:kNilOptions error:&error];
+    if(!certificateData) {
+        NSLog(@"Could not find Apple Root Cert: [%@]", error);
+    }
     if (!certificateData || [self verifyPCKS7:p7 withCertificateData:certificateData])
     {
         struct pkcs7_st *contents = p7->d.sign->contents;
@@ -385,9 +390,15 @@ static NSURL *_appleRootCertificateURL = nil;
 {
     NSAssert(self.subscriptionExpirationDate != nil, @"The product %@ is not an auto-renewable subscription.", self.productIdentifier);
     
-    if (self.cancellationDate) return NO;
+    if (self.cancellationDate) {
+        return NO; // TODO: How to test?
+    }
     
-    return [self.purchaseDate compare:date] != NSOrderedDescending && [date compare:self.subscriptionExpirationDate] != NSOrderedDescending;
+    BOOL ret = [self.purchaseDate compare:date] != NSOrderedDescending && [date compare:self.subscriptionExpirationDate] != NSOrderedDescending;
+
+    NSLog(@"[%@] -> Active for date: %@ => %d", self.productIdentifier, self.subscriptionExpirationDate, ret);
+    
+    return ret;
 }
 
 @end

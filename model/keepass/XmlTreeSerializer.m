@@ -11,6 +11,7 @@
 #import "XMLWriter.h"
 #import "KeePassDatabase.h"
 #import "InnerRandomStreamFactory.h"
+#import "Utils.h"
 
 @interface XmlTreeSerializer ()
 
@@ -42,8 +43,10 @@
         self.xmlWriter = [[XMLWriter alloc] init];
         
         if(prettyPrint) {
-            [self.xmlWriter setPrettyPrinting:@"    " withLineBreak:@"\n"];
+            [self.xmlWriter setPrettyPrinting:@"\t" withLineBreak:@"\n"];
         }
+        
+        [self.xmlWriter setAutomaticEmptyElements:YES];
     }
     
     return self;
@@ -97,7 +100,13 @@
             [self.xmlWriter writeCharacters:encrypted];
         }
         else {
-            [self.xmlWriter writeCharacters:tree.node.xmlText];
+            if(tree.node.doNotTrimWhitespaceText) {
+                [self.xmlWriter writeCharacters:tree.node.xmlText];
+            }
+            else {
+                NSString* trimmed = [tree.node.xmlText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                [self.xmlWriter writeCharacters:trimmed];
+            }
         }
     }
     

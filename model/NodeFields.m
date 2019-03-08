@@ -36,9 +36,26 @@
         self.passwordModified = [NSDate date];
         self.attachments = [NSMutableArray array];
         self.customFields = [NSMutableDictionary dictionary];
+        self.keePassHistory = [NSMutableArray array];
     }
     
     return self;
+}
+
+- (NodeFields *)cloneForHistory {
+    NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username url:self.url password:self.password notes:self.notes email:self.email];
+
+    ret.created = self.created;
+    ret.modified = self.modified;
+    ret.accessed = self.accessed;
+    ret.passwordModified = self.passwordModified;
+    ret.attachments = [self.attachments mutableCopy];
+    ret.customFields = [self.customFields mutableCopy];
+    
+    // History should be empty for a historical node
+    ret.keePassHistory = [NSMutableArray array];
+    
+    return ret;
 }
 
 - (void)setPassword:(NSString *)password {

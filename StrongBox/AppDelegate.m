@@ -24,6 +24,8 @@
 
 @interface AppDelegate ()
 
+@property NSDate* appLaunchTime;
+
 @end
 
 @implementation AppDelegate
@@ -38,6 +40,7 @@
     if(Settings.sharedInstance.installDate == nil) {
         Settings.sharedInstance.installDate = [NSDate date];
     }
+    self.appLaunchTime = [NSDate date];
     
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
 
@@ -102,6 +105,23 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [[self getInitialViewController] appBecameActive];
+    
+    NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
+    double minutes = timeDifference / 60;
+    double hoursSinceLaunch = minutes / 60;
+    
+    if(hoursSinceLaunch > 2) { // Stuff we'd like to do, but definitely not immediately on first launch...
+        // Do not request review immediately on launch but after a while and after user has used app for a bit
+        NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
+        
+        if (launchCount > 30) {
+            if (@available( iOS 10.3,*)) {
+                [SKStoreReviewController requestReview];
+            }
+        }
+        
+        // TODO: Refresh and Verify Receipt once a month or so
+    }
 }
 
 - (void)initializeDropbox {

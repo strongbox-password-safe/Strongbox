@@ -10,6 +10,8 @@
 #import "PasswordHistory.h"
 #import "NodeFileAttachment.h"
 
+@class Node;
+
 @interface NodeFields : NSObject
 
 - (instancetype _Nullable)init;
@@ -25,7 +27,6 @@
 @property (nonatomic, strong, nonnull) NSString *email;
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
-@property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // FUTURE: make KeePass compatible
 @property (nonatomic, strong, nullable) NSDate *created;
 @property (nonatomic, strong, nullable) NSDate *modified;
 @property (nonatomic, strong, nullable) NSDate *accessed;
@@ -33,4 +34,9 @@
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
 @property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, NSString*> *customFields;
 
+@property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
+@property NSMutableArray<Node*> *keePassHistory;
+
+- (NodeFields *)cloneForHistory;
+    
 @end

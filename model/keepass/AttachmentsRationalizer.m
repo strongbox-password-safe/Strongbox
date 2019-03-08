@@ -12,9 +12,26 @@
 @implementation AttachmentsRationalizer
 
 + (NSArray<DatabaseAttachment *> *)rationalizeAttachments:(NSArray<DatabaseAttachment *> *)attachments root:(Node *)root {
-    NSArray<Node*>* allNodesWithAttachments = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*>* currentNodesWithAttachments = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup && node.fields.attachments.count > 0;
     }];
+
+    NSArray<Node*>* allNodesWithHistoryNodeAttachments = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup && [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.attachments.count > 0;
+        }];
+    }];
+
+    NSArray<Node*>* allHistoricalNodesWithAttachments = [allNodesWithHistoryNodeAttachments flatMap:^id _Nonnull(Node * _Nonnull node, NSUInteger idx) {
+        return [node.fields.keePassHistory filter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.attachments.count > 0;
+        }];
+    }];
+    
+    //
+    
+    NSMutableArray *allNodesWithAttachments = [NSMutableArray arrayWithArray:currentNodesWithAttachments];
+    [allNodesWithAttachments addObjectsFromArray:allHistoricalNodesWithAttachments];
 
     // 1. Node Attachment could point to non existent db attachment = Pretty bad corruption or inconsistency somehow...
     

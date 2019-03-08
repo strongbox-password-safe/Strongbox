@@ -20,6 +20,7 @@
 + (instancetype)rootGroup {
     return [[Node alloc] initAsRoot:nil];
 }
+
 - (instancetype)initAsRoot:(NSUUID*)uuid {
     return [self initAsRoot:nil childRecordsAllowed:YES];
 }
@@ -72,12 +73,32 @@
         _uuid = uuid == nil ?  [[NSUUID alloc] init] : uuid;
         _fields = fields == nil ? [[NodeFields alloc] init] : fields;
         _childRecordsAllowed = childRecordsAllowed;
-        
+        _iconId = nil;
+        _customIconUuid = nil;
+
         return self;
     }
     
     return self;
 }
+
+- (Node *)cloneForHistory {
+    NodeFields* clonedFields = [self.fields cloneForHistory];
+    
+    Node* ret = [[Node alloc] initWithParent:self.parent
+                                       title:self.title
+                                     isGroup:self.isGroup
+                                        uuid:self.uuid // Yes, verified with KeePass
+                                      fields:clonedFields
+                         childRecordsAllowed:self.childRecordsAllowed];
+    
+    ret.iconId = self.iconId;
+    ret.customIconUuid = self.customIconUuid;
+    
+    return ret;
+}
+
+/////////////
 
 - (NSArray<Node*>*)children {
     return self.isGroup ? [self filterChildren:NO predicate:nil] : [NSArray array];
@@ -91,6 +112,12 @@
 
 - (NSArray<Node *> *)childRecords {
     return self.isGroup ? [self filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup;
+    }] : [NSArray array];
+}
+
+- (NSArray<Node *> *)allChildRecords {
+    return self.isGroup ? [self filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
     }] : [NSArray array];
 }

@@ -21,6 +21,12 @@
     if(self) {
         _generator = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kGeneratorElementName context:context];
         self.generator.text = kStrongboxGenerator;
+        
+        _historyMaxItems = [[GenericTextIntegerElementHandler alloc] initWithXmlElementName:kHistoryMaxItemsElementName context:context];
+        self.historyMaxItems.integer = kDefaultHistoryMaxItems;
+        
+        _historyMaxSize = [[GenericTextIntegerElementHandler alloc] initWithXmlElementName:kHistoryMaxSizeElementName context:context];
+        self.historyMaxSize.integer = kDefaultHistoryMaxSize;
     }
     
     return self;
@@ -47,7 +53,13 @@
     else if ([xmlElementName isEqualToString:kCustomIconListElementName]) {
         return [[CustomIconList alloc] initWithContext:self.context];
     }
-    
+    else if ([xmlElementName isEqualToString:kHistoryMaxItemsElementName]) {
+        return [[GenericTextIntegerElementHandler alloc] initWithXmlElementName:kHistoryMaxItemsElementName context:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kHistoryMaxSizeElementName]) {
+        return [[GenericTextIntegerElementHandler alloc] initWithXmlElementName:kHistoryMaxSizeElementName context:self.context];
+    }
+
     return [super getChildHandler:xmlElementName];
 
 
@@ -70,6 +82,14 @@
         self.customIconList = (CustomIconList*)completedObject;
         return YES;
     }
+    else if ([withXmlElementName isEqualToString:kHistoryMaxItemsElementName]) {
+        self.historyMaxItems = (GenericTextIntegerElementHandler*)completedObject;
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kHistoryMaxSizeElementName]) {
+        self.historyMaxSize = (GenericTextIntegerElementHandler*)completedObject;
+        return YES;
+    }
     else {
         return NO;
     }
@@ -84,6 +104,8 @@
     if(self.headerHash) [ret.children addObject:[self.headerHash generateXmlTree]];
     if(self.v3binaries) [ret.children addObject:[self.v3binaries generateXmlTree]];
     if(self.customIconList) [ret.children addObject:[self.customIconList generateXmlTree]];
+    if(self.historyMaxItems) [ret.children addObject:[self.historyMaxItems generateXmlTree]];
+    if(self.historyMaxSize) [ret.children addObject:[self.historyMaxSize generateXmlTree]];
     
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
@@ -91,7 +113,8 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@]", self.generator, self.headerHash, self.v3binaries];
+    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@], historyMaxItems = [%@], historyMaxSize = [%@]",
+            self.generator, self.headerHash, self.v3binaries, self.historyMaxItems, self.historyMaxSize];
 }
 
 @end

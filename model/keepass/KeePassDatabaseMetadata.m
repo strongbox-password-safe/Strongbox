@@ -28,6 +28,8 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
         self.transformRounds = kDefaultTransformRounds;
         self.innerRandomStreamId = kDefaultInnerRandomStreamId;
         self.cipherUuid = aesCipherUuid();
+        self.historyMaxItems = kDefaultHistoryMaxItems;
+        self.historyMaxSize = kDefaultHistoryMaxSize;
     }
     
     return self;
@@ -43,6 +45,10 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
     [kvps addKey:@"Transform Rounds" andValue:[NSString stringWithFormat:@"%llu", self.transformRounds]];
     [kvps addKey:@"Outer Encryption" andValue:outerEncryptionAlgorithmString(self.cipherUuid)];
     [kvps addKey:@"Inner Encryption" andValue:innerEncryptionString(self.innerRandomStreamId)];
+    [kvps addKey:@"Max History Items" andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
+    
+    NSString* size = [NSByteCountFormatter stringFromByteCount:self.historyMaxSize countStyle:NSByteCountFormatterCountStyleFile];
+    [kvps addKey:@"Max History Size" andValue:size];
 
     return kvps;
 }

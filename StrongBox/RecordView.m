@@ -26,6 +26,7 @@
 #import "IconsCollectionViewController.h"
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
+#import "KeePassHistoryController.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -48,6 +49,7 @@ static const int kMinNotesCellHeight = 160;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewIcon;
 @property UIBarButtonItem *navBack;
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
+@property (readonly) BOOL readOnlyMode;
 
 @end
 
@@ -388,12 +390,16 @@ static const int kMinNotesCellHeight = 160;
         }
         else {
             self.navigationItem.leftBarButtonItem = self.navBack;
-            self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly);
+            self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.readOnlyMode);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
             self.navBack = nil;
             [self enableDisableUiForEditing];
         }
     }
+}
+
+-(BOOL)readOnlyMode {
+    return self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache || self.isHistoricalEntry;
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
@@ -451,15 +457,19 @@ static const int kMinNotesCellHeight = 160;
 
     // Attachments & Custom Fields screen not available in edit mode
     
-    self.labelAttachmentCount.textColor = self.editing ? [UIColor grayColor] : [UIColor blueColor];
-    self.tableCellAttachments.userInteractionEnabled = !self.editing;
+    BOOL attachmentsSegueAppropriate = !self.editing && !(self.readOnlyMode && (self.record.fields.attachments.count == 0));
+    self.labelAttachmentCount.textColor = attachmentsSegueAppropriate ? [UIColor blueColor] : [UIColor grayColor];
+    self.tableCellAttachments.userInteractionEnabled = attachmentsSegueAppropriate;
 
-    self.labelCustomFieldsCount.textColor = self.editing ? [UIColor grayColor] : [UIColor blueColor];
-    self.tableCellCustomFields.userInteractionEnabled = !self.editing;
+    BOOL customFieldsSegueAppropriate = !self.editing && !(self.readOnlyMode && (self.record.fields.customFields.count == 0));
+    self.labelCustomFieldsCount.textColor = customFieldsSegueAppropriate ? [UIColor blueColor] : [UIColor grayColor];
+    self.tableCellCustomFields.userInteractionEnabled = customFieldsSegueAppropriate;
 
-    // History only available on Password Safe and non new
+    // History only available on Password Safe/KeePass 2+ and non new
 
-    self.buttonHistory.enabled = !self.editing && self.viewModel.database.format == kPasswordSafe;
+    DatabaseFormat format = self.viewModel.database.format;
+    BOOL keePassHistoryAvailable = self.record.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
+    self.buttonHistory.hidden = (self.editing || !(self.viewModel.database.format == kPasswordSafe || keePassHistoryAvailable));
 
     // Show / Hide Password
     
@@ -473,8 +483,12 @@ static const int kMinNotesCellHeight = 160;
         
     // Edit OTP
     
-    self.buttonSetOtp.hidden = Settings.sharedInstance.hideTotp || self.isEditing;
-    self.buttonSetOtp.enabled = !self.isEditing && !self.viewModel.isReadOnly;
+    self.buttonSetOtp.hidden = Settings.sharedInstance.hideTotp || self.isEditing || self.readOnlyMode;
+    self.buttonSetOtp.enabled = !self.isEditing && !self.readOnlyMode;
+
+    // Password Generation Settings
+    
+    self.buttonPasswordGenerationSettings.hidden = !self.isEditing;
 }
 
 - (void)setTitleTextFieldUIValidationIndicator {
@@ -639,15 +653,38 @@ static NSString * trim(NSString *string) {
     [self copyToClipboard:self.record.fields.email message:@"Email Copied"];
 }
 
+- (IBAction)onViewHistory:(id)sender {
+    if(self.viewModel.database.format == kPasswordSafe) {
+        [self performSegueWithIdentifier:@"segueToPasswordHistory" sender:nil];
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToKeePassHistory" sender:nil];
+    }
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil))
     {
         PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.record.fields.passwordHistory;
-        vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
+        vc.readOnly = self.readOnlyMode;
         
         vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(NSError *)) {
             [self onPasswordHistoryChanged:changed onDone:onDone];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToKeePassHistory"] && (self.record != nil)) {
+        KeePassHistoryController *vc = segue.destinationViewController;
+        
+        vc.historicalItems = self.record.fields.keePassHistory;
+        vc.viewModel = self.viewModel;
+        
+        vc.restoreToHistoryItem = ^(Node * historicalNode) {
+            [self onRestoreFromHistoryNode:historicalNode];
+        };
+        
+        vc.deleteHistoryItem = ^(Node * historicalNode) {
+            [self onDeleteHistoryItem:historicalNode];
         };
     }
     else if ([segue.identifier isEqual:@"segueToFileAttachments"]) {
@@ -658,7 +695,7 @@ static NSString * trim(NSString *string) {
         NSArray<UiAttachment*>* attachments = getUiAttachments(self.record, self.viewModel.database.attachments);
         vc.attachments = attachments;
         vc.format = self.viewModel.database.format;
-        vc.readOnly = self.viewModel.isReadOnly;
+        vc.readOnly = self.readOnlyMode;
         
         __weak FileAttachmentsViewControllerTableViewController* weakRef = vc;
         vc.onDoneWithChanges = ^{
@@ -669,7 +706,7 @@ static NSString * trim(NSString *string) {
         UINavigationController *nav = segue.destinationViewController;
         
         CustomFieldsViewController* vc = (CustomFieldsViewController*)[nav topViewController];
-        vc.readOnly = self.viewModel.isReadOnly;
+        vc.readOnly = self.readOnlyMode;
         
         NSArray<NSString*> *sortedKeys = [self.record.fields.customFields.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
             return [obj1 compare:obj2];
@@ -798,7 +835,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.accessed = [[NSDate alloc] init];
     self.record.fields.modified = [[NSDate alloc] init];
     
-    [self.viewModel update:^(NSError *error) {
+    [self sync:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(error);
         });
@@ -806,9 +843,17 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)onAttachmentsChanged:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments {
+    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
+    [self addHistoricalNode:clonedOriginalNodeForHistory]; // Must be done before changes, or we could orphan an attachment
+    
+    // Makes Changes
+
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+
     [self.viewModel.database setNodeAttachments:node attachments:attachments];
     
-    [self saveChanges:^(NSError *error) {
+    [self sync:^(NSError *error) {
         if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
@@ -817,18 +862,27 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         }
         else {
             [self bindUiToRecord];
+            [self enableDisableUiForEditing];
         }
     }];
 }
 
 - (void)onCustomFieldsChanged:(Node*)node items:(NSArray<CustomField*>*)items {
+    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
+    [self addHistoricalNode:clonedOriginalNodeForHistory];
+    
+    // Make Changes
+    
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+    
     [node.fields.customFields removeAllObjects];
     
     for (CustomField *field in items) {
         [node.fields.customFields setObject:field.value forKey:field.key];
     }
     
-    [self saveChanges:^(NSError *error) {
+    [self sync:^(NSError *error) {
         if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
@@ -837,6 +891,66 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         }
         else {
             [self bindUiToRecord];
+            [self enableDisableUiForEditing];
+        }
+    }];
+}
+
+- (void)onDeleteHistoryItem:(Node*) historicalNode {
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+    
+    [self.record.fields.keePassHistory removeObject:historicalNode];
+
+    // Sync
+    
+    [self sync:^(NSError *error) {
+        if (error != nil) {
+            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
+            NSLog(@"%@", error);
+        }
+        else {
+            [self bindUiToRecord];
+            [self enableDisableUiForEditing];
+        }
+    }];
+}
+
+- (void)onRestoreFromHistoryNode:(Node*)historicalNode {
+    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
+    [self addHistoricalNode:clonedOriginalNodeForHistory];
+    
+    // Make Changes
+    
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+    
+    self.record.title = historicalNode.title;
+    self.record.iconId = historicalNode.iconId;
+    self.record.customIconUuid = historicalNode.customIconUuid;
+    
+    self.record.fields.username = historicalNode.fields.username;
+    self.record.fields.url = historicalNode.fields.url;
+    self.record.fields.password = historicalNode.fields.password;
+    self.record.fields.notes = historicalNode.fields.notes;
+    self.record.fields.passwordModified = historicalNode.fields.passwordModified;
+    self.record.fields.attachments = [historicalNode.fields.attachments mutableCopy];
+    self.record.fields.customFields = [historicalNode.fields.customFields mutableCopy];
+    
+    // Sync
+    
+    [self sync:^(NSError *error) {
+        if (error != nil) {
+            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }];
+            NSLog(@"%@", error);
+        }
+        else {
+            [self bindUiToRecord];
+            [self enableDisableUiForEditing];
         }
     }];
 }
@@ -885,12 +999,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
+                    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
                     BOOL success = [self.record setTotpWithString:string appendUrlToNotes:self.viewModel.database.format == kPasswordSafe];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
                     }
                     else {
-                        [self saveAfterTotpSet];
+                        [self saveAfterTotpSet:clonedOriginalNodeForHistory];
                     }
                 }
             };
@@ -900,12 +1015,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         else if(response == 1) {
             [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Secret or OTPAuth URL" title:@"Please enter the secret or an OTPAuth URL" message:@"" completion:^(NSString *text, BOOL response) {
                 if(response) {
+                    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
                     BOOL success = [self.record setTotpWithString:text appendUrlToNotes:self.viewModel.database.format == kPasswordSafe];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
                     }
                     else {
-                        [self saveAfterTotpSet];
+                        [self saveAfterTotpSet:clonedOriginalNodeForHistory];
                     }
                 }
             }];
@@ -913,8 +1029,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     }];
 }
 
-- (void)saveAfterTotpSet {
-    [self.viewModel update:^(NSError *error) {
+- (void)saveAfterTotpSet:(Node*)originalNodeForHistory {
+    [self addHistoricalNode:originalNodeForHistory];
+    
+    self.record.fields.accessed = [[NSDate alloc] init];
+    self.record.fields.modified = [[NSDate alloc] init];
+    
+    [self sync:^(NSError *error) {
         if(error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts error:self title:@"Error While Saving" error:error];
@@ -940,7 +1061,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 - (void)onDoneWithChanges {
     self.editButtonItem.enabled = NO;
 
-    [self saveChanges:^(NSError *error) {
+    Node* originalNodeForHistory = [self.record cloneForHistory];
+    
+    [self saveChanges:originalNodeForHistory completion:^(NSError *error) {
         self.navigationItem.leftBarButtonItem = self.navBack;
         self.editButtonItem.enabled = YES;
         self.navBack = nil;
@@ -958,7 +1081,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     }];
 }
 
-- (void)saveChanges:(void (^)(NSError *))completion {
+- (void)saveChanges:(Node*)originalNodeForHistory completion:(void (^)(NSError *))completion {
     self.record.fields.accessed = [[NSDate alloc] init];
     self.record.fields.modified = [[NSDate alloc] init];
     self.record.fields.notes = self.textViewNotes.text;
@@ -971,6 +1094,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     if (self.editingNewRecord) {
         self.record.fields.created = [[NSDate alloc] init];
         [self.parentGroup addChild:self.record];
+    }
+    else { // Add History Entry for this change if appropriate...
+        [self addHistoricalNode:originalNodeForHistory];
     }
     
     // Custom Icon addition must be done after node has been added to parent, because otherwise the custom icon rationalizer
@@ -1017,9 +1143,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)sync:(void (^)(NSError *))completion {
-//    NSLog(@"Syncing...");
     [self.viewModel update:^(NSError *error) {
-//        NSLog(@"Syncing Done: [%@]...", error);
         if(!error) {
             self.editingNewRecord = NO;
             self.userSelectedNewCustomIcon = nil;
@@ -1030,6 +1154,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             completion(error);
         });
     }];
+}
+
+- (void)addHistoricalNode:(Node*)originalNodeForHistory {
+    BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
+    if(shouldAddHistory && originalNodeForHistory != nil) {
+        [self.record.fields.keePassHistory addObject:originalNodeForHistory];
+    }
 }
 
 @end

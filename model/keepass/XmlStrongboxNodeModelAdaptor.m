@@ -82,7 +82,7 @@
     }
     
     for(Node* childEntry in group.childRecords) {
-        [ret.entries addObject:[self buildXmlEntry:childEntry]];
+        [ret.entries addObject:[self buildXmlEntry:childEntry stripHistory:NO]];
     }
     
     ret.name.text = group.title;
@@ -91,7 +91,7 @@
     return ret;
 }
 
-- (Entry*)buildXmlEntry:(Node*)entry {
+- (Entry*)buildXmlEntry:(Node*)entry stripHistory:(BOOL)stripHistory {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
     Entry *previousXmlEntry = (Entry*)entry.linkedData;
     
@@ -195,6 +195,15 @@
         [ret.binaries addObject:xmlBinary];
     }
     
+    // History
+    
+    if(!stripHistory) {
+        for(Node* historicalNode in entry.fields.keePassHistory) {
+            Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES]; // Just in case we have accidentally left history on a historical entry itself...
+            [ret.history.entries addObject:historicalEntry];
+        }
+    }
+    
     return ret;
 }
 
@@ -272,6 +281,13 @@
     
     if(childEntry.customIcon) entryNode.customIconUuid = childEntry.customIcon;
     if(childEntry.icon != nil) entryNode.iconId = childEntry.icon;
+    
+    if(childEntry.history && childEntry.history.entries) {
+        for (Entry* historicalEntry in childEntry.history.entries) {
+            Node* historicalEntryNode = [self nodeFromEntry:historicalEntry groupNode:groupNode];
+            [fields.keePassHistory addObject:historicalEntryNode];
+        }
+    }
     
     return entryNode;
 }

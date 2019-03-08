@@ -110,6 +110,12 @@ static const BOOL kLogVerbose = NO;
     if(xmlDoc.keePassFile.meta.generator.text) {
         metadata.generator = xmlDoc.keePassFile.meta.generator.text;
     }
+    if(xmlDoc.keePassFile.meta.historyMaxItems) {
+        metadata.historyMaxItems = xmlDoc.keePassFile.meta.historyMaxItems.integer;
+    }
+    if(xmlDoc.keePassFile.meta.historyMaxSize) {
+        metadata.historyMaxSize = xmlDoc.keePassFile.meta.historyMaxSize.integer;
+    }
     
     metadata.cipherUuid = serializationData.cipherUuid;
     metadata.kdfParameters = serializationData.kdfParameters;
@@ -141,9 +147,13 @@ static const BOOL kLogVerbose = NO;
         
         return nil;
     }
-    
+
     KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
     RootXmlDomainObject* existingRootXmlDocument = tag ? tag.xmlDocument : nil;
+    
+    // 0. Trim KeePass History
+    
+    [database trimKeePassHistory];
     
     // 1. From Strongbox to Xml Model
     

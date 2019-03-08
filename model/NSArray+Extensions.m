@@ -39,6 +39,10 @@
     return [result copy];
 }
 
+- (BOOL)anyMatch:(BOOL (^)(id obj))block {
+    return [self firstOrDefault:block] != nil;
+}
+
 - (id)firstOrDefault:(BOOL (^)(id obj))block {
     for(id obj in self) {
         if(block(obj)) {

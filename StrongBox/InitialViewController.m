@@ -168,13 +168,7 @@
                 
                 [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
             }
-            else {
-                [self showStartupMessaging];
-            }
         }
-    }
-    else {
-        [self showStartupMessaging];
     }
     
     //
@@ -623,42 +617,6 @@
     else {
         [Alerts info:self title:@"Cannot open App Store" message:@"Please find Strongbox in the App Store and you can write a review there. Much appreciated! -Mark"];
     }
-}
-
-- (void)showStartupMessaging {
-    [self maybeAskForReview];
-}
-
-- (void)maybeAskForReview {
-    NSInteger promptedForReview = [[Settings sharedInstance] isUserHasBeenPromptedForReview];
-    NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
-    
-    if (launchCount > 20) {
-        if (@available( iOS 10.3,*)) {
-            [SKStoreReviewController requestReview];
-        }
-        else if(launchCount % 10 == 0 && promptedForReview == 0) {
-            [self oldAskForReview];
-        }
-    }
-}
-
-- (void)oldAskForReview {
-    [Alerts  threeOptions:self
-                    title:@"Review Strongbox?"
-                  message:@"Hi, I'm Mark, the developer of Strongbox.\nI would really appreciate it if you could rate this app in the App Store for me.\n\nWould you be so kind?"
-        defaultButtonText:@"Sure, take me there!"
-         secondButtonText:@"Naah"
-          thirdButtonText:@"Like, maybe later!"
-                   action:^(int response) {
-                       if (response == 0) {
-                           [self openAppStoreForOldReview];
-                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                       }
-                       else if (response == 1) {
-                           [[Settings sharedInstance] setUserHasBeenPromptedForReview:1];
-                       }
-                   }];
 }
 
 @end

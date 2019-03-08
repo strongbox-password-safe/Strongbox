@@ -27,6 +27,10 @@ static NSString* const kCustomIconUuidElementName = @"CustomIconUUID";
 static NSString* const kUuidElementName = @"UUID";
 static NSString* const kTimesElementName = @"Times";
 static NSString* const kGeneratorElementName = @"Generator";
+
+static NSString* const kHistoryMaxItemsElementName = @"HistoryMaxItems";
+static NSString* const kHistoryMaxSizeElementName = @"HistoryMaxSize";
+
 static NSString* const kHeaderHashElementName = @"HeaderHash";
 static NSString* const kKeePassFileElementName = @"KeePassFile";
 static NSString* const kStringElementName = @"String";
@@ -34,6 +38,8 @@ static NSString* const kV3BinariesListElementName = @"Binaries";
 static NSString* const kBinaryElementName = @"Binary";
 static NSString* const kKeyElementName = @"Key";
 static NSString* const kValueElementName = @"Value";
+static NSString* const kHistoryElementName = @"History";
+
 static NSString* const kBinaryValueAttributeRef = @"Ref";
 static NSString* const kCustomIconListElementName = @"CustomIcons";
 static NSString* const kCustomIconElementName = @"Icon";
@@ -64,5 +70,8 @@ static const uint32_t kDefaultTransformRounds = 600000;
 static const int kFlagsSha2 = 1;
 static const int kFlagsAes = 2;
 static const int kFlagsTwoFish = 8;
+
+static const NSInteger kDefaultHistoryMaxItems = 10;
+static const NSInteger kDefaultHistoryMaxSize = 6 * 1024 * 1024;
 
 #endif /* Header_h */

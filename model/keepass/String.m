@@ -61,8 +61,11 @@
     
     ret.node = self.nonCustomisedXmlTree.node;
     [ret.children addObject:[self.key generateXmlTree]];
-    [ret.children addObject:[self.value generateXmlTree]];
-
+    
+    XmlTree *foo = [self.value generateXmlTree];
+    foo.node.doNotTrimWhitespaceText = YES; // Don't trim Values - Whitespace might be important...
+    
+    [ret.children addObject:foo];
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
     return ret;

@@ -137,6 +137,8 @@
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
 		4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
 		4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */; };
+		4DE0CB6E2232C0D400E109F9 /* GenericTextIntegerElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */; };
+		4DE0CB712232C0F200E109F9 /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB702232C0F200E109F9 /* History.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */; };
 		4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */; };
 		4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
@@ -442,6 +444,10 @@
 		4DDCE1C821BBFF7800D1DE09 /* ProgressWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProgressWindow.h; path = MacBox/ProgressWindow.h; sourceTree = "<group>"; };
 		4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProgressWindow.m; path = MacBox/ProgressWindow.m; sourceTree = "<group>"; };
 		4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressWindow.xib; path = MacBox/ProgressWindow.xib; sourceTree = "<group>"; };
+		4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextIntegerElementHandler.m; path = ../model/keepass/GenericTextIntegerElementHandler.m; sourceTree = "<group>"; };
+		4DE0CB6D2232C0D400E109F9 /* GenericTextIntegerElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextIntegerElementHandler.h; path = ../model/keepass/GenericTextIntegerElementHandler.h; sourceTree = "<group>"; };
+		4DE0CB6F2232C0F200E109F9 /* History.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = History.h; path = ../model/keepass/History.h; sourceTree = "<group>"; };
+		4DE0CB702232C0F200E109F9 /* History.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = History.m; path = ../model/keepass/History.m; sourceTree = "<group>"; };
 		4DEAEC261F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreateFormatAndSetCredentialsWizard.h; path = MacBox/CreateFormatAndSetCredentialsWizard.h; sourceTree = "<group>"; };
 		4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreateFormatAndSetCredentialsWizard.m; path = MacBox/CreateFormatAndSetCredentialsWizard.m; sourceTree = "<group>"; };
 		4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ChangeMasterPasswordWindowController.xib; path = MacBox/ChangeMasterPasswordWindowController.xib; sourceTree = "<group>"; };
@@ -670,6 +676,8 @@
 				4D9E096721825105007BA1E7 /* XMLWriter.h */,
 				4D9E097E21825107007BA1E7 /* XMLWriter.m */,
 				4D9E096121825104007BA1E7 /* String.h */,
+				4DE0CB6F2232C0F200E109F9 /* History.h */,
+				4DE0CB702232C0F200E109F9 /* History.m */,
 				4D9E096221825104007BA1E7 /* String.m */,
 				4D9E095421825103007BA1E7 /* Times.h */,
 				4D9E095621825103007BA1E7 /* Times.m */,
@@ -691,6 +699,8 @@
 				4D9E097421825106007BA1E7 /* Entry.h */,
 				4D9E095221825103007BA1E7 /* Entry.m */,
 				4D9E094E21825103007BA1E7 /* GenericTextDateElementHandler.h */,
+				4DE0CB6D2232C0D400E109F9 /* GenericTextIntegerElementHandler.h */,
+				4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */,
 				4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */,
 				4D9E097821825107007BA1E7 /* GenericTextStringElementHandler.h */,
 				4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */,
@@ -1264,6 +1274,7 @@
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
 				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
 				4D524CDA219B47DB00C22CB4 /* VariantDictionary.m in Sources */,
+				4DE0CB6E2232C0D400E109F9 /* GenericTextIntegerElementHandler.m in Sources */,
 				4D524CAB219B45F700C22CB4 /* DatabaseAttachment.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
 				4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */,
@@ -1374,6 +1385,7 @@
 				4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */,
 				4DBCE22B2224207000A2AFA2 /* KeePassPredefinedIcons.m in Sources */,
 				4D524CEC219B481200C22CB4 /* ChaCha20Cipher.m in Sources */,
+				4DE0CB712232C0F200E109F9 /* History.m in Sources */,
 				4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */,

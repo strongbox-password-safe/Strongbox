@@ -13,6 +13,7 @@
 #import "Times.h"
 #import "String.h"
 #import "Binary.h"
+#import "History.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) Times* times;
 @property (nonatomic) NSMutableArray<String*> *strings;
 @property (nonatomic) NSMutableArray<Binary*> *binaries;
+@property (nonatomic) History* history;
 
 @property (nonatomic) NSNumber* icon;
 @property (nonatomic, nullable) NSUUID* customIcon;
@@ -41,11 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString* notes;
 
 // Safe Custom String setter...
-
 - (void)setString:(NSString*)key value:(NSString*)value protected:(BOOL)protected;
 
 // R/O Handy View
-
 @property (nonatomic, readonly) NSDictionary<NSString*, NSString*> *customFields;
 
 @end

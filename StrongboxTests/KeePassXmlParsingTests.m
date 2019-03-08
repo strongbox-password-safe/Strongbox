@@ -121,7 +121,7 @@
                                           attributes:nil];
 }
 
-- (void)testRegenerateXmlAndVerifyEquivalent {
+- (void)tstRegenerateXmlAndVerifyEquivalent {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSString *path = [bundle pathForResource:@"ladder" ofType:@"xml"];
     NSString *xml = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:path] encoding:NSUTF8StringEncoding];
@@ -131,11 +131,13 @@
     
     // Serialize
     
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
+    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
     
     NSString *regeneratedXml = [s serializeTrees:xmlTree.children];
     
-    //NSLog(@"\n%@", regeneratedXml);
+    NSLog(@"\n%@", xml);
+    NSLog(@"\n==========================================================================================================");
+    NSLog(@"\n%@", regeneratedXml);
   
     XCTAssertTrue([self isEquivalentXml:xml xml2:regeneratedXml]);
 }

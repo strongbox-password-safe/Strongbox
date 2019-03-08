@@ -15,6 +15,7 @@
 @property (nonatomic, strong, nullable) Node *record;
 @property (nonatomic, strong, nullable) Node *parentGroup;
 @property (nonatomic, strong, nonnull) Model *viewModel;
+@property BOOL isHistoricalEntry;
 
 @property (weak, nonatomic, nullable) IBOutlet UITextField *textFieldEmail;
 @property (weak, nonatomic, nullable) IBOutlet UITextView *textViewNotes;

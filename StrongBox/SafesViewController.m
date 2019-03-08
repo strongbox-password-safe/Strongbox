@@ -444,7 +444,7 @@
     
     // Express
     
-    if(Settings.sharedInstance.iCloudAvailable) {
+    if(Settings.sharedInstance.iCloudAvailable && Settings.sharedInstance.iCloudOn) {
         UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"⚡ New Database (Express)"
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {

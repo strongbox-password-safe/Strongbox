@@ -8,6 +8,8 @@
 #import "StrongboxDatabase.h"
 #import "AttachmentsRationalizer.h"
 #import "NSArray+Extensions.h"
+#import "KeePassDatabaseMetadata.h"
+#import "KeePass4DatabaseMetadata.h"
 
 @interface StrongboxDatabase ()
 
@@ -70,6 +72,119 @@
     return [self.mutableAttachments copy];
 }
 
+- (void)trimKeePassHistory {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        [self trimKeePassHistory:metadata.historyMaxItems maxSize:metadata.historyMaxSize];
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        [self trimKeePassHistory:metadata.historyMaxItems maxSize:metadata.historyMaxSize];
+    }
+}
+
+- (void)trimKeePassHistory:(NSInteger)maxItems maxSize:(NSInteger)maxSize {
+    for(Node* record in self.rootGroup.allChildRecords) {
+        [self trimNodeKeePassHistory:record maxItems:maxItems maxSize:maxSize];
+    }
+}
+
+- (BOOL)trimNodeKeePassHistory:(Node*)node maxItems:(NSInteger)maxItems maxSize:(NSInteger)maxSize {
+    bool trimmed = false;
+    
+    if(maxItems >= 0)
+    {
+        while(node.fields.keePassHistory.count > maxItems)
+        {
+            [self removeOldestHistoryItem:node];
+            trimmed = YES;
+        }
+    }
+    
+    if(maxSize >= 0)
+    {
+        while(true)
+        {
+            NSUInteger histSize = 0;
+            
+            for (Node* historicalNode in node.fields.keePassHistory) {
+                histSize += [self getEstimatedSize:historicalNode];
+            }
+            
+            if(histSize > maxSize)
+            {
+                [self removeOldestHistoryItem:node];
+                trimmed = YES;
+            }
+            else {
+                break;
+            }
+        }
+    }
+    
+    return trimmed;
+}
+
+- (NSUInteger)getEstimatedSize:(Node*)node {
+    // Try to get a decent estimate of size but really this is not very precise...
+    NSUInteger fixedStructuralSizeGuess = 256;
+    
+    NSUInteger basicFields = node.title.length +
+    node.fields.username.length +
+    node.fields.password.length +
+    node.fields.url.length +
+    node.fields.notes.length;
+    
+    NSUInteger customFields = 0;
+    for (NSString* key in node.fields.customFields.allKeys) {
+        customFields += key.length + node.fields.customFields[key].length;
+    }
+    
+    // History
+    
+    NSUInteger historySize = 0;
+    for (Node* historyNode in node.fields.keePassHistory) {
+        historySize += [self getEstimatedSize:historyNode];
+    }
+    
+    // Custom Icon
+    
+    NSUInteger iconSize = 0;
+    if(node.customIconUuid) {
+        NSData* data = self.mutableCustomIcons[node.customIconUuid];
+        iconSize = data == nil ? 0 : data.length;
+    }
+    
+    // Binary
+    
+    NSUInteger binariesSize = 0;
+    for (NodeFileAttachment* attachments in node.fields.attachments) {
+        DatabaseAttachment* dbA = self.mutableAttachments[attachments.index];
+        binariesSize += dbA == nil ? 0 : dbA.data.length;
+    }
+    
+    NSUInteger textSize = (basicFields + customFields) * 2; // Unicode in memory probably?
+    
+    NSUInteger ret = fixedStructuralSizeGuess + textSize + historySize + iconSize + binariesSize;
+
+    //NSLog(@"Estimated Size: %@ -> [%lu]", node, (unsigned long)ret);
+    
+    return ret;
+}
+
+- (void)removeOldestHistoryItem:(Node*)node {
+    NSArray* sorted = [node.fields.keePassHistory sortedArrayUsingComparator:^NSComparisonResult(Node*  _Nonnull obj1, Node*  _Nonnull obj2) {
+        return [obj1.fields.modified compare:obj2.fields.modified];
+    }];
+    
+    if(sorted.count < 2) {
+        [node.fields.keePassHistory removeAllObjects];
+    }
+    else {
+        node.fields.keePassHistory = [[sorted subarrayWithRange:NSMakeRange(1, sorted.count - 1)] mutableCopy];
+    }
+}
+
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex {
     if(atIndex < 0 || atIndex >= node.fields.attachments.count) {
         NSLog(@"WARN: removeNodeAttachment [OUT OF BOUNDS]");
@@ -128,10 +243,27 @@
 - (void)rationalizeCustomIcons {
     //NSLog(@"Before Rationalization: [%@]", self.mutableCustomIcons.allKeys);
     
-    NSArray<Node*>* customIconNodes = [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*>* currentCustomIconNodes = [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return node.customIconUuid != nil;
     }];
     
+    NSArray<Node*>* allNodesWithHistoryAndCustomIcons = [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup && [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
+            return obj.customIconUuid != nil;
+        }];
+    }];
+    
+    NSArray<Node*>* allHistoricalNodesWithCustomIcons = [allNodesWithHistoryAndCustomIcons flatMap:^id _Nonnull(Node * _Nonnull node, NSUInteger idx) {
+        return [node.fields.keePassHistory filter:^BOOL(Node * _Nonnull obj) {
+            return obj.customIconUuid != nil;
+        }];
+    }];
+    
+    //
+    
+    NSMutableArray *customIconNodes = [NSMutableArray arrayWithArray:currentCustomIconNodes];
+    [customIconNodes addObjectsFromArray:allHistoricalNodesWithCustomIcons];
+
     NSMutableDictionary<NSUUID*, NSData*>* fresh = [NSMutableDictionary dictionaryWithCapacity:customIconNodes.count];
     for (Node* node in customIconNodes) {
         NSUUID* key = node.customIconUuid;
@@ -139,7 +271,7 @@
             fresh[key] = self.mutableCustomIcons[key];
         }
         else {
-            NSLog(@"Removed bad Custom Icon reference [%@]-[%@]", node, key);
+            NSLog(@"Removed bad Custom Icon reference [%@]-[%@]", node.title, key);
             node.customIconUuid = nil;
         }
     }

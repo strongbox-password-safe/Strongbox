@@ -8,6 +8,7 @@
 
 #import "Entry.h"
 #import "KeePassDatabase.h"
+#import "History.h"
 
 @implementation Entry
 
@@ -37,6 +38,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     if(self = [super initWithXmlElementName:kEntryElementName context:context]) {
         self.uuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:context];
         self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
+        self.history = [[History alloc] initWithXmlElementName:kHistoryElementName context:context];
         self.strings = [NSMutableArray array];
         self.binaries = [NSMutableArray array];
         self.iconId = nil; //[[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:context];
@@ -52,6 +54,9 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
     else if([xmlElementName isEqualToString:kTimesElementName]) {
         return [[Times alloc] initWithContext:self.context];
+    }
+    else if([xmlElementName isEqualToString:kHistoryElementName]) {
+        return [[History alloc] initWithContext:self.context];
     }
     else if([xmlElementName isEqualToString:kStringElementName]) {
         return [[String alloc] initWithContext:self.context];
@@ -76,6 +81,10 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
     else if([withXmlElementName isEqualToString:kTimesElementName]) {
         self.times = (Times*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kHistoryElementName]) {
+        self.history = (History*)completedObject;
         return YES;
     }
     else if([withXmlElementName isEqualToString:kStringElementName]) {
@@ -103,8 +112,8 @@ const static NSSet<NSString*> *wellKnownKeys;
     
     ret.node = self.nonCustomisedXmlTree.node;
     
-    [ret.children addObject:[self.uuid generateXmlTree]];
-    [ret.children addObject:[self.times generateXmlTree]];
+    if(self.uuid) [ret.children addObject:[self.uuid generateXmlTree]];
+    if(self.times) [ret.children addObject:[self.times generateXmlTree]];
     
     if(self.iconId) [ret.children addObject:[self.iconId generateXmlTree]];
     if(self.customIconUuid) [ret.children addObject:[self.customIconUuid generateXmlTree]];
@@ -117,6 +126,12 @@ const static NSSet<NSString*> *wellKnownKeys;
         [ret.children addObject:[binary generateXmlTree]];
     }
     
+    // History...
+    
+    if(self.history && self.history.entries && self.history.entries.count) {
+        [ret.children addObject:[self.history generateXmlTree]];
+    }
+
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
     return ret;

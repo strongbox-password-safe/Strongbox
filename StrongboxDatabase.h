@@ -61,11 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data;
 
-//#if TARGET_OS_IPHONE
-//- (void)setNodeCustomIcon:(Node*)node icon:(UIImage*)icon;
-//#else
-//- (void)setNodeCustomIcon:(Node*)node icon:(NSImage*)icon;
-//#endif
+- (void)trimKeePassHistory;
 
 @end
 

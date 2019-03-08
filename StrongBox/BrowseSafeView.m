@@ -173,6 +173,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [self saveChangesToSafeAndRefreshView];
 }
 
+- (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
+    BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
+    if(shouldAddHistory && originalNodeForHistory != nil) {
+        [item.fields.keePassHistory addObject:originalNodeForHistory];
+    }
+}
+
 - (void)onRenameItem:(NSIndexPath * _Nonnull)indexPath {
     Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
     
@@ -182,6 +189,14 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                           message:@"Please enter a new title for this item"
                        completion:^(NSString *text, BOOL response) {
                            if(response && [text length]) {
+                               if(!item.isGroup) {
+                                   Node* originalNodeForHistory = [item cloneForHistory];
+                                   [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+                               }
+                               
+                               item.fields.accessed = [NSDate date];
+                               item.fields.modified = [NSDate date];
+                               
                                item.title = text;
                                
                                [self saveChangesToSafeAndRefreshView];
@@ -220,6 +235,14 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [self.sni changeIcon:self urlHint:urlHint format:self.viewModel.database.format completion:^(BOOL goNoGo, NSNumber* userSelectedNewIconIndex, UIImage* userSelectedNewCustomIcon) {
         NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
         if(goNoGo) {
+            if(!item.isGroup) {
+                Node* originalNodeForHistory = [item cloneForHistory];
+                [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+            }
+            
+            item.fields.accessed = [NSDate date];
+            item.fields.modified = [NSDate date];
+            
             if(userSelectedNewCustomIcon) {
                 NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
                 [self.viewModel.database setNodeCustomIcon:item data:data];

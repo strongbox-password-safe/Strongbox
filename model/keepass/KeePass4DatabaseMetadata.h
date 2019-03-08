@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property uint32_t innerRandomStreamId;
 @property uint32_t compressionFlags;
 @property NSString* version;
+@property (nonatomic) NSInteger historyMaxItems;
+@property (nonatomic) NSInteger historyMaxSize;
 
 - (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi;
 
