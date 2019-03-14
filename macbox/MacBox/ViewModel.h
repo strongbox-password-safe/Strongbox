@@ -36,11 +36,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
 - (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData* _Nullable)custom;
 
+- (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
+- (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
+    
 - (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
 - (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
 
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
+
+- (void)setTotp:(Node *)item otp:(NSString *)otp;
+- (void)clearTotp:(Node *)item;
 
 - (BOOL)addNewRecord:(Node *)parentGroup;
 - (void)addNewGroup:(Node *)parentGroup;
@@ -91,6 +97,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^onCustomFieldsChanged)(Node* node);
 @property (nonatomic, copy) void (^onDeleteItem)(Node* node);
 @property (nonatomic, copy) void (^onChangeParent)(Node* node);
+@property (nonatomic, copy) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
+@property (nonatomic, copy) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
+
+@property (nonatomic, copy) void (^onSetItemTotp)(Node* node);
+@property (nonatomic, copy) void (^onClearItemTotp)(Node* node);
 
 @end
 

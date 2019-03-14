@@ -13,6 +13,8 @@
 #import "DatabaseModel.h"
 #import "PasswordGenerator.h"
 #import "Settings.h"
+#import "Node+OtpToken.h"
+#import "OTPToken+Serialization.h"
 
 static NSString* kDefaultNewTitle = @"Untitled";
 
@@ -192,6 +194,8 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [self setItemIcon:item index:index custom:custom modified:nil];
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -200,8 +204,16 @@ static NSString* kDefaultNewTitle = @"Untitled";
     NSString* old = item.title;
     NSDate* oldModified = item.fields.modified;
     
+    Node* cloneForHistory = [item cloneForHistory];
     if([item setTitle:title]) {
         item.fields.modified = modified ? modified : [[NSDate alloc] init];
+        
+        if(self.document.undoManager.isUndoing) {
+            if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+        }
+        else {
+            [item.fields.keePassHistory addObject:cloneForHistory];
+        }
         
         [[self.document.undoManager prepareWithInvocationTarget:self] setItemTitle:item title:old modified:oldModified];
         [self.document.undoManager setActionName:@"Title Change"];
@@ -224,6 +236,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
     NSString* old = item.fields.email;
     NSDate* oldModified = item.fields.modified;
 
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+    
     item.fields.email = email;
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
@@ -242,6 +262,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
     NSString* old = item.fields.username;
     NSDate* oldModified = item.fields.modified;
+
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
 
     item.fields.username = username;
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
@@ -262,6 +290,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
     NSString* old = item.fields.url;
     NSDate* oldModified = item.fields.modified;
 
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+
     item.fields.url = url;
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
@@ -281,8 +317,17 @@ static NSString* kDefaultNewTitle = @"Untitled";
     NSString* old = item.fields.password;
     NSDate* oldModified = item.fields.modified;
 
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+
     item.fields.password = password;
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    item.fields.passwordModified = item.fields.modified;
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemPassword:item password:old modified:oldModified];
     [self.document.undoManager setActionName:@"Password Change"];
@@ -299,6 +344,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
     
     NSString* old = item.fields.notes;
     NSDate* oldModified = item.fields.modified;
+
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
 
     item.fields.notes = notes;
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
@@ -327,6 +380,18 @@ static NSString* kDefaultNewTitle = @"Untitled";
         index = item.isGroup ? @(48) : @(0);
     }
     
+    // Manage History
+    
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+
+    // Change...
+    
     item.iconId = index;
     [self.passwordDatabase setNodeCustomIcon:item data:custom];
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
@@ -339,6 +404,85 @@ static NSString* kDefaultNewTitle = @"Untitled";
     });
 }
 
+- (void)deleteHistoryItem:(Node *)item historicalItem:(Node *)historicalItem {
+    [self deleteHistoryItem:item historicalItem:historicalItem index:-1 modified:nil];
+}
+- (void)deleteHistoryItem:(Node *)item historicalItem:(Node *)historicalItem index:(NSUInteger)index modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    NSDate* oldModified = item.fields.modified;
+    
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    if(!self.document.undoManager.isUndoing) {
+        index = [item.fields.keePassHistory indexOfObject:historicalItem]; // removeObjectAtIndex:index];
+        [item.fields.keePassHistory removeObjectAtIndex:index];
+    }
+    else {
+        [item.fields.keePassHistory insertObject:historicalItem atIndex:index];
+    }
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] deleteHistoryItem:item
+                                                                     historicalItem:historicalItem
+                                                                              index:index
+                                                                           modified:oldModified];
+    
+    [self.document.undoManager setActionName:@"Delete History Item"];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onDeleteHistoryItem(item, historicalItem);
+    });
+}
+
+- (void)restoreHistoryItem:(Node *)item historicalItem:(Node *)historicalItem {
+    [self restoreHistoryItem:item historicalItem:historicalItem modified:nil];
+}
+- (void)restoreHistoryItem:(Node *)item historicalItem:(Node *)historicalItem modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    NSDate* oldModified = item.fields.modified;
+    Node* originalNode = [item cloneForHistory];
+
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+
+    // Record History
+    
+    [item.fields.keePassHistory addObject:originalNode];
+    
+    // Make Changes
+    
+    item.fields.accessed = [[NSDate alloc] init];
+    item.fields.modified = [[NSDate alloc] init];
+    
+    // TODO: This should be a function on Node - copyFromNode(Node* node) or something - also find it iOS app...
+    
+    item.title = historicalItem.title;
+    item.iconId = historicalItem.iconId;
+    item.customIconUuid = historicalItem.customIconUuid;
+    
+    item.fields.username = historicalItem.fields.username;
+    item.fields.url = historicalItem.fields.url;
+    item.fields.password = historicalItem.fields.password;
+    item.fields.notes = historicalItem.fields.notes;
+    item.fields.passwordModified = historicalItem.fields.passwordModified;
+    item.fields.attachments = [historicalItem.fields.attachments mutableCopy];
+    item.fields.customFields = [historicalItem.fields.customFields mutableCopy];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] restoreHistoryItem:item
+                                                                      historicalItem:originalNode
+                                                                            modified:oldModified];
+    
+    [self.document.undoManager setActionName:@"Restore History Item"];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onRestoreHistoryItem(item, historicalItem);
+    });
+}
+
 - (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -347,6 +491,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
     NodeFileAttachment* nodeAttachment = item.fields.attachments[atIndex];
     DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
     UiAttachment* old = [[UiAttachment alloc] initWithFilename:nodeAttachment.filename data:dbAttachment.data];
+    
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
     
     [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item attachment:old];
     
@@ -364,6 +516,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
 - (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
     }
     
     [self.passwordDatabase addNodeAttachment:item attachment:attachment];
@@ -409,6 +569,14 @@ static NSString* kDefaultNewTitle = @"Untitled";
     
     NSString* oldValue = [item.fields.customFields objectForKey:key];
     
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+    
     [item.fields.customFields setObject:value forKey:key];
     
     if(oldValue) {
@@ -431,8 +599,16 @@ static NSString* kDefaultNewTitle = @"Untitled";
     }
 
     NSString* oldValue = [item.fields.customFields objectForKey:key];
-    [item.fields.customFields removeObjectForKey:key];
+    
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
 
+    [item.fields.customFields removeObjectForKey:key];
 
     [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue];
     
@@ -442,6 +618,63 @@ static NSString* kDefaultNewTitle = @"Untitled";
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.onCustomFieldsChanged(item);
+    });
+}
+
+- (void)setTotp:(Node *)item otp:(NSString *)otp {
+    [self setTotp:item otp:otp modified:nil];
+}
+- (void)setTotp:(Node *)item otp:(NSString *)otp modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    Node* cloneForHistory = [item cloneForHistory];
+    [item.fields.keePassHistory addObject:cloneForHistory];
+    
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [item setTotpWithString:otp appendUrlToNotes:self.format == kPasswordSafe];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
+    
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Set TOTP"];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onSetItemTotp(item);
+    });
+}
+
+-(void)clearTotp:(Node *)item  {
+    [self clearTotp:item modified:nil];
+}
+-(void)clearTotp:(Node *)item modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    OTPToken* oldOtpToken = item.otpToken;
+    if(oldOtpToken == nil) { // NOP
+        NSLog(@"Attempt to clear non existent OTP token");
+        return;
+    }
+    
+    NSURL* oldOtpTokenUrl = [oldOtpToken url:YES];
+    Node* cloneForHistory = [item cloneForHistory];
+    [item.fields.keePassHistory addObject:cloneForHistory];
+    
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [item clearTotp];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setTotp:item otp:oldOtpTokenUrl.absoluteString];
+    
+    if(!self.document.undoManager.isUndoing) {
+        [self.document.undoManager setActionName:@"Clear TOTP"];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onClearItemTotp(item);
     });
 }
 

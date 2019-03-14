@@ -68,6 +68,10 @@
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
 @property (weak) IBOutlet ClickableImageView *imageViewIcon;
 @property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
+@property (weak) IBOutlet NSTextField *textFieldTotp;
+@property (weak) IBOutlet NSView *viewPasswordRow;
+@property (weak) IBOutlet NSLayoutConstraint *viewPasswordRowHeightConstraint;
+@property (weak) IBOutlet NSProgressIndicator *progressTotp;
 
 - (IBAction)onSearch:(id)sender;
 - (IBAction)onOutlineViewDoubleClick:(id)sender;

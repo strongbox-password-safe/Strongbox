@@ -17,6 +17,7 @@
 @property (weak) IBOutlet NSButton *switchAutoClearClipboard;
 @property (weak) IBOutlet NSSlider *sliderAutoClearClipboardTimeout;
 @property (weak) IBOutlet NSTextField *labelClearClipboardTimeout;
+@property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
 
 @end
 
@@ -70,6 +71,7 @@
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
     self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
     self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
+    self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
 }
 
 -(void) bindAutoFillToSettings {
@@ -216,6 +218,7 @@
     Settings.sharedInstance.alwaysShowUsernameInOutlineView = self.checkboxAlwaysShowUsernameInOutlineView.state == NSOnState;
     Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
+    Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
     
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];

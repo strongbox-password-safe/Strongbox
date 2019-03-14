@@ -85,6 +85,9 @@
 		4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */; };
 		4D8DE9C021F898470043DDC0 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B521F898470043DDC0 /* OTPToken.m */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
+		4D9903C4223664D3002C10EE /* MacKeePassHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9903C2223664D3002C10EE /* MacKeePassHistoryController.m */; };
+		4D9903C5223664D3002C10EE /* KeePassHistoryController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D9903C3223664D3002C10EE /* KeePassHistoryController.xib */; };
+		4D9903C82237BFDA002C10EE /* MacNodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */; };
 		4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
 		4D9E098321825108007BA1E7 /* Times.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095621825103007BA1E7 /* Times.m */; };
@@ -113,6 +116,7 @@
 		4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
 		4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
+		4DA746522239678B002535F9 /* Node+OtpToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA746502239678B002535F9 /* Node+OtpToken.m */; };
 		4DAC95FA21A0699E00E59D53 /* HierarchyOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC95F921A0699E00E59D53 /* HierarchyOutlineView.m */; };
 		4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
 		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
@@ -338,6 +342,11 @@
 		4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+QueryItems.h"; path = "../lib/OneTimePassword/NSURL+QueryItems.h"; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WindowController.h; path = MacBox/WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WindowController.m; path = MacBox/WindowController.m; sourceTree = "<group>"; };
+		4D9903C1223664D3002C10EE /* MacKeePassHistoryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacKeePassHistoryController.h; path = MacBox/MacKeePassHistoryController.h; sourceTree = "<group>"; };
+		4D9903C2223664D3002C10EE /* MacKeePassHistoryController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacKeePassHistoryController.m; path = MacBox/MacKeePassHistoryController.m; sourceTree = "<group>"; };
+		4D9903C3223664D3002C10EE /* KeePassHistoryController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = KeePassHistoryController.xib; path = MacBox/KeePassHistoryController.xib; sourceTree = "<group>"; };
+		4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacNodeIconHelper.h; path = MacBox/MacNodeIconHelper.h; sourceTree = "<group>"; };
+		4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacNodeIconHelper.m; path = MacBox/MacNodeIconHelper.m; sourceTree = "<group>"; };
 		4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = ../model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = "<group>"; };
 		4D9E094A21825103007BA1E7 /* KeePassGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassGroup.h; path = ../model/keepass/KeePassGroup.h; sourceTree = "<group>"; };
 		4D9E094B21825103007BA1E7 /* RootXmlDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootXmlDomainObject.h; path = ../model/keepass/RootXmlDomainObject.h; sourceTree = "<group>"; };
@@ -396,6 +405,8 @@
 		4D9E09A021825161007BA1E7 /* Salsa20Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Salsa20Stream.h; path = ../model/keepass/Salsa20Stream.h; sourceTree = "<group>"; };
 		4D9E09A121825161007BA1E7 /* Salsa20Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Salsa20Stream.m; path = ../model/keepass/Salsa20Stream.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4DA746502239678B002535F9 /* Node+OtpToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Node+OtpToken.m"; path = "../model/Node+OtpToken.m"; sourceTree = "<group>"; };
+		4DA746512239678B002535F9 /* Node+OtpToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Node+OtpToken.h"; path = "../model/Node+OtpToken.h"; sourceTree = "<group>"; };
 		4DAC95F821A0699E00E59D53 /* HierarchyOutlineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HierarchyOutlineView.h; sourceTree = "<group>"; };
 		4DAC95F921A0699E00E59D53 /* HierarchyOutlineView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HierarchyOutlineView.m; sourceTree = "<group>"; };
 		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
@@ -783,6 +794,11 @@
 				4DBCE22422241D6700A2AFA2 /* PredefinedKeePassIcon.h */,
 				4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */,
 				4DBCE22622241D6700A2AFA2 /* PredefinedKeePassIcon.xib */,
+				4D9903C1223664D3002C10EE /* MacKeePassHistoryController.h */,
+				4D9903C2223664D3002C10EE /* MacKeePassHistoryController.m */,
+				4D9903C3223664D3002C10EE /* KeePassHistoryController.xib */,
+				4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */,
+				4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -937,6 +953,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DA746512239678B002535F9 /* Node+OtpToken.h */,
+				4DA746502239678B002535F9 /* Node+OtpToken.m */,
 				4DC8D9BA21B6F391004F1812 /* KeyFileParser.h */,
 				4DC8D9B921B6F391004F1812 /* KeyFileParser.m */,
 				4D29663F21ADAC0B009B7936 /* CustomField.h */,
@@ -1199,6 +1217,7 @@
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
+				4D9903C5223664D3002C10EE /* KeePassHistoryController.xib in Resources */,
 				4D524D13219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D88AD4F21E654E700B49149 /* SourceSansPro-Bold.ttf in Resources */,
@@ -1327,10 +1346,12 @@
 				4D524CF1219B481200C22CB4 /* CryptoParameters.m in Sources */,
 				4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */,
 				4D524D05219B48D300C22CB4 /* CustomIcon.m in Sources */,
+				4D9903C82237BFDA002C10EE /* MacNodeIconHelper.m in Sources */,
 				4D4AD4F521A02817002C33C6 /* UiAttachment.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
+				4D9903C4223664D3002C10EE /* MacKeePassHistoryController.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
 				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
@@ -1362,6 +1383,7 @@
 				4D524CD9219B47DB00C22CB4 /* KdfParameters.m in Sources */,
 				4D524D04219B48D300C22CB4 /* AttachmentsRationalizer.m in Sources */,
 				4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */,
+				4DA746522239678B002535F9 /* Node+OtpToken.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,

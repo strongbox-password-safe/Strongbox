@@ -537,7 +537,7 @@ static const int kMinNotesCellHeight = 160;
             userSetIconIsSameAsRecordIcon = NO;
         }
         else {
-            userSetIconIsSameAsRecordIcon = (self.record.iconId.intValue == self.userSelectedNewIconIndex.intValue);
+            userSetIconIsSameAsRecordIcon = (self.record.iconId.intValue == self.userSelectedNewIconIndex.intValue) && self.record.customIconUuid == nil;
         }
     }
     
@@ -1157,7 +1157,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)addHistoricalNode:(Node*)originalNodeForHistory {
-    BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
+    BOOL shouldAddHistory = YES; // FUTURE: only valid for KeePass 2+ also...
     if(shouldAddHistory && originalNodeForHistory != nil) {
         [self.record.fields.keePassHistory addObject:originalNodeForHistory];
     }

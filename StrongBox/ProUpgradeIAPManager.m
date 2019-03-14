@@ -41,7 +41,7 @@
 - (void)initialize {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self loadAppStoreProducts];
-        [self upgradeOrDowngradeBasedOnReceipt:NO]; // TODO: Do this in an hour or so again
+        [self upgradeOrDowngradeBasedOnReceipt:NO]; // TODO: Do this in an hour or so again - this happens at startup and works but UI does not update
     });
 }
 

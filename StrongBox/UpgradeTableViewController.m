@@ -70,11 +70,11 @@ static NSString* const kFontName =  @"Futura-Bold";
     self.buttonYearly.layer.cornerRadius = 25;
     self.buttonLifetime.layer.cornerRadius = 25;
 
-    [self.buttonNope setEnabled:NO];
+//    [self.buttonNope setEnabled:NO];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self.buttonNope setEnabled:YES];
-    });
+//    });
 }
 
 - (void)enableButtons:(BOOL)enable {
@@ -298,6 +298,7 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
 - (IBAction)on1Month:(id)sender {
     [self purchase:kMonthly];
 }
+
 - (IBAction)on3Months:(id)sender {
     [self purchase:k3Monthly];
 }

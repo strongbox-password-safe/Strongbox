@@ -64,7 +64,7 @@
 }
 
 - (NSDictionary<NSUUID *,NSData *> *)customIcons {
-    [self rationalizeCustomIcons];
+    [self rationalizeCustomIcons]; // TODO: Perf
     return [self.mutableCustomIcons copy];
 }
 

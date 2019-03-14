@@ -71,7 +71,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
             components.queryItems = @[key];
         }
         self.fields.customFields[@"otp"] = components.query;
-        
+    
         // Notes Field if it's a Password Safe database
         
         if(appendUrlToNotes) {
@@ -82,6 +82,31 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     }
 
     return NO;
+}
+
+- (void)clearTotp {
+    // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
+    
+    // KeePassXC Otp
+    
+    self.fields.customFields[@"TOTP Seed"] = nil;
+    self.fields.customFields[@"TOTP Settings"] = nil;
+    
+    // KeeOtp Plugin
+    // * otp="key=2GQFLXXUBJQELC&step=31"
+    
+    self.fields.customFields[@"otp"] = nil;
+    
+    // Notes Field if it's a Password Safe database
+    
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: \\[.*\\]" options:NSRegularExpressionDotMatchesLineSeparators error:Nil];
+
+    NSTextCheckingResult *result = [regex firstMatchInString:self.fields.notes options:kNilOptions range:NSMakeRange(0, self.fields.notes.length)];
+    
+    if(result) {
+        NSLog(@"Found matching OTP in Notes: [%@]", [self.fields.notes substringWithRange:result.range]);
+        self.fields.notes = [self.fields.notes stringByReplacingCharactersInRange:result.range withString:@""];
+    }
 }
 
 + (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes {

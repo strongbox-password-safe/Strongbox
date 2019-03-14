@@ -35,6 +35,8 @@
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
 
+@property BOOL doNotShowTotp;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

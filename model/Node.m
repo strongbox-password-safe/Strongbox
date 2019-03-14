@@ -94,6 +94,7 @@
     
     ret.iconId = self.iconId;
     ret.customIconUuid = self.customIconUuid;
+    ret.linkedData = self.linkedData;
     
     return ret;
 }

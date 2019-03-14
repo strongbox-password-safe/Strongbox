@@ -331,7 +331,7 @@
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)notification {
-    NSLog(@"applicationWillBecomeActive");
+//    NSLog(@"applicationWillBecomeActive");
 
     [self initializeClipboardWatchingTask];
 }
@@ -345,12 +345,12 @@
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
-    NSLog(@"applicationWillResignActive");
+//    NSLog(@"applicationWillResignActive");
     [self killClipboardWatchingTask];
 }
 
 - (void)startClipboardWatchingTask {
-    NSLog(@"startClipboardWatchingTask...");
+//    NSLog(@"startClipboardWatchingTask...");
     self.currentClipboardVersion = -1;
     self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f repeats:YES block:^(NSTimer * _Nonnull timer) {
         [self checkClipboardForChangesAndNotify];
@@ -358,7 +358,7 @@
 }
 
 - (void)killClipboardWatchingTask {
-    NSLog(@"killClipboardWatchingTask...");
+//    NSLog(@"killClipboardWatchingTask...");
     
     self.currentClipboardVersion = -1;
     

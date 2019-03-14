@@ -25,11 +25,16 @@
 #import "ProgressWindow.h"
 #import "SelectPredefinedIconController.h"
 #import "KeePassPredefinedIcons.h"
+#import "MacKeePassHistoryController.h"
+#import "MacNodeIconHelper.h"
+#import "Node+OtpToken.h"
+#import "OTPToken+Generation.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
 @interface ViewController ()
 
+@property (strong, nonatomic) MacKeePassHistoryController *keePassHistoryController;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) ProgressWindow* progressWindow;
@@ -47,22 +52,25 @@
 @property BOOL suppressConcealDetailsOnSelectionUpdateNextTime;
 @property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *itemsCache;
 
+@property NSTimer* timerRefreshOtp;
+@property NSView* currentlyEditingUIControl;
+
 @end
 
-static NSImage* kFolderImage;
+//static NSImage* kFolderImage;
 static NSImage* kStrongBox256Image;
-static NSImage* kSmallYellowFolderImage;
-static NSImage* kSmallLockImage;
+//static NSImage* kSmallYellowFolderImage;
+//static NSImage* kSmallLockImage;
 static NSImage* kDefaultAttachmentIcon;
 
 @implementation ViewController
 
 + (void)initialize {
     if(self == [ViewController class]) {
-        kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
+//        kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
         kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
-        kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
-        kSmallLockImage = [NSImage imageNamed:@"lock-48"];
+//        kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
+//        kSmallLockImage = [NSImage imageNamed:@"lock-48"];
         kDefaultAttachmentIcon = [NSImage imageNamed:@"document_empty_64"];
     }
 }
@@ -109,12 +117,8 @@ static NSImage* kDefaultAttachmentIcon;
     
     // Password
     
-    if (@available(macOS 10.13, *)) {
-        self.textFieldPw.textColor = [NSColor colorNamed:@"password-field-text-color"];
-
-    } else {
-        self.textFieldPw.textColor = [NSColor controlTextColor];
-    }
+    self.textFieldPw.textColor = [self getPasswordTextColor];
+    self.textFieldTotp.textColor = [self getPasswordTextColor];
 
     // Using Menlo for the moment seems to be clearer
     //
@@ -191,6 +195,7 @@ static NSImage* kDefaultAttachmentIcon;
 -(void)setModel:(ViewModel *)model {
     _model = model;
     
+    // TODO: protocol or some other way!
     model.onNewItemAdded = ^(Node * _Nonnull node) {
         [self onNewItemAdded:node];
     };
@@ -227,7 +232,32 @@ static NSImage* kDefaultAttachmentIcon;
     model.onItemIconChanged = ^(Node * _Nonnull node) {
         [self onItemIconChanged:node];
     };
+    model.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
+        [self onDeleteHistoryItem:item historicalItem:historicalItem];
+    };
+    model.onRestoreHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
+        [self onRestoreHistoryItem:item historicalItem:historicalItem];
+    };
+    model.onSetItemTotp = ^(Node * _Nonnull node) {
+        [self onSetItemTotp:node];
+    };
+    model.onClearItemTotp = ^(Node * _Nonnull node) {
+        [self onClearItemTotp:node];
+    };
+    
     [self bindToModel];
+}
+
+- (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
+    return [MacNodeIconHelper getIconForNode:self.model vm:vm large:large];
+}
+- (void)onSetItemTotp:(Node*)node {
+    self.itemsCache = nil; // Clear items cache
+    [self bindDetailsPane];
+}
+- (void)onClearItemTotp:(Node*)node {
+    self.itemsCache = nil; // Clear items cache
+    [self bindDetailsPane];
 }
 
 - (void)onItemIconChanged:(Node*)node {
@@ -236,6 +266,24 @@ static NSImage* kDefaultAttachmentIcon;
     if([self getCurrentSelectedItem] == node) {
         self.imageViewIcon.image = [self getIconForNode:node large:NO];
         self.imageViewGroupDetails.image = [self getIconForNode:node large:NO];
+    }
+}
+
+- (void)onDeleteHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
+    // NOP - Not displayed in main view...
+    NSLog(@"Deleted History Item... no need to update UI");
+}
+
+- (void)onRestoreHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
+    self.itemsCache = nil; // Clear items cache
+    Node* selectionToMaintain = [self getCurrentSelectedItem];
+    [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
+    NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
+    
+    if(row != -1) {
+        self.suppressConcealDetailsOnSelectionUpdateNextTime = YES;
+        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        // This selection change will lead to a full reload of the details pane via selectionDidChange
     }
 }
 
@@ -449,6 +497,23 @@ static NSImage* kDefaultAttachmentIcon;
         
         self.showPassword = Settings.sharedInstance.alwaysShowPassword;
         [self showOrHidePassword];
+        
+        // TOTP
+
+        [self refreshOtpCode:nil];
+
+        if(!Settings.sharedInstance.doNotShowTotp && it.otpToken) {
+            if(self.timerRefreshOtp == nil) {
+                self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
+                [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+            }
+        }
+        else {
+            if(self.timerRefreshOtp) {
+                [self.timerRefreshOtp invalidate];
+                self.timerRefreshOtp = nil;
+            }
+        }
     }
 }
 
@@ -847,41 +912,6 @@ static NSImage* kDefaultAttachmentIcon;
         
         return cell;
     }
-}
-
-- (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
-    NSImage* ret;
-    
-    if(self.model.format == kPasswordSafe) {
-        if(!large) {
-            ret = vm.isGroup ? kSmallYellowFolderImage : kSmallLockImage;
-        }
-        else {
-            ret = vm.isGroup ? kFolderImage : kSmallLockImage;
-        }
-    }
-    else {
-        ret = vm.isGroup ? KeePassPredefinedIcons.icons[48] : KeePassPredefinedIcons.icons[0];
-    }
-    
-    // KeePass Specials
-    
-    if(vm.customIconUuid) {
-        NSData* data = self.model.customIcons[vm.customIconUuid];
-        
-        if(data) {
-            NSImage* img = [[NSImage alloc] initWithData:data]; // FUTURE: Cache
-            if(img) {
-                NSImage *resized = scaleImage(img, CGSizeMake(48, 48)); // FUTURE: Scale up if large? THis is only used on details pane
-                return resized;
-            }
-        }
-    }
-    else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < KeePassPredefinedIcons.icons.count) {
-        ret = KeePassPredefinedIcons.icons[vm.iconId.intValue];
-    }
-
-    return ret;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
@@ -1299,6 +1329,12 @@ static NSImage* kDefaultAttachmentIcon;
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 }
 
+- (IBAction)onCopyTotp:(id)sender {
+    [[NSPasteboard generalPasteboard] clearContents];
+    NSString *password = self.textFieldTotp.stringValue;
+    [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (Node*)getCurrentSelectedItem {
@@ -1323,56 +1359,92 @@ static NSImage* kDefaultAttachmentIcon;
     return [src objectAtIndex:index];
 }
 
+- (void)textDidBeginEditing:(NSNotification *)notification {
+    //NSLog(@"textDidBeginEditing: %@", notification);
+    
+    self.currentlyEditingUIControl = notification.object;
+}
+
+- (void)controlTextDidBeginEditing:(NSNotification *)obj {
+    //NSLog(@"controlTextDidEndEditing: %@", obj);
+    
+    self.currentlyEditingUIControl = obj.object;
+}
+
 - (void)textDidEndEditing:(NSNotification *)notification {
     //NSLog(@"textDidEndEditing: %@", notification);
     
-    if(notification.object == self.textViewNotes) {
-        [self bindModelToSimpleUiFields];
-    }
+    [self setModelForEditField:notification.object];
+
+    self.currentlyEditingUIControl = nil;
 }
 
 -(void)controlTextDidEndEditing:(NSNotification *)obj {
-   // NSLog(@"controlTextDidEndEditing: %@", obj);
+    //NSLog(@"controlTextDidEndEditing: %@", obj);
     
-    [self bindModelToSimpleUiFields];
+    [self setModelForEditField:obj.object];
+    
+    self.currentlyEditingUIControl = nil;
 }
 
-- (IBAction)bindModelToSimpleUiFields {
-    if(self.model.locked) { // Can happen when user hits Lock in middle of edit...
+- (IBAction)saveDocument:(id)sender {
+    Node* item = [self getCurrentSelectedItem];
+    
+    if(item && !item.isGroup && self.currentlyEditingUIControl) {
+        //NSLog(@"We are currently editing: [%@] - forcing model bind", self.currentlyEditingUIControl);
+
+        [self setModelForEditField:self.currentlyEditingUIControl];
+    }
+    
+    [self.model.document saveDocument:sender];
+}
+
+- (void)setModelForEditField:(NSView*)obj {
+    if(self.model.locked || obj == nil) { // Can happen when user hits Lock in middle of edit...
         return;
     }
     
-    //NSLog(@"bindModelToSimpleUiFields");
-    
     Node* item = [self getCurrentSelectedItem];
-
+    
     if(!item || item.isGroup) {
         return;
     }
-
-    if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
-        [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
-    }
     
-    if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
-        [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
-    }
+    //NSLog(@"setModelForEditField for [%@]", obj);
     
-    if(![item.fields.email isEqualToString:trimField(self.comboBoxEmail)]) {
-        [self.model setItemEmail:item email:trimField(self.comboBoxEmail)];
+    if(obj == self.textFieldTitle) {
+        if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
+            [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
+        }
     }
-    
-    if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
-        [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
+    else if(obj == self.comboboxUsername) {
+        if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
+            [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
+        }
     }
-    
-    if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
-        [self.model setItemPassword:item password:trimField(self.textFieldPw)];
+    else if(obj == self.comboBoxEmail){
+        if(![item.fields.email isEqualToString:trimField(self.comboBoxEmail)]) {
+            [self.model setItemEmail:item email:trimField(self.comboBoxEmail)];
+        }
     }
-    
-    NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
-    if(![item.fields.notes isEqualToString:updated]) {
-        [self.model setItemNotes:item notes:updated];
+    else if(obj == self.textFieldUrl){
+        if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
+            [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
+        }
+    }
+    else if(obj == self.textFieldPw){
+        if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
+            [self.model setItemPassword:item password:trimField(self.textFieldPw)];
+        }
+    }
+    else if(obj == self.textViewNotes) {
+        NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
+        if(![item.fields.notes isEqualToString:updated]) {
+            [self.model setItemNotes:item notes:updated];
+        }
+    }
+    else {
+        NSLog(@"NOP for setModelForEditField");
     }
 }
 
@@ -1392,18 +1464,6 @@ static NSImage* kDefaultAttachmentIcon;
     else {
         textField.stringValue = newTitle;
     }
-}
-
-- (IBAction)saveDocument:(id)sender {
-    Node* item = [self getCurrentSelectedItem];
-    
-    if(item && !item.isGroup) {
-        // We could be in process of editing a simple field in the details panel...
-        
-        [self bindModelToSimpleUiFields];
-    }
-    
-    [self.model.document saveDocument:sender];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1654,6 +1714,9 @@ NSString* trimField(NSTextField* textField) {
     else if (theAction == @selector(onCopyPassword:)) {
         return item && !item.isGroup && item.fields.password.length;
     }
+    else if (theAction == @selector(onCopyTotp:)) {
+        return item && !item.isGroup && item.otpToken;
+    }
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
@@ -1675,6 +1738,19 @@ NSString* trimField(NSTextField* textField) {
     }
     else if (theAction == @selector(onSetItemIcon:)) {
         return item != nil && self.model.format != kPasswordSafe;
+    }
+    else if(theAction == @selector(onClearItemTotp:)) {
+        return item && !item.isGroup && item.otpToken;
+    }
+    else if(theAction == @selector(onSetItemTotp:)) {
+        return item && !item.isGroup;
+    }
+    else if (theAction == @selector(onViewItemHistory:)) {
+        return
+            item != nil &&
+            !item.isGroup &&
+            item.fields.keePassHistory.count > 0 &&
+            (self.model.format == kKeePass || self.model.format == kKeePass4);
     }
     
     return YES;
@@ -2072,6 +2148,91 @@ const int kMaxCustomIconDimension = 256;
     }
     else {
         [self.model setItemIcon:item index:index custom:nil];
+    }
+}
+
+- (IBAction)onViewItemHistory:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    
+    if(item == nil ||
+       item.isGroup || item.fields.keePassHistory.count == 0 ||
+       (!(self.model.format == kKeePass || self.model.format == kKeePass4))) {
+        return;
+    }
+    
+    self.keePassHistoryController = [[MacKeePassHistoryController alloc] initWithWindowNibName:@"KeePassHistoryController"];
+
+    __weak ViewController* weakSelf = self;
+    self.keePassHistoryController.onDeleteHistoryItem = ^(Node * _Nonnull node) {
+        [weakSelf.model deleteHistoryItem:item historicalItem:node];
+    };
+    self.keePassHistoryController.onRestoreHistoryItem = ^(Node * _Nonnull node) {
+        [weakSelf.model restoreHistoryItem:item historicalItem:node];
+    };
+    
+    self.keePassHistoryController.model = self.model;
+    self.keePassHistoryController.history = item.fields.keePassHistory; 
+    
+    [self.view.window beginSheet:self.keePassHistoryController.window completionHandler:nil];
+}
+
+- (IBAction)refreshOtpCode:(id)sender
+{
+    Node *item = [self getCurrentSelectedItem];
+    
+    if(item == nil || item.isGroup) {
+        return;
+    }
+    
+    if(!Settings.sharedInstance.doNotShowTotp && item.otpToken) {
+        self.viewPasswordRowHeightConstraint.constant = 95.0f;
+        
+        //NSLog(@"Token: [%@] - Password: %@", item.otpToken, item.otpToken.password);
+        uint64_t remainingSeconds = item.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)item.otpToken.period);
+        
+        self.textFieldTotp.stringValue = item.otpToken.password;
+        
+        self.textFieldTotp.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : [self getPasswordTextColor];
+
+        self.progressTotp.minValue = 0;
+        self.progressTotp.maxValue = item.otpToken.period;
+        self.progressTotp.doubleValue = remainingSeconds;
+    }
+    else {
+        self.textFieldTotp.stringValue = @"000000";
+        self.viewPasswordRowHeightConstraint.constant = 59.0f;
+    }
+}
+
+- (IBAction)onSetTotp:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    
+    if(item == nil || item.isGroup) {
+        return;
+    }
+    
+    NSString* response = [[Alerts alloc] input:@"Please enter the secret or an OTPAuth URL" defaultValue:@"" allowEmpty:NO];
+    
+    if(response) {
+        [self.model setTotp:item otp:response];
+    }
+}
+
+- (IBAction)onClearTotp:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    
+    if(item == nil || item.isGroup || !item.otpToken) {
+        return;
+    }
+    
+    [self.model clearTotp:item];
+}
+
+- (NSColor*)getPasswordTextColor {
+    if (@available(macOS 10.13, *)) {
+        return [NSColor colorNamed:@"password-field-text-color"];
+    } else {
+        return [NSColor controlTextColor];
     }
 }
 

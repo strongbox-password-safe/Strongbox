@@ -49,7 +49,7 @@
     [self registerForClipboardClearingNotifications];
 
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
-    
+
     return YES;
 }
 

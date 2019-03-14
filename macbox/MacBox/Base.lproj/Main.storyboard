@@ -208,6 +208,12 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="7OZ-Ow-jzX"/>
+                                        <menuItem title="View Item History" keyEquivalent="H" id="Gxr-A6-Po9">
+                                            <connections>
+                                                <action selector="onViewItemHistory:" target="Ady-hI-5gd" id="e0o-2Z-zdZ"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="yxy-tZ-b5F"/>
                                         <menuItem title="Set Item Icon" keyEquivalent="I" id="ToM-aZ-HMw" userLabel="Set Icon">
                                             <connections>
                                                 <action selector="onSetItemIcon:" target="Ady-hI-5gd" id="NFv-5i-mBM"/>
@@ -245,6 +251,11 @@ CA
                                         <menuItem title="Copy Password" keyEquivalent="C" id="0qE-Cw-4gz" userLabel="Copy Password">
                                             <connections>
                                                 <action selector="onCopyPassword:" target="Ady-hI-5gd" id="UXE-nN-nb2"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Copy TOTP" keyEquivalent="T" id="IO8-7D-XU3">
+                                            <connections>
+                                                <action selector="onCopyTotp:" target="Ady-hI-5gd" id="00c-qf-adk"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Copy Notes" keyEquivalent="N" id="tai-eY-D1L" userLabel="Copy Notes">
@@ -286,6 +297,19 @@ CA
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="onClearTouchId:" target="Ady-hI-5gd" id="Djm-cK-BLe"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="scr-Kd-CZJ"/>
+                                        <menuItem title="Clear TOTP" id="wrk-AN-HdR">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onClearTotp:" target="Ady-hI-5gd" id="D36-DN-m3x"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Set TOTP" id="Mjh-dp-KeE">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onSetTotp:" target="Ady-hI-5gd" id="ojr-1I-Mso"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -356,7 +380,7 @@ CA
                 </windowController>
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-578" y="389"/>
+            <point key="canvasLocation" x="-322" y="629"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -1016,10 +1040,10 @@ DQ
                                                                                                 </constraints>
                                                                                             </customView>
                                                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="h19-FF-lJC" userLabel="Password">
-                                                                                                <rect key="frame" x="0.0" y="361" width="404" height="60"/>
+                                                                                                <rect key="frame" x="0.0" y="326" width="404" height="95"/>
                                                                                                 <subviews>
-                                                                                                    <stackView distribution="equalCentering" orientation="horizontal" alignment="centerY" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hhh-MI-eLJ" userLabel="Buttons">
-                                                                                                        <rect key="frame" x="72" y="34" width="304" height="18"/>
+                                                                                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="WFB-XR-3uG">
+                                                                                                        <rect key="frame" x="72" y="77" width="304" height="18"/>
                                                                                                         <subviews>
                                                                                                             <button toolTip="Password Generation Settings" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="LiX-Kn-Eoz" userLabel="Generation Settings">
                                                                                                                 <rect key="frame" x="0.0" y="0.0" width="18" height="18"/>
@@ -1051,6 +1075,18 @@ DQ
                                                                                                                     <action selector="onToggleShowHidePassword:" target="5gI-5U-AMq" id="Ltl-pb-NPO"/>
                                                                                                                 </connections>
                                                                                                             </button>
+                                                                                                            <button toolTip="Add Custom Field" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yeV-ok-mIE" userLabel="TOTP Button">
+                                                                                                                <rect key="frame" x="170" y="0.0" width="108" height="18"/>
+                                                                                                                <buttonCell key="cell" type="square" title="Set TOTP / 2FA..." bezelStyle="shadowlessSquare" imagePosition="overlaps" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="qUd-qU-TRS">
+                                                                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                                                    <font key="font" metaFont="system"/>
+                                                                                                                    <string key="keyEquivalent">p</string>
+                                                                                                                    <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                                                                                                                </buttonCell>
+                                                                                                                <connections>
+                                                                                                                    <action selector="onSetTotp:" target="5gI-5U-AMq" id="Cg1-uI-CSs"/>
+                                                                                                                </connections>
+                                                                                                            </button>
                                                                                                             <button toolTip="Generate New Password" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="LJc-Iz-DyC" userLabel="Regenerate">
                                                                                                                 <rect key="frame" x="286" y="0.0" width="18" height="18"/>
                                                                                                                 <constraints>
@@ -1066,27 +1102,40 @@ DQ
                                                                                                                 </connections>
                                                                                                             </button>
                                                                                                         </subviews>
-                                                                                                        <visibilityPriorities>
-                                                                                                            <integer value="1000"/>
-                                                                                                            <integer value="1000"/>
-                                                                                                            <integer value="1000"/>
-                                                                                                        </visibilityPriorities>
-                                                                                                        <customSpacing>
-                                                                                                            <real value="3.4028234663852886e+38"/>
-                                                                                                            <real value="3.4028234663852886e+38"/>
-                                                                                                            <real value="3.4028234663852886e+38"/>
-                                                                                                        </customSpacing>
-                                                                                                    </stackView>
+                                                                                                        <constraints>
+                                                                                                            <constraint firstItem="yeV-ok-mIE" firstAttribute="top" secondItem="WFB-XR-3uG" secondAttribute="top" id="1iS-Jm-vPw"/>
+                                                                                                            <constraint firstAttribute="trailing" secondItem="LJc-Iz-DyC" secondAttribute="trailing" id="2bh-7n-uHF"/>
+                                                                                                            <constraint firstItem="LJc-Iz-DyC" firstAttribute="leading" secondItem="yeV-ok-mIE" secondAttribute="trailing" constant="8" id="9Ch-US-4K6"/>
+                                                                                                            <constraint firstAttribute="bottom" secondItem="LiX-Kn-Eoz" secondAttribute="bottom" id="ASx-Oj-PjI"/>
+                                                                                                            <constraint firstItem="51L-Cu-Tku" firstAttribute="top" secondItem="WFB-XR-3uG" secondAttribute="top" id="EMh-2a-zfQ"/>
+                                                                                                            <constraint firstItem="51L-Cu-Tku" firstAttribute="centerX" secondItem="WFB-XR-3uG" secondAttribute="centerX" id="N2c-XE-mpC"/>
+                                                                                                            <constraint firstItem="LiX-Kn-Eoz" firstAttribute="leading" secondItem="WFB-XR-3uG" secondAttribute="leading" id="fO9-Zw-A9b"/>
+                                                                                                            <constraint firstAttribute="bottom" secondItem="LJc-Iz-DyC" secondAttribute="bottom" id="fUF-wC-eSb"/>
+                                                                                                            <constraint firstAttribute="height" constant="18" id="fbl-Hx-Osy"/>
+                                                                                                            <constraint firstAttribute="bottom" secondItem="51L-Cu-Tku" secondAttribute="bottom" id="grF-lx-JqA"/>
+                                                                                                            <constraint firstItem="LJc-Iz-DyC" firstAttribute="top" secondItem="WFB-XR-3uG" secondAttribute="top" id="iK8-Ut-ZGx"/>
+                                                                                                            <constraint firstAttribute="bottom" secondItem="yeV-ok-mIE" secondAttribute="bottom" id="ie9-2Q-hwx"/>
+                                                                                                            <constraint firstItem="LiX-Kn-Eoz" firstAttribute="top" secondItem="WFB-XR-3uG" secondAttribute="top" id="vaM-4W-rqP"/>
+                                                                                                        </constraints>
+                                                                                                    </customView>
                                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Be1-bi-AEZ" userLabel="Label Password">
-                                                                                                        <rect key="frame" x="3" y="8" width="63" height="17"/>
+                                                                                                        <rect key="frame" x="3" y="48" width="63" height="17"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Password" id="9Pz-vh-muz">
                                                                                                             <font key="font" metaFont="system"/>
                                                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                                         </textFieldCell>
                                                                                                     </textField>
+                                                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E6K-2j-aJG" userLabel="Label TOTP">
+                                                                                                        <rect key="frame" x="3" y="5" width="63" height="17"/>
+                                                                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="TOTP" id="d5G-wX-2Z2">
+                                                                                                            <font key="font" metaFont="system"/>
+                                                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                                                        </textFieldCell>
+                                                                                                    </textField>
                                                                                                     <textField verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="eSx-uM-hGi">
-                                                                                                        <rect key="frame" x="72" y="4" width="304" height="25"/>
+                                                                                                        <rect key="frame" x="72" y="44" width="304" height="25"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="PQqasswO0ord123mnyIl1|" drawsBackground="YES" id="JSh-Nh-aIu">
                                                                                                             <font key="font" size="14" name="Menlo-Bold"/>
                                                                                                             <color key="textColor" name="Password Text Color"/>
@@ -1097,7 +1146,7 @@ DQ
                                                                                                         </connections>
                                                                                                     </textField>
                                                                                                     <textField verticalHuggingPriority="750" verticalCompressionResistancePriority="751" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bw6-tX-Yv0" userLabel="Text Field Hidden Pw" customClass="CustomPasswordTextField">
-                                                                                                        <rect key="frame" x="72" y="4" width="304" height="25"/>
+                                                                                                        <rect key="frame" x="72" y="44" width="304" height="25"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="*******************" drawsBackground="YES" id="4Jw-Ps-PG5">
                                                                                                             <font key="font" size="14" name="Menlo-Bold"/>
                                                                                                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1108,7 +1157,7 @@ DQ
                                                                                                         </connections>
                                                                                                     </textField>
                                                                                                     <button toolTip="Copy Password" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E8R-VV-PeV" userLabel="Copy Password">
-                                                                                                        <rect key="frame" x="384" y="7" width="20" height="20"/>
+                                                                                                        <rect key="frame" x="384" y="47" width="20" height="20"/>
                                                                                                         <constraints>
                                                                                                             <constraint firstAttribute="height" constant="20" id="5nV-OG-e6P"/>
                                                                                                             <constraint firstAttribute="width" constant="20" id="dWh-t4-sRW"/>
@@ -1121,31 +1170,67 @@ DQ
                                                                                                             <action selector="onCopyPassword:" target="2Tp-Fl-jBw" id="ZOp-aY-Zbd"/>
                                                                                                         </connections>
                                                                                                     </button>
+                                                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vLa-Ap-NEg" userLabel="TOTP">
+                                                                                                        <rect key="frame" x="70" y="1" width="106" height="41"/>
+                                                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="034621" id="eCe-um-R8W">
+                                                                                                            <font key="font" size="28" name="Menlo-Regular"/>
+                                                                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                                        </textFieldCell>
+                                                                                                    </textField>
+                                                                                                    <progressIndicator wantsLayer="YES" maxValue="100" doubleValue="50" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="A0u-nf-ac0">
+                                                                                                        <rect key="frame" x="182" y="7" width="194" height="20"/>
+                                                                                                    </progressIndicator>
+                                                                                                    <button toolTip="Copy TOTP" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fwb-IW-3ef" userLabel="Copy TOTP">
+                                                                                                        <rect key="frame" x="384" y="7" width="20" height="20"/>
+                                                                                                        <constraints>
+                                                                                                            <constraint firstAttribute="height" constant="20" id="3Ev-nO-nJn"/>
+                                                                                                            <constraint firstAttribute="width" constant="20" id="idn-U2-Uin"/>
+                                                                                                        </constraints>
+                                                                                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="copy_64" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="evv-pJ-xtm">
+                                                                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                                                            <font key="font" metaFont="system"/>
+                                                                                                        </buttonCell>
+                                                                                                        <connections>
+                                                                                                            <action selector="onCopyTotp:" target="5gI-5U-AMq" id="Dfw-0I-cQf"/>
+                                                                                                        </connections>
+                                                                                                    </button>
                                                                                                 </subviews>
                                                                                                 <constraints>
+                                                                                                    <constraint firstItem="vLa-Ap-NEg" firstAttribute="top" secondItem="eSx-uM-hGi" secondAttribute="bottom" constant="2" id="1xs-04-9d0"/>
                                                                                                     <constraint firstItem="bw6-tX-Yv0" firstAttribute="leading" secondItem="eSx-uM-hGi" secondAttribute="leading" id="36O-3u-EK3"/>
+                                                                                                    <constraint firstItem="Be1-bi-AEZ" firstAttribute="centerY" secondItem="bw6-tX-Yv0" secondAttribute="centerY" id="7W5-pV-jop"/>
                                                                                                     <constraint firstItem="E8R-VV-PeV" firstAttribute="centerY" secondItem="eSx-uM-hGi" secondAttribute="centerY" id="7kO-6t-Wh1"/>
-                                                                                                    <constraint firstAttribute="height" constant="60" id="Ara-sd-evk"/>
+                                                                                                    <constraint firstAttribute="height" constant="95" id="Ara-sd-evk"/>
+                                                                                                    <constraint firstItem="WFB-XR-3uG" firstAttribute="leading" secondItem="h19-FF-lJC" secondAttribute="leading" constant="72" id="EAm-rp-gLz"/>
                                                                                                     <constraint firstAttribute="trailing" secondItem="E8R-VV-PeV" secondAttribute="trailing" id="F0d-8F-HDG"/>
-                                                                                                    <constraint firstItem="eSx-uM-hGi" firstAttribute="top" secondItem="hhh-MI-eLJ" secondAttribute="bottom" constant="5" id="FAn-Ol-xge"/>
+                                                                                                    <constraint firstItem="eSx-uM-hGi" firstAttribute="top" secondItem="WFB-XR-3uG" secondAttribute="bottom" constant="8" id="F9r-kd-BSG"/>
                                                                                                     <constraint firstItem="Be1-bi-AEZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="h19-FF-lJC" secondAttribute="leading" constant="5" id="Jb2-Nu-2k0"/>
-                                                                                                    <constraint firstAttribute="trailing" secondItem="hhh-MI-eLJ" secondAttribute="trailing" constant="28" id="LYX-jR-dbC"/>
                                                                                                     <constraint firstItem="bw6-tX-Yv0" firstAttribute="trailing" secondItem="eSx-uM-hGi" secondAttribute="trailing" id="Ldm-Pw-ado"/>
+                                                                                                    <constraint firstAttribute="trailing" secondItem="WFB-XR-3uG" secondAttribute="trailing" constant="28" id="Ob9-cI-mAl"/>
+                                                                                                    <constraint firstItem="WFB-XR-3uG" firstAttribute="top" secondItem="h19-FF-lJC" secondAttribute="top" id="PJW-fJ-Xxg"/>
                                                                                                     <constraint firstItem="bw6-tX-Yv0" firstAttribute="bottom" secondItem="eSx-uM-hGi" secondAttribute="bottom" id="PeU-zL-BdU"/>
                                                                                                     <constraint firstItem="eSx-uM-hGi" firstAttribute="leading" secondItem="h19-FF-lJC" secondAttribute="leading" constant="72" id="QSU-SN-DOF"/>
                                                                                                     <constraint firstItem="eSx-uM-hGi" firstAttribute="firstBaseline" secondItem="Be1-bi-AEZ" secondAttribute="firstBaseline" id="TIy-Xy-PYR"/>
+                                                                                                    <constraint firstItem="vLa-Ap-NEg" firstAttribute="leading" secondItem="h19-FF-lJC" secondAttribute="leading" constant="72" id="TZI-YF-niE"/>
                                                                                                     <constraint firstItem="E8R-VV-PeV" firstAttribute="leading" secondItem="eSx-uM-hGi" secondAttribute="trailing" constant="8" id="WNv-uU-np2"/>
                                                                                                     <constraint firstItem="eSx-uM-hGi" firstAttribute="leading" secondItem="Be1-bi-AEZ" secondAttribute="trailing" constant="8" id="ajU-h5-tMy"/>
-                                                                                                    <constraint firstItem="hhh-MI-eLJ" firstAttribute="leading" secondItem="h19-FF-lJC" secondAttribute="leading" constant="72" id="gM6-dU-cP0"/>
+                                                                                                    <constraint firstItem="E6K-2j-aJG" firstAttribute="firstBaseline" secondItem="vLa-Ap-NEg" secondAttribute="firstBaseline" id="eQY-BK-oBa"/>
+                                                                                                    <constraint firstItem="A0u-nf-ac0" firstAttribute="centerY" secondItem="Fwb-IW-3ef" secondAttribute="centerY" id="evC-hM-bs7"/>
+                                                                                                    <constraint firstItem="vLa-Ap-NEg" firstAttribute="leading" secondItem="E6K-2j-aJG" secondAttribute="trailing" constant="8" id="hKz-CT-JRO"/>
+                                                                                                    <constraint firstAttribute="trailing" secondItem="Fwb-IW-3ef" secondAttribute="trailing" id="lQE-VY-lbq"/>
+                                                                                                    <constraint firstItem="E6K-2j-aJG" firstAttribute="leading" secondItem="h19-FF-lJC" secondAttribute="leading" constant="5" id="nGE-Wj-bDB"/>
+                                                                                                    <constraint firstItem="A0u-nf-ac0" firstAttribute="leading" secondItem="vLa-Ap-NEg" secondAttribute="trailing" constant="8" id="pUN-Yi-DdS"/>
                                                                                                     <constraint firstItem="bw6-tX-Yv0" firstAttribute="top" secondItem="eSx-uM-hGi" secondAttribute="top" id="rH9-PH-q2b"/>
-                                                                                                    <constraint firstAttribute="bottom" secondItem="Be1-bi-AEZ" secondAttribute="bottom" constant="8" id="t9O-SB-6yK"/>
+                                                                                                    <constraint firstItem="vLa-Ap-NEg" firstAttribute="firstBaseline" secondItem="A0u-nf-ac0" secondAttribute="bottom" id="rtO-dA-CFu"/>
+                                                                                                    <constraint firstItem="Fwb-IW-3ef" firstAttribute="leading" secondItem="A0u-nf-ac0" secondAttribute="trailing" constant="8" id="ubO-aq-klh"/>
                                                                                                 </constraints>
                                                                                             </customView>
                                                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="yMy-Y4-BO6" userLabel="Custom Fields Row">
-                                                                                                <rect key="frame" x="0.0" y="258" width="404" height="95"/>
+                                                                                                <rect key="frame" x="0.0" y="246" width="404" height="72"/>
                                                                                                 <subviews>
                                                                                                     <button toolTip="Add Custom Field" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5o-EJ-klB" userLabel="Add Button">
-                                                                                                        <rect key="frame" x="390" y="81" width="14" height="14"/>
+                                                                                                        <rect key="frame" x="390" y="58" width="14" height="14"/>
                                                                                                         <constraints>
                                                                                                             <constraint firstAttribute="width" constant="14" id="8SY-xI-zo1"/>
                                                                                                             <constraint firstAttribute="height" constant="14" id="wjP-Kw-DCT"/>
@@ -1161,7 +1246,7 @@ DQ
                                                                                                         </connections>
                                                                                                     </button>
                                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wBQ-Jn-o39">
-                                                                                                        <rect key="frame" x="157" y="78" width="91" height="17"/>
+                                                                                                        <rect key="frame" x="157" y="55" width="91" height="17"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Custom Fields" id="Tfv-Ql-1tr">
                                                                                                             <font key="font" metaFont="system"/>
                                                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1169,13 +1254,13 @@ DQ
                                                                                                         </textFieldCell>
                                                                                                     </textField>
                                                                                                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mb3-hn-xnO">
-                                                                                                        <rect key="frame" x="0.0" y="0.0" width="404" height="75"/>
+                                                                                                        <rect key="frame" x="0.0" y="0.0" width="404" height="52"/>
                                                                                                         <clipView key="contentView" id="dPz-Qd-1sJ">
-                                                                                                            <rect key="frame" x="1" y="0.0" width="402" height="74"/>
+                                                                                                            <rect key="frame" x="1" y="0.0" width="402" height="51"/>
                                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                             <subviews>
                                                                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="4Mh-0O-JTz" viewBased="YES" id="Ke9-4k-fx9">
-                                                                                                                    <rect key="frame" x="0.0" y="0.0" width="402" height="49"/>
+                                                                                                                    <rect key="frame" x="0.0" y="0.0" width="402" height="26"/>
                                                                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1274,7 +1359,7 @@ DQ
                                                                                                         </tableHeaderView>
                                                                                                     </scrollView>
                                                                                                     <button toolTip="Remove Custom Field" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZqA-Sf-PEj" userLabel="Remove Button">
-                                                                                                        <rect key="frame" x="370" y="81" width="14" height="14"/>
+                                                                                                        <rect key="frame" x="370" y="58" width="14" height="14"/>
                                                                                                         <constraints>
                                                                                                             <constraint firstAttribute="width" constant="14" id="5LT-Eq-gFa"/>
                                                                                                             <constraint firstAttribute="height" constant="14" id="V1V-ca-Fde"/>
@@ -1305,10 +1390,10 @@ DQ
                                                                                                 </constraints>
                                                                                             </customView>
                                                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Xg9-vH-AHa" userLabel="Attachments Row">
-                                                                                                <rect key="frame" x="0.0" y="155" width="404" height="95"/>
+                                                                                                <rect key="frame" x="0.0" y="167" width="404" height="71"/>
                                                                                                 <subviews>
                                                                                                     <button toolTip="Add Attachments" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xch-6c-Jng" userLabel="Add Button">
-                                                                                                        <rect key="frame" x="390" y="80" width="14" height="14"/>
+                                                                                                        <rect key="frame" x="390" y="56" width="14" height="14"/>
                                                                                                         <constraints>
                                                                                                             <constraint firstAttribute="height" constant="14" id="eSB-dz-LFM"/>
                                                                                                             <constraint firstAttribute="width" constant="14" id="vFf-jX-Pyv"/>
@@ -1324,7 +1409,7 @@ DQ
                                                                                                         </connections>
                                                                                                     </button>
                                                                                                     <button toolTip="Remove Attachment(s)" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ycQ-eI-aQ3" userLabel="Remove Button">
-                                                                                                        <rect key="frame" x="368" y="80" width="14" height="14"/>
+                                                                                                        <rect key="frame" x="368" y="56" width="14" height="14"/>
                                                                                                         <constraints>
                                                                                                             <constraint firstAttribute="height" constant="14" id="61h-79-eZb"/>
                                                                                                             <constraint firstAttribute="width" constant="14" id="fAV-2h-IWe"/>
@@ -1340,7 +1425,7 @@ DQ
                                                                                                         </connections>
                                                                                                     </button>
                                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="o2X-2x-yfK">
-                                                                                                        <rect key="frame" x="162" y="78" width="81" height="17"/>
+                                                                                                        <rect key="frame" x="162" y="54" width="81" height="17"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Attachments" id="esV-54-Iye">
                                                                                                             <font key="font" metaFont="system"/>
                                                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1348,13 +1433,13 @@ DQ
                                                                                                         </textFieldCell>
                                                                                                     </textField>
                                                                                                     <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bXb-63-kHb">
-                                                                                                        <rect key="frame" x="0.0" y="0.0" width="404" height="75"/>
+                                                                                                        <rect key="frame" x="0.0" y="0.0" width="404" height="51"/>
                                                                                                         <clipView key="contentView" id="oap-XL-Mme">
-                                                                                                            <rect key="frame" x="1" y="1" width="402" height="73"/>
+                                                                                                            <rect key="frame" x="1" y="1" width="402" height="49"/>
                                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                             <subviews>
                                                                                                                 <collectionView selectable="YES" id="ySz-It-h5D" customClass="AttachmentCollectionView">
-                                                                                                                    <rect key="frame" x="0.0" y="0.0" width="402" height="73"/>
+                                                                                                                    <rect key="frame" x="0.0" y="0.0" width="402" height="49"/>
                                                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                                                                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="2" minimumLineSpacing="2" id="bOb-Ar-CX6">
                                                                                                                         <size key="itemSize" width="200" height="40"/>
@@ -1377,7 +1462,7 @@ DQ
                                                                                                         </scroller>
                                                                                                     </scrollView>
                                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pmW-Td-og3" userLabel="Hint">
-                                                                                                        <rect key="frame" x="244" y="79" width="88" height="11"/>
+                                                                                                        <rect key="frame" x="244" y="55" width="88" height="11"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="(Space to Preview)" id="RRX-kw-aPm">
                                                                                                             <font key="font" metaFont="miniSystem"/>
                                                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1402,10 +1487,10 @@ DQ
                                                                                                 </constraints>
                                                                                             </customView>
                                                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="7ut-YV-mxA" userLabel="Notes">
-                                                                                                <rect key="frame" x="0.0" y="33" width="404" height="114"/>
+                                                                                                <rect key="frame" x="0.0" y="33" width="404" height="126"/>
                                                                                                 <subviews>
                                                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8vG-fA-yRR">
-                                                                                                        <rect key="frame" x="182" y="103" width="40" height="6"/>
+                                                                                                        <rect key="frame" x="182" y="104" width="40" height="17"/>
                                                                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Notes" id="zsQ-Yj-TPx">
                                                                                                             <font key="font" metaFont="system"/>
                                                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1413,17 +1498,17 @@ DQ
                                                                                                         </textFieldCell>
                                                                                                     </textField>
                                                                                                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nwU-ra-Y09">
-                                                                                                        <rect key="frame" x="0.0" y="0.0" width="404" height="100"/>
+                                                                                                        <rect key="frame" x="0.0" y="0.0" width="404" height="101"/>
                                                                                                         <clipView key="contentView" drawsBackground="NO" id="n6X-39-X3W">
-                                                                                                            <rect key="frame" x="1" y="1" width="387" height="98"/>
+                                                                                                            <rect key="frame" x="1" y="1" width="387" height="99"/>
                                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                             <subviews>
                                                                                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
-                                                                                                                    <rect key="frame" x="0.0" y="0.0" width="387" height="98"/>
+                                                                                                                    <rect key="frame" x="0.0" y="0.0" width="387" height="99"/>
                                                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                                                    <size key="minSize" width="387" height="98"/>
+                                                                                                                    <size key="minSize" width="387" height="99"/>
                                                                                                                     <size key="maxSize" width="595" height="10000000"/>
                                                                                                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                     <connections>
@@ -1440,7 +1525,7 @@ DQ
                                                                                                             <autoresizingMask key="autoresizingMask"/>
                                                                                                         </scroller>
                                                                                                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="LLQ-pY-V30">
-                                                                                                            <rect key="frame" x="388" y="1" width="15" height="98"/>
+                                                                                                            <rect key="frame" x="388" y="1" width="15" height="99"/>
                                                                                                             <autoresizingMask key="autoresizingMask"/>
                                                                                                         </scroller>
                                                                                                     </scrollView>
@@ -1486,7 +1571,7 @@ DQ
                                                                                             <constraint firstAttribute="trailing" secondItem="7ut-YV-mxA" secondAttribute="trailing" id="C6q-lU-ili"/>
                                                                                             <constraint firstItem="Bg3-A1-iCa" firstAttribute="leading" secondItem="hhL-5Q-tPE" secondAttribute="leading" id="CHk-ib-Hvl"/>
                                                                                             <constraint firstAttribute="trailing" secondItem="h19-FF-lJC" secondAttribute="trailing" id="Fp8-V6-QAi"/>
-                                                                                            <constraint firstItem="7ut-YV-mxA" firstAttribute="height" secondItem="Xg9-vH-AHa" secondAttribute="height" multiplier="1.2" id="INo-qz-ddQ"/>
+                                                                                            <constraint firstItem="7ut-YV-mxA" firstAttribute="height" secondItem="Xg9-vH-AHa" secondAttribute="height" multiplier="1.75:1" id="INo-qz-ddQ"/>
                                                                                             <constraint firstAttribute="trailing" secondItem="Bg3-A1-iCa" secondAttribute="trailing" id="KOx-CH-OVO"/>
                                                                                             <constraint firstItem="h19-FF-lJC" firstAttribute="leading" secondItem="hhL-5Q-tPE" secondAttribute="leading" id="MC2-ga-g3a"/>
                                                                                             <constraint firstAttribute="trailing" secondItem="KVd-1J-5AV" secondAttribute="trailing" id="Rnd-w8-3fN"/>
@@ -1894,6 +1979,7 @@ DQ
                         <outlet property="imageViewIcon" destination="5Jt-Ar-1s4" id="nNP-4g-gWp"/>
                         <outlet property="imageViewShowHidePassword" destination="Ze3-3m-JN1" id="ahK-bV-0GZ"/>
                         <outlet property="outlineView" destination="hwF-Mb-pXx" id="tqD-sc-dbD"/>
+                        <outlet property="progressTotp" destination="A0u-nf-ac0" id="hWl-2G-pR1"/>
                         <outlet property="searchField" destination="pbj-27-Yn8" id="08z-KH-2mp"/>
                         <outlet property="searchSegmentedControl" destination="Joh-VG-Yuw" id="LP4-DM-pre"/>
                         <outlet property="tabViewLockUnlock" destination="lRf-9K-Xfe" id="7Sn-2a-NtM"/>
@@ -1905,8 +1991,11 @@ DQ
                         <outlet property="textFieldPw" destination="eSx-uM-hGi" id="XXz-1N-chT"/>
                         <outlet property="textFieldSummaryTitle" destination="p16-z3-Ie6" id="J8l-vh-Ice"/>
                         <outlet property="textFieldTitle" destination="vgA-Bj-Esc" id="YC7-Hd-B4F"/>
+                        <outlet property="textFieldTotp" destination="vLa-Ap-NEg" id="ZJx-lR-nEO"/>
                         <outlet property="textFieldUrl" destination="XMG-gg-AIl" id="za7-i9-89k"/>
                         <outlet property="textViewNotes" destination="R2W-LK-2el" id="vrS-ua-7el"/>
+                        <outlet property="viewPasswordRow" destination="h19-FF-lJC" id="XRd-tH-qRZ"/>
+                        <outlet property="viewPasswordRowHeightConstraint" destination="Ara-sd-evk" id="YbR-Ji-CSr"/>
                     </connections>
                 </viewController>
                 <customObject id="2Tp-Fl-jBw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -1993,7 +2082,7 @@ CA
                     </items>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="-321" y="987"/>
+            <point key="canvasLocation" x="-323.5" y="1281"/>
         </scene>
     </scenes>
     <resources>

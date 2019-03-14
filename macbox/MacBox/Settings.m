@@ -22,6 +22,7 @@ static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings"
 static NSString* const kAutoSave = @"autoSave";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
+static NSString* const kDoNotShowTotp = @"doNotShowTotp";
 
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
@@ -234,6 +235,15 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [userDefaults setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
     
     [userDefaults synchronize];
+}
+
+- (BOOL)doNotShowTotp {
+    return [self getBool:kDoNotShowTotp];
+
+}
+
+- (void)setDoNotShowTotp:(BOOL)doNotShowTotp {
+    [self setBool:kDoNotShowTotp value:doNotShowTotp];
 }
 
 @end

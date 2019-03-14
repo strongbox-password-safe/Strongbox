@@ -31,6 +31,7 @@
 + (instancetype)tokenWithURL:(NSURL *)url secret:(NSData *)secret;
 
 - (NSURL *)url;
+- (NSURL *)url:(BOOL)includeSecret;
 
 @end
 

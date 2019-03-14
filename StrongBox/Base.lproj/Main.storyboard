@@ -9,14 +9,6 @@
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="SourceSansPro-Bold.ttf">
-            <string>SourceSansPro-Bold</string>
-        </array>
-        <array key="SourceSansPro-Regular.ttf">
-            <string>SourceSansPro-Regular</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--Databases [Lite Version]-->
         <scene sceneID="JvJ-3L-1tN">
@@ -163,20 +155,20 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="748" text="This is a really long title and it is hard to view" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oPW-yE-ef8">
-                                            <rect key="frame" x="78.000000000000014" y="19" width="219.33333333333337" height="20"/>
+                                            <rect key="frame" x="78" y="19" width="205" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="📎" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Wi-Ey-wba" userLabel="Flags">
-                                            <rect key="frame" x="299.33333333333331" y="19" width="23" height="19.666666666666671"/>
+                                            <rect key="frame" x="285" y="19" width="23" height="19.666666666666671"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="249" horizontalCompressionResistancePriority="749" text="88888888" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yYV-Bn-b5j" userLabel="OTP">
-                                            <rect key="frame" x="326.33333333333331" y="19" width="67.666666666666686" height="21.666666666666671"/>
-                                            <fontDescription key="fontDescription" name="SourceSansPro-Regular" family="Source Sans Pro" pointSize="17"/>
+                                            <rect key="frame" x="312" y="19" width="82" height="20"/>
+                                            <fontDescription key="fontDescription" name="Menlo-Regular" family="Menlo" pointSize="17"/>
                                             <color key="textColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -2524,8 +2516,8 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="314562" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V13-iT-T5C" userLabel="OTP Code">
-                                                    <rect key="frame" x="20" y="117.00000000000001" width="326" height="51.666666666666671"/>
-                                                    <fontDescription key="fontDescription" name="SourceSansPro-Bold" family="Source Sans Pro" pointSize="41"/>
+                                                    <rect key="frame" x="20" y="117" width="326" height="48"/>
+                                                    <fontDescription key="fontDescription" name="Menlo-Bold" family="Menlo" pointSize="41"/>
                                                     <color key="textColor" red="0.50196078430000002" green="0.0" blue="0.49803921569999998" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -2541,10 +2533,10 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                                     </connections>
                                                 </button>
                                                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="2cg-EL-Zew">
-                                                    <rect key="frame" x="20" y="172.66666666666666" width="326" height="2"/>
+                                                    <rect key="frame" x="20" y="169" width="326" height="2"/>
                                                 </progressView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fMs-qu-wXV">
-                                                    <rect key="frame" x="354" y="123" width="40" height="40"/>
+                                                    <rect key="frame" x="354" y="121" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="CNd-yp-sEY"/>
                                                         <constraint firstAttribute="width" constant="40" id="kVI-Pi-T8D"/>
@@ -3572,32 +3564,40 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="220" id="HG6-qc-xpS">
-                                        <rect key="frame" x="0.0" y="1205" width="414" height="220"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="330" id="HG6-qc-xpS">
+                                        <rect key="frame" x="0.0" y="1205" width="414" height="330"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="HG6-qc-xpS" id="aIo-m5-4uc">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="219.66666666666666"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="329.66666666666669"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="40" baselineAdjustment="alignBaselines" minimumFontSize="8" translatesAutoresizingMaskIntoConstraints="NO" id="mJT-Ec-Hvd" userLabel="T&amp;Cs">
-                                                    <rect key="frame" x="8" y="8" width="398" height="203.66666666666666"/>
-                                                    <string key="text">• Subscriptions are auto renewable with recurring billing. Cancel anytime.
-• Payment will be charged to iTunes Account at confirmation of purchase
+                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wqr-iS-2cS">
+                                                    <rect key="frame" x="8" y="12" width="398" height="305.66666666666669"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <attributedString key="attributedText">
+                                                        <fragment>
+                                                            <string key="content">• Subscriptions are auto renewable with recurring billing. Cancel anytime. • Payment will be charged to iTunes Account at confirmation of purchase
 • Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period
 • Account will be charged for renewal within 24-hours prior to the end of the current period, and identify the cost of the renewal
 • Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase
 • Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription where applicable
-• Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase • Privacy Policy may be found here:  https://strongboxsafe.com/privacy-policy/ • Terms of Use may be found here:  https://strongboxsafe.com/terms/</string>
-                                                    <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="10"/>
-                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
+• Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase
+• Privacy Policy may be found here:  https://strongboxsafe.com/privacy-policy
+• Terms of Use may be found here:  https://strongboxsafe.com/terms </string>
+                                                            <attributes>
+                                                                <font key="NSFont" size="10" name=".AppleSystemUIFont"/>
+                                                            </attributes>
+                                                        </fragment>
+                                                    </attributedString>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                    <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                                                </textView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="mJT-Ec-Hvd" firstAttribute="leading" secondItem="aIo-m5-4uc" secondAttribute="leadingMargin" id="Pkd-ZP-nur"/>
-                                                <constraint firstItem="mJT-Ec-Hvd" firstAttribute="trailing" secondItem="aIo-m5-4uc" secondAttribute="trailingMargin" id="X1I-np-2ZC"/>
-                                                <constraint firstItem="mJT-Ec-Hvd" firstAttribute="top" secondItem="aIo-m5-4uc" secondAttribute="topMargin" id="pjg-NJ-mvc"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="mJT-Ec-Hvd" secondAttribute="bottom" id="r12-ci-xCD"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="wqr-iS-2cS" secondAttribute="trailing" id="N43-Nx-X9r"/>
+                                                <constraint firstItem="wqr-iS-2cS" firstAttribute="leading" secondItem="aIo-m5-4uc" secondAttribute="leadingMargin" id="Xkw-Qw-kHc"/>
+                                                <constraint firstItem="wqr-iS-2cS" firstAttribute="top" secondItem="aIo-m5-4uc" secondAttribute="topMargin" constant="4" id="iSv-uJ-Ihs"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="wqr-iS-2cS" secondAttribute="bottom" constant="4" id="lSk-gD-X2N"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -5812,7 +5812,7 @@ Supports Predefined Icons &amp; Attachments</string>
         <segue reference="B0D-Y9-Jhh"/>
         <segue reference="pfC-It-asC"/>
         <segue reference="wk7-aR-oOp"/>
-        <segue reference="mpb-pU-y6e"/>
+        <segue reference="tkg-5B-Eni"/>
         <segue reference="nFA-zL-t4W"/>
         <segue reference="aI5-1C-HAz"/>
     </inferredMetricsTieBreakers>

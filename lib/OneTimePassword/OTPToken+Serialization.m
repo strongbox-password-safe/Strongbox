@@ -101,10 +101,17 @@ static NSString *const kQueryIssuerKey = @"issuer";
     return token;
 }
 
-- (NSURL *)url
-{
+- (NSURL *)url {
+    return [self url:NO];
+}
+
+- (NSURL *)url:(BOOL)includeSecret {
     NSMutableArray *query = [NSMutableArray array];
 
+    if(includeSecret){
+        [query addObject:[NSURLQueryItem queryItemWithName:kQuerySecretKey value:[self.secret base32String]]];
+    }
+    
     [query addObject:[NSURLQueryItem queryItemWithName:kQueryAlgorithmKey value:[NSString stringForAlgorithm:self.algorithm]]];
     [query addObject:[NSURLQueryItem queryItemWithName:kQueryDigitsKey value:@(self.digits).stringValue]];
 
@@ -124,6 +131,9 @@ static NSString *const kQueryIssuerKey = @"issuer";
         urlComponents.path = [@"/" stringByAppendingString:self.name];
     urlComponents.queryItems = query;
 
+    NSLog(@"URL: [%@]", urlComponents);
+    NSLog(@"URL: [%@]", urlComponents.URL);
+    
     return urlComponents.URL;
 }
 

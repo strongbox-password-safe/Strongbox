@@ -63,7 +63,7 @@
         // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
         // Update Touch Id Password
         
-        NSLog(@"Updating Touch ID Password in case is has changed");
+//        NSLog(@"Updating Touch ID Password in case is has changed");
         safe.touchIdPassword = self.model.masterPassword;
         safe.touchIdKeyFileDigest = self.model.masterKeyFileDigest;
     }
