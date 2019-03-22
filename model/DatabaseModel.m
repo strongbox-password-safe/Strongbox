@@ -151,6 +151,8 @@
 }
 
 - (NSData*)getAsData:(NSError**)error {
+    [self.theSafe performPreSerializationTidy]; // Tidy up attachments, custom icons, trim history
+    
     return [self.adaptor save:self.theSafe error:error];
 }
 
@@ -252,6 +254,18 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
 - (void)setNodeCustomIcon:(Node *)node data:(NSData *)data {
     [self.theSafe setNodeCustomIcon:node data:data];
+}
+
+- (BOOL)recycleBinEnabled {
+    return self.theSafe.recycleBinEnabled;
+}
+
+- (Node*)recycleBinNode {
+    return self.theSafe.recycleBinNode;
+}
+
+- (void)createNewRecycleBinNode {
+    [self.theSafe createNewRecycleBinNode];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

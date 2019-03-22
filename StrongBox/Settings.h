@@ -15,6 +15,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 static NSString* const kAppGroupName = @"group.strongbox.mcguill";
+static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 
 @interface Settings : NSObject
 
@@ -101,6 +102,13 @@ static NSString* const kAppGroupName = @"group.strongbox.mcguill";
 @property BOOL uiDoNotSortKeePassNodesInBrowseView;
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL doNotAutoDetectKeyFiles;
+
+@property (nullable) NSDate* lastEntitlementCheckAttempt;
+@property NSUInteger numberOfEntitlementCheckFails;
+
+@property BOOL doNotShowRecycleBinInBrowse;
+@property BOOL showRecycleBinInSearchResults;
+@property BOOL doNotCopyOtpCodeOnAutoFillSelect;
 
 NS_ASSUME_NONNULL_END
 

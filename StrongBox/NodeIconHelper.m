@@ -113,22 +113,33 @@ static NSArray<UIImage*>* getKeePassIconSet() {
     // KeePass Specials
     
     if(vm.customIconUuid) {
-        NSData* data = database.customIcons[vm.customIconUuid];
-        
-        if(data) {
-            //NSLog(@"Custom: [%@]", [data base64EncodedStringWithOptions:kNilOptions]);
-            UIImage* img = [UIImage imageWithData:data];
-            if(img) {
-                UIImage *resized = scaleImage(img, CGSizeMake(48, 48));
-                ret = resized;
-            }
-        }
+        ret = [NodeIconHelper getCustomIcon:vm.customIconUuid customIcons:database.customIcons];
     }
     else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < kKeePassIconSet.count) {
         ret = kKeePassIconSet[vm.iconId.intValue];
     }
     
     return ret;
+}
+
++ (UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons {
+    NSData* data = customIcons[uuid];
+    
+    if(data) {
+        //NSLog(@"Custom: [%@]", [data base64EncodedStringWithOptions:kNilOptions]);
+        UIImage* img = [UIImage imageWithData:data];
+        if(!img) {
+            return nil;
+        }
+        
+        if(img.size.height != 48 || img.size.width != 48) {
+            return scaleImage(img, CGSizeMake(48, 48));
+        }
+        
+        return img;
+    }
+    
+    return nil;
 }
 
 + (NSArray<UIImage*>*)iconSet {

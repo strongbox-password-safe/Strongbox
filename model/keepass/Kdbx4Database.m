@@ -110,13 +110,28 @@ static const BOOL kLogVerbose = NO;
     if(xmlDoc.keePassFile.meta.generator.text) {
         metadata.generator = xmlDoc.keePassFile.meta.generator.text;
     }
+    
+    // History Settings
+    
     if(xmlDoc.keePassFile.meta.historyMaxItems) {
         metadata.historyMaxItems = xmlDoc.keePassFile.meta.historyMaxItems.integer;
     }
     if(xmlDoc.keePassFile.meta.historyMaxSize) {
         metadata.historyMaxSize = xmlDoc.keePassFile.meta.historyMaxSize.integer;
     }
+
+    // Recycle Bin Settings
     
+    if(xmlDoc.keePassFile.meta.recycleBinEnabled) {
+        metadata.recycleBinEnabled = xmlDoc.keePassFile.meta.recycleBinEnabled.booleanValue;
+    }
+    if(xmlDoc.keePassFile.meta.recycleBinGroup) {
+        metadata.recycleBinGroup = xmlDoc.keePassFile.meta.recycleBinGroup.uuid;
+    }
+    if(xmlDoc.keePassFile.meta.recycleBinChanged) {
+        metadata.recycleBinChanged = xmlDoc.keePassFile.meta.recycleBinChanged.date;
+    }
+
     metadata.cipherUuid = serializationData.cipherUuid;
     metadata.kdfParameters = serializationData.kdfParameters;
     metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
@@ -151,10 +166,6 @@ static const BOOL kLogVerbose = NO;
     KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
     RootXmlDomainObject* existingRootXmlDocument = tag ? tag.xmlDocument : nil;
     
-    // 0. Trim KeePass History
-    
-    [database trimKeePassHistory];
-    
     // 1. From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
@@ -178,12 +189,19 @@ static const BOOL kLogVerbose = NO;
     rootXmlDocument.keePassFile.meta.headerHash = nil; // Do not serialize this, we do not calculate it
     
     KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)database.metadata;
+    
+    // 4. Write Back any changed Metadata
+    
+    rootXmlDocument.keePassFile.meta.recycleBinEnabled.booleanValue = metadata.recycleBinEnabled;
+    rootXmlDocument.keePassFile.meta.recycleBinGroup.uuid = metadata.recycleBinGroup;
+    rootXmlDocument.keePassFile.meta.recycleBinChanged.date = metadata.recycleBinChanged;
+    
+    // 5. From Xml Model to Xml String (including inner stream encryption)
+    
     XmlTreeSerializer *xmlSerializer = [[XmlTreeSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
                                                                                         key:nil // Auto generated new key
                                                                                 prettyPrint:NO];
 
-    // 5. From Xml Model to Xml String (including inner stream encryption)
-    
     XmlTree* xmlTree = [rootXmlDocument generateXmlTree];
     NSString *xml = [xmlSerializer serializeTrees:xmlTree.children];
     

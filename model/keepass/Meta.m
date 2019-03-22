@@ -8,6 +8,7 @@
 
 #import "Meta.h"
 #import "KeePassDatabase.h"
+#import "NSUUID+Zero.h"
 
 @implementation Meta
 
@@ -27,6 +28,15 @@
         
         _historyMaxSize = [[GenericTextIntegerElementHandler alloc] initWithXmlElementName:kHistoryMaxSizeElementName context:context];
         self.historyMaxSize.integer = kDefaultHistoryMaxSize;
+        
+        _recycleBinEnabled = [[GenericTextBooleanElementHandler alloc] initWithXmlElementName:kRecycleBinEnabledElementName context:context];
+        self.recycleBinEnabled.booleanValue = YES;
+        
+        _recycleBinChanged = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kRecycleBinChangedElementName context:context];
+        _recycleBinChanged.date = [NSDate date];
+        
+        _recycleBinGroup = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kRecycleBinGroupElementName context:context];
+        _recycleBinGroup.uuid = NSUUID.zero;
     }
     
     return self;
@@ -59,10 +69,17 @@
     else if ([xmlElementName isEqualToString:kHistoryMaxSizeElementName]) {
         return [[GenericTextIntegerElementHandler alloc] initWithXmlElementName:kHistoryMaxSizeElementName context:self.context];
     }
-
+    else if ([xmlElementName isEqualToString:kRecycleBinEnabledElementName]) {
+        return [[GenericTextBooleanElementHandler alloc] initWithXmlElementName:kRecycleBinEnabledElementName context:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kRecycleBinGroupElementName]) {
+        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kRecycleBinGroupElementName context:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kRecycleBinChangedElementName]) {
+        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kRecycleBinChangedElementName context:self.context];
+    }
+    
     return [super getChildHandler:xmlElementName];
-
-
 }
 
 - (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
@@ -90,6 +107,18 @@
         self.historyMaxSize = (GenericTextIntegerElementHandler*)completedObject;
         return YES;
     }
+    else if ([withXmlElementName isEqualToString:kRecycleBinEnabledElementName]) {
+        self.recycleBinEnabled = (GenericTextBooleanElementHandler*)completedObject;
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kRecycleBinGroupElementName]) {
+        self.recycleBinGroup = (GenericTextUuidElementHandler*)completedObject;
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kRecycleBinChangedElementName]) {
+        self.recycleBinChanged = (GenericTextDateElementHandler*)completedObject;
+        return YES;
+    }
     else {
         return NO;
     }
@@ -106,6 +135,9 @@
     if(self.customIconList) [ret.children addObject:[self.customIconList generateXmlTree]];
     if(self.historyMaxItems) [ret.children addObject:[self.historyMaxItems generateXmlTree]];
     if(self.historyMaxSize) [ret.children addObject:[self.historyMaxSize generateXmlTree]];
+    if(self.recycleBinEnabled) [ret.children addObject:[self.recycleBinEnabled generateXmlTree]];
+    if(self.recycleBinGroup) [ret.children addObject:[self.recycleBinGroup generateXmlTree]];
+    if(self.recycleBinChanged) [ret.children addObject:[self.recycleBinChanged generateXmlTree]];
     
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
@@ -113,8 +145,8 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@], historyMaxItems = [%@], historyMaxSize = [%@]",
-            self.generator, self.headerHash, self.v3binaries, self.historyMaxItems, self.historyMaxSize];
+    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@], historyMaxItems = [%@], historyMaxSize = [%@], Recycle Bin enabled = [%@], Recycle Bin Group = [%@], Recycle Bin Changed = [%@]",
+            self.generator, self.headerHash, self.v3binaries, self.historyMaxItems, self.historyMaxSize, self.recycleBinEnabled, self.recycleBinGroup, self.recycleBinChanged];
 }
 
 @end

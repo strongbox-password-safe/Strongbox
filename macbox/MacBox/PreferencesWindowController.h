@@ -48,6 +48,9 @@
 @property (weak) IBOutlet NSButton *radioAutolock1Min;
 @property (weak) IBOutlet NSButton *radioAutolock2Min;
 @property (weak) IBOutlet NSButton *radioAutolock5Min;
+@property (weak) IBOutlet NSButton *radioAutolock10Min;
+@property (weak) IBOutlet NSButton *radioAutolock30Min;
+@property (weak) IBOutlet NSButton *radioAutolock60Min;
 
 @property (weak) IBOutlet NSSegmentedControl *segmentTitle;
 @property (weak) IBOutlet NSTextField *labelCustomTitle;

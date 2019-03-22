@@ -149,6 +149,11 @@
     self.tableView.tableFooterView = [UIView new];
     
     self.tableView.rowHeight = 65.0f;
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onProStatusChanged:)
+                                               name:kProStatusChangedNotificationKey
+                                             object:nil];
 }
 
 - (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
@@ -619,6 +624,13 @@
     NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
     [toolbarButtons removeObject:button];
     [self setToolbarItems:toolbarButtons animated:NO];
+}
+
+- (void)onProStatusChanged:(id)param {
+    NSLog(@"Pro Status Changed!");
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self bindProOrFreeTrialUi];
+    });
 }
 
 -(void)bindProOrFreeTrialUi {

@@ -32,7 +32,10 @@
         else {
             long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
             
-            if(daysLeft < 15) {
+            if(daysLeft < 1) {
+                freeTrialLiteSuffix = @" - (Pro Upgrade Available)";
+            }
+            else if(daysLeft < 15) {
                 freeTrialLiteSuffix = [NSString stringWithFormat:@" - [%ld 'Pro' Days Left]", daysLeft];
             }
         }

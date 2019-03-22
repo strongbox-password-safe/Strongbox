@@ -23,6 +23,11 @@
 
 @interface AppDelegate ()
 
+@property (strong) IBOutlet NSMenu *systemTraymenu;
+@property NSStatusItem* statusItem;
+
+
+
 @property (nonatomic) BOOL applicationHasFinishedLaunching;
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
@@ -57,7 +62,15 @@
     //    BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
     
     if(![Settings sharedInstance].fullVersion) {
-        [self getValidIapProductsAndMessageForUpgrade];
+        [self getValidIapProducts];
+
+        if(![Settings sharedInstance].freeTrial){
+            // Do not message for Upgrade until at least a while after initial open (per Apple guidelines)
+
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(180 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
+                [self randomlyShowUpgradeMessage];
+            });
+        }
     
         if([Settings sharedInstance].endFreeTrialDate == nil) {
             [self initializeFreeTrialAndShowWelcomeMessage];
@@ -74,6 +87,17 @@
 //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
 //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+    
+    ///
+    
+    // TODO:
+    //    NSImage* statusImage = [NSImage imageNamed:@"Strongbox-36x26-inverted-bw"];
+    //    statusImage.size = NSMakeSize(18.0, 18.0);
+    //    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
+    //    self.statusItem.image = statusImage;
+    //    self.statusItem.highlightMode = YES;
+    //    self.statusItem.enabled = YES;
+    //    self.statusItem.menu = self.systemTraymenu;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -125,7 +149,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)getValidIapProductsAndMessageForUpgrade {
+- (void)getValidIapProducts {
     NSSet *productIdentifiers = [NSSet setWithObjects:kIapFullVersionStoreId, nil];
     self.productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     self.productsRequest.delegate = self;
@@ -158,13 +182,10 @@
                 NSLog(@"%@", validProduct.price);
             }
         }
-
-        if(![Settings sharedInstance].freeTrial){
-            [self randomlyShowUpgradeMessage];
-        }
     }
     else {
-        [Alerts error:@"Error Contacting App Store for Upgrade Info" error:error window:[NSApplication sharedApplication].mainWindow];
+        // Do not do this, violates Apple's rules at startup... no messaging
+        // [Alerts error:@"Error Contacting App Store for Upgrade Info" error:error window:[NSApplication sharedApplication].mainWindow];
     }
 }
 
@@ -285,12 +306,17 @@
 }
 
 - (void)showUpgradeModal:(NSInteger)delay {
-    SKProduct* product = [_validProducts objectAtIndex:0];
-    
-    if([UpgradeWindowController run:product cancelDelay:delay]) {
-        [[Settings sharedInstance] setFullVersion:YES];
-        [self removeUpgradeMenuItem];
-    };
+    if(!self.validProducts || self.validProducts == 0) {
+        [self getValidIapProducts];
+    }
+    else {
+        SKProduct* product = [_validProducts objectAtIndex:0];
+        
+        if([UpgradeWindowController run:product cancelDelay:delay]) {
+            [[Settings sharedInstance] setFullVersion:YES];
+            [self removeUpgradeMenuItem];
+        };
+    }
 }
 
 - (IBAction)onEmailSupport:(id)sender {

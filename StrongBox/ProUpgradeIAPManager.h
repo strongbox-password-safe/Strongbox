@@ -39,6 +39,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 - (void)initialize;
 - (void)restorePrevious:(RestoreCompletionBlock)completion;
 - (void)purchase:(NSString*)productId completion:(PurchaseCompletionBlock)completion;
+- (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc;
 
 @end
 

@@ -9,7 +9,6 @@
 #import "XmlStrongBoxModelAdaptor.h"
 #import "KeePassConstants.h"
 #import "XmlTreeSerializer.h"
-#import "AttachmentsRationalizer.h"
 #import "KdbxSerializationCommon.h"
 #import "KeePass2TagPackage.h"
 
@@ -127,9 +126,14 @@
 
     KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
     
+    // 7.1 Generator
+    
     if(xmlDoc.keePassFile.meta.generator.text) {
         metadata.generator = xmlDoc.keePassFile.meta.generator.text;
     }
+    
+    // 7.2 History
+    
     if(xmlDoc.keePassFile.meta.historyMaxItems) {
         metadata.historyMaxItems = xmlDoc.keePassFile.meta.historyMaxItems.integer;
     }
@@ -137,6 +141,20 @@
         metadata.historyMaxSize = xmlDoc.keePassFile.meta.historyMaxSize.integer;
     }
 
+    // 7.3 Recycle Bin
+    
+    if(xmlDoc.keePassFile.meta.recycleBinEnabled) {
+        metadata.recycleBinEnabled = xmlDoc.keePassFile.meta.recycleBinEnabled.booleanValue;
+    }
+    if(xmlDoc.keePassFile.meta.recycleBinGroup) {
+        metadata.recycleBinGroup = xmlDoc.keePassFile.meta.recycleBinGroup.uuid;
+    }
+    if(xmlDoc.keePassFile.meta.recycleBinChanged) {
+        metadata.recycleBinChanged = xmlDoc.keePassFile.meta.recycleBinChanged.date;
+    }
+    
+    // 7.4 Crypto...
+    
     metadata.transformRounds = serializationData.transformRounds;
     metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
     metadata.compressionFlags = serializationData.compressionFlags;
@@ -169,11 +187,7 @@
     
     KeePass2TagPackage* adaptorTag = (KeePass2TagPackage*)database.adaptorTag;
     
-    // 1. Trim KeePass History
-    
-    [database trimKeePassHistory];
-    
-    // 2. From Strongbox to Xml Model
+    // 1. From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     RootXmlDomainObject *xmlDoc = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
@@ -191,7 +205,7 @@
         return nil;
     }
     
-    // 3. Add Attachments to Xml Doc
+    // Add Attachments to Xml Doc
     
     if(!xmlDoc.keePassFile.meta.v3binaries) {
         xmlDoc.keePassFile.meta.v3binaries = [[V3BinariesList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
@@ -242,6 +256,12 @@
     }
     
     [xmlDoc.keePassFile.meta setHash:headerHash];
+    
+    // Write Back any changed Metadata
+    
+    xmlDoc.keePassFile.meta.recycleBinEnabled.booleanValue = metadata.recycleBinEnabled;
+    xmlDoc.keePassFile.meta.recycleBinGroup.uuid = metadata.recycleBinGroup;
+    xmlDoc.keePassFile.meta.recycleBinChanged.date = metadata.recycleBinChanged;
     
     // 3. From Xml Model to Xml String (including inner stream encryption)
    

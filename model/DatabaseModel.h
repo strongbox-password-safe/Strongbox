@@ -61,6 +61,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
+@property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
+@property (readonly) Node* recycleBinNode;
+- (void)createNewRecycleBinNode;
+
 @end
 
 #endif // ifndef _DatabaseModel_h

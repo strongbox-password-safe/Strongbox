@@ -12,6 +12,7 @@
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
 #import "Argon2KdfCipher.h"
+#import "NSUUID+Zero.h"
 
 static NSString* const kDefaultFileVersion = @"4.0";
 static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
@@ -31,7 +32,9 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
         self.cipherUuid = chaCha20CipherUuid();
         self.historyMaxItems = kDefaultHistoryMaxItems;
         self.historyMaxSize = kDefaultHistoryMaxSize;
-
+        self.recycleBinEnabled = YES;
+        self.recycleBinGroup = NSUUID.zero;
+        self.recycleBinChanged = [NSDate date];
     }
     
     return self;
@@ -51,6 +54,10 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
 
     NSString* size = [NSByteCountFormatter stringFromByteCount:self.historyMaxSize countStyle:NSByteCountFormatterCountStyleFile];
     [kvps addKey:@"Max History Size" andValue:size];
+
+    [kvps addKey:@"Recycle Bin Enabled" andValue:self.recycleBinEnabled ? @"Yes" : @"No"];
+//    [kvps addKey:@"Recycle Bin Group" andValue:[self.recycleBinGroup isEqual:NSUUID.zero] ? @"Created on Demand" : [NSString stringWithFormat:@"%@", self.recycleBinGroup]]; 
+//    [kvps addKey:@"Recycle Bin Changed" andValue:[NSString stringWithFormat:@"%@", self.recycleBinChanged]];
 
     return kvps;
 }

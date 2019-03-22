@@ -23,7 +23,9 @@ static NSString* const kAutoSave = @"autoSave";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
 static NSString* const kDoNotShowTotp = @"doNotShowTotp";
-
+static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
+static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
+            
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 @implementation Settings
@@ -239,11 +241,26 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (BOOL)doNotShowTotp {
     return [self getBool:kDoNotShowTotp];
-
 }
 
 - (void)setDoNotShowTotp:(BOOL)doNotShowTotp {
     [self setBool:kDoNotShowTotp value:doNotShowTotp];
+}
+
+- (BOOL)showRecycleBinInSearchResults {
+    return [self getBool:kShowRecycleBinInSearchResults];
+}
+
+- (void)setShowRecycleBinInSearchResults:(BOOL)showRecycleBinInSearchResults {
+    [self setBool:kShowRecycleBinInSearchResults value:showRecycleBinInSearchResults];
+}
+
+- (BOOL)doNotShowRecycleBinInBrowse {
+    return [self getBool:kDoNotShowRecycleBinInBrowse];
+}
+
+- (void)setDoNotShowRecycleBinInBrowse:(BOOL)doNotShowRecycleBinInBrowse {
+    [self setBool:kDoNotShowRecycleBinInBrowse value:doNotShowRecycleBinInBrowse];
 }
 
 @end

@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIImage*)getIconForNode:(Node*)vm database:(DatabaseModel*)database;
 + (NSArray<UIImage*>*)iconSet;
++ (UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
 
 @end
 

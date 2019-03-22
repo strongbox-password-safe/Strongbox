@@ -55,13 +55,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nullable) NSString *masterPassword;
 @property (nonatomic, retain, nullable) NSData *keyFileDigest;
 
+@property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
+@property (readonly) NSUUID* recycleBinNodeUuid;   // NOT read-only because we made to set on demand
+@property (readonly) NSDate* recycleBinChanged;
+
+@property (readonly) Node* recycleBinNode;
+- (void)createNewRecycleBinNode;
+
 - (void)removeNodeAttachment:(Node*)node atIndex:(NSUInteger)atIndex;
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data;
 
-- (void)trimKeePassHistory;
+- (void)performPreSerializationTidy;
 
 @end
 

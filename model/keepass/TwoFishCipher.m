@@ -33,7 +33,7 @@ static const uint32_t kIvSize = kBlockSize;
 
     uint8_t pt[kBlockSize];
     
-    for(int block=0;block < numBlocks - 1;block++) {
+    for(int block=0;block < numBlocks-1;block++) {
         twofish_ecb_decrypt(ct, pt, &skey);
 
         for (int i = 0; i < kBlockSize; i++) {
@@ -48,25 +48,32 @@ static const uint32_t kIvSize = kBlockSize;
     // PKCS#7 Padding
 
     twofish_ecb_decrypt(ct, pt, &skey);
-    
+
     for (int i = 0; i < kBlockSize; i++) {
         pt[i] ^= blockIv[i];
     }
-    
+
+    BOOL padding = YES;
     int paddingLength = pt[kBlockSize-1];
     if(paddingLength <= 0 || paddingLength > kBlockSize)  {
-        NSLog(@"TWOFISH: Padding Byte Out of Range!");
-        return nil;
+        NSLog(@"TWOFISH: Padding Byte Out of Range! Assuming Not Padded...");
+        padding = NO;
     }
+    
     for(int i = kBlockSize - paddingLength; i < kBlockSize; i++) {
         if(pt[i] != paddingLength) {
-            NSLog(@"TWOFISH: Padding byte not equal expected!");
-            return nil;
+            NSLog(@"TWOFISH: Padding byte not equal expected! Assuming Not Padded...");
+            padding = NO;
         }
     }
 
-    [decData appendBytes:pt length:kBlockSize - paddingLength];
-
+    if(padding) {
+        [decData appendBytes:pt length:kBlockSize - paddingLength];
+    }
+    else {
+        [decData appendBytes:pt length:kBlockSize];
+    }
+    
     return decData;
 }
 

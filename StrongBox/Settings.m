@@ -46,6 +46,11 @@ static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
 static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
 static NSString* const kTryDownloadFavIconForNewRecord = @"tryDownloadFavIconForNewRecord";
 static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles";
+static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
+static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
+static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
+static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
+static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
 
 @implementation Settings
 
@@ -102,6 +107,8 @@ static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles";
     [userDefaults setBool:value forKey:kIsProKey];
     
     [userDefaults synchronize];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
 }
 
 - (BOOL)isPro
@@ -643,6 +650,61 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setDoNotAutoDetectKeyFiles:(BOOL)doNotAutoDetectKeyFiles {
     [[self getUserDefaults] setBool:doNotAutoDetectKeyFiles forKey:kDoNotAutoDetectKeyFiles];
+    [[self getUserDefaults] synchronize];
+}
+
+
+- (NSDate *)lastEntitlementCheckAttempt {
+    NSUserDefaults *userDefaults = [self getUserDefaults];
+    
+    //[userDefaults removeObjectForKey:kEndFreeTrialDate];
+    
+    return [userDefaults objectForKey:kLastEntitlementCheckAttempt];
+}
+
+- (void)setLastEntitlementCheckAttempt:(NSDate *)lastEntitlementCheckAttempt {
+    NSUserDefaults *userDefaults = [self getUserDefaults];
+    
+    [userDefaults setObject:lastEntitlementCheckAttempt forKey:kLastEntitlementCheckAttempt];
+    
+    [userDefaults synchronize];
+}
+
+- (NSUInteger)numberOfEntitlementCheckFails {
+    NSInteger ret =  [[self getUserDefaults] integerForKey:kNumberOfEntitlementCheckFails];
+    return ret;
+}
+
+
+- (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
+    [[self getUserDefaults] setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)doNotShowRecycleBinInBrowse {
+    return [[self getUserDefaults] boolForKey:kDoNotShowRecycleBinInBrowse];
+}
+
+- (void)setDoNotShowRecycleBinInBrowse:(BOOL)doNotShowRecycleBinInBrowse {
+    [[self getUserDefaults] setBool:doNotShowRecycleBinInBrowse forKey:kDoNotShowRecycleBinInBrowse];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)showRecycleBinInSearchResults {
+    return [[self getUserDefaults] boolForKey:kShowRecycleBinInSearchResults];
+}
+
+- (void)setShowRecycleBinInSearchResults:(BOOL)showRecycleBinInSearchResults {
+    [[self getUserDefaults] setBool:showRecycleBinInSearchResults forKey:kShowRecycleBinInSearchResults];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)doNotCopyOtpCodeOnAutoFillSelect {
+    return [[self getUserDefaults] boolForKey:kCopyOtpCodeOnAutoFillSelect];
+}
+
+- (void)setDoNotCopyOtpCodeOnAutoFillSelect:(BOOL)copyOtpCodeOnAutoFillSelect {
+    [[self getUserDefaults] setBool:copyOtpCodeOnAutoFillSelect forKey:kCopyOtpCodeOnAutoFillSelect];
     [[self getUserDefaults] synchronize];
 }
 

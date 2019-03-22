@@ -23,6 +23,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSInteger historyMaxItems;
 @property (nonatomic) NSInteger historyMaxSize;
 
+@property (nullable) NSDate* recycleBinChanged;
+@property (nullable) NSUUID* recycleBinGroup;
+@property BOOL recycleBinEnabled;
+
 - (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi;
 
 @end

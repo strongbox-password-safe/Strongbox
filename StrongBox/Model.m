@@ -239,8 +239,30 @@
     return nil;
 }
 
-- (void)deleteItem:(Node *_Nonnull)child {
-    [child.parent removeChild:child];
+- (BOOL)deleteWillRecycle:(Node*_Nonnull)child {
+    BOOL willRecycle = self.database.recycleBinEnabled;
+    if(self.database.recycleBinEnabled && self.database.recycleBinNode) {
+        if([self.database.recycleBinNode contains:child] || self.database.recycleBinNode == child) {
+            willRecycle = NO;
+        }
+    }
+
+    return willRecycle;
+}
+
+- (BOOL)deleteItem:(Node *_Nonnull)child {
+    if([self deleteWillRecycle:child]) {
+        // UUID is NIL/Non Existent or Zero? - Create
+        if(self.database.recycleBinNode == nil) {
+            [self.database createNewRecycleBinNode];
+        }
+        
+        return [child changeParent:self.database.recycleBinNode];
+    }
+    else {
+        [child.parent removeChild:child];
+        return YES;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

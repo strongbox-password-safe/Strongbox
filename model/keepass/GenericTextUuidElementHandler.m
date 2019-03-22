@@ -31,11 +31,14 @@
     
     ret.node = self.nonCustomisedXmlTree.node;
     
-    uuid_t rawUuid;
-    [self.uuid getUUIDBytes:(uint8_t*)&rawUuid];
+    if(self.uuid) { // Shouldn't really happen
+        uuid_t rawUuid;
+        [self.uuid getUUIDBytes:(uint8_t*)&rawUuid];
+        
+        NSData *dataUuid = [NSData dataWithBytes:&rawUuid length:sizeof(uuid_t)];
+        ret.node.xmlText = [dataUuid base64EncodedStringWithOptions:kNilOptions];
+    }
     
-    NSData *dataUuid = [NSData dataWithBytes:&rawUuid length:sizeof(uuid_t)];
-    ret.node.xmlText = [dataUuid base64EncodedStringWithOptions:kNilOptions];
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
     return ret;

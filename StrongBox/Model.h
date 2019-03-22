@@ -48,7 +48,8 @@
 // Operations
 
 - (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
-- (void)deleteItem:(Node *_Nonnull)child;
+- (BOOL)deleteItem:(Node *_Nonnull)child;
+- (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
 -(void)encrypt:(void (^_Nullable)(NSData* _Nullable data, NSError* _Nullable error))completion;
 - (NSString *_Nonnull)generatePassword;

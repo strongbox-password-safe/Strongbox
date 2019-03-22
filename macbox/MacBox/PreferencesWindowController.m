@@ -18,6 +18,8 @@
 @property (weak) IBOutlet NSSlider *sliderAutoClearClipboardTimeout;
 @property (weak) IBOutlet NSTextField *labelClearClipboardTimeout;
 @property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
+@property (weak) IBOutlet NSButton *checkboxShowRecycleBinInBrowse;
+@property (weak) IBOutlet NSButton *checkboxShowRecycleBinInSearch;
 
 @end
 
@@ -72,6 +74,10 @@
     self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
     self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
     self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
+
+    self.checkboxShowRecycleBinInBrowse.state = Settings.sharedInstance.doNotShowRecycleBinInBrowse ? NSOffState : NSOnState;
+    
+    self.checkboxShowRecycleBinInSearch.state = Settings.sharedInstance.showRecycleBinInSearchResults ? NSOnState : NSOffState;
 }
 
 -(void) bindAutoFillToSettings {
@@ -120,6 +126,9 @@
     self.radioAutolock1Min.state = alt == 60 ? NSOnState : NSOffState;
     self.radioAutolock2Min.state = alt == 120 ? NSOnState : NSOffState;
     self.radioAutolock5Min.state = alt == 300 ? NSOnState : NSOffState;
+    self.radioAutolock10Min.state = alt == 600 ? NSOnState : NSOffState;
+    self.radioAutolock30Min.state = alt == 1800 ? NSOnState : NSOffState;
+    self.radioAutolock60Min.state = alt == 3600 ? NSOnState : NSOffState;
 }
 
 - (void)bindPasswordUiToSettings {
@@ -219,7 +228,9 @@
     Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
     Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
-    
+    Settings.sharedInstance.doNotShowRecycleBinInBrowse = self.checkboxShowRecycleBinInBrowse.state == NSOffState;
+    Settings.sharedInstance.showRecycleBinInSearchResults = self.checkboxShowRecycleBinInSearch.state == NSOnState;
+
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
@@ -236,6 +247,15 @@
     }
     else if (self.radioAutolock5Min.state == NSOnState) {
         Settings.sharedInstance.autoLockTimeoutSeconds = 300;
+    }
+    else if (self.radioAutolock10Min.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 600;
+    }
+    else if (self.radioAutolock30Min.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 1800;
+    }
+    else if (self.radioAutolock60Min.state == NSOnState) {
+        Settings.sharedInstance.autoLockTimeoutSeconds = 3600;
     }
     
     [self bindAutoLockToSettings];

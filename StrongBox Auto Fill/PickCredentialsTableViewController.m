@@ -77,7 +77,11 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         self.tableView.tableHeaderView = self.searchController.searchBar;
         [self.searchController.searchBar sizeToFit];
     }
-        
+    
+    [self loadItems];
+}
+
+- (void)loadItems {
     self.items = self.model.database.allRecords;
     
     // Filter KeePass1 Backup Group if so configured...
@@ -94,6 +98,15 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                 }];
             }
         }
+    }
+    
+    // Filter Recycle Bin...
+    
+    Node* recycleBin = self.model.database.recycleBinNode;
+    if(recycleBin) {
+        self.items = [self.items filter:^BOOL(Node * _Nonnull obj) {
+            return ![recycleBin contains:obj];
+        }];
     }
     
     [self smartInitializeSearch];
@@ -239,6 +252,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         }
     }
 
+    Node* recycleBin = self.model.database.recycleBinNode;
+    if(recycleBin) {
+        foo = [foo filter:^BOOL(Node * _Nonnull obj) {
+            return ![recycleBin contains:obj];
+        }];
+    }
+    
     self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
 }
 
@@ -306,7 +326,18 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     Node* record = [[self getDataSource] objectAtIndex:indexPath.row];
 
     if(record) {
-        NSLog(@"[%@] selected... Sending credentials [%@/%@]...", record.title, record.fields.username, record.fields.password);
+        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && record.otpToken) {
+            NSString* value = record.otpToken.password;
+            if (!value.length) {
+                return;
+            }
+            
+            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+            pasteboard.string = value;
+            NSLog(@"Copied TOTP to Pasteboard...");
+        }
+        
+        //NSLog(@"[%@] selected... Sending credentials [%@/%@]...", record.title, record.fields.username, record.fields.password);
         [self.rootViewController onCredentialSelected:record.fields.username password:record.fields.password];
     }
     else {

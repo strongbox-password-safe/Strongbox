@@ -11,6 +11,8 @@
 #import "Utils.h"
 #import "KeePassPredefinedIcons.h"
 #import "Alerts.h"
+#import "CollectionViewHeader.h"
+#import "MacNodeIconHelper.h"
 
 @interface SelectPredefinedIconController () <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
@@ -30,14 +32,29 @@
     self.buttonSelectFile.hidden = self.hideSelectFile;
 }
 
+- (BOOL)hasCustomIcons {
+    return (self.customIcons && self.customIcons.count);
+}
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView {
+    return [self hasCustomIcons] ? 2 : 1;
+}
+
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return KeePassPredefinedIcons.icons.count;
+    return [self hasCustomIcons] && section == 0 ? self.customIcons.count : KeePassPredefinedIcons.icons.count;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
     PredefinedKeePassIcon *item = [self.collectionView makeItemWithIdentifier:@"PredefinedKeePassIcon" forIndexPath:indexPath];
     
-    item.icon.image = KeePassPredefinedIcons.icons[indexPath.item];
+    if([self hasCustomIcons] && indexPath.section == 0) {
+        NSUUID* uuid = self.customIcons.allKeys[indexPath.item];
+        
+        item.icon.image = [MacNodeIconHelper getCustomIcon:uuid customIcons:self.customIcons];
+    }
+    else {
+        item.icon.image = KeePassPredefinedIcons.icons[indexPath.item];
+    }
     
     return item;
 }
@@ -45,14 +62,24 @@
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
     if(indexPaths.count == 1) {
         NSLog(@"Selected: [%@]", indexPaths.anyObject);
+        NSIndexPath *indexPath = indexPaths.anyObject;
+        
         [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-        self.onSelectedItem(@(indexPaths.anyObject.item), nil);
+        
+        if([self hasCustomIcons] && indexPath.section == 0) {
+            NSUUID* uuid = self.customIcons.allKeys[indexPath.item];
+            self.onSelectedItem(nil, nil, uuid);
+        }
+        else {
+            self.onSelectedItem(@(indexPath.item), nil, nil);
+        }
+        
     }
 }
 
 - (IBAction)onUseDefault:(id)sender {
     [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-    self.onSelectedItem(@(-1), nil);
+    self.onSelectedItem(@(-1), nil, nil);
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -75,9 +102,22 @@
             }
 
             [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-            self.onSelectedItem(nil, data);
+            self.onSelectedItem(nil, data, nil);
         }
     }];
+}
+
+- (NSView *)collectionView:(NSCollectionView *)collectionView viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind atIndexPath:(NSIndexPath *)indexPath {
+    if (kind == NSCollectionElementKindSectionHeader) {
+        CollectionViewHeader* ret = [self.collectionView makeSupplementaryViewOfKind:kind withIdentifier:@"CollectionViewHeader" forIndexPath:indexPath];
+        
+        
+        ret.labelTitle.stringValue = [self hasCustomIcons] && indexPath.section == 0 ? @"Database Icons" : @"KeePass Icons";
+        
+        return ret;
+    }
+    
+    return nil;
 }
 
 @end

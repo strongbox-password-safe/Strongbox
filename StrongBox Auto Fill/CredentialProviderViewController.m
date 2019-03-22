@@ -14,6 +14,7 @@
 #import "Settings.h"
 #import "iCloudSafesCoordinator.h"
 #import "Alerts.h"
+#import "mach/mach.h"
 
 #import "GoogleDriveManager.h"
 
@@ -41,6 +42,30 @@
     [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
         NSLog(@"iCloud Access Initialized...");
     }];
+}
+
+- (void)didReceiveMemoryWarning {
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX MEMORY WARNING RECEIVED: %f XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", [self __getMemoryUsedPer1]);
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+}
+
+
+- (float)__getMemoryUsedPer1
+{
+    struct mach_task_basic_info info;
+    mach_msg_type_number_t size = sizeof(info);
+    kern_return_t kerr = task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &size);
+    if (kerr == KERN_SUCCESS)
+    {
+        float used_bytes = info.resident_size;
+        float total_bytes = [NSProcessInfo processInfo].physicalMemory;
+        //NSLog(@"Used: %f MB out of %f MB (%f%%)", used_bytes / 1024.0f / 1024.0f, total_bytes / 1024.0f / 1024.0f, used_bytes * 100.0f / total_bytes);
+        return used_bytes / total_bytes;
+    }
+    return 1;
 }
 
 - (void)viewWillAppear:(BOOL)animated {

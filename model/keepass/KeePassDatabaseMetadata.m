@@ -11,6 +11,7 @@
 #import "BasicOrderedDictionary.h"
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
+#import "NSUUID+Zero.h"
 
 static NSString* const kDefaultFileVersion = @"3.1";
 static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
@@ -30,6 +31,10 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
         self.cipherUuid = aesCipherUuid();
         self.historyMaxItems = kDefaultHistoryMaxItems;
         self.historyMaxSize = kDefaultHistoryMaxSize;
+        
+        self.recycleBinEnabled = YES;
+        self.recycleBinGroup = NSUUID.zero;
+        self.recycleBinChanged = [NSDate date];
     }
     
     return self;
@@ -49,6 +54,11 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     NSString* size = [NSByteCountFormatter stringFromByteCount:self.historyMaxSize countStyle:NSByteCountFormatterCountStyleFile];
     [kvps addKey:@"Max History Size" andValue:size];
+
+    [kvps addKey:@"Recycle Bin Enabled" andValue:self.recycleBinEnabled ? @"Yes" : @"No"];
+    
+//    [kvps addKey:@"Recycle Bin Group" andValue:[self.recycleBinGroup isEqual:NSUUID.zero] ? @"Created on Demand" : [NSString stringWithFormat:@"%@", self.recycleBinGroup]];
+//    [kvps addKey:@"Recycle Bin Changed" andValue:[NSString stringWithFormat:@"%@", self.recycleBinChanged]];
 
     return kvps;
 }

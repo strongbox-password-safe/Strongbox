@@ -47,21 +47,27 @@ static NSImage* kSmallLockImage;
     // KeePass Specials
     
     if(vm.customIconUuid) {
-        NSData* data = model.customIcons[vm.customIconUuid];
-        
-        if(data) {
-            NSImage* img = [[NSImage alloc] initWithData:data]; // FUTURE: Cache
-            if(img) {
-                NSImage *resized = scaleImage(img, CGSizeMake(48, 48)); // FUTURE: Scale up if large? THis is only used on details pane
-                return resized;
-            }
-        }
+        ret = [MacNodeIconHelper getCustomIcon:vm.customIconUuid customIcons:model.customIcons];
     }
     else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < KeePassPredefinedIcons.icons.count) {
         ret = KeePassPredefinedIcons.icons[vm.iconId.intValue];
     }
     
     return ret;
+}
+
++ (NSImage *)getCustomIcon:(NSUUID *)uuid customIcons:(NSDictionary<NSUUID *,NSData *> *)customIcons {
+    NSData* data = customIcons[uuid];
+    
+    if(data) {
+        NSImage* img = [[NSImage alloc] initWithData:data]; // FUTURE: Cache
+        if(img) {
+            NSImage *resized = scaleImage(img, CGSizeMake(48, 48)); // FUTURE: Scale up if large? THis is only used on details pane
+            return resized;
+        }
+    }
+    
+    return nil;
 }
 
 @end

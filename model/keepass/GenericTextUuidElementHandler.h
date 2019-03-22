@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithXmlElementName:(NSString*)xmlElementName context:(XmlProcessingContext*)context NS_DESIGNATED_INITIALIZER;
 
-@property NSUUID *uuid;
+@property (nullable) NSUUID *uuid;
 
 @end
 

@@ -22,6 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) uint32_t innerRandomStreamId;
 @property NSUUID* cipherUuid;
 
+@property (nullable) NSDate* recycleBinChanged;
+@property (nullable) NSUUID* recycleBinGroup;
+@property BOOL recycleBinEnabled;
+
 @end
 
 NS_ASSUME_NONNULL_END

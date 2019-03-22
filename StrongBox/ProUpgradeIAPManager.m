@@ -13,6 +13,7 @@
 #import "RMStore.h"
 #import "RMStoreAppReceiptVerifier.h"
 #import "RMAppReceipt.h"
+#import "Alerts.h"
 
 @interface ProUpgradeIAPManager ()
 
@@ -41,49 +42,103 @@
 - (void)initialize {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self loadAppStoreProducts];
-        [self upgradeOrDowngradeBasedOnReceipt:NO]; // TODO: Do this in an hour or so again - this happens at startup and works but UI does not update
+        
+        // See if we can auto upgrade the app if Pro is available
+        
+        RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
+        if ([verificator verifyAppReceipt]) {
+            NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
+            [self checkProEntitlements]; 
+        }
+        else {
+            NSLog(@"Startup receipt check failed...");
+        }
     });
 }
 
-- (void)upgradeOrDowngradeBasedOnReceipt:(BOOL)canRequestRefresh {
+- (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc {
+    if(Settings.sharedInstance.lastEntitlementCheckAttempt != nil) {
+        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        
+        NSDateComponents *components = [gregorian components:NSCalendarUnitDay
+                                                    fromDate:Settings.sharedInstance.lastEntitlementCheckAttempt
+                                                      toDate:[NSDate date]
+                                                     options:0];
+        
+        NSInteger days = [components day];
+        
+        NSLog(@"%ld days since last entitlement check... [%@]", (long)days, Settings.sharedInstance.lastEntitlementCheckAttempt);
+        
+        if(days == 0) { // Already checked today...
+            NSLog(@"Already checked entitlements today... not rechecking...");
+            return;
+        }
+        
+        // Last check was successful and was less than a week ago... no need to check again so soon
+        
+        if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 14) // TODO: Reduce Days
+        {
+            NSLog(@"We had a successful check recently, not rechecking...");
+            return;
+        }
+        else {
+            NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)Settings.sharedInstance.numberOfEntitlementCheckFails, (long)days);
+        }
+    }
+
+    NSLog(@"Performing Scheduled Check of Entitlements...");
+    
+    if(Settings.sharedInstance.numberOfEntitlementCheckFails < 20) { // TODO: Reduce count
+        [self checkReceiptAndProEntitlements];
+    }
+    else {
+        // TODO: We should probably message and downgrade now... Something very funny is up
+        // For now - we will warn and ask to message support so we can handle this gracefully if someone is
+        // struggling...
+        [Alerts info:vc title:@"Strongbox Entitlements Error" message:@"Strongbox is having trouble verifying its App Store entitlements. This could lead to a future App downgrade. Please contact support@strongboxsafe.com to get some help with this."];
+    
+        [self checkReceiptAndProEntitlements];
+    }
+}
+
+- (void)checkReceiptAndProEntitlements { // Don't want to do a refresh if we're launching...
+    Settings.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
+    
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
     if ([verificator verifyAppReceipt]) {
         NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-        [self upgradeOrDowngradeBasedOnReceiptEntitlements];
+        [self checkProEntitlements];
     }
-    else if(canRequestRefresh) {
+    else {
         NSLog(@"Receipt Not Good... Refreshing...");
 
         [[RMStore defaultStore] refreshReceiptOnSuccess:^{
             if ([verificator verifyAppReceipt]) {
                 NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-                [self upgradeOrDowngradeBasedOnReceiptEntitlements];
+                [self checkProEntitlements];
             }
             else {
                 NSLog(@"Receipt not good even after refresh");
-                // TODO: Have a counter or date on this, and try again... After too many fails... downgrade
+                Settings.sharedInstance.numberOfEntitlementCheckFails++;
             }
         } failure:^(NSError *error) {
             NSLog(@"Refresh Receipt - Error [%@]", error);
-            // TODO: Have a counter or date on this, and try again... After too many fails... downgrade
+            Settings.sharedInstance.numberOfEntitlementCheckFails++;
         }];
-    }
-    else {
-        NSLog(@"Receipt not good but cannot refresh right now...");
-        // TODO: Have a counter or date on this, and try again... After too many fails... downgrade
     }
 }
 
-- (void)upgradeOrDowngradeBasedOnReceiptEntitlements {
+- (void)checkProEntitlements {
+    Settings.sharedInstance.numberOfEntitlementCheckFails = 0;
+    
     if([self receiptHasProEntitlements]) {
         NSLog(@"Upgrading App to Pro as Entitlement found in Receipt...");
         [Settings.sharedInstance setPro:YES];
     }
     else {
         if(Settings.sharedInstance.isPro) {
-            NSLog(@"Downgrading App as Entitlement found in Receipt...");
-            //[Settings.sharedInstance setPro:YES];
-            // TODO: Enable in next release if all goes well
+            NSLog(@"Downgrading App as Entitlement NOT found in Receipt...");
+            // [Settings.sharedInstance setPro:NO]; // TODO: Message here next release
         }
         else {
             NSLog(@"App Pro Entitlement not found in Receipt... leaving downgraded...");
@@ -129,7 +184,7 @@
     }];
 }
 
--(NSDictionary<NSString *,SKProduct *> *)availableProducts {
+- (NSDictionary<NSString *,SKProduct *> *)availableProducts {
     return self.readyState == kReady ? [self.products copy] : @{};
 }
 
@@ -137,7 +192,7 @@
     [RMStore.defaultStore restoreTransactionsOnSuccess:^(NSArray *transactions) {
         NSLog(@"Restore Done Successfully: [%@]", transactions);
 
-        [self upgradeOrDowngradeBasedOnReceipt:YES];
+        [self checkReceiptAndProEntitlements];
         
         completion(nil);
     } failure:^(NSError *error) {
@@ -154,7 +209,7 @@
     [[RMStore defaultStore] addPayment:productId success:^(SKPaymentTransaction *transaction) {
         NSLog(@"Product purchased: [%@]", transaction);
         
-        [self upgradeOrDowngradeBasedOnReceipt:YES];
+        [self checkReceiptAndProEntitlements];
 
         completion(nil);
     } failure:^(SKPaymentTransaction *transaction, NSError *error) {

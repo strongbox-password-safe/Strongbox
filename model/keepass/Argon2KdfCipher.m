@@ -64,24 +64,45 @@ static const BOOL kLogVerbose = NO;
     self = [super init];
     if (self) {
         //NSLog(@"ARGON2: %@", parameters);
-        
-        // Required:
-        
-        VariantObject *parallelism = [parameters objectForKey:kParameterParallelism];
-        VariantObject *memory = [parameters objectForKey:kParameterMemory];
-        VariantObject *iterations = [parameters objectForKey:kParameterIterations];
-        VariantObject *version = [parameters objectForKey:kParameterVersion];
         VariantObject *salt = [parameters objectForKey:kParameterSalt];
-        
-        if(!parallelism || !memory || !iterations || !version || !salt) {
+        if( !salt) {
             return nil;
         }
+        else {
+            _salt = (NSData*)salt.theObject;
+        }
+
+        VariantObject *parallelism = [parameters objectForKey:kParameterParallelism];
+        if(!parallelism) {
+            _parallelism = kDefaultParallelism;
+        }
+        else {
+            _parallelism = ((NSNumber*)parallelism.theObject).unsignedIntValue;
+        }
         
-        _parallelism = ((NSNumber*)parallelism.theObject).unsignedIntValue;
-        _memory = ((NSNumber*)memory.theObject).longLongValue;
-        _iterations = ((NSNumber*)iterations.theObject).longLongValue;
-        _version = ((NSNumber*)version.theObject).unsignedIntValue;
-        _salt = (NSData*)salt.theObject;
+        VariantObject *memory = [parameters objectForKey:kParameterMemory];
+        if(!memory) {
+            _memory = kDefaultMemory;
+        }
+        else {
+            _memory = ((NSNumber*)memory.theObject).longLongValue;
+        }
+        
+        VariantObject *iterations = [parameters objectForKey:kParameterIterations];
+        if(!iterations) {
+            _iterations = kDefaultIterations;
+        }
+        else {
+            _iterations = ((NSNumber*)iterations.theObject).longLongValue;
+        }
+        
+        VariantObject *version = [parameters objectForKey:kParameterVersion];
+        if(!version) {
+            _version = kDefaultVersion;
+        }
+        else {
+            _version = ((NSNumber*)version.theObject).unsignedIntValue;
+        }
         
         // Optional
         

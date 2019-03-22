@@ -37,6 +37,9 @@
 
 @property BOOL doNotShowTotp;
 
+@property BOOL doNotShowRecycleBinInBrowse;
+@property BOOL showRecycleBinInSearchResults;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

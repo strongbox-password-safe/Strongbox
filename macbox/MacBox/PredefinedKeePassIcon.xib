@@ -28,10 +28,8 @@
                 </imageView>
             </subviews>
             <constraints>
-                <constraint firstItem="tK5-SL-MjB" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="8" id="DMi-JX-Nbg"/>
-                <constraint firstAttribute="bottom" secondItem="tK5-SL-MjB" secondAttribute="bottom" constant="8" id="PgD-WP-2Ze"/>
-                <constraint firstAttribute="trailing" secondItem="tK5-SL-MjB" secondAttribute="trailing" constant="8" id="ShR-Uh-IKs"/>
-                <constraint firstItem="tK5-SL-MjB" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="8" id="vrD-7L-d2G"/>
+                <constraint firstItem="tK5-SL-MjB" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="ITk-Lj-Evd"/>
+                <constraint firstItem="tK5-SL-MjB" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="iNE-Sc-MDj"/>
             </constraints>
             <point key="canvasLocation" x="-56" y="62"/>
         </customView>

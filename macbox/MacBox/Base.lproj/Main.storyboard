@@ -114,12 +114,6 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="HR3-B1-mg4"/>
-                                        <menuItem title="Export as CSV to Clipboard" id="AYY-x4-SiO">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="onCopyAsCsv:" target="Ady-hI-5gd" id="hW3-wo-4ig"/>
-                                            </connections>
-                                        </menuItem>
                                         <menuItem title="Import Entries from CSV..." id="MoE-nD-wes">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -160,6 +154,13 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Slf-f5-74F"/>
+                                        <menuItem title="Copy Database as CSV" id="AYY-x4-SiO">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="onCopyAsCsv:" target="Ady-hI-5gd" id="hW3-wo-4ig"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="bYW-hZ-4F3"/>
                                         <menuItem title="Select All" keyEquivalent="a" id="zNd-1L-0B7" userLabel="Select All">
                                             <connections>
                                                 <action selector="selectAll:" target="Ady-hI-5gd" id="apc-rt-RJH"/>
@@ -359,7 +360,18 @@ CA
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
+                    <connections>
+                        <outlet property="systemTraymenu" destination="z6J-LZ-5Xb" id="uSI-j5-qBR"/>
+                    </connections>
+                </customObject>
+                <menu title="Strongbox" id="z6J-LZ-5Xb" userLabel="System Menu Bar Tray Icon">
+                    <items>
+                        <menuItem title="Testing" id="F2f-Z1-B7k" userLabel="Testing">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                    </items>
+                </menu>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-545" y="-102"/>
@@ -380,7 +392,7 @@ CA
                 </windowController>
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-322" y="629"/>
+            <point key="canvasLocation" x="-545" y="156"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -646,9 +658,9 @@ DQ
                                                                             <rect key="frame" x="0.0" y="0.0" width="388" height="500"/>
                                                                             <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
                                                                                 <rect key="frame" x="1" y="0.0" width="386" height="499"/>
-                                                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                <autoresizingMask key="autoresizingMask"/>
                                                                                 <subviews>
-                                                                                    <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="WfS-hP-cVj" viewBased="YES" indentationPerLevel="8" autosaveExpandedItems="YES" autoresizesOutlineColumn="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx" customClass="HierarchyOutlineView">
+                                                                                    <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="WfS-hP-cVj" viewBased="YES" indentationPerLevel="8" autosaveExpandedItems="YES" autoresizesOutlineColumn="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx" customClass="HierarchyOutlineView">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="386" height="476"/>
                                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                                         <size key="intercellSpacing" width="3" height="3"/>
@@ -1257,7 +1269,7 @@ DQ
                                                                                                         <rect key="frame" x="0.0" y="0.0" width="404" height="52"/>
                                                                                                         <clipView key="contentView" id="dPz-Qd-1sJ">
                                                                                                             <rect key="frame" x="1" y="0.0" width="402" height="51"/>
-                                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                                             <subviews>
                                                                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="4Mh-0O-JTz" viewBased="YES" id="Ke9-4k-fx9">
                                                                                                                     <rect key="frame" x="0.0" y="0.0" width="402" height="26"/>
@@ -1436,7 +1448,7 @@ DQ
                                                                                                         <rect key="frame" x="0.0" y="0.0" width="404" height="51"/>
                                                                                                         <clipView key="contentView" id="oap-XL-Mme">
                                                                                                             <rect key="frame" x="1" y="1" width="402" height="49"/>
-                                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                                             <subviews>
                                                                                                                 <collectionView selectable="YES" id="ySz-It-h5D" customClass="AttachmentCollectionView">
                                                                                                                     <rect key="frame" x="0.0" y="0.0" width="402" height="49"/>
@@ -1501,7 +1513,7 @@ DQ
                                                                                                         <rect key="frame" x="0.0" y="0.0" width="404" height="101"/>
                                                                                                         <clipView key="contentView" drawsBackground="NO" id="n6X-39-X3W">
                                                                                                             <rect key="frame" x="1" y="1" width="387" height="99"/>
-                                                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                                            <autoresizingMask key="autoresizingMask"/>
                                                                                                             <subviews>
                                                                                                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" id="R2W-LK-2el">
                                                                                                                     <rect key="frame" x="0.0" y="0.0" width="387" height="99"/>
@@ -1982,6 +1994,7 @@ DQ
                         <outlet property="progressTotp" destination="A0u-nf-ac0" id="hWl-2G-pR1"/>
                         <outlet property="searchField" destination="pbj-27-Yn8" id="08z-KH-2mp"/>
                         <outlet property="searchSegmentedControl" destination="Joh-VG-Yuw" id="LP4-DM-pre"/>
+                        <outlet property="systemTraymenu" destination="z6J-LZ-5Xb" id="N4b-Xr-1vn"/>
                         <outlet property="tabViewLockUnlock" destination="lRf-9K-Xfe" id="7Sn-2a-NtM"/>
                         <outlet property="tabViewRightPane" destination="GWN-fo-GiB" id="bql-Vv-vEL"/>
                         <outlet property="tableViewCustomFields" destination="Ke9-4k-fx9" id="1of-W5-SER"/>

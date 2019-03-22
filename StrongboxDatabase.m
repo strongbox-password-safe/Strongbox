@@ -63,13 +63,14 @@
     return self;
 }
 
-- (NSDictionary<NSUUID *,NSData *> *)customIcons {
-    [self rationalizeCustomIcons]; // TODO: Perf
-    return [self.mutableCustomIcons copy];
+- (void)rationalizeAttachments {
+    _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:_mutableAttachments root:self.rootGroup] mutableCopy];
 }
 
-- (NSArray<DatabaseAttachment *> *)attachments {
-    return [self.mutableAttachments copy];
+- (void)performPreSerializationTidy {
+    [self rationalizeAttachments];
+    [self rationalizeCustomIcons];
+    [self trimKeePassHistory];
 }
 
 - (void)trimKeePassHistory {
@@ -185,6 +186,13 @@
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Attachments
+
+- (NSArray<DatabaseAttachment *> *)attachments {
+    return [self.mutableAttachments copy];
+}
+
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex {
     if(atIndex < 0 || atIndex >= node.fields.attachments.count) {
         NSLog(@"WARN: removeNodeAttachment [OUT OF BOUNDS]");
@@ -192,7 +200,7 @@
     }
     
     [node.fields.attachments removeObjectAtIndex:atIndex];
-    _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:_mutableAttachments root:self.rootGroup] mutableCopy];
+    [self rationalizeAttachments];
 }
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment *)attachment {
@@ -204,8 +212,15 @@
     nodeAttachment.filename = attachment.filename;
     nodeAttachment.index = (uint32_t)_mutableAttachments.count - 1;
     [node.fields.attachments addObject:nodeAttachment];
-    
-    _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:_mutableAttachments root:self.rootGroup] mutableCopy];
+
+    [self rationalizeAttachments];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Custom Icons
+
+- (NSDictionary<NSUUID *,NSData *> *)customIcons {
+    return [self.mutableCustomIcons copy];
 }
 
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments {
@@ -224,7 +239,7 @@
         [node.fields.attachments addObject:nodeAttachment];
     }
 
-    _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:_mutableAttachments root:self.rootGroup] mutableCopy];
+    [self rationalizeAttachments];
 }
 
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data {
@@ -280,6 +295,106 @@
     
     self.mutableCustomIcons = fresh;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Recycle Bin (KeePass 2)
+
+- (BOOL)recycleBinEnabled {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        return metadata.recycleBinEnabled;
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        return metadata.recycleBinEnabled;
+    }
+    else {
+        return NO;
+    }
+}
+
+- (NSUUID *)recycleBinNodeUuid {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        return metadata.recycleBinGroup;
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        return metadata.recycleBinGroup;
+    }
+    else {
+        return nil;
+    }
+}
+
+- (void)setRecycleBinNodeUuid:(NSUUID *)recycleBinNode {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        metadata.recycleBinGroup = recycleBinNode;
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        metadata.recycleBinGroup = recycleBinNode;
+    }
+}
+
+- (NSDate *)recycleBinChanged {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        return metadata.recycleBinChanged;
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        return metadata.recycleBinChanged;
+    }
+    else {
+        return nil;
+    }
+}
+
+- (void)setRecycleBinChanged:(NSDate *)recycleBinChanged {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        metadata.recycleBinChanged = recycleBinChanged;
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        metadata.recycleBinChanged = recycleBinChanged;
+    }
+}
+
+- (Node *)recycleBinNode {
+    if(self.recycleBinNodeUuid) {
+        return [self.rootGroup findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+            return [node.uuid isEqual:self.recycleBinNodeUuid];
+        }];
+    }
+    else {
+        return nil;
+    }
+}
+
+- (void)createNewRecycleBinNode {
+    // KeePass funky root/non-root group! - Slight abstractioon leak here... this will only work for KeePass
+
+    Node* effectiveRoot;
+    if(self.rootGroup.children.count > 0) {
+        effectiveRoot = [self.rootGroup.children objectAtIndex:0];
+    }
+    else {
+        effectiveRoot = self.rootGroup; // This should never be able to happen but for safety
+    }
+
+    Node* recycleBin = [[Node alloc] initAsGroup:@"Recycle Bin" parent:effectiveRoot uuid:nil];
+    recycleBin.iconId = @(43);
+    [effectiveRoot addChild:recycleBin];
+    
+    self.recycleBinNodeUuid = recycleBin.uuid;
+    self.recycleBinChanged = [NSDate date];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 
 -(NSString *)description {
     return [NSString stringWithFormat:@"masterPassword = %@, metadata=%@, rootGroup = %@", self.masterPassword, self.metadata, self.rootGroup];

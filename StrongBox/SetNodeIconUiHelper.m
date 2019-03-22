@@ -22,22 +22,22 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property UIViewController *viewController;
-@property SetNodeIconUiCompletionBlock completionBlock;
+@property ChangeIconCompletionBlock completionBlock;
 
 @end
 
 @implementation SetNodeIconUiHelper
 
-- (void)changeIcon:(UIViewController *)viewController urlHint:(NSString*)urlHint format:(DatabaseFormat)format completion:(SetNodeIconUiCompletionBlock)completion {
+- (void)changeIcon:(UIViewController *)viewController urlHint:(NSString *)urlHint format:(DatabaseFormat)format completion:(ChangeIconCompletionBlock)completion {
     self.viewController = viewController;
     self.completionBlock = completion;
     
     if(format == kPasswordSafe) {
         NSLog(@"Should not be calling this if safe is Password Safe!!");
-        self.completionBlock(NO, nil, nil);
+        self.completionBlock(NO, nil, nil, nil);
     }
     if(format == kKeePass1) {
-        [self presentPredefinedIconSelectionController];
+        [self presentKeePassAndDatabaseIconSets];
     }
     else {
         NSURL* url = [self smartDetermineUrlFromHint:urlHint];
@@ -50,9 +50,9 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             // this is the center of the screen currently but it can be any point in the view
             
             
-            UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"KeePass Native Icon Set"
+            UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"KeePass & Database Icon Set"
                                                                     style:UIAlertActionStyleDefault
-                                                                  handler:^(UIAlertAction *a) { [self presentPredefinedIconSelectionController]; }];
+                                                                  handler:^(UIAlertAction *a) { [self presentKeePassAndDatabaseIconSets]; }];
             
             UIAlertAction *secondAction = [UIAlertAction actionWithTitle:@"Media Library"
                                                                    style:UIAlertActionStyleDefault
@@ -60,11 +60,13 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             
             UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ? @"Download FavIcon" : @"Download FavIcon (Pro Only)"
                                                                   style:UIAlertActionStyleDefault
-                                                                handler:^(UIAlertAction *a) {  [self downloadFavIcon:url silent:NO]; }];
+                                                                handler:^(UIAlertAction *a) {  [self downloadFavIcon:url silent:NO completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
+                completion(goNoGo, nil, nil, userSelectedNewCustomIcon);
+            }]; }];
             
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                                    style:UIAlertActionStyleCancel
-                                                                 handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil); }];
+                                                                 handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, nil); }];
             
             thirdAction.enabled = Settings.sharedInstance.isProOrFreeTrial;
             
@@ -79,34 +81,33 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             [Alerts threeOptions:viewController
                            title:@"Select Icon Source"
                          message:@"Select the source of the icon you would like to use for this entry"
-               defaultButtonText:@"KeePass Native Icon Set"
+               defaultButtonText:@"KeePass & Database Icon Set"
                 secondButtonText:@"Media Library"
                  thirdButtonText:@"Cancel"
                           action:^(int response) {
                    if(response == 0) {
-                       [self presentPredefinedIconSelectionController];
+                       [self presentKeePassAndDatabaseIconSets];
                    }
                    else if(response == 1) {
                        [self presentCustomIconImagePicker];
                    }
                    else {
-                       self.completionBlock(NO, nil, nil); // Cancelled
+                       self.completionBlock(NO, nil, nil, nil); // Cancelled
                    }}];
         }
     }
 }
 
-- (void)tryDownloadFavIcon:(NSString*)urlHint completion:(SetNodeIconUiCompletionBlock)completion {
+- (void)tryDownloadFavIcon:(NSString*)urlHint completion:(DownloadFavIconCompletionBlock)completion {
     NSURL* url = [self smartDetermineUrlFromHint:urlHint];
     
     if(url) {
-        self.completionBlock = completion;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self downloadFavIcon:url silent:YES];
+            [self downloadFavIcon:url silent:YES completion:completion];
         });
     }
     else {
-        completion(NO, nil, nil);
+        completion(NO, nil);
     }
 }
 
@@ -154,7 +155,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
     return url;
 }
 
-- (void)downloadFavIcon:(NSURL*)url silent:(BOOL)silent {
+- (void)downloadFavIcon:(NSURL*)url silent:(BOOL)silent completion:(DownloadFavIconCompletionBlock)completion {
     //[Fav downloadPreferred:];
     [SVProgressHUD showWithStatus:@"Downloading FavIcon"];
     NSLog(@"attempting to download favicon for: [%@]", url);
@@ -163,32 +164,33 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             [SVProgressHUD dismiss];
             
             if(image && image.size.width > 0 && image.size.height > 0) {
-                self.completionBlock(YES, nil, image);
+                completion(YES, image);
                 NSLog(@"FavIcon download Done!");
             }
             else {
                 if(!silent) {
                     [Alerts warn:self.viewController title:@"FavIcon Problem" message:@"Could not download favicon for this item"];
                 }
-                self.completionBlock(NO, nil, nil);
+                completion(NO, nil);
             }
         });
     }];
 }
 
-- (void)presentPredefinedIconSelectionController {
+- (void)presentKeePassAndDatabaseIconSets {
     IconsCollectionViewController* vc = [[IconsCollectionViewController alloc] init];
+    vc.customIcons = self.customIcons;
     
-    vc.onDone = ^(BOOL response, NSInteger selectedIndex) {
+    vc.onDone = ^(BOOL response, NSInteger selectedIndex, NSUUID * _Nullable selectedCustomIconId) {
         [self.viewController dismissViewControllerAnimated:YES completion:nil];
         
         //NSLog(@"%ld", (long)selectedIndex);
         
         if(response) {
-            self.completionBlock(YES, @(selectedIndex), nil);
+            self.completionBlock(YES, @(selectedIndex), selectedCustomIconId, nil);
         }
         else {
-            self.completionBlock(NO, nil, nil);
+            self.completionBlock(NO, nil, nil, nil);
         }
     };
     
@@ -203,7 +205,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
     
     if(!available) {
         [Alerts info:self.viewController title:@"Image Source Unavailable" message:@"Could not access photos source."];
-        self.completionBlock(NO, nil, nil);
+        self.completionBlock(NO, nil, nil, nil);
         return;
     }
     
@@ -223,7 +225,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:^
      {
-         self.completionBlock(NO, nil, nil);
+         self.completionBlock(NO, nil, nil, nil);
      }];
 }
 
@@ -239,7 +241,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             if(!data) {
                 NSLog(@"Error: %@", error);
                 [Alerts error:self.viewController title:@"Error Reading Image" error:error];
-                self.completionBlock(NO, nil, nil);
+                self.completionBlock(NO, nil, nil, nil);
             }
             else {
                 [self analyzeCustomIconAndSet:data];
@@ -270,18 +272,18 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
                     NSString* message = [NSString stringWithFormat:@"This is a rather large image (%dx%d), would you like to rescale it to a maximum dimension of %d pixels for a file size saving of roughly %@", (int)image.size.width, (int)image.size.height, kMaxRecommendedCustomIconDimension, savingString];
                     
                     [Alerts yesNo:self.viewController title:@"Large Custom Icon Image, Rescale?" message:message action:^(BOOL response) {
-                        self.completionBlock(YES, nil, response ? rescaled : image);
+                        self.completionBlock(YES, nil, nil, response ? rescaled : image);
                     }];
                 }
                 else {
-                    self.completionBlock(YES, nil, image);
+                    self.completionBlock(YES, nil, nil, image);
                 }
             });
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD dismiss];
-                self.completionBlock(YES, nil, image);
+                self.completionBlock(YES, nil, nil, image);
             });
         }
     });

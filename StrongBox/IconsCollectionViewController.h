@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface IconsCollectionViewController : UIViewController
 
-@property (nonatomic, copy) void (^onDone)(BOOL response, NSInteger selectedIndex);
+@property (nonatomic, copy) void (^onDone)(BOOL response, NSInteger selectedIndex, NSUUID*_Nullable selectedCustomIconId);
+@property NSDictionary<NSUUID*, NSData*>* customIcons;
 
 @end
 

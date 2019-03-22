@@ -12,8 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SelectPredefinedIconController : NSWindowController
 
-@property (copy)void (^onSelectedItem)(NSNumber* _Nullable index, NSData* _Nullable data);
+@property (copy)void (^onSelectedItem)(NSNumber* _Nullable index, NSData* _Nullable data, NSUUID* _Nullable existingCustom);
 @property BOOL hideSelectFile;
+@property NSDictionary<NSUUID*, NSData*>* customIcons;
 
 @end
 

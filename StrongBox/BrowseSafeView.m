@@ -205,16 +205,19 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath {
+    Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+    BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
     [Alerts yesNo:self.searchController.isActive ? self.searchController : self
             title:@"Are you sure?"
-          message:@"Are you sure you want to delete this item?"
+          message:willRecycle ? @"Are you sure you want to send this item to the Recycle Bin?" : @"Are you sure you want to permanently delete this item?"
            action:^(BOOL response) {
                if (response) {
-                    Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
-
-                    [self.viewModel deleteItem:item];
-
-                    [self saveChangesToSafeAndRefreshView];
+                   if(![self.viewModel deleteItem:item]) {
+                       [Alerts warn:self title:@"Delete Failed" message:@"There was an error trying to delete this item."];
+                   }
+                   else {
+                       [self saveChangesToSafeAndRefreshView];
+                   }
                }
            }];
 }
@@ -223,6 +226,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
 
     self.sni = [[SetNodeIconUiHelper alloc] init];
+    self.sni.customIcons = self.viewModel.database.customIcons;
     
     NSString* urlHint;
     if(!item.isGroup) {
@@ -232,8 +236,11 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         }
     }    
     
-    [self.sni changeIcon:self urlHint:urlHint format:self.viewModel.database.format completion:^(BOOL goNoGo, NSNumber* userSelectedNewIconIndex, UIImage* userSelectedNewCustomIcon) {
-        NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
+    [self.sni changeIcon:self
+                 urlHint:urlHint
+                  format:self.viewModel.database.format
+              completion:^(BOOL goNoGo, NSNumber * userSelectedNewIconIndex, NSUUID * userSelectedExistingCustomIconId, UIImage * userSelectedNewCustomIcon) {
+        NSLog(@"completion: %d - %@-%@-%@", goNoGo, userSelectedNewIconIndex, userSelectedExistingCustomIconId, userSelectedNewCustomIcon);
         if(goNoGo) {
             if(!item.isGroup) {
                 Node* originalNodeForHistory = [item cloneForHistory];
@@ -246,6 +253,9 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             if(userSelectedNewCustomIcon) {
                 NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
                 [self.viewModel.database setNodeCustomIcon:item data:data];
+            }
+            else if(userSelectedExistingCustomIconId) {
+                item.customIconUuid = userSelectedExistingCustomIconId;
             }
             else if(userSelectedNewIconIndex) {
                 if(userSelectedNewIconIndex.intValue == -1) {
@@ -359,6 +369,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         }
     }
     
+    Node* recycleBin = self.viewModel.database.recycleBinNode;
+    if(!Settings.sharedInstance.showRecycleBinInSearchResults && recycleBin) {
+        foo = [foo filter:^BOOL(Node * _Nonnull obj) {
+            return obj != recycleBin && ![recycleBin contains:obj];
+        }];
+    }
+    
     self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
 }
 
@@ -377,6 +394,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         cell.title.text = node.title;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+        
+        if(self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode) {
+            cell.title.font = [UIFont italicSystemFontOfSize:cell.title.font.pointSize];
+        }
+        else {
+            cell.title.font = [UIFont systemFontOfSize:cell.title.font.pointSize];
+        }
         
         return cell;
     }
@@ -522,6 +546,18 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         }
     }
     
+    // Filter Recycle Bin?
+
+    Node* recycleBin = self.viewModel.database.recycleBinNode;
+    
+    if(Settings.sharedInstance.doNotShowRecycleBinInBrowse && recycleBin) {
+        if([self.currentGroup contains:recycleBin]) {
+            self.items = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
+                return obj != recycleBin;
+            }];
+        }
+    }
+    
     // Display
     
     [self updateSearchResultsForSearchController:self.searchController];
@@ -652,15 +688,26 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
     
     if (selectedRows.count > 0) {
+        NSArray<Node *> *items = [self getSelectedItems:selectedRows];
+        Node* item = [items firstObject];
+        BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
+        
         [Alerts yesNo:self.searchController.isActive ? self.searchController : self
                 title:@"Are you sure?"
-              message:@"Are you sure you want to delete these item(s)?"
+              message:willRecycle ? @"Are you sure you want to send these item(s) to the Recycle Bin?" : @"Are you sure you want to permanently delete these item(s)?"
                action:^(BOOL response) {
                    if (response) {
                        NSArray<Node *> *items = [self getSelectedItems:selectedRows];
                        
+                       BOOL fail = NO;
                        for (Node* item in items) {
-                           [self.viewModel deleteItem:item];
+                           if(![self.viewModel deleteItem:item]) {
+                               fail = YES;
+                           }
+                       }
+                       
+                       if(fail) {
+                           [Alerts warn:self title:@"Error Deleting" message:@"There was a problem deleting a least one of these items."];
                        }
                        
                        [self saveChangesToSafeAndRefreshView];

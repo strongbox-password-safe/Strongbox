@@ -11,6 +11,9 @@
 #import "V3BinariesList.h"
 #import "CustomIconList.h"
 #import "GenericTextIntegerElementHandler.h"
+#import "GenericTextBooleanElementHandler.h"
+#import "GenericTextUuidElementHandler.h"
+#import "GenericTextDateElementHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,6 +29,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) GenericTextIntegerElementHandler *historyMaxItems;
 @property (nonatomic) GenericTextIntegerElementHandler *historyMaxSize;
+
+// <RecycleBinEnabled>True</RecycleBinEnabled>
+// <RecycleBinUUID>AAAAAAAAAAAAAAAAAAAAAA==</RecycleBinUUID>
+// <RecycleBinChanged>2019-02-11T14:14:56Z</RecycleBinChanged>
+
+@property GenericTextBooleanElementHandler *recycleBinEnabled;
+@property GenericTextUuidElementHandler* recycleBinGroup;
+@property GenericTextDateElementHandler* recycleBinChanged;
 
 - (void)setHash:(NSString*)hash;
 

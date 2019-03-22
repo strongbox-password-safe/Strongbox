@@ -23,7 +23,6 @@
 #import "OTPToken+Generation.h"
 #import "QRCodeScannerViewController.h"
 #import "NodeIconHelper.h"
-#import "IconsCollectionViewController.h"
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
@@ -39,6 +38,7 @@ static const int kMinNotesCellHeight = 160;
 
 @property BOOL editingNewRecord;
 @property NSNumber* userSelectedNewIconIndex;
+@property NSUUID* userSelectedNewExistingCustomIconId;
 @property UIImage* userSelectedNewCustomIcon;
 @property BOOL hidePassword;
 @property BOOL showOtp;
@@ -57,20 +57,27 @@ static const int kMinNotesCellHeight = 160;
 
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
+    self.sni.customIcons = self.viewModel.database.customIcons;
     
     NSString* urlHint = trim(self.textFieldUrl.text);
     if(!urlHint.length) {
         urlHint = trim(self.textFieldTitle.text);
     }
     
-    [self.sni changeIcon:self urlHint:urlHint format:self.viewModel.database.format completion:^(BOOL goNoGo, NSNumber* userSelectedNewIconIndex, UIImage* userSelectedNewCustomIcon) {
+    [self.sni changeIcon:self urlHint:urlHint
+                  format:self.viewModel.database.format
+              completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, UIImage * _Nullable userSelectedNewCustomIcon) {
         //NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
         if(goNoGo) {
             self.userSelectedNewIconIndex = userSelectedNewIconIndex;
+            self.userSelectedNewExistingCustomIconId = userSelectedExistingCustomIconId;
             self.userSelectedNewCustomIcon = userSelectedNewCustomIcon;
 
             if(self.userSelectedNewCustomIcon) {
                 self.imageViewIcon.image = self.userSelectedNewCustomIcon;
+            }
+            else if(self.userSelectedNewExistingCustomIconId) {
+                self.imageViewIcon.image = [NodeIconHelper getCustomIcon:self.userSelectedNewExistingCustomIconId customIcons:self.viewModel.database.customIcons];
             }
             else if(self.userSelectedNewIconIndex) {
                 if(self.userSelectedNewIconIndex.intValue == -1) {
@@ -94,6 +101,7 @@ static const int kMinNotesCellHeight = 160;
     if(self.isEditing) {
         if(!self.editingNewRecord) {
             self.userSelectedNewIconIndex = nil;
+            self.userSelectedNewExistingCustomIconId = nil;
             self.userSelectedNewCustomIcon = nil;
             [self bindUiToRecord];
             [self setEditing:NO animated:YES];
@@ -327,6 +335,9 @@ static const int kMinNotesCellHeight = 160;
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
     self.userSelectedNewIconIndex = nil;
+    self.userSelectedNewExistingCustomIconId = nil;
+    self.userSelectedNewCustomIcon = nil;
+    
     self.hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
 
     if(!self.record) {
@@ -527,23 +538,21 @@ static const int kMinNotesCellHeight = 160;
         return YES;
     }
     
-    //NSLog(@"userSelectedNewIconIndex: [%@]", self.userSelectedNewIconIndex);
-
+    BOOL userHasSetIcon = (self.userSelectedNewIconIndex != nil || self.userSelectedNewExistingCustomIconId != nil || self.userSelectedNewCustomIcon != nil);
     BOOL userSetIconIsSameAsRecordIcon = YES;
-    BOOL userHasNotSetIcon = (self.userSelectedNewIconIndex == nil && self.userSelectedNewCustomIcon == nil);
     
-    if(!userHasNotSetIcon) {
+    if(userHasSetIcon) {
         if(self.userSelectedNewCustomIcon != nil) {
             userSetIconIsSameAsRecordIcon = NO;
         }
         else {
-            userSetIconIsSameAsRecordIcon = (self.record.iconId.intValue == self.userSelectedNewIconIndex.intValue) && self.record.customIconUuid == nil;
+            userSetIconIsSameAsRecordIcon =
+                (self.userSelectedNewIconIndex && (self.record.iconId.intValue == self.userSelectedNewIconIndex.intValue)) ||
+                (self.userSelectedNewExistingCustomIconId && (self.record.customIconUuid == self.userSelectedNewExistingCustomIconId));
         }
     }
     
-    BOOL iconClean =    self.viewModel.database.format == kPasswordSafe ||
-                        userHasNotSetIcon ||
-                        userSetIconIsSameAsRecordIcon;
+    BOOL iconClean = !userHasSetIcon || userSetIconIsSameAsRecordIcon;
     
     BOOL notesClean = [self.textViewNotes.text isEqualToString:self.record.fields.notes];
     BOOL passwordClean = [trim(self.textFieldPassword.text) isEqualToString:self.record.fields.password];
@@ -1106,6 +1115,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         NSData *data = UIImagePNGRepresentation(self.userSelectedNewCustomIcon);
         [self.viewModel.database setNodeCustomIcon:self.record data:data];
     }
+    else if(self.userSelectedNewExistingCustomIconId) {
+        self.record.customIconUuid = self.userSelectedNewExistingCustomIconId;
+    }
     else if(self.userSelectedNewIconIndex) {
         if(self.userSelectedNewIconIndex.intValue == -1) {
             self.record.iconId = @(0); // Default
@@ -1127,7 +1139,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             }
             
             self.sni = [[SetNodeIconUiHelper alloc] init];
-            [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, NSNumber * userSelectedNewIconIndex, UIImage *userSelectedNewCustomIcon) {
+            self.sni.customIcons = self.viewModel.database.customIcons;
+            
+            [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
                 if(goNoGo && userSelectedNewCustomIcon) {
                     NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
                     [self.viewModel.database setNodeCustomIcon:self.record data:data];
@@ -1148,6 +1162,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             self.editingNewRecord = NO;
             self.userSelectedNewCustomIcon = nil;
             self.userSelectedNewIconIndex = nil;
+            self.userSelectedNewExistingCustomIconId = nil;
         }
         
         dispatch_async(dispatch_get_main_queue(), ^(void) {

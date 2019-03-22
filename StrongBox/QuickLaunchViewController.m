@@ -45,6 +45,13 @@
     singleTap.numberOfTapsRequired = 1;
     self.imageViewLogo.userInteractionEnabled = YES;
     [self.imageViewLogo addGestureRecognizer:singleTap];
+    
+    //
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onProStatusChanged:)
+                                               name:kProStatusChangedNotificationKey
+                                             object:nil];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -85,6 +92,13 @@
             [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
         });
     }
+}
+
+- (void)onProStatusChanged:(id)param {
+    NSLog(@"Pro Status Changed!");
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self bindProOrFreeTrialUi];
+    });
 }
 
 -(void)bindProOrFreeTrialUi {

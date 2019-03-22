@@ -23,6 +23,10 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoDetectKeyFiles;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInBrowse;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
+@property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
+
 @end
 
 @implementation PreferencesTableViewController {
@@ -79,6 +83,9 @@
     [self bindKeePassNoSorting];
     [self bindAutoFavIcon];
     [self bindAutoDetectKeyFiles];
+    [self bindShowRecycleBin];
+    [self bindCopyTotpAutoFill];
+    
     //[self customizeAppLockSectionFooter];
 }
 
@@ -586,6 +593,30 @@
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
     
     [self bindKeePassNoSorting];
+}
+
+-(void)bindShowRecycleBin {
+    self.switchShowRecycleBinInBrowse.on = !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
+    self.switchShowRecycleBinInSearch.on = Settings.sharedInstance.showRecycleBinInSearchResults;
+}
+
+- (IBAction)onShowRecycleBinInBrowse:(id)sender {
+    Settings.sharedInstance.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
+    [self bindShowRecycleBin];
+}
+
+- (IBAction)onShowRecycleBinInSearch:(id)sender {
+    Settings.sharedInstance.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
+    [self bindShowRecycleBin];
+}
+
+- (IBAction)onCopyTotpAutoFill:(id)sender {
+    Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
+    [self bindCopyTotpAutoFill];
+}
+
+- (void)bindCopyTotpAutoFill {
+    self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
 }
 
 @end

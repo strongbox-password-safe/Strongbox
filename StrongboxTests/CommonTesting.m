@@ -91,8 +91,17 @@
 
 + (NSString*)getXmlFromBundleFile:(NSString*)fileName {
     NSBundle *bundle = [NSBundle bundleForClass:[CommonTesting class]];
+    if(!bundle) {
+        return nil;
+    }
+    
     NSString *path = [bundle pathForResource:fileName ofType:@"xml"];
+    if(!path.length) {
+        return nil;
+    }
+    
     NSString *xml = [[NSString alloc] initWithData:[NSData dataWithContentsOfFile:path] encoding:NSUTF8StringEncoding];
+    
     return xml;
 }
 

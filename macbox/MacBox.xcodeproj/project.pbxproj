@@ -139,6 +139,8 @@
 		4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
+		4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
+		4DDA015D2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */; };
 		4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
 		4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */; };
 		4DE0CB6E2232C0D400E109F9 /* GenericTextIntegerElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */; };
@@ -146,6 +148,8 @@
 		4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */; };
 		4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */; };
 		4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
+		4DF299802243CEAD0080F9DC /* CollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DF2997F2243CEAD0080F9DC /* CollectionViewHeader.xib */; };
+		4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF299822243CED70080F9DC /* CollectionViewHeader.m */; };
 		4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DA2074FA3500148741 /* PasswordHistoryEntry.m */; };
 		4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DC2074FA3500148741 /* PwSafeDatabase.m */; };
 		4DF347E72074FA3500148741 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DD2074FA3500148741 /* Group.m */; };
@@ -452,6 +456,10 @@
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DocumentController.h; path = MacBox/DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DocumentController.m; path = MacBox/DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = MacBox/Credits.rtf; sourceTree = "<group>"; };
+		4DDA01582242A1B300C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "../StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
+		4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "../StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
+		4DDA015B2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextBooleanElementHandler.h; path = ../model/keepass/GenericTextBooleanElementHandler.h; sourceTree = "<group>"; };
+		4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextBooleanElementHandler.m; path = ../model/keepass/GenericTextBooleanElementHandler.m; sourceTree = "<group>"; };
 		4DDCE1C821BBFF7800D1DE09 /* ProgressWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProgressWindow.h; path = MacBox/ProgressWindow.h; sourceTree = "<group>"; };
 		4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProgressWindow.m; path = MacBox/ProgressWindow.m; sourceTree = "<group>"; };
 		4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressWindow.xib; path = MacBox/ProgressWindow.xib; sourceTree = "<group>"; };
@@ -464,6 +472,9 @@
 		4DEAEC281F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ChangeMasterPasswordWindowController.xib; path = MacBox/ChangeMasterPasswordWindowController.xib; sourceTree = "<group>"; };
 		4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSAdvancedTextField.h; path = MacBox/NSAdvancedTextField.h; sourceTree = "<group>"; };
 		4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSAdvancedTextField.m; path = MacBox/NSAdvancedTextField.m; sourceTree = "<group>"; };
+		4DF2997F2243CEAD0080F9DC /* CollectionViewHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CollectionViewHeader.xib; path = MacBox/CollectionViewHeader.xib; sourceTree = "<group>"; };
+		4DF299812243CED70080F9DC /* CollectionViewHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CollectionViewHeader.h; sourceTree = "<group>"; };
+		4DF299822243CED70080F9DC /* CollectionViewHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewHeader.m; sourceTree = "<group>"; };
 		4DF347D62074FA3500148741 /* PwSafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeDatabase.h; path = ../model/pwsafe/PwSafeDatabase.h; sourceTree = "<group>"; };
 		4DF347D92074FA3500148741 /* Record.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Record.h; path = ../model/pwsafe/Record.h; sourceTree = "<group>"; };
 		4DF347DA2074FA3500148741 /* PasswordHistoryEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryEntry.m; path = ../model/pwsafe/PasswordHistoryEntry.m; sourceTree = "<group>"; };
@@ -670,6 +681,8 @@
 		4D524CF2219B481A00C22CB4 /* Xml */ = {
 			isa = PBXGroup;
 			children = (
+				4DDA015B2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.h */,
+				4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */,
 				4D524CF7219B48D200C22CB4 /* XmlProcessingContext.h */,
 				4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */,
 				4D524CFA219B48D200C22CB4 /* CustomIcon.h */,
@@ -788,9 +801,6 @@
 				4DDCE1C821BBFF7800D1DE09 /* ProgressWindow.h */,
 				4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */,
 				4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */,
-				4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */,
-				4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */,
-				4DBCE221222414A100A2AFA2 /* SelectPredefinedIconController.xib */,
 				4DBCE22422241D6700A2AFA2 /* PredefinedKeePassIcon.h */,
 				4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */,
 				4DBCE22622241D6700A2AFA2 /* PredefinedKeePassIcon.xib */,
@@ -799,6 +809,12 @@
 				4D9903C3223664D3002C10EE /* KeePassHistoryController.xib */,
 				4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */,
 				4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */,
+				4DBCE221222414A100A2AFA2 /* SelectPredefinedIconController.xib */,
+				4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */,
+				4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */,
+				4DF2997F2243CEAD0080F9DC /* CollectionViewHeader.xib */,
+				4DF299812243CED70080F9DC /* CollectionViewHeader.h */,
+				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -846,6 +862,8 @@
 		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
+				4DDA01582242A1B300C7F0E2 /* NSUUID+Zero.h */,
+				4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */,
 				4D524CF3219B482800C22CB4 /* KDBX3 */,
 				4D524CF2219B481A00C22CB4 /* Xml */,
 				4D524CDB219B47EA00C22CB4 /* Crypto */,
@@ -1209,6 +1227,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */,
+				4DF299802243CEAD0080F9DC /* CollectionViewHeader.xib in Resources */,
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
 				4DBCE223222414A100A2AFA2 /* SelectPredefinedIconController.xib in Resources */,
 				4D553B54219DD2CE00AA4BAB /* AttachmentItem.xib in Resources */,
@@ -1289,6 +1308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
+				4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */,
 				4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */,
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
 				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
@@ -1426,7 +1446,9 @@
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
 				4DBF493D22232A3200F48182 /* DAVRequestGroup.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
+				4DDA015D2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m in Sources */,
 				4D8DE9BD21F898470043DDC0 /* OTPTokenType.m in Sources */,
+				4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4D524CA5219B458B00C22CB4 /* BiometricIdHelper.m in Sources */,
 				4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */,
 			);

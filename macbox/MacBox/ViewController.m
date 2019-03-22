@@ -32,6 +32,9 @@
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
+const int kMaxRecommendCustomIconSize = 128*1024;
+const int kMaxCustomIconDimension = 256;
+
 @interface ViewController ()
 
 @property (strong, nonatomic) MacKeePassHistoryController *keePassHistoryController;
@@ -54,6 +57,8 @@
 
 @property NSTimer* timerRefreshOtp;
 @property NSView* currentlyEditingUIControl;
+@property NSFont* italicFont;
+@property NSFont* regularFont;
 
 @end
 
@@ -635,7 +640,8 @@ static NSImage* kDefaultAttachmentIcon;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
 
     NSError* error;
-    BOOL success = [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
+    //BOOL success =
+    [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -724,20 +730,6 @@ static NSImage* kDefaultAttachmentIcon;
     }];
 }
 
-// FUTURE: Drag and Drop attachments to/from
-
-//- (NSDragOperation)collectionView:(NSCollectionView *)collectionView validateDrop:(id<NSDraggingInfo>)draggingInfo proposedIndex:(NSInteger *)proposedDropIndex dropOperation:(NSCollectionViewDropOperation *)proposedDropOperation {
-//
-//}
-//
-//- (BOOL)collectionView:(NSCollectionView *)collectionView acceptDrop:(id<NSDraggingInfo>)draggingInfo index:(NSInteger)index dropOperation:(NSCollectionViewDropOperation)dropOperation {
-//
-//}
-//
-//- (BOOL)collectionView:(NSCollectionView *)collectionView writeItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths toPasteboard:(NSPasteboard *)pasteboard {
-//
-//}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
@@ -809,17 +801,34 @@ static NSImage* kDefaultAttachmentIcon;
     //NSLog(@"loadSafeItems for [%@]", parentGroup.uuid);
     
     BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.model.format == kPasswordSafe;
+    
     NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
-    //NSLog(@"Sorting: %d-%d", sort, Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView);
     
     NSString* searchText = self.searchField.stringValue;
     if(![searchText length]) {
+        // Filter Recycle Bin if Required in Browse
+        if(Settings.sharedInstance.doNotShowRecycleBinInBrowse && self.model.recycleBinNode) {
+            return [sorted filter:^BOOL(Node * _Nonnull obj) {
+                return obj != self.model.recycleBinNode;
+            }];
+        }
+        
         return sorted;
     }
+    else {
+        // Filter Recycle Bin if Required in Search
+        if(!Settings.sharedInstance.showRecycleBinInSearchResults && self.model.recycleBinNode) {
+            sorted = [sorted filter:^BOOL(Node * _Nonnull obj) {
+                return obj != self.model.recycleBinNode;
+            }];
+        }
+    }
     
-    return [sorted filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        return [self isSafeItemMatchesSearchCriteria:evaluatedObject recurse:YES];
-    }]];
+    // Filter by Search term
+    
+    return [sorted filter:^BOOL(Node * _Nonnull obj) {
+        return [self isSafeItemMatchesSearchCriteria:obj recurse:YES];
+    }];
 }
 
 - (BOOL)isSafeItemMatchesSearchCriteria:(Node*)item recurse:(BOOL)recurse {
@@ -895,8 +904,19 @@ static NSImage* kDefaultAttachmentIcon;
 - (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
     if([tableColumn.identifier isEqualToString:@"TitleColumn"]) {
         NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"TitleCell" owner:self];
-
+        if(!self.italicFont) {
+            self.regularFont = cell.textField.font;
+            self.italicFont = [NSFontManager.sharedFontManager convertFont:cell.textField.font toHaveTrait:NSFontItalicTrait];
+        }
+        
         Node *it = (Node*)item;
+        
+        if(it.isGroup && self.model.recycleBinEnabled && self.model.recycleBinNode && self.model.recycleBinNode == it) {
+            cell.textField.font = self.italicFont;
+        }
+        else {
+            cell.textField.font = self.regularFont;
+        }
         
         cell.textField.stringValue = it.title;
         cell.imageView.objectValue = [self getIconForNode:it large:NO];
@@ -1628,7 +1648,9 @@ NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    [Alerts yesNo:[NSString stringWithFormat:@"Are you sure you want to delete '%@'?", item.title] window:self.view.window completion:^(BOOL yesNo) {
+    BOOL willRecycle = [self.model deleteWillRecycle:item];
+    
+    [Alerts yesNo:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%@' to the Recycle Bin?" : @"Are you sure you want to delete '%@'?", item.title] window:self.view.window completion:^(BOOL yesNo) {
         if(yesNo) {
             [self.model deleteItem:item];
         }
@@ -2095,19 +2117,17 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     __weak id weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
+    self.selectPredefinedIconController.customIcons = self.model.customIcons;
     self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
-    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data) {
-        [weakSelf onSelectedNewIcon:item index:index data:data];
+    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data, NSUUID * _Nullable existingCustom) {
+        [weakSelf onSelectedNewIcon:item index:index data:data existingCustom:existingCustom];
     };
     
     [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
 }
 
-const int kMaxRecommendCustomIconSize = 128*1024;
-const int kMaxCustomIconDimension = 256;
-
-- (void)onSelectedNewIcon:(Node*)item index:(NSNumber*)index data:(NSData*)data {
-    if(index == nil) {
+- (void)onSelectedNewIcon:(Node*)item index:(NSNumber*)index data:(NSData*)data existingCustom:(NSUUID*)existingCustom {
+    if(data) {
         NSImage* icon = [[NSImage alloc] initWithData:data];
         if(icon) {
             if(data.length > kMaxRecommendCustomIconSize) {
@@ -2127,19 +2147,19 @@ const int kMaxCustomIconDimension = 256;
                     NSString* message = [NSString stringWithFormat:@"This is a large image to use as an icon. Would you like to use a scaled down version to save %@?", savingStr];
                     [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
                         if(yesNo) {
-                            [self.model setItemIcon:item index:index custom:compressed];
+                            [self.model setItemIcon:item index:index existingCustom:existingCustom custom:compressed];
                         }
                         else {
-                            [self.model setItemIcon:item index:index custom:data];
+                            [self.model setItemIcon:item index:index existingCustom:existingCustom custom:data];
                         }
                     }];
                 }
                 else {
-                    [self.model setItemIcon:item index:index custom:data];
+                    [self.model setItemIcon:item index:index existingCustom:existingCustom custom:data];
                 }
             }
             else {
-                [self.model setItemIcon:item index:index custom:data];
+                [self.model setItemIcon:item index:index existingCustom:existingCustom custom:data];
             }
         }
         else {
@@ -2147,7 +2167,7 @@ const int kMaxCustomIconDimension = 256;
         }
     }
     else {
-        [self.model setItemIcon:item index:index custom:nil];
+        [self.model setItemIcon:item index:index existingCustom:existingCustom custom:nil];
     }
 }
 

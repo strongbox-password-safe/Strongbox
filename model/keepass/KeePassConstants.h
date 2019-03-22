@@ -74,4 +74,8 @@ static const int kFlagsTwoFish = 8;
 static const NSInteger kDefaultHistoryMaxItems = 10;
 static const NSInteger kDefaultHistoryMaxSize = 6 * 1024 * 1024;
 
+static NSString* const kRecycleBinChangedElementName = @"RecycleBinChanged";
+static NSString* const kRecycleBinEnabledElementName = @"RecycleBinEnabled";
+static NSString* const kRecycleBinGroupElementName = @"RecycleBinUUID";
+
 #endif /* Header_h */

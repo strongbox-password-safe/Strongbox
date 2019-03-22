@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setItemUrl:(Node*)item url:(NSString*)url;
 - (void)setItemPassword:(Node*)item password:(NSString*)password;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData* _Nullable)custom;
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData* _Nullable)custom;
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
@@ -51,7 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)addNewRecord:(Node *)parentGroup;
 - (void)addNewGroup:(Node *)parentGroup;
 
-- (void)deleteItem:(Node *)child;
+- (BOOL)deleteItem:(Node *)child;
+- (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
 - (BOOL)validateChangeParent:(Node *)parent node:(Node *)node;
 - (BOOL)changeParent:(Node *)parent node:(Node *)node;
@@ -74,6 +75,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString* masterPassword;
 @property (nonatomic, readonly) NSData* masterKeyFileDigest;
 - (void)setMasterCredentials:(NSString *)masterPassword masterKeyFileDigest:(NSData *)masterKeyFileDigest;
+
+@property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
+@property (readonly) Node* recycleBinNode;
+- (void)createNewRecycleBinNode;
 
 // Convenience / Summary
 

@@ -26,7 +26,7 @@
                 <subviews>
                     <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nCr-GA-F2s">
                         <rect key="frame" x="20" y="61" width="530" height="307"/>
-                        <clipView key="contentView" ambiguous="YES" id="CaZ-8e-QHd">
+                        <clipView key="contentView" id="CaZ-8e-QHd">
                             <rect key="frame" x="1" y="1" width="528" height="305"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
@@ -35,6 +35,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="QyG-3a-gal">
                                         <size key="itemSize" width="56" height="56"/>
+                                        <size key="headerReferenceSize" width="0.0" height="30"/>
                                     </collectionViewFlowLayout>
                                     <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </collectionView>
@@ -100,7 +101,6 @@ Gw
                     <constraint firstAttribute="trailing" secondItem="nCr-GA-F2s" secondAttribute="trailing" constant="20" id="RhI-8g-fYy"/>
                     <constraint firstItem="lFk-kt-54F" firstAttribute="top" secondItem="ZYx-hs-rzI" secondAttribute="bottom" constant="20" id="SbY-wW-MOr"/>
                     <constraint firstItem="k4b-DX-DI0" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="ZZO-Xk-kXs"/>
-                    <constraint firstItem="guW-A7-hbt" firstAttribute="top" secondItem="CaZ-8e-QHd" secondAttribute="bottom" constant="20" id="dps-gk-aP9"/>
                     <constraint firstAttribute="bottom" secondItem="guW-A7-hbt" secondAttribute="bottom" constant="20" id="fva-BT-A2T"/>
                     <constraint firstItem="STV-Hs-hOA" firstAttribute="centerY" secondItem="guW-A7-hbt" secondAttribute="centerY" id="myR-qw-Edx"/>
                     <constraint firstItem="guW-A7-hbt" firstAttribute="top" secondItem="nCr-GA-F2s" secondAttribute="bottom" constant="20" id="oEM-eZ-u4q"/>

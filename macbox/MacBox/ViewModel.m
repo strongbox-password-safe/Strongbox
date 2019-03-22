@@ -165,6 +165,20 @@ static NSString* kDefaultNewTitle = @"Untitled";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+- (BOOL)recycleBinEnabled {
+    return self.passwordDatabase.recycleBinEnabled;
+}
+
+- (Node *)recycleBinNode {
+    return self.passwordDatabase.recycleBinNode;
+}
+
+- (void)createNewRecycleBinNode {
+    [self createNewRecycleBinNode];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title
 {
     return [self setItemTitle:item title:title modified:nil];
@@ -190,8 +204,8 @@ static NSString* kDefaultNewTitle = @"Untitled";
     [self setItemNotes:item notes:notes modified:nil];
 }
 
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData*)custom {
-    [self setItemIcon:item index:index custom:custom modified:nil];
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom {
+    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom modified:nil];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,7 +378,7 @@ static NSString* kDefaultNewTitle = @"Untitled";
     });
 }
 
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index custom:(NSData*)custom modified:(NSDate*)modified {
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -393,10 +407,18 @@ static NSString* kDefaultNewTitle = @"Untitled";
     // Change...
     
     item.iconId = index;
-    [self.passwordDatabase setNodeCustomIcon:item data:custom];
+    if(existingCustom) {
+        item.customIconUuid = existingCustom;
+    }
+    else {
+        [self.passwordDatabase setNodeCustomIcon:item data:custom];
+    }
+    
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex custom:oldCustom modified:oldModified];
+    // Save data rather than existing custom icon here, as custom icon could be rationalized away, holding data guarantees we can undo...
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex existingCustom:nil custom:oldCustom modified:oldModified];
     [self.document.undoManager setActionName:@"Icon Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -763,28 +785,55 @@ static NSString* kDefaultNewTitle = @"Untitled";
     });
 }
 
-- (void)deleteItem:(Node *_Nonnull)child {
-    [child.parent removeChild:child];
-    
-    [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent];
-    if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Delete Item"];
-    }
+- (BOOL)deleteItem:(Node *_Nonnull)child {
+    if([self deleteWillRecycle:child]) {
+        // UUID is NIL/Non Existent or Zero? - Create
+        if(self.passwordDatabase.recycleBinNode == nil) {
+            [self.passwordDatabase createNewRecycleBinNode];
+        }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.onDeleteItem(child);
-    });
+        return [self changeParent:self.passwordDatabase.recycleBinNode node:child isRecycleOp:YES];
+    }
+    else {
+        [child.parent removeChild:child];
+        
+        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent];
+        if(!self.document.undoManager.isUndoing) {
+            [self.document.undoManager setActionName:@"Delete Item"];
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.onDeleteItem(child);
+        });
+    }
+    
+    return YES;
+}
+
+- (BOOL)deleteWillRecycle:(Node *)child {
+    BOOL willRecycle = self.passwordDatabase.recycleBinEnabled;
+    if(self.passwordDatabase.recycleBinEnabled && self.passwordDatabase.recycleBinNode) {
+        if([self.passwordDatabase.recycleBinNode contains:child] || self.passwordDatabase.recycleBinNode == child) {
+            willRecycle = NO;
+        }
+    }
+    
+    return willRecycle;
 }
 
 - (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
+    return [self changeParent:parent node:node isRecycleOp:NO];
+}
+
+- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node isRecycleOp:(BOOL)isRecycleOp {
     if(![node validateChangeParent:parent]) {
         return NO;
     }
 
     Node* old = node.parent;
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] changeParent:old node:node];
-    [self.document.undoManager setActionName:@"Move Item"];
+    [[self.document.undoManager prepareWithInvocationTarget:self] changeParent:old node:node isRecycleOp:isRecycleOp];
+    [self.document.undoManager setActionName:isRecycleOp ? @"Delete Item" : @"Move Item"];
     
     BOOL ret = [node changeParent:parent];
 

@@ -47,7 +47,7 @@
     [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems]; // Inbox should be empty
     
     [self registerForClipboardClearingNotifications];
-
+    
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
 
     return YES;
@@ -109,18 +109,26 @@
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
     double minutes = timeDifference / 60;
     double hoursSinceLaunch = minutes / 60;
+
     
     if(hoursSinceLaunch > 2) { // Stuff we'd like to do, but definitely not immediately on first launch...
         // Do not request review immediately on launch but after a while and after user has used app for a bit
         NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
-        
-        if (launchCount > 30) {
+
+        if (launchCount > 30) { // Don't bother any new / recent users - no need for entitlements check until user is regular user
             if (@available( iOS 10.3,*)) {
                 [SKStoreReviewController requestReview];
             }
+
+            //                NSCalendar *cal = [NSCalendar currentCalendar];
+            //                NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-2 toDate:[NSDate date] options:0];
+            //    Settings.sharedInstance.lastEntitlementCheckAttempt = date;
+            //    Settings.sharedInstance.numberOfEntitlementCheckFails = 1;
+            //    NSDate *d2 = [cal dateByAddingUnit:NSCalendarUnitDay value:90 toDate:[NSDate date] options:0];
+            //    [[Settings sharedInstance] setEndFreeTrialDate:d2];
+            
+            [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate:self.window.rootViewController];
         }
-        
-        // TODO: Refresh and Verify Receipt once a month or so
     }
 }
 
