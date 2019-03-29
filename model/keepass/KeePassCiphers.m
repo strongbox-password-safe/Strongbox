@@ -14,10 +14,56 @@
 
 @implementation KeePassCiphers
 
+static NSString* const aesKdbx3Kdf = @"C9D9F39A-628A-4460-BF74-0D08C18A4FEA";
+static NSString* const aesKdbx4Kdf = @"7C02BB82-79A7-4AC0-927D-114A00648238";
 static NSString* const aesUuid = @"31C1F2E6-BF71-4350-BE58-05216AFC5AFF";
 static NSString* const chaCha20Uuid = @"D6038A2B-8B6F-4CB5-A524-339A31DBB59A";
 static NSString* const argon2Uuid = @"EF636DDF-8C29-444B-91F7-A9A403E30A0C";
 static NSString* const twoFishUuid = @"AD68F29F-576F-4BB9-A36A-D47AF965346C";
+
+NSUUID* const aesKdbx3KdfCipherUuid() {
+    static NSUUID* foo = nil;
+    
+    if (!foo) {
+        foo = [[NSUUID alloc] initWithUUIDString:aesKdbx3Kdf];
+    }
+    
+    return foo;
+}
+
+NSData* aesKdbx3KdfCipherUuidData() {
+    static NSData* foo = nil;
+    
+    if(!foo) {
+        uuid_t uuid;
+        [aesKdbx3KdfCipherUuid() getUUIDBytes:uuid];
+        foo = [NSData dataWithBytes:uuid length:sizeof(uuid_t)];
+    }
+    
+    return foo;
+}
+
+NSUUID* const aesKdbx4KdfCipherUuid() {
+    static NSUUID* foo = nil;
+    
+    if (!foo) {
+        foo = [[NSUUID alloc] initWithUUIDString:aesKdbx4Kdf];
+    }
+    
+    return foo;
+}
+
+NSData* aesKdbx4KdfCipherUuidData() {
+    static NSData* foo = nil;
+    
+    if(!foo) {
+        uuid_t uuid;
+        [aesKdbx4KdfCipherUuid() getUUIDBytes:uuid];
+        foo = [NSData dataWithBytes:uuid length:sizeof(uuid_t)];
+    }
+    
+    return foo;
+}
 
 NSUUID* const twoFishCipherUuid() {
     static NSUUID* foo = nil;
@@ -130,6 +176,12 @@ NSString* innerEncryptionString(uint32_t innerRandomStreamId) {
 NSString* keyDerivationAlgorithmString(NSUUID* uuid){
     if([uuid isEqual:aesCipherUuid()]) {
         return @"AES";
+    }
+    else if([uuid isEqual:aesKdbx3KdfCipherUuid()]) {
+        return @"AES (KDBX 3)";
+    }
+    else if([uuid isEqual:aesKdbx4KdfCipherUuid()]) {
+        return @"AES (KDBX 4)";
     }
     else if([uuid isEqual:argon2CipherUuid()]) {
         return @"Argon2";

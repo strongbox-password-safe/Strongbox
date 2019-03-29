@@ -10,4 +10,8 @@
 
 @implementation CustomField
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"[%@] = [%@] Protected=[%@]", self.key, self.value, self.protected ? @"YES" : @"NO"];
+}
 @end

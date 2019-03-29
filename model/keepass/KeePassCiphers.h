@@ -16,6 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 NSUUID* const aesCipherUuid(void);
 NSData* aesCipherUuidData(void);
 
+NSUUID* const aesKdbx3KdfCipherUuid(void);
+NSData* aesKdbx3KdfCipherUuidData(void);
+NSUUID* const aesKdbx4KdfCipherUuid(void);
+NSData* aesKdbx4KdfCipherUuidData(void);
+
 NSUUID* const argon2CipherUuid(void);
 NSData* argon2CipherUuidData(void);
 

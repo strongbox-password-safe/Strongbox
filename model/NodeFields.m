@@ -7,6 +7,7 @@
 //
 
 #import "NodeFields.h"
+#import "NSArray+Extensions.h"
 
 @implementation NodeFields
 
@@ -42,6 +43,23 @@
     return self;
 }
 
+- (NSMutableArray<NodeFileAttachment*>*)cloneAttachments {
+    return [[self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
+        return [NodeFileAttachment attachmentWithName:obj.filename index:obj.index linkedObject:obj.linkedObject];
+    }] mutableCopy];
+}
+
+- (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields {
+    NSMutableDictionary<NSString*, StringValue*>* ret = [NSMutableDictionary dictionaryWithCapacity:self.customFields.count];
+    
+    for (NSString* key in self.customFields.allKeys) {
+        StringValue* orig = self.customFields[key];
+        ret[key] = [StringValue valueWithString:orig.value protected:orig.protected];
+    }
+    
+    return ret;
+}
+
 - (NodeFields *)cloneForHistory {
     NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username url:self.url password:self.password notes:self.notes email:self.email];
 
@@ -49,10 +67,11 @@
     ret.modified = self.modified;
     ret.accessed = self.accessed;
     ret.passwordModified = self.passwordModified;
-    ret.attachments = [self.attachments mutableCopy];
-    ret.customFields = [self.customFields mutableCopy];
+
+    ret.attachments = [self cloneAttachments];
+    ret.customFields = [self cloneCustomFields];
     
-    // History should be empty for a historical node
+    // Empty History
     ret.keePassHistory = [NSMutableArray array];
     
     return ret;

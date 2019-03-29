@@ -61,22 +61,24 @@
     ret.keePassFile.meta.generator.text = kStrongboxGenerator;
     
     // 4. Custom Icons
-    
-    if(customIcons.count) {
-        if(!ret.keePassFile.meta.customIconList) {
-            ret.keePassFile.meta.customIconList = [[CustomIconList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
-        }
-        
-        [ret.keePassFile.meta.customIconList.icons removeAllObjects];
-        for (NSUUID* uuid in customIcons.allKeys) {
-            NSData* data = customIcons[uuid];
-            CustomIcon *icon = [[CustomIcon alloc] initWithContext:[XmlProcessingContext standardV3Context]];
-            icon.uuid = uuid;
-            icon.data = data;
-            
-            [ret.keePassFile.meta.customIconList.icons addObject:icon];
-        }
+
+    if(customIcons.count && !ret.keePassFile.meta.customIconList) {
+        ret.keePassFile.meta.customIconList = [[CustomIconList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
     }
+    
+    if(ret.keePassFile.meta.customIconList) {
+        [ret.keePassFile.meta.customIconList.icons removeAllObjects];
+    }
+    
+    for (NSUUID* uuid in customIcons.allKeys) {
+        NSData* data = customIcons[uuid];
+        CustomIcon *icon = [[CustomIcon alloc] initWithContext:[XmlProcessingContext standardV3Context]];
+        icon.uuid = uuid;
+        icon.data = data;
+        
+        [ret.keePassFile.meta.customIconList.icons addObject:icon];
+    }
+
     
     return ret;
 }

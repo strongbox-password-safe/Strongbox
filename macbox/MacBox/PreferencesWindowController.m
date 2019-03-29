@@ -20,6 +20,10 @@
 @property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInBrowse;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInSearch;
+@property (weak) IBOutlet NSButton *checkboxFloatDetailsWindowsOnTop;
+@property (weak) IBOutlet NSButton *checkboxAlternatingGrid;
+@property (weak) IBOutlet NSButton *checkboxHorizontalGridLines;
+@property (weak) IBOutlet NSButton *checkboxVerticalGridLines;
 
 @end
 
@@ -74,10 +78,12 @@
     self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
     self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
     self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
-
     self.checkboxShowRecycleBinInBrowse.state = Settings.sharedInstance.doNotShowRecycleBinInBrowse ? NSOffState : NSOnState;
-    
     self.checkboxShowRecycleBinInSearch.state = Settings.sharedInstance.showRecycleBinInSearchResults ? NSOnState : NSOffState;
+    self.checkboxFloatDetailsWindowsOnTop.state = Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSOffState : NSOnState;
+    self.checkboxAlternatingGrid.state = Settings.sharedInstance.noAlternatingRows ? NSOffState : NSOnState;
+    self.checkboxHorizontalGridLines.state = Settings.sharedInstance.showHorizontalGrid ? NSOnState : NSOffState;
+    self.checkboxVerticalGridLines.state = Settings.sharedInstance.showVerticalGrid ? NSOnState : NSOffState;
 }
 
 -(void) bindAutoFillToSettings {
@@ -230,7 +236,11 @@
     Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
     Settings.sharedInstance.doNotShowRecycleBinInBrowse = self.checkboxShowRecycleBinInBrowse.state == NSOffState;
     Settings.sharedInstance.showRecycleBinInSearchResults = self.checkboxShowRecycleBinInSearch.state == NSOnState;
-
+    Settings.sharedInstance.doNotFloatDetailsWindowOnTop = self.checkboxFloatDetailsWindowsOnTop.state == NSOffState;
+    Settings.sharedInstance.noAlternatingRows = self.checkboxAlternatingGrid.state == NSOffState;
+    Settings.sharedInstance.showHorizontalGrid = self.checkboxHorizontalGridLines.state == NSOnState;
+    Settings.sharedInstance.showVerticalGrid = self.checkboxVerticalGridLines.state == NSOnState;
+    
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }

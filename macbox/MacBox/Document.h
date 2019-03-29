@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCredentials:(DatabaseFormat)format password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest;
 
+//- (void)foo:(Node*)item;
+
 NS_ASSUME_NONNULL_END
 
 @end

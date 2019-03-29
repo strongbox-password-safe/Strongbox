@@ -726,7 +726,11 @@ static NSString * trim(NSString *string) {
             CustomField* customField = [[CustomField alloc] init];
             
             customField.key = key;
-            customField.value = self.record.fields.customFields[key];
+            
+            StringValue* stringValue = self.record.fields.customFields[key];
+            
+            customField.value = stringValue.value;
+            customField.protected = stringValue.protected;
             
             [items addObject:customField];
         }
@@ -888,7 +892,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     [node.fields.customFields removeAllObjects];
     
     for (CustomField *field in items) {
-        [node.fields.customFields setObject:field.value forKey:field.key];
+        node.fields.customFields[field.key] = [StringValue valueWithString:field.value protected:field.protected];
     }
     
     [self sync:^(NSError *error) {
@@ -945,8 +949,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.password = historicalNode.fields.password;
     self.record.fields.notes = historicalNode.fields.notes;
     self.record.fields.passwordModified = historicalNode.fields.passwordModified;
-    self.record.fields.attachments = [historicalNode.fields.attachments mutableCopy];
-    self.record.fields.customFields = [historicalNode.fields.customFields mutableCopy];
+    
+    self.record.fields.attachments = [historicalNode.fields cloneAttachments];
+    self.record.fields.customFields = [historicalNode.fields cloneCustomFields];
     
     // Sync
     

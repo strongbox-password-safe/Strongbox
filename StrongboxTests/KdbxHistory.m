@@ -11,6 +11,7 @@
 #import "KeePassConstants.h"
 #import "DatabaseModel.h"
 #import "KeePassDatabase.h"
+#import "Kdbx4Database.h"
 
 @interface KdbxHistory : XCTestCase
 
@@ -23,7 +24,7 @@
     
     NSError* error;
     //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    StrongboxDatabase* db = [[[KeePassDatabase alloc] init] open:safeData password:@"a" error:&error];
+    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData password:@"a" error:&error];
     NSLog(@"%@", db);
     
     XCTAssertNotNil(db);

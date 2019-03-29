@@ -20,6 +20,7 @@
 #import "PinEntryController.h"
 #import "AppleICloudProvider.h"
 #import "DuressDummyStorageProvider.h"
+#import <AuthenticationServices/AuthenticationServices.h>
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -799,6 +800,30 @@ typedef void(^CompletionBlock)(Model* model);
         if(self.safe.autoFillCacheEnabled) {
             [viewModel updateAutoFillCacheWithData:data];
         }
+        
+        // TODO: Quick Type Support
+//        if(YES) { // TODO: QUICK TYPE Master Switch?
+//            // TODO: Delete all if that switch is switched off!
+//            // TODO: This might be only iOS 12.0 so need to gate that
+//            if (@available(iOS 12.0, *)) {
+//                [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
+//                    NSLog(@"%@", state);
+//                    if(state.enabled) {
+//                        //                NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
+//
+//                        ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:@"google.com" type:ASCredentialServiceIdentifierTypeDomain];
+//                        ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:@"mark" recordIdentifier:@"record-id"];
+//
+//                        [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:@[iden] completion:^(BOOL success, NSError * _Nullable error) {
+//                            NSLog(@"Saved Credential Identities... [%d] - [%@]", success, error);
+//                        }];
+//                    }
+//                    else {
+//                        NSLog(@"AutoFill Credential Store Disabled...");
+//                    }
+//                }];
+//            }
+//        }
     }
     
     self.completion(viewModel);

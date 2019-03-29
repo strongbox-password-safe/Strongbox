@@ -18,6 +18,9 @@
 
 static NSString* kDefaultNewTitle = @"Untitled";
 
+NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
+NSString* const kNotificationUserInfoKeyNode = @"node";
+
 @interface ViewModel ()
 
 @property (strong, nonatomic) DatabaseModel* passwordDatabase;
@@ -491,8 +494,8 @@ static NSString* kDefaultNewTitle = @"Untitled";
     item.fields.password = historicalItem.fields.password;
     item.fields.notes = historicalItem.fields.notes;
     item.fields.passwordModified = historicalItem.fields.passwordModified;
-    item.fields.attachments = [historicalItem.fields.attachments mutableCopy];
-    item.fields.customFields = [historicalItem.fields.customFields mutableCopy];
+    item.fields.attachments = [historicalItem.fields cloneAttachments];
+    item.fields.customFields = [historicalItem.fields cloneCustomFields];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] restoreHistoryItem:item
                                                                       historicalItem:originalNode
@@ -584,12 +587,12 @@ static NSString* kDefaultNewTitle = @"Untitled";
     });
 }
 
-- (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value {
+- (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    NSString* oldValue = [item.fields.customFields objectForKey:key];
+    StringValue* oldValue = [item.fields.customFields objectForKey:key];
     
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
@@ -609,9 +612,9 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [[self.document.undoManager prepareWithInvocationTarget:self] removeCustomField:item key:key];
         [self.document.undoManager setActionName:@"Add Custom Field"];
     }
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onCustomFieldsChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationCustomFieldsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -620,7 +623,7 @@ static NSString* kDefaultNewTitle = @"Untitled";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
 
-    NSString* oldValue = [item.fields.customFields objectForKey:key];
+    StringValue* oldValue = item.fields.customFields[key];
     
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
@@ -639,7 +642,7 @@ static NSString* kDefaultNewTitle = @"Untitled";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onCustomFieldsChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationCustomFieldsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 

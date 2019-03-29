@@ -23,6 +23,7 @@
 #import "PwSafeSerialization.h"
 #import "VariantDictionary.h"
 #import "Keys.h"
+#import "AesKdfCipher.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
@@ -81,7 +82,7 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    Keys *keys = getKeys(password, keyFileDigest, serializationData.kdfParameters, masterSeed);
+    Keys *keys = getKeys(password, keyFileDigest, serializationData.kdfParameters, masterSeed, ppError);
     
     //NSLog(@"SERIALIZE KEYS: [%@]", keys);
     
@@ -174,14 +175,10 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    Keys *keys = getKeys(password, keyFileDigest, cryptoParams.kdfParameters, cryptoParams.masterSeed);
-    
+    Keys *keys = getKeys(password, keyFileDigest, cryptoParams.kdfParameters, cryptoParams.masterSeed, ppError);
     //NSLog(@"DESERIALIZE KEYS: [%@]", keys);
 
     if (!keys) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Could not get all keys. Cannot open." errorCode:-2];
-        }
         return nil;
     }
     
@@ -463,9 +460,9 @@ static NSData* decryptBlocks(HmacBlockHeader *blockHeader, Keys *keys, CryptoPar
     return [cipher decrypt:dec iv:cryptoParams.iv key:keys.masterKey];
 }
 
-static Keys* getKeys(NSString* password, NSData* keyFileDigest, KdfParameters *kdfParameters, NSData* masterSeed) {
+static Keys* getKeys(NSString* password, NSData* keyFileDigest, KdfParameters *kdfParameters, NSData* masterSeed, NSError** error) {
     Keys *ret = [[Keys alloc] init];
-    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters);
+    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, error);
     
     if(!kdf) {
         NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", kdfParameters);
@@ -523,12 +520,34 @@ static BOOL checkHeaderHmac(NSData* safeData, size_t offset, NSData* hmacKey) {
     return YES;
 }
 
-static id<KeyDerivationCipher> getKeyDerivationCipher(KdfParameters *kdfParameters) {
+static id<KeyDerivationCipher> getKeyDerivationCipher(KdfParameters *kdfParameters, NSError** error) {
     if([kdfParameters.uuid isEqual:argon2CipherUuid()]) {
-        return [[Argon2KdfCipher alloc] initWithParametersDictionary:kdfParameters.parameters];
+        id<KeyDerivationCipher> ret = [[Argon2KdfCipher alloc] initWithParametersDictionary:kdfParameters];
+        if(ret == nil) {
+            if(error) {
+                *error = [Utils createNSError:@"Could not initialize Argon2 with Parameters" errorCode:-1];
+            }
+        }
+        
+        return ret;
     }
-    
-    return nil;
+    else if([kdfParameters.uuid isEqual:aesKdbx3KdfCipherUuid()] || [kdfParameters.uuid isEqual:aesKdbx4KdfCipherUuid()]) {
+        id<KeyDerivationCipher> ret = [[AesKdfCipher alloc] initWithParametersDictionary:kdfParameters];
+
+        if(ret == nil) {
+            if(error) {
+                *error = [Utils createNSError:@"Could not initialize AES KDF with Parameters" errorCode:-1];
+            }
+        }
+        
+        return ret;
+    }
+    else {
+        if(error) {
+            *error = [Utils createNSError:[NSString stringWithFormat:@"Unknown Key Derivation Cipher: [%@]", kdfParameters.uuid.UUIDString] errorCode:-1];
+        }
+        return nil;
+    }
 }
 
 static NSData* getHmacKey(NSData* masterSeed, NSData* transformKey) {

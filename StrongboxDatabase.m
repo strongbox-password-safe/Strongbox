@@ -138,7 +138,7 @@
     
     NSUInteger customFields = 0;
     for (NSString* key in node.fields.customFields.allKeys) {
-        customFields += key.length + node.fields.customFields[key].length;
+        customFields += key.length + node.fields.customFields[key].value.length;
     }
     
     // History

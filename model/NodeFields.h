@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "PasswordHistory.h"
 #import "NodeFileAttachment.h"
+#import "StringValue.h"
 
 @class Node;
 
@@ -32,11 +33,14 @@
 @property (nonatomic, strong, nullable) NSDate *accessed;
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
-@property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, NSString*> *customFields;
+@property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, StringValue*> *customFields;
 
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
 
 - (NodeFields *)cloneForHistory;
-    
+
+- (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
+- (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;
+
 @end

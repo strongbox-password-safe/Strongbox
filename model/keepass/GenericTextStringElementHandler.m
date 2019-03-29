@@ -19,7 +19,7 @@
 }
 
 - (void)onCompleted {
-    self.text = [self getXmlText];
+   self.text = [self getXmlText];
 }
 
 - (XmlTree *)generateXmlTree {

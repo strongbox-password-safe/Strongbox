@@ -15,6 +15,7 @@
 @property NSTextField* simpleInputTextField;
 @property NSTextField* keyTextField;
 @property NSTextField* valueTextField;
+@property NSButton* checkboxProtected;
 
 @end
 
@@ -131,7 +132,12 @@
     return nil;
 }
 
-- (void)inputKeyValue:(NSString*)prompt completion:(void (^)(BOOL yesNo, NSString* key, NSString* value))completion {
+- (void)inputKeyValue:(NSString*)prompt
+              initKey:(NSString*)initKey
+            initValue:(NSString*)initValue
+        initProtected:(BOOL)initProtected
+          placeHolder:(BOOL)placeHolder
+           completion:(void (^)(BOOL yesNo, NSString* key, NSString* value, BOOL protected))completion {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:prompt];
     //alert.informativeText = @"Informative?";
@@ -142,6 +148,13 @@
     
     // Accessory View
 
+    self.checkboxProtected = [[NSButton alloc] initWithFrame:NSMakeRect(40, 0, 100, 30)];
+    [self.checkboxProtected setTitle:@"Protected"];
+    [self.checkboxProtected setButtonType:NSButtonTypeSwitch];
+    self.checkboxProtected.target = self;
+    self.checkboxProtected.action = @selector(onCheckboxProtected);
+    self.checkboxProtected.state = initProtected ? NSOnState : NSOffState;
+    
     NSTextField *keyLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 77, 295, 16)];
     self.keyTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(40, 75, 295, 24)];
     NSTextField *valueLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 35, 295, 16)];
@@ -163,6 +176,15 @@
     self.valueTextField.delegate = self;
     self.keyTextField.nextKeyView = self.valueTextField;
     self.valueTextField.nextKeyView = self.keyTextField;
+
+    if(placeHolder) {
+        self.keyTextField.placeholderString = initKey;
+        self.valueTextField.placeholderString = initValue;
+    }
+    else {
+        self.keyTextField.stringValue = initKey;
+        self.valueTextField.stringValue = initValue;
+    }
     
     NSStackView *stackViewer = [[NSStackView alloc] initWithFrame:NSMakeRect(0,0, 295, 100)];
 
@@ -172,6 +194,7 @@
     [stackViewer addSubview:valueLabel];
     [stackViewer addSubview:self.valueTextField];
 
+    [stackViewer addSubview:self.checkboxProtected];
     
     alert.accessoryView = stackViewer;
     
@@ -179,7 +202,7 @@
     
     NSInteger button = [alert runModal];
     
-    completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue);
+    completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue, self.checkboxProtected.state == NSOnState);
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification {
@@ -198,8 +221,8 @@
     }
 }
 
-//- (void)controlTextDidEndEditing:(NSNotification *)notification {
-//    NSLog(@"controlTextDidEndEditing");
-//}
+- (void)onCheckboxProtected {
+    self.okButton.enabled = self.keyTextField.stringValue.length;
+}
 
 @end

@@ -48,9 +48,11 @@ static NSString* const kOtpAuthScheme = @"otpauth";
         
         // KeePassXC Otp
         
-        self.fields.customFields[@"TOTP Seed"] = [token.secret base32String];
+        self.fields.customFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
+        
         if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-            self.fields.customFields[@"TOTP Settings"] = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+            NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+            self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
         }
         else {
             self.fields.customFields[@"TOTP Settings"] = nil;
@@ -70,7 +72,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
         else {
             components.queryItems = @[key];
         }
-        self.fields.customFields[@"otp"] = components.query;
+        self.fields.customFields[@"otp"] = [StringValue valueWithString:components.query protected:YES];
     
         // Notes Field if it's a Password Safe database
         
@@ -109,7 +111,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     }
 }
 
-+ (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes {
++ (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary<NSString*, StringValue*>*)fields notes:(NSString*)notes {
     // KyPass - OTPAuth url in the Password field…
     
     NSURL *otpUrl = [NSURL URLWithString:password];
@@ -125,58 +127,68 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     // * []TOTP Seed=<seed>
     // * []TOTP Settings=30;6 - time and digits - can be 30;S for “Steam”?
     
-    NSString* keePassXcOtpSecret = fields[@"TOTP Seed"];
-    if(keePassXcOtpSecret) {
-        OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:keePassXcOtpSecret] name:@"<Unknown>" issuer:@"<Unknown>"];
-        
-        NSString* keePassXcOtpParams = fields[@"TOTP Settings"];
-        
-        if(keePassXcOtpParams) {
-            NSArray<NSString*>* params = [keePassXcOtpParams componentsSeparatedByString:@";"];
-            if(params.count > 0) {
-                token.period = [params[0] integerValue];
-            }
-            if(params.count > 1 && ![params[1] isEqualToString:@"S"]) { // S = Steam? Not sure how to gen... FUTURE
-                token.digits = [params[1] integerValue];
-            }
-        }
-        
-        if([token validate])
-        {
-            return token;
-        }
-    }
+    StringValue* keePassXcOtpSecretEntry = fields[@"TOTP Seed"];
     
-    // KeeOtp Plugin
-    // * otp="key=2GQFLXXUBJQELC&step=31"
-    // * otp="key=2GQFLXXUBJQELC&size=8"
-    
-    NSString* keeOtpSecret = fields[@"otp"];
-    if(keeOtpSecret) {
-        NSURLComponents *components = [NSURLComponents new];
-        [components setQuery:keeOtpSecret];
-        NSArray *queryItems = components.queryItems;
-        NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:queryItems.count];
-        for (NSURLQueryItem *item in queryItems) {
-            params[item.name] = item.value;
-        }
-        
-        NSString* secret = params[@"key"];
-        
-        if(secret.length) {
-            OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:secret] name:@"<Unknown>" issuer:@"<Unknown>"];
+    if(keePassXcOtpSecretEntry) {
+        NSString* keePassXcOtpSecret = keePassXcOtpSecretEntry.value;
+        if(keePassXcOtpSecret) {
+            OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:keePassXcOtpSecret] name:@"<Unknown>" issuer:@"<Unknown>"];
             
-            if(params[@"step"]) {
-                token.period = [params[@"step"] integerValue];
-            }
+            StringValue* keePassXcOtpParamsEntry = fields[@"TOTP Settings"];
             
-            if(params[@"size"]) {
-                token.digits = [params[@"size"] integerValue];
+            if(keePassXcOtpParamsEntry) {
+                NSString* keePassXcOtpParams = keePassXcOtpParamsEntry.value;
+                if(keePassXcOtpParams) {
+                    NSArray<NSString*>* params = [keePassXcOtpParams componentsSeparatedByString:@";"];
+                    if(params.count > 0) {
+                        token.period = [params[0] integerValue];
+                    }
+                    if(params.count > 1 && ![params[1] isEqualToString:@"S"]) { // S = Steam? Not sure how to gen... FUTURE
+                        token.digits = [params[1] integerValue];
+                    }
+                }
             }
             
             if([token validate])
             {
                 return token;
+            }
+        }
+    }
+    // KeeOtp Plugin
+    // * otp="key=2GQFLXXUBJQELC&step=31"
+    // * otp="key=2GQFLXXUBJQELC&size=8"
+    
+    StringValue* keeOtpSecretEntry = fields[@"otp"];
+
+    if(keeOtpSecretEntry) {
+        NSString* keeOtpSecret = keeOtpSecretEntry.value;
+        if(keeOtpSecret) {
+            NSURLComponents *components = [NSURLComponents new];
+            [components setQuery:keeOtpSecret];
+            NSArray *queryItems = components.queryItems;
+            NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:queryItems.count];
+            for (NSURLQueryItem *item in queryItems) {
+                params[item.name] = item.value;
+            }
+            
+            NSString* secret = params[@"key"];
+            
+            if(secret.length) {
+                OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:secret] name:@"<Unknown>" issuer:@"<Unknown>"];
+                
+                if(params[@"step"]) {
+                    token.period = [params[@"step"] integerValue];
+                }
+                
+                if(params[@"size"]) {
+                    token.digits = [params[@"size"] integerValue];
+                }
+                
+                if([token validate])
+                {
+                    return token;
+                }
             }
         }
     }

@@ -207,9 +207,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath {
     Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
     BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
+
     [Alerts yesNo:self.searchController.isActive ? self.searchController : self
             title:@"Are you sure?"
-          message:willRecycle ? @"Are you sure you want to send this item to the Recycle Bin?" : @"Are you sure you want to permanently delete this item?"
+          message:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%@' to the Recycle Bin?" : @"Are you sure you want to permanently delete '%@'?", item.title]
            action:^(BOOL response) {
                if (response) {
                    if(![self.viewModel deleteItem:item]) {
@@ -341,7 +342,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             // Search inside custom fields... can't find easy way to do this by predicate!
             
             for (NSString* key in node.fields.customFields.allKeys) {
-                NSString* value = node.fields.customFields[key];
+                NSString* value = node.fields.customFields[key].value;
                 
                 if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
                    [value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
@@ -870,9 +871,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)copyPasswordOnLongPress:(Node *)item withTapLocation:(CGPoint)tapLocation {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    pasteboard.string = item.fields.password;
+    BOOL copyTotp = (item.fields.password.length == 0 && item.otpToken);
+    pasteboard.string = copyTotp ? item.otpToken.password : item.fields.password;
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Password Copied", item.title]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ? @"'%@' OTP Code Copied" : @"'%@' Password Copied", item.title]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES

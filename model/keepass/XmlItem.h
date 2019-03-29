@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithXmlElementName:(nonnull NSString*)xmlElementName NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic) NSString* xmlElementName;
-@property (nonatomic) NSMutableDictionary* xmlAttributes;
+@property (nonatomic) NSMutableDictionary<NSString*, NSString*>* xmlAttributes;
 @property (nonatomic) NSString *xmlText;
 
 - (BOOL)isXmlEquivalent:(XmlItem*)other;

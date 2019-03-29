@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithDefaults;
-- (instancetype)initWithParametersDictionary:(NSDictionary<NSString*, VariantObject*>*)parameters;
+- (instancetype)initWithParametersDictionary:(KdfParameters*)parameters;
 
 - (NSData*)deriveKey:(NSData*)data;
 

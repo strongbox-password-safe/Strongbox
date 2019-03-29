@@ -25,6 +25,10 @@ static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSecond
 static NSString* const kDoNotShowTotp = @"doNotShowTotp";
 static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
 static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
+static NSString* const kDoNotFloatDetailsWindowOnTop = @"doNotFloatDetailsWindowOnTop";
+static NSString* const kNoAlternatingRows = @"noAlternatingRows";
+static NSString* const kShowHorizontalGrid = @"showHorizontalGrid";
+static NSString* const kShowVerticalGrid = @"showVerticalGrid";
             
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
@@ -261,6 +265,38 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setDoNotShowRecycleBinInBrowse:(BOOL)doNotShowRecycleBinInBrowse {
     [self setBool:kDoNotShowRecycleBinInBrowse value:doNotShowRecycleBinInBrowse];
+}
+
+- (BOOL)doNotFloatDetailsWindowOnTop {
+    return [self getBool:kDoNotFloatDetailsWindowOnTop];
+}
+
+- (void)setDoNotFloatDetailsWindowOnTop:(BOOL)doNotFloatDetailsWindowOnTop {
+    [self setBool:kDoNotFloatDetailsWindowOnTop value:doNotFloatDetailsWindowOnTop];
+}
+
+- (BOOL)noAlternatingRows {
+    return [self getBool:kNoAlternatingRows];
+}
+
+- (void)setNoAlternatingRows:(BOOL)noAlternatingRows {
+    [self setBool:kNoAlternatingRows value:noAlternatingRows];
+}
+
+- (BOOL)showHorizontalGrid {
+    return [self getBool:kShowHorizontalGrid];
+}
+
+- (void)setShowHorizontalGrid:(BOOL)showHorizontalGrid {
+    [self setBool:kShowHorizontalGrid value:showHorizontalGrid];
+}
+
+- (BOOL)showVerticalGrid {
+    return [self getBool:kShowVerticalGrid];
+}
+
+- (void)setShowVerticalGrid:(BOOL)showVerticalGrid {
+    [self setBool:kShowVerticalGrid value:showVerticalGrid];
 }
 
 @end

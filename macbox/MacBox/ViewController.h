@@ -33,7 +33,6 @@
 
 // App wide fields
 @property (weak) IBOutlet NSTableView *tableViewSummary;
-@property (weak) IBOutlet NSTableView *tableViewCustomFields;
 
 @property (weak) IBOutlet AttachmentCollectionView *attachmentsView;
 @property (weak) IBOutlet NSOutlineView *outlineView;
@@ -43,7 +42,6 @@
 @property (weak) IBOutlet NSButton *buttonCreateRecord;
 @property (weak) IBOutlet NSView *emailRow;
 @property (weak) IBOutlet NSView *attachmentsRow;
-@property (weak) IBOutlet NSView *customFieldsRow;
 
 // Locked Fields
 
@@ -87,6 +85,8 @@
 // Concealed View Fields
 
 - (IBAction)onCheckboxRevealDetailsImmediately:(id)sender;
+
+- (void)onDetailsWindowClosed:(id)wc;
 
 @end
 

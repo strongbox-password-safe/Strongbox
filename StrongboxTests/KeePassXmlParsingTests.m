@@ -276,9 +276,9 @@
 
     Entry* entry = [root.rootGroup.entries objectAtIndex:1];
     
-    NSLog(@"%@", entry.customFields);
+    NSLog(@"%@", entry.customStrings);
     
-    XCTAssertTrue([[entry.customFields objectForKey:@"Blah-Mark"] isEqualToString:@"Blah Value"]);
+    XCTAssertTrue([[entry.customStrings objectForKey:@"Blah-Mark"].value isEqualToString:@"Blah Value"]);
 }
 
 - (void)testViewCustomIcon {

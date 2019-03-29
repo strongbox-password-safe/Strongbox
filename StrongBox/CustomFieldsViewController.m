@@ -11,6 +11,7 @@
 #import "ISMessages/ISMessages.h"
 #import "NSArray+Extensions.h"
 #import "Entry.h"
+#import "CustomFieldTableCell.h"
 
 @interface CustomFieldsViewController ()
 
@@ -29,11 +30,17 @@
 
     self.tableView.tableFooterView = [UIView new];
     
-    self.tableView.rowHeight = 55.0f;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.estimatedRowHeight = 55.0f;
     
     self.workingItems = self.items ? [self.items mutableCopy] : [NSMutableArray array];
     
     self.buttonAdd.enabled = !self.readOnly;
+}
+
+- (void)onCellHeightChangedNotification {
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -41,7 +48,18 @@
     
     [self.navigationController setToolbarHidden:NO];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onCellHeightChangedNotification)
+                                                 name:CustomFieldCellHeightChanged
+                                               object:nil];
+
     [self refresh];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self name:CustomFieldCellHeightChanged object:nil];
 }
 
 - (void)refresh {
@@ -92,7 +110,9 @@
     if(self.readOnly) {
         return @[];
     }
-    
+
+    CustomField* item = [self.workingItems objectAtIndex:indexPath.row];
+
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeItem:indexPath];
     }];
@@ -100,8 +120,16 @@
     UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Edit" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self editItem:indexPath];
     }];
+    editAction.backgroundColor = UIColor.blueColor;
     
-    return @[removeAction, editAction];
+    UITableViewRowAction *toggleProtectAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:item.protected ? @"Unprotect" : @"Protect" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        item.protected = !item.protected;
+        self.dirty = YES;
+        [self refresh];
+    }];
+    toggleProtectAction.backgroundColor = UIColor.orangeColor;
+    
+    return @[removeAction, editAction, toggleProtectAction];
 }
 
 - (void)removeItem:(NSIndexPath*)indexPath {
@@ -260,13 +288,15 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CustomFieldsReuseIdentifier" forIndexPath:indexPath];
+    CustomField* field = [self.workingItems objectAtIndex:indexPath.row];
+
+    CustomFieldTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CustomFieldsReuseIdentifier" forIndexPath:indexPath];
+
+    cell.key = field.key;
+    cell.value = field.value;
+    cell.hidden = field.protected;
+    cell.isHideable = field.protected;
     
-    CustomField* attachment = [self.workingItems objectAtIndex:indexPath.row];
-
-    cell.textLabel.text = attachment.key;
-    cell.detailTextLabel.text = attachment.value;
-
     return cell;
 }
 
@@ -280,7 +310,7 @@
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     pasteboard.string = field.value;
     
-    [ISMessages showCardAlertWithTitle:@"Value Copied to Clipboard"
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Value Copied to Clipboard", field.key]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -288,6 +318,8 @@
                              alertType:ISAlertTypeSuccess
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

@@ -40,6 +40,11 @@
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
 
+@property BOOL doNotFloatDetailsWindowOnTop;
+@property BOOL noAlternatingRows;
+@property BOOL showHorizontalGrid;
+@property BOOL showVerticalGrid;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

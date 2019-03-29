@@ -14,6 +14,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kModelUpdateNotificationCustomFieldsChanged;
+extern NSString* const kNotificationUserInfoKeyNode;
+
 @interface ViewModel : NSObject
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
@@ -42,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
 - (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
 
-- (void)setCustomField:(Node *)item key:(NSString *)key value:(NSString *)value;
+- (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
 
 - (void)setTotp:(Node *)item otp:(NSString *)otp;
@@ -99,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^onItemNotesChanged)(Node* node);
 @property (nonatomic, copy) void (^onItemIconChanged)(Node* node);
 @property (nonatomic, copy) void (^onAttachmentsChanged)(Node* node);
-@property (nonatomic, copy) void (^onCustomFieldsChanged)(Node* node);
+
 @property (nonatomic, copy) void (^onDeleteItem)(Node* node);
 @property (nonatomic, copy) void (^onChangeParent)(Node* node);
 @property (nonatomic, copy) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);

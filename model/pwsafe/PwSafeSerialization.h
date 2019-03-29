@@ -18,6 +18,7 @@
 #define TWOFISH_KEYSIZE_BYTES               32
 #define FIELD_HEADER_LENGTH                 5
 
+
 typedef struct _PasswordSafe3Header {
     char tag[4];
     unsigned char salt[32];
@@ -38,6 +39,8 @@ typedef struct _FieldHeader {
 
 @interface PwSafeSerialization : NSObject
 
+NS_ASSUME_NONNULL_BEGIN
+
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (PasswordSafe3Header)getHeader:(NSData*)data;
 + (NSInteger)getKeyStretchIterations:(NSData*)data;
@@ -51,5 +54,7 @@ typedef struct _FieldHeader {
 + (NSMutableData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks;
 + (NSData *)extractDbHeaderAndRecords:(NSData *)decData headerFields_p:(NSMutableArray **)headerFields_p records_p:(NSMutableArray **)records_p;
 + (void)dumpDbHeaderAndRecords:(NSMutableArray *)headerFields records:(NSMutableArray *)records;
+
+NS_ASSUME_NONNULL_END
 
 @end

@@ -14,6 +14,7 @@
 #import "String.h"
 #import "Binary.h"
 #import "History.h"
+#import "StringValue.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) GenericTextUuidElementHandler* customIconUuid;
 @property (nonatomic) GenericTextUuidElementHandler* uuid;
 @property (nonatomic) Times* times;
-@property (nonatomic) NSMutableArray<String*> *strings;
 @property (nonatomic) NSMutableArray<Binary*> *binaries;
 @property (nonatomic) History* history;
 
@@ -43,10 +43,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString* notes;
 
 // Safe Custom String setter...
+
+- (void)setString:(NSString*)key value:(NSString*)value; // Do not change protected attribute
 - (void)setString:(NSString*)key value:(NSString*)value protected:(BOOL)protected;
 
 // R/O Handy View
-@property (nonatomic, readonly) NSDictionary<NSString*, NSString*> *customFields;
+
+@property (nonatomic, readonly) NSDictionary<NSString*, StringValue*> *customStrings;
+@property (nonatomic, readonly) NSDictionary<NSString*, StringValue*> *allStrings;
 
 @end
 

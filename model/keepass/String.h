@@ -20,10 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface String : BaseXmlDomainObjectHandler
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
-- (instancetype)initWithProtectedValue:(BOOL)protected context:(XmlProcessingContext*)context;
+- (instancetype)initWithKey:(NSString *)key value:(NSString *)value protected:(BOOL)protected context:(XmlProcessingContext*)context;
 
-@property (nonatomic) GenericTextStringElementHandler *key;
-@property (nonatomic) GenericTextStringElementHandler *value;
+@property NSString* key;
+@property NSString* value;
+@property BOOL protected;
 
 @end
 

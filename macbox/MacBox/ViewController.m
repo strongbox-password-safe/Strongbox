@@ -29,6 +29,7 @@
 #import "MacNodeIconHelper.h"
 #import "Node+OtpToken.h"
 #import "OTPToken+Generation.h"
+#import "NodeDetailsWindowController.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -46,7 +47,6 @@ const int kMaxCustomIconDimension = 256;
 @property (strong, nonatomic) NSArray<NSString*>* usernameAutoCompleteCache;
 @property (nonnull, strong, nonatomic) NSArray *attachments;
 @property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
-@property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
 
 // MMcG: 31-Jan-2019 - Sometimes during new record creation or title editing we don't want to immediately conceal
 // details (with a selection change, selection change is though unavoidable because the outline view needs to be
@@ -60,22 +60,18 @@ const int kMaxCustomIconDimension = 256;
 @property NSFont* italicFont;
 @property NSFont* regularFont;
 
+@property NSMutableArray<NodeDetailsWindowController*>* detailsWindowControllers; // Required to keep a hold of these window objects or actions don't work!
+
 @end
 
-//static NSImage* kFolderImage;
 static NSImage* kStrongBox256Image;
-//static NSImage* kSmallYellowFolderImage;
-//static NSImage* kSmallLockImage;
 static NSImage* kDefaultAttachmentIcon;
 
 @implementation ViewController
 
 + (void)initialize {
     if(self == [ViewController class]) {
-//        kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
         kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
-//        kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
-//        kSmallLockImage = [NSImage imageNamed:@"lock-48"];
         kDefaultAttachmentIcon = [NSImage imageNamed:@"document_empty_64"];
     }
 }
@@ -88,6 +84,40 @@ static NSImage* kDefaultAttachmentIcon;
     [self setInitialFocus];
 }
 
+- (void)viewDidDisappear {
+    [super viewDidDisappear];
+
+    for (NodeDetailsWindowController *wc in [self.detailsWindowControllers copy]) { // Copy as race condition of windows closing and calling into us will lead to crash
+        [wc close];
+    }
+
+    [self.detailsWindowControllers removeAllObjects];
+}
+
+- (IBAction)onViewItemDetails:(id)sender {
+    //Node* item = [self getCurrentSelectedItem];
+    //[self.model.document foo:item];
+    
+    [self showItemDetails];
+}
+
+- (void)showItemDetails {
+    Node* item = [self getCurrentSelectedItem];
+    if(!item || item.isGroup || self.model.format == kPasswordSafe) {
+        return;
+    }
+    
+    NodeDetailsWindowController* wc = [NodeDetailsWindowController showNode:item model:self.model readOnly:NO parentViewController:self];
+    
+    NSLog(@"Adding Details WindowController to List: [%@]", wc);
+    [self.detailsWindowControllers addObject:wc];
+}
+
+- (void)onDetailsWindowClosed:(id)wc {
+    NSLog(@"Removing Details WindowController to List: [%@]", wc);
+    [self.detailsWindowControllers removeObject:wc];
+}
+
 - (void)updateAutocompleteCaches {
     // NB: We use these caches tso that we don't get a feedback when entering entries in the fields and setting them on the model. Also PERF
     
@@ -98,6 +128,8 @@ static NSImage* kDefaultAttachmentIcon;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.detailsWindowControllers = [NSMutableArray array];
+    
     [self enableDragDrop];
 
     [self customizeUi];
@@ -158,9 +190,6 @@ static NSImage* kDefaultAttachmentIcon;
     
     // Custom Fields
     
-    self.customFields = [NSArray array];
-    self.tableViewCustomFields.dataSource = self;
-    self.tableViewCustomFields.delegate = self;
     self.buttonUnlockWithTouchId.hidden = YES;
     
     //
@@ -171,6 +200,15 @@ static NSImage* kDefaultAttachmentIcon;
         self.textFieldMasterPassword.showsText = !self.textFieldMasterPassword.showsText;
         self.imageViewShowHidePassword.image = !self.textFieldMasterPassword.showsText ? [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
     };
+    
+    self.outlineView.doubleAction = @selector(showItemDetails);
+
+    [self customizeOutlineViewFromSettings];
+}
+
+- (void)customizeOutlineViewFromSettings {
+    self.outlineView.usesAlternatingRowBackgroundColors = !Settings.sharedInstance.noAlternatingRows;
+    self.outlineView.gridStyleMask = (Settings.sharedInstance.showVerticalGrid ? NSTableViewSolidVerticalGridLineMask : 0) | (Settings.sharedInstance.showHorizontalGrid ? NSTableViewSolidHorizontalGridLineMask : 0);
 }
 
 - (void)disableFeaturesForLiteVersion {
@@ -200,7 +238,6 @@ static NSImage* kDefaultAttachmentIcon;
 -(void)setModel:(ViewModel *)model {
     _model = model;
     
-    // TODO: protocol or some other way!
     model.onNewItemAdded = ^(Node * _Nonnull node) {
         [self onNewItemAdded:node];
     };
@@ -225,9 +262,6 @@ static NSImage* kDefaultAttachmentIcon;
     model.onAttachmentsChanged = ^(Node * _Nonnull node) {
         [self onAttachmentsChanged:node];
     };
-    model.onCustomFieldsChanged = ^(Node * _Nonnull node) {
-        [self onCustomFieldsChanged:node];
-    };
     model.onDeleteItem = ^(Node * _Nonnull node) {
         [self onDeleteItem:node];
     };
@@ -249,6 +283,8 @@ static NSImage* kDefaultAttachmentIcon;
     model.onClearItemTotp = ^(Node * _Nonnull node) {
         [self onClearItemTotp:node];
     };
+    
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onCustomFieldsChanged:) name:kModelUpdateNotificationCustomFieldsChanged object:nil];
     
     [self bindToModel];
 }
@@ -353,11 +389,12 @@ static NSImage* kDefaultAttachmentIcon;
     }
 }
 
-- (void)onCustomFieldsChanged:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    if([self getCurrentSelectedItem] == node) {
-        [self refreshCustomFields:node];
+- (void)onCustomFieldsChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
     }
+    
+    self.itemsCache = nil; // Clear items cache
 }
 
 - (void)onDeleteItem:(Node*)node {
@@ -412,16 +449,19 @@ static NSImage* kDefaultAttachmentIcon;
     else {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
     }
-    
-    NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
-    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
-    col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
 
+    [self showHideOutlineViewColumns];
     [self.outlineView reloadData];
     
     [self bindDetailsPane];
 }
-                   
+
+- (void)showHideOutlineViewColumns {
+    NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
+    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
+    col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
+}
+
 - (void)setInitialFocus {
     if(self.model == nil || self.model.locked) {
         if([self biometricOpenIsAvailableForSafe]) {
@@ -433,25 +473,6 @@ static NSImage* kDefaultAttachmentIcon;
 - (void)refreshAttachments:(Node *)it {
     self.attachments = [it.fields.attachments copy];
     [self.attachmentsView reloadData];
-}
-
-- (void)refreshCustomFields:(Node *)it {
-    NSArray<NSString*> *sortedKeys = [it.fields.customFields.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        return [obj1 compare:obj2];
-    }];
-    
-    NSMutableArray *fields = [NSMutableArray array];
-    for (NSString *key in sortedKeys) {
-        NSString* value = it.fields.customFields[key];
-        
-        CustomField* field = [[CustomField alloc] init];
-        field.key = key;
-        field.value = value;
-        [fields addObject:field];
-    }
-    
-    self.customFields = [fields copy];
-    [self.tableViewCustomFields reloadData];
 }
 
 - (void)bindDetailsPane {
@@ -473,7 +494,6 @@ static NSImage* kDefaultAttachmentIcon;
     else {
         self.emailRow.hidden = self.model.format != kPasswordSafe;
         self.attachmentsRow.hidden = self.model.format == kPasswordSafe;
-        self.customFieldsRow.hidden = self.model.format == kPasswordSafe || self.model.format == kKeePass1;
         
         //NSLog(@"Setting Text fields");
         self.textFieldTitle.stringValue = it.title;
@@ -498,7 +518,6 @@ static NSImage* kDefaultAttachmentIcon;
         self.suppressConcealDetailsOnSelectionUpdateNextTime = NO; // Toggle off - back to normal selection change behaviour
         
         [self refreshAttachments:it];
-        [self refreshCustomFields:it];
         
         self.showPassword = Settings.sharedInstance.alwaysShowPassword;
         [self showOrHidePassword];
@@ -871,11 +890,13 @@ static NSImage* kDefaultAttachmentIcon;
     }
     else if(searchAll && (self.model.format == kKeePass4 || self.model.format == kKeePass)) {
         for (NSString* key in item.fields.customFields.allKeys) {
-            NSString* value = item.fields.customFields[key];
+            StringValue* value = item.fields.customFields[key];
             
-            if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
-               [value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
-                return YES;
+            if(value) {
+                if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
+                   [value.value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
+                    return YES;
+                }
             }
         }
     }
@@ -1176,6 +1197,11 @@ static NSImage* kDefaultAttachmentIcon;
 - (IBAction)lockSafeContinuation:(id)sender {
     Node* item = [self getCurrentSelectedItem];
     
+    for (NodeDetailsWindowController *wc in [self.detailsWindowControllers copy]) { // Copy as race condition of windows closing and calling into us will lead to crash
+        [wc close];
+    }    
+    [self.detailsWindowControllers removeAllObjects];
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError* error;
         BOOL lockSuccess = [self.model lock:&error selectedItem:item.serializationId];
@@ -1247,7 +1273,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (IBAction)onSearch:(id)sender {
-    NSLog(@"Search For: %@", self.searchField.stringValue);
+    //NSLog(@"Search For: %@", self.searchField.stringValue);
     
     self.itemsCache = nil; // Clear items cache
     
@@ -1696,7 +1722,10 @@ NSString* trimField(NSTextField* textField) {
     
     Node* item = [self getCurrentSelectedItem];
     
-    if (theAction == @selector(onDelete:)) {
+    if (theAction == @selector(onViewItemDetails:)) {
+        return item != nil;
+    }
+    else if (theAction == @selector(onDelete:)) {
         return item != nil;
     }
     else if(theAction == @selector(onCreateGroup:) ||
@@ -1912,6 +1941,9 @@ NSString* trimField(NSTextField* textField) {
         
         self.itemsCache = nil; // Clear items cache
         
+        [self showHideOutlineViewColumns];
+        [self customizeOutlineViewFromSettings];
+        
         [self.outlineView reloadData];
         
         [self selectItem:currentSelection];
@@ -1945,159 +1977,24 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    if(tableView == self.tableViewSummary) {
-        BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
-        return dictionary.count;
-    }
-    else {
-        return self.customFields.count;
-    }
+    BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
+    return dictionary.count;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    if(tableView == self.tableViewSummary) {
-        NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
+    NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
 
-        BasicOrderedDictionary *dict = getSummaryDictionary(self.model);
-        
-        
-        NSString *key = dict.allKeys[row];
-        NSString *value = [dict objectForKey:key];
-        
-        value = value == nil ? @"" : value; // Safety Only
-        
-        cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
-        
-        return cell;
-    }
-    else {
-        NSString* cellId = [tableColumn.identifier isEqualToString:@"CustomFieldKeyColumn"] ? @"CustomFieldKeyCellIdentifier" : @"CustomFieldValueCellIdentifier";
-        
-        NSTableCellView* cell = [self.tableViewCustomFields makeViewWithIdentifier:cellId owner:nil];
-
-        // NB: Values are set with bindings using objectValueForTableColumn below...
-        
-        return cell;
-    }
-}
-
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    if(tableView != self.tableViewSummary) {
-        CustomField* field = [self.customFields objectAtIndex:row];
-        return [tableColumn.identifier isEqualToString:@"CustomFieldKeyColumn"] ? field.key : field.value;
-    }
-    else {
-        return nil;
-    }
-}
-
-- (IBAction)onEndCustomFieldKeyCellEditing:(id)sender {
-    NSInteger row = self.tableViewCustomFields.selectedRow;
+    BasicOrderedDictionary *dict = getSummaryDictionary(self.model);
     
-    if(row == -1) {
-        NSLog(@"No edited Row Key?");
-        return;
-    }
-    //NSLog(@"Row: %ld", (long)row);
-
-    NSTextField* textField = ((NSTextField*)sender);
-    NSString* key = textField.stringValue;
-    CustomField* oldField = self.customFields[row];
     
-    if([key isEqualToString:oldField.key]) {
-        return;
-    }
+    NSString *key = dict.allKeys[row];
+    NSString *value = [dict objectForKey:key];
     
-    if(!key.length) {
-        [Alerts info:@"You cannot have an empty Key here. Use the remove button to remove this field if you want." window:self.view.window];
-        textField.stringValue = oldField.key;
-        return;
-    }
+    value = value == nil ? @"" : value; // Safety Only
     
-    NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
-        return obj.key;
-    }];
+    cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
     
-    NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
-    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
-    
-    if([existingKeySet containsObject:key]) {
-        [Alerts info:@"You cannot use that Key here as it already exists in custom fields." window:self.view.window];
-        textField.stringValue = oldField.key;
-        return;
-    }
-        
-    if([keePassReserved containsObject:key]) {
-        [Alerts info:@"You cannot use that Key here as it is reserved for standard KeePass fields." window:self.view.window];
-        textField.stringValue = oldField.key;
-        return;
-    }
-    
-    Node* item = [self getCurrentSelectedItem];
-    
-    [self.model removeCustomField:item key:oldField.key];
-    [self.model setCustomField:item key:key value:oldField.value];
-}
-
-- (IBAction)onEndCustomFieldValueCellEditing:(id)sender {
-    NSInteger row = self.tableViewCustomFields.selectedRow;
-
-    if(row == -1) {
-        NSLog(@"No edited Row Value?");
-        return;
-    }
-    //NSLog(@"Row: %ld", (long)row);
-    
-    NSTextField* textField = ((NSTextField*)sender);
-    NSString* value = textField.stringValue;
-    CustomField* oldField = self.customFields[row];
-
-    Node* item = [self getCurrentSelectedItem];
-    
-    [self.model setCustomField:item key:oldField.key value:value];
-}
-
-- (IBAction)onRemoveCustomField:(id)sender {
-    if(self.tableViewCustomFields.selectedRow != -1) {
-        CustomField *field = self.customFields[self.tableViewCustomFields.selectedRow];
-        
-        [Alerts yesNo:@"Are you sure you want to remove this field?" window:self.view.window completion:^(BOOL yesNo) {
-            if(yesNo) {
-                Node* item = [self getCurrentSelectedItem];
-                
-                [self.model removeCustomField:item key:field.key];
-            }
-        }];
-    }
-}
-
-- (IBAction)onAddCustomField:(id)sender {
-    Alerts* alert = [[Alerts alloc] init];
-    
-    [alert inputKeyValue:@"Enter New Custom Field" completion:^(BOOL yesNo, NSString *key, NSString *value) {
-        if(yesNo) {
-            NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
-                return obj.key;
-            }];
-            
-            NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
-            const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
-            
-            if([existingKeySet containsObject:key]) {
-                [Alerts info:@"You cannot use that Key here as it already exists in custom fields." window:self.view.window];
-                return;
-            }
-            
-            if([keePassReserved containsObject:key]) {
-                [Alerts info:@"You cannot use that Key here as it is reserved for standard KeePass fields." window:self.view.window];
-                return;
-            }
-
-            Node* item = [self getCurrentSelectedItem];
-            
-            [self.model setCustomField:item key:key value:value];
-        }
-    }];
+    return cell;
 }
 
 - (IBAction)onSetItemIcon:(id)sender {

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol KeyDerivationCipher <NSObject>
 
-- (instancetype)initWithParametersDictionary:(NSDictionary<NSString*, VariantObject*>*)parameters;
+- (instancetype)initWithParametersDictionary:(KdfParameters*)parameters;
 - (NSData*)deriveKey:(NSData*)data;
 
 @property (readonly, nonatomic) KdfParameters* kdfParameters;

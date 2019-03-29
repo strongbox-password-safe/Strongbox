@@ -24,7 +24,8 @@
 }
 
 - (void)testKeeOtpPluginStyle {
-    OTPToken* token = [Node getOtpTokenFromRecord:@"" fields:@{@"otp" : @"key=2GQFLXXUBJQELC&step=31"} notes:@""];
+    StringValue* stringValue = [StringValue valueWithString:@"key=2GQFLXXUBJQELC&step=31"];
+    OTPToken* token = [Node getOtpTokenFromRecord:@"" fields:@{@"otp" : stringValue} notes:@""];
 
     XCTAssertNotNil(token);
     
@@ -32,7 +33,7 @@
 }
 
 - (void)testKeePassXc {
-    NSDictionary *fields = @{ @"TOTP Seed" : @"2gqegflxxubjqeld", @"TOTP Settings" : @"30;6" };
+    NSDictionary *fields = @{ @"TOTP Seed" : [StringValue valueWithString:@"2gqegflxxubjqeld"], @"TOTP Settings" : [StringValue valueWithString:@"30;6"] };
     
     OTPToken* token = [Node getOtpTokenFromRecord:@"" fields:fields notes:@""];
 
@@ -42,7 +43,7 @@
 }
 
 - (void)testKeePassXcWithS {
-    NSDictionary *fields = @{ @"TOTP Seed" : @"2gqegflxxubjqeld", @"TOTP Settings" : @"30;S" };
+    NSDictionary *fields = @{ @"TOTP Seed" : [StringValue valueWithString:@"2gqegflxxubjqeld"], @"TOTP Settings" : [StringValue valueWithString:@"30;S"] };
     
     OTPToken* token = [Node getOtpTokenFromRecord:@"" fields:fields notes:@""];
     
@@ -54,7 +55,7 @@
 - (void)testNotesContainingOtpUrl {
     OTPToken* token = [Node getOtpTokenFromRecord:@""
                                            fields:@{}
-                                            notes:@"This are some notes containing an OTP Url like this: otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase which is kind of cool"];
+                                            notes:@"This are some notes containing an OTP Url like this: otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqexxubjqelc&issuer=Coinbase which is kind of cool"];
     
     XCTAssertNotNil(token);
     

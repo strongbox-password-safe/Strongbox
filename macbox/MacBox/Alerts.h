@@ -21,6 +21,12 @@
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty;
-- (void)inputKeyValue:(NSString*)prompt completion:(void (^)(BOOL yesNo, NSString* key, NSString* value))completion;
+
+- (void)inputKeyValue:(NSString*)prompt
+              initKey:(NSString*)initKey
+            initValue:(NSString*)initValue
+        initProtected:(BOOL)initProtected
+          placeHolder:(BOOL)placeHolder
+           completion:(void (^)(BOOL yesNo, NSString* key, NSString* value, BOOL protected))completion;
 
 @end

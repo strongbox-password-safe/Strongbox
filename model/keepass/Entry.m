@@ -10,6 +10,12 @@
 #import "KeePassDatabase.h"
 #import "History.h"
 
+@interface Entry ()
+
+@property (nonatomic) NSMutableDictionary<NSString*, StringValue*> *strings;
+
+@end
+
 @implementation Entry
 
 static NSString* const kTitleStringKey = @"Title";
@@ -39,10 +45,10 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.uuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:context];
         self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
         self.history = [[History alloc] initWithXmlElementName:kHistoryElementName context:context];
-        self.strings = [NSMutableArray array];
+        self.strings = [NSMutableDictionary dictionary];
         self.binaries = [NSMutableArray array];
-        self.iconId = nil; //[[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:context];
-        self.customIconUuid = nil; //[[GenericTextUuidElementHandler alloc] initWithXmlElementName:kCustomIconUuid context:context];
+        self.iconId = nil;
+        self.customIconUuid = nil;
     }
     
     return self;
@@ -88,7 +94,8 @@ const static NSSet<NSString*> *wellKnownKeys;
         return YES;
     }
     else if([withXmlElementName isEqualToString:kStringElementName]) {
-        [self.strings addObject:(String*)completedObject];
+        String* str = (String*)completedObject;
+        self.strings[str.key] = [StringValue valueWithString:str.value protected:str.protected];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kBinaryElementName]) {
@@ -118,8 +125,10 @@ const static NSSet<NSString*> *wellKnownKeys;
     if(self.iconId) [ret.children addObject:[self.iconId generateXmlTree]];
     if(self.customIconUuid) [ret.children addObject:[self.customIconUuid generateXmlTree]];
     
-    for (String *string in self.strings) {
-        [ret.children addObject:[string generateXmlTree]];
+    for (NSString* key in self.strings.allKeys) {
+        StringValue* value = self.strings[key];
+        String* strXml = [[String alloc] initWithKey:key value:value.value protected:value.protected context:self.context];
+        [ret.children addObject:[strXml generateXmlTree]];
     }
 
     for (Binary *binary in self.binaries) {
@@ -137,91 +146,102 @@ const static NSSet<NSString*> *wellKnownKeys;
     return ret;
 }
 
-- (NSDictionary<NSString*, String*>*)stringsLookup {
-    NSMutableDictionary<NSString*, String*> *ret = [NSMutableDictionary dictionary];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Strings
 
-    for (String* string in self.strings) {
-        [ret setObject:string forKey:string.key.text];
-    }
+- (StringValue*)getString:(NSString*)key {
+    return self.strings[key];
+}
+
+- (NSString*)getStringOrDefault:(NSString*)key {
+    StringValue* string = [self getString:key];
+    return string == nil || string.value == nil ? @"" : string.value;
+}
+
+- (void)setString:(NSString*)key value:(NSString*)value {
+    StringValue* string = [self getString:key];
     
-    return ret;
-}
-
-- (NSString *)title {
-    String* string = [[self stringsLookup] objectForKey:kTitleStringKey];
-    return string == nil ? @"" : string.value.text;
-}
-
--(void)setTitle:(NSString *)title {
-    BOOL protected = NO;
-    [self setString:kTitleStringKey value:title protected:protected];
-}
-
-- (NSString *)username {
-    String* string = [[self stringsLookup] objectForKey:kUserNameStringKey];
-    return string == nil ? @"" : string.value.text;
-}
-
-- (void)setUsername:(NSString *)username {
-    BOOL protected = NO;
-    [self setString:kUserNameStringKey value:username protected:protected];
-}
-
-- (NSString *)password {
-    String* string = [[self stringsLookup] objectForKey:kPasswordStringKey];
-    return string == nil ? @"" : string.value.text;
-}
-
-- (void)setPassword:(NSString *)password {
-    BOOL protected = YES; // FUTURE: init this with the defaults if they are in the XML Doc?
-    [self setString:kPasswordStringKey value:password protected:protected];
-}
-
-- (NSString *)url {
-    String* string = [[self stringsLookup] objectForKey:kUrlStringKey];
-    return string == nil ? @"" : string.value.text;
-}
-
-- (void)setUrl:(NSString *)url {
-    BOOL protected = NO;
-    [self setString:kUrlStringKey value:url protected:protected];
-}
-
-- (NSString *)notes {
-    String* string = [[self stringsLookup] objectForKey:kNotesStringKey];
-    return string == nil ? @"" : string.value.text;
-}
-
-- (void)setNotes:(NSString *)notes {
-    BOOL protected = NO;
-    [self setString:kNotesStringKey value:notes protected:protected];
+    if(!string) {
+        self.strings[key] = [StringValue valueWithString:value protected:NO];
+    }
+    else {
+        string.value = value ? value : @"";
+    }
 }
 
 - (void)setString:(NSString*)key value:(NSString*)value protected:(BOOL)protected {
-    String* string = [[self stringsLookup] objectForKey:key];
+    StringValue* string = [self getString:key];
     
     if(!string) {
-        string = [[String alloc] initWithProtectedValue:protected context:self.context];
-        string.key.text = key;
-        string.value.text = value ? value : @"";
-        
-        [self.strings addObject:string];
+        self.strings[key] = [StringValue valueWithString:value protected:protected];
     }
     else {
-        string.value.text = value ? value : @"";
+        string.value = value ? value : @"";
+        string.protected = protected;
     }
 }
 
--(NSDictionary<NSString *,NSString *> *)customFields {
-    NSMutableDictionary<NSString*, NSString*> *ret = [NSMutableDictionary dictionary];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Well Known Strings
+
+- (NSString *)title {
+    return [self getStringOrDefault:kTitleStringKey];
+}
+
+-(void)setTitle:(NSString *)title {
+    [self setString:kTitleStringKey value:title protected:NO]; // FUTURE: Default Protection can be specified in the header
+}
+
+- (NSString *)username {
+    return [self getStringOrDefault:kUserNameStringKey];
+}
+
+- (void)setUsername:(NSString *)username {
+    [self setString:kUserNameStringKey value:username protected:NO];  // FUTURE: Default Protection can be specified in the header
+}
+
+- (NSString *)password {
+    return [self getStringOrDefault:kPasswordStringKey];
+}
+
+- (void)setPassword:(NSString *)password {
+    [self setString:kPasswordStringKey value:password protected:YES];  // FUTURE: Default Protection can be specified in the header
+}
+
+- (NSString *)url {
+    return [self getStringOrDefault:kUrlStringKey];
+}
+
+- (void)setUrl:(NSString *)url {
+    [self setString:kUrlStringKey value:url protected:NO];  // FUTURE: Default Protection can be specified in the header
+}
+
+- (NSString *)notes {
+    return [self getStringOrDefault:kNotesStringKey];
+}
+
+- (void)setNotes:(NSString *)notes {
+    [self setString:kNotesStringKey value:notes protected:NO];  // FUTURE: Default Protection can be specified in the header
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Custom Strings Readonly
+
+- (NSDictionary<NSString *,StringValue *> *)allStrings {
+    return self.strings;
+}
+
+- (NSDictionary<NSString *,StringValue *> *)customStrings {
+    NSMutableDictionary<NSString*, StringValue*> *ret = [NSMutableDictionary dictionary];
     
-    for (String* string in self.strings) {
-        if(![wellKnownKeys containsObject:string.key.text]) {
-            [ret setObject:string.value.text forKey:string.key.text];
+    for (NSString* key in self.strings.allKeys) {
+        if(![wellKnownKeys containsObject:key]) {
+            StringValue* string = self.strings[key];
+            ret[key] = string;
         }
     }
     
-    return [ret copy];
+    return ret;
 }
 
 - (NSNumber *)icon {
@@ -255,7 +275,7 @@ const static NSSet<NSString*> *wellKnownKeys;
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"[%@]-[%@]-[%@]-[%@]-[%@]\nUUID = [%@]\nTimes = [%@], iconId = [%@]/[%@]\ncustomFields = [%@]",
-            self.title, self.username, self.password, self.url, self.notes, self.uuid, self.times, self.iconId, self.customIcon, self.customFields];
+            self.title, self.username, self.password, self.url, self.notes, self.uuid, self.times, self.iconId, self.customIcon, self.customStrings];
 }
 
 @end

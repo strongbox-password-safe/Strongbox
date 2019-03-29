@@ -207,7 +207,14 @@ static BOOL kLogVerbose = NO;
     }
     
     NSData *decrypted = [cipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
-    
+    if(decrypted == nil) {
+        if (ppError != nil) {
+            *ppError = [Utils createNSError:@"Could not decrypt using provided parameters" errorCode:-1];
+        }
+        
+        return nil;
+    }
+
     // Verify Start Stream - This checks the correct passphrase/keyfile has been used (or we've done something very wrong in the decryption process :/)
     
     NSData *actualStartStream = [decrypted subdataWithRange:NSMakeRange(0, decryptionParameters.streamStartBytes.length)];

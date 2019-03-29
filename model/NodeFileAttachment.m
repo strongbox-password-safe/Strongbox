@@ -10,6 +10,16 @@
 
 @implementation NodeFileAttachment
 
++ (instancetype)attachmentWithName:(NSString *)filename index:(uint32_t)index linkedObject:(NSObject *)linkedObject {
+    NodeFileAttachment* ret = [[NodeFileAttachment alloc] init];
+    
+    ret.filename = filename;
+    ret.index = index;
+    ret.linkedObject = linkedObject;
+    
+    return ret;
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"[%@] index: %d", self.filename, self.index];

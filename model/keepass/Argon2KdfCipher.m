@@ -60,19 +60,19 @@ static const BOOL kLogVerbose = NO;
     return self;
 }
 
-- (instancetype)initWithParametersDictionary:(NSDictionary<NSString*, VariantObject*>*)parameters {
+- (instancetype)initWithParametersDictionary:(KdfParameters*)parameters {
     self = [super init];
     if (self) {
         //NSLog(@"ARGON2: %@", parameters);
-        VariantObject *salt = [parameters objectForKey:kParameterSalt];
-        if( !salt) {
+        VariantObject *salt = [parameters.parameters objectForKey:kParameterSalt];
+        if(!salt) {
             return nil;
         }
         else {
             _salt = (NSData*)salt.theObject;
         }
 
-        VariantObject *parallelism = [parameters objectForKey:kParameterParallelism];
+        VariantObject *parallelism = [parameters.parameters objectForKey:kParameterParallelism];
         if(!parallelism) {
             _parallelism = kDefaultParallelism;
         }
@@ -80,7 +80,7 @@ static const BOOL kLogVerbose = NO;
             _parallelism = ((NSNumber*)parallelism.theObject).unsignedIntValue;
         }
         
-        VariantObject *memory = [parameters objectForKey:kParameterMemory];
+        VariantObject *memory = [parameters.parameters objectForKey:kParameterMemory];
         if(!memory) {
             _memory = kDefaultMemory;
         }
@@ -88,7 +88,7 @@ static const BOOL kLogVerbose = NO;
             _memory = ((NSNumber*)memory.theObject).longLongValue;
         }
         
-        VariantObject *iterations = [parameters objectForKey:kParameterIterations];
+        VariantObject *iterations = [parameters.parameters objectForKey:kParameterIterations];
         if(!iterations) {
             _iterations = kDefaultIterations;
         }
@@ -96,7 +96,7 @@ static const BOOL kLogVerbose = NO;
             _iterations = ((NSNumber*)iterations.theObject).longLongValue;
         }
         
-        VariantObject *version = [parameters objectForKey:kParameterVersion];
+        VariantObject *version = [parameters.parameters objectForKey:kParameterVersion];
         if(!version) {
             _version = kDefaultVersion;
         }
@@ -106,11 +106,12 @@ static const BOOL kLogVerbose = NO;
         
         // Optional
         
-        VariantObject *secretKey = [parameters objectForKey:kParameterSecretKey];
-        VariantObject *assocData = [parameters objectForKey:kParameterAssocData];
+        VariantObject *secretKey = [parameters.parameters objectForKey:kParameterSecretKey];
+        VariantObject *assocData = [parameters.parameters objectForKey:kParameterAssocData];
         _secretKey = secretKey ? (NSData*)secretKey.theObject : nil;
         _assocData = assocData ? (NSData*)assocData.theObject : nil;
     }
+    
     return self;
 }
 

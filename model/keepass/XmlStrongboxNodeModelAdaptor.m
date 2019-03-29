@@ -118,42 +118,11 @@
     ret.times.lastModificationTime.date = entry.fields.modified;
     ret.times.creationTime.date = entry.fields.created;
 
-    // Strings also partially managed / add previous strings with their attributes/elements/text first then
-    // overwrite
-
-    // Duplicate the strings, so we don't overwrite the original record.
-    // (useful for unit testing in Xml Comparison only at the moment, but I see no harm in doing this). Looks ugly though
+    // Strings
     
-    for (String* originalString in previousXmlEntry.strings) {
-        if(![entry.fields.customFields objectForKey:originalString.key.text]) {
-            continue; // This entry must have been removed... skip
-        }
-            
-        String* duplicatedString = [[String alloc] initWithContext:self.xmlParsingContext];
-        [duplicatedString setXmlInfo:originalString.nonCustomisedXmlTree.node.xmlElementName
-                          attributes:originalString.nonCustomisedXmlTree.node.xmlAttributes
-                                text:originalString.nonCustomisedXmlTree.node.xmlText];
-
-        [duplicatedString.key setXmlInfo:originalString.key.nonCustomisedXmlTree.node.xmlElementName
-                              attributes:originalString.key.nonCustomisedXmlTree.node.xmlAttributes
-                                    text:originalString.key.nonCustomisedXmlTree.node.xmlText];
-
-        duplicatedString.key.text = originalString.key.text;
-
-        [duplicatedString.value setXmlInfo:originalString.value.nonCustomisedXmlTree.node.xmlElementName
-                                attributes:originalString.value.nonCustomisedXmlTree.node.xmlAttributes
-                                      text:originalString.value.nonCustomisedXmlTree.node.xmlText];
-
-        duplicatedString.value.text = originalString.value.text;
-
-        [ret.strings addObject:duplicatedString];
-    }
- 
-    // Now Overwrite to maintain any attributes but keep new Strongbox values
-
     for (NSString* key in entry.fields.customFields.allKeys) {
-        NSString* value = entry.fields.customFields[key];
-        [ret setString:key value:value protected:YES];
+        StringValue* value = entry.fields.customFields[key];
+        [ret setString:key value:value.value protected:value.protected];
     }
 
     ret.title = entry.title;
@@ -162,19 +131,9 @@
     ret.url = entry.fields.url;
     ret.notes = entry.fields.notes;
     
+    // Verify it's ok to strip empty strings. Looks like it is: https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
     // MMcG: Don't strip emptys, it seems to be useful to allow empty values in the custom fields, or at least the
     // Windows app allows this
-    
-//    // Verify it's ok to strip empty strings. Looks like it is.
-//    // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
-//
-//    NSArray<String*>* filtered = [ret.strings filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-//        String* string = (String*)evaluatedObject;
-//        return string.value.text.length;
-//    }]];
-
-//    [ret.strings removeAllObjects];
-//    [ret.strings addObjectsFromArray:filtered];
 
     // Binaries
     
@@ -267,8 +226,8 @@
     
     // Custom Fields
     
-    for (NSString* key in childEntry.customFields.allKeys) {
-        NSString* value = childEntry.customFields[key];
+    for (NSString* key in childEntry.customStrings.allKeys) {
+        StringValue* value = childEntry.customStrings[key];
         [fields.customFields setObject:value forKey:key];
     }
     

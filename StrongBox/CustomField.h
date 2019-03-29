@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSString* key;
 @property NSString* value;
+@property BOOL protected;
 
 @end
 

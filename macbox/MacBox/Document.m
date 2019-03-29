@@ -18,6 +18,7 @@
 #import "SafeMetaData.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
+#import "NodeDetailsWindowController.h"
 
 @interface Document ()
 
@@ -48,6 +49,16 @@
 
     [self setWindowModel:self.model];
 }
+
+//- (void)foo:(Node*)item {
+//    if(!item || item.isGroup || self.model.format == kPasswordSafe) {
+//        return;
+//    }
+//    
+//    NodeDetailsWindowController* wc = [NodeDetailsWindowController showNode:item model:self.model readOnly:NO parentViewController:self];
+//    
+//    [self addWindowController:wc];
+//}
 
 - (IBAction)saveDocument:(id)sender
 {

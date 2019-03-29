@@ -33,6 +33,9 @@
 		4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */; };
 		4D10154F21F7315400D2F711 /* LockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D10154C21F7315400D2F711 /* LockViewController.m */; };
 		4D10155021F7315400D2F711 /* LockViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D10154E21F7315400D2F711 /* LockViewController.xib */; };
+		4D108BFB224A2D6700C17095 /* CustomFieldTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */; };
+		4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
+		4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
 		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
@@ -134,6 +137,8 @@
 		4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */; };
 		4D2F6C4421807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */; };
 		4D2F6C4521807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */; };
+		4D305766224B4F8F00C36287 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D305765224B4F8F00C36287 /* StringValue.m */; };
+		4D305767224B4F8F00C36287 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D305765224B4F8F00C36287 /* StringValue.m */; };
 		4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D31B374219B32DE00C190C0 /* db-4-nocompression.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D31B373219B32DE00C190C0 /* db-4-nocompression.kdbx */; };
 		4D326E8122302BED00DCD8C7 /* NMSSHLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D326E5E22302BED00DCD8C7 /* NMSSHLogger.m */; };
@@ -581,6 +586,10 @@
 		4D10154C21F7315400D2F711 /* LockViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LockViewController.m; path = StrongBox/LockViewController.m; sourceTree = "<group>"; };
 		4D10154D21F7315400D2F711 /* LockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LockViewController.h; path = StrongBox/LockViewController.h; sourceTree = "<group>"; };
 		4D10154E21F7315400D2F711 /* LockViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LockViewController.xib; path = StrongBox/LockViewController.xib; sourceTree = "<group>"; };
+		4D108BF9224A2D6700C17095 /* CustomFieldTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldTableCell.h; path = StrongBox/CustomFieldTableCell.h; sourceTree = "<group>"; };
+		4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldTableCell.m; path = StrongBox/CustomFieldTableCell.m; sourceTree = "<group>"; };
+		4D108BFC224A40EC00C17095 /* AesKdfCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesKdfCipher.h; path = model/keepass/AesKdfCipher.h; sourceTree = "<group>"; };
+		4D108BFD224A40EC00C17095 /* AesKdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesKdfCipher.m; path = model/keepass/AesKdfCipher.m; sourceTree = "<group>"; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BrowseSafeView.h; path = StrongBox/BrowseSafeView.h; sourceTree = "<group>"; };
 		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BrowseSafeView.m; path = StrongBox/BrowseSafeView.m; sourceTree = "<group>"; };
 		4D1757971C8361D200E6356F /* GoogleDriveManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GoogleDriveManager.h; path = StrongBox/GoogleDriveManager.h; sourceTree = "<group>"; };
@@ -683,6 +692,8 @@
 		4D2F6C4221807CF9007931E4 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = SOURCE_ROOT; };
 		4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseXmlDomainObjectHandler.m; path = model/keepass/BaseXmlDomainObjectHandler.m; sourceTree = SOURCE_ROOT; };
 		4D2F82331F754FB0001688C9 /* Strongbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox.entitlements; path = StrongBox/Strongbox.entitlements; sourceTree = "<group>"; };
+		4D305764224B4F8F00C36287 /* StringValue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringValue.h; path = model/keepass/StringValue.h; sourceTree = "<group>"; };
+		4D305765224B4F8F00C36287 /* StringValue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StringValue.m; path = model/keepass/StringValue.m; sourceTree = "<group>"; };
 		4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "StrongBox/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D31B373219B32DE00C190C0 /* db-4-nocompression.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "db-4-nocompression.kdbx"; sourceTree = "<group>"; };
 		4D326E5D22302BED00DCD8C7 /* socket_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socket_helper.h; sourceTree = "<group>"; };
@@ -1634,6 +1645,8 @@
 		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				4D108BF9224A2D6700C17095 /* CustomFieldTableCell.h */,
+				4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */,
 				4D06943622083E2000FB826C /* Upgrade */,
 				4DED20C72168BF1800A5800A /* Root */,
 				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
@@ -1856,6 +1869,8 @@
 				4DC8D9AA21B6E8A9004F1812 /* KeyFileParser.m */,
 				4DDA01542242621400C7F0E2 /* NSUUID+Zero.h */,
 				4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */,
+				4D305764224B4F8F00C36287 /* StringValue.h */,
+				4D305765224B4F8F00C36287 /* StringValue.m */,
 			);
 			name = Keepass;
 			sourceTree = "<group>";
@@ -2129,6 +2144,8 @@
 				4D3AC32221908D4A0010CFCD /* Keys.m */,
 				4D4598CB2193048400792EF7 /* TwoFishCipher.h */,
 				4D4598CC2193048400792EF7 /* TwoFishCipher.m */,
+				4D108BFC224A40EC00C17095 /* AesKdfCipher.h */,
+				4D108BFD224A40EC00C17095 /* AesKdfCipher.m */,
 			);
 			name = crypto;
 			sourceTree = "<group>";
@@ -2923,6 +2940,7 @@
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4DF972BD21C0079F00F384C9 /* SFTPProviderData.m in Sources */,
 				4DF972C121C017F100F384C9 /* WebDAVStorageProvider.m in Sources */,
+				4D108BFB224A2D6700C17095 /* CustomFieldTableCell.m in Sources */,
 				4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
@@ -3030,10 +3048,12 @@
 				4D2F6C1D21807C25007931E4 /* XMLWriter.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
 				4DF97F2B21BF10EB0090A55E /* NSDateRFC1123.m in Sources */,
+				4D305766224B4F8F00C36287 /* StringValue.m in Sources */,
 				4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 				4D41D9FB21C15BFB007D982B /* WebDAVConfigurationViewController.m in Sources */,
 				4DAF92B622118C2A0000D013 /* LicenceCodeManager.m in Sources */,
+				4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D2962B3223173FC0082897D /* History.m in Sources */,
 				4D4598CD2193048400792EF7 /* TwoFishCipher.m in Sources */,
 			);
@@ -3065,6 +3085,7 @@
 				4D5B1EA82194AAAF00ECAF0D /* KdbEntry.m in Sources */,
 				4D2F6C1821807C07007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D766D6022204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
+				4D305767224B4F8F00C36287 /* StringValue.m in Sources */,
 				4D3E1485218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D2F6C2721807C53007931E4 /* XmlItem.m in Sources */,
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
@@ -3075,6 +3096,7 @@
 				4DF972BE21C0079F00F384C9 /* SFTPProviderData.m in Sources */,
 				4DF972CB21C01ABF00F384C9 /* DAVRequestGroup.m in Sources */,
 				4D4767082179013900C4358F /* RootXmlDomainObject.m in Sources */,
+				4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
 				4D56D91421B837A20030E13A /* AddNewSafeHelper.m in Sources */,
