@@ -8,9 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-extern NSString *const CustomFieldCellHeightChanged;
-
 NS_ASSUME_NONNULL_BEGIN
+
+extern NSString *const CustomFieldCellHeightChanged;
 
 @interface CustomFieldTableCell : UITableViewCell
 

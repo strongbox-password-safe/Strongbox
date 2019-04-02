@@ -10,6 +10,8 @@
 #import "NodeFields.h"
 #import "OTPToken.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface Node : NSObject
 
 + (instancetype)rootGroup;
@@ -17,7 +19,7 @@
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid;
-- (nonnull instancetype)initAsRoot:(NSUUID*)uuid childRecordsAllowed:(BOOL)childRecordsAllowed;
+- (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid childRecordsAllowed:(BOOL)childRecordsAllowed;
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent
@@ -83,3 +85,5 @@
 extern NSComparator finderStyleNodeComparator;
 
 @end
+
+NS_ASSUME_NONNULL_END

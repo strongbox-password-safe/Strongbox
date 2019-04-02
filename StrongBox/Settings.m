@@ -51,6 +51,7 @@ static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementChe
 static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
 static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
 static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
+static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill";
 
 @implementation Settings
 
@@ -700,11 +701,21 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 }
 
 - (BOOL)doNotCopyOtpCodeOnAutoFillSelect {
+
     return [[self getUserDefaults] boolForKey:kCopyOtpCodeOnAutoFillSelect];
 }
 
 - (void)setDoNotCopyOtpCodeOnAutoFillSelect:(BOOL)copyOtpCodeOnAutoFillSelect {
     [[self getUserDefaults] setBool:copyOtpCodeOnAutoFillSelect forKey:kCopyOtpCodeOnAutoFillSelect];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)doNotUseQuickTypeAutoFill {
+    return [[self getUserDefaults] boolForKey:kDoNotUseQuickTypeAutoFill];
+}
+
+- (void)setDoNotUseQuickTypeAutoFill:(BOOL)doNotUseQuickTypeAutoFill {
+    [[self getUserDefaults] setBool:doNotUseQuickTypeAutoFill forKey:kDoNotUseQuickTypeAutoFill];
     [[self getUserDefaults] synchronize];
 }
 

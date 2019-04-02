@@ -18,6 +18,12 @@
 #import "Utils.h"
 #import "regdom.h"
 
+static NSInteger const kScopeTitle = 0;
+static NSInteger const kScopeUsername = 1;
+static NSInteger const kScopePassword = 2;
+static NSInteger const kScopeUrl = 3;
+static NSInteger const kScopeAll = 4;
+
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
 @property (strong, nonatomic) NSArray<Node*> *searchResults;
@@ -67,7 +73,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
-    self.searchController.searchBar.selectedScopeButtonIndex = 4;
+    self.searchController.searchBar.selectedScopeButtonIndex = kScopeAll;
     
     if (@available(iOS 11.0, *)) {
         self.navigationItem.searchController = self.searchController;
@@ -88,9 +94,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     if(!Settings.sharedInstance.showKeePass1BackupGroup) {
         if (self.model.database.format == kKeePass1) {
-            Node* backupGroup = [self.model.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
-                return [node.title isEqualToString:@"Backup"];
-            }];
+            Node* backupGroup = self.model.database.keePass1BackupNode;
             
             if(backupGroup) {
                 self.items = [self.model.database.allRecords filter:^BOOL(Node * _Nonnull obj) {
@@ -110,40 +114,6 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     }
     
     [self smartInitializeSearch];
-}
-
-- (void)smartInitializeSearch {
-    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-    
-    if(serviceIdentifiers.count > 1) {
-        NSLog(@"Service Identifiers > 1: [%@]", serviceIdentifiers);
-    }
-    
-    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
-    if(serviceId) {
-        if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
-            NSURL* url = [NSURL URLWithString:serviceId.identifier];
-
-            NSLog(@"URL: %@", url);
-
-            NSString * searchTerm = getSearchTermFromDomain(url.host);
-        
-            //self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
-            [self.searchController.searchBar setText:searchTerm];
-            return;
-        }
-        else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
-            NSString * searchTerm = getSearchTermFromDomain(serviceId.identifier);
-            
-            //self.searchController.searchBar.selectedScopeButtonIndex = 0;
-            [self.searchController.searchBar setText:searchTerm];
-        
-            return;
-        }
-    }
-    
-    //self.searchController.searchBar.selectedScopeButtonIndex = 0; // Title
-    //[self.searchController.searchBar setText:@""];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -205,20 +175,102 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         return;
     }
     
+    NSArray* foo = [self getMatchingItems:searchText scope:scope];
+    
+    self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
+}
+
+- (void)smartInitializeSearch {
+    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
+    
+    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+    if(serviceId) {
+        if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
+            NSURL* url = [NSURL URLWithString:serviceId.identifier];
+            
+            //NSLog(@"URL: %@", url);
+            
+            // Direct URL Match?
+            
+            NSArray* items = [self getMatchingItems:url.absoluteString scope:kScopeUrl];
+            if(items.count) {
+                [self.searchController.searchBar setText:url.absoluteString];
+                [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+                return;
+            }
+            else {
+                NSLog(@"No matches for URL: %@", url.absoluteString);
+            }
+            
+            // Host URL Match?
+            
+            items = [self getMatchingItems:url.host scope:kScopeUrl];
+            if(items.count) {
+                [self.searchController.searchBar setText:url.host];
+                [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+                return;
+            }
+            else {
+                NSLog(@"No matches for URL: %@", url.host);
+            }
+
+            
+            NSString* domain = getDomain(url.host);
+            [self smartInitializeSearchFromDomain:domain];
+
+        }
+        else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
+            [self smartInitializeSearchFromDomain:serviceId.identifier];
+        }
+    }
+}
+
+- (void)smartInitializeSearchFromDomain:(NSString*)domain {
+    // Domain URL Match?
+    
+    NSArray* items = [self getMatchingItems:domain scope:kScopeUrl];
+    if(items.count) {
+        [self.searchController.searchBar setText:domain];
+        [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+        return;
+    }
+    else {
+        NSLog(@"No matches in URLs for Domain: %@", domain);
+    }
+    
+    // Broad Search across all fields for domain...
+    
+    items = [self getMatchingItems:domain scope:kScopeAll];
+    if(items.count) {
+        [self.searchController.searchBar setText:domain];
+        [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+        return;
+    }
+    else {
+        NSLog(@"No matches across all fields for Domain: %@", domain);
+    }
+
+    // Broadest general search (try grab the company/organisation name from the host)
+    
+    NSString * searchTerm = getCompanyOrOrganisationNameFromDomain(domain);
+    [self.searchController.searchBar setText:searchTerm];
+}
+
+- (NSArray*)getMatchingItems:(NSString*)searchText scope:(NSInteger)scope {
     NSPredicate *predicate;
     
-    if (scope == 0) {
+    if (scope == kScopeTitle) {
         predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
     }
-    else if (scope == 1)
+    else if (scope == kScopeUsername)
     {
         predicate = [NSPredicate predicateWithFormat:@"fields.username contains[c] %@", searchText];
     }
-    else if (scope == 2)
+    else if (scope == kScopePassword)
     {
         predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
     }
-    else if (scope == 3)
+    else if (scope == kScopeUrl)
     {
         predicate = [NSPredicate predicateWithFormat:@"fields.url contains[c] %@", searchText];
     }
@@ -240,9 +292,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     if(!Settings.sharedInstance.showKeePass1BackupGroup) {
         if (self.model.database.format == kKeePass1) {
-            Node* backupGroup = [self.model.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
-                return [node.title isEqualToString:@"Backup"];
-            }];
+            Node* backupGroup = self.model.database.keePass1BackupNode;
             
             if(backupGroup) {
                 foo = [foo filter:^BOOL(Node * _Nonnull obj) {
@@ -251,15 +301,15 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             }
         }
     }
-
+    
     Node* recycleBin = self.model.database.recycleBinNode;
     if(recycleBin) {
         foo = [foo filter:^BOOL(Node * _Nonnull obj) {
             return ![recycleBin contains:obj];
         }];
     }
-    
-    self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
+
+    return foo;
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -328,13 +378,11 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     if(record) {
         if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && record.otpToken) {
             NSString* value = record.otpToken.password;
-            if (!value.length) {
-                return;
+            if (value.length) {
+                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                pasteboard.string = value;
+                NSLog(@"Copied TOTP to Pasteboard...");
             }
-            
-            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-            pasteboard.string = value;
-            NSLog(@"Copied TOTP to Pasteboard...");
         }
         
         //NSLog(@"[%@] selected... Sending credentials [%@/%@]...", record.title, record.fields.username, record.fields.password);
@@ -362,7 +410,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
                 NSURL* url = [NSURL URLWithString:serviceId.identifier];
                 if(url && url.host.length) {
-                    NSString* foo = getSearchTermFromDomain(url.host);
+                    NSString* foo = getCompanyOrOrganisationNameFromDomain(url.host);
                     vc.suggestedTitle = foo.length ? [foo capitalizedString] : foo;
                     vc.suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
                 }
@@ -372,7 +420,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
                 return;
             }
             else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
-                NSString* foo = getSearchTermFromDomain(serviceId.identifier);
+                NSString* foo = getCompanyOrOrganisationNameFromDomain(serviceId.identifier);
                 vc.suggestedTitle = foo.length ? [foo capitalizedString] : foo;
                 vc.suggestedUrl = serviceId.identifier;
                 return;
@@ -456,9 +504,7 @@ NSString *getDomain(NSString* host) {
     return domain;
 }
 
-NSString *getSearchTermFromDomain(NSString* host) {
-    NSString* domain = getDomain(host);
-    
+NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if(!domain.length) {
         return domain;
     }

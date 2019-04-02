@@ -184,11 +184,11 @@
 
     UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
                                                             style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { }];
+                                                          handler:^(UIAlertAction *a) { if(completion) { completion(); } }];
 
     [alertController addAction:defaultAction];
 
-    [viewController presentViewController:alertController animated:YES completion:completion];
+    [viewController presentViewController:alertController animated:YES completion:nil];
 }
 
 + (void)warn:(UIViewController *)viewController

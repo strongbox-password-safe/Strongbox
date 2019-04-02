@@ -34,7 +34,7 @@
 }
 
 - (instancetype)init {
-    if([super init]) {
+    if(self = [super init]) {
         _displayName = @"WebDAV";
         _icon = @"webdav-32x32";
         _storageId = kWebDAV;

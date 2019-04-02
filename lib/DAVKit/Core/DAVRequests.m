@@ -81,7 +81,7 @@
 		[req setValue:@"infinity" forHTTPHeaderField:@"Depth"];
 	}
 	else {
-		[req setValue:[NSString stringWithFormat:@"%ld", _depth] forHTTPHeaderField:@"Depth"];
+        [req setValue:[NSString stringWithFormat:@"%lu", (unsigned long)_depth] forHTTPHeaderField:@"Depth"];
 	}
 	
 	[req setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
@@ -145,7 +145,7 @@
 - (NSURLRequest *)request {
 	NSParameterAssert(_pdata != nil);
 	
-	NSString *len = [NSString stringWithFormat:@"%ld", [_pdata length]];
+    NSString *len = [NSString stringWithFormat:@"%lu", (unsigned long)[_pdata length]];
 	
 	NSMutableURLRequest *req = [self newRequestWithPath:self.path method:@"PUT"];
 	[req setValue:[self dataMIMEType] forHTTPHeaderField:@"Content-Type"];

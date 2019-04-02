@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)getAppName;
 + (NSString *)getAppVersion;
 + (NSString *)insertTimestampInFilename:(NSString *)title;
-+ (NSString *)hostname;
++ (nullable NSString *)hostname;
 + (NSString *)getUsername;
 + (NSString *)trim:(NSString*)string;
 + (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2;
@@ -53,7 +53,7 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width);
 + (NSString *)hexadecimalString:(NSData *)data;
 
 NSData* sha256(NSData *data);
-NSData* getRandomData(uint32_t length);
+NSData*_Nullable getRandomData(uint32_t length);
 uint32_t getRandomUint32(void);
 
 #if TARGET_OS_IPHONE
@@ -63,7 +63,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize);
 #endif
 
 #if TARGET_OS_IPHONE
-+ (NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error;
++ (nullable NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error;
 #endif
 
 NS_ASSUME_NONNULL_END

@@ -76,18 +76,20 @@
             NSDate *timestamp = [NSDate dateWithTimeIntervalSince1970:ts];
 
             NSUInteger passwordLength = [self getIntegerFromHexCharArray:entryHeader.passwordLength length:4];
-
-            char pw[passwordLength];
-
             if (data.length < (currentEntryStartOffset + SIZE_OF_ENTRY_HEADER + passwordLength)) {
                 NSLog(@"Invalid current size for pwhist. %@", data);
                 return nil;
             }
 
-            [data getBytes:pw range:NSMakeRange(currentEntryStartOffset + SIZE_OF_ENTRY_HEADER, passwordLength)];
+            NSString *password = @"";
+            if(passwordLength > 0) {
+                char pw[passwordLength];
+                
+                [data getBytes:pw range:NSMakeRange(currentEntryStartOffset + SIZE_OF_ENTRY_HEADER, passwordLength)];
 
-            NSString *password = [self getStringFromCharArray:pw length:passwordLength];
-
+                password = [self getStringFromCharArray:pw length:passwordLength];
+            }
+            
             PasswordHistoryEntry *entry = [[PasswordHistoryEntry alloc] initWithTimestamp:timestamp password:password];
             [self.entries addObject:entry];
 

@@ -22,7 +22,7 @@
 }
 
 - (instancetype)initWithKeyChainUuid:(NSString*)keyChainUuid {
-    if([super init]) {
+    if(self = [super init]) {
         self.keyChainUuid = keyChainUuid;
     }
     
@@ -48,7 +48,9 @@
     ret.host = [dictionary objectForKey:@"host"];
     
     NSNumber* num = [dictionary objectForKey:@"authenticationMode"];
-    if(num) ret.authenticationMode = num.intValue;
+    if(num != nil) {
+        ret.authenticationMode = num.intValue;
+    }
     
     ret.username = [dictionary objectForKey:@"username"];
     

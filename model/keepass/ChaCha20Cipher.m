@@ -43,12 +43,8 @@ static const BOOL kLogVerbose = NO;
     }
     
     NSMutableData *foo = [NSMutableData dataWithLength:data.length];
-    int status = crypto_stream_chacha20_ietf_xor(foo.mutableBytes, data.bytes, data.length, iv.bytes, key.bytes);
     
-    if(kLogVerbose) {
-        NSLog(@"Status: %d", status);
-        NSLog(@"Out (b64): %@", [foo base64EncodedStringWithOptions:kNilOptions]);
-    }
+    crypto_stream_chacha20_ietf_xor(foo.mutableBytes, data.bytes, data.length, iv.bytes, key.bytes);
     
     return foo;
 }

@@ -10,6 +10,8 @@
 #import "SafeMetaData.h"
 #import "Model.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface BrowseSafeView : UITableViewController
 
 @property (nonatomic, strong, nonnull) Model *viewModel;
@@ -27,3 +29,5 @@
 - (IBAction)onMove:(id _Nullable)sender;
 
 @end
+
+NS_ASSUME_NONNULL_END

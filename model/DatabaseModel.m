@@ -268,6 +268,9 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     [self.theSafe createNewRecycleBinNode];
 }
 
+- (Node *)keePass1BackupNode {
+    return self.theSafe.keePass1BackupNode;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience
 
@@ -285,6 +288,28 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return node.isGroup;
     }];
+}
+
+- (NSArray<Node *> *)activeRecords {
+    if(self.format == kPasswordSafe) {
+        return self.allRecords;
+    }
+    else if(self.format == kKeePass1) {
+        // Filter Backup Group
+        // TODO: Expired
+        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return !node.isGroup;
+        }];
+    }
+    else {
+        // Filter Recycle Bin
+        // TODO: Expired
+        Node* recycleBin = self.recycleBinNode;
+        
+        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return !node.isGroup && (recycleBin == nil || ![recycleBin contains:node]);
+        }];
+    }
 }
 
 - (NSSet<NSString*> *)usernameSet {

@@ -54,4 +54,6 @@
 -(void)encrypt:(void (^_Nullable)(NSData* _Nullable data, NSError* _Nullable error))completion;
 - (NSString *_Nonnull)generatePassword;
 
+- (void)updateAutoFillQuickTypeDatabase;
+     
 @end

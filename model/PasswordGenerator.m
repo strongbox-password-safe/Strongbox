@@ -185,7 +185,7 @@ static NSString* const kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
                                  wordCount:(int)wordCount {
     NSDictionary<NSNumber*, NSString*>* wordList = [PasswordGenerator getWordList:xKcdWordList];
 
-    int diceRolls =  [PasswordGenerator getDiceRollsForList:xKcdWordList];
+//    int diceRolls =  [PasswordGenerator getDiceRollsForList:xKcdWordList];
     
     return wordList[@(11111)];
 }

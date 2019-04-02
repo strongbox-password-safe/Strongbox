@@ -110,6 +110,8 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL showRecycleBinInSearchResults;
 @property BOOL doNotCopyOtpCodeOnAutoFillSelect;
 
+@property BOOL doNotUseQuickTypeAutoFill;
+
 NS_ASSUME_NONNULL_END
 
 @end

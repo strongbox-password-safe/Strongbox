@@ -46,7 +46,7 @@ static NSMutableDictionary *timeZonesByOffset;
 }
 
 - (NSCalendar *) makeCalendarWithDesiredConfiguration {
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 	calendar.firstWeekday = 2; //Monday
 	calendar.timeZone = [NSTimeZone defaultTimeZone];
 	return calendar;
@@ -145,11 +145,11 @@ static BOOL is_leap_year(NSUInteger year);
 	NSDate *now = [NSDate date];
 
 	NSDateComponents *components = [[NSDateComponents alloc] init];
-	NSDateComponents *nowComponents = [parsingCalendar components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:now];
+	NSDateComponents *nowComponents = [parsingCalendar components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay) fromDate:now];
 
 	NSUInteger
 		//Date
-		year,
+		year = 0U,
 		month_or_week = 0U,
 		day = 0U,
 		//Time
@@ -655,7 +655,7 @@ static BOOL is_leap_year(NSUInteger year);
 		case ISO8601DateFormatOrdinal:
 			return [self stringFromDate:date formatString:ISO_ORDINAL_DATE_FORMAT timeZone:timeZone];
 		default:
-			[NSException raise:NSInternalInconsistencyException format:@"self.format was %d, not calendar (%d), week (%d), or ordinal (%d)", self.format, ISO8601DateFormatCalendar, ISO8601DateFormatWeek, ISO8601DateFormatOrdinal];
+            [NSException raise:NSInternalInconsistencyException format:@"self.format was %lu, not calendar (%d), week (%d), or ordinal (%d)", (unsigned long)self.format, ISO8601DateFormatCalendar, ISO8601DateFormatWeek, ISO8601DateFormatOrdinal];
 			return nil;
 	}
 }
@@ -686,7 +686,7 @@ static BOOL is_leap_year(NSUInteger year);
 		if (offset == 0)
 			str = [str stringByAppendingString:ISO_TIMEZONE_UTC_FORMAT];
 		else
-			str = [str stringByAppendingFormat:ISO_TIMEZONE_OFFSET_FORMAT, offset / 60, offset % 60];
+			str = [str stringByAppendingFormat:ISO_TIMEZONE_OFFSET_FORMAT, (int)offset / 60, (int)offset % 60];
 	}
 
 	//Undo the change we made earlier
@@ -708,13 +708,13 @@ static BOOL is_leap_year(NSUInteger year);
  */
 - (NSString *) weekDateStringForDate:(NSDate *)date timeZone:(NSTimeZone *)timeZone {
 	unparsingCalendar.timeZone = timeZone;
-	NSDateComponents *components = [unparsingCalendar components:NSYearCalendarUnit | NSWeekdayCalendarUnit | NSDayCalendarUnit fromDate:date];
+	NSDateComponents *components = [unparsingCalendar components:NSCalendarUnitYear | NSCalendarUnitWeekday | NSCalendarUnitDay fromDate:date];
 
 	//Determine the ordinal date.
-	NSDateComponents *startOfYearComponents = [unparsingCalendar components:NSYearCalendarUnit fromDate:date];
+	NSDateComponents *startOfYearComponents = [unparsingCalendar components:NSCalendarUnitYear fromDate:date];
 	startOfYearComponents.month = 1;
 	startOfYearComponents.day = 1;
-	NSDateComponents *ordinalComponents = [unparsingCalendar components:NSDayCalendarUnit fromDate:[unparsingCalendar dateFromComponents:startOfYearComponents] toDate:date options:0];
+	NSDateComponents *ordinalComponents = [unparsingCalendar components:NSCalendarUnitDay fromDate:[unparsingCalendar dateFromComponents:startOfYearComponents] toDate:date options:0];
 	ordinalComponents.day += 1;
 
 	enum {

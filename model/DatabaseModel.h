@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
 
-+ (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
++ (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
+
 @property (nonatomic, retain, nullable) NSString *masterPassword;
 @property (nonatomic, retain, nullable) NSData *keyFileDigest;
 @property (nonatomic, readonly) DatabaseFormat format;
@@ -64,6 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
 @property (readonly) Node* recycleBinNode;
 - (void)createNewRecycleBinNode;
+
+@property (nullable, readonly) Node* keePass1BackupNode;
 
 @end
 

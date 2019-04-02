@@ -1231,10 +1231,9 @@
 			};
 			buildConfigurationList = 4DF59F4C1F30DB7A00D68BFE /* Build configuration list for PBXProject "MacBox" */;
 			compatibilityVersion = "Xcode 6.3";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);

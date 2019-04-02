@@ -67,8 +67,9 @@ static NSString* const kDataElementName = @"Data";
         return nil;
     }
     
-    unsigned char *bytes = malloc([hex length]/2);
-    unsigned char *bp = bytes;
+    NSMutableData* ret = [NSMutableData dataWithLength:hex.length/2];
+    
+    unsigned char *bp = ret.mutableBytes;
     for (CFIndex i = 0; i < [hex length]; i += 2) {
         buf[0] = [hex characterAtIndex:i];
         buf[1] = [hex characterAtIndex:i+1];
@@ -79,8 +80,8 @@ static NSString* const kDataElementName = @"Data";
             return nil;
         }
     }
-    
-    return [NSData dataWithBytesNoCopy:bytes length:[hex length]/2 freeWhenDone:YES];
+
+    return ret;
 }
 
 + (NSData*)getXmlKey:(NSData*)data {

@@ -96,6 +96,9 @@
         
         reusableView = collectionHeader;
     }
+    else {
+        reusableView = [[UICollectionReusableView alloc] init];
+    }
     
     return reusableView;
 }

@@ -23,7 +23,7 @@
 }
 
 - (instancetype)initWithKeyChainUuid:(NSString*)keyChainUuid {
-    if([super init]) {
+    if(self = [super init]) {
         self.keyChainUuid = keyChainUuid;
     }
     
@@ -51,7 +51,9 @@
     
     
     NSNumber* num = [dictionary objectForKey:@"allowUntrustedCertificate"];
-    if(num) ret.allowUntrustedCertificate = num.boolValue;
+    if(num != nil) {
+        ret.allowUntrustedCertificate = num.boolValue;
+    }
     
     return ret;
 }

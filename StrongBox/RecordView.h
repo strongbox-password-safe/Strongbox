@@ -10,6 +10,8 @@
 #import "Record.h"
 #import "Model.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RecordView : UITableViewController
 
 @property (nonatomic, strong, nullable) Node *record;
@@ -48,3 +50,5 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonSetOtp;
 
 @end
+
+NS_ASSUME_NONNULL_END

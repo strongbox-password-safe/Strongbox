@@ -358,10 +358,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     if(!Settings.sharedInstance.showKeePass1BackupGroup) {
         if (self.viewModel.database.format == kKeePass1) {
-            Node* backupGroup = [self.viewModel.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
-                return [node.title isEqualToString:@"Backup"];
-            }];
-            
+            Node* backupGroup = self.viewModel.database.keePass1BackupNode;
             if(backupGroup) {
                 foo = [foo filter:^BOOL(Node * _Nonnull obj) {
                     return (obj != backupGroup && ![backupGroup contains:obj]);
@@ -533,9 +530,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     if(!Settings.sharedInstance.showKeePass1BackupGroup) {
         if (self.viewModel.database.format == kKeePass1) {
-            Node* backupGroup = [self.viewModel.database.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
-                return [node.title isEqualToString:@"Backup"];
-            }];
+            Node* backupGroup = self.viewModel.database.keePass1BackupNode;
             
             if(backupGroup) {
                 if([self.currentGroup contains:backupGroup]) {

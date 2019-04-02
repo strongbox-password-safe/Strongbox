@@ -40,9 +40,12 @@
 
 @property (nonatomic) BOOL autoFillCacheEnabled;
 @property (nonatomic) BOOL autoFillCacheAvailable;
+@property (nonatomic) BOOL useQuickTypeAutoFill;
 
 @property (nonatomic) BOOL readOnly;
 @property (nonatomic) BOOL hasUnresolvedConflicts;
+
+
 
 @end
 

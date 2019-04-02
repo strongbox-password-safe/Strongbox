@@ -11,6 +11,7 @@
 #import "SVProgressHUD.h"
 #import "PasswordGenerator.h"
 #import "Settings.h"
+#import "AutoFillManager.h"
 
 @implementation Model {
     id <SafeStorageProvider> _storageProvider;
@@ -62,6 +63,7 @@
                           completion:^(NSError *error) {
                               [self updateOfflineCacheWithData:updatedSafeData];
                               [self updateAutoFillCacheWithData:updatedSafeData];
+                              [self updateAutoFillQuickTypeDatabase];
                               handler(error);
                           }];
         }];
@@ -286,6 +288,12 @@
     PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
     
     return [PasswordGenerator generatePassword:params];
+}
+
+- (void)updateAutoFillQuickTypeDatabase {
+    if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill && self.metadata.useQuickTypeAutoFill) {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
+    }
 }
 
 @end

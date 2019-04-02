@@ -20,13 +20,11 @@
 #import "PinEntryController.h"
 #import "AppleICloudProvider.h"
 #import "DuressDummyStorageProvider.h"
-#import <AuthenticationServices/AuthenticationServices.h>
+#import "AutoFillManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
 #endif
-
-typedef void(^CompletionBlock)(Model* model);
 
 @interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
@@ -51,7 +49,7 @@ typedef void(^CompletionBlock)(Model* model);
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
-                             completion:(void (^)(Model* model))completion {
+                             completion:(CompletionBlock)completion {
     [OpenSafeSequenceHelper beginSequenceWithViewController:viewController safe:safe openAutoFillCache:NO canConvenienceEnrol:canConvenienceEnrol completion:completion];
 }
 
@@ -59,7 +57,7 @@ typedef void(^CompletionBlock)(Model* model);
                                    safe:(SafeMetaData*)safe
                       openAutoFillCache:(BOOL)openAutoFillCache
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
-                             completion:(void (^)(Model* model))completion {
+                             completion:(CompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                       safe:safe
                                          openAutoFillCache:openAutoFillCache
@@ -73,7 +71,7 @@ typedef void(^CompletionBlock)(Model* model);
                           safe:(SafeMetaData*)safe
              openAutoFillCache:(BOOL)openAutoFillCache
              canConvenienceEnrol:(BOOL)canConvenienceEnrol
-                    completion:(void (^)(Model* model))completion {
+                    completion:(CompletionBlock)completion {
     self = [super init];
     if (self) {
         self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
@@ -92,6 +90,8 @@ typedef void(^CompletionBlock)(Model* model);
     if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
         BOOL biometricAllowed = !Settings.sharedInstance.disallowAllBiometricId;
+        
+        NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
         
         if(biometricPossible && biometricAllowed) {
             [self showBiometricAuthentication];
@@ -166,7 +166,7 @@ typedef void(^CompletionBlock)(Model* model);
                 [self promptForManualCredentials];
             }
             else {
-                self.completion(nil);
+                self.completion(nil, nil);
             }
         }];
     };
@@ -184,23 +184,23 @@ typedef void(^CompletionBlock)(Model* model);
                                                      cacheMode:NO
                                                     isReadOnly:NO];
         
-        self.completion(viewModel);
+        self.completion(viewModel, nil);
     }
     else if (self.safe.duressAction == kPresentError) {
         NSError *error = [Utils createNSError:@"There was a technical error opening the database." errorCode:-1729];
         [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
-            self.completion(nil);
+            self.completion(nil, error);
         }];
     }
     else if (self.safe.duressAction == kRemoveDatabase) {
         [self removeOrDeleteSafe];
         NSError *error = [Utils createNSError:@"There was a technical error opening the database." errorCode:-1729];
         [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
-            self.completion(nil);
+            self.completion(nil, error);
         }];
     }
     else {
-        self.completion(nil);
+        self.completion(nil, nil);
     }
 }
 
@@ -392,7 +392,7 @@ typedef void(^CompletionBlock)(Model* model);
                                                                                                 [self onUseKeyFile:weakSelf.viewController];
                                                                                             }
                                                                                             else {
-                                                                                                weakSelf.completion(nil);
+                                                                                                weakSelf.completion(nil, nil);
                                                                                             }
                                                                                         }];
                                                               }
@@ -401,7 +401,7 @@ typedef void(^CompletionBlock)(Model* model);
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
-                                                             self.completion(nil);
+                                                             self.completion(nil, nil);
                                                          }];
     
     [self.alertController addAction:defaultAction];
@@ -441,8 +441,8 @@ typedef void(^CompletionBlock)(Model* model);
                          BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
                          
                          if(!available) {
-                             [Alerts info:self.viewController title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"];
-                             self.completion(nil);
+                             [Alerts info:self.viewController title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"]; // TODO: Not an NSError
+                             self.completion(nil, nil);
                              return;
                          }
                          
@@ -452,7 +452,7 @@ typedef void(^CompletionBlock)(Model* model);
                          [self.viewController presentViewController:vc animated:YES completion:nil];
                      }
                      else {
-                         self.completion(nil);
+                         self.completion(nil, nil);
                      }
                  }];
 }
@@ -465,7 +465,7 @@ typedef void(^CompletionBlock)(Model* model);
          if(!data) {
              NSLog(@"Error: %@", error);
              [Alerts error:self.viewController title:@"Error Reading Image" error:error];
-             self.completion(nil);
+             self.completion(nil, error);
          }
          else {
              self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
@@ -477,12 +477,12 @@ typedef void(^CompletionBlock)(Model* model);
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:^
      {
-         self.completion(nil);
+         self.completion(nil, nil);
      }];
 }
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
-    self.completion(nil);
+    self.completion(nil, nil);
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
@@ -497,7 +497,7 @@ typedef void(^CompletionBlock)(Model* model);
     if(!data) {
         NSLog(@"Error: %@", error);
         [Alerts error:self.viewController title:@"There was an error reading the Key File" error:error completion:^{
-            self.completion(nil);
+            self.completion(nil, nil);
         }];
     }
     else {
@@ -530,7 +530,7 @@ typedef void(^CompletionBlock)(Model* model);
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
-                                                             self.completion(nil);
+                                                             self.completion(nil, nil);
                                                          }];
     
     [self.alertController addAction:defaultAction];
@@ -577,7 +577,7 @@ typedef void(^CompletionBlock)(Model* model);
             }
             else {
                 [Alerts error:self.viewController title:@"There was a problem opening the database." error:error completion:^{
-                    self.completion(nil);
+                    self.completion(nil, error);
                 }];
             }
         }
@@ -621,10 +621,10 @@ typedef void(^CompletionBlock)(Model* model);
     if (openedSafe == nil) {
         if(!error) {
             [Alerts error:self.viewController title:@"There was a problem opening the database." error:error];
-            self.completion(nil);
+            self.completion(nil, error);
             return;
         }
-        else if (error.code == kStrongboxErrorCodeIncorrectCredentials) {
+        else if (error.code == kStrongboxErrorCodeIncorrectCredentials) { // TODO: This interpretation of the error blocks us from moving Alerts out of here...
             if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
@@ -646,7 +646,7 @@ typedef void(^CompletionBlock)(Model* model);
             [Alerts error:self.viewController title:@"There was a problem opening the database." error:error];
         }
         
-        self.completion(nil);
+        self.completion(nil, error);
     }
     else {
         if (!self.canConvenienceEnrol || cacheMode || self.safe.isEnrolledForConvenience || ![[Settings sharedInstance] isProOrFreeTrial] || self.safe.hasBeenPromptedForConvenience) {
@@ -800,33 +800,13 @@ typedef void(^CompletionBlock)(Model* model);
         if(self.safe.autoFillCacheEnabled) {
             [viewModel updateAutoFillCacheWithData:data];
         }
-        
-        // TODO: Quick Type Support
-//        if(YES) { // TODO: QUICK TYPE Master Switch?
-//            // TODO: Delete all if that switch is switched off!
-//            // TODO: This might be only iOS 12.0 so need to gate that
-//            if (@available(iOS 12.0, *)) {
-//                [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
-//                    NSLog(@"%@", state);
-//                    if(state.enabled) {
-//                        //                NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
-//
-//                        ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:@"google.com" type:ASCredentialServiceIdentifierTypeDomain];
-//                        ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:@"mark" recordIdentifier:@"record-id"];
-//
-//                        [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:@[iden] completion:^(BOOL success, NSError * _Nullable error) {
-//                            NSLog(@"Saved Credential Identities... [%d] - [%@]", success, error);
-//                        }];
-//                    }
-//                    else {
-//                        NSLog(@"AutoFill Credential Store Disabled...");
-//                    }
-//                }];
-//            }
-//        }
+
+        if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill && self.safe.useQuickTypeAutoFill) {
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
+        }
     }
     
-    self.completion(viewModel);
+    self.completion(viewModel, nil);
 }
 
 - (void)openWithOfflineCacheFile:(NSString *)message {
@@ -848,10 +828,9 @@ typedef void(^CompletionBlock)(Model* model);
                     }];
                }
                else {
-                   self.completion(nil);
+                   self.completion(nil, nil);
                }
            }];
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

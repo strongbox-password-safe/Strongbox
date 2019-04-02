@@ -13,6 +13,8 @@
 
 @class Node;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NodeFields : NSObject
 
 - (instancetype _Nullable)init;
@@ -44,3 +46,5 @@
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;
 
 @end
+
+NS_ASSUME_NONNULL_END

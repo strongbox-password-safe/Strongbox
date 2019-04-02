@@ -35,7 +35,7 @@
 }
 
 - (instancetype)init {
-    if([super init]) {
+    if(self = [super init]) {
         _displayName = @"SFTP";
         _icon = @"sftp-32x32"; 
         _storageId = kSFTP;

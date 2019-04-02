@@ -56,10 +56,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nullable) NSData *keyFileDigest;
 
 @property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
-@property (readonly) NSUUID* recycleBinNodeUuid;   // NOT read-only because we made to set on demand
-@property (readonly) NSDate* recycleBinChanged;
+@property (nullable, readonly) NSUUID* recycleBinNodeUuid;   // NOT read-only because we made to set on demand
+@property (nullable, readonly) NSDate* recycleBinChanged;
+@property (nullable, readonly) Node* recycleBinNode;
 
-@property (readonly) Node* recycleBinNode;
+@property (nullable, readonly) Node* keePass1BackupNode;
+    
 - (void)createNewRecycleBinNode;
 
 - (void)removeNodeAttachment:(Node*)node atIndex:(NSUInteger)atIndex;

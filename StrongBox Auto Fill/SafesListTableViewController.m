@@ -201,7 +201,7 @@
                                                         safe:safe
                                           openAutoFillCache:useAutoFillCache
                                           canConvenienceEnrol:NO
-                                                 completion:^(Model * _Nonnull model) {
+                                                 completion:^(Model * _Nullable model, NSError * _Nullable error) {
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
                                                           }

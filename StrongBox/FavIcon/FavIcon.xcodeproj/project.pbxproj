@@ -407,10 +407,11 @@
 			};
 			buildConfigurationList = 2E1852151BDAE5160065F877 /* Build configuration list for PBXProject "FavIcon" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 2E1852111BDAE5160065F877;
 			productRefGroup = 2E18521C1BDAE5160065F877 /* Products */;

@@ -25,6 +25,8 @@
 @implementation CustomFieldsViewController
 
 - (void)viewDidLoad {
+    [super viewDidLoad];
+    
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
 

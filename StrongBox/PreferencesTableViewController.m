@@ -17,6 +17,7 @@
 #import "OneDriveStorageProvider.h"
 #import "PinEntryController.h"
 #import "NSArray+Extensions.h"
+#import "AutoFillManager.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -26,6 +27,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
 
 @end
 
@@ -34,6 +36,22 @@
     NSDictionary<NSNumber*, NSNumber*> *_appLockDelayList;
     NSDictionary<NSNumber*, NSNumber*> *_autoClearClipboardIndex;
 }
+
+- (IBAction)onUseQuickTypeAutoFill:(id)sender {
+    NSLog(@"Setting doNotUseQuickTypeAutoFill to %d", !self.switchUseQuickTypeAutoFill.on);
+    Settings.sharedInstance.doNotUseQuickTypeAutoFill = !self.switchUseQuickTypeAutoFill.on;
+    
+    if(!self.switchUseQuickTypeAutoFill.on) {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    }
+    
+    [self bindQuickTypeAutoFill];
+}
+
+- (void)bindQuickTypeAutoFill {
+    self.switchUseQuickTypeAutoFill.on = !Settings.sharedInstance.doNotUseQuickTypeAutoFill;
+}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -85,6 +103,7 @@
     [self bindAutoDetectKeyFiles];
     [self bindShowRecycleBin];
     [self bindCopyTotpAutoFill];
+    [self bindQuickTypeAutoFill];
     
     //[self customizeAppLockSectionFooter];
 }

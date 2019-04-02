@@ -18,6 +18,8 @@
 @implementation NewSafeFormatController
 
 - (void)viewDidLoad {
+    [super viewDidLoad];
+    
     self.tableView.delegate = self;
 }
 

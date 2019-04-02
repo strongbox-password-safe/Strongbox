@@ -365,7 +365,9 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
             UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
             
             if(!image) {
-                *error = [Utils createNSError:@"Could not read the data for this item" errorCode:-1];
+                if(error) {
+                    *error = [Utils createNSError:@"Could not read the data for this item" errorCode:-1];
+                }
                 return nil;
             }
             

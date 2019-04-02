@@ -47,6 +47,8 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     if([self.textFieldTitle canBecomeFirstResponder]) {
         [self.textFieldTitle becomeFirstResponder];
     }

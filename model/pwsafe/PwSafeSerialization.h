@@ -37,24 +37,24 @@ typedef struct _FieldHeader {
     unsigned char data;
 } FieldHeader;
 
-@interface PwSafeSerialization : NSObject
-
 NS_ASSUME_NONNULL_BEGIN
+
+@interface PwSafeSerialization : NSObject
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (PasswordSafe3Header)getHeader:(NSData*)data;
 + (NSInteger)getKeyStretchIterations:(NSData*)data;
 + (NSInteger)getNumberOfBlocks:(NSData*)candidate;
-+ (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations masterPassword:(NSString *)masterPassword K:(NSData **)K L:(NSData **)L;
-+ (NSData *)serializeField:(Field *)field;
-+ (NSData *)encryptCBC:(NSData *)K ptData:(NSData *)ptData iv:(unsigned char *)iv;
++ (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations masterPassword:(NSString *)masterPassword K:(NSData *_Nonnull*_Nonnull)K L:(NSData *_Nonnull*_Nonnull)L;
++ (nullable NSData *)serializeField:(Field *)field;
++ (nullable NSData *)encryptCBC:(NSData *)K ptData:(NSData *)ptData iv:(unsigned char *)iv;
 + (NSData *)calculateRFC2104Hmac:(NSData *)m key:(NSData *)key;
-+ (BOOL)checkPassword:(PasswordSafe3Header *)pHeader password:(NSString *)password pBar:(NSData **)ppBar;
-+ (BOOL)getKandL:(NSData *)pBar header:(PasswordSafe3Header)header K_p:(NSData **)K_p L_p:(NSData **)L_p;
-+ (NSMutableData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks;
-+ (NSData *)extractDbHeaderAndRecords:(NSData *)decData headerFields_p:(NSMutableArray **)headerFields_p records_p:(NSMutableArray **)records_p;
++ (BOOL)checkPassword:(PasswordSafe3Header *)pHeader password:(NSString *)password pBar:(NSData *_Nonnull*_Nonnull)ppBar;
++ (BOOL)getKandL:(NSData *)pBar header:(PasswordSafe3Header)header K_p:(NSData *_Nonnull*_Nonnull)K_p L_p:(NSData *_Nonnull*_Nonnull)L_p;
++ (nullable NSMutableData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks;
++ (nullable NSData *)extractDbHeaderAndRecords:(NSData *)decData headerFields_p:(NSMutableArray *_Nonnull*_Nonnull)headerFields_p records_p:(NSMutableArray *_Nonnull*_Nonnull)records_p;
 + (void)dumpDbHeaderAndRecords:(NSMutableArray *)headerFields records:(NSMutableArray *)records;
 
-NS_ASSUME_NONNULL_END
-
 @end
+
+NS_ASSUME_NONNULL_END

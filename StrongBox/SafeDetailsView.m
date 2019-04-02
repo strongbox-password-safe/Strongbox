@@ -27,22 +27,217 @@
 
 @interface SafeDetailsView () <MFMailComposeViewControllerDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
+@property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
+@property (weak, nonatomic) IBOutlet UILabel *labelOfflineCacheTime;
+@property (weak, nonatomic) IBOutlet UILabel *labelAutoFillCacheTime;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowOfflineCache;
+@property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowQuickTypeAutoFill;
+
 @end
 
 @implementation SafeDetailsView
 
+- (IBAction)onSwitchAllowQuickTypeAutoFill:(id)sender {
+    self.viewModel.metadata.useQuickTypeAutoFill = self.switchAllowQuickTypeAutoFill.on;
+    
+    if(self.switchAllowQuickTypeAutoFill.on && !Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
+        [self.viewModel updateAutoFillQuickTypeDatabase];
+    }
+}
+
+- (void)bindAllowQuickTypeAutoFill {
+    self.switchAllowQuickTypeAutoFill.on = self.viewModel.metadata.useQuickTypeAutoFill;
+}
+
+- (void)bindAllowBiometricUnlock {
+    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
+    self.labelAllowBiometricSetting.text = [NSString stringWithFormat:@"Allow %@ Unlock", biometricIdName];
+    self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.darkTextColor : UIColor.lightGrayColor;
+    
+    self.switchAllowBiometric.enabled = [self canToggleTouchId];
+    self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
+}
+
+- (IBAction)onSwitchBiometricUnlock:(id)sender {
+    NSString* bIdName = [[Settings sharedInstance] getBiometricIdName];
+    
+    if (!self.switchAllowBiometric.on) {
+        NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
+        @"Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
+        @"Are you sure you want to disable %@ for this database?";
+        
+        [Alerts yesNo:self
+                title:[NSString stringWithFormat:@"Disable %@?", bIdName]
+              message:[NSString stringWithFormat:message, bIdName]
+               action:^(BOOL response) {
+                   if (response) {
+                       self.viewModel.metadata.isTouchIdEnabled = NO;
+                       
+                       if(self.viewModel.metadata.conveniencePin == nil) {
+                           self.viewModel.metadata.isEnrolledForConvenience = NO;
+                           self.viewModel.metadata.convenienceMasterPassword = nil;
+                           self.viewModel.metadata.convenenienceKeyFileDigest = nil;
+                       }
+                       
+                       [[SafesList sharedInstance] update:self.viewModel.metadata];
+
+                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
+                                                  message:[NSString stringWithFormat:@"%@ for this database has been disabled.", bIdName]
+                                                 duration:3.f
+                                              hideOnSwipe:YES
+                                                hideOnTap:YES
+                                                alertType:ISAlertTypeSuccess
+                                            alertPosition:ISAlertPositionTop
+                                                  didHide:nil];
+                   }
+                   
+                   [self bindAllowBiometricUnlock];
+               }];
+    }
+    else {
+        self.viewModel.metadata.isTouchIdEnabled = YES;
+        self.viewModel.metadata.isEnrolledForConvenience = YES;
+        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
+        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
+        
+        [[SafesList sharedInstance] update:self.viewModel.metadata];
+        [self bindAllowBiometricUnlock];
+
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
+                                   message:[NSString stringWithFormat:@"%@ has been enabled for this database.", bIdName]
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+    }
+}
+
+- (void)bindAllowAutoFillCache {
+    NSDate* modDate = [[LocalDeviceStorageProvider sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
+    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
+    self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillCacheEnabled;
+}
+
+- (IBAction)onSwitchAllowAutoFillCache:(id)sender {
+    if (!self.switchAllowAutoFillCache.on) {
+        [Alerts yesNo:self
+                title:@"Disable AutoFill Cache?"
+              message:@"Disabling the AutoFill Cache will remove the AutoFill cache and you will not be able to use AutoFill in certain contexts. Are you sure you want to do this?"
+               action:^(BOOL response) {
+                   if (response) {
+                       [self.viewModel disableAndClearAutoFillCache];
+                      [self bindAllowAutoFillCache];
+                       
+                       [ISMessages showCardAlertWithTitle:@"AutoFill Cache Disabled"
+                                                  message:nil
+                                                 duration:3.f
+                                              hideOnSwipe:YES
+                                                hideOnTap:YES
+                                                alertType:ISAlertTypeSuccess
+                                            alertPosition:ISAlertPositionTop
+                                                  didHide:nil];
+                   }
+                   else {
+                      [self bindAllowAutoFillCache];
+                   }
+               }];
+    }
+    else {
+        [self.viewModel enableAutoFillCache];
+        [self.viewModel updateAutoFillCache:^{
+            [self bindAllowAutoFillCache];
+            
+            [ISMessages                 showCardAlertWithTitle:@"AutoFill Cache Enabled"
+                                                       message:nil
+                                                      duration:3.f
+                                                   hideOnSwipe:YES
+                                                     hideOnTap:YES
+                                                     alertType:ISAlertTypeSuccess
+                                                 alertPosition:ISAlertPositionTop
+                                                       didHide:nil];
+        }];
+    }
+}
+
+- (void)bindAllowOfflineCache {
+    NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
+    self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
+
+    self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
+    self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
+    self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
+}
+
+- (IBAction)onSwitchAllowOfflineCache:(id)sender {
+    if (!self.switchAllowOfflineCache.on) {
+        [Alerts yesNo:self
+                title:@"Disable Offline Cache?"
+              message:@"Disabling Offline Cache for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?"
+               action:^(BOOL response) {
+                   if (response) {
+                       [self.viewModel disableAndClearOfflineCache];
+                       [self bindAllowOfflineCache];
+                       [ISMessages showCardAlertWithTitle:@"Offline Cache Disabled"
+                                                  message:nil
+                                                 duration:3.f
+                                              hideOnSwipe:YES
+                                                hideOnTap:YES
+                                                alertType:ISAlertTypeSuccess
+                                            alertPosition:ISAlertPositionTop
+                                                  didHide:nil];
+                   }
+                   else {
+                      [self bindAllowOfflineCache];
+                   }
+               }];
+    }
+    else {
+        [self.viewModel enableOfflineCache];
+        [self.viewModel updateOfflineCache:^{
+            [self bindAllowOfflineCache];
+            
+            [ISMessages                 showCardAlertWithTitle:@"Offline Cache Enabled"
+                                                       message:nil
+                                                      duration:3.f
+                                                   hideOnSwipe:YES
+                                                     hideOnTap:YES
+                                                     alertType:ISAlertTypeSuccess
+                                                 alertPosition:ISAlertPositionTop
+                                                       didHide:nil];
+        }];
+    }
+}
+
+- (void)bindReadOnly {
+    self.switchReadOnly.on = self.viewModel.metadata.readOnly;
+}
+
+- (IBAction)onReadOnly:(id)sender {
+    self.viewModel.metadata.readOnly = self.switchReadOnly.on;
+    
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+    
+    [self bindReadOnly];
+    
+    [Alerts info:self title:@"Re-Open Required" message:@"Please re open this database for this read only change to take effect."];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self updateTouchIdButtonText];
-    [self updateOfflineCacheButtonText];
-    [self updateAutoFillCacheButtonText];
+    [self bindAllowBiometricUnlock];
+    [self bindAllowAutoFillCache];
     [self bindReadOnly];
-
+    [self bindAllowOfflineCache];
+    [self bindAllowQuickTypeAutoFill];
+    
     self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
     self.labelChangeKeyFile.enabled = [self canChangeKeyFile];
-    self.labelToggleTouchId.enabled = [self canToggleTouchId];
-    self.labelToggleOfflineCache.enabled = [self canToggleOfflineCache];
 
     self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : @"<None>";
     self.labelMostPopularEmail.text = self.viewModel.database.mostPopularEmail ? self.viewModel.database.mostPopularEmail : @"<None>";
@@ -67,28 +262,19 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     df.locale = NSLocale.currentLocale;
     
     NSString *modDateStr = [df stringFromDate:modDate];
-    return [NSString stringWithFormat:@"Last Cached: %@", modDateStr];
+    return [NSString stringWithFormat:@"(Cached %@)", modDateStr];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 0) {
+    if(indexPath.section == 1) {
         if(indexPath.row == 0 && [self canChangeMasterPassword]) { // Change Master Password {
             [self onChangeMasterPassword];
         }
         if(indexPath.row == 1 && [self canChangeKeyFile]) { // Change Master Password {
             [self onChangeKeyFile];
         }
-        else if (indexPath.row == 2 && [self canToggleOfflineCache]) { // Offline Cache
-            [self onToggleOfflineCache];
-        }
-        else if (indexPath.row == 3) { // Export Safe
+        else if (indexPath.row == 2) { // Export Safe
             [self onExport];
-        }
-        else if (indexPath.row == 4  && [self canToggleTouchId]) { // Toggle Touch ID
-            [self onToggleTouchId];
-        }
-        else if (indexPath.row == 5) { // Autofill Cache
-            [self onToggleAutoFillCache];
         }
     }
 }
@@ -96,7 +282,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     
-    if(indexPath.section == 2) {
+    if(indexPath.section == 3) {
         BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
 
         if(indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
@@ -113,13 +299,49 @@ static NSString *getLastCachedDate(NSDate *modDate) {
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
-    if(indexPath.section == 2 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
+    if(indexPath.section == 3 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
     {
         return 0;
     }
     
     return [super tableView:tableView heightForRowAtIndexPath:indexPath];
 }
+
+- (void)onExport {
+    [Alerts threeOptionsWithCancel:self title:@"How would you like to export your database?"
+                           message:@"You can export your encrypted database by email, or you can copy your database in plaintext format (CSV) to the clipboard."
+                 defaultButtonText:@"Export (Encrypted) by Email"
+                  secondButtonText:@"Export as CSV by Email"
+                   thirdButtonText:@"Copy CSV to Clipboard"
+                            action:^(int response) {
+                                if(response == 0) {
+                                    [self exportEncryptedSafeByEmail];
+                                }
+                                else if(response == 1){
+                                    NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
+                                    
+                                    NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
+                                    [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
+                                }
+                                else if(response == 2){
+                                    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database.rootGroup] encoding:NSUTF8StringEncoding];
+                                    
+                                    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                                    pasteboard.string = newStr;
+                                    
+                                    [ISMessages showCardAlertWithTitle:@"Database Copied to Clipboard"
+                                                               message:nil
+                                                              duration:3.f
+                                                           hideOnSwipe:YES
+                                                             hideOnTap:YES
+                                                             alertType:ISAlertTypeSuccess
+                                                         alertPosition:ISAlertPositionTop
+                                                               didHide:nil];
+                                }
+                            }];
+    
+}
+
 
 - (BOOL)canChangeKeyFile {
     return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache || self.viewModel.database.format == kPasswordSafe);
@@ -300,190 +522,6 @@ static NSString *getLastCachedDate(NSDate *modDate) {
                                 }];
 }
 
-- (void)updateTouchIdButtonText {
-    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
-    self.labelToggleTouchId.text = [NSString stringWithFormat:@"%@ %@", self.viewModel.metadata.isTouchIdEnabled ? @"Disable" : @"Enable", biometricIdName];
-}
-
-- (void)updateOfflineCacheButtonText {
-    self.labelToggleOfflineCache.text = self.viewModel.metadata.offlineCacheEnabled ? @"Disable Offline Cache" : @"Enable Offline Cache";
-
-    NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
-    self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
-}
-
-- (void)updateAutoFillCacheButtonText {
-    self.labelToggleAutoFillCache.text = self.viewModel.metadata.autoFillCacheEnabled ? @"Disable Auto Fill Cache" : @"Enable Auto Fill Cache";
-
-    NSDate* modDate = [[LocalDeviceStorageProvider sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
-    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
-}
-
-- (void)onToggleTouchId {
-    NSString* bIdName = [[Settings sharedInstance] getBiometricIdName];
-    
-    if (self.viewModel.metadata.isTouchIdEnabled) {
-        NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
-            @"Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-            @"Are you sure you want to disable %@ for this database?";
-        
-        [Alerts yesNo:self
-                title:[NSString stringWithFormat:@"Disable %@?", bIdName]
-              message:[NSString stringWithFormat:message, bIdName]
-               action:^(BOOL response) {
-                   if (response) {
-                       self.viewModel.metadata.isTouchIdEnabled = NO;
-
-                       if(self.viewModel.metadata.conveniencePin == nil) {
-                           self.viewModel.metadata.isEnrolledForConvenience = NO;
-                           self.viewModel.metadata.convenienceMasterPassword = nil;
-                           self.viewModel.metadata.convenenienceKeyFileDigest = nil;
-                       }
-                       
-                       [[SafesList sharedInstance] update:self.viewModel.metadata];
-                       [self updateTouchIdButtonText];
-                       
-                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
-                                                  message:[NSString stringWithFormat:@"%@ for this database has been disabled.", bIdName]
-                                                 duration:3.f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:nil];
-                   }
-               }];
-    }
-    else {
-        self.viewModel.metadata.isTouchIdEnabled = YES;
-        self.viewModel.metadata.isEnrolledForConvenience = YES;
-        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
-        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
-
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
-                                   message:[NSString stringWithFormat:@"%@ has been enabled for this database.", bIdName]
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
-    }
-    
-    [self updateTouchIdButtonText];
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
-}
-
-- (void)onToggleOfflineCache {
-    if (self.viewModel.metadata.offlineCacheEnabled) {
-        [Alerts yesNo:self
-                title:@"Disable Offline Cache?"
-              message:@"Disabling Offline Cache for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?"
-               action:^(BOOL response) {
-                   if (response) {
-                       [self.viewModel disableAndClearOfflineCache];
-                       [self updateOfflineCacheButtonText];
-                       
-                       [ISMessages showCardAlertWithTitle:@"Offline Cache Disabled"
-                                                  message:nil
-                                                 duration:3.f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:nil];
-                   }
-               }];
-    }
-    else {
-        [self.viewModel enableOfflineCache];
-        [self.viewModel updateOfflineCache:^{
-            [self updateOfflineCacheButtonText];
-            
-            [ISMessages                 showCardAlertWithTitle:@"Offline Cache Enabled"
-                                                       message:nil
-                                                      duration:3.f
-                                                   hideOnSwipe:YES
-                                                     hideOnTap:YES
-                                                     alertType:ISAlertTypeSuccess
-                                                 alertPosition:ISAlertPositionTop
-                                                       didHide:nil];
-        }];
-    }
-}
-
-- (void)onToggleAutoFillCache {
-    if (self.viewModel.metadata.autoFillCacheEnabled) {
-        [Alerts yesNo:self
-                title:@"Disable Autofill Cache?"
-              message:@"Disabling the Autofill Cache will remove the autofill cache and you will not be able to access the database for use during autofill. Are you sure you want to do this?"
-               action:^(BOOL response) {
-                   if (response) {
-                       [self.viewModel disableAndClearAutoFillCache];
-                       [self updateAutoFillCacheButtonText];
-
-                       [ISMessages showCardAlertWithTitle:@"Autofill Cache Disabled"
-                                                  message:nil
-                                                 duration:3.f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:nil];
-                   }
-               }];
-    }
-    else {
-        [self.viewModel enableAutoFillCache];
-        [self.viewModel updateAutoFillCache:^{
-            [self updateAutoFillCacheButtonText];
-            
-            [ISMessages                 showCardAlertWithTitle:@"Autofill Cache Enabled"
-                                                       message:nil
-                                                      duration:3.f
-                                                   hideOnSwipe:YES
-                                                     hideOnTap:YES
-                                                     alertType:ISAlertTypeSuccess
-                                                 alertPosition:ISAlertPositionTop
-                                                       didHide:nil];
-        }];
-    }
-}
-
-- (void)onExport {
-    [Alerts threeOptionsWithCancel:self title:@"How would you like to export your database?"
-                           message:@"You can export your encrypted database by email, or you can copy your database in plaintext format (CSV) to the clipboard."
-                 defaultButtonText:@"Export (Encrypted) by Email"
-                  secondButtonText:@"Export as CSV by Email"
-                   thirdButtonText:@"Copy CSV to Clipboard"
-                            action:^(int response) {
-        if(response == 0) {
-            [self exportEncryptedSafeByEmail];
-        }
-        else if(response == 1){
-            NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
-
-            NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
-            [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
-        }
-        else if(response == 2){
-            NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database.rootGroup] encoding:NSUTF8StringEncoding];
-
-            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-            pasteboard.string = newStr;
-            
-            [ISMessages showCardAlertWithTitle:@"Database Copied to Clipboard"
-                                       message:nil
-                                      duration:3.f
-                                   hideOnSwipe:YES
-                                     hideOnTap:YES
-                                     alertType:ISAlertTypeSuccess
-                                 alertPosition:ISAlertPositionTop
-                                       didHide:nil];
-        }
-    }];
-}
-
 - (void)exportEncryptedSafeByEmail {
     [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
         if(!safeData) {
@@ -524,20 +562,6 @@ static NSString *getLastCachedDate(NSDate *modDate) {
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:^{ }];
-}
-
-- (void)bindReadOnly {
-    self.switchReadOnly.on = self.viewModel.metadata.readOnly;
-}
-
-- (IBAction)onReadOnly:(id)sender {
-    self.viewModel.metadata.readOnly = self.switchReadOnly.on;
-    
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
-
-    [self bindReadOnly];
-    
-    [Alerts info:self title:@"Re-Open Required" message:@"Please re open this database for this read only change to take effect."];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

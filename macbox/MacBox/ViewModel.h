@@ -26,8 +26,8 @@ extern NSString* const kNotificationUserInfoKeyNode;
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (BOOL)lock:(NSError**)error selectedItem:(NSString*_Nullable)selectedItem;
-- (BOOL)unlock:(NSString*)password selectedItem:(NSString*_Nullable*)selectedItem error:(NSError**)error;
-- (BOOL)unlock:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest selectedItem:(NSString*_Nullable*)selectedItem error:(NSError**)error;
+- (BOOL)unlock:(NSString*)password selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError**)error;
+- (BOOL)unlock:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError**)error;
 
 - (NSData*_Nullable)getPasswordDatabaseAsData:(NSError**)error;
 

@@ -308,7 +308,6 @@
 		4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2A1FB1E27700A68A92 /* NodeFields.m */; };
 		4D78AC311FB1E27700A68A92 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2C1FB1E27700A68A92 /* Utils.m */; };
 		4D78AC321FB1E27700A68A92 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2E1FB1E27700A68A92 /* Node.m */; };
-		4D792A6A222EF46A00250086 /* RMStoreTransactionReceiptVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A0E222EF46A00250086 /* RMStoreTransactionReceiptVerifier.m */; };
 		4D792A6B222EF46A00250086 /* RMStoreTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A0F222EF46A00250086 /* RMStoreTransaction.m */; };
 		4D792A6F222EF46A00250086 /* RMStoreAppReceiptVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A63222EF46A00250086 /* RMStoreAppReceiptVerifier.m */; };
 		4D792A70222EF46A00250086 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A64222EF46A00250086 /* RMAppReceipt.m */; };
@@ -334,6 +333,8 @@
 		4D8C14972074F63B00CE9CAE /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14982074F64A00CE9CAE /* crypt_argchk.c */; };
 		4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */; };
+		4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
+		4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8EA82522316B4300B47035 /* KdbxHistory.m */; };
 		4D8EC42922302649008EE004 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8EC3AD22302649008EE004 /* libcrypto.a */; };
 		4D8EC42A22302649008EE004 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8EC3AD22302649008EE004 /* libcrypto.a */; };
@@ -455,6 +456,8 @@
 		4DEF7B97216FC74A00A3EE12 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
 		4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
 		4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
+		4DF14F6A2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */; };
+		4DF14F6B2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */; };
 		4DF2997B2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF299792243B8020080F9DC /* IconsSectionHeaderReusableView.m */; };
 		4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF299792243B8020080F9DC /* IconsSectionHeaderReusableView.m */; };
 		4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DF2997A2243B8020080F9DC /* IconsSectionHeaderReusableView.xib */; };
@@ -890,13 +893,11 @@
 		4D792A0A222EF46A00250086 /* RMAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMAppReceipt.h; sourceTree = "<group>"; };
 		4D792A0B222EF46A00250086 /* RMStoreAppReceiptVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreAppReceiptVerifier.h; sourceTree = "<group>"; };
 		4D792A0C222EF46A00250086 /* RMStoreKeychainPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreKeychainPersistence.h; sourceTree = "<group>"; };
-		4D792A0E222EF46A00250086 /* RMStoreTransactionReceiptVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreTransactionReceiptVerifier.m; sourceTree = "<group>"; };
 		4D792A0F222EF46A00250086 /* RMStoreTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreTransaction.m; sourceTree = "<group>"; };
 		4D792A10222EF46A00250086 /* RMStoreUserDefaultsPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreUserDefaultsPersistence.h; sourceTree = "<group>"; };
 		4D792A63222EF46A00250086 /* RMStoreAppReceiptVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreAppReceiptVerifier.m; sourceTree = "<group>"; };
 		4D792A64222EF46A00250086 /* RMAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMAppReceipt.m; sourceTree = "<group>"; };
 		4D792A65222EF46A00250086 /* RMStoreKeychainPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreKeychainPersistence.m; sourceTree = "<group>"; };
-		4D792A66222EF46A00250086 /* RMStoreTransactionReceiptVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreTransactionReceiptVerifier.h; sourceTree = "<group>"; };
 		4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreUserDefaultsPersistence.m; sourceTree = "<group>"; };
 		4D792A68222EF46A00250086 /* RMStoreTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreTransaction.h; sourceTree = "<group>"; };
 		4D7C21D12180EAC200458A5B /* funky.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = funky.xml; sourceTree = "<group>"; };
@@ -929,6 +930,8 @@
 		4D8C14962074F63B00CE9CAE /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = model/pwsafe/twofish/twofish.c; sourceTree = SOURCE_ROOT; };
 		4D8C14982074F64A00CE9CAE /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = model/pwsafe/twofish/crypt_argchk.c; sourceTree = SOURCE_ROOT; };
 		4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = SOURCE_ROOT; };
+		4D8C72B722525E160016A5CC /* AutoFillManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillManager.h; path = StrongBox/AutoFillManager.h; sourceTree = "<group>"; };
+		4D8C72B822525E160016A5CC /* AutoFillManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillManager.m; path = StrongBox/AutoFillManager.m; sourceTree = "<group>"; };
 		4D8EA82522316B4300B47035 /* KdbxHistory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxHistory.m; path = StrongboxTests/KdbxHistory.m; sourceTree = "<group>"; };
 		4D8EC3AD22302649008EE004 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		4D8EC3AE22302649008EE004 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
@@ -1182,6 +1185,8 @@
 		4DED20C52168B63200A5800A /* QuickLaunchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickLaunchViewController.m; path = StrongBox/QuickLaunchViewController.m; sourceTree = "<group>"; };
 		4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetector.h; path = StrongBox/OfflineDetector.h; sourceTree = "<group>"; };
 		4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OfflineDetector.m; path = StrongBox/OfflineDetector.m; sourceTree = "<group>"; };
+		4DF14F682250F69000B6AF25 /* QuickTypeRecordIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickTypeRecordIdentifier.h; path = "StrongBox Auto Fill/QuickTypeRecordIdentifier.h"; sourceTree = "<group>"; };
+		4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickTypeRecordIdentifier.m; path = "StrongBox Auto Fill/QuickTypeRecordIdentifier.m"; sourceTree = "<group>"; };
 		4DF299782243B8020080F9DC /* IconsSectionHeaderReusableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IconsSectionHeaderReusableView.h; path = StrongBox/IconsSectionHeaderReusableView.h; sourceTree = "<group>"; };
 		4DF299792243B8020080F9DC /* IconsSectionHeaderReusableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconsSectionHeaderReusableView.m; path = StrongBox/IconsSectionHeaderReusableView.m; sourceTree = "<group>"; };
 		4DF2997A2243B8020080F9DC /* IconsSectionHeaderReusableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = IconsSectionHeaderReusableView.xib; path = StrongBox/IconsSectionHeaderReusableView.xib; sourceTree = "<group>"; };
@@ -1881,13 +1886,11 @@
 				4D792A0A222EF46A00250086 /* RMAppReceipt.h */,
 				4D792A0B222EF46A00250086 /* RMStoreAppReceiptVerifier.h */,
 				4D792A0C222EF46A00250086 /* RMStoreKeychainPersistence.h */,
-				4D792A0E222EF46A00250086 /* RMStoreTransactionReceiptVerifier.m */,
 				4D792A0F222EF46A00250086 /* RMStoreTransaction.m */,
 				4D792A10222EF46A00250086 /* RMStoreUserDefaultsPersistence.h */,
 				4D792A63222EF46A00250086 /* RMStoreAppReceiptVerifier.m */,
 				4D792A64222EF46A00250086 /* RMAppReceipt.m */,
 				4D792A65222EF46A00250086 /* RMStoreKeychainPersistence.m */,
-				4D792A66222EF46A00250086 /* RMStoreTransactionReceiptVerifier.h */,
 				4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */,
 				4D792A68222EF46A00250086 /* RMStoreTransaction.h */,
 			);
@@ -2187,6 +2190,8 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D8C72B722525E160016A5CC /* AutoFillManager.h */,
+				4D8C72B822525E160016A5CC /* AutoFillManager.m */,
 				4D2962AC223171BA0082897D /* misc */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D25675021EBD094006260B7 /* LaunchScreen.storyboard */,
@@ -2312,6 +2317,8 @@
 				4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */,
 				4D9CD55C2211D2F9000F30E9 /* CreateCredentialTableViewController.h */,
 				4D9CD55D2211D2F9000F30E9 /* CreateCredentialTableViewController.m */,
+				4DF14F682250F69000B6AF25 /* QuickTypeRecordIdentifier.h */,
+				4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */,
 			);
 			name = "Auto-Fill-Extension";
 			sourceTree = "<group>";
@@ -2534,7 +2541,7 @@
 			};
 			buildConfigurationList = 4DBE5B2C1C8356C700C310BC /* Build configuration list for PBXProject "Strongbox" */;
 			compatibilityVersion = "Xcode 6.3";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -2928,13 +2935,13 @@
 				4DB1B7D42188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
 				4D67B1E42191FD0400B0D29A /* XmlProcessingContext.m in Sources */,
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
+				4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
 				4DC95E9E2231AA3B00DE4E9F /* KeePassHistoryController.m in Sources */,
 				4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */,
 				4D9E09AD218251D0007BA1E7 /* Salsa20Stream.m in Sources */,
 				4DC8D9AB21B6E8A9004F1812 /* KeyFileParser.m in Sources */,
 				4D3E14A62183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
-				4D792A6A222EF46A00250086 /* RMStoreTransactionReceiptVerifier.m in Sources */,
 				4DF972C521C0190D00F384C9 /* WebDAVSessionConfiguration.m in Sources */,
 				4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
@@ -2988,6 +2995,7 @@
 				4DF972D321C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
 				4D004CE021F4C26700E2B194 /* OTPToken.m in Sources */,
 				4D4766E02178C82B00C4358F /* SerializationData.m in Sources */,
+				4DF14F6A2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */,
 				4D5F5B8F218B66C500A0739A /* Binary.m in Sources */,
 				4DF972B921BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */,
 				4D88AD4C21E4CD4A00B49149 /* BrowseGroupTableViewCell.m in Sources */,
@@ -3098,6 +3106,7 @@
 				4D4767082179013900C4358F /* RootXmlDomainObject.m in Sources */,
 				4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
+				4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
 				4D56D91421B837A20030E13A /* AddNewSafeHelper.m in Sources */,
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
@@ -3123,6 +3132,7 @@
 				4DA12F03219837830000CEBB /* CustomIconList.m in Sources */,
 				4D19678B217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
 				4D67B1E52191FD0400B0D29A /* XmlProcessingContext.m in Sources */,
+				4DF14F6B2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */,
 				4D876B4421AC36F800805DED /* CustomField.m in Sources */,
 				4DF972D421C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
 				4D2F6C3721807C7E007931E4 /* KeePassGroup.m in Sources */,
@@ -3447,7 +3457,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/lib/RMStore/RMStore/Optional/openssl-1.0.1e/lib",
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
@@ -3536,7 +3545,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/lib/RMStore/RMStore/Optional/openssl-1.0.1e/lib",
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);

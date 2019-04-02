@@ -11,6 +11,8 @@
 #import "KeePassDatabaseMetadata.h"
 #import "KeePass4DatabaseMetadata.h"
 
+static NSString* const kKeePass1BackupGroupName = @"Backup";
+
 @interface StrongboxDatabase ()
 
 @property (nonatomic, readonly) NSMutableArray<DatabaseAttachment*> *mutableAttachments;
@@ -372,6 +374,12 @@
     else {
         return nil;
     }
+}
+
+- (Node*)keePass1BackupNode {
+    return [self.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+        return [node.title isEqualToString:kKeePass1BackupGroupName];
+    }];
 }
 
 - (void)createNewRecycleBinNode {

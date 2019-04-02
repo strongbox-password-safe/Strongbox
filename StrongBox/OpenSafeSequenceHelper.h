@@ -12,6 +12,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void(^CompletionBlock)(Model*_Nullable model, NSError*_Nullable error);
+
 @interface OpenSafeSequenceHelper : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -19,15 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
       canConvenienceEnrol:(BOOL)canBiometricEnrol
-                             completion:(void (^)(Model* model))completion;
+                             completion:(CompletionBlock)completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                       openAutoFillCache:(BOOL)openAutoFillCache
       canConvenienceEnrol:(BOOL)canBiometricEnrol
-                             completion:(void (^)(Model* model))completion;
+                             completion:(CompletionBlock)completion;
 
-+ (NSData*)findAssociatedLocalKeyFile:(NSString*)filename;
++ (nullable NSData*)findAssociatedLocalKeyFile:(NSString*)filename;
 + (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename;
 
 @end

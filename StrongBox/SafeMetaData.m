@@ -11,19 +11,29 @@
 
 @implementation SafeMetaData
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.uuid = [[NSUUID UUID] UUIDString];
+        self.failedPinAttempts = 0;
+        self.offlineCacheEnabled = YES;
+        self.autoFillCacheEnabled = YES;
+        self.useQuickTypeAutoFill = YES;
+    }
+    
+    return self;
+}
+
 - (instancetype)initWithNickName:(NSString *)nickName
                  storageProvider:(StorageProvider)storageProvider
                         fileName:(NSString*)fileName
                   fileIdentifier:(NSString*)fileIdentifier {
-    if(self = [super init]) {
-        _nickName = nickName;
-        _uuid = [[NSUUID UUID] UUIDString];
+    if(self = [self init]) {
+        self.nickName = nickName;
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
-        self.failedPinAttempts = 0;
-        self.offlineCacheEnabled = YES;
-        self.autoFillCacheEnabled = YES;
     }
     
     return self;
@@ -54,6 +64,8 @@
     [encoder encodeInteger:self.duressAction forKey:@"duressAction"];
     [encoder encodeBool:self.hasBeenPromptedForConvenience forKey:@"hasBeenPromptedForConvenience"];
     [encoder encodeInteger:self.failedPinAttempts forKey:@"failedPinAttempts"];
+
+    [encoder encodeBool:self.useQuickTypeAutoFill forKey:@"useQuickTypeAutoFill"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -96,6 +108,10 @@
         
         if([decoder containsValueForKey:@"failedPinAttempts"]) {
             self.failedPinAttempts = (int)[decoder decodeIntegerForKey:@"failedPinAttempts"];
+        }
+        
+        if([decoder containsValueForKey:@"useQuickTypeAutoFill"]) {
+            self.useQuickTypeAutoFill = [decoder decodeBoolForKey:@"useQuickTypeAutoFill"];
         }
     }
     
