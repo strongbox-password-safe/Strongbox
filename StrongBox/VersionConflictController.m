@@ -28,6 +28,7 @@ NSDateFormatter* _dateFormatter;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController.toolbar setHidden:YES];
+    self.navigationController.toolbarHidden = YES;
     
     NSMutableArray * fileVersions = [NSMutableArray array];
     

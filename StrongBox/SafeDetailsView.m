@@ -18,6 +18,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "KeyFileParser.h"
 #import "PinsConfigurationController.h"
+#import "AutoFillManager.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -43,8 +44,13 @@
 - (IBAction)onSwitchAllowQuickTypeAutoFill:(id)sender {
     self.viewModel.metadata.useQuickTypeAutoFill = self.switchAllowQuickTypeAutoFill.on;
     
-    if(self.switchAllowQuickTypeAutoFill.on && !Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
-        [self.viewModel updateAutoFillQuickTypeDatabase];
+    if(self.switchAllowQuickTypeAutoFill.on) {
+        if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
+            [self.viewModel updateAutoFillQuickTypeDatabase];
+        }
+    }
+    else {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     }
 }
 

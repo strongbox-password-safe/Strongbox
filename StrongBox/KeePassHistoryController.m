@@ -44,6 +44,8 @@
     [super viewWillAppear:animated];
 
     self.navigationController.toolbar.hidden = YES;
+    self.navigationController.toolbarHidden = YES;
+
     self.navigationController.navigationBar.hidden = NO;
     [self.navigationController setNavigationBarHidden:NO animated:NO];
     self.navigationController.navigationBarHidden = NO;

@@ -51,7 +51,7 @@ static NSString* const kNodeIdKey = @"nodeId";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@-%@", self.databaseId, self.nodeId];
+    return [NSString stringWithFormat:@"database = {%@}, node = {%@}", self.databaseId, self.nodeId];
 }
 
 @end

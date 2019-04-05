@@ -27,6 +27,7 @@
     [super viewWillAppear:animated];
     
     self.navigationController.toolbar.hidden = YES;
+    self.navigationController.toolbarHidden = YES;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

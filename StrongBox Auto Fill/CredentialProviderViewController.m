@@ -22,6 +22,7 @@
 #import "Utils.h"
 #import "GoogleDriveManager.h"
 #import "OpenSafeSequenceHelper.h"
+#import "AutoFillManager.h"
 
 @interface CredentialProviderViewController ()
 
@@ -76,16 +77,27 @@
                     [self onOpenedQuickType:model identifier:identifier];
                 }
                 else {
-                    [self.extensionContext cancelRequestWithError:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+                    [Alerts error:self title:@"Strongbox: Error Opening Database" error:error completion:^{
+                        [self.extensionContext cancelRequestWithError:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+                    }];
                 }
             }];
         }
         else {
-            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
+            [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+            
+            [Alerts info:self title:@"Strongbox: Unknown Database" message:@"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
+                [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
+            }];
         }
     }
     else {
-        [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+        
+        [Alerts info:self title:@"Strongbox: Error Locating Entry" message:@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
+            
+            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
+        }];
     }
 }
 
@@ -95,7 +107,7 @@
     }];
     
     if(node) {
-        NSLog(@"Return User/Pass from Node: [%@]", node);
+        //NSLog(@"Return User/Pass from Node: [%@]", node);
         ASPasswordCredential *cred = [[ASPasswordCredential alloc] initWithUser:node.fields.username password:node.fields.password];
         
         // Copy TOTP code if configured to do so...
@@ -113,7 +125,11 @@
         [self.extensionContext completeRequestWithSelectedCredential:cred completionHandler:nil];
     }
     else {
-        [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+        
+        [Alerts info:self title:@"Strongbox: Error Locating This Record" message:@"Strongbox could not find this record in the database any longer. It is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
+            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
+        }];
     }
 }
 

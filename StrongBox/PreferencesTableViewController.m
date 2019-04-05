@@ -57,7 +57,8 @@
     [super viewDidLoad];
     
     self.navigationController.toolbar.hidden = NO;
-    
+    self.navigationController.toolbarHidden = NO;
+
     if (@available(iOS 11.0, *)) {
         self.navigationController.navigationBar.prefersLargeTitles = YES;
     }

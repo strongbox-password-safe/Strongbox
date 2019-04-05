@@ -21,7 +21,20 @@
                     <view key="view" contentMode="scaleToFill" id="BuU-Ak-iZz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="PgB-Jk-Hsc" userLabel="Logo">
+                                <rect key="frame" x="62.666666666666657" y="64" width="249.99999999999997" height="250"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="AOX-Ad-9LE"/>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="BFD-7m-ERP"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="PgB-Jk-Hsc" firstAttribute="top" secondItem="Ky8-vK-JVj" secondAttribute="top" constant="20" id="Js8-Nr-J4B"/>
+                            <constraint firstItem="PgB-Jk-Hsc" firstAttribute="centerX" secondItem="BuU-Ak-iZz" secondAttribute="centerX" id="gtN-lc-DQ8"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="Ky8-vK-JVj"/>
                     </view>
                     <toolbarItems>

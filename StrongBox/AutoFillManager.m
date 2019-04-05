@@ -11,6 +11,7 @@
 #import "QuickTypeRecordIdentifier.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
+#import "SVProgressHUD.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +37,15 @@ static NSString* const kMailToScheme = @"mailto";
         
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
             if(state.enabled) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD showWithStatus:@"Clearing AutoFill..."];
+                });
+                
                 [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
             }
         }];
     }
@@ -48,6 +57,10 @@ static NSString* const kMailToScheme = @"mailto";
         
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
             if(state.enabled) { // We cannot really support incremental updates - because we do not own/control update mechanisms...
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD showWithStatus:@"Populating AutoFill..."];
+                });
+                
                 NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
                 
                 for (Node* node in database.activeRecords) { 
@@ -68,6 +81,10 @@ static NSString* const kMailToScheme = @"mailto";
                         NSLog(@"Saved Credential Identities... [%d] - [%@]", success, error);
                     }];
                 }
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
             }
             else {
                 NSLog(@"AutoFill Credential Store Disabled...");
@@ -88,7 +105,8 @@ static NSString* const kMailToScheme = @"mailto";
     
     // Custom Fields?
     
-    for(StringValue* strValue in node.fields.customFields) {
+    for(NSString* key in node.fields.customFields.allKeys) {
+        StringValue* strValue = node.fields.customFields[key];
         NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
         [urls addObjectsFromArray:foo];
     }
@@ -116,6 +134,10 @@ static NSString* const kMailToScheme = @"mailto";
 }
 
 - (NSArray<NSString*>*)findUrlsInString:(NSString*)target {
+    if(!target.length) {
+        return @[];
+    }
+    
     NSError *error;
     NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
     

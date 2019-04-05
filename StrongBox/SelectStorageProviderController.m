@@ -44,6 +44,7 @@
     }
 
     self.navigationController.toolbar.hidden = YES;
+    self.navigationController.toolbarHidden = YES;
 }
 
 - (void)viewDidLoad {

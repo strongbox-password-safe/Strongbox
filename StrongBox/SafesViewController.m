@@ -24,6 +24,7 @@
 #import "AddSafeAlertController.h"
 #import "StrongboxUIDocument.h"
 #import "SVProgressHUD.h"
+#import "AutoFillManager.h"
 
 @interface SafesViewController () <UIDocumentPickerDelegate>
 
@@ -394,6 +395,10 @@
                                                                       NSLog(@"Delete Offline Cache File. Error = %@", error);
                                                                   }];
     }
+    
+    if(safe.useQuickTypeAutoFill) {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    }
          
     [[SafesList sharedInstance] remove:safe.uuid];
 
@@ -636,7 +641,6 @@
 -(void)bindProOrFreeTrialUi {
     self.navigationController.toolbarHidden =  [[Settings sharedInstance] isPro];
     self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
-    [self.navigationController setToolbarHidden:[[Settings sharedInstance] isPro]];
     
     //[self.buttonTogglePro setTitle:(![[Settings sharedInstance] isProOrFreeTrial] ? @"Go Pro" : @"Go Free")];
     //[self.buttonTogglePro setEnabled:NO];

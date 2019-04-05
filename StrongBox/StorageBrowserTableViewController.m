@@ -29,18 +29,16 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
     [self.navigationItem setPrompt:nil];
 }
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController.toolbar setHidden:self.existing];
+    self.navigationController.toolbarHidden = self.existing;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    self.navigationController.toolbar.hidden = NO;
     
     _defaultFolderImage = [UIImage imageNamed:@"folder-48x48"];
     _defaultFileImage = [UIImage imageNamed:@"page_white_text-48x48"];
@@ -71,8 +69,6 @@
         }];
     });
 }
-
-
 
 - (void)onList:(BOOL)userCancelled items:(NSArray<StorageBrowserItem *> *)items error:(NSError *)error {
     self.listDone = YES;
