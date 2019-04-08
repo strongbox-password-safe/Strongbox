@@ -23,6 +23,7 @@
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
 #import "SetNodeIconUiHelper.h"
+#import "SprCompilation.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -210,7 +211,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 
     [Alerts yesNo:self.searchController.isActive ? self.searchController : self
             title:@"Are you sure?"
-          message:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%@' to the Recycle Bin?" : @"Are you sure you want to permanently delete '%@'?", item.title]
+          message:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%@' to the Recycle Bin?" : @"Are you sure you want to permanently delete '%@'?", [self dereference:item.title node:item]]
            action:^(BOOL response) {
                if (response) {
                    if(![self.viewModel deleteItem:item]) {
@@ -305,54 +306,86 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     NSString *searchString = searchController.searchBar.text;
     
     [self filterContentForSearchText:searchString scope:searchController.searchBar.selectedScopeButtonIndex];
+    
     [self.tableView reloadData];
+    
+    [self startOtpRefreshTimerIfAppropriate];
 }
 
 - (void)filterContentForSearchText:(NSString *)searchText scope:(NSInteger)scope {
-    NSPredicate *predicate;
-    BOOL searchAll = NO;
+    NSArray<Node*> *matches;
     
     if (scope == 0) {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
+        matches = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            NSString* title = node.title;
+            if (Settings.sharedInstance.searchDereferencedFields && self.viewModel.database.format != kPasswordSafe) {
+                title = [self dereference:title node:node];
+            }
+
+            return [title localizedCaseInsensitiveContainsString:searchText];
+        }];
     }
     else if (scope == 1)
     {
-        predicate = [NSPredicate predicateWithFormat:@"fields.username contains[c] %@", searchText];
+        matches = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            NSString* foo = node.fields.username;
+            if (Settings.sharedInstance.searchDereferencedFields && self.viewModel.database.format != kPasswordSafe) {
+                foo = [self dereference:foo node:node];
+            }
+
+            return [foo localizedCaseInsensitiveContainsString:searchText];
+        }];
     }
     else if (scope == 2)
     {
-        predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
+        matches = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            NSString* foo = node.fields.password;
+            if (Settings.sharedInstance.searchDereferencedFields && self.viewModel.database.format != kPasswordSafe) {
+                foo = [self dereference:foo node:node];
+            }
+            
+            return [foo localizedCaseInsensitiveContainsString:searchText];
+        }];
     }
     else {
-        searchAll = YES;
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ "
-                     @"OR fields.password contains[c] %@  "
-                     @"OR fields.username contains[c] %@  "
-                     @"OR fields.email contains[c] %@  "
-                     @"OR fields.url contains[c] %@ "
-                     @"OR fields.notes contains[c] %@",
-                     searchText, searchText, searchText, searchText, searchText, searchText];
-    }
-    
-    NSArray<Node*> *foo = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        if([predicate evaluateWithObject:node]) {
-            return YES;
-        }
-        else if(searchAll && (self.viewModel.database.format == kKeePass4 || self.viewModel.database.format == kKeePass)) {
-            // Search inside custom fields... can't find easy way to do this by predicate!
+        matches = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            NSString* title = node.title;
+            NSString* username = node.fields.username;
+            NSString* password = node.fields.password;
+            NSString* url = node.fields.password;
+            NSString* notes = node.fields.password;
             
-            for (NSString* key in node.fields.customFields.allKeys) {
-                NSString* value = node.fields.customFields[key].value;
-                
-                if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
-                   [value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
-                    return YES;
+            if (Settings.sharedInstance.searchDereferencedFields && self.viewModel.database.format != kPasswordSafe) {
+                title = [self dereference:title node:node];
+                username = [self dereference:username node:node];
+                password = [self dereference:password node:node];
+                url = [self dereference:url node:node];
+                notes = [self dereference:notes node:node];
+            }
+ 
+            BOOL simple = [title localizedCaseInsensitiveContainsString:searchText] ||
+                    [username localizedCaseInsensitiveContainsString:searchText] ||
+                    [password localizedCaseInsensitiveContainsString:searchText] ||
+                    [node.fields.email localizedCaseInsensitiveContainsString:searchText] ||
+                    [url localizedCaseInsensitiveContainsString:searchText] ||
+                    [notes localizedCaseInsensitiveContainsString:searchText];
+            
+            if(simple) {
+                return YES;
+            }
+            else if (self.viewModel.database.format == kKeePass4 || self.viewModel.database.format == kKeePass) {
+                for (NSString* key in node.fields.customFields.allKeys) {
+                    NSString* value = node.fields.customFields[key].value;
+                    
+                    if ([key localizedCaseInsensitiveContainsString:searchText] || [value localizedCaseInsensitiveContainsString:searchText]) {
+                        return YES;
+                    }
                 }
             }
-        }
-        
-        return NO;
-    }];
+            
+            return NO;
+        }];
+    }
     
     // Filter out any results from the KDB root 'Backup' group/folder if configured so...
     
@@ -360,7 +393,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         if (self.viewModel.database.format == kKeePass1) {
             Node* backupGroup = self.viewModel.database.keePass1BackupNode;
             if(backupGroup) {
-                foo = [foo filter:^BOOL(Node * _Nonnull obj) {
+                matches = [matches filter:^BOOL(Node * _Nonnull obj) {
                     return (obj != backupGroup && ![backupGroup contains:obj]);
                 }];
             }
@@ -369,12 +402,12 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     Node* recycleBin = self.viewModel.database.recycleBinNode;
     if(!Settings.sharedInstance.showRecycleBinInSearchResults && recycleBin) {
-        foo = [foo filter:^BOOL(Node * _Nonnull obj) {
+        matches = [matches filter:^BOOL(Node * _Nonnull obj) {
             return obj != recycleBin && ![recycleBin contains:obj];
         }];
     }
     
-    self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
+    self.searchResults = [matches sortedArrayUsingComparator:searchResultsComparator];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -389,6 +422,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     Node *node = [self getDataSource][indexPath.row];
     if(node.isGroup) {
         BrowseGroupTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"GroupCell" forIndexPath:indexPath];
+        
+        // TODO: Should this be deferenced too?
         cell.title.text = node.title;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
@@ -407,8 +442,15 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 
         NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
         
-        cell.title.text = node.title;
-        cell.username.text = node.fields.username;
+        if(Settings.sharedInstance.viewDereferencedFields) {
+            cell.title.text = [self dereference:node.title node:node];
+            cell.username.text = [self dereference:node.fields.username node:node];
+        }
+        else {
+            cell.title.text = node.title;
+            cell.username.text = node.fields.username;
+        }
+
         cell.path.text = groupLocation;
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
@@ -418,6 +460,25 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         
         return cell;
     }
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node {
+    if(self.viewModel.database.format == kPasswordSafe) {
+        return text;
+    }
+    
+    NSError* error;
+    
+    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
+    
+    NSString* compiled = isCompilable ?
+        [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.viewModel.database.rootGroup error:&error] : text;
+
+    if(error) {
+        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+    }
+    
+    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
 }
 
 - (void)setOtpCellProperties:(BrowseSafeEntryTableViewCell*)cell node:(Node*)node {
@@ -598,7 +659,13 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         self.timerRefreshOtp = nil;
     }
     
-    if(!Settings.sharedInstance.hideTotpInBrowse) {
+    BOOL hasOtpToken = [[self getDataSource] anyMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.otpToken != nil;
+    }];
+    
+    if(!Settings.sharedInstance.hideTotpInBrowse && hasOtpToken) {
+        NSLog(@"Starting OTP Refresh Timer");
+        
         self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
         [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
     }
@@ -795,9 +862,9 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    pasteboard.string = item.fields.username;
+    pasteboard.string = [self dereference:item.fields.username node:item]   ;
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Username Copied", item.title]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Username Copied", [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -867,9 +934,9 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
     BOOL copyTotp = (item.fields.password.length == 0 && item.otpToken);
-    pasteboard.string = copyTotp ? item.otpToken.password : item.fields.password;
+    pasteboard.string = copyTotp ? item.otpToken.password : [self dereference:item.fields.password node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ? @"'%@' OTP Code Copied" : @"'%@' Password Copied", item.title]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ? @"'%@' OTP Code Copied" : @"'%@' Password Copied", [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES

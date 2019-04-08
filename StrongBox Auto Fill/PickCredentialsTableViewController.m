@@ -17,6 +17,7 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"
+#import "SprCompilation.h"
 
 static NSInteger const kScopeTitle = 0;
 static NSInteger const kScopeUsername = 1;
@@ -257,6 +258,8 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (NSArray*)getMatchingItems:(NSString*)searchText scope:(NSInteger)scope {
+    // TODO: Merge this with BrowseSafeView search code - it's better and does dereferencing...
+    
     NSPredicate *predicate;
     
     if (scope == kScopeTitle) {
@@ -335,8 +338,15 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         
         NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
         
-        cell.title.text = node.title;
-        cell.username.text = node.fields.username;
+        if(Settings.sharedInstance.viewDereferencedFields) {
+            cell.title.text = [self dereference:node.title node:node];
+            cell.username.text = [self dereference:node.fields.username node:node];
+        }
+        else {
+            cell.title.text = node.title;
+            cell.username.text = node.fields.username;
+        }
+
         cell.path.text = groupLocation;
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.model.database];
@@ -385,12 +395,35 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             }
         }
         
-        //NSLog(@"[%@] selected... Sending credentials [%@/%@]...", record.title, record.fields.username, record.fields.password);
-        [self.rootViewController onCredentialSelected:record.fields.username password:record.fields.password];
+        NSString* user = [self dereference:record.fields.username node:record];
+        NSString* password = [self dereference:record.fields.password node:record];
+        
+        //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
+
+        [self.rootViewController onCredentialSelected:user password:password];
     }
     else {
         NSLog(@"WARN: DidSelectRow with no Record?!");
     }
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node {
+    if(self.model.database.format == kPasswordSafe) {
+        return text;
+    }
+    
+    NSError* error;
+    
+    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
+    
+    NSString* compiled = isCompilable ?
+    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.model.database.rootGroup error:&error] : text;
+    
+    if(error) {
+        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+    }
+    
+    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
 }
 
 - (IBAction)onAddCredential:(id)sender {

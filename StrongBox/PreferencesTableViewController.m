@@ -28,6 +28,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
+@property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
+@property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
 
 @end
 
@@ -35,6 +37,28 @@
     NSDictionary<NSNumber*, NSNumber*> *_autoLockList;
     NSDictionary<NSNumber*, NSNumber*> *_appLockDelayList;
     NSDictionary<NSNumber*, NSNumber*> *_autoClearClipboardIndex;
+}
+
+- (void)bindViewDereferenced {
+    self.switchViewDereferenced.on = Settings.sharedInstance.viewDereferencedFields;
+}
+
+- (void)bindSearchDereferenced {
+    self.switchSearchDereferenced.on = Settings.sharedInstance.searchDereferencedFields;
+}
+
+- (IBAction)onViewDereferenced:(id)sender {
+    NSLog(@"Setting viewDereferencedFields to %d", self.switchViewDereferenced.on);
+
+    Settings.sharedInstance.viewDereferencedFields = self.switchViewDereferenced.on;
+    [self bindViewDereferenced];
+}
+
+- (IBAction)onSearchDereferenced:(id)sender {
+    NSLog(@"Setting searchDereferencedFields to %d", self.switchSearchDereferenced.on);
+
+    Settings.sharedInstance.searchDereferencedFields = self.switchSearchDereferenced.on;
+    [self bindSearchDereferenced];
 }
 
 - (IBAction)onUseQuickTypeAutoFill:(id)sender {
@@ -105,6 +129,8 @@
     [self bindShowRecycleBin];
     [self bindCopyTotpAutoFill];
     [self bindQuickTypeAutoFill];
+    [self bindViewDereferenced];
+    [self bindSearchDereferenced];
     
     //[self customizeAppLockSectionFooter];
 }

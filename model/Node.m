@@ -254,19 +254,36 @@
 }
 
 - (Node*_Nullable)findFirstChild:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate {
-    NSArray<Node*> *match = [self filterChildren:recursive predicate:predicate firstMatchOnly:YES];
-
-    return match.firstObject;
+    if(!self.isGroup) {
+        return nil;
+    }
+    
+    if(!predicate) {
+        return _mutableChildren.firstObject;
+    }
+    
+    for(Node* child in _mutableChildren) {
+        if(predicate(child)) {
+            return child;
+        }
+    }
+    
+    if(recursive) {
+        for(Node* child in _mutableChildren) {
+            if(child.isGroup) {
+                Node* match = [child findFirstChild:YES predicate:predicate];
+                if(match) {
+                    return match;
+                }
+            }
+        }
+    }
+    
+    return nil;
 }
 
 - (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive
                                 predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate {
-    return [self filterChildren:recursive predicate:predicate firstMatchOnly:NO];
-}
-
-- (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive
-                                predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate
-                           firstMatchOnly:(BOOL)firstMatchOnly {
     if(!self.isGroup) {
         return [NSArray array];
     }
@@ -276,17 +293,9 @@
     if(predicate) {
         for(Node* child in _mutableChildren) {
             if(predicate(child)) {
-                if(firstMatchOnly) {
-                    return [NSArray arrayWithObject:child];
-                }
-                else {
-                    [matching addObject:child];
-                }
+                [matching addObject:child];
             }
         }
-    }
-    else if(firstMatchOnly && _mutableChildren.count > 0) {
-        return [NSArray arrayWithObject:_mutableChildren.firstObject];
     }
     else {
         [matching addObjectsFromArray:_mutableChildren];
@@ -295,12 +304,7 @@
     if(recursive) {
         for(Node* child in _mutableChildren) {
             if(child.isGroup) {
-                NSArray<Node*> *bar = [child filterChildren:recursive predicate:predicate firstMatchOnly:firstMatchOnly];
-                
-                if(firstMatchOnly && bar.count > 0) {
-                    return bar;
-                }
-
+                NSArray<Node*> *bar = [child filterChildren:recursive predicate:predicate];
                 [matching addObjectsFromArray:bar];
             }
         }

@@ -241,6 +241,24 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
     return [NSString stringWithString:hexString];
 }
 
++ (NSData *)dataFromHexString:(NSString*)string {
+    const char *chars = [string UTF8String];
+    NSUInteger i = 0, len = string.length;
+    
+    NSMutableData *data = [NSMutableData dataWithCapacity:len / 2];
+    char byteChars[3] = {'\0','\0','\0'};
+    unsigned long wholeByte;
+    
+    while (i < len) {
+        byteChars[0] = chars[i++];
+        byteChars[1] = chars[i++];
+        wholeByte = strtoul(byteChars, NULL, 16);
+        [data appendBytes:&wholeByte length:1];
+    }
+    
+    return data;
+}
+
 NSData* sha256(NSData *data) {
     uint8_t digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
     

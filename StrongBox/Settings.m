@@ -52,6 +52,8 @@ static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBro
 static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
 static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
 static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill";
+static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
+static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
 
 @implementation Settings
 
@@ -716,6 +718,24 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setDoNotUseQuickTypeAutoFill:(BOOL)doNotUseQuickTypeAutoFill {
     [[self getUserDefaults] setBool:doNotUseQuickTypeAutoFill forKey:kDoNotUseQuickTypeAutoFill];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)viewDereferencedFields {
+    return [[self getUserDefaults] boolForKey:kViewDereferencedFields];
+}
+
+- (void)setViewDereferencedFields:(BOOL)viewDereferencedFields {
+    [[self getUserDefaults] setBool:viewDereferencedFields forKey:kViewDereferencedFields];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)searchDereferencedFields {
+    return [[self getUserDefaults] boolForKey:kSearchDereferencedFields];
+}
+
+- (void)setSearchDereferencedFields:(BOOL)searchDereferencedFields {
+    [[self getUserDefaults] setBool:searchDereferencedFields forKey:kSearchDereferencedFields];
     [[self getUserDefaults] synchronize];
 }
 

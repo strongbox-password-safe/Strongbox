@@ -70,6 +70,10 @@
 		4D1885652170E386001AE6B0 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46E206D350300AD537E /* PasswordGenerator.m */; };
 		4D1885672170E55F001AE6B0 /* OpenSafeSequenceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */; };
 		4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
+		4D18F23322577FB100768E18 /* FieldReferenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18F23222577FB100768E18 /* FieldReferenceTests.m */; };
+		4D18F2362257987E00768E18 /* SprCompilation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18F2352257987E00768E18 /* SprCompilation.m */; };
+		4D18F2372257987F00768E18 /* SprCompilation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18F2352257987E00768E18 /* SprCompilation.m */; };
+		4D18F23922579B3F00768E18 /* Deleteme.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18F23822579B3F00768E18 /* Deleteme.m */; };
 		4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D196789217F0CAE0057DF06 /* KeePassDatabaseMetadata.m */; };
 		4D19678B217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D196789217F0CAE0057DF06 /* KeePassDatabaseMetadata.m */; };
 		4D196797217F1C190057DF06 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D196796217F1C190057DF06 /* PwSafeMetadata.m */; };
@@ -438,6 +442,8 @@
 		4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
 		4DDA01572242621400C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
 		4DDB4AAA2177A72B00A06A73 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		4DDF7C9D225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */; };
+		4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */; };
 		4DE0CB6A2232AF4300E109F9 /* GenericTextIntegerElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB692232AF4300E109F9 /* GenericTextIntegerElementHandler.m */; };
 		4DE0CB6B2232AF4300E109F9 /* GenericTextIntegerElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB692232AF4300E109F9 /* GenericTextIntegerElementHandler.m */; };
 		4DE18335219F410200F51D39 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE18334219F410200F51D39 /* StrongboxDatabase.m */; };
@@ -614,6 +620,10 @@
 		4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeStorageProviderFactory.m; path = StrongBox/SafeStorageProviderFactory.m; sourceTree = "<group>"; };
 		4D18855F2170DE90001AE6B0 /* OpenSafeSequenceHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OpenSafeSequenceHelper.h; path = StrongBox/OpenSafeSequenceHelper.h; sourceTree = "<group>"; };
 		4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OpenSafeSequenceHelper.m; path = StrongBox/OpenSafeSequenceHelper.m; sourceTree = "<group>"; };
+		4D18F23222577FB100768E18 /* FieldReferenceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FieldReferenceTests.m; path = StrongboxTests/FieldReferenceTests.m; sourceTree = "<group>"; };
+		4D18F2342257987E00768E18 /* SprCompilation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SprCompilation.h; path = model/SprCompilation.h; sourceTree = "<group>"; };
+		4D18F2352257987E00768E18 /* SprCompilation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SprCompilation.m; path = model/SprCompilation.m; sourceTree = "<group>"; };
+		4D18F23822579B3F00768E18 /* Deleteme.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Deleteme.m; sourceTree = "<group>"; };
 		4D196788217F0CAE0057DF06 /* KeePassDatabaseMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseMetadata.h; path = model/keepass/KeePassDatabaseMetadata.h; sourceTree = SOURCE_ROOT; };
 		4D196789217F0CAE0057DF06 /* KeePassDatabaseMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseMetadata.m; path = model/keepass/KeePassDatabaseMetadata.m; sourceTree = SOURCE_ROOT; };
 		4D196790217F14400057DF06 /* KeePassConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassConstants.h; path = model/keepass/KeePassConstants.h; sourceTree = SOURCE_ROOT; };
@@ -1165,6 +1175,8 @@
 		4DDA015222425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "corrupt-recycly-bin-values.xml"; sourceTree = "<group>"; };
 		4DDA01542242621400C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
 		4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
+		4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+Extensions.h"; path = "model/NSDictionary+Extensions.h"; sourceTree = "<group>"; };
+		4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+Extensions.m"; path = "model/NSDictionary+Extensions.m"; sourceTree = "<group>"; };
 		4DE0CB682232AF4300E109F9 /* GenericTextIntegerElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextIntegerElementHandler.h; path = model/keepass/GenericTextIntegerElementHandler.h; sourceTree = "<group>"; };
 		4DE0CB692232AF4300E109F9 /* GenericTextIntegerElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextIntegerElementHandler.m; path = model/keepass/GenericTextIntegerElementHandler.m; sourceTree = "<group>"; };
 		4DE18333219F410100F51D39 /* StrongboxDatabase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = /Users/mark/dev/strongbox/StrongboxDatabase.h; sourceTree = "<absolute>"; };
@@ -1389,6 +1401,8 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4D18F23822579B3F00768E18 /* Deleteme.m */,
+				4D18F23222577FB100768E18 /* FieldReferenceTests.m */,
 				4D98344621775F3800731FFC /* test-files */,
 				4D376F8322425A6C0031049E /* XmlTests.m */,
 				4D8EA82522316B4300B47035 /* KdbxHistory.m */,
@@ -2190,6 +2204,8 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D18F2342257987E00768E18 /* SprCompilation.h */,
+				4D18F2352257987E00768E18 /* SprCompilation.m */,
 				4D8C72B722525E160016A5CC /* AutoFillManager.h */,
 				4D8C72B822525E160016A5CC /* AutoFillManager.m */,
 				4D2962AC223171BA0082897D /* misc */,
@@ -2251,6 +2267,8 @@
 				4D29E46E206D350300AD537E /* PasswordGenerator.m */,
 				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
 				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
+				4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */,
+				4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */,
 				4D446807216CE02C00F6358D /* Csv.h */,
 				4D446808216CE02C00F6358D /* Csv.m */,
 				4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */,
@@ -2840,6 +2858,7 @@
 				4D376F8422425A6C0031049E /* XmlTests.m in Sources */,
 				4D8FBEE621A9A5D7004797FA /* KeePassKeyFileTests.m in Sources */,
 				4D93AC912184ADE000A141C6 /* MiscScratchPadTests.m in Sources */,
+				4D18F23922579B3F00768E18 /* Deleteme.m in Sources */,
 				4D6FE2C72194469600EB9997 /* KdbDatabaseTests.m in Sources */,
 				4D3AC31C219066FC0010CFCD /* VariantDictionaryTests.m in Sources */,
 				4DF972B221BFD78700F384C9 /* SFTPTests.m in Sources */,
@@ -2850,6 +2869,7 @@
 				4D19679B217F22E90057DF06 /* PwSafeSerializationTests.m in Sources */,
 				4D1967AD217F7F4B0057DF06 /* KeePassDatabaseTests.m in Sources */,
 				4D4766FE2178CDCF00C4358F /* KeePassXmlParsingTests.m in Sources */,
+				4D18F23322577FB100768E18 /* FieldReferenceTests.m in Sources */,
 				4DD696A7218F13C80082DC08 /* AttachmentsRationalizerTests.m in Sources */,
 				4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */,
 			);
@@ -2912,6 +2932,7 @@
 				4D2F6C2821807C53007931E4 /* KeePassXmlParserDelegate.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
+				4DDF7C9D225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
 				4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */,
 				4D5B1EAF2194B2D900ECAF0D /* KdbSerializationData.m in Sources */,
@@ -3016,6 +3037,7 @@
 				4D5F5B6E218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
+				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */,
@@ -3108,6 +3130,7 @@
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
 				4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
+				4D18F2372257987F00768E18 /* SprCompilation.m in Sources */,
 				4D56D91421B837A20030E13A /* AddNewSafeHelper.m in Sources */,
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
@@ -3172,6 +3195,7 @@
 				4D1884D421709E13001AE6B0 /* Group.m in Sources */,
 				4DF972CA21C01ABF00F384C9 /* DAVRequest.m in Sources */,
 				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
+				4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */,
 				4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */,
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,

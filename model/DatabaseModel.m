@@ -298,7 +298,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         // Filter Backup Group
         // TODO: Expired
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup;
+            return !node.isGroup && (self.keePass1BackupNode == nil || ![self.keePass1BackupNode contains:node]);
         }];
     }
     else {

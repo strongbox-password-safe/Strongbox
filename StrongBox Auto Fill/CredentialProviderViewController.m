@@ -23,6 +23,7 @@
 #import "GoogleDriveManager.h"
 #import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
+#import "SprCompilation.h"
 
 @interface CredentialProviderViewController ()
 
@@ -107,8 +108,12 @@
     }];
     
     if(node) {
-        //NSLog(@"Return User/Pass from Node: [%@]", node);
-        ASPasswordCredential *cred = [[ASPasswordCredential alloc] initWithUser:node.fields.username password:node.fields.password];
+        NSString* user = [self dereference:node.fields.username node:node database:model.database];
+        NSString* password = [self dereference:node.fields.password node:node database:model.database];
+        
+        //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, node);
+
+        ASPasswordCredential *cred = [[ASPasswordCredential alloc] initWithUser:user password:password];
         
         // Copy TOTP code if configured to do so...
         
@@ -121,7 +126,6 @@
             }
         }
         
-        // TODO: When we support field references this could be wrong
         [self.extensionContext completeRequestWithSelectedCredential:cred completionHandler:nil];
     }
     else {
@@ -208,6 +212,25 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
         
         [Alerts info:vc title:@"Welcome to Strongbox Auto Fill" message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:\n\n- Dropbox\n- OneDrive\n- Google Drive\n- Local Device\n\nIn these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy the Auto Fill extension!\n-Mark"];
     }
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node database:(DatabaseModel*)database {
+    if(database.format == kPasswordSafe) {
+        return text;
+    }
+    
+    NSError* error;
+    
+    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
+    
+    NSString* compiled = isCompilable ?
+    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:database.rootGroup error:&error] : text;
+    
+    if(error) {
+        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+    }
+    
+    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
 }
 
 //- (void)didReceiveMemoryWarning {

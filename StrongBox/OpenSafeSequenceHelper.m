@@ -408,6 +408,8 @@
     [self.alertController addAction:keyFileOnlyAction];
     [self.alertController addAction:cancelAction];
     
+    self.alertController.preferredAction = defaultAction; // Return leads to the default action
+    
     [self.viewController presentViewController:self.alertController animated:YES completion:nil];
 }
 

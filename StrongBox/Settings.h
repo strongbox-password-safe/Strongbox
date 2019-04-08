@@ -112,6 +112,9 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 @property BOOL doNotUseQuickTypeAutoFill;
 
+@property BOOL viewDereferencedFields;
+@property BOOL searchDereferencedFields;
+
 NS_ASSUME_NONNULL_END
 
 @end

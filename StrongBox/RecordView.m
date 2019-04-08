@@ -26,6 +26,7 @@
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
+#import "SprCompilation.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -103,7 +104,9 @@ static const int kMinNotesCellHeight = 160;
             self.userSelectedNewIconIndex = nil;
             self.userSelectedNewExistingCustomIconId = nil;
             self.userSelectedNewCustomIcon = nil;
-            [self bindUiToRecord];
+            
+            [self bindUiToKeePassDereferenceableFields:NO];
+            
             [self setEditing:NO animated:YES];
         }
         else {
@@ -348,16 +351,51 @@ static const int kMinNotesCellHeight = 160;
     
     [self bindUiToRecord];
     
-    [self setEditing:self.editingNewRecord animated:YES];
+    if(self.editingNewRecord) {
+        [self setEditing:self.editingNewRecord animated:YES];
+    }
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node {
+    if(self.viewModel.database.format == kPasswordSafe) {
+        return text;
+    }
+    
+    NSError* error;
+    
+    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
+    
+    NSString* compiled = isCompilable ?
+    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.viewModel.database.rootGroup error:&error] : text;
+    
+    if(error) {
+        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+    }
+    
+    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
+}
+
+- (void)bindUiToKeePassDereferenceableFields:(BOOL)allowDereferencing {
+    if(Settings.sharedInstance.viewDereferencedFields && allowDereferencing) {
+        self.textFieldPassword.text = [self dereference:self.record.fields.password node:self.record];
+        self.textFieldTitle.text = [self dereference:self.record.title node:self.record];
+        self.textFieldUrl.text = [self dereference:self.record.fields.url node:self.record];
+        self.textFieldUsername.text = [self dereference:self.record.fields.username node:self.record];
+        self.textViewNotes.text = [self dereference:self.record.fields.notes node:self.record];
+    }
+    else {
+        self.textFieldPassword.text = self.record.fields.password;
+        self.textFieldTitle.text = self.record.title;
+        self.textFieldUrl.text = self.record.fields.url;
+        self.textFieldUsername.text = self.record.fields.username;
+        self.textViewNotes.text = self.record.fields.notes;
+    }
 }
 
 - (void)bindUiToRecord {
-    self.textFieldPassword.text = self.record.fields.password;
-    self.textFieldTitle.text = self.record.title;
-    self.textFieldUrl.text = self.record.fields.url;
-    self.textFieldUsername.text = self.record.fields.username;
+    [self bindUiToKeePassDereferenceableFields:YES];
+    
     self.textFieldEmail.text = self.record.fields.email;
-    self.textViewNotes.text = self.record.fields.notes;
     
     int count = (int)self.record.fields.attachments.count;
     
@@ -388,16 +426,17 @@ static const int kMinNotesCellHeight = 160;
     [super setEditing:flag animated:animated];
 
     if (flag == YES) {
+        [self bindUiToKeePassDereferenceableFields:NO];
+        [self enableDisableUiForEditing];
+
         self.navBack = self.navigationItem.leftBarButtonItem;
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
-        
-        [self enableDisableUiForEditing];
-        
         self.editButtonItem.enabled = [self recordCanBeSaved];
         [self.textFieldTitle becomeFirstResponder];
     }
     else {
         if ([self recordCanBeSaved]) { // Any other changes? Change the record and save the safe
+            NSLog(@"Saving changes to record.");
             [self onDoneWithChanges];
         }
         else {
@@ -405,6 +444,7 @@ static const int kMinNotesCellHeight = 160;
             self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.readOnlyMode);
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
             self.navBack = nil;
+            [self bindUiToKeePassDereferenceableFields:YES];
             [self enableDisableUiForEditing];
         }
     }
@@ -624,16 +664,19 @@ static NSString * trim(NSString *string) {
     }
     else
     {
-        [self copyToClipboard:self.record.fields.password message:@"Password Copied"];
+        NSString* pw = [self dereference:self.record.fields.password node:self.record];
+        [self copyToClipboard:pw message:@"Password Copied"];
     }
 }
 
 - (IBAction)onCopyUrl:(id)sender {
-    [self copyToClipboard:self.record.fields.url message:@"URL Copied"];
+    NSString* foo = [self dereference:self.record.fields.url node:self.record];
+    [self copyToClipboard:foo message:@"URL Copied"];
 }
 
 - (IBAction)onCopyUsername:(id)sender {
-    [self copyToClipboard:self.record.fields.username message:@"Username Copied"];
+    NSString* foo = [self dereference:self.record.fields.username node:self.record];
+    [self copyToClipboard:foo message:@"Username Copied"];
 }
 
 - (IBAction)onCopyTotp:(id)sender {
@@ -641,13 +684,14 @@ static NSString * trim(NSString *string) {
 }
 
 - (IBAction)onCopyAndLaunchUrl:(id)sender {
-    NSString *urlString = self.record.fields.url;
+    NSString* urlString = [self dereference:self.record.fields.url node:self.record];
 
     if (!urlString.length) {
         return;
     }
 
-    [self copyToClipboard:self.record.fields.password message:@"Password Copied. Launching URL..."];
+    NSString* pw = [self dereference:self.record.fields.password node:self.record];
+    [self copyToClipboard:pw message:@"Password Copied. Launching URL..."];
     
     if (![urlString.lowercaseString hasPrefix:@"http://"] &&
         ![urlString.lowercaseString hasPrefix:@"https://"]) {

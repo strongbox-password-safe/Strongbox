@@ -16,6 +16,18 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 
 @implementation Node (OtpToken)
 
++ (NSRegularExpression *)regex
+{
+    static NSRegularExpression *_regex;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        _regex = [NSRegularExpression regularExpressionWithPattern:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: \\[.*\\]" options:NSRegularExpressionDotMatchesLineSeparators error:Nil];
+    });
+    
+    return _regex;
+}
+
 -(OTPToken *)otpToken {
     return [Node getOtpTokenFromRecord:self.fields.password fields:self.fields.customFields notes:self.fields.notes];
 }
@@ -101,9 +113,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     
     // Notes Field if it's a Password Safe database
     
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: \\[.*\\]" options:NSRegularExpressionDotMatchesLineSeparators error:Nil];
-
-    NSTextCheckingResult *result = [regex firstMatchInString:self.fields.notes options:kNilOptions range:NSMakeRange(0, self.fields.notes.length)];
+    NSTextCheckingResult *result = [[Node regex] firstMatchInString:self.fields.notes options:kNilOptions range:NSMakeRange(0, self.fields.notes.length)];
     
     if(result) {
         NSLog(@"Found matching OTP in Notes: [%@]", [self.fields.notes substringWithRange:result.range]);

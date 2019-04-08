@@ -12,6 +12,7 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "SVProgressHUD.h"
+#import "SprCompilation.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,7 +65,7 @@ static NSString* const kMailToScheme = @"mailto";
                 NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
                 
                 for (Node* node in database.activeRecords) { 
-                    [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node databaseUuid:databaseUuid]];
+                    [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node database:database databaseUuid:databaseUuid]];
                 }
                 
                 NSInteger databasesUsingQuickType = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
@@ -93,14 +94,16 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
-- (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node databaseUuid:(NSString*)databaseUuid  API_AVAILABLE(ios(12.0)){
+- (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node database:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid  API_AVAILABLE(ios(12.0)){
     if(!node.fields.username.length) {
         return @[];
     }
     
     NSMutableArray<NSString*> *urls = [NSMutableArray array];
-    if(node.fields.url.length) {
-        [urls addObject:node.fields.url];
+    
+    NSString* urlField = [self dereference:node.fields.url node:node database:database];
+    if(urlField) {
+        [urls addObject:urlField];
     }
     
     // Custom Fields?
@@ -112,21 +115,26 @@ static NSString* const kMailToScheme = @"mailto";
     }
     
     // Notes?
-    
-    if(node.fields.notes.length) {
-        NSArray<NSString*> *foo = [self findUrlsInString:node.fields.notes];
+
+    NSString* notesField = [self dereference:node.fields.notes node:node database:database];
+
+    if(notesField.length) {
+        NSArray<NSString*> *foo = [self findUrlsInString:notesField];
         [urls addObjectsFromArray:foo];
     }
     
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
     
     for (NSString* url in urls) {
-        // NSLog(@"Adding [%@ [%@]] to Quick Type DB", url, node.fields.username);
-        
         QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString];
         
         ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
-        ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:node.fields.username recordIdentifier:[recordIdentifier toJson]];
+        
+        NSString* usernameField = [self dereference:node.fields.username node:node database:database];
+
+        NSLog(@"Adding [%@ [%@]] to Quick Type DB", url, usernameField);
+        
+        ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:usernameField recordIdentifier:[recordIdentifier toJson]];
         [identities addObject:iden];
     }
     
@@ -163,5 +171,23 @@ static NSString* const kMailToScheme = @"mailto";
     return urls;
 }
 
+- (NSString*)dereference:(NSString*)text node:(Node*)node database:(DatabaseModel*)database {
+    if(database.format == kPasswordSafe) {
+        return text;
+    }
+    
+    NSError* error;
+    
+    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
+    
+    NSString* compiled = isCompilable ?
+    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:database.rootGroup error:&error] : text;
+    
+    if(error) {
+        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+    }
+    
+    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
+}
 
 @end
