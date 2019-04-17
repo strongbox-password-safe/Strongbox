@@ -30,11 +30,15 @@
 #import "Node+OtpToken.h"
 #import "OTPToken+Generation.h"
 #import "NodeDetailsWindowController.h"
+#import "MBProgressHUD.h"
+#import "CustomFieldTableCellView.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
 const int kMaxRecommendCustomIconSize = 128*1024;
 const int kMaxCustomIconDimension = 256;
+
+static NSString* const kPasswordCellIdentifier = @"CustomFieldValueCellIdentifier";
 
 @interface ViewController ()
 
@@ -43,36 +47,36 @@ const int kMaxCustomIconDimension = 256;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) ProgressWindow* progressWindow;
 @property (nonatomic) BOOL showPassword;
-@property (strong, nonatomic) NSArray<NSString*>* emailAutoCompleteCache;
-@property (strong, nonatomic) NSArray<NSString*>* usernameAutoCompleteCache;
-@property (nonnull, strong, nonatomic) NSArray *attachments;
-@property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
 
-// MMcG: 31-Jan-2019 - Sometimes during new record creation or title editing we don't want to immediately conceal
-// details (with a selection change, selection change is though unavoidable because the outline view needs to be
-// reloaded and the selection/moved/maintained to a new row... unavoidable)
-
-@property BOOL suppressConcealDetailsOnSelectionUpdateNextTime;
 @property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *itemsCache;
 
 @property NSTimer* timerRefreshOtp;
-@property NSView* currentlyEditingUIControl;
 @property NSFont* italicFont;
 @property NSFont* regularFont;
 
-@property NSMutableArray<NodeDetailsWindowController*>* detailsWindowControllers; // Required to keep a hold of these window objects or actions don't work!
+@property NSMutableDictionary<NSUUID*, NodeDetailsWindowController*>* detailsWindowControllers; // Required to keep a hold of these window objects or actions don't work!
+@property (weak) IBOutlet NSTextField *labelTitle;
+@property (weak) IBOutlet NSTextField *labelUsername;
+@property (weak) IBOutlet NSTextField *labelEmail;
+@property (weak) IBOutlet NSTextField *labelPassword;
+@property (weak) IBOutlet NSTextField *labelUrl;
+@property (weak) IBOutlet NSTextField *labelHiddenPassword;
+@property (weak) IBOutlet ClickableImageView *imageViewTogglePassword;
+@property (weak) IBOutlet NSView *totpRow;
+@property (weak) IBOutlet NSTabView *quickViewColumn;
+@property (weak) IBOutlet NSButton *buttonToggleQuickViewPanel;
+
+@property (strong) IBOutlet NSMenu *outlineHeaderColumnsMenu;
 
 @end
 
 static NSImage* kStrongBox256Image;
-static NSImage* kDefaultAttachmentIcon;
 
 @implementation ViewController
 
 + (void)initialize {
     if(self == [ViewController class]) {
         kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
-        kDefaultAttachmentIcon = [NSImage imageNamed:@"document_empty_64"];
     }
 }
 
@@ -82,12 +86,20 @@ static NSImage* kDefaultAttachmentIcon;
     [self initializeFullOrTrialOrLiteUI];
     
     [self setInitialFocus];
+    
+    [self startRefreshOtpTimer];
 }
 
 - (void)viewDidDisappear {
     [super viewDidDisappear];
 
-    for (NodeDetailsWindowController *wc in [self.detailsWindowControllers copy]) { // Copy as race condition of windows closing and calling into us will lead to crash
+    [self stopRefreshOtpTimer];
+
+    [self closeAllDetailsWindows];
+}
+
+- (void)closeAllDetailsWindows {
+    for (NodeDetailsWindowController *wc in [self.detailsWindowControllers.allValues copy]) { // Copy as race condition of windows closing and calling into us will lead to crash
         [wc close];
     }
 
@@ -95,40 +107,42 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (IBAction)onViewItemDetails:(id)sender {
-    //Node* item = [self getCurrentSelectedItem];
-    //[self.model.document foo:item];
-    
     [self showItemDetails];
 }
 
 - (void)showItemDetails {
     Node* item = [self getCurrentSelectedItem];
-    if(!item || item.isGroup || self.model.format == kPasswordSafe) {
+    [self showItemDetails:item];
+}
+
+- (void)showItemDetails:(Node*)item {
+    if(!item || item.isGroup) {
         return;
     }
     
-    NodeDetailsWindowController* wc = [NodeDetailsWindowController showNode:item model:self.model readOnly:NO parentViewController:self];
+    NodeDetailsWindowController* wc = self.detailsWindowControllers[item.uuid];
     
-    NSLog(@"Adding Details WindowController to List: [%@]", wc);
-    [self.detailsWindowControllers addObject:wc];
+    if(wc)
+    {
+        NSLog(@"Details window already exists... Activating... [%@]", wc);
+        [wc showWindow:nil];
+    }
+    else {
+        wc = [NodeDetailsWindowController showNode:item model:self.model readOnly:NO parentViewController:self];
+        NSLog(@"Adding Details WindowController to List: [%@]", wc);
+        self.detailsWindowControllers[item.uuid] = wc;
+    }
 }
 
 - (void)onDetailsWindowClosed:(id)wc {
     NSLog(@"Removing Details WindowController to List: [%@]", wc);
-    [self.detailsWindowControllers removeObject:wc];
-}
-
-- (void)updateAutocompleteCaches {
-    // NB: We use these caches tso that we don't get a feedback when entering entries in the fields and setting them on the model. Also PERF
-    
-    self.emailAutoCompleteCache = self.model ? [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
-    self.usernameAutoCompleteCache = self.model ? [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
+    [self.detailsWindowControllers removeObjectForKey:wc];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.detailsWindowControllers = [NSMutableArray array];
+    self.detailsWindowControllers = [NSMutableDictionary dictionary];
     
     [self enableDragDrop];
 
@@ -141,74 +155,131 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)customizeUi {
-    self.buttonRevealDetail.layer.cornerRadius = 20;
-    self.checkboxRevealDetailsImmediately.state = [Settings sharedInstance].revealDetailsImmediately;
-    
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
-    [self.comboboxUsername setDataSource:self];
-    [self.comboBoxEmail setDataSource:self];
-    
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
+    self.buttonUnlockWithTouchId.hidden = YES;
     
-    // Password
-    
-    self.textFieldPw.textColor = [self getPasswordTextColor];
-    self.textFieldTotp.textColor = [self getPasswordTextColor];
-
-    // Using Menlo for the moment seems to be clearer
-    //
-    //    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
-    //    //NSLog(@"Loaded Font: %@", ft);
-    //    if(ft) {
-    //        self.textFieldPw.font = ft;
-    //        self.textFieldHiddenPassword.font = ft;
-    //    }
-    
-    // Any Clicks into the Password Field show it for editing
-    
-    self.textFieldHiddenPassword.onBecomesFirstResponder = ^{
-        self.showPassword = YES;
-        [self showOrHidePassword];
+    self.imageViewTogglePassword.clickable = YES;
+    self.imageViewTogglePassword.onClick = ^{
+        [self onToggleShowHideQuickViewPassword:nil];
     };
     
     self.showPassword = Settings.sharedInstance.alwaysShowPassword;
-    
-    self.attachments = [NSArray array];
-    self.attachmentsView.dataSource = self;
-    self.attachmentsView.delegate = self;
-    
-    self.attachmentsView.onSpaceBar = self.attachmentsView.onDoubleClick = ^{ // Funky
-        [self onPreviewAttachment:nil];
-    };
-    
-    // Summary Table
-    
-    self.tableViewSummary.dataSource = self;
-    self.tableViewSummary.delegate = self;
-    
-    // Custom Fields
-    
-    self.buttonUnlockWithTouchId.hidden = YES;
-    
-    //
-    
+
     self.imageViewShowHidePassword.clickable = YES;
     self.imageViewShowHidePassword.showClickableBorder = NO;
     self.imageViewShowHidePassword.onClick = ^{
         self.textFieldMasterPassword.showsText = !self.textFieldMasterPassword.showsText;
         self.imageViewShowHidePassword.image = !self.textFieldMasterPassword.showsText ? [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
     };
-    
-    self.outlineView.doubleAction = @selector(showItemDetails);
 
-    [self customizeOutlineViewFromSettings];
+    self.tableViewSummary.dataSource = self;
+    self.tableViewSummary.delegate = self;
+    
+    [self customizeOutlineView];
+    
+    self.quickViewColumn.hidden = !Settings.sharedInstance.revealDetailsImmediately;
+    [self bindQuickViewButton];
 }
 
-- (void)customizeOutlineViewFromSettings {
+- (void)customizeOutlineView {
+    // TODO: Sorting...
+    //self.outlineView.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES] ];
+    
+    NSNib* nib = [[NSNib alloc] initWithNibNamed:@"CustomFieldTableCellView" bundle:nil];
+    [self.outlineView registerNib:nib forIdentifier:kPasswordCellIdentifier];
+
     self.outlineView.usesAlternatingRowBackgroundColors = !Settings.sharedInstance.noAlternatingRows;
     self.outlineView.gridStyleMask = (Settings.sharedInstance.showVerticalGrid ? NSTableViewSolidVerticalGridLineMask : 0) | (Settings.sharedInstance.showHorizontalGrid ? NSTableViewSolidHorizontalGridLineMask : 0);
+    
+    self.outlineView.headerView.menu = self.outlineHeaderColumnsMenu;
+    self.outlineView.autosaveTableColumns = YES;
+    
+    self.outlineView.delegate = self;
+    self.outlineView.dataSource = self;
+    
+    [self bindColumnsToSettings];
+}
+
+- (void)bindColumnsToSettings {
+    NSArray<NSString*>* visible = Settings.sharedInstance.visibleColumns;
+    
+    // Show / Hide...
+    
+    for (NSString* column in [Settings kAllColumns]) {
+        [self showHideOutlineViewColumn:column show:[visible containsObject:column] && [self isColumnAvailableForModel:column]];
+    }
+    
+    // Order...
+    
+    int i=0;
+    for (NSString* column in visible) {
+        NSInteger colIdx = [self.outlineView columnWithIdentifier:column];
+        if(colIdx != -1) { // Perhaps we removed a column?!
+            NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
+            
+            if(!col.hidden) { // Maybe hidden because it isn't available in this Model Format (Password Safe/KeePass)
+                [self.outlineView moveColumn:colIdx toColumn:i++];
+            }
+        }
+    }
+    
+//    [self.outlineView setColumnAutoresizingStyle:NSTableViewUniformColumnAutoresizingStyle];
+}
+
+- (IBAction)onOutlineHeaderColumnsChanged:(id)sender {
+    NSMenuItem* menuItem = (NSMenuItem*)sender;
+    
+    //NSLog(@"Columns Changed: %@-%d", menuItem.identifier, menuItem.state == NSOnState);
+    
+    NSMutableArray<NSString*>* newColumns = [Settings.sharedInstance.visibleColumns mutableCopy];
+    
+    if(menuItem.state == NSOnState) // We are request to removing an existing column
+    {
+        [newColumns removeObject:menuItem.identifier];
+        Settings.sharedInstance.visibleColumns = newColumns;
+    }
+    else { // We're adding a column
+        if(![newColumns containsObject:menuItem.identifier]) { // Don't add a duplicate somehow
+            [newColumns addObject:menuItem.identifier];
+            Settings.sharedInstance.visibleColumns = newColumns;
+        }
+    }
+    
+    [self bindColumnsToSettings];
+}
+
+- (void)showHideOutlineViewColumn:(NSString*)identifier show:(BOOL)show {
+    NSInteger colIdx = [self.outlineView columnWithIdentifier:identifier];
+    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
+    
+    //NSLog(@"Set hidden: %@->%d", col.identifier, !show);
+
+    col.hidden = !show;
+}
+
+- (BOOL)isColumnAvailableForModel:(NSString*)identifier {
+    if(!self.model) {
+        return NO;
+    }
+    
+    BOOL ret;
+    if (self.model.format == kPasswordSafe) {
+        ret = (![identifier isEqualToString:kCustomFieldsColumn] && ![identifier isEqualToString:kAttachmentsColumn]);
+    }
+    else {
+        ret = ![identifier isEqualToString:kEmailColumn];
+    }
+    
+    //NSLog(@"isColumnAvailableForModel: %d = %@ -> %d", self.model.format == kPasswordSafe, identifier, ret);
+    
+    return ret;
+}
+
+- (BOOL)isColumnVisible:(NSString*)identifier {
+    return [Settings.sharedInstance.visibleColumns containsObject:identifier];
 }
 
 - (void)disableFeaturesForLiteVersion {
@@ -241,35 +312,11 @@ static NSImage* kDefaultAttachmentIcon;
     model.onNewItemAdded = ^(Node * _Nonnull node) {
         [self onNewItemAdded:node];
     };
-    model.onItemTitleChanged = ^(Node * _Nonnull node) {
-        [self onItemTitleChanged:node];
-    };
-    model.onItemUsernameChanged = ^(Node * _Nonnull node) {
-        [self onItemUsernameChanged:node];
-    };
-    model.onItemEmailChanged = ^(Node * _Nonnull node) {
-        [self onItemEmailChanged:node];
-    };
-    model.onItemUrlChanged = ^(Node * _Nonnull node) {
-        [self onItemUrlChanged:node];
-    };
-    model.onItemPasswordChanged = ^(Node * _Nonnull node) {
-        [self onItemPasswordChanged:node];
-    };
-    model.onItemNotesChanged = ^(Node * _Nonnull node) {
-        [self onItemNotesChanged:node];
-    };
-    model.onAttachmentsChanged = ^(Node * _Nonnull node) {
-        [self onAttachmentsChanged:node];
-    };
     model.onDeleteItem = ^(Node * _Nonnull node) {
         [self onDeleteItem:node];
     };
     model.onChangeParent = ^(Node * _Nonnull node) {
         [self onChangeParent:node];
-    };
-    model.onItemIconChanged = ^(Node * _Nonnull node) {
-        [self onItemIconChanged:node];
     };
     model.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
         [self onDeleteHistoryItem:item historicalItem:historicalItem];
@@ -277,37 +324,23 @@ static NSImage* kDefaultAttachmentIcon;
     model.onRestoreHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
         [self onRestoreHistoryItem:item historicalItem:historicalItem];
     };
-    model.onSetItemTotp = ^(Node * _Nonnull node) {
-        [self onSetItemTotp:node];
-    };
-    model.onClearItemTotp = ^(Node * _Nonnull node) {
-        [self onClearItemTotp:node];
-    };
     
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onCustomFieldsChanged:) name:kModelUpdateNotificationCustomFieldsChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemTitleChanged:) name: kModelUpdateNotificationTitleChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemUsernameChanged:) name: kModelUpdateNotificationUsernameChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemUrlChanged:) name: kModelUpdateNotificationUrlChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemEmailChanged:) name: kModelUpdateNotificationEmailChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemNotesChanged:) name: kModelUpdateNotificationNotesChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemPasswordChanged:) name:kModelUpdateNotificationPasswordChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemIconChanged:) name:kModelUpdateNotificationIconChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onAttachmentsChanged:) name:kModelUpdateNotificationAttachmentsChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onTotpChanged:) name:kModelUpdateNotificationTotpChanged object:nil];
     
     [self bindToModel];
 }
 
 - (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
     return [MacNodeIconHelper getIconForNode:self.model vm:vm large:large];
-}
-- (void)onSetItemTotp:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    [self bindDetailsPane];
-}
-- (void)onClearItemTotp:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    [self bindDetailsPane];
-}
-
-- (void)onItemIconChanged:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    [self.outlineView reloadItem:node];
-    if([self getCurrentSelectedItem] == node) {
-        self.imageViewIcon.image = [self getIconForNode:node large:NO];
-        self.imageViewGroupDetails.image = [self getIconForNode:node large:NO];
-    }
 }
 
 - (void)onDeleteHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
@@ -322,71 +355,154 @@ static NSImage* kDefaultAttachmentIcon;
     NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
     
     if(row != -1) {
-        self.suppressConcealDetailsOnSelectionUpdateNextTime = YES;
         [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         // This selection change will lead to a full reload of the details pane via selectionDidChange
     }
 }
 
-- (void)onItemTitleChanged:(Node*)node {
+//////////////
+
+- (void)onTotpChanged:(NSNotification*)notification {
+    self.itemsCache = nil; // Clear items cache
+    [self bindDetailsPane];
+
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' TOTP Changed...", node.title]];
+}
+
+- (void)onAttachmentsChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
+    }
+    
+    self.itemsCache = nil; // Clear items cache
+
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Attachments Changed...", node.title]];
+}
+
+- (void)onItemIconChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
+    }
+    
+    self.itemsCache = nil; // Clear items cache
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+
+    [self.outlineView reloadItem:node];
+    if([self getCurrentSelectedItem] == node) {
+        self.imageViewGroupDetails.image = [self getIconForNode:node large:NO];
+    }
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Icon Changed...", node.title]];
+}
+
+- (void)onItemTitleChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
+    }
+    
     self.itemsCache = nil; // Clear items cache
     Node* selectionToMaintain = [self getCurrentSelectedItem];
     [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
     NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
     
     if(row != -1) {
-        self.suppressConcealDetailsOnSelectionUpdateNextTime = YES;
         [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         // This selection change will lead to a full reload of the details pane via selectionDidChange
     }
+    
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Title Changed...", node.title]];
 }
 
-- (void)onItemUsernameChanged:(Node*)node {
+- (void)onItemPasswordChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
+    }
+    
     self.itemsCache = nil; // Clear items cache
-    self.usernameAutoCompleteCache = self.model ? [[self.model.usernameSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
+
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
     [self.outlineView reloadItem:node];
     
     if([self getCurrentSelectedItem] == node) {
-        self.comboboxUsername.stringValue = node.fields.username;
+        [self bindDetailsPane];
     }
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Password Changed...", node.title]];
 }
 
-- (void)onItemEmailChanged:(Node*)node {
+- (void)onItemUsernameChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
+    }
+    
     self.itemsCache = nil; // Clear items cache
-    self.emailAutoCompleteCache = self.model ? [[self.model.emailSet allObjects] sortedArrayUsingComparator:finderStringComparator] : [NSArray array];
+
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
     
     if([self getCurrentSelectedItem] == node) {
-        self.comboBoxEmail.stringValue = node.fields.email;
+        [self bindDetailsPane];
     }
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Username Changed...", node.title]];
 }
 
-- (void)onItemUrlChanged:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    if([self getCurrentSelectedItem] == node) {
-        self.textFieldUrl.stringValue = node.fields.url;
+- (void)onItemEmailChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
     }
+    
+    self.itemsCache = nil; // Clear items cache
+    
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
+
+    if([self getCurrentSelectedItem] == node) {
+        [self bindDetailsPane];
+    }
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Email Changed...", node.title]];
 }
 
-- (void)onItemPasswordChanged:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    if([self getCurrentSelectedItem] == node) {
-        self.textFieldPw.stringValue = node.fields.password;
+- (void)onItemUrlChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
     }
+    
+    self.itemsCache = nil; // Clear items cache
+    
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
+
+    if([self getCurrentSelectedItem] == node) {
+        [self bindDetailsPane];
+    }
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' URL Changed...", node.title]];
 }
 
-- (void)onItemNotesChanged:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
-    if([self getCurrentSelectedItem] == node) {
-        self.textViewNotes.string = node.fields.notes;
+- (void)onItemNotesChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
     }
-}
+    
+    self.itemsCache = nil; // Clear items cache
+    
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
 
-- (void)onAttachmentsChanged:(Node*)node {
-    self.itemsCache = nil; // Clear items cache
     if([self getCurrentSelectedItem] == node) {
-        self.attachmentsIconCache = nil; // TODO: what?
-        [self refreshAttachments:node];
+        [self bindDetailsPane];
     }
+    
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Notes Changed...", node.title]];
 }
 
 - (void)onCustomFieldsChanged:(NSNotification*)notification {
@@ -395,6 +511,11 @@ static NSImage* kDefaultAttachmentIcon;
     }
     
     self.itemsCache = nil; // Clear items cache
+
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+    [self.outlineView reloadItem:node];
+
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Custom Fields Changed...", node.title]];
 }
 
 - (void)onDeleteItem:(Node*)node {
@@ -425,7 +546,6 @@ static NSImage* kDefaultAttachmentIcon;
 
 - (void)bindToModel {
     self.itemsCache = nil; // Clear items cache
-    [self updateAutocompleteCaches];
     
     if(self.model == nil) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:2];
@@ -450,16 +570,9 @@ static NSImage* kDefaultAttachmentIcon;
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
     }
 
-    [self showHideOutlineViewColumns];
+    [self bindColumnsToSettings];
     [self.outlineView reloadData];
-    
     [self bindDetailsPane];
-}
-
-- (void)showHideOutlineViewColumns {
-    NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
-    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
-    col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
 }
 
 - (void)setInitialFocus {
@@ -468,11 +581,6 @@ static NSImage* kDefaultAttachmentIcon;
             [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
         }
     }
-}
-
-- (void)refreshAttachments:(Node *)it {
-    self.attachments = [it.fields.attachments copy];
-    [self.attachmentsView reloadData];
 }
 
 - (void)bindDetailsPane {
@@ -489,264 +597,50 @@ static NSImage* kDefaultAttachmentIcon;
         self.imageViewGroupDetails.showClickableBorder = YES;
         self.imageViewGroupDetails.onClick = ^{ [self onEditNodeIcon:it]; };
 
-        self.textFieldSummaryTitle.stringValue = it.title;
+        self.textFieldSummaryTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];;
     }
     else {
+        [self.tabViewRightPane selectTabViewItemAtIndex:0];
         self.emailRow.hidden = self.model.format != kPasswordSafe;
-        self.attachmentsRow.hidden = self.model.format == kPasswordSafe;
         
         //NSLog(@"Setting Text fields");
-        self.textFieldTitle.stringValue = it.title;
-        self.textFieldPw.stringValue = it.fields.password;
-        self.textFieldUrl.stringValue = it.fields.url;
-        self.comboboxUsername.stringValue = it.fields.username;
-        self.comboBoxEmail.stringValue = it.fields.email;
-        self.textViewNotes.string = it.fields.notes;
-        self.textFieldSummaryTitle.stringValue = it.title;
-        
-        self.imageViewIcon.image = [self getIconForNode:it large:NO];
-        self.imageViewIcon.clickable = self.model.format != kPasswordSafe;
-        self.imageViewIcon.onClick = ^{ [self onEditNodeIcon:it]; };
-        self.imageViewIcon.showClickableBorder = YES;
-        
-        if(self.suppressConcealDetailsOnSelectionUpdateNextTime || [Settings sharedInstance].revealDetailsImmediately) {
-            [self revealDetails];
-        }
-        else {
-            [self concealDetails];
-        }
-        self.suppressConcealDetailsOnSelectionUpdateNextTime = NO; // Toggle off - back to normal selection change behaviour
-        
-        [self refreshAttachments:it];
+        self.labelTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.labelPassword.stringValue = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.labelUrl.stringValue = [self maybeDereference:it.fields.url node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.labelUsername.stringValue = [self maybeDereference:it.fields.username node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.labelEmail.stringValue = it.fields.email;
+        self.textViewNotes.string = [self maybeDereference:it.fields.notes node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+
+        // Necessary to pick up links... :/        
+        [self.textViewNotes setEditable:YES];
+        [self.textViewNotes checkTextInDocument:nil];
+        [self.textViewNotes setEditable:NO];
         
         self.showPassword = Settings.sharedInstance.alwaysShowPassword;
-        [self showOrHidePassword];
+        [self showOrHideQuickViewPassword];
         
         // TOTP
 
         [self refreshOtpCode:nil];
-
-        if(!Settings.sharedInstance.doNotShowTotp && it.otpToken) {
-            if(self.timerRefreshOtp == nil) {
-                self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
-                [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
-            }
-        }
-        else {
-            if(self.timerRefreshOtp) {
-                [self.timerRefreshOtp invalidate];
-                self.timerRefreshOtp = nil;
-            }
-        }
     }
 }
 
-- (IBAction)onRevealDetails:(id)sender {
-    [self revealDetails];
+- (NSString*)maybeDereference:(NSString*)text node:(Node*)node maybe:(BOOL)maybe {
+    return maybe ? [self.model dereference:text node:node] : text;
 }
-
-- (IBAction)onConcealDetails:(id)sender {
-    [self concealDetails];
-}
-
-- (void)revealDetails {
-    [self.tabViewRightPane selectTabViewItemAtIndex:0];
-}
-
-- (void)concealDetails {
-    [self.tabViewRightPane selectTabViewItemAtIndex:3];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Collection View - Attachments
-
-- (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.attachments.count;
-}
-
-- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
-    AttachmentItem *item = [self.attachmentsView makeItemWithIdentifier:@"AttachmentItem" forIndexPath:indexPath];
- 
-    NodeFileAttachment* attachment = self.attachments[indexPath.item];
-    DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
-
-    item.textField.stringValue = attachment.filename;
-    item.imageView.image = kDefaultAttachmentIcon;
-    item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.data.length countStyle:NSByteCountFormatterCountStyleFile];
-    
-    if(self.attachmentsIconCache == nil) {
-        self.attachmentsIconCache = [NSMutableDictionary dictionary];
-        [self buildAttachmentsIconCache];
-    }
-    
-    NSImage* cachedIcon = self.attachmentsIconCache[@(attachment.index)];
-    if(cachedIcon) {
-        item.imageView.image = cachedIcon;
-    }
-    else {
-        NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename];
-        
-        if(img.size.width != 32 || img.size.height != 32) {
-            img = scaleImage(img, CGSizeMake(32, 32));
-        }
-        
-        item.imageView.image = img;
-    }
-    
-    return item;
-}
-
-- (void)buildAttachmentsIconCache {
-    NSArray *workingCopy = [self.model.attachments copy];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        for (int i=0;i<workingCopy.count;i++) {
-            DatabaseAttachment* dbAttachment = workingCopy[i];
-            
-            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.data];
-            if(img) {
-                img = scaleImage(img, CGSizeMake(32, 32));
-                [self.attachmentsIconCache setObject:img forKey:@(i)];
-            }
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.attachmentsView reloadData];
-            [self.view setNeedsDisplay:YES];
-        });
-    });
-}
-
-- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView {
-    return 1;
-}
-
-- (IBAction)onPreviewAttachment:(id)sender {
-    NSUInteger index = [self.attachmentsView.selectionIndexes firstIndex];
-    if(index == NSNotFound) {
-        return;
-    }
-    
-    [QLPreviewPanel.sharedPreviewPanel makeKeyAndOrderFront:self];
-}
-
-- (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
-    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
-    if(idx == NSNotFound) {
-        return 0;
-    }
-    
-    return 1;
-}
-
-- (id<QLPreviewItem>)previewPanel:(QLPreviewPanel *)panel previewItemAtIndex:(NSInteger)index {
-    if(index != 0) {
-        return nil;
-    }
-    
-    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
-    if(idx == NSNotFound) {
-        return nil;
-    }
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
-    
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return nil;
-    }
-    
-    DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-    
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
-
-    NSError* error;
-    //BOOL success =
-    [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
-    NSURL* url = [NSURL fileURLWithPath:f];
-    
-    return url;
-}
-
-- (BOOL)acceptsPreviewPanelControl:(QLPreviewPanel *)panel {
-    return YES;
-}
-
-- (void)beginPreviewPanelControl:(QLPreviewPanel *)panel {
-    panel.dataSource = self;
-    panel.delegate = self;
-}
-
-- (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-    for (NSString *file in tmpDirectory) {
-        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+                                       
+- (void)startRefreshOtpTimer {
+    if(self.timerRefreshOtp == nil) {
+        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
     }
 }
 
-- (IBAction)onSaveAttachment:(id)sender {
-    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
-    if(idx == NSNotFound) {
-        return;
+- (void)stopRefreshOtpTimer {
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
     }
-    
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
-    
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return;
-    }
-    
-    // Save As Dialog...
-    
-    NSSavePanel * savePanel = [NSSavePanel savePanel];
-    savePanel.nameFieldStringValue = nodeAttachment.filename;
-    
-    [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
-            DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-            [dbAttachment.data writeToFile:savePanel.URL.path atomically:YES];
-            [savePanel orderOut:self];
-        }
-    }];
-}
-
-- (IBAction)onRemoveAttachment:(id)sender {
-    NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
-    if(idx == NSNotFound) {
-        return;
-    }
-    
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
-    NSString* prompt = [NSString stringWithFormat:@"Are you sure you want to remove the attachment: %@?", nodeAttachment.filename];
-    [Alerts yesNo:prompt window:self.view.window completion:^(BOOL yesNo) {
-        if(yesNo) {
-            Node* node = [self getCurrentSelectedItem];
-            [self.model removeItemAttachment:node atIndex:idx];
-        }
-    }];
-}
-
-- (IBAction)onAddAttachment:(id)sender {
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
-            NSLog(@"Add: %@", openPanel.URL);
-
-            Node* node = [self getCurrentSelectedItem];
-            
-            NSError* error;
-            NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
-            
-            if(!data) {
-                NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
-                return;
-            }
-            
-            NSString* filename = openPanel.URL.lastPathComponent;
-            
-            [self.model addItemAttachment:node attachment:[[UiAttachment alloc] initWithFilename:filename data:data]];
-        }
-    }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -798,6 +692,291 @@ static NSImage* kDefaultAttachmentIcon;
     return items[index];
 }
 
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)theColumn byItem:(id)item
+{
+    return item;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+{
+    return NO;
+}
+
+- (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
+    Node *it = (Node*)item;
+    if([tableColumn.identifier isEqualToString:kTitleColumn]) {
+        return [self getTitleCell:it];
+    }
+    else if([tableColumn.identifier isEqualToString:kUsernameColumn]) {
+        return [self getEditableCell:it.fields.username node:it selector:@selector(onOutlineViewItemUsernameEdited:)];
+    }
+    else if([tableColumn.identifier isEqualToString:kPasswordColumn]) {
+        CustomFieldTableCellView* cell = [self.outlineView makeViewWithIdentifier:kPasswordCellIdentifier owner:nil];
+        
+        cell.value = it.isGroup ? @"" : [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
+        cell.protected = !it.isGroup;
+        cell.valueHidden = !it.isGroup;
+        
+        return cell;
+    }
+    else if([tableColumn.identifier isEqualToString:kTOTPColumn]) {
+        NSTableCellView* cell = [self getReadOnlyCell:it.otpToken ? it.otpToken.password : @""];
+
+        if(it.otpToken) {
+            uint64_t remainingSeconds = [self getTotpRemainingSeconds:item];
+            
+            cell.textField.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : NSColor.controlTextColor;
+        }
+
+        return cell;
+    }
+    else if([tableColumn.identifier isEqualToString:kURLColumn]) {
+        return [self getUrlCell:it.fields.url node:it];
+    }
+    else if([tableColumn.identifier isEqualToString:kEmailColumn]) {
+        return [self getEditableCell:it.fields.email node:it selector:@selector(onOutlineViewItemEmailEdited:)];
+    }
+    else if([tableColumn.identifier isEqualToString:kNotesColumn]) {
+        return [self getEditableCell:it.fields.notes node:it selector:@selector(onOutlineViewItemNotesEdited:)];
+    }
+    else if([tableColumn.identifier isEqualToString:kAttachmentsColumn]) {
+        return [self getReadOnlyCell:@(it.fields.attachments.count).stringValue];
+    }
+    else if([tableColumn.identifier isEqualToString:kCustomFieldsColumn]) {
+        return [self getReadOnlyCell:@(it.fields.customFields.count).stringValue];
+    }
+    else {
+        return [self getReadOnlyCell:@"< Unknown Column TO DO >"];
+    }
+}
+
+- (NSTableCellView*)getReadOnlyCell:(NSString*)text {
+    NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"ReadOnlyCell" owner:self];
+    cell.textField.stringValue = text;
+    cell.textField.editable = NO;
+    return cell;
+}
+
+- (NSTableCellView*)getUrlCell:(NSString*)text node:(Node*)node {
+    NSTableCellView* cell = [self getEditableCell:text node:node selector:@selector(onOutlineViewItemUrlEdited:)];
+
+    // MMcG: Valiant attempt but does not work well after edit, or indeed looks poor while selected...
+    // no click functionality either... or selection of browser...
+    
+//    if(text.length) { // Absolutely required because NSDataDetector will die and kill us in strange ways otherwise...
+//        NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+//        if(detector) {
+//            NSTextCheckingResult* result = [detector firstMatchInString:it.fields.url options:kNilOptions range:NSMakeRange(0, text.length)];
+//            if (result.resultType == NSTextCheckingTypeLink && result.range.location == 0 && result.range.length == text.length) {
+//                NSMutableAttributedString* attrString = [[NSMutableAttributedString alloc] initWithString:text];
+//                NSRange range = NSMakeRange(0, [attrString length]);
+//
+//                [attrString beginEditing];
+//
+//                [attrString addAttribute:NSLinkAttributeName value:it.fields.url range:range];
+//                [attrString addAttribute:NSForegroundColorAttributeName value:[NSColor systemBlueColor] range:range];
+//                [attrString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt:NSUnderlineStyleSingle] range:range];
+//
+//                [attrString endEditing];
+//
+//                cell.textField.attributedStringValue = attrString;
+//            }
+//        }
+//    }
+
+    return cell;
+}
+
+- (NSTableCellView*)getEditableCell:(NSString*)text node:(Node*)node selector:(SEL)selector {
+    NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"GenericCell" owner:self];
+    
+    cell.textField.stringValue = [self maybeDereference:text node:node maybe:Settings.sharedInstance.dereferenceInOutlineView];
+    
+    // Do not allow editing of dereferenced text in Outline View... impossible to work UI wise at the moment
+    
+    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.model isDereferenceableText:text];
+    
+    cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
+    cell.textField.action = selector;
+    
+    return cell;
+}
+
+- (NSTableCellView*)getTitleCell:(Node*)it {
+    NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"TitleCell" owner:self];
+    if(!self.italicFont) {
+        self.regularFont = cell.textField.font;
+        self.italicFont = [NSFontManager.sharedFontManager convertFont:cell.textField.font toHaveTrait:NSFontItalicTrait];
+    }
+    
+    if(it.isGroup && self.model.recycleBinEnabled && self.model.recycleBinNode && self.model.recycleBinNode == it) {
+        cell.textField.font = self.italicFont;
+    }
+    else {
+        cell.textField.font = self.regularFont;
+    }
+
+    cell.imageView.objectValue = [self getIconForNode:it large:NO];
+    cell.textField.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
+
+    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.model isDereferenceableText:it.title];
+    cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
+
+    cell.textField.editable = !Settings.sharedInstance.outlineViewTitleIsReadonly;
+    
+    return cell;
+}
+
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification {
+    //NSLog(@"Selection Change Outline View");
+    [self bindDetailsPane];
+}
+
+- (IBAction)onOutlineViewItemEmailEdited:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    if(item == nil) {
+        return;
+    }
+    
+    NSTextField *textField = (NSTextField*)sender;
+    NSString* newString =  [Utils trim:textField.stringValue];
+    if(![item.fields.email isEqualToString:newString]) {
+        [self.model setItemEmail:item email:newString];
+    }
+    else {
+        textField.stringValue = newString;
+    }
+    
+    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+}
+
+- (IBAction)onOutlineViewItemNotesEdited:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    if(item == nil) {
+        return;
+    }
+    
+    NSTextField *textField = (NSTextField*)sender;
+    NSString* newString =  textField.stringValue;
+    if(![item.fields.notes isEqualToString:newString]) {
+        [self.model setItemNotes:item notes:newString];
+    }
+    else {
+        textField.stringValue = newString;
+    }
+    
+    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+}
+
+- (IBAction)onOutlineViewItemUrlEdited:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    if(item == nil) {
+        return;
+    }
+    
+    NSTextField *textField = (NSTextField*)sender;
+    NSString* newString =  [Utils trim:textField.stringValue];
+    if(![item.fields.url isEqualToString:newString]) {
+        [self.model setItemUrl:item url:newString];
+    }
+    else {
+        textField.stringValue = newString;
+    }
+    
+    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+}
+
+- (IBAction)onOutlineViewItemUsernameEdited:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    if(item == nil) {
+        return;
+    }
+    
+    NSTextField *textField = (NSTextField*)sender;
+    NSString* newString =  [Utils trim:textField.stringValue];
+    if(![item.fields.username isEqualToString:newString]) {
+        [self.model setItemUsername:item username:newString];
+    }
+    else {
+        textField.stringValue = newString;
+    }
+    
+    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+}
+
+- (IBAction)onOutlineViewItemTitleEdited:(id)sender {
+    Node *item = [self getCurrentSelectedItem];
+    if(item == nil) {
+        return;
+    }
+    
+    NSTextField *textField = (NSTextField*)sender;
+    
+    NSString* newTitle =  [Utils trim:textField.stringValue];
+    if(![item.title isEqualToString:newTitle]) {
+        [self.model setItemTitle:item title:newTitle];
+    }
+    else {
+        textField.stringValue = newTitle;
+    }
+
+    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+}
+
+- (void)outlineView:(NSOutlineView *)outlineView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors {
+    // TODO: Sorting...
+    NSLog(@"sortDescriptors did change!");
+}
+
+- (void)outlineViewColumnDidMove:(NSNotification *)notification {
+    NSNumber* newNum = notification.userInfo[@"NSNewColumn"];
+
+    NSTableColumn* column = self.outlineView.tableColumns[newNum.intValue];
+    
+    //NSLog(@"tableViewColumnDidMove: %@ -> %@", column.identifier, newNum);
+    
+    NSMutableArray<NSString*>* newColumns = [Settings.sharedInstance.visibleColumns mutableCopy];
+   
+    [newColumns removeObject:column.identifier];
+    [newColumns insertObject:column.identifier atIndex:newNum.integerValue];
+    
+    Settings.sharedInstance.visibleColumns = newColumns;
+}
+
+- (IBAction)onOutlineViewDoubleClick:(id)sender {
+    NSInteger colIdx = [sender clickedColumn];
+    NSInteger rowIdx = [sender clickedRow];
+    
+    if(colIdx != -1 && rowIdx != -1) {
+        NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
+        Node *item = [sender itemAtRow:rowIdx];
+        
+        if([col.identifier isEqualToString:kTitleColumn]) {
+            [self showItemDetails:item];
+        }
+        else if([col.identifier isEqualToString:kUsernameColumn]) {
+            [self copyUsername:item];
+        }
+        else if([col.identifier isEqualToString:kPasswordColumn]) {
+            [self copyPassword:item];
+        }
+        else if([col.identifier isEqualToString:kTOTPColumn]) {
+            [self copyTotp:item];
+        }
+        else if([col.identifier isEqualToString:kURLColumn]) {
+            [self copyUrl:item];
+        }
+        else if([col.identifier isEqualToString:kEmailColumn]) {
+            [self copyEmail:item];
+        }
+        else if([col.identifier isEqualToString:kNotesColumn]) {
+            [self copyNotes:item];
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (NSArray<Node*> *)getItems:(Node*)parentGroup {
     if(!self.model || self.model.locked) {
         NSLog(@"Request for safe items while model nil or locked!");
@@ -835,14 +1014,14 @@ static NSImage* kDefaultAttachmentIcon;
         return sorted;
     }
     else {
-        // Filter Recycle Bin if Required in Search
+        // Filter Recycle Bin if Required in Search - also TODO: KeePass1 Backup Group, Expired etc...
         if(!Settings.sharedInstance.showRecycleBinInSearchResults && self.model.recycleBinNode) {
             sorted = [sorted filter:^BOOL(Node * _Nonnull obj) {
                 return obj != self.model.recycleBinNode;
             }];
         }
     }
-    
+
     // Filter by Search term
     
     return [sorted filter:^BOOL(Node * _Nonnull obj) {
@@ -852,53 +1031,12 @@ static NSImage* kDefaultAttachmentIcon;
 
 - (BOOL)isSafeItemMatchesSearchCriteria:(Node*)item recurse:(BOOL)recurse {
     NSString* searchText = self.searchField.stringValue;
-    
     if(![searchText length]) {
         return YES;
     }
     
-    BOOL searchAll = NO;
-    NSPredicate *predicate;
-    
-    NSInteger scope = self.searchSegmentedControl.selectedSegment;
-    if (scope == 0) {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
-    }
-    else if (scope == 1)
-    {
-        predicate = [NSPredicate predicateWithFormat:@"fields.username contains[c] %@", searchText];
-    }
-    else if (scope == 2)
-    {
-        predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
-    }
-    else {
-        searchAll = YES;
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@  "
-                 @"OR fields.password contains[c] %@  "
-                 @"OR fields.username contains[c] %@  "
-                 @"OR fields.email contains[c] %@  "
-                 @"OR fields.url contains[c] %@  "
-                 @"OR fields.notes contains[c] %@",
-                     searchText, searchText, searchText, searchText, searchText, searchText];
-    
-        // Future: Attachments?!
-    }
-
-    if([predicate evaluateWithObject:item]) {
+    if([self immediateMatch:searchText item:item scope:self.searchSegmentedControl.selectedSegment]) {
         return YES;
-    }
-    else if(searchAll && (self.model.format == kKeePass4 || self.model.format == kKeePass)) {
-        for (NSString* key in item.fields.customFields.allKeys) {
-            StringValue* value = item.fields.customFields[key];
-            
-            if(value) {
-                if([key rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound ||
-                   [value.value rangeOfString:searchText options:NSCaseInsensitiveSearch].location != NSNotFound) {
-                    return YES;
-                }
-            }
-        }
     }
     
     if(item.isGroup && recurse) {
@@ -912,53 +1050,39 @@ static NSImage* kDefaultAttachmentIcon;
     return NO;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)theColumn byItem:(id)item
-{
-    return item;
-}
+- (BOOL)immediateMatch:(NSString*)searchText item:(Node*)item scope:(NSInteger)scope {
+    BOOL immediateMatch = NO;
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
-{
-    return NO;
-}
-
-- (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
-    if([tableColumn.identifier isEqualToString:@"TitleColumn"]) {
-        NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"TitleCell" owner:self];
-        if(!self.italicFont) {
-            self.regularFont = cell.textField.font;
-            self.italicFont = [NSFontManager.sharedFontManager convertFont:cell.textField.font toHaveTrait:NSFontItalicTrait];
+    NSArray<NSString*> *terms = [self.model getSearchTerms:searchText];
+    
+    NSLog(@"Searching for Terms: [%@]", terms);
+    
+    for (NSString* term in terms) {
+        if (scope == kSearchScopeTitle) {
+            immediateMatch = [self.model isTitleMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
-        
-        Node *it = (Node*)item;
-        
-        if(it.isGroup && self.model.recycleBinEnabled && self.model.recycleBinNode && self.model.recycleBinNode == it) {
-            cell.textField.font = self.italicFont;
+        else if (scope == kSearchScopeUsername) {
+            immediateMatch = [self.model isUsernameMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+        }
+        else if (scope == kSearchScopePassword) {
+            immediateMatch = [self.model isPasswordMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+        }
+        else if (scope == kSearchScopeUrl) {
+            immediateMatch = [self.model isUrlMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         else {
-            cell.textField.font = self.regularFont;
+            immediateMatch = [self.model isAllFieldsMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         
-        cell.textField.stringValue = it.title;
-        cell.imageView.objectValue = [self getIconForNode:it large:NO];
-        
-        return cell;
+        if(!immediateMatch) { // MUST match all terms...
+            return NO;
+        }
     }
-    else {
-        NSTableCellView* cell = (NSTableCellView*)[outlineView makeViewWithIdentifier:@"UsernameCell" owner:self];
-        
-        Node *it = (Node*)item;
-        
-        cell.textField.stringValue = it.fields.username;
-        
-        return cell;
-    }
+    
+    return immediateMatch;
 }
 
-- (void)outlineViewSelectionDidChange:(NSNotification *)notification {
-    //NSLog(@"Selection Change Outline View");
-    [self bindDetailsPane];
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction)onUseKeyFileOnly:(id)sender {
     [self onUseKeyFileCommon:nil];
@@ -1197,11 +1321,8 @@ static NSImage* kDefaultAttachmentIcon;
 - (IBAction)lockSafeContinuation:(id)sender {
     Node* item = [self getCurrentSelectedItem];
     
-    for (NodeDetailsWindowController *wc in [self.detailsWindowControllers copy]) { // Copy as race condition of windows closing and calling into us will lead to crash
-        [wc close];
-    }    
-    [self.detailsWindowControllers removeAllObjects];
-
+    [self closeAllDetailsWindows];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError* error;
         BOOL lockSuccess = [self.model lock:&error selectedItem:item.serializationId];
@@ -1225,17 +1346,6 @@ static NSImage* kDefaultAttachmentIcon;
     [self setInitialFocus];
     
     [self.view setNeedsDisplay:YES];
-}
-         
-- (IBAction)onOutlineViewDoubleClick:(id)sender {
-    Node *item = [sender itemAtRow:[sender clickedRow]];
-    
-    if ([sender isItemExpanded:item]) {
-        [sender collapseItem:item];
-    }
-    else {
-        [sender expandItem:item];
-    }
 }
 
 - (IBAction)onFind:(id)sender {
@@ -1272,21 +1382,14 @@ static NSImage* kDefaultAttachmentIcon;
     }];
 }
 
-- (IBAction)onSearch:(id)sender {
-    //NSLog(@"Search For: %@", self.searchField.stringValue);
-    
+- (IBAction)onSearch:(id)sender {    
     self.itemsCache = nil; // Clear items cache
     
     Node* currentSelection = [self getCurrentSelectedItem];
     
     [self.outlineView reloadData];
     
-    NSInteger colIdx = [self.outlineView columnWithIdentifier:@"UsernameColumn"];
-    NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
-    
     if( self.searchField.stringValue.length > 0) {
-        col.hidden = NO;
-        
         // Select first match...
         
         [self.outlineView expandItem:nil expandChildren:YES];
@@ -1303,82 +1406,129 @@ static NSImage* kDefaultAttachmentIcon;
         }
     }
     else {
-        col.hidden = !Settings.sharedInstance.alwaysShowUsernameInOutlineView;
-        
         // Search cleared - can we maintain the selection?
         
         [self selectItem:currentSelection];
     }
 }
 
-- (IBAction)onCheckboxRevealDetailsImmediately:(id)sender {
-    [Settings sharedInstance].revealDetailsImmediately = self.checkboxRevealDetailsImmediately.state;
-}
-
-- (IBAction)onToggleShowHidePassword:(id)sender {
+- (IBAction)onToggleShowHideQuickViewPassword:(id)sender {
     self.showPassword = !self.showPassword;
-    
-    if(!self.showPassword) {
-        // Shift Focus out of "Disabled" Password Text Field - otherwise we get a weird setup and passwords can be set to asterisks
-        
-        [self.textFieldPw resignFirstResponder];
-        [self.textFieldTitle becomeFirstResponder];
-    }
-    
-    [self showOrHidePassword];
+    [self showOrHideQuickViewPassword];
 }
 
-- (void)showOrHidePassword {
-    if(self.showPassword) {
-        self.textFieldHiddenPassword.hidden = YES;
-        self.textFieldHiddenPassword.enabled = NO;
-        self.textFieldPw.hidden = NO;
+- (void)showOrHideQuickViewPassword {
+    self.labelHiddenPassword.hidden = self.showPassword;
+    self.labelPassword.hidden = !self.showPassword;
+    self.imageViewTogglePassword.image = [NSImage imageNamed:self.showPassword ? @"hide" : @"show"];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-(void)copyToPasteboard:(NSString*)text item:(Node*)item {
+    if(!item || !text.length) {
+        [[NSPasteboard generalPasteboard] clearContents];
+        return;
     }
-    else {
-        self.textFieldHiddenPassword.hidden = NO;
-        self.textFieldHiddenPassword.enabled = YES;
-        self.textFieldPw.hidden = YES;
-    }
+    
+    NSString* deref = [self.model dereference:text node:item];
+    
+    [[NSPasteboard generalPasteboard] clearContents];
+    [[NSPasteboard generalPasteboard] setString:deref forType:NSStringPboardType];
 }
 
 - (IBAction)onCopyTitle:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:self.textFieldTitle.stringValue forType:NSStringPboardType];
+    [self copyTitle:[self getCurrentSelectedItem]];
 }
 
 - (IBAction)onCopyUsername:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:self.comboboxUsername.stringValue forType:NSStringPboardType];
+    [self copyUsername:[self getCurrentSelectedItem]];
 }
 
 - (IBAction)onCopyEmail:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:self.comboBoxEmail.stringValue forType:NSStringPboardType];
+    [self copyEmail:[self getCurrentSelectedItem]];
 }
 
 - (IBAction)onCopyUrl:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:self.textFieldUrl.stringValue forType:NSStringPboardType];
+    [self copyUrl:[self getCurrentSelectedItem]];
+}
+
+- (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
+    Node* item = [self getCurrentSelectedItem];
+    [self copyPassword:item];
+    [self onLaunchUrl:sender];
 }
 
 - (IBAction)onCopyNotes:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:self.textViewNotes.textStorage.string forType:NSStringPboardType];
+    [self copyNotes:[self getCurrentSelectedItem]];
 }
 
 - (IBAction)onCopyPassword:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    
-    Node* item = [self getCurrentSelectedItem];
-    
-    NSString *password = item.fields.password;
-    [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
+    [self copyPassword:[self getCurrentSelectedItem]];
 }
 
 - (IBAction)onCopyTotp:(id)sender {
+    [self copyTotp:[self getCurrentSelectedItem]];
+}
+
+- (void)copyTitle:(Node*)item {
+    if(!item) return;
+    
+    [self copyToPasteboard:item.title item:item];
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Title Copied", item.title]];
+}
+
+- (void)copyUsername:(Node*)item {
+    if(!item) return;
+    
+    [self copyToPasteboard:item.fields.username item:item];
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Username Copied", item.title]];
+}
+
+- (void)copyEmail:(Node*)item {
+    if(!item) return;
+    
+    [self copyToPasteboard:item.fields.email item:item];
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Email Copied", item.title]];
+}
+
+- (void)copyUrl:(Node*)item {
+    if(!item) return;
+    
+    [self copyToPasteboard:item.fields.url item:item];
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' URL Copied", item.title]];
+}
+
+- (void)copyNotes:(Node*)item {
+    if(!item) return;
+    
+    [self copyToPasteboard:item.fields.notes item:item];
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Notes Copied", item.title]];
+}
+
+- (void)copyPassword:(Node*)item {
+    if(!item || item.isGroup) {
+        return;
+    }
+
     [[NSPasteboard generalPasteboard] clearContents];
-    NSString *password = self.textFieldTotp.stringValue;
+    
+    NSString *password = [self.model dereference:item.fields.password node:item];
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
+
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Password Copied", item.title]];
+}
+
+- (void)copyTotp:(Node*)item {
+    if(!item || !item.otpToken) {
+        return;
+    }
+    
+    [[NSPasteboard generalPasteboard] clearContents];
+    NSString *password = item.otpToken.password;
+    [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
+
+    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' TOTP Copied", item.title]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1392,131 +1542,6 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
-{
-    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? self.usernameAutoCompleteCache : self.emailAutoCompleteCache;
-    return src.count;
-}
-
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
-{
-    NSArray<NSString*>* src = aComboBox == self.comboboxUsername ? self.usernameAutoCompleteCache : self.emailAutoCompleteCache;
-    return [src objectAtIndex:index];
-}
-
-- (void)textDidBeginEditing:(NSNotification *)notification {
-    //NSLog(@"textDidBeginEditing: %@", notification);
-    
-    self.currentlyEditingUIControl = notification.object;
-}
-
-- (void)controlTextDidBeginEditing:(NSNotification *)obj {
-    //NSLog(@"controlTextDidEndEditing: %@", obj);
-    
-    self.currentlyEditingUIControl = obj.object;
-}
-
-- (void)textDidEndEditing:(NSNotification *)notification {
-    //NSLog(@"textDidEndEditing: %@", notification);
-    
-    [self setModelForEditField:notification.object];
-
-    self.currentlyEditingUIControl = nil;
-}
-
--(void)controlTextDidEndEditing:(NSNotification *)obj {
-    //NSLog(@"controlTextDidEndEditing: %@", obj);
-    
-    [self setModelForEditField:obj.object];
-    
-    self.currentlyEditingUIControl = nil;
-}
-
-- (IBAction)saveDocument:(id)sender {
-    Node* item = [self getCurrentSelectedItem];
-    
-    if(item && !item.isGroup && self.currentlyEditingUIControl) {
-        //NSLog(@"We are currently editing: [%@] - forcing model bind", self.currentlyEditingUIControl);
-
-        [self setModelForEditField:self.currentlyEditingUIControl];
-    }
-    
-    [self.model.document saveDocument:sender];
-}
-
-- (void)setModelForEditField:(NSView*)obj {
-    if(self.model.locked || obj == nil) { // Can happen when user hits Lock in middle of edit...
-        return;
-    }
-    
-    Node* item = [self getCurrentSelectedItem];
-    
-    if(!item || item.isGroup) {
-        return;
-    }
-    
-    //NSLog(@"setModelForEditField for [%@]", obj);
-    
-    if(obj == self.textFieldTitle) {
-        if(![item.title isEqualToString:trimField(self.textFieldTitle)]) {
-            [self.model setItemTitle:item title:trimField(self.textFieldTitle)];
-        }
-    }
-    else if(obj == self.comboboxUsername) {
-        if(![item.fields.username isEqualToString:trimField(self.comboboxUsername)]) {
-            [self.model setItemUsername:item username:trimField(self.comboboxUsername)];
-        }
-    }
-    else if(obj == self.comboBoxEmail){
-        if(![item.fields.email isEqualToString:trimField(self.comboBoxEmail)]) {
-            [self.model setItemEmail:item email:trimField(self.comboBoxEmail)];
-        }
-    }
-    else if(obj == self.textFieldUrl){
-        if(![item.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
-            [self.model setItemUrl:item url:trimField(self.textFieldUrl)];
-        }
-    }
-    else if(obj == self.textFieldPw){
-        if(![item.fields.password isEqualToString:trimField(self.textFieldPw)]) {
-            [self.model setItemPassword:item password:trimField(self.textFieldPw)];
-        }
-    }
-    else if(obj == self.textViewNotes) {
-        NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
-        if(![item.fields.notes isEqualToString:updated]) {
-            [self.model setItemNotes:item notes:updated];
-        }
-    }
-    else {
-        NSLog(@"NOP for setModelForEditField");
-    }
-}
-
-- (IBAction)onOutlineViewItemEdited:(id)sender {
-    Node *item = [self getCurrentSelectedItem];
-    
-    if(item == nil) {
-        return;
-    }
-    
-    NSTextField *textField = (NSTextField*)sender;
-
-    NSString* newTitle = trimField(textField);
-    if(![item.title isEqualToString:newTitle]) {
-        [self.model setItemTitle:item title:newTitle];
-    }
-    else {
-        textField.stringValue = newTitle;
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-NSString* trimField(NSTextField* textField) {
-    return [Utils trim:textField.stringValue];
-}
 
 - (void)expandParentsOfItem:(Node*)item {
     NSMutableArray *stack = [[NSMutableArray alloc] init];
@@ -1645,23 +1670,12 @@ NSString* trimField(NSTextField* textField) {
         NSLog(@"Could not find newly added item?");
     }
     else {
-        self.suppressConcealDetailsOnSelectionUpdateNextTime = YES;
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if(!node.isGroup) {
-                self.showPassword = YES;
-                
-                [self showOrHidePassword];
-                if([self.textFieldTitle acceptsFirstResponder]) {
-                    [self.view.window makeFirstResponder:self.textFieldTitle];
-                }
-            }
-            else{
-                NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
-                if ([cellView.textField acceptsFirstResponder]) {
-                    [cellView.window makeFirstResponder:cellView.textField];
-                }
+            NSTableCellView* cellView = (NSTableCellView*)[self.outlineView viewAtColumn:0 row:row makeIfNecessary:YES];
+            if ([cellView.textField acceptsFirstResponder]) {
+                [cellView.window makeFirstResponder:cellView.textField];
             }
         });
     }
@@ -1684,7 +1698,9 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onLaunchUrl:(id)sender {
-    NSString *urlString = self.textFieldUrl.stringValue;
+    Node* item = [self getCurrentSelectedItem];
+    
+    NSString *urlString = [self.model dereference:item.fields.url node:item];
     
     if (!urlString.length) {
         return;
@@ -1696,16 +1712,6 @@ NSString* trimField(NSTextField* textField) {
     }
     
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
-}
-
-- (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    
-    Node* item = [self getCurrentSelectedItem];
-    NSString *password = item.fields.password;
-    [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
-
-    [self onLaunchUrl:sender];
 }
 
 - (IBAction)onCopyDiagnosticDump:(id)sender {
@@ -1748,19 +1754,19 @@ NSString* trimField(NSTextField* textField) {
     }
     else if(theAction == @selector(onLaunchUrl:) ||
             theAction == @selector(onCopyUrl:)) {
-        return item && !item.isGroup && self.textFieldUrl.stringValue.length;
+        return item && !item.isGroup;
     }
     else if (theAction == @selector(onCopyTitle:)) {
-        return item && !item.isGroup && self.textFieldTitle.stringValue.length;
+        return item && !item.isGroup;
     }
     else if (theAction == @selector(onCopyUsername:)) {
-        return item && !item.isGroup && self.comboboxUsername.stringValue.length;
+        return item && !item.isGroup;
     }
     else if (theAction == @selector(onCopyEmail:)) {
-        return item && !item.isGroup && self.comboBoxEmail.stringValue.length;
+        return item && !item.isGroup && self.model.format == kPasswordSafe;
     }
     else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
-        return item && !item.isGroup && item.fields.password.length && self.textFieldUrl.stringValue.length;
+        return item && !item.isGroup && item.fields.password.length;
     }
     else if (theAction == @selector(onCopyPassword:)) {
         return item && !item.isGroup && item.fields.password.length;
@@ -1769,20 +1775,11 @@ NSString* trimField(NSTextField* textField) {
         return item && !item.isGroup && item.otpToken;
     }
     else if (theAction == @selector(onCopyNotes:)) {
-        return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
+        return item && !item.isGroup && self.textViewNotes.textStorage.string.length; // TODO: Group can have notes
     }
     else if (theAction == @selector(onClearTouchId:)) {
         SafeMetaData* metaData = [self getDatabaseMetaData];
         return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
-    }
-    else if (theAction == @selector(onPreviewAttachment:)) {
-        return [self.attachmentsView.selectionIndexes count] != 0;
-    }
-    else if (theAction == @selector(onSaveAttachment:)) {
-        return [self.attachmentsView.selectionIndexes count] != 0;
-    }
-    else if (theAction == @selector(onRemoveAttachment:)) {
-        return [self.attachmentsView.selectionIndexes count] != 0;
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.model.locked;
@@ -1790,11 +1787,11 @@ NSString* trimField(NSTextField* textField) {
     else if (theAction == @selector(onSetItemIcon:)) {
         return item != nil && self.model.format != kPasswordSafe;
     }
-    else if(theAction == @selector(onClearItemTotp:)) {
-        return item && !item.isGroup && item.otpToken;
-    }
-    else if(theAction == @selector(onSetItemTotp:)) {
+    else if(theAction == @selector(onSetTotp:)) {
         return item && !item.isGroup;
+    }
+    else if(theAction == @selector(onClearTotp:)) {
+        return item && !item.isGroup && item.otpToken;
     }
     else if (theAction == @selector(onViewItemHistory:)) {
         return
@@ -1802,6 +1799,11 @@ NSString* trimField(NSTextField* textField) {
             !item.isGroup &&
             item.fields.keePassHistory.count > 0 &&
             (self.model.format == kKeePass || self.model.format == kKeePass4);
+    }
+    else if(theAction == @selector(onOutlineHeaderColumnsChanged:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = [self isColumnVisible:menuItem.identifier];
+        return [self isColumnAvailableForModel:menuItem.identifier];
     }
     
     return YES;
@@ -1818,19 +1820,6 @@ NSString* trimField(NSTextField* textField) {
         
         [self bindToModel];
     }
-}
-
-- (IBAction)onGenerate:(id)sender {
-    Node* item = [self getCurrentSelectedItem];
-    
-    [self.model setItemPassword:item password:[self.model generatePassword]];
-
-    self.showPassword = YES;
-    [self showOrHidePassword];
-
-//    self.textFieldPw.stringValue = [];
-//
-//    [self bindModelToSimpleUiFields];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -1941,19 +1930,14 @@ NSString* trimField(NSTextField* textField) {
         
         self.itemsCache = nil; // Clear items cache
         
-        [self showHideOutlineViewColumns];
-        [self customizeOutlineViewFromSettings];
+        [self bindColumnsToSettings];
+        [self customizeOutlineView];
         
         [self.outlineView reloadData];
         
         [self selectItem:currentSelection];
     });
 }
-
-static NSComparator finderStringComparator = ^(id obj1, id obj2)
-{
-    return [Utils finderStringCompare:obj1 string2:obj2];
-};
 
 static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     BasicOrderedDictionary *ret = [[BasicOrderedDictionary alloc] init];
@@ -2012,18 +1996,18 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return;
     }
     
-    __weak id weakSelf = self;
+    __weak ViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
     self.selectPredefinedIconController.customIcons = self.model.customIcons;
     self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
     self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data, NSUUID * _Nullable existingCustom) {
-        [weakSelf onSelectedNewIcon:item index:index data:data existingCustom:existingCustom];
+        onSelectedNewIcon(weakSelf.model, item, index, data, existingCustom, weakSelf.view.window);
     };
     
     [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
 }
 
-- (void)onSelectedNewIcon:(Node*)item index:(NSNumber*)index data:(NSData*)data existingCustom:(NSUUID*)existingCustom {
+void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window) {
     if(data) {
         NSImage* icon = [[NSImage alloc] initWithData:data];
         if(icon) {
@@ -2042,29 +2026,29 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
                 if(saving > (32 * 1024)) {
                     NSString* savingStr = [[[NSByteCountFormatter alloc] init] stringFromByteCount:saving];
                     NSString* message = [NSString stringWithFormat:@"This is a large image to use as an icon. Would you like to use a scaled down version to save %@?", savingStr];
-                    [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
+                    [Alerts yesNo:message window:window completion:^(BOOL yesNo) {
                         if(yesNo) {
-                            [self.model setItemIcon:item index:index existingCustom:existingCustom custom:compressed];
+                            [model setItemIcon:item index:index existingCustom:existingCustom custom:compressed];
                         }
                         else {
-                            [self.model setItemIcon:item index:index existingCustom:existingCustom custom:data];
+                            [model setItemIcon:item index:index existingCustom:existingCustom custom:data];
                         }
                     }];
                 }
                 else {
-                    [self.model setItemIcon:item index:index existingCustom:existingCustom custom:data];
+                    [model setItemIcon:item index:index existingCustom:existingCustom custom:data];
                 }
             }
             else {
-                [self.model setItemIcon:item index:index existingCustom:existingCustom custom:data];
+                [model setItemIcon:item index:index existingCustom:existingCustom custom:data];
             }
         }
         else {
-            [Alerts info:@"This is not a valid image file." window:self.view.window];
+            [Alerts info:@"This is not a valid image file." window:window];
         }
     }
     else {
-        [self.model setItemIcon:item index:index existingCustom:existingCustom custom:nil];
+        [model setItemIcon:item index:index existingCustom:existingCustom custom:nil];
     }
 }
 
@@ -2095,32 +2079,59 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (IBAction)refreshOtpCode:(id)sender
 {
-    Node *item = [self getCurrentSelectedItem];
+    if([self isColumnVisible:kTOTPColumn]) {
+        NSScrollView* scrollView = [self.outlineView enclosingScrollView];
+        CGRect visibleRect = scrollView.contentView.visibleRect;
+        NSRange rowRange = [self.outlineView rowsInRect:visibleRect];
+        NSInteger totpColumnIndex = [self.outlineView columnWithIdentifier:kTOTPColumn];
+
+        if(rowRange.length) {
+            [self.outlineView beginUpdates];
+            for(int i=0;i<rowRange.length;i++) {
+                Node* item = (Node*)[self.outlineView itemAtRow:rowRange.location + i];
+                if(item.otpToken) {
+                    [self.outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:rowRange.location + i]
+                                                columnIndexes:[NSIndexSet indexSetWithIndex:totpColumnIndex]];
+
+                }
+            }
+            [self.outlineView endUpdates];
+        }
+    }
     
+    [self refreshQuickViewOtpCode];
+}
+
+- (void)refreshQuickViewOtpCode {
+    Node *item = [self getCurrentSelectedItem];
     if(item == nil || item.isGroup) {
         return;
     }
     
     if(!Settings.sharedInstance.doNotShowTotp && item.otpToken) {
-        self.viewPasswordRowHeightConstraint.constant = 95.0f;
+        self.totpRow.hidden = NO;
         
         //NSLog(@"Token: [%@] - Password: %@", item.otpToken, item.otpToken.password);
-        uint64_t remainingSeconds = item.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)item.otpToken.period);
         
         self.textFieldTotp.stringValue = item.otpToken.password;
         
-        self.textFieldTotp.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : [self getPasswordTextColor];
+        uint64_t remainingSeconds = [self getTotpRemainingSeconds:item];
+        
+        self.textFieldTotp.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : NSColor.controlTextColor;
 
         self.progressTotp.minValue = 0;
         self.progressTotp.maxValue = item.otpToken.period;
         self.progressTotp.doubleValue = remainingSeconds;
     }
     else {
+        self.totpRow.hidden = YES;
         self.textFieldTotp.stringValue = @"000000";
-        self.viewPasswordRowHeightConstraint.constant = 59.0f;
     }
 }
 
+- (uint64_t)getTotpRemainingSeconds:(Node*)item {
+    return item.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)item.otpToken.period);
+}
 - (IBAction)onSetTotp:(id)sender {
     Node *item = [self getCurrentSelectedItem];
     
@@ -2145,12 +2156,106 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [self.model clearTotp:item];
 }
 
-- (NSColor*)getPasswordTextColor {
-    if (@available(macOS 10.13, *)) {
-        return [NSColor colorNamed:@"password-field-text-color"];
-    } else {
-        return [NSColor controlTextColor];
+- (void)showPopupToastNotification:(NSString*)message {
+    if(Settings.sharedInstance.doNotShowChangeNotifications) {
+        return;
     }
+    
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = message;
+    hud.color = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
+    hud.mode = MBProgressHUDModeText;
+    hud.margin = 10.f;
+    hud.yOffset = 150.f;
+    hud.removeFromSuperViewOnHide = YES;
+    hud.dismissible = YES;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [hud hide:YES];
+    });
+}
+
+- (IBAction)onShowHideQuickView:(id)sender {
+    Settings.sharedInstance.revealDetailsImmediately = !Settings.sharedInstance.revealDetailsImmediately;
+    self.quickViewColumn.hidden = !Settings.sharedInstance.revealDetailsImmediately;
+    [self bindQuickViewButton];
+}
+
+- (void)bindQuickViewButton {
+    [self.buttonToggleQuickViewPanel setTitle:self.quickViewColumn.hidden ? @"Show Quick View Panel" : @"Hide Quick View Panel"];
 }
 
 @end
+
+
+// FUTURE: Attempt to fix funky tab ordering! Very difficult
+
+//- (void)controlTextDidEndEditing:(NSNotification *)notification {
+////    NSLog(@"controlTextDidEndEditing - XXX");
+//
+//    NSDictionary *userInfo = [notification userInfo];
+//
+//    int textMovement = [[userInfo valueForKey:@"NSTextMovement"] intValue];
+//
+//    //[self.outlineView controlTextDidEndEditing:notification];
+//
+//    NSInteger editedColumn = [self.outlineView columnForView:notification.object];
+//    NSInteger editedRow = [self.outlineView rowForView:notification.object];
+//
+//    NSInteger lastCol = self.outlineView.numberOfColumns; // [[self.outlineView tableColumns] count] - 1;
+//    NSInteger lastRow = self.outlineView.numberOfRows; // [[self.outlineView tableColumns] count] - 1;
+//
+//    if (textMovement == NSTabTextMovement)
+//    {
+//        if (editedColumn != lastCol - 1 )
+//        {
+//            [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:editedRow] byExtendingSelection:NO];
+//            [self.outlineView editColumn: editedColumn+1 row: editedRow withEvent: nil select: YES];
+//        }
+//        else
+//        {
+//            if (editedRow !=lastRow-1)
+//            {
+//                [self.outlineView editColumn:0 row:editedRow + 1 withEvent:nil select:YES];
+//            }
+//            else
+//            {
+//                [self.outlineView editColumn:0 row:0 withEvent:nil select:YES]; // Go to the first cell
+//            }
+//        }
+//    }
+//    else if (textMovement == NSReturnTextMovement)
+//    {
+//        if(editedRow !=lastRow-1)
+//        {
+//            [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:editedRow+1] byExtendingSelection:NO];
+//            [self.outlineView editColumn: editedColumn row: editedRow+1 withEvent: nil select: YES];
+//        }
+//        else
+//        {
+//            if (editedColumn !=lastCol - 1)
+//            {
+//                [self.outlineView editColumn:editedColumn+1 row:0 withEvent:nil select:YES];
+//            }
+//            else
+//            {
+//                [self.outlineView editColumn:0 row:0 withEvent:nil select:YES]; //Go to the first cell
+//            }
+//        }
+//    }
+//
+//
+//
+//
+//
+//    //    if ( (editedColumn == lastColumn)
+////        && (textMovement == NSTextMovementTab)
+////        && editedRow < ([self.outlineView numberOfRows] - 1)
+////        )
+////    {
+////        // the tab key was hit while in the last column,
+////        // so go to the left most cell in the next row
+////        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:(editedRow+1)] byExtendingSelection:NO];
+////        [self.outlineView editColumn: 0 row: (editedRow + 1)  withEvent: nil select: YES];
+////    }
+//

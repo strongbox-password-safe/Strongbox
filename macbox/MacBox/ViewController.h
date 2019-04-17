@@ -17,15 +17,8 @@
 
 @interface ViewController : NSViewController<   NSOutlineViewDelegate,
                                                 NSOutlineViewDataSource,
-                                                NSTextViewDelegate,
-                                                NSTextFieldDelegate,
-                                                NSComboBoxDataSource,
-                                                NSTableViewDataSource,
                                                 NSTableViewDelegate,
-                                                NSCollectionViewDataSource,
-                                                NSCollectionViewDelegate,
-                                                QLPreviewPanelDataSource,
-                                                QLPreviewPanelDelegate>
+                                                NSTableViewDataSource>
 
 @property (strong, nonatomic) ViewModel* model;
 //-(void)updateDocumentUrl;
@@ -34,14 +27,12 @@
 // App wide fields
 @property (weak) IBOutlet NSTableView *tableViewSummary;
 
-@property (weak) IBOutlet AttachmentCollectionView *attachmentsView;
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSTabView *tabViewLockUnlock;
 @property (weak) IBOutlet NSTabView *tabViewRightPane;
 @property (weak) IBOutlet NSButton *buttonCreateGroup;
 @property (weak) IBOutlet NSButton *buttonCreateRecord;
 @property (weak) IBOutlet NSView *emailRow;
-@property (weak) IBOutlet NSView *attachmentsRow;
 
 // Locked Fields
 
@@ -51,30 +42,15 @@
 
 @property (weak) IBOutlet NSSegmentedControl *searchSegmentedControl;
 @property (weak) IBOutlet NSSearchField *searchField;
-@property (weak) IBOutlet NSButton *buttonRevealDetail;
-@property (weak) IBOutlet NSButton *checkboxRevealDetailsImmediately;
-@property (weak) IBOutlet NSButton *buttonShowHidePassword;
-@property (weak) IBOutlet NSButton *buttonGeneratePassword;
 
-@property (weak) IBOutlet NSTextField *textFieldTitle;
-@property (weak) IBOutlet NSTextField *textFieldUrl;
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
-@property (weak) IBOutlet NSTextField *textFieldPw;
-@property (weak) IBOutlet CustomPasswordTextField *textFieldHiddenPassword;
-@property (weak) IBOutlet NSComboBox *comboboxUsername;
-@property (weak) IBOutlet NSComboBox *comboBoxEmail;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
-@property (weak) IBOutlet ClickableImageView *imageViewIcon;
 @property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
 @property (weak) IBOutlet NSTextField *textFieldTotp;
-@property (weak) IBOutlet NSView *viewPasswordRow;
-@property (weak) IBOutlet NSLayoutConstraint *viewPasswordRowHeightConstraint;
 @property (weak) IBOutlet NSProgressIndicator *progressTotp;
 
 - (IBAction)onSearch:(id)sender;
 - (IBAction)onOutlineViewDoubleClick:(id)sender;
-- (IBAction)onRevealDetails:(id)sender;
-- (IBAction)onConcealDetails:(id)sender;
 - (IBAction)onEnterMasterPassword:(id)sender;
 @property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
 
@@ -82,11 +58,11 @@
 
 @property (weak) IBOutlet NSTextField *textFieldSummaryTitle;
 
-// Concealed View Fields
-
-- (IBAction)onCheckboxRevealDetailsImmediately:(id)sender;
-
 - (void)onDetailsWindowClosed:(id)wc;
+
+// Used by Node Details too...
+
+void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window);
 
 @end
 

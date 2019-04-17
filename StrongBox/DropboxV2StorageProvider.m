@@ -143,7 +143,7 @@
     [SVProgressHUD show];
 
     DBUserClient *client = DBClientsManager.authorizedClient;
-
+    
     [[[client.filesRoutes uploadData:path
                                 mode:[[DBFILESWriteMode alloc] initWithOverwrite]
                           autorename:@(NO)
@@ -195,15 +195,14 @@
                                                       usingBlock:^(NSNotification *_Nonnull note)
         {
             [center removeObserver:token];
-            
-            DBOAuthResult *authResult = (DBOAuthResult *)note.object;
-
+  
             if (DBClientsManager.authorizedClient) {
                 NSLog(@"Linked");
                 task(nil);
             }
             else {
                 NSLog(@"Not Linked");
+                DBOAuthResult *authResult = (DBOAuthResult *)note.object;
                 NSLog(@"Error: %@", authResult);
                 task([Utils createNSError:@"Could not create link to Dropbox." errorCode:-1]);
             }
@@ -234,7 +233,7 @@
 
     NSMutableArray<StorageBrowserItem *> *items = [[NSMutableArray alloc] init];
     DBFILESMetadata *parent = (DBFILESMetadata *)parentFolder;
-
+    
     [[DBClientsManager.authorizedClient.filesRoutes listFolder:parent ? parent.
       pathLower : @""]
      setResponseBlock:^(DBFILESListFolderResult *_Nullable response, DBFILESListFolderError *_Nullable routeError,

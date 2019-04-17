@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MacNodeIconHelper : NSObject
 
 + (NSImage * )getIconForNode:(ViewModel*)model vm:(Node *)vm large:(BOOL)large;
-+ (NSImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
++ (NSImage* _Nullable)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
 
 @end
 

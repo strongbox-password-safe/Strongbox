@@ -26,8 +26,6 @@
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
 
-
-
 @property (nonatomic) BOOL applicationHasFinishedLaunching;
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
@@ -98,6 +96,12 @@
     //    self.statusItem.highlightMode = YES;
     //    self.statusItem.enabled = YES;
     //    self.statusItem.menu = self.systemTraymenu;
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification {
+    if(Settings.sharedInstance.clearClipboardEnabled) {
+        [self clearClipboardIfChangeCountMatches];
+    }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -407,22 +411,28 @@
     }
 }
 
+static NSInteger clipboardChangeCount;
+
+- (void)clearClipboardIfChangeCountMatches {
+    if(clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount) {
+        NSLog(@"Clipboard change count matches after time delay... Clearing Clipboard");
+        [NSPasteboard.generalPasteboard clearContents];
+    }
+    else {
+        NSLog(@"Clipboard change count DOES NOT matches after time delay... NOP");
+    }
+}
+
 - (void)onApplicationDidChangeClipboard {
     NSLog(@"onApplicationDidChangeClipboard...");
     
     if(Settings.sharedInstance.clearClipboardEnabled) {
-        NSInteger clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
+        clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
         NSLog(@"Clipboard Changed and Clear Clipboard Enabled... Recording Change Count as [%ld]", (long)clipboardChangeCount);
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-               if(clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount) {
-                   NSLog(@"Clipboard change count matches after time delay... Clearing Clipboard");
-                   [NSPasteboard.generalPasteboard clearContents];
-               }
-               else {
-                   NSLog(@"Clipboard change count DOES NOT matches after time delay... NOP");
-               }
+               [self clearClipboardIfChangeCountMatches];
            });
     }
 }

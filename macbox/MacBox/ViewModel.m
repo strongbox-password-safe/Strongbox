@@ -19,6 +19,16 @@
 static NSString* kDefaultNewTitle = @"Untitled";
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
+NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
+NSString* const kModelUpdateNotificationTitleChanged = @"kModelUpdateNotificationTitleChanged";
+NSString* const kModelUpdateNotificationUsernameChanged = @"kModelUpdateNotificationUsernameChanged";
+NSString* const kModelUpdateNotificationEmailChanged = @"kModelUpdateNotificationEmailChanged";
+NSString* const kModelUpdateNotificationUrlChanged = @"kModelUpdateNotificationUrlChanged";
+NSString* const kModelUpdateNotificationNotesChanged = @"kModelUpdateNotificationNotesChanged";
+NSString* const kModelUpdateNotificationIconChanged = @"kModelUpdateNotificationIconChanged";
+NSString* const kModelUpdateNotificationAttachmentsChanged = @"kModelUpdateNotificationAttachmentsChanged";
+NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotificationTotpChanged";
+
 NSString* const kNotificationUserInfoKeyNode = @"node";
 
 @interface ViewModel ()
@@ -70,6 +80,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (NSDictionary<NSUUID *,NSData *> *)customIcons {
     return self.passwordDatabase.customIcons;
+}
+
+- (NSArray<Node*>*)activeRecords {
+    return self.passwordDatabase.activeRecords;
 }
 
 -(Node*)rootGroup {
@@ -139,6 +153,16 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (NSURL*)fileUrl {
     return [self.document fileURL];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)isDereferenceableText:(NSString *)text {
+    return [self.passwordDatabase isDereferenceableText:text];
+}
+
+- (NSString *)dereference:(NSString *)text node:(Node *)node {
+    return [self.passwordDatabase dereference:text node:node];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,9 +258,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         
         [[self.document.undoManager prepareWithInvocationTarget:self] setItemTitle:item title:old modified:oldModified];
         [self.document.undoManager setActionName:@"Title Change"];
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.onItemTitleChanged(item);
+            [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTitleChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
         });
 
         return YES;
@@ -268,7 +292,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager setActionName:@"Email Change"];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onItemEmailChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationEmailChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -295,7 +319,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager setActionName:@"Username Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onItemUsernameChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationUsernameChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -322,7 +346,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager setActionName:@"URL Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onItemUrlChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationUrlChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -350,7 +374,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager setActionName:@"Password Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onItemPasswordChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationPasswordChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -377,7 +401,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager setActionName:@"Notes Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onItemNotesChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNotesChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -425,7 +449,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager setActionName:@"Icon Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onItemIconChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationIconChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -534,7 +558,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onAttachmentsChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationAttachmentsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -583,7 +607,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onAttachmentsChanged(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationAttachmentsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -667,7 +691,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onSetItemTotp(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTotpChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -699,7 +723,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onClearItemTotp(item);
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTotpChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 
@@ -960,6 +984,10 @@ NSString* getSmartFillNotes() {
     return self.passwordDatabase.emailSet;
 }
 
+- (NSSet<NSString*> *)urlSet {
+    return self.passwordDatabase.urlSet;
+}
+
 - (NSSet<NSString*> *)usernameSet {
     return self.passwordDatabase.usernameSet;
 }
@@ -982,6 +1010,30 @@ NSString* getSmartFillNotes() {
 
 - (NSInteger)numberOfGroups {
     return self.passwordDatabase.numberOfGroups;
+}
+
+- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    return [self.passwordDatabase isTitleMatches:searchText node:node dereference:dereference];
+}
+
+- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    return [self.passwordDatabase isUsernameMatches:searchText node:node dereference:dereference];
+}
+
+- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    return [self.passwordDatabase isPasswordMatches:searchText node:node dereference:dereference];
+}
+
+- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    return [self.passwordDatabase isUrlMatches:searchText node:node dereference:dereference];
+}
+
+- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    return [self.passwordDatabase isAllFieldsMatches:searchText node:node dereference:dereference];
+}
+
+- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
+    return [self.passwordDatabase getSearchTerms:searchText];
 }
 
 @end

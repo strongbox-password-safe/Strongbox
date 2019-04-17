@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,48 +15,49 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY">
-            <rect key="frame" x="0.0" y="0.0" width="200" height="40"/>
+            <rect key="frame" x="0.0" y="0.0" width="103" height="130"/>
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
             <subviews>
                 <imageView verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="6du-gZ-jdO">
-                    <rect key="frame" x="3" y="5" width="30" height="30"/>
+                    <rect key="frame" x="10" y="39" width="83" height="83"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="30" id="8jh-BO-aw9"/>
-                        <constraint firstAttribute="width" constant="30" id="lEy-lc-Q9a"/>
+                        <constraint firstAttribute="height" constant="83" id="WUM-e6-XrL"/>
+                        <constraint firstAttribute="width" constant="83" id="ZJ1-mU-wXQ"/>
                     </constraints>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="ymK-WN-IuT"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="show" id="ymK-WN-IuT"/>
                 </imageView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="NbX-pw-tkc" userLabel="Filename">
-                    <rect key="frame" x="34" y="19" width="165" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" title="filename.txt" id="ctN-i7-k3f" userLabel="Filename">
-                        <font key="font" metaFont="system" size="12"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Bsw-N9-1HR" userLabel="Size">
+                    <rect key="frame" x="2" y="5" width="99" height="13"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="center" title="10 KB" id="Aze-hg-VmM" userLabel="Filename">
+                        <font key="font" metaFont="system" size="10"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Bsw-N9-1HR" userLabel="Size">
-                    <rect key="frame" x="34" y="8" width="165" height="12"/>
-                    <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="left" title="10 KB" id="Aze-hg-VmM" userLabel="Filename">
-                        <font key="font" metaFont="system" size="10"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="NbX-pw-tkc" userLabel="Filename">
+                    <rect key="frame" x="2" y="20" width="99" height="16"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" alignment="center" title="filename.txt" id="ctN-i7-k3f" userLabel="Filename">
+                        <font key="font" metaFont="cellTitle"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
             </subviews>
             <constraints>
-                <constraint firstItem="6du-gZ-jdO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="1n7-x2-6XH"/>
-                <constraint firstItem="6du-gZ-jdO" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="5" id="1xg-oT-1fg"/>
-                <constraint firstItem="NbX-pw-tkc" firstAttribute="leading" secondItem="6du-gZ-jdO" secondAttribute="trailing" constant="3" id="DXC-Zv-XtT"/>
-                <constraint firstItem="NbX-pw-tkc" firstAttribute="top" secondItem="6du-gZ-jdO" secondAttribute="top" id="Dol-dQ-itp"/>
-                <constraint firstAttribute="bottom" secondItem="6du-gZ-jdO" secondAttribute="bottom" constant="5" id="KuN-sS-GVx"/>
-                <constraint firstItem="Bsw-N9-1HR" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="20" symbolic="YES" id="R2B-Co-IPW"/>
-                <constraint firstAttribute="trailing" secondItem="NbX-pw-tkc" secondAttribute="trailing" constant="3" id="XTB-SF-hrx"/>
-                <constraint firstAttribute="bottom" secondItem="Bsw-N9-1HR" secondAttribute="bottom" constant="8" id="YIL-NL-kD4"/>
-                <constraint firstItem="Bsw-N9-1HR" firstAttribute="leading" secondItem="NbX-pw-tkc" secondAttribute="leading" id="Zto-9a-Vhn"/>
-                <constraint firstItem="6du-gZ-jdO" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="3" id="aAj-2k-ckF"/>
-                <constraint firstItem="Bsw-N9-1HR" firstAttribute="trailing" secondItem="NbX-pw-tkc" secondAttribute="trailing" id="eOh-Fr-iJQ"/>
+                <constraint firstAttribute="trailing" secondItem="6du-gZ-jdO" secondAttribute="trailing" constant="10" id="GdE-ej-NJc"/>
+                <constraint firstItem="NbX-pw-tkc" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="N17-gq-sbb"/>
+                <constraint firstItem="6du-gZ-jdO" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="8" id="PlK-p5-KH1"/>
+                <constraint firstItem="NbX-pw-tkc" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="4" id="icq-W1-y8S"/>
+                <constraint firstItem="6du-gZ-jdO" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="ieM-15-gf4"/>
+                <constraint firstAttribute="bottom" secondItem="Bsw-N9-1HR" secondAttribute="bottom" constant="5" id="ipm-LJ-PTa"/>
+                <constraint firstItem="Bsw-N9-1HR" firstAttribute="leading" secondItem="NbX-pw-tkc" secondAttribute="leading" id="kKy-Aq-wBS"/>
+                <constraint firstItem="NbX-pw-tkc" firstAttribute="top" relation="greaterThanOrEqual" secondItem="6du-gZ-jdO" secondAttribute="bottom" constant="3" id="mbV-Ei-U7j"/>
+                <constraint firstItem="Bsw-N9-1HR" firstAttribute="trailing" secondItem="NbX-pw-tkc" secondAttribute="trailing" id="qij-Zc-Cal"/>
+                <constraint firstAttribute="trailing" secondItem="NbX-pw-tkc" secondAttribute="trailing" constant="4" id="r02-9t-s3M"/>
+                <constraint firstItem="Bsw-N9-1HR" firstAttribute="top" secondItem="NbX-pw-tkc" secondAttribute="bottom" constant="2" id="vdT-ZT-UYY"/>
+                <constraint firstItem="NbX-pw-tkc" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" id="xrc-aS-btf"/>
             </constraints>
-            <point key="canvasLocation" x="-264" y="58"/>
+            <point key="canvasLocation" x="-426.5" y="108"/>
         </customView>
         <collectionViewItem nibName="AttachmentItem" id="Utg-nn-Tf3" customClass="AttachmentItem">
             <connections>
@@ -67,4 +68,7 @@
             </connections>
         </collectionViewItem>
     </objects>
+    <resources>
+        <image name="show" width="512" height="512"/>
+    </resources>
 </document>

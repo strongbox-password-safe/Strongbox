@@ -7,6 +7,7 @@
 //
 
 #import "CustomFieldTableCellView.h"
+#import "Settings.h"
 
 @interface CustomFieldTableCellView ()
 
@@ -55,15 +56,20 @@
 
 - (void)updateUI {
     if(self.valueHidden) {
-        self.labelText.stringValue = @"*******************";
+        self.labelText.stringValue = @"********";
+        [self.labelText setLineBreakMode:NSLineBreakByClipping];
         [self.buttonShowHide setImage:[NSImage imageNamed:@"show"]];
     }
     else {
         self.labelText.stringValue = self.val;
+        [self.labelText setLineBreakMode:NSLineBreakByWordWrapping];
         [self.buttonShowHide setImage:[NSImage imageNamed:@"hide"]];
     }
     
+    self.labelText.font = self.protected ? [NSFont fontWithName:Settings.sharedInstance.easyReadFontName size:13.0f] : [NSFont systemFontOfSize:13.0f];
+    
     self.buttonShowHide.hidden = !self.protected;
 }
+
 
 @end

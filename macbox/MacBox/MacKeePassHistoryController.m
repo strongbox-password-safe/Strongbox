@@ -39,7 +39,6 @@
 }
 
 - (IBAction)onShowPasswords:(id)sender {
-    NSLog(@"onShowPasswords");
     [self.tableViewHistory reloadData];
 }
 

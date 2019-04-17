@@ -79,11 +79,9 @@ static void remapDuplicates(NSArray<DatabaseAttachment*> *attachments, NSArray<N
         NSNumber* originalIndex = [attachmentHashMap objectForKey:hash];
         
         if(originalIndex != nil) {
-            NSLog(@"Possible Duplicate, performing full comparison...");
-            
             DatabaseAttachment *original = attachments[originalIndex.intValue];
             if([original.data isEqualToData:current.data]) {
-                NSLog(@"Definite Duplicate... ");
+                NSLog(@"Found Definite Duplicate... ");
                 [remappings setObject:originalIndex forKey:@(i)];
             }
         }

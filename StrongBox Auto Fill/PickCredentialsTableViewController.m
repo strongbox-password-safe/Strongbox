@@ -17,13 +17,6 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"
-#import "SprCompilation.h"
-
-static NSInteger const kScopeTitle = 0;
-static NSInteger const kScopeUsername = 1;
-static NSInteger const kScopePassword = 2;
-static NSInteger const kScopeUrl = 3;
-static NSInteger const kScopeAll = 4;
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -37,26 +30,6 @@ static NSInteger const kScopeAll = 4;
 @end
 
 @implementation PickCredentialsTableViewController
-
-static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
-    Node* n1 = (Node*)obj1;
-    Node* n2 = (Node*)obj2;
-    
-    if(n1.isGroup && !n2.isGroup) {
-        return NSOrderedDescending;
-    }
-    else if(!n1.isGroup && n2.isGroup) {
-        return NSOrderedAscending;
-    }
-    
-    NSComparisonResult result = [n1.title compare:n2.title options:NSCaseInsensitiveSearch];
-    
-    if(result == NSOrderedSame) {
-        return [n1.title compare:n2.title];
-    }
-    
-    return result;
-};
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -74,7 +47,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
-    self.searchController.searchBar.selectedScopeButtonIndex = kScopeAll;
+    self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
     
     if (@available(iOS 11.0, *)) {
         self.navigationItem.searchController = self.searchController;
@@ -176,9 +149,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
         return;
     }
     
-    NSArray* foo = [self getMatchingItems:searchText scope:scope];
-    
-    self.searchResults = [foo sortedArrayUsingComparator:searchResultsComparator];
+    self.searchResults = [self getMatchingItems:searchText scope:scope];
 }
 
 - (void)smartInitializeSearch {
@@ -193,10 +164,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             
             // Direct URL Match?
             
-            NSArray* items = [self getMatchingItems:url.absoluteString scope:kScopeUrl];
+            NSArray* items = [self getMatchingItems:url.absoluteString scope:kSearchScopeUrl];
             if(items.count) {
                 [self.searchController.searchBar setText:url.absoluteString];
-                [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+                [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
                 return;
             }
             else {
@@ -205,10 +176,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
             
             // Host URL Match?
             
-            items = [self getMatchingItems:url.host scope:kScopeUrl];
+            items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
             if(items.count) {
                 [self.searchController.searchBar setText:url.host];
-                [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+                [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
                 return;
             }
             else {
@@ -229,10 +200,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 - (void)smartInitializeSearchFromDomain:(NSString*)domain {
     // Domain URL Match?
     
-    NSArray* items = [self getMatchingItems:domain scope:kScopeUrl];
+    NSArray* items = [self getMatchingItems:domain scope:kSearchScopeUrl];
     if(items.count) {
         [self.searchController.searchBar setText:domain];
-        [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+        [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
         return;
     }
     else {
@@ -241,10 +212,10 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     
     // Broad Search across all fields for domain...
     
-    items = [self getMatchingItems:domain scope:kScopeAll];
+    items = [self getMatchingItems:domain scope:kSearchScopeAll];
     if(items.count) {
         [self.searchController.searchBar setText:domain];
-        [self.searchController.searchBar setSelectedScopeButtonIndex:kScopeUrl];
+        [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
         return;
     }
     else {
@@ -257,62 +228,12 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
     [self.searchController.searchBar setText:searchTerm];
 }
 
-- (NSArray*)getMatchingItems:(NSString*)searchText scope:(NSInteger)scope {
-    // TODO: Merge this with BrowseSafeView search code - it's better and does dereferencing...
-    
-    NSPredicate *predicate;
-    
-    if (scope == kScopeTitle) {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
-    }
-    else if (scope == kScopeUsername)
-    {
-        predicate = [NSPredicate predicateWithFormat:@"fields.username contains[c] %@", searchText];
-    }
-    else if (scope == kScopePassword)
-    {
-        predicate = [NSPredicate predicateWithFormat:@"fields.password contains[c] %@", searchText];
-    }
-    else if (scope == kScopeUrl)
-    {
-        predicate = [NSPredicate predicateWithFormat:@"fields.url contains[c] %@", searchText];
-    }
-    else {
-        predicate = [NSPredicate predicateWithFormat:@"title contains[c] %@ "
-                     @"OR fields.password contains[c] %@  "
-                     @"OR fields.username contains[c] %@  "
-                     @"OR fields.email contains[c] %@  "
-                     @"OR fields.url contains[c] %@ "
-                     @"OR fields.notes contains[c] %@",
-                     searchText, searchText, searchText, searchText, searchText, searchText];
-    }
-    
-    NSArray<Node*> *foo = [self.model.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup && [predicate evaluateWithObject:node];
-    }];
-    
-    // Filter out any results from the KDB root 'Backup' group/folder if configured so...
-    
-    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
-        if (self.model.database.format == kKeePass1) {
-            Node* backupGroup = self.model.database.keePass1BackupNode;
-            
-            if(backupGroup) {
-                foo = [foo filter:^BOOL(Node * _Nonnull obj) {
-                    return (obj != backupGroup && ![backupGroup contains:obj]);
-                }];
-            }
-        }
-    }
-    
-    Node* recycleBin = self.model.database.recycleBinNode;
-    if(recycleBin) {
-        foo = [foo filter:^BOOL(Node * _Nonnull obj) {
-            return ![recycleBin contains:obj];
-        }];
-    }
-
-    return foo;
+- (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(NSInteger)scope {
+    return [self.model.database search:searchText
+                                 scope:scope
+                           dereference:Settings.sharedInstance.searchDereferencedFields
+                 includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
+                     includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -408,22 +329,7 @@ static NSComparator searchResultsComparator = ^(id obj1, id obj2) {
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
-    if(self.model.database.format == kPasswordSafe) {
-        return text;
-    }
-    
-    NSError* error;
-    
-    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
-    
-    NSString* compiled = isCompilable ?
-    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.model.database.rootGroup error:&error] : text;
-    
-    if(error) {
-        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
-    }
-    
-    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
+    return [self.model.database dereference:text node:node];
 }
 
 - (IBAction)onAddCredential:(id)sender {

@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSMutableDictionary<NSString*, NSString*>* xmlAttributes;
 @property (nonatomic) NSString *xmlText;
 
+- (void)appendXmlText:(NSString *)xmlText;
+
 - (BOOL)isXmlEquivalent:(XmlItem*)other;
 
 @property BOOL doNotTrimWhitespaceText;

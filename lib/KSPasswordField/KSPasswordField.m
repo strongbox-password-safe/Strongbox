@@ -38,6 +38,8 @@ NSString *MyControlDidBecomeFirstResponderNotification = @"MyControlDidBecomeFir
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
+//          NSLog(@"%d,%d,%d,%d", cellFrame.origin.x, cellFrame.origin.x, cellFrame.size.width, cellFrame.size.height);
+
     cellFrame.origin.y -= 1;
     [super drawInteriorWithFrame:cellFrame inView:controlView];
 }
@@ -47,13 +49,30 @@ NSString *MyControlDidBecomeFirstResponderNotification = @"MyControlDidBecomeFir
 @implementation KSPasswordSecureTextFieldCell
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
+{   
     [super drawInteriorWithFrame:cellFrame inView:controlView];
 }
 
 @end
 
 @implementation KSPasswordField
+
+//- (void)awakeFromNib {
+//    // my image button icon is 16px by 16px
+//    
+//    NSRect buttonFrame = NSMakeRect(0.0f,0.0f, 16.0f, 16.0f);
+//    NSButton *popoverButton = [[NSButton alloc] initWithFrame: buttonFrame];
+//    
+//    popoverButton.buttonType = NSMomentaryChangeButton;
+//    popoverButton.bezelStyle = NSInlineBezelStyle;
+//    popoverButton.bordered = NO;
+//    popoverButton.imagePosition = NSImageOnly;
+//    [popoverButton setImage:[NSImage imageNamed:@"show"]];
+//    [popoverButton.cell setHighlightsBy:NSContentsCellMask];
+//    
+//    [self addSubview:popoverButton];
+//    NSLog(@"awakeFromNib loaded.");
+//}
 
 -(BOOL)textView:(NSTextView *)aTextView doCommandBySelector: (SEL)aSelector
 {
@@ -76,6 +95,8 @@ NSString *MyControlDidBecomeFirstResponderNotification = @"MyControlDidBecomeFir
 
 		// Don't show text by default. This needs to be called to replace the standard cell with our custom one.
 		[self setShowsText:NO];
+//
+//        [self.cell setFocusRingType:NSFocusRingTypeNone];
     }
     return self;
 }
@@ -88,6 +109,8 @@ NSString *MyControlDidBecomeFirstResponderNotification = @"MyControlDidBecomeFir
 
 		// Don't show text by default. This needs to be called to replace the standard cell with our custom one.
 		[self setShowsText:NO];
+        
+//        [self.cell setFocusRingType:NSFocusRingTypeNone];
     }
     return self;
 }

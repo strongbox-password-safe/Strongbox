@@ -41,7 +41,7 @@
         Settings.sharedInstance.installDate = [NSDate date];
     }
     self.appLaunchTime = [NSDate date];
-    
+
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
 
     [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems]; // Inbox should be empty
@@ -49,7 +49,7 @@
     [self registerForClipboardClearingNotifications];
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
-
+    
     return YES;
 }
 

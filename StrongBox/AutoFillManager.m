@@ -101,8 +101,8 @@ static NSString* const kMailToScheme = @"mailto";
     
     NSMutableArray<NSString*> *urls = [NSMutableArray array];
     
-    NSString* urlField = [self dereference:node.fields.url node:node database:database];
-    if(urlField) {
+    NSString* urlField = [database dereference:node.fields.url node:node];
+    if(urlField.length) {
         [urls addObject:urlField];
     }
     
@@ -116,7 +116,7 @@ static NSString* const kMailToScheme = @"mailto";
     
     // Notes?
 
-    NSString* notesField = [self dereference:node.fields.notes node:node database:database];
+    NSString* notesField = [database dereference:node.fields.notes node:node];
 
     if(notesField.length) {
         NSArray<NSString*> *foo = [self findUrlsInString:notesField];
@@ -130,7 +130,7 @@ static NSString* const kMailToScheme = @"mailto";
         
         ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
         
-        NSString* usernameField = [self dereference:node.fields.username node:node database:database];
+        NSString* usernameField = [database dereference:node.fields.username node:node];
 
         NSLog(@"Adding [%@ [%@]] to Quick Type DB", url, usernameField);
         
@@ -169,25 +169,6 @@ static NSString* const kMailToScheme = @"mailto";
     }
     
     return urls;
-}
-
-- (NSString*)dereference:(NSString*)text node:(Node*)node database:(DatabaseModel*)database {
-    if(database.format == kPasswordSafe) {
-        return text;
-    }
-    
-    NSError* error;
-    
-    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
-    
-    NSString* compiled = isCompilable ?
-    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:database.rootGroup error:&error] : text;
-    
-    if(error) {
-        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
-    }
-    
-    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
 }
 
 @end

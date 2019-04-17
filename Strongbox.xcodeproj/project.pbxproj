@@ -318,6 +318,8 @@
 		4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A65222EF46A00250086 /* RMStoreKeychainPersistence.m */; };
 		4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */; };
 		4D7C21D22180EAC200458A5B /* funky.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C21D12180EAC200458A5B /* funky.xml */; };
+		4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
+		4D7E39DC22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
 		4D8144B42199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B62199B7790044E617 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
@@ -911,6 +913,8 @@
 		4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreUserDefaultsPersistence.m; sourceTree = "<group>"; };
 		4D792A68222EF46A00250086 /* RMStoreTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreTransaction.h; sourceTree = "<group>"; };
 		4D7C21D12180EAC200458A5B /* funky.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = funky.xml; sourceTree = "<group>"; };
+		4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+Extensions.h"; path = "model/NSMutableArray+Extensions.h"; sourceTree = "<group>"; };
+		4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+Extensions.m"; path = "model/NSMutableArray+Extensions.m"; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
 		4D8144B32199B4A80044E617 /* NodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
 		4D87569A2222B46A00D6B8EA /* CustomNavigationItemTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomNavigationItemTitleView.h; path = StrongBox/CustomNavigationItemTitleView.h; sourceTree = "<group>"; };
@@ -1547,6 +1551,8 @@
 				4D4D6AF4222EF3D80056514E /* RMStore */,
 				4D8EC29E22301201008EE004 /* OpenSSL-1.0.2r */,
 				4D8EC43022302739008EE004 /* NMSSH */,
+				4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */,
+				4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1807,6 +1813,10 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D18F2342257987E00768E18 /* SprCompilation.h */,
+				4D18F2352257987E00768E18 /* SprCompilation.m */,
+				4D8C72B722525E160016A5CC /* AutoFillManager.h */,
+				4D8C72B822525E160016A5CC /* AutoFillManager.m */,
 				4DE18333219F410100F51D39 /* StrongboxDatabase.h */,
 				4DE18334219F410200F51D39 /* StrongboxDatabase.m */,
 				4D1D6FD51F38760F00D2B8EC /* Model.h */,
@@ -2204,10 +2214,6 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
-				4D18F2342257987E00768E18 /* SprCompilation.h */,
-				4D18F2352257987E00768E18 /* SprCompilation.m */,
-				4D8C72B722525E160016A5CC /* AutoFillManager.h */,
-				4D8C72B822525E160016A5CC /* AutoFillManager.m */,
 				4D2962AC223171BA0082897D /* misc */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D25675021EBD094006260B7 /* LaunchScreen.storyboard */,
@@ -2926,6 +2932,7 @@
 				4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				4D326E8D22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
+				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlTreeSerializer.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
@@ -3238,6 +3245,7 @@
 				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,
 				4D2F6C3521807C7E007931E4 /* KeePassFile.m in Sources */,
 				4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */,
+				4D7E39DC22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4DB1B7DD2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */,
 				4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */,
 				4D5F5B8C218B5A7000A0739A /* FileAttachmentsViewControllerTableViewController.m in Sources */,

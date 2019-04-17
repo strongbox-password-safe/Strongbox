@@ -26,7 +26,6 @@
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
-#import "SprCompilation.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -354,25 +353,13 @@ static const int kMinNotesCellHeight = 160;
     if(self.editingNewRecord) {
         [self setEditing:self.editingNewRecord animated:YES];
     }
+    else {
+        [self enableDisableUiForEditing];
+    }
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
-    if(self.viewModel.database.format == kPasswordSafe) {
-        return text;
-    }
-    
-    NSError* error;
-    
-    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
-    
-    NSString* compiled = isCompilable ?
-    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.viewModel.database.rootGroup error:&error] : text;
-    
-    if(error) {
-        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
-    }
-    
-    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
+    return [self.viewModel.database dereference:text node:node];
 }
 
 - (void)bindUiToKeePassDereferenceableFields:(BOOL)allowDereferencing {

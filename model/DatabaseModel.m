@@ -8,6 +8,17 @@
 #import "Kdb1Database.h"
 #import "Settings.h"
 #import "PasswordGenerator.h"
+#import "SprCompilation.h"
+#import "NSArray+Extensions.h"
+#import "NSMutableArray+Extensions.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+NSInteger const kSearchScopeTitle = 0;
+NSInteger const kSearchScopeUsername = 1;
+NSInteger const kSearchScopePassword = 2;
+NSInteger const kSearchScopeUrl = 3;
+NSInteger const kSearchScopeAll = 4;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -184,6 +195,37 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                     uuid:nil]];
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)isDereferenceableText:(NSString*)text {
+    return self.format != kPasswordSafe && [SprCompilation.sharedInstance isSprCompilable:text];
+}
+
+- (NSString*)maybeDeref:(NSString*)text node:(Node*)node maybe:(BOOL)maybe {
+    return maybe ? [self dereference:text node:node] : text;
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node {
+    if(self.format == kPasswordSafe || !text.length) {
+        return text;
+    }
+    
+    NSError* error;
+    
+    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
+    
+    NSString* compiled = isCompilable ?
+    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.rootGroup error:&error] : text;
+    
+    if(error) {
+        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+    }
+    
+    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (Node*)rootGroup {
     if(self.format == kKeePass || self.format == kKeePass4) {
         // Hide the root group - Can not add entries and not really useful - Perhaps make this optional?
@@ -311,11 +353,22 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         }];
     }
 }
+- (NSSet<NSString*> *)urlSet {
+    NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
+    
+    for (Node *recordNode in self.activeRecords) {
+        if ([Utils trim:recordNode.fields.url].length > 0) {
+            [bag addObject:recordNode.fields.url];
+        }
+    }
+    
+    return bag;
+}
 
 - (NSSet<NSString*> *)usernameSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-for (Node *recordNode in self.allRecords) {
+    for (Node *recordNode in self.activeRecords) {
         if ([Utils trim:recordNode.fields.username].length > 0) {
             [bag addObject:recordNode.fields.username];
         }
@@ -327,7 +380,7 @@ for (Node *recordNode in self.allRecords) {
 - (NSSet<NSString*> *)emailSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in self.allRecords) {
+    for (Node *record in self.activeRecords) {
         if ([Utils trim:record.fields.email].length > 0) {
             [bag addObject:record.fields.email];
         }
@@ -339,7 +392,7 @@ for (Node *recordNode in self.allRecords) {
 - (NSSet<NSString*> *)passwordSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in self.allRecords) {
+    for (Node *record in self.activeRecords) {
         if ([Utils trim:record.fields.password].length > 0) {
             [bag addObject:record.fields.password];
         }
@@ -351,7 +404,7 @@ for (Node *recordNode in self.allRecords) {
 - (NSString *)mostPopularEmail {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.allRecords) {
+    for (Node *record in self.activeRecords) {
         if(record.fields.email.length) {
             [bag addObject:record.fields.email];
         }
@@ -363,7 +416,7 @@ for (Node *recordNode in self.allRecords) {
 - (NSString *)mostPopularUsername {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.allRecords) {
+    for (Node *record in self.activeRecords) {
         if(record.fields.username.length) {
             [bag addObject:record.fields.username];
         }
@@ -375,7 +428,7 @@ for (Node *recordNode in self.allRecords) {
 - (NSString *)mostPopularPassword {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.allRecords) {
+    for (Node *record in self.activeRecords) {
         [bag addObject:record.fields.password];
     }
     
@@ -404,6 +457,186 @@ for (Node *recordNode in self.allRecords) {
     }
     
     return mostOccurring;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Search...
+
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(NSInteger)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin {
+    NSArray<NSString*>* terms = [self getSearchTerms:searchText];
+    
+    NSLog(@"Search for nodes containing: [%@]", terms);
+
+    NSMutableArray* results = [self.allNodes mutableCopy]; // Mutable for memory/perf reasons
+    
+    for (NSString* word in terms) {
+        [self filterForWord:results
+                 searchText:word
+                      scope:scope
+                dereference:dereference
+      includeKeePass1Backup:includeKeePass1Backup
+          includeRecycleBin:includeRecycleBin];
+    }
+    
+    [self filterExcludedSearchItems:results includeKeePass1Backup:includeKeePass1Backup includeRecycleBin:includeRecycleBin];
+    
+    [results sortUsingComparator:finderStyleNodeComparator];
+    
+    return results;
+}
+
+- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
+    NSArray* split = [searchText componentsSeparatedByString:@" "];
+    NSMutableSet<NSString*>* unique = [NSMutableSet setWithArray:split];
+    [unique removeObject:@""];
+    
+    // Split into words and sort by longest word first to eliminate most entries...
+    
+    return [unique.allObjects sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [@(((NSString*)obj2).length) compare:@(((NSString*)obj1).length)];
+    }];
+}
+
+- (void)filterForWord:(NSMutableArray<Node*>*)searchNodes
+           searchText:(NSString *)searchText
+                scope:(NSInteger)scope
+          dereference:(BOOL)dereference
+includeKeePass1Backup:(BOOL)includeKeePass1Backup
+    includeRecycleBin:(BOOL)includeRecycleBin {
+    if (scope == kSearchScopeTitle) {
+        [self searchTitle:searchNodes searchText:searchText dereference:dereference];
+    }
+    else if (scope == kSearchScopeUsername) {
+        [self searchUsername:searchNodes searchText:searchText dereference:dereference];
+    }
+    else if (scope == kSearchScopePassword) {
+        [self searchPassword:searchNodes searchText:searchText dereference:dereference];
+    }
+    else if (scope == kSearchScopeUrl) {
+        [self searchUrl:searchNodes searchText:searchText dereference:dereference];
+    }
+    else {
+        [self searchAllFields:searchNodes searchText:searchText dereference:dereference];
+    }
+}
+
+- (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self isTitleMatches:searchText node:node dereference:dereference];
+    }];
+}
+
+- (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self isUsernameMatches:searchText node:node dereference:dereference];
+    }];
+}
+
+- (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self isPasswordMatches:searchText node:node dereference:dereference];
+    }];
+}
+
+- (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self isUrlMatches:searchText node:node dereference:dereference];
+    }];
+}
+
+- (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self isAllFieldsMatches:searchText node:node dereference:dereference];
+    }];
+}
+
+- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
+    return [foo localizedCaseInsensitiveContainsString:searchText];
+}
+
+- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* foo = [self maybeDeref:node.fields.username node:node maybe:dereference];
+    return [foo localizedCaseInsensitiveContainsString:searchText];
+}
+
+- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* foo = [self maybeDeref:node.fields.password node:node maybe:dereference];
+    return [foo localizedCaseInsensitiveContainsString:searchText];
+}
+
+- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
+    return [foo localizedCaseInsensitiveContainsString:searchText];
+}
+
+- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* title = [self maybeDeref:node.title node:node maybe:dereference];
+    NSString* username = [self maybeDeref:node.fields.username node:node maybe:dereference];
+    NSString* password = [self maybeDeref:node.fields.password node:node maybe:dereference];
+    NSString* url = [self maybeDeref:node.fields.url node:node maybe:dereference];
+    NSString* email = [self maybeDeref:node.fields.email node:node maybe:dereference];
+    NSString* notes = [self maybeDeref:node.fields.notes node:node maybe:dereference];
+    
+    BOOL simple =   [title localizedCaseInsensitiveContainsString:searchText] ||
+    [username localizedCaseInsensitiveContainsString:searchText] ||
+    [password localizedCaseInsensitiveContainsString:searchText] ||
+    [email localizedCaseInsensitiveContainsString:searchText] ||
+    [url localizedCaseInsensitiveContainsString:searchText] ||
+    [notes localizedCaseInsensitiveContainsString:searchText];
+    
+    if(simple) {
+        return YES;
+    }
+    else {
+        if (self.format == kKeePass4 || self.format == kKeePass) {
+            for (NSString* key in node.fields.customFields.allKeys) {
+                NSString* value = node.fields.customFields[key].value;
+                
+                if ([key localizedCaseInsensitiveContainsString:searchText] || [value localizedCaseInsensitiveContainsString:searchText]) {
+                    return YES;
+                }
+            }
+        }
+        
+        if (self.format != kPasswordSafe) {
+            BOOL attachmentMatch = [node.fields.attachments anyMatch:^BOOL(NodeFileAttachment* _Nonnull obj) {
+                return [obj.filename localizedCaseInsensitiveContainsString:searchText];
+            }];
+            
+            if (attachmentMatch) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
+- (void)filterExcludedSearchItems:(NSMutableArray<Node*>*)matches
+            includeKeePass1Backup:(BOOL)includeKeePass1Backup
+                includeRecycleBin:(BOOL)includeRecycleBin {
+    if(!includeKeePass1Backup) {
+        if (self.format == kKeePass1) {
+            Node* backupGroup = self.keePass1BackupNode;
+            if(backupGroup) {
+                [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+                    return (obj != backupGroup && ![backupGroup contains:obj]);
+                }];
+            }
+        }
+    }
+    
+    Node* recycleBin = self.recycleBinNode;
+    if(!includeRecycleBin && recycleBin) {
+        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj != recycleBin && ![recycleBin contains:obj];
+        }];
+    }
 }
 
 @end

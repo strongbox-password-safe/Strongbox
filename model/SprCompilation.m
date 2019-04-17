@@ -120,13 +120,17 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 //    }
 
     if(match.numberOfRanges != 9) {
-        *error = [Utils createNSError:@"Incorrect number of ranges found. Cannot Compile" errorCode:-1];
+        if(error) {
+            *error = [Utils createNSError:@"Incorrect number of ranges found. Cannot Compile" errorCode:-1];
+        }
         return nil;
     }
 
     NSString* operation = ([match rangeAtIndex:1].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:1]];
     if(!operation) {
-        *error = [Utils createNSError:@"Operation not found. Cannot Compile" errorCode:-1];
+        if(error) {
+            *error = [Utils createNSError:@"Operation not found. Cannot Compile" errorCode:-1];
+        }
         return nil;
     }
     
@@ -160,7 +164,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         return [self sprCompileReference:match test:test node:node rootNode:rootNode error:error];
     }
     else {
-        *error = [Utils createNSError:@"Unknown Operation. Cannot Compile" errorCode:-1];
+        if(error) {
+            *error = [Utils createNSError:@"Unknown Operation. Cannot Compile" errorCode:-1];
+        }
         return nil;
     }
     
@@ -173,7 +179,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     NSString* searchTarget = ([match rangeAtIndex:8].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:8]];
 
     if(!desiredField || !searchByField || !searchTarget) {
-        *error = [Utils createNSError:@"Field reference missing one of required parameters" errorCode:-2];
+        if(error) {
+            *error = [Utils createNSError:@"Field reference missing one of required parameters" errorCode:-2];
+        }
         return nil;
     }
     
@@ -204,7 +212,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         return [self keePassStringIdFromUuid:target.uuid];
     }
     else {
-        *error = [Utils createNSError:@"Field reference desired field unknown" errorCode:-4];
+        if(error) {
+            *error = [Utils createNSError:@"Field reference desired field unknown" errorCode:-4];
+        }
         return nil;
     }
 }
@@ -216,7 +226,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         NSUUID* uuidTarget = [self uuidFromKeePassStringId:searchTarget];
         
         if(!uuidTarget) {
-            *error = [Utils createNSError:@"Field reference ID not correct format or length" errorCode:-2];
+            if(error) {
+                *error = [Utils createNSError:@"Field reference ID not correct format or length" errorCode:-2];
+            }
             return nil;
         }
         
@@ -338,7 +350,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         }
     }
     else {
-        *error = [Utils createNSError:@"Unknown URL Sub Operation. Cannot Compile" errorCode:-1];
+        if(error) {
+            *error = [Utils createNSError:@"Unknown URL Sub Operation. Cannot Compile" errorCode:-1];
+        }
         return nil;
     }
 }

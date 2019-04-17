@@ -24,6 +24,14 @@
 @property (weak) IBOutlet NSButton *checkboxAlternatingGrid;
 @property (weak) IBOutlet NSButton *checkboxHorizontalGridLines;
 @property (weak) IBOutlet NSButton *checkboxVerticalGridLines;
+@property (weak) IBOutlet NSButton *checkboxShowAutoCompleteSuggestions;
+@property (weak) IBOutlet NSButton *checkboxShowPopupNotifications;
+@property (weak) IBOutlet NSButton *checkboxTitleIsEditable;
+@property (weak) IBOutlet NSButton *checkboxOtherFieldsAreEditable;
+@property (weak) IBOutlet NSButton *checkboxDereferenceQuickView;
+@property (weak) IBOutlet NSButton *checkboxDereferenceOutlineView;
+@property (weak) IBOutlet NSButton *checkboxDereferenceSearch;
+
 
 @end
 
@@ -38,6 +46,10 @@
     });
     
     return sharedInstance;
+}
+
+- (void)cancel:(id)sender { // Pick up escape key
+    [self close];
 }
 
 - (void)show {
@@ -60,14 +72,6 @@
     
     NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
     [self.labelSamplePassword addGestureRecognizer:click];
-
-    // Using Menlo instead 
-    //
-    //    NSFont *ft = [NSFont fontWithName:@"SourceSansPro-Bold" size:16.0];
-    //    //NSLog(@"Loaded Font: %@", ft);
-    //    if(ft) {
-    //        self.labelSamplePassword.font = ft;
-    //    }
     
     [self refreshSamplePassword];
 }
@@ -75,7 +79,6 @@
 - (void)bindGeneralUiToSettings {
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
-    self.checkboxAlwaysShowUsernameInOutlineView.state = Settings.sharedInstance.alwaysShowUsernameInOutlineView ? NSOnState : NSOffState;
     self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
     self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
     self.checkboxShowRecycleBinInBrowse.state = Settings.sharedInstance.doNotShowRecycleBinInBrowse ? NSOffState : NSOnState;
@@ -84,6 +87,36 @@
     self.checkboxAlternatingGrid.state = Settings.sharedInstance.noAlternatingRows ? NSOffState : NSOnState;
     self.checkboxHorizontalGridLines.state = Settings.sharedInstance.showHorizontalGrid ? NSOnState : NSOffState;
     self.checkboxVerticalGridLines.state = Settings.sharedInstance.showVerticalGrid ? NSOnState : NSOffState;
+    self.checkboxShowAutoCompleteSuggestions.state = Settings.sharedInstance.doNotShowAutoCompleteSuggestions ? NSOffState : NSOnState;
+    self.checkboxShowPopupNotifications.state = Settings.sharedInstance.doNotShowChangeNotifications ? NSOffState : NSOnState;
+    self.checkboxTitleIsEditable.state = Settings.sharedInstance.outlineViewTitleIsReadonly ? NSOffState : NSOnState;
+    self.checkboxOtherFieldsAreEditable.state = Settings.sharedInstance.outlineViewEditableFieldsAreReadonly ? NSOffState : NSOnState;
+    self.checkboxDereferenceQuickView.state = Settings.sharedInstance.dereferenceInQuickView ? NSOnState : NSOffState;
+    self.checkboxDereferenceOutlineView.state = Settings.sharedInstance.dereferenceInOutlineView ? NSOnState : NSOffState;
+    self.checkboxDereferenceSearch.state = Settings.sharedInstance.dereferenceDuringSearch ? NSOnState : NSOffState;
+}
+
+- (IBAction)onGeneralSettingsChange:(id)sender {
+    Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
+    Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
+    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
+    Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
+    Settings.sharedInstance.doNotShowRecycleBinInBrowse = self.checkboxShowRecycleBinInBrowse.state == NSOffState;
+    Settings.sharedInstance.showRecycleBinInSearchResults = self.checkboxShowRecycleBinInSearch.state == NSOnState;
+    Settings.sharedInstance.doNotFloatDetailsWindowOnTop = self.checkboxFloatDetailsWindowsOnTop.state == NSOffState;
+    Settings.sharedInstance.noAlternatingRows = self.checkboxAlternatingGrid.state == NSOffState;
+    Settings.sharedInstance.showHorizontalGrid = self.checkboxHorizontalGridLines.state == NSOnState;
+    Settings.sharedInstance.showVerticalGrid = self.checkboxVerticalGridLines.state == NSOnState;
+    Settings.sharedInstance.doNotShowAutoCompleteSuggestions = self.checkboxShowAutoCompleteSuggestions.state == NSOffState;
+    Settings.sharedInstance.doNotShowChangeNotifications = self.checkboxShowPopupNotifications.state == NSOffState;
+    Settings.sharedInstance.outlineViewTitleIsReadonly = self.checkboxTitleIsEditable.state == NSOffState;
+    Settings.sharedInstance.outlineViewEditableFieldsAreReadonly = self.checkboxOtherFieldsAreEditable.state == NSOffState;
+    Settings.sharedInstance.dereferenceInQuickView = self.checkboxDereferenceQuickView.state == NSOnState;
+    Settings.sharedInstance.dereferenceInOutlineView = self.checkboxDereferenceOutlineView.state == NSOnState;
+    Settings.sharedInstance.dereferenceDuringSearch = self.checkboxDereferenceSearch.state == NSOnState;
+
+    [self bindGeneralUiToSettings];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
 -(void) bindAutoFillToSettings {
@@ -226,23 +259,6 @@
     
     [self bindPasswordUiToSettings];
     [self refreshSamplePassword];
-}
-
-- (IBAction)onGeneralSettingsChange:(id)sender {
-    Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
-    Settings.sharedInstance.alwaysShowUsernameInOutlineView = self.checkboxAlwaysShowUsernameInOutlineView.state == NSOnState;
-    Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
-    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
-    Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
-    Settings.sharedInstance.doNotShowRecycleBinInBrowse = self.checkboxShowRecycleBinInBrowse.state == NSOffState;
-    Settings.sharedInstance.showRecycleBinInSearchResults = self.checkboxShowRecycleBinInSearch.state == NSOnState;
-    Settings.sharedInstance.doNotFloatDetailsWindowOnTop = self.checkboxFloatDetailsWindowsOnTop.state == NSOffState;
-    Settings.sharedInstance.noAlternatingRows = self.checkboxAlternatingGrid.state == NSOffState;
-    Settings.sharedInstance.showHorizontalGrid = self.checkboxHorizontalGridLines.state == NSOnState;
-    Settings.sharedInstance.showVerticalGrid = self.checkboxVerticalGridLines.state == NSOnState;
-    
-    [self bindGeneralUiToSettings];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
 - (IBAction)onAutolockChange:(id)sender {

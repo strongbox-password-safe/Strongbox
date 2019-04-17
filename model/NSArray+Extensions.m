@@ -22,7 +22,6 @@
     return result;
 }
 
-
 - (NSArray *)flatMap:(NSArray* (^)(id obj, NSUInteger idx))block {
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
     [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {

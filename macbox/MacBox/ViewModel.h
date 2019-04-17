@@ -15,7 +15,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kModelUpdateNotificationCustomFieldsChanged;
+extern NSString* const kModelUpdateNotificationPasswordChanged;
+extern NSString* const kModelUpdateNotificationTitleChanged;
 extern NSString* const kNotificationUserInfoKeyNode;
+extern NSString* const kModelUpdateNotificationUsernameChanged;
+extern NSString* const kModelUpdateNotificationEmailChanged;
+extern NSString* const kModelUpdateNotificationUrlChanged;
+extern NSString* const kModelUpdateNotificationNotesChanged;
+extern NSString* const kModelUpdateNotificationIconChanged;
+extern NSString* const kModelUpdateNotificationAttachmentsChanged;
+extern NSString* const kModelUpdateNotificationTotpChanged;
 
 @interface ViewModel : NSObject
 
@@ -28,6 +37,9 @@ extern NSString* const kNotificationUserInfoKeyNode;
 - (BOOL)lock:(NSError**)error selectedItem:(NSString*_Nullable)selectedItem;
 - (BOOL)unlock:(NSString*)password selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError**)error;
 - (BOOL)unlock:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError**)error;
+
+- (BOOL)isDereferenceableText:(NSString*)text;
+- (NSString*)dereference:(NSString*)text node:(Node*)node;
 
 - (NSData*_Nullable)getPasswordDatabaseAsData:(NSError**)error;
 
@@ -64,6 +76,13 @@ extern NSString* const kNotificationUserInfoKeyNode;
 
 - (NSString*)generatePassword;
 
+- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
+
 @property (nonatomic, readonly) Document*  document;
 @property (nonatomic, readonly) BOOL dirty;
 @property (nonatomic, readonly) BOOL locked;
@@ -85,7 +104,10 @@ extern NSString* const kNotificationUserInfoKeyNode;
 
 // Convenience / Summary
 
+@property (readonly) NSArray<Node*>* activeRecords;
+
 @property (nonatomic, readonly, copy) NSSet<NSString*> * usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> * urlSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * passwordSet;
 @property (nonatomic, readonly) NSString * mostPopularUsername;
@@ -94,22 +116,10 @@ extern NSString* const kNotificationUserInfoKeyNode;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
 @property (nonatomic, copy) void (^onNewItemAdded)(Node* node);
-@property (nonatomic, copy) void (^onItemTitleChanged)(Node* node);
-@property (nonatomic, copy) void (^onItemUsernameChanged)(Node* node);
-@property (nonatomic, copy) void (^onItemEmailChanged)(Node* node);
-@property (nonatomic, copy) void (^onItemUrlChanged)(Node* node);
-@property (nonatomic, copy) void (^onItemPasswordChanged)(Node* node);
-@property (nonatomic, copy) void (^onItemNotesChanged)(Node* node);
-@property (nonatomic, copy) void (^onItemIconChanged)(Node* node);
-@property (nonatomic, copy) void (^onAttachmentsChanged)(Node* node);
-
 @property (nonatomic, copy) void (^onDeleteItem)(Node* node);
 @property (nonatomic, copy) void (^onChangeParent)(Node* node);
 @property (nonatomic, copy) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
 @property (nonatomic, copy) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
-
-@property (nonatomic, copy) void (^onSetItemTotp)(Node* node);
-@property (nonatomic, copy) void (^onClearItemTotp)(Node* node);
 
 @end
 

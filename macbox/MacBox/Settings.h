@@ -10,9 +10,21 @@
 #import "PasswordGenerationParameters.h"
 #import "AutoFillNewRecordSettings.h"
 
+extern NSString* const kTitleColumn;
+extern NSString* const kUsernameColumn;
+extern NSString* const kPasswordColumn;
+extern NSString* const kTOTPColumn;
+extern NSString* const kURLColumn;
+extern NSString* const kEmailColumn;
+extern NSString* const kNotesColumn;
+extern NSString* const kAttachmentsColumn;
+extern NSString* const kCustomFieldsColumn;
+
 @interface Settings : NSObject
 
 + (instancetype)sharedInstance;
+
++ (NSArray<NSString*> *)kAllColumns;
 
 @property (nonatomic) BOOL revealDetailsImmediately;
 @property (nonatomic) BOOL fullVersion;
@@ -23,7 +35,6 @@
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 
-@property (nonatomic) BOOL alwaysShowUsernameInOutlineView;
 @property (nonatomic) BOOL alwaysShowPassword;
 @property (nonatomic) BOOL warnedAboutTouchId;
 
@@ -44,6 +55,20 @@
 @property BOOL noAlternatingRows;
 @property BOOL showHorizontalGrid;
 @property BOOL showVerticalGrid;
+
+@property BOOL doNotShowAutoCompleteSuggestions;
+@property BOOL doNotShowChangeNotifications;
+
+@property (readonly) NSString* easyReadFontName;
+
+@property NSArray<NSString*>* visibleColumns;
+
+@property BOOL outlineViewTitleIsReadonly;
+@property BOOL outlineViewEditableFieldsAreReadonly;
+
+@property BOOL dereferenceInQuickView;
+@property BOOL dereferenceInOutlineView;
+@property BOOL dereferenceDuringSearch;
 
 @end
 

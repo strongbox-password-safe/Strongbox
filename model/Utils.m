@@ -83,6 +83,10 @@
     return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
+NSComparator finderStringComparator = ^(id obj1, id obj2)
+{
+    return [Utils finderStringCompare:obj1 string2:obj2];
+};
 
 + (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2
 {

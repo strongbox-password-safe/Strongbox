@@ -14,7 +14,6 @@
 #define kAutoLockTimeout @"autoLockTimeout"
 #define kPasswordGenerationParameters @"passwordGenerationParameters"
 #define kWarnedAboutTouchId @"warnedAboutTouchId"
-#define kAlwaysShowUsernameInOutlineView @"alwaysShowUsernameInOutlineView"
 #define kAlwaysShowPassword @"alwaysShowPassword"
 #define kUiDoNotSortKeePassNodesInBrowseView @"uiDoNotSortKeePassNodesInBrowseView"
 
@@ -29,7 +28,26 @@ static NSString* const kDoNotFloatDetailsWindowOnTop = @"doNotFloatDetailsWindow
 static NSString* const kNoAlternatingRows = @"noAlternatingRows";
 static NSString* const kShowHorizontalGrid = @"showHorizontalGrid";
 static NSString* const kShowVerticalGrid = @"showVerticalGrid";
+static NSString* const kDoNotShowAutoCompleteSuggestions = @"doNotShowAutoCompleteSuggestions";
+static NSString* const kDoNotShowChangeNotifications = @"doNotShowChangeNotifications";
+static NSString* const kOutlineViewTitleIsReadonly = @"outlineViewTitleIsReadonly";
+static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEditableFieldsAreReadonly";
+static NSString* const kDereferenceInQuickView = @"dereferenceInQuickView";
+static NSString* const kDereferenceInOutlineView = @"dereferenceInOutlineView";
+static NSString* const kDereferenceDuringSearch = @"dereferenceDuringSearch";
             
+static NSString* const kVisibleColumns = @"visibleColumns";
+
+NSString* const kTitleColumn = @"TitleColumn";
+NSString* const kUsernameColumn = @"UsernameColumn";
+NSString* const kPasswordColumn = @"PasswordColumn";
+NSString* const kTOTPColumn = @"TOTPColumn";
+NSString* const kURLColumn = @"URLColumn";
+NSString* const kEmailColumn = @"EmailColumn";
+NSString* const kNotesColumn = @"NotesColumn";
+NSString* const kAttachmentsColumn = @"AttachmentsColumn";
+NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
+
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 @implementation Settings
@@ -42,6 +60,50 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
         sharedInstance = [[Settings alloc] init];
     });
     return sharedInstance;
+}
+
++ (NSArray<NSString*> *)kDefaultVisibleColumns
+{
+    static NSArray *_arr;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        _arr = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
+    });
+    
+    return _arr;
+}
+
++ (NSArray<NSString*> *)kAllColumns
+{
+    static NSArray *_arr;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        _arr = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kTOTPColumn, kURLColumn, kEmailColumn, kNotesColumn, kAttachmentsColumn, kCustomFieldsColumn];
+    });
+    
+    return _arr;
+}
+
+- (BOOL)getBool:(NSString*)key {
+    return [self getBool:key fallback:NO];
+}
+
+- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    NSNumber* obj = [userDefaults objectForKey:key];
+    
+    return obj != nil ? obj.boolValue : fallback;
+}
+
+- (void)setBool:(NSString*)key value:(BOOL)value {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [userDefaults setBool:value forKey:key];
+    
+    [userDefaults synchronize];
 }
 
 - (BOOL)revealDetailsImmediately {
@@ -74,14 +136,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 -(void)setAlwaysShowPassword:(BOOL)alwaysShowPassword {
     [self setBool:kAlwaysShowPassword value:alwaysShowPassword];
-}
-
-- (BOOL)alwaysShowUsernameInOutlineView {
-    return [self getBool:kAlwaysShowUsernameInOutlineView];
-}
-
-- (void)setAlwaysShowUsernameInOutlineView:(BOOL)alwaysShowUsernameInOutlineView {
-    [self setBool:kAlwaysShowUsernameInOutlineView value:alwaysShowUsernameInOutlineView];
 }
 
 - (BOOL)freeTrial {
@@ -123,20 +177,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
     [userDefaults setObject:endFreeTrialDate forKey:kEndFreeTrialDate];
-    
-    [userDefaults synchronize];
-}
-
-- (BOOL)getBool:(NSString*)key {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    return [userDefaults boolForKey:key];
-}
-
-- (void)setBool:(NSString*)key value:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    [userDefaults setBool:value forKey:key];
     
     [userDefaults synchronize];
 }
@@ -297,6 +337,84 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setShowVerticalGrid:(BOOL)showVerticalGrid {
     [self setBool:kShowVerticalGrid value:showVerticalGrid];
+}
+
+- (BOOL)doNotShowAutoCompleteSuggestions {
+    return [self getBool:kDoNotShowAutoCompleteSuggestions];
+}
+
+- (void)setDoNotShowAutoCompleteSuggestions:(BOOL)doNotShowAutoCompleteSuggestions {
+    [self setBool:kDoNotShowAutoCompleteSuggestions value:doNotShowAutoCompleteSuggestions];
+}
+
+- (BOOL)doNotShowChangeNotifications {
+    return [self getBool:kDoNotShowChangeNotifications];
+}
+
+- (void)setDoNotShowChangeNotifications:(BOOL)doNotShowChangeNotifications {
+    [self setBool:kDoNotShowChangeNotifications value:doNotShowChangeNotifications];
+}
+
+- (NSString *)easyReadFontName {
+    return @"Menlo";
+}
+
+- (NSArray<NSString *> *)visibleColumns {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    NSArray<NSString*>* ret = [userDefaults objectForKey:kVisibleColumns];
+    
+    return ret ? ret : [Settings kDefaultVisibleColumns];
+}
+
+- (void)setVisibleColumns:(NSArray<NSString *> *)visibleColumns {
+    if(!visibleColumns || !visibleColumns.count) {
+        visibleColumns = [Settings kDefaultVisibleColumns];
+    }
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:visibleColumns forKey:kVisibleColumns];
+    [userDefaults synchronize];
+}
+
+- (BOOL)outlineViewTitleIsReadonly {
+    return [self getBool:kOutlineViewTitleIsReadonly];
+}
+
+- (void)setOutlineViewTitleIsReadonly:(BOOL)outlineViewTitleIsReadonly {
+    [self setBool:kOutlineViewTitleIsReadonly value:outlineViewTitleIsReadonly];
+}
+
+- (BOOL)outlineViewEditableFieldsAreReadonly {
+    return [self getBool:kOutlineViewEditableFieldsAreReadonly];
+}
+
+- (void)setOutlineViewEditableFieldsAreReadonly:(BOOL)outlineViewEditableFieldsAreReadonly {
+    [self setBool:kOutlineViewEditableFieldsAreReadonly value:outlineViewEditableFieldsAreReadonly];
+}
+
+- (BOOL)dereferenceInQuickView {
+    return [self getBool:kDereferenceInQuickView fallback:YES];
+}
+
+- (void)setDereferenceInQuickView:(BOOL)dereferenceInQuickView {
+    [self setBool:kDereferenceInQuickView value:dereferenceInQuickView];
+}
+
+- (BOOL)dereferenceInOutlineView {
+    return [self getBool:kDereferenceInOutlineView fallback:YES];
+}
+
+- (void)setDereferenceInOutlineView:(BOOL)dereferenceInOutlineView {
+    [self setBool:kDereferenceInOutlineView value:dereferenceInOutlineView];
+}
+
+- (BOOL)dereferenceDuringSearch {
+    return [self getBool:kDereferenceDuringSearch fallback:NO];
+}
+
+- (void)setDereferenceDuringSearch:(BOOL)dereferenceDuringSearch {
+    [self setBool:kDereferenceDuringSearch value:dereferenceDuringSearch];
 }
 
 @end

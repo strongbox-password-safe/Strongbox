@@ -3506,7 +3506,7 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="product32" translatesAutoresizingMaskIntoConstraints="NO" id="XCJ-ng-sRh">
-                                            <rect key="frame" x="61.5" y="42" width="16" height="16"/>
+                                            <rect key="frame" x="45.5" y="34" width="32" height="32"/>
                                         </imageView>
                                     </subviews>
                                     <constraints>
@@ -6121,17 +6121,17 @@ Supports Predefined Icons &amp; Attachments</string>
                                 <rect key="frame" x="20" y="192" width="374" height="550"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="HTi-cL-E0I" userLabel="LogoAndOpen">
-                                        <rect key="frame" x="179" y="248" width="16" height="54"/>
+                                        <rect key="frame" x="62" y="131" width="250" height="288"/>
                                         <subviews>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="a40-j1-jXu" userLabel="Logo">
-                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="250" height="250"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="l9w-pX-Ywi"/>
                                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="ygh-Rt-Smz"/>
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n8l-3f-Gbd" userLabel="Open Button">
-                                                <rect key="frame" x="-34" y="24" width="84" height="30"/>
+                                                <rect key="frame" x="83" y="258" width="84" height="30"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <state key="normal" title="Tap to Open">
                                                     <color key="titleColor" red="1" green="0.68935331161591151" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -6319,11 +6319,11 @@ Supports Predefined Icons &amp; Attachments</string>
         <image name="warning-32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Yf0-U4-iru"/>
-        <segue reference="pfC-It-asC"/>
-        <segue reference="wk7-aR-oOp"/>
-        <segue reference="tkg-5B-Eni"/>
-        <segue reference="nFA-zL-t4W"/>
-        <segue reference="aI5-1C-HAz"/>
+        <segue reference="B0D-Y9-Jhh"/>
+        <segue reference="okm-JQ-5uE"/>
+        <segue reference="hDV-D2-02z"/>
+        <segue reference="mpb-pU-y6e"/>
+        <segue reference="4jb-TP-1Xg"/>
+        <segue reference="aYd-mP-3oX"/>
     </inferredMetricsTieBreakers>
 </document>

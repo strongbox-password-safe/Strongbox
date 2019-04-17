@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;
 + (NSString *)trim:(NSString*)string;
+
+extern NSComparator finderStringComparator;
 + (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2;
 
 + (void)integerTolittleEndian4Bytes:(int)data bytes:(unsigned char *)b;

@@ -131,8 +131,8 @@ static NSString *const kQueryIssuerKey = @"issuer";
         urlComponents.path = [@"/" stringByAppendingString:self.name];
     urlComponents.queryItems = query;
 
-    NSLog(@"URL: [%@]", urlComponents);
-    NSLog(@"URL: [%@]", urlComponents.URL);
+    //NSLog(@"URL: [%@]", urlComponents);
+    //NSLog(@"URL: [%@]", urlComponents.URL);
     
     return urlComponents.URL;
 }

@@ -46,14 +46,17 @@
 - (void)showHideClickableBorder {
     if(_isShowClickableBorder && _isClickable) {
         self.layer.borderWidth = 1.5f;
-        CGColorRef color = CGColorRetain([NSColor colorWithRed:0 green:0.5f blue:0.7f alpha:0.65f].CGColor);
-        self.layer.borderColor = color;
+        self.layer.borderColor = [NSColor colorWithRed:0 green:0.5f blue:0.7f alpha:0.65f].CGColor;
     }
     else {
         self.layer.borderColor = nil;
         self.layer.borderWidth = 0.0f;
     }
 }
+
+//- (BOOL)acceptsFirstResponder {
+//    return YES;
+//}
 
 - (void)mouseDown:(NSEvent *)theEvent
 {

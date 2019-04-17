@@ -75,7 +75,6 @@
     //NSLog(@"%@", serializationData.xml);
     //[[serializationData.xml dataUsingEncoding:NSUTF8StringEncoding] writeToFile:@"/Users/mark/Desktop/keepass.xml" atomically:NO];
     
-    
     RootXmlDomainObject* xmlDoc = parseKeePassXml(  serializationData.innerRandomStreamId,
                                                            serializationData.protectedStreamKey,
                                                            XmlProcessingContext.standardV3Context,

@@ -18,12 +18,10 @@
 #import "QuickTypeRecordIdentifier.h"
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
-
 #import "Utils.h"
 #import "GoogleDriveManager.h"
 #import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
-#import "SprCompilation.h"
 
 @interface CredentialProviderViewController ()
 
@@ -108,8 +106,8 @@
     }];
     
     if(node) {
-        NSString* user = [self dereference:node.fields.username node:node database:model.database];
-        NSString* password = [self dereference:node.fields.password node:node database:model.database];
+        NSString* user = [model.database dereference:node.fields.username node:node];
+        NSString* password = [model.database dereference:node.fields.password node:node];
         
         //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, node);
 
@@ -212,25 +210,6 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
         
         [Alerts info:vc title:@"Welcome to Strongbox Auto Fill" message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:\n\n- Dropbox\n- OneDrive\n- Google Drive\n- Local Device\n\nIn these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy the Auto Fill extension!\n-Mark"];
     }
-}
-
-- (NSString*)dereference:(NSString*)text node:(Node*)node database:(DatabaseModel*)database {
-    if(database.format == kPasswordSafe) {
-        return text;
-    }
-    
-    NSError* error;
-    
-    BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
-    
-    NSString* compiled = isCompilable ?
-    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:database.rootGroup error:&error] : text;
-    
-    if(error) {
-        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
-    }
-    
-    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
 }
 
 //- (void)didReceiveMemoryWarning {

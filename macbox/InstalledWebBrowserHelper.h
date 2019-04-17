@@ -1,8 +1,8 @@
 //
-//  NSDictionary+Extensions.h
+//  InstalledWebBrowserHelper.h
 //  Strongbox
 //
-//  Created by Mark on 08/04/2019.
+//  Created by Mark on 16/04/2019.
 //  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
@@ -10,9 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSDictionary (Extensions)
-
-- (id _Nullable)objectForCaseInsensitiveKey:(NSString *)key;
+@interface InstalledWebBrowserHelper : NSObject
 
 @end
 

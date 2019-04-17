@@ -120,7 +120,9 @@
             NSLog(@"Autolock Time [%@s] exceeded, locking safe.", seconds);
             
             UINavigationController* nav = [self selectedViewController];
+            [nav dismissViewControllerAnimated:NO completion:nil]; // Custom Fields and Attachments are presented over the view controller, need to be dismissed...
             [nav popToRootViewControllerAnimated:NO];
+            
         }
     }
 }

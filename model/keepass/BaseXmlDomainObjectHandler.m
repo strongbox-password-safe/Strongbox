@@ -74,7 +74,8 @@
 }
 
 - (void)appendXmlText:(nonnull NSString *)text {
-    self.nonCustomisedXmlTree.node.xmlText = [NSString stringWithFormat:@"%@%@", self.nonCustomisedXmlTree.node.xmlText,text];
+    //NSLog(@"appendXmlText: [%@]", text);
+    [self.nonCustomisedXmlTree.node appendXmlText:text];
 }
 
 - (nonnull NSString *)getXmlText {
