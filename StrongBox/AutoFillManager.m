@@ -132,7 +132,7 @@ static NSString* const kMailToScheme = @"mailto";
         
         NSString* usernameField = [database dereference:node.fields.username node:node];
 
-        NSLog(@"Adding [%@ [%@]] to Quick Type DB", url, usernameField);
+        // NSLog(@"Adding [%@ [%@]] to Quick Type DB", url, usernameField);
         
         ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:usernameField recordIdentifier:[recordIdentifier toJson]];
         [identities addObject:iden];

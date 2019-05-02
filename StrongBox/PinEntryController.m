@@ -7,6 +7,7 @@
 //
 
 #import "PinEntryController.h"
+#import "Settings.h"
 
 @interface PinEntryController ()
 
@@ -104,6 +105,16 @@
 
 - (IBAction)onEditPin:(id)sender {
     [self validatePin];
+    
+    // Instant Unlock Mode?
+    
+    if(self.pinLength > 0 && self.textFieldPin.text.length == self.pinLength && Settings.sharedInstance.instantPinUnlocking) {
+        // We auto submit at the matching length - This prevents repeated attempts bny using the 3 strikes failure mode
+        // If we didn't do this then an attacker could try as many combinations as he liked if he knew you were using
+        // Instant PIN mode...
+        
+        self.onDone(kOk, self.textFieldPin.text);
+    }
 }
 
 @end

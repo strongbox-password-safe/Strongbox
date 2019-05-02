@@ -30,6 +30,11 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
 @property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseOldItemDetailsEditor;
+@property (weak, nonatomic) IBOutlet UISwitch *hideEmptyFields;
+@property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
+@property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
+@property (weak, nonatomic) IBOutlet UISwitch *showChildCountOnFolder;
 
 @end
 
@@ -38,6 +43,27 @@
     NSDictionary<NSNumber*, NSNumber*> *_appLockDelayList;
     NSDictionary<NSNumber*, NSNumber*> *_autoClearClipboardIndex;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction)onGenericPreferencesChanged:(id)sender {
+    NSLog(@"Generic Preference Changed: [%@]", sender);
+    Settings.sharedInstance.useOldItemDetailsScene = self.switchUseOldItemDetailsEditor.on;
+    Settings.sharedInstance.hideEmptyFieldsInDetailsView = self.hideEmptyFields.on;
+    Settings.sharedInstance.easyReadFontForAll = self.easyReadFontForAll.on;
+    Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
+    Settings.sharedInstance.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
+}
+
+- (void)bindGenericPreferencesChanged {
+    self.switchUseOldItemDetailsEditor.on = Settings.sharedInstance.useOldItemDetailsScene;
+    self.hideEmptyFields.on = Settings.sharedInstance.hideEmptyFieldsInDetailsView;
+    self.easyReadFontForAll.on = Settings.sharedInstance.easyReadFontForAll;
+    self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
+    self.showChildCountOnFolder.on = Settings.sharedInstance.showChildCountOnFolderInBrowse;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)bindViewDereferenced {
     self.switchViewDereferenced.on = Settings.sharedInstance.viewDereferencedFields;
@@ -132,6 +158,7 @@
     [self bindViewDereferenced];
     [self bindSearchDereferenced];
     
+    [self bindGenericPreferencesChanged];
     //[self customizeAppLockSectionFooter];
 }
 

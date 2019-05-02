@@ -87,6 +87,7 @@
 - (void)requestPinCode {
     PinEntryController *vc = [[PinEntryController alloc] init];
     vc.info = @"Please enter your PIN to Unlock Strongbox";
+    vc.pinLength = Settings.sharedInstance.appLockPin.length;
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {

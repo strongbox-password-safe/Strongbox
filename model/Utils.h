@@ -26,10 +26,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)insertTimestampInFilename:(NSString *)title;
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;
+
+NSString* keePassStringIdFromUuid(NSUUID* uuid);
+NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
+
+NSString* friendlyFileSizeString(long long byteCount);
+NSString *frientlyDateString(NSDate *modDate);
+BOOL isValidUrl(NSString* urlString);
+NSString* trim(NSString* str);
 + (NSString *)trim:(NSString*)string;
 
 extern NSComparator finderStringComparator;
-+ (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2;
+NSComparisonResult finderStringCompare(NSString* string1, NSString* string2);
 
 + (void)integerTolittleEndian4Bytes:(int)data bytes:(unsigned char *)b;
 

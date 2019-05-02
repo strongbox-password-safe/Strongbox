@@ -114,6 +114,7 @@
     const int maxFailedPinAttempts = 3;
     
     PinEntryController *vc = [[PinEntryController alloc] init];
+    vc.pinLength = self.safe.conveniencePin.length;
     vc.info = @"Please enter your PIN to Unlock Database";
     vc.showFallbackOption = YES;
     

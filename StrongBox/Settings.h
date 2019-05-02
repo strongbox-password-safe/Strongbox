@@ -115,6 +115,15 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL viewDereferencedFields;
 @property BOOL searchDereferencedFields;
 
+@property BOOL useOldItemDetailsScene;
+@property BOOL hideEmptyFieldsInDetailsView;
+
+@property NSArray<NSNumber*>* detailsViewCollapsedSections;
+@property BOOL easyReadFontForAll;
+
+@property BOOL instantPinUnlocking;
+@property BOOL showChildCountOnFolderInBrowse;
+
 NS_ASSUME_NONNULL_END
 
 @end

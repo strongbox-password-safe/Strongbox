@@ -101,26 +101,34 @@ static NSArray<UIImage*>* getKeePassIconSet() {
 }
 
 + (UIImage *)getIconForNode:(Node *)vm database:(DatabaseModel *)database {
+    return [NodeIconHelper getIconForNode:vm.isGroup customIconUuid:vm.customIconUuid iconId:vm.iconId database:database];
+}
+
++ (UIImage *)getIconForNode:(BOOL)isGroup
+             customIconUuid:(NSUUID*)customIconUuid
+                     iconId:(NSNumber*)iconId
+                   database:(DatabaseModel *)database {
     UIImage* ret;
     
     if(database.format == kPasswordSafe) {
-        ret = vm.isGroup ? kDefaultFolderImage : kDefaultRecordImage;
+        ret = isGroup ? kDefaultFolderImage : kDefaultRecordImage;
     }
     else {
-        ret = vm.isGroup ? kKeePassIconSet[48] : kKeePassIconSet[0];
+        ret = isGroup ? kKeePassIconSet[48] : kKeePassIconSet[0];
     }
     
     // KeePass Specials
     
-    if(vm.customIconUuid) {
-        ret = [NodeIconHelper getCustomIcon:vm.customIconUuid customIcons:database.customIcons];
+    if(customIconUuid) {
+        ret = [NodeIconHelper getCustomIcon:customIconUuid customIcons:database.customIcons];
     }
-    else if(vm.iconId && vm.iconId.intValue >= 0 && vm.iconId.intValue < kKeePassIconSet.count) {
-        ret = kKeePassIconSet[vm.iconId.intValue];
+    else if(iconId && iconId.intValue >= 0 && iconId.intValue < kKeePassIconSet.count) {
+        ret = kKeePassIconSet[iconId.intValue];
     }
     
     return ret;
 }
+
 
 + (UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons {
     NSData* data = customIcons[uuid];

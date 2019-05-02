@@ -37,9 +37,11 @@ static const int kMinNotesCellHeight = 160;
 @property (weak, nonatomic) IBOutlet UILabel *labelAttachmentCount;
 
 @property BOOL editingNewRecord;
+
 @property NSNumber* userSelectedNewIconIndex;
 @property NSUUID* userSelectedNewExistingCustomIconId;
 @property UIImage* userSelectedNewCustomIcon;
+
 @property BOOL hidePassword;
 @property BOOL showOtp;
 @property NSTimer* timerRefreshOtp;
@@ -291,7 +293,6 @@ static const int kMinNotesCellHeight = 160;
     
     [self showHideOtpCode];
     [self refreshOtpCode:nil];
-
     if(self.timerRefreshOtp) {
         [self.timerRefreshOtp invalidate];
         self.timerRefreshOtp = nil;
@@ -619,11 +620,6 @@ static const int kMinNotesCellHeight = 160;
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
     
     return [[Node alloc] initAsRecord:title parent:self.parentGroup fields:fields uuid:nil];
-}
-
-static NSString * trim(NSString *string) {
-    return [string stringByTrimmingCharactersInSet:
-            [NSCharacterSet whitespaceCharacterSet]];
 }
 
 - (void)copyToClipboard:(NSString *)value message:(NSString *)message {

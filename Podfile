@@ -40,8 +40,8 @@ abstract_target 'common-ios' do
 
     target 'Strongbox-iOS' do
 	use_frameworks!
-
-        pod 'ISMessages' 
+        
+        pod 'ISMessages'
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'

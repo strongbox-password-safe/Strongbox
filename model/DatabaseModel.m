@@ -214,8 +214,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     
     BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
     
-    NSString* compiled = isCompilable ?
-    [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.rootGroup error:&error] : text;
+    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.rootGroup error:&error] : text;
     
     if(error) {
         NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
@@ -225,6 +224,24 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (NSString *)getGroupPathDisplayString:(Node *)vm {
+    if(!vm || vm.parent == nil || vm.parent == self.rootGroup) {
+        return @"/";
+    }
+    
+    NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
+    
+    Node* current = vm;
+    while (current.parent != nil && current.parent != self.rootGroup) {
+        [hierarchy insertObject:current.parent.title atIndex:0]; 
+        current = current.parent;
+    }
+    
+    NSString *path = [hierarchy componentsJoinedByString:@"/"];
+    
+    return path;
+}
 
 - (Node*)rootGroup {
     if(self.format == kKeePass || self.format == kKeePass4) {
@@ -469,7 +486,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         includeRecycleBin:(BOOL)includeRecycleBin {
     NSArray<NSString*>* terms = [self getSearchTerms:searchText];
     
-    NSLog(@"Search for nodes containing: [%@]", terms);
+    //NSLog(@"Search for nodes containing: [%@]", terms);
 
     NSMutableArray* results = [self.allNodes mutableCopy]; // Mutable for memory/perf reasons
     

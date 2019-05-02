@@ -33,9 +33,20 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 }
 
 - (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes {
-    NSURL* url = [Node findOtpUrlInString:string];
-    OTPToken* token = nil;
+    OTPToken* token = [Node getOtpTokenFromString:string];
     
+    if(token) {
+        [self setTotp:token appendUrlToNotes:appendUrlToNotes];
+        return YES;
+    }
+    
+    return NO;
+}
+
++ (OTPToken*)getOtpTokenFromString:(NSString * _Nonnull)string {
+    OTPToken *token = nil;
+    NSURL *url = [Node findOtpUrlInString:string];
+
     if(url) {
         token = [OTPToken tokenWithURL:url];
     }
@@ -46,56 +57,46 @@ static NSString* const kOtpAuthScheme = @"otpauth";
             token = [token validate] ? token : nil;
         }
     }
-
-    if(token) {
-        return [self setTotp:token appendUrlToNotes:appendUrlToNotes && url ? url.absoluteString : nil];
-    }
-
-    return NO;
+    
+    return token;
 }
 
-- (BOOL)setTotp:(OTPToken*)token appendUrlToNotes:(NSString*)appendUrlToNotes {
-    if(token) {
-        // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
-        
-        // KeePassXC Otp
-        
-        self.fields.customFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
-        
-        if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-            NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
-            self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
-        }
-        else {
-            self.fields.customFields[@"TOTP Settings"] = nil;
-        }
-        
-        // KeeOtp Plugin
-        // * otp="key=2GQFLXXUBJQELC&step=31"
-        
-        NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
-        NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
-        
-        if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-            NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
-            NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
-            components.queryItems = @[key, step, size];
-        }
-        else {
-            components.queryItems = @[key];
-        }
-        self.fields.customFields[@"otp"] = [StringValue valueWithString:components.query protected:YES];
+- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes {
+    // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
     
-        // Notes Field if it's a Password Safe database
-        
-        if(appendUrlToNotes) {
-            self.fields.notes = [self.fields.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", appendUrlToNotes];
-        }
-        
-        return YES;
+    // KeePassXC Otp
+    
+    self.fields.customFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
+    
+    if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
+        NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+        self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
     }
+    else {
+        self.fields.customFields[@"TOTP Settings"] = nil;
+    }
+    
+    // KeeOtp Plugin
+    // * otp="key=2GQFLXXUBJQELC&step=31"
+    
+    NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
+    NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
+    
+    if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
+        NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
+        NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
+        components.queryItems = @[key, step, size];
+    }
+    else {
+        components.queryItems = @[key];
+    }
+    self.fields.customFields[@"otp"] = [StringValue valueWithString:components.query protected:YES];
 
-    return NO;
+    // Notes Field if it's a Password Safe database
+    
+    if(appendUrlToNotes) {
+        self.fields.notes = [self.fields.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", [token url:YES]];
+    }
 }
 
 - (void)clearTotp {

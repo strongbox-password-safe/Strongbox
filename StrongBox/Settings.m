@@ -8,6 +8,8 @@
 
 #import "Settings.h"
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "SafesList.h"
+#import "NSArray+Extensions.h"
 
 static NSString* const kLaunchCountKey = @"launchCount";
 static NSString* const kAutoLockTimeSeconds = @"autoLockTimeSeconds";
@@ -54,6 +56,12 @@ static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSel
 static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill";
 static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
 static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
+static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene";
+static NSString* const kHideEmptyFieldsInDetailsView = @"hideEmptyFieldsInDetailsView";
+static NSString* const kCollapsedSections = @"collapsedSections";
+static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
+static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
+static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolderInBrowse";
 
 @implementation Settings
 
@@ -72,6 +80,20 @@ static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
     
     return defaults;
+}
+
+- (BOOL)getBool:(NSString*)key {
+    return [self getBool:key fallback:NO];
+}
+
+- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
+    NSNumber* obj = [[self getUserDefaults] objectForKey:key];
+    return obj != nil ? obj.boolValue : fallback;
+}
+
+- (void)setBool:(NSString*)key value:(BOOL)value {
+    [[self getUserDefaults] setBool:value forKey:key];
+    [[self getUserDefaults] synchronize];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -737,6 +759,73 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 - (void)setSearchDereferencedFields:(BOOL)searchDereferencedFields {
     [[self getUserDefaults] setBool:searchDereferencedFields forKey:kSearchDereferencedFields];
     [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)useOldItemDetailsScene {
+    return [[self getUserDefaults] boolForKey:kUseOldItemDetailsScene];
+}
+
+- (void)setUseOldItemDetailsScene:(BOOL)useOldItemDetailsScene {
+    [[self getUserDefaults] setBool:useOldItemDetailsScene forKey:kUseOldItemDetailsScene];
+    [[self getUserDefaults] synchronize];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)hideEmptyFieldsInDetailsView {
+    return [self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
+}
+
+- (void)setHideEmptyFieldsInDetailsView:(BOOL)hideEmptyFieldsInDetailsView {
+    [self setBool:kHideEmptyFieldsInDetailsView value:hideEmptyFieldsInDetailsView];
+}
+
+- (NSArray<NSNumber *> *)detailsViewCollapsedSections {
+    NSArray* ret = [[self getUserDefaults] arrayForKey:kCollapsedSections];
+    
+    return ret ? ret : @[@(0), @(0), @(0), @(0), @(1), @(1)]; // Default
+}
+
+- (void)setDetailsViewCollapsedSections:(NSArray<NSNumber *> *)detailsViewCollapsedSections {
+    [[self getUserDefaults] setObject:detailsViewCollapsedSections forKey:kCollapsedSections];
+    [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)easyReadFontForAll {
+    return [self getBool:kEasyReadFontForAll];
+}
+
+- (void)setEasyReadFontForAll:(BOOL)easyReadFontForAll {
+    [self setBool:kEasyReadFontForAll value:easyReadFontForAll];
+}
+
+- (BOOL)instantPinUnlocking {
+    NSNumber* obj = [[self getUserDefaults] objectForKey:kInstantPinUnlocking];
+    
+    if(!obj) {
+        // Try to be smart about default here... don't want to switch this on if user is
+        // already using PINs but if they're not then I think this should be the default
+        
+        BOOL userAlreadyUsingPins = [SafesList.sharedInstance.snapshot anyMatch:^BOOL(SafeMetaData *obj) {
+            return obj.conveniencePin != nil;
+        }];
+        
+        [self setInstantPinUnlocking:!userAlreadyUsingPins];
+    }
+    
+    return [self getBool:kInstantPinUnlocking];
+}
+
+- (void)setInstantPinUnlocking:(BOOL)instantPinUnlocking {
+    [self setBool:kInstantPinUnlocking value:instantPinUnlocking];
+}
+
+- (BOOL)showChildCountOnFolderInBrowse {
+    return [self getBool:kShowChildCountOnFolderInBrowse];
+}
+
+- (void)setShowChildCountOnFolderInBrowse:(BOOL)showChildCountOnFolderInBrowse {
+    [self setBool:kShowChildCountOnFolderInBrowse value:showChildCountOnFolderInBrowse];
 }
 
 @end

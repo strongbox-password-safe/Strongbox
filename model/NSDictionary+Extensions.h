@@ -10,9 +10,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSDictionary (Extensions)
+@interface NSDictionary<KeyType, ValueType> (Extensions)
 
 - (id _Nullable)objectForCaseInsensitiveKey:(NSString *)key;
+-(NSArray*)map:(id (^)(KeyType key, ValueType value))block;
 
 @end
 

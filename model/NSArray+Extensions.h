@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<ObjectType> *)filter:(BOOL (^)(ObjectType obj))block;
 - (NSArray*)map:(id (^)(ObjectType obj, NSUInteger idx))block;
 - (nullable ObjectType)firstOrDefault:(BOOL (^)(ObjectType obj))block;
-- (BOOL)anyMatch:(BOOL (^)(id obj))block;
+- (BOOL)anyMatch:(BOOL (^)(ObjectType obj))block;
 
 - (NSArray *)flatMap:(NSArray* (^)(ObjectType obj, NSUInteger idx))block;
 

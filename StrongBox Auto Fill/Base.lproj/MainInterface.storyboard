@@ -232,7 +232,7 @@
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="14c-4c-qwD"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" id="nWg-WP-1SN">
+                    <navigationItem key="navigationItem" prompt="Tip: Long Press to Copy Password, Double Tap to Copy Username" id="nWg-WP-1SN">
                         <barButtonItem key="rightBarButtonItem" title="Create New..." id="CiF-V3-i2n">
                             <connections>
                                 <action selector="onAddCredential:" destination="tum-o5-Per" id="088-1I-OpV"/>

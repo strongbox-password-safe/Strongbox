@@ -15,6 +15,23 @@
 
 @implementation Utils
 
+BOOL isValidUrl(NSString* urlString) {
+    NSString *target = trim(urlString);
+    if(!target.length) {
+        return NO;
+    }
+    
+    NSError *error;
+    NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
+
+    if(detector) {
+        NSRange range =[detector rangeOfFirstMatchInString:target options:NSMatchingAnchored range:NSMakeRange(0, [target length])];
+        return range.location == 0 && range.length == target.length;
+    }
+
+    return NO;
+}
+
 + (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode {
     NSArray *keys = @[NSLocalizedDescriptionKey];
     NSArray *values = @[description];
@@ -79,17 +96,61 @@
     return NSFullUserName();
 }
 
+NSString* friendlyFileSizeString(long long byteCount) {
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
+}
+
+NSString *frientlyDateString(NSDate *modDate) {
+    if(!modDate) { return @""; }
+    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = NSDateFormatterShortStyle;
+    df.dateStyle = NSDateFormatterMediumStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+    
+    return [df stringFromDate:modDate];
+}
+
+NSString* keePassStringIdFromUuid(NSUUID* uuid) {
+    // 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C => 46C9B1FFBD4ABC4BBB260C6190BAD20C
+    
+    uuid_t uid;
+    [uuid getUUIDBytes:(uint8_t*)&uid];
+    
+    return [Utils hexadecimalString:[NSData dataWithBytes:uid length:sizeof(uuid_t)]];
+}
+
+NSUUID* uuidFromKeePassStringId(NSString* stringId) {
+    if(stringId.length != 32) {
+        return nil;
+    }
+    
+    // 46C9B1FFBD4ABC4BBB260C6190BAD20C => 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C;
+    
+    NSData* uuidData = [Utils dataFromHexString:stringId];
+    return [[NSUUID alloc] initWithUUIDBytes:uuidData.bytes];
+}
+
+NSString* trim(NSString* str) {
+    return [str stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
+
 +(NSString *)trim:(NSString*)string {
-    return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    return trim(string);
 }
 
 NSComparator finderStringComparator = ^(id obj1, id obj2)
 {
-    return [Utils finderStringCompare:obj1 string2:obj2];
+    return finderStringCompare(obj1, obj2);
 };
 
 + (NSComparisonResult)finderStringCompare:(NSString*)string1 string2:(NSString*)string2
 {
+    return finderStringCompare(string1, string2);
+}
+
+NSComparisonResult finderStringCompare(NSString* string1, NSString* string2) {
     // Finder Like String Sort
     // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Strings/Articles/SearchingStrings.html#//apple_ref/doc/uid/20000149-SW1
     

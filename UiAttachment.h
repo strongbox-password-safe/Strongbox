@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UiAttachment : NSObject
 
++ (instancetype)attachmentWithFilename:(NSString*)filename data:(NSData*)data;
+
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithFilename:(NSString*)filename data:(NSData*)data NS_DESIGNATED_INITIALIZER;
 

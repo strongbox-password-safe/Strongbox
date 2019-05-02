@@ -16,7 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel *labelSubtitle;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPin;
 @property (weak, nonatomic) IBOutlet UILabel *labelWarning;
+
 @property (nonatomic, copy) void (^onDone)(PinEntryResponse response, NSString* _Nullable pin);
+
+@property NSUInteger pinLength; // Used for Instant PIN Open
 
 @property NSString* info;
 @property NSString* warning;

@@ -20,4 +20,26 @@
     return nil;
 }
 
+- (NSArray *)map:(id  _Nonnull (^)(id _Nonnull, id _Nonnull))block {
+    NSMutableArray *ret = [NSMutableArray arrayWithCapacity:self.count];
+    
+    NSArray *allKeys = [self allKeys];
+    for (id key in allKeys) {
+        id value = [self objectForKey:key];
+        id mapped = block(key, value);
+        [ret addObject:mapped];
+    }
+    
+    return ret;
+}
+
+//- (NSArray *)map:(id (^)(id obj, NSUInteger idx))block {
+//    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
+//    [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+//        [result addObject:block(obj, idx)];
+//    }];
+//    return [result copy];
+//}
+
+
 @end

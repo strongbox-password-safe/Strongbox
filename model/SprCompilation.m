@@ -209,7 +209,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         return target.fields.notes;
     }
     else if([desiredField isEqualToString:kReferenceFieldId]) {
-        return [self keePassStringIdFromUuid:target.uuid];
+        return keePassStringIdFromUuid(target.uuid);
     }
     else {
         if(error) {
@@ -223,7 +223,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     Node* target = nil;
     
     if([searchByField isEqualToString:kReferenceFieldId]) {
-        NSUUID* uuidTarget = [self uuidFromKeePassStringId:searchTarget];
+        NSUUID* uuidTarget = uuidFromKeePassStringId(searchTarget);
         
         if(!uuidTarget) {
             if(error) {
@@ -367,26 +367,6 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     }
     
     return [[SprCompilation regex] matchesInString:test options:kNilOptions range:NSMakeRange(0, test.length)];
-}
-
-- (NSString*)keePassStringIdFromUuid:(NSUUID*)uuid {
-    // 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C => 46C9B1FFBD4ABC4BBB260C6190BAD20C
-    
-    uuid_t uid;
-    [uuid getUUIDBytes:(uint8_t*)&uid];
-    
-    return [Utils hexadecimalString:[NSData dataWithBytes:uid length:sizeof(uuid_t)]];
-}
-
-- (NSUUID*)uuidFromKeePassStringId:(NSString*)searchTarget {
-    if(searchTarget.length != 32) {
-        return nil;
-    }
-    
-    // 46C9B1FFBD4ABC4BBB260C6190BAD20C => 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C;
-    
-    NSData* uuidData = [Utils dataFromHexString:searchTarget];
-    return [[NSUUID alloc] initWithUUIDBytes:uuidData.bytes];
 }
 
 @end

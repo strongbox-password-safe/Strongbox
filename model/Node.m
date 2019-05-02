@@ -402,7 +402,7 @@ NSComparator finderStyleNodeComparator = ^(id obj1, id obj2)
         return NSOrderedDescending;
     }
     
-    return [Utils finderStringCompare:n1.title string2:n2.title];
+    return finderStringCompare(n1.title, n2.title);
 };
 
 NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
@@ -416,8 +416,8 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     else if(!n1.isGroup && n2.isGroup) {
         return NSOrderedDescending;
     }
-    
-    return [Utils finderStringCompare:n2.title string2:n1.title];
+
+    return finderStringCompare(n2.title, n1.title);
 };
 
 

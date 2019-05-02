@@ -33,6 +33,8 @@
 - (NSURL *)url;
 - (NSURL *)url:(BOOL)includeSecret;
 
++ (BOOL)areDifferent:(OTPToken*)a b:(OTPToken*)b;
+
 @end
 
 

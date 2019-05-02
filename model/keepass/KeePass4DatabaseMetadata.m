@@ -13,6 +13,7 @@
 #import "KeePassCiphers.h"
 #import "Argon2KdfCipher.h"
 #import "NSUUID+Zero.h"
+#import "Utils.h"
 
 static NSString* const kDefaultFileVersion = @"4.0";
 static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
@@ -52,7 +53,7 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
     [kvps addKey:@"Inner Encryption" andValue:innerEncryptionString(self.innerRandomStreamId)];
     [kvps addKey:@"Max History Items" andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
 
-    NSString* size = [NSByteCountFormatter stringFromByteCount:self.historyMaxSize countStyle:NSByteCountFormatterCountStyleFile];
+    NSString* size = friendlyFileSizeString(self.historyMaxSize);
     [kvps addKey:@"Max History Size" andValue:size];
 
     [kvps addKey:@"Recycle Bin Enabled" andValue:self.recycleBinEnabled ? @"Yes" : @"No"];

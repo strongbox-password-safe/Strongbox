@@ -59,6 +59,8 @@ extern NSInteger const kSearchScopeAll;
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
+- (NSString *)getGroupPathDisplayString:(Node *)vm;
+
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;

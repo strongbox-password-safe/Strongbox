@@ -11,6 +11,8 @@
 #import "NodeIconHelper.h"
 #import "RecordView.h"
 #import "Alerts.h"
+#import "ItemDetailsViewController.h"
+#import "Settings.h"
 
 @interface KeePassHistoryController ()
 
@@ -76,7 +78,17 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Node* node = self.items[indexPath.row];
 
-    [self performSegueWithIdentifier:@"segueToRecordView" sender:node];
+    if (@available(iOS 11.0, *)) {
+        if(Settings.sharedInstance.useOldItemDetailsScene) {
+            [self performSegueWithIdentifier:@"segueToRecordView" sender:node];
+        }
+        else {
+            [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:node];
+        }
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToRecordView" sender:node];
+    }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -88,6 +100,17 @@
         vc.parentGroup = record.parent;
         vc.viewModel = self.viewModel;
         vc.isHistoricalEntry = YES;
+    }
+    else if ([segue.identifier isEqualToString:@"HistoryToItemDetails"]) {
+        Node *record = (Node *)sender;
+        
+        ItemDetailsViewController *vc = segue.destinationViewController;
+        
+        vc.createNewItem = NO;
+        vc.item = record;
+        vc.parentGroup = record.parent;
+        vc.readOnly = YES;
+        vc.databaseModel = self.viewModel;
     }
 }
 

@@ -402,6 +402,41 @@
 		4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DA2A7DB219C31B0006689E6 /* LICENSE.md */; };
 		4DA5F8F72221DABE00B6C650 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; };
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
+		4DAE98A02270B4E200A811C4 /* CustomFieldEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98802270B4E200A811C4 /* CustomFieldEditorViewController.m */; };
+		4DAE98A12270B4E200A811C4 /* CustomFieldEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98802270B4E200A811C4 /* CustomFieldEditorViewController.m */; };
+		4DAE98A22270B4E200A811C4 /* FontManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98812270B4E200A811C4 /* FontManager.m */; };
+		4DAE98A32270B4E200A811C4 /* FontManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98812270B4E200A811C4 /* FontManager.m */; };
+		4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */; };
+		4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */; };
+		4DAE98A62270B4E200A811C4 /* IconTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98842270B4E200A811C4 /* IconTableCell.xib */; };
+		4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98842270B4E200A811C4 /* IconTableCell.xib */; };
+		4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */; };
+		4DAE98AA2270B4E200A811C4 /* ConfidentialTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */; };
+		4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */; };
+		4DAE98AD2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */; };
+		4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */; };
+		4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */; };
+		4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */; };
+		4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */; };
+		4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE988B2270B4E200A811C4 /* NotesTableViewCell.xib */; };
+		4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE988B2270B4E200A811C4 /* NotesTableViewCell.xib */; };
+		4DAE98B42270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */; };
+		4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */; };
+		4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
+		4DAE98B72270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
+		4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */; };
+		4DAE98B92270B4E200A811C4 /* EditPasswordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */; };
+		4DAE98BA2270B4E200A811C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
+		4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
+		4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */; };
+		4DAE98BE2270B4E200A811C4 /* GenericBasicCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98962270B4E200A811C4 /* GenericBasicCell.m */; };
+		4DAE98BF2270B4E200A811C4 /* GenericBasicCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98962270B4E200A811C4 /* GenericBasicCell.m */; };
+		4DAE98C02270B4E200A811C4 /* MBAutoGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98972270B4E200A811C4 /* MBAutoGrowingTextView.m */; };
+		4DAE98C12270B4E200A811C4 /* MBAutoGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98972270B4E200A811C4 /* MBAutoGrowingTextView.m */; };
+		4DAE98C22270B4E200A811C4 /* ItemDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98982270B4E200A811C4 /* ItemDetailsViewController.m */; };
+		4DAE98C42270B4E200A811C4 /* ItemDetailsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE989D2270B4E200A811C4 /* ItemDetailsModel.m */; };
+		4DAE98C62270B4E200A811C4 /* CustomFieldViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE989E2270B4E200A811C4 /* CustomFieldViewModel.m */; };
+		4DAE98C72270B4E200A811C4 /* CustomFieldViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE989E2270B4E200A811C4 /* CustomFieldViewModel.m */; };
 		4DAEA41D217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */; };
 		4DAEA41E217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */; };
 		4DAF92B622118C2A0000D013 /* LicenceCodeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAF92B522118C2A0000D013 /* LicenceCodeManager.m */; };
@@ -413,6 +448,8 @@
 		4DB1B7D92188B22500CF1663 /* ChaCha20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7D72188B22500CF1663 /* ChaCha20Stream.m */; };
 		4DB1B7DC2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7DB2188B5C900CF1663 /* KeePass4DatabaseMetadata.m */; };
 		4DB1B7DD2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7DB2188B5C900CF1663 /* KeePass4DatabaseMetadata.m */; };
+		4DB574002274913E001BB13C /* ItemMetadataEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB573FF2274913E001BB13C /* ItemMetadataEntry.m */; };
+		4DBC7A4A2279DC1600CA534D /* CollapsibleTableViewHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */; };
 		4DC5B9BE217B31F100FE9DD9 /* CommonTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9BD217B31F100FE9DD9 /* CommonTesting.m */; };
 		4DC5B9C1217B376F00FE9DD9 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C0217B376F00FE9DD9 /* Root.m */; };
 		4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C0217B376F00FE9DD9 /* Root.m */; };
@@ -430,6 +467,7 @@
 		4DCC3F8A2177BA1A00FB13C2 /* password-three-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F892177BA1A00FB13C2 /* password-three-entries-ladder.xml */; };
 		4DCC3F8C2177BEEE00FB13C2 /* password-five-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F8B2177BEEE00FB13C2 /* password-five-entries-ladder.xml */; };
 		4DCC3F8E2177C08400FB13C2 /* ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F8D2177C08400FB13C2 /* ladder.xml */; };
+		4DCEE40C2273470C004AE3A7 /* AutoCompleteTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */; };
 		4DCF5FBC1F7294A800011756 /* StrongboxUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* StrongboxUIDocument.m */; };
 		4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4DD127AA2221F7BE008F3039 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -455,6 +493,13 @@
 		4DE48A62216F54A300C9C991 /* Strongbox Auto Fill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE48A55216F54A300C9C991 /* Strongbox Auto Fill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4DE48A66216F558E00C9C991 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
 		4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
+		4DE498B52271AD28007EF98C /* AddAttachmentHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498B42271AD28007EF98C /* AddAttachmentHelper.m */; };
+		4DE498B62271B2AF007EF98C /* AddAttachmentHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498B42271AD28007EF98C /* AddAttachmentHelper.m */; };
+		4DE498B92271E2C4007EF98C /* SetIconModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498B82271E2C4007EF98C /* SetIconModel.m */; };
+		4DE498BA2271E5C7007EF98C /* SetIconModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498B82271E2C4007EF98C /* SetIconModel.m */; };
+		4DE498BD2271E911007EF98C /* IconTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498BC2271E911007EF98C /* IconTableCell.m */; };
+		4DE498C02271F746007EF98C /* TotpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE498BF2271F746007EF98C /* TotpCell.xib */; };
+		4DE498C32271F85B007EF98C /* TotpCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498C22271F85B007EF98C /* TotpCell.m */; };
 		4DE9A60521F5FEF700128560 /* QRCodeScannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */; };
 		4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE9A60421F5FEF700128560 /* QRCodeScannerViewController.xib */; };
 		4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C22168AC9A00A5800A /* InitialViewController.m */; };
@@ -597,8 +642,8 @@
 		4D10154C21F7315400D2F711 /* LockViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LockViewController.m; path = StrongBox/LockViewController.m; sourceTree = "<group>"; };
 		4D10154D21F7315400D2F711 /* LockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LockViewController.h; path = StrongBox/LockViewController.h; sourceTree = "<group>"; };
 		4D10154E21F7315400D2F711 /* LockViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LockViewController.xib; path = StrongBox/LockViewController.xib; sourceTree = "<group>"; };
-		4D108BF9224A2D6700C17095 /* CustomFieldTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldTableCell.h; path = StrongBox/CustomFieldTableCell.h; sourceTree = "<group>"; };
-		4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldTableCell.m; path = StrongBox/CustomFieldTableCell.m; sourceTree = "<group>"; };
+		4D108BF9224A2D6700C17095 /* CustomFieldTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomFieldTableCell.h; sourceTree = "<group>"; };
+		4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomFieldTableCell.m; sourceTree = "<group>"; };
 		4D108BFC224A40EC00C17095 /* AesKdfCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesKdfCipher.h; path = model/keepass/AesKdfCipher.h; sourceTree = "<group>"; };
 		4D108BFD224A40EC00C17095 /* AesKdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesKdfCipher.m; path = model/keepass/AesKdfCipher.m; sourceTree = "<group>"; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BrowseSafeView.h; path = StrongBox/BrowseSafeView.h; sourceTree = "<group>"; };
@@ -1125,6 +1170,38 @@
 		4DA5F8F62221DABE00B6C650 /* FavIcon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FavIcon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomStorageProviderTableViewCell.h; path = StrongBox/CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomStorageProviderTableViewCell.m; path = StrongBox/CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
+		4DAE987E2270B4E200A811C4 /* ItemDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemDetailsViewController.h; sourceTree = "<group>"; };
+		4DAE987F2270B4E200A811C4 /* MBAutoGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBAutoGrowingTextView.h; sourceTree = "<group>"; };
+		4DAE98802270B4E200A811C4 /* CustomFieldEditorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomFieldEditorViewController.m; sourceTree = "<group>"; };
+		4DAE98812270B4E200A811C4 /* FontManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FontManager.m; sourceTree = "<group>"; };
+		4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenericBasicCell.xib; sourceTree = "<group>"; };
+		4DAE98842270B4E200A811C4 /* IconTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IconTableCell.xib; sourceTree = "<group>"; };
+		4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewCell.m; sourceTree = "<group>"; };
+		4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConfidentialTableCell.m; sourceTree = "<group>"; };
+		4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericKeyValueTableViewCell.m; sourceTree = "<group>"; };
+		4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EditAttachmentCell.xib; sourceTree = "<group>"; };
+		4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewAttachmentCell.xib; sourceTree = "<group>"; };
+		4DAE988A2270B4E200A811C4 /* EditAttachmentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditAttachmentCell.h; sourceTree = "<group>"; };
+		4DAE988B2270B4E200A811C4 /* NotesTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotesTableViewCell.xib; sourceTree = "<group>"; };
+		4DAE988C2270B4E200A811C4 /* GenericBasicCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericBasicCell.h; sourceTree = "<group>"; };
+		4DAE988D2270B4E200A811C4 /* EditPasswordTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditPasswordTableViewCell.h; sourceTree = "<group>"; };
+		4DAE988E2270B4E200A811C4 /* ConfidentialTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfidentialTableCell.h; sourceTree = "<group>"; };
+		4DAE988F2270B4E200A811C4 /* NotesTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotesTableViewCell.h; sourceTree = "<group>"; };
+		4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenericKeyValueTableViewCell.xib; sourceTree = "<group>"; };
+		4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericKeyValueTableViewCell.h; sourceTree = "<group>"; };
+		4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfidentialTableCell.xib; sourceTree = "<group>"; };
+		4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EditPasswordCell.xib; sourceTree = "<group>"; };
+		4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditAttachmentCell.m; sourceTree = "<group>"; };
+		4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditPasswordTableViewCell.m; sourceTree = "<group>"; };
+		4DAE98962270B4E200A811C4 /* GenericBasicCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericBasicCell.m; sourceTree = "<group>"; };
+		4DAE98972270B4E200A811C4 /* MBAutoGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBAutoGrowingTextView.m; sourceTree = "<group>"; };
+		4DAE98982270B4E200A811C4 /* ItemDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemDetailsViewController.m; sourceTree = "<group>"; };
+		4DAE98992270B4E200A811C4 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
+		4DAE989B2270B4E200A811C4 /* ItemDetailsModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemDetailsModel.h; sourceTree = "<group>"; };
+		4DAE989C2270B4E200A811C4 /* CustomFieldViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomFieldViewModel.h; sourceTree = "<group>"; };
+		4DAE989D2270B4E200A811C4 /* ItemDetailsModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemDetailsModel.m; sourceTree = "<group>"; };
+		4DAE989E2270B4E200A811C4 /* CustomFieldViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomFieldViewModel.m; sourceTree = "<group>"; };
+		4DAE989F2270B4E200A811C4 /* CustomFieldEditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomFieldEditorViewController.h; sourceTree = "<group>"; };
 		4DAEA41B217CBB1300AC128E /* GenericTextUuidElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextUuidElementHandler.h; path = model/keepass/GenericTextUuidElementHandler.h; sourceTree = SOURCE_ROOT; };
 		4DAEA41C217CBB1300AC128E /* GenericTextUuidElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextUuidElementHandler.m; path = model/keepass/GenericTextUuidElementHandler.m; sourceTree = SOURCE_ROOT; };
 		4DAF92B422118C2A0000D013 /* LicenceCodeManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LicenceCodeManager.h; path = StrongBox/LicenceCodeManager.h; sourceTree = "<group>"; };
@@ -1139,6 +1216,10 @@
 		4DB1B7D72188B22500CF1663 /* ChaCha20Stream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20Stream.m; path = model/keepass/ChaCha20Stream.m; sourceTree = "<group>"; };
 		4DB1B7DA2188B5C900CF1663 /* KeePass4DatabaseMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePass4DatabaseMetadata.h; path = model/keepass/KeePass4DatabaseMetadata.h; sourceTree = "<group>"; };
 		4DB1B7DB2188B5C900CF1663 /* KeePass4DatabaseMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePass4DatabaseMetadata.m; path = model/keepass/KeePass4DatabaseMetadata.m; sourceTree = "<group>"; };
+		4DB573FE2274913E001BB13C /* ItemMetadataEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItemMetadataEntry.h; sourceTree = "<group>"; };
+		4DB573FF2274913E001BB13C /* ItemMetadataEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ItemMetadataEntry.m; sourceTree = "<group>"; };
+		4DBC7A482279DC1600CA534D /* CollapsibleTableViewHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CollapsibleTableViewHeader.h; path = StrongBox/CollapsibleTableViewHeader.h; sourceTree = "<group>"; };
+		4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CollapsibleTableViewHeader.m; path = StrongBox/CollapsibleTableViewHeader.m; sourceTree = "<group>"; };
 		4DBE5B311C8356C700C310BC /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DBE5B351C8356C700C310BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = StrongBox/main.m; sourceTree = "<group>"; };
 		4DBE5B371C8356C700C310BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = StrongBox/AppDelegate.h; sourceTree = "<group>"; };
@@ -1164,6 +1245,8 @@
 		4DCC3F892177BA1A00FB13C2 /* password-three-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-three-entries-ladder.xml"; sourceTree = "<group>"; };
 		4DCC3F8B2177BEEE00FB13C2 /* password-five-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-five-entries-ladder.xml"; sourceTree = "<group>"; };
 		4DCC3F8D2177C08400FB13C2 /* ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ladder.xml; sourceTree = "<group>"; };
+		4DCEE40A2273470C004AE3A7 /* AutoCompleteTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoCompleteTextField.h; path = StrongBox/AutoCompleteTextField.h; sourceTree = "<group>"; };
+		4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoCompleteTextField.m; path = StrongBox/AutoCompleteTextField.m; sourceTree = "<group>"; };
 		4DCF5FBA1F7294A800011756 /* StrongboxUIDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StrongboxUIDocument.h; path = StrongBox/StrongboxUIDocument.h; sourceTree = "<group>"; };
 		4DCF5FBB1F7294A800011756 /* StrongboxUIDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StrongboxUIDocument.m; path = StrongBox/StrongboxUIDocument.m; sourceTree = "<group>"; };
 		4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppleICloudProvider.h; path = StrongBox/AppleICloudProvider.h; sourceTree = "<group>"; };
@@ -1192,6 +1275,15 @@
 		4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CredentialProviderViewController.m; path = "StrongBox Auto Fill/CredentialProviderViewController.m"; sourceTree = "<group>"; };
 		4DE48A5E216F54A300C9C991 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "StrongBox Auto Fill/Info.plist"; sourceTree = "<group>"; };
 		4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox_Auto_Fill.entitlements; path = "StrongBox Auto Fill/Strongbox_Auto_Fill.entitlements"; sourceTree = "<group>"; };
+		4DE498B32271AD28007EF98C /* AddAttachmentHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddAttachmentHelper.h; path = StrongBox/RecordScene/AddAttachmentHelper.h; sourceTree = "<group>"; };
+		4DE498B42271AD28007EF98C /* AddAttachmentHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddAttachmentHelper.m; path = StrongBox/RecordScene/AddAttachmentHelper.m; sourceTree = "<group>"; };
+		4DE498B72271E2C4007EF98C /* SetIconModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SetIconModel.h; sourceTree = "<group>"; };
+		4DE498B82271E2C4007EF98C /* SetIconModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SetIconModel.m; sourceTree = "<group>"; };
+		4DE498BB2271E911007EF98C /* IconTableCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IconTableCell.h; sourceTree = "<group>"; };
+		4DE498BC2271E911007EF98C /* IconTableCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IconTableCell.m; sourceTree = "<group>"; };
+		4DE498BF2271F746007EF98C /* TotpCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TotpCell.xib; sourceTree = "<group>"; };
+		4DE498C12271F85B007EF98C /* TotpCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TotpCell.h; sourceTree = "<group>"; };
+		4DE498C22271F85B007EF98C /* TotpCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TotpCell.m; sourceTree = "<group>"; };
 		4DE9A60221F5FEF700128560 /* QRCodeScannerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QRCodeScannerViewController.h; path = StrongBox/QRCodeScannerViewController.h; sourceTree = "<group>"; };
 		4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QRCodeScannerViewController.m; path = StrongBox/QRCodeScannerViewController.m; sourceTree = "<group>"; };
 		4DE9A60421F5FEF700128560 /* QRCodeScannerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = QRCodeScannerViewController.xib; path = StrongBox/QRCodeScannerViewController.xib; sourceTree = "<group>"; };
@@ -1206,6 +1298,7 @@
 		4DF299782243B8020080F9DC /* IconsSectionHeaderReusableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IconsSectionHeaderReusableView.h; path = StrongBox/IconsSectionHeaderReusableView.h; sourceTree = "<group>"; };
 		4DF299792243B8020080F9DC /* IconsSectionHeaderReusableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconsSectionHeaderReusableView.m; path = StrongBox/IconsSectionHeaderReusableView.m; sourceTree = "<group>"; };
 		4DF2997A2243B8020080F9DC /* IconsSectionHeaderReusableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = IconsSectionHeaderReusableView.xib; path = StrongBox/IconsSectionHeaderReusableView.xib; sourceTree = "<group>"; };
+		4DF2C81522735B9200CF13B5 /* SearchTextField.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SearchTextField.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DF3A3CA2214BA5A00DE1F8F /* Montserrat-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Bold.otf"; sourceTree = "<group>"; };
 		4DF3A3CB2214BA5A00DE1F8F /* Montserrat-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Montserrat-Regular.otf"; sourceTree = "<group>"; };
 		4DF544FA2231627A00DDEECE /* apple.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = apple.cer; sourceTree = "<group>"; };
@@ -1670,8 +1763,7 @@
 		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				4D108BF9224A2D6700C17095 /* CustomFieldTableCell.h */,
-				4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */,
+				4DAE986A2270B39100A811C4 /* Item Details Scene */,
 				4D06943622083E2000FB826C /* Upgrade */,
 				4DED20C72168BF1800A5800A /* Root */,
 				4D17578F1C8361D200E6356F /* BrowseSafeView.h */,
@@ -2211,11 +2303,83 @@
 			name = Kdbx3.1;
 			sourceTree = "<group>";
 		};
+		4DAE986A2270B39100A811C4 /* Item Details Scene */ = {
+			isa = PBXGroup;
+			children = (
+				4DAE989A2270B4E200A811C4 /* Model */,
+				4DAE98822270B4E200A811C4 /* CustomCells */,
+				4DAE987E2270B4E200A811C4 /* ItemDetailsViewController.h */,
+				4DAE98982270B4E200A811C4 /* ItemDetailsViewController.m */,
+				4DAE989F2270B4E200A811C4 /* CustomFieldEditorViewController.h */,
+				4DAE98802270B4E200A811C4 /* CustomFieldEditorViewController.m */,
+				4DAE98992270B4E200A811C4 /* FontManager.h */,
+				4DAE98812270B4E200A811C4 /* FontManager.m */,
+				4DAE987F2270B4E200A811C4 /* MBAutoGrowingTextView.h */,
+				4DAE98972270B4E200A811C4 /* MBAutoGrowingTextView.m */,
+				4DE498B32271AD28007EF98C /* AddAttachmentHelper.h */,
+				4DE498B42271AD28007EF98C /* AddAttachmentHelper.m */,
+				4DCEE40A2273470C004AE3A7 /* AutoCompleteTextField.h */,
+				4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */,
+				4DBC7A482279DC1600CA534D /* CollapsibleTableViewHeader.h */,
+				4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */,
+			);
+			name = "Item Details Scene";
+			sourceTree = "<group>";
+		};
+		4DAE98822270B4E200A811C4 /* CustomCells */ = {
+			isa = PBXGroup;
+			children = (
+				4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */,
+				4DAE988E2270B4E200A811C4 /* ConfidentialTableCell.h */,
+				4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */,
+				4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */,
+				4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */,
+				4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */,
+				4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */,
+				4DAE988D2270B4E200A811C4 /* EditPasswordTableViewCell.h */,
+				4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */,
+				4DAE98842270B4E200A811C4 /* IconTableCell.xib */,
+				4DE498BB2271E911007EF98C /* IconTableCell.h */,
+				4DE498BC2271E911007EF98C /* IconTableCell.m */,
+				4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */,
+				4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */,
+				4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */,
+				4DAE988A2270B4E200A811C4 /* EditAttachmentCell.h */,
+				4DAE988C2270B4E200A811C4 /* GenericBasicCell.h */,
+				4DAE988B2270B4E200A811C4 /* NotesTableViewCell.xib */,
+				4DAE988F2270B4E200A811C4 /* NotesTableViewCell.h */,
+				4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */,
+				4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */,
+				4DAE98962270B4E200A811C4 /* GenericBasicCell.m */,
+				4DE498BF2271F746007EF98C /* TotpCell.xib */,
+				4DE498C12271F85B007EF98C /* TotpCell.h */,
+				4DE498C22271F85B007EF98C /* TotpCell.m */,
+			);
+			path = CustomCells;
+			sourceTree = "<group>";
+		};
+		4DAE989A2270B4E200A811C4 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4DAE989B2270B4E200A811C4 /* ItemDetailsModel.h */,
+				4DAE989D2270B4E200A811C4 /* ItemDetailsModel.m */,
+				4DAE989C2270B4E200A811C4 /* CustomFieldViewModel.h */,
+				4DAE989E2270B4E200A811C4 /* CustomFieldViewModel.m */,
+				4DE498B72271E2C4007EF98C /* SetIconModel.h */,
+				4DE498B82271E2C4007EF98C /* SetIconModel.m */,
+				4DB573FE2274913E001BB13C /* ItemMetadataEntry.h */,
+				4DB573FF2274913E001BB13C /* ItemMetadataEntry.m */,
+			);
+			name = Model;
+			path = StrongBox/RecordScene/Model;
+			sourceTree = "<group>";
+		};
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
-				4D2962AC223171BA0082897D /* misc */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
+				4D62D6941C85F2B50051E13B /* ViewControllers */,
+				4D2962AC223171BA0082897D /* misc */,
 				4D25675021EBD094006260B7 /* LaunchScreen.storyboard */,
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
@@ -2224,7 +2388,6 @@
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
 				4D326EA1223032C800DCD8C7 /* Libraries */,
-				4D62D6941C85F2B50051E13B /* ViewControllers */,
 				4DE48A57216F54A300C9C991 /* Auto-Fill-Extension */,
 				4D78AC241FB1E23B00A68A92 /* PwSafe */,
 				4D78AC251FB1E24D00A68A92 /* Keepass */,
@@ -2350,6 +2513,8 @@
 		4DED20C72168BF1800A5800A /* Root */ = {
 			isa = PBXGroup;
 			children = (
+				4D108BF9224A2D6700C17095 /* CustomFieldTableCell.h */,
+				4D108BFA224A2D6700C17095 /* CustomFieldTableCell.m */,
 				4D10154D21F7315400D2F711 /* LockViewController.h */,
 				4D10154C21F7315400D2F711 /* LockViewController.m */,
 				4D10154E21F7315400D2F711 /* LockViewController.xib */,
@@ -2421,6 +2586,7 @@
 		C28E68E855D68D8BECCE3B5B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4DF2C81522735B9200CF13B5 /* SearchTextField.framework */,
 				4D326E9E2230311A00DCD8C7 /* libz.1.dylib */,
 				4D326E9C22302E7F00DCD8C7 /* libz.tbd */,
 				4DA5F8F62221DABE00B6C650 /* FavIcon.framework */,
@@ -2638,7 +2804,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4D446814216D2EC100F6358D /* Cartfile in Resources */,
+				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
 				4DF3A3CC2214BA5B00DE1F8F /* Montserrat-Bold.otf in Resources */,
@@ -2646,6 +2814,7 @@
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4D10155021F7315400D2F711 /* LockViewController.xib in Resources */,
+				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D9A6BA721FF744800F003B2 /* eff_short_wordlist_2_0.txt in Resources */,
 				4D25674E21E8C65D006260B7 /* PinEntryController.xib in Resources */,
@@ -2654,17 +2823,23 @@
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */,
 				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
+				4DAE98A62270B4E200A811C4 /* IconTableCell.xib in Resources */,
+				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4D9A6BA221FF73D300F003B2 /* diceware.wordlist.txt in Resources */,
 				4D2F45C721D6300B002B9144 /* SourceSansPro-Regular.ttf in Resources */,
 				4D9A6BAB21FF744800F003B2 /* eff_short_wordlist_1.txt in Resources */,
+				4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
+				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D41D9FD21C15BFB007D982B /* WebDAVConfigurationViewController.xib in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 				4DF3A3CE2214BA5B00DE1F8F /* Montserrat-Regular.otf in Resources */,
+				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
 				4D2F45C921D6300B002B9144 /* SourceSansPro-Bold.ttf in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
+				4DAE98B42270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2675,7 +2850,9 @@
 				4DF3A3CD2214BA5B00DE1F8F /* Montserrat-Bold.otf in Resources */,
 				4D41D9FE21C15BFB007D982B /* WebDAVConfigurationViewController.xib in Resources */,
 				4D25674F21E8C65D006260B7 /* PinEntryController.xib in Resources */,
+				4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4D8EC42E22302649008EE004 /* LICENSE in Resources */,
+				4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4D9A6BA121FF73D300F003B2 /* beale.wordlist.txt in Resources */,
 				4D9A6BAC21FF744800F003B2 /* eff_short_wordlist_1.txt in Resources */,
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
@@ -2684,15 +2861,21 @@
 				4D5F5B87218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4D2F45C821D6300B002B9144 /* SourceSansPro-Regular.ttf in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,
+				4DAE98B72270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
+				4DAE98B92270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
+				4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4D9A6BA321FF73D300F003B2 /* diceware.wordlist.txt in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
 				4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
+				4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4D9A6BAD21FF746500F003B2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D9A6BA821FF744800F003B2 /* eff_short_wordlist_2_0.txt in Resources */,
+				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
+				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D2F45CA21D6300B002B9144 /* SourceSansPro-Bold.ttf in Resources */,
 				4DF3A3CF2214BA5B00DE1F8F /* Montserrat-Regular.otf in Resources */,
 			);
@@ -2891,6 +3074,7 @@
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
 				4D10154F21F7315400D2F711 /* LockViewController.m in Sources */,
 				4D5F5B76218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
+				4DAE98C22270B4E200A811C4 /* ItemDetailsViewController.m in Sources */,
 				4D664DB42179C53B0023FF0C /* XmlTree.m in Sources */,
 				4DE18335219F410200F51D39 /* StrongboxDatabase.m in Sources */,
 				4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
@@ -2910,6 +3094,7 @@
 				4D3AC31F219072C90010CFCD /* VariantObject.m in Sources */,
 				4D87569C2222B46B00D6B8EA /* CustomNavigationItemTitleView.m in Sources */,
 				4D196797217F1C190057DF06 /* PwSafeMetadata.m in Sources */,
+				4DCEE40C2273470C004AE3A7 /* AutoCompleteTextField.m in Sources */,
 				4D326E8F22302BED00DCD8C7 /* NMSSHHostConfig.m in Sources */,
 				4D67B1E12191DA5A00B0D29A /* NewSafeFormatController.m in Sources */,
 				4DB1B7DC2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */,
@@ -2931,6 +3116,7 @@
 				4DF97F2C21BF10EB0090A55E /* ISO8601DateFormatter.m in Sources */,
 				4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
+				4DAE98C42270B4E200A811C4 /* ItemDetailsModel.m in Sources */,
 				4D326E8D22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
@@ -2950,6 +3136,7 @@
 				4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */,
 				4D004CDD21F4C26700E2B194 /* OTPAlgorithm.m in Sources */,
 				4D2F6C2621807C53007931E4 /* XmlItem.m in Sources */,
+				4DE498B92271E2C4007EF98C /* SetIconModel.m in Sources */,
 				4D56D91321B837A20030E13A /* AddNewSafeHelper.m in Sources */,
 				4DC5B9C9217B47C500FE9DD9 /* GenericTextDateElementHandler.m in Sources */,
 				4D210F4E21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
@@ -2958,6 +3145,7 @@
 				4D1757C31C8361D300E6356F /* IOsUtils.m in Sources */,
 				4D3E14882183293200A41CA0 /* KeePassCiphers.m in Sources */,
 				4DF97F2121BF101B0090A55E /* DAVBaseRequest.m in Sources */,
+				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				4DB1B7D42188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
@@ -2965,6 +3153,7 @@
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
 				4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
+				4DBC7A4A2279DC1600CA534D /* CollapsibleTableViewHeader.m in Sources */,
 				4DC95E9E2231AA3B00DE4E9F /* KeePassHistoryController.m in Sources */,
 				4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */,
 				4D9E09AD218251D0007BA1E7 /* Salsa20Stream.m in Sources */,
@@ -2996,9 +3185,11 @@
 				4D2F6C4421807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D8144B42199B4A80044E617 /* NodeIconHelper.m in Sources */,
 				4D5B1EAB2194AEB400ECAF0D /* KdbSerialization.m in Sources */,
+				4DE498BD2271E911007EF98C /* IconTableCell.m in Sources */,
 				4D2F6C1621807C00007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4D3E149221832BEF00A41CA0 /* encoding.c in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
+				4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
@@ -3012,14 +3203,17 @@
 				4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */,
 				4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */,
 				4D47670B217905AB00C4358F /* Meta.m in Sources */,
+				4DB574002274913E001BB13C /* ItemMetadataEntry.m in Sources */,
 				4D326EA6223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
 				4DB1B7D82188B22500CF1663 /* ChaCha20Stream.m in Sources */,
 				4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */,
+				4DAE98C02270B4E200A811C4 /* MBAutoGrowingTextView.m in Sources */,
 				4D2F6C3821807C7E007931E4 /* String.m in Sources */,
 				4D3652142184A24700A56519 /* regdom.c in Sources */,
 				4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
 				4D74B929218C40B000FC369E /* V3Binary.m in Sources */,
+				4DE498B52271AD28007EF98C /* AddAttachmentHelper.m in Sources */,
 				4DF972D321C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
 				4D004CE021F4C26700E2B194 /* OTPToken.m in Sources */,
 				4D4766E02178C82B00C4358F /* SerializationData.m in Sources */,
@@ -3064,12 +3258,15 @@
 				4DA12F06219837D10000CEBB /* CustomIcon.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
 				4DF97F2421BF101B0090A55E /* DAVRequests.m in Sources */,
+				4DAE98BE2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
 				4D758F2C21C2B38600A2AD3F /* BrowseSafeEntryTableViewCell.m in Sources */,
+				4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */,
 				4D1A5BFF1F7924C30036684C /* SafeItemTableCell.m in Sources */,
 				4D4AD4EE21A0191D002C33C6 /* UiAttachment.m in Sources */,
 				4D792A6F222EF46A00250086 /* RMStoreAppReceiptVerifier.m in Sources */,
 				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
 				4D8C147D2074F5D100CE9CAE /* CHCSVParser.m in Sources */,
+				4DAE98BA2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4D446809216CE02C00F6358D /* Csv.m in Sources */,
 				4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
@@ -3080,16 +3277,21 @@
 				4DF97F2321BF101B0090A55E /* DAVRequestGroup.m in Sources */,
 				4D3E147C2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */,
 				4DC74105221066E1009C32F0 /* UpgradeTableViewController.m in Sources */,
+				4DAE98A02270B4E200A811C4 /* CustomFieldEditorViewController.m in Sources */,
 				4D9E08E621822F5C007BA1E7 /* AesCipher.m in Sources */,
 				4D2F6C3421807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D2F6C1D21807C25007931E4 /* XMLWriter.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
 				4DF97F2B21BF10EB0090A55E /* NSDateRFC1123.m in Sources */,
+				4DAE98C62270B4E200A811C4 /* CustomFieldViewModel.m in Sources */,
 				4D305766224B4F8F00C36287 /* StringValue.m in Sources */,
+				4DAE98AA2270B4E200A811C4 /* ConfidentialTableCell.m in Sources */,
 				4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
+				4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 				4D41D9FB21C15BFB007D982B /* WebDAVConfigurationViewController.m in Sources */,
 				4DAF92B622118C2A0000D013 /* LicenceCodeManager.m in Sources */,
+				4DAE98A22270B4E200A811C4 /* FontManager.m in Sources */,
 				4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D2962B3223173FC0082897D /* History.m in Sources */,
 				4D4598CD2193048400792EF7 /* TwoFishCipher.m in Sources */,
@@ -3103,6 +3305,7 @@
 				4D2F6C4521807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D5B1EAC2194AEB400ECAF0D /* KdbSerialization.m in Sources */,
 				4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */,
+				4DAE98AD2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D664DB52179C7DF0023FF0C /* XmlTree.m in Sources */,
 				4D47670C217905AB00C4358F /* Meta.m in Sources */,
 				4D2962B4223173FC0082897D /* History.m in Sources */,
@@ -3119,14 +3322,17 @@
 				4D2F6C2921807C53007931E4 /* KeePassXmlParserDelegate.m in Sources */,
 				4D3E1481218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				4D5F5B7C218B4C3500A0739A /* OpenSafeSequenceHelper.m in Sources */,
+				4DAE98A12270B4E200A811C4 /* CustomFieldEditorViewController.m in Sources */,
 				4D5B1EA82194AAAF00ECAF0D /* KdbEntry.m in Sources */,
 				4D2F6C1821807C07007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D766D6022204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
+				4DAE98A32270B4E200A811C4 /* FontManager.m in Sources */,
 				4D305767224B4F8F00C36287 /* StringValue.m in Sources */,
 				4D3E1485218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D2F6C2721807C53007931E4 /* XmlItem.m in Sources */,
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
+				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4D2F6C2021807C25007931E4 /* XmlTreeSerializer.m in Sources */,
 				4DC5B9CA217B47C500FE9DD9 /* GenericTextDateElementHandler.m in Sources */,
 				4D3E14A221832D5500A41CA0 /* ref.c in Sources */,
@@ -3188,17 +3394,21 @@
 				4DB1B7D52188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
 				4D4598CE2193048400792EF7 /* TwoFishCipher.m in Sources */,
 				4D3AC32421908D4A0010CFCD /* Keys.m in Sources */,
+				4DE498B62271B2AF007EF98C /* AddAttachmentHelper.m in Sources */,
 				4D5B1EA42194A56300ECAF0D /* KdbGroup.m in Sources */,
 				4D1884D721709E26001AE6B0 /* PasswordHistory.m in Sources */,
 				4DB1B7D92188B22500CF1663 /* ChaCha20Stream.m in Sources */,
 				4DF972C621C0190D00F384C9 /* WebDAVSessionConfiguration.m in Sources */,
+				4DE498BA2271E5C7007EF98C /* SetIconModel.m in Sources */,
 				4D5F5B90218B66C500A0739A /* Binary.m in Sources */,
 				4D4AD4EF21A0191D002C33C6 /* UiAttachment.m in Sources */,
 				4D1884D621709E1F001AE6B0 /* PasswordHistoryEntry.m in Sources */,
 				4D0F122021C1418000C4451D /* SFTPSessionConfigurationViewController.m in Sources */,
 				4D004CE721F4F7B300E2B194 /* OTPToken.m in Sources */,
 				4D1884D521709E18001AE6B0 /* Record.m in Sources */,
+				4DAE98C12270B4E200A811C4 /* MBAutoGrowingTextView.m in Sources */,
 				4D004CEA21F4F7BB00E2B194 /* OTPToken+Serialization.m in Sources */,
+				4DAE98C72270B4E200A811C4 /* CustomFieldViewModel.m in Sources */,
 				4D1884D421709E13001AE6B0 /* Group.m in Sources */,
 				4DF972CA21C01ABF00F384C9 /* DAVRequest.m in Sources */,
 				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
@@ -3208,6 +3418,7 @@
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,
 				4D1884D021709DF3001AE6B0 /* Node.m in Sources */,
 				4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */,
+				4DAE98BF2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
 				4D3E147D2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */,
 				4D5F5B7B218B4C2E00A0739A /* GoogleDriveManager.m in Sources */,
 				4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */,

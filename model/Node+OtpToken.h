@@ -16,7 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) OTPToken* otpToken;
 + (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; // Unit Testing
 
++ (OTPToken*_Nullable)getOtpTokenFromString:(NSString * _Nonnull)string;
+
 - (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes;
+- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes;
+
 - (void)clearTotp;
 
 @end

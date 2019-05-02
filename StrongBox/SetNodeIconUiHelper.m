@@ -35,6 +35,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
     if(format == kPasswordSafe) {
         NSLog(@"Should not be calling this if safe is Password Safe!!");
         self.completionBlock(NO, nil, nil, nil);
+        return;
     }
     if(format == kKeePass1) {
         [self presentKeePassAndDatabaseIconSets];
@@ -267,8 +268,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
                 
                 if(dataOriginal.length > rescaledData.length) {
                     NSUInteger saving = dataOriginal.length - rescaledData.length;
-                    NSString* savingString = [[[NSByteCountFormatter alloc] init] stringFromByteCount:saving];
-                    
+                    NSString* savingString = friendlyFileSizeString(saving);
                     NSString* message = [NSString stringWithFormat:@"This is a rather large image (%dx%d), would you like to rescale it to a maximum dimension of %d pixels for a file size saving of roughly %@", (int)image.size.width, (int)image.size.height, kMaxRecommendedCustomIconDimension, savingString];
                     
                     [Alerts yesNo:self.viewController title:@"Large Custom Icon Image, Rescale?" message:message action:^(BOOL response) {

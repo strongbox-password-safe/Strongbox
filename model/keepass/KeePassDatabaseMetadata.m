@@ -12,6 +12,7 @@
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
 #import "NSUUID+Zero.h"
+#import "Utils.h"
 
 static NSString* const kDefaultFileVersion = @"3.1";
 static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
@@ -52,7 +53,8 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
     [kvps addKey:@"Inner Encryption" andValue:innerEncryptionString(self.innerRandomStreamId)];
     [kvps addKey:@"Max History Items" andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
     
-    NSString* size = [NSByteCountFormatter stringFromByteCount:self.historyMaxSize countStyle:NSByteCountFormatterCountStyleFile];
+    NSString* size = friendlyFileSizeString(self.historyMaxSize);
+    
     [kvps addKey:@"Max History Size" andValue:size];
 
     [kvps addKey:@"Recycle Bin Enabled" andValue:self.recycleBinEnabled ? @"Yes" : @"No"];

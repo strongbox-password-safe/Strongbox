@@ -23,6 +23,7 @@
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
 #import "SetNodeIconUiHelper.h"
+#import "ItemDetailsViewController.h"
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -48,6 +49,10 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
     
     [self refresh];
 }
@@ -83,10 +88,14 @@
     self.tableView.allowsMultipleSelection = NO;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsSelectionDuringEditing = YES;
+    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.tableFooterView = [UIView new];
     
     if(Settings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
+    
     if (!Settings.sharedInstance.hideTips && (!self.currentGroup || self.currentGroup.parent == nil)) {
         if(arc4random_uniform(100) < 50) {
             [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
@@ -306,7 +315,10 @@
     if(node.isGroup) {
         BrowseGroupTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"GroupCell" forIndexPath:indexPath];
         
-        cell.title.text = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+        NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+        
+        cell.title.text = title;
+        cell.childCount.text = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
         
@@ -316,6 +328,8 @@
         else {
             cell.title.font = [UIFont systemFontOfSize:cell.title.font.pointSize];
         }
+
+        //NSLog(@"Group: %f", cell.frame.size.height);
         
         return cell;
     }
@@ -339,6 +353,8 @@
         cell.flags.text = node.fields.attachments.count > 0 ? @"📎" : @"";
 
         [self setOtpCellProperties:cell node:node];
+        
+        //NSLog(@"Item: %f", cell.frame.size.height);
         
         return cell;
     }
@@ -415,7 +431,17 @@
         Node *item = arr[indexPath.row];
 
         if (!item.isGroup) {
-            [self performSegueWithIdentifier:@"segueToRecord" sender:item];
+            if (@available(iOS 11.0, *)) {
+                if(Settings.sharedInstance.useOldItemDetailsScene) {
+                    [self performSegueWithIdentifier:@"segueToRecord" sender:item];
+                }
+                else {
+                    [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
+                }
+            }
+            else {
+                [self performSegueWithIdentifier:@"segueToRecord" sender:item];
+            }
         }
         else {
             [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
@@ -444,8 +470,8 @@
     self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
                                  (self.currentGroup.parent == nil) ?
                                  self.viewModel.metadata.nickName : self.currentGroup.title,
-                                 self.viewModel.isUsingOfflineCache ? @" [Offline]" : @"",
-                                 self.viewModel.isReadOnly ? @" [Read Only]" : @""];
+                                 self.viewModel.isUsingOfflineCache ? @" (Offline)" : @"",
+                                 self.viewModel.isReadOnly ? @" (Read Only)" : @""];
 
     NSMutableArray* unsorted = [[NSMutableArray alloc] initWithArray:self.currentGroup.children];
     BOOL sortNodes = self.viewModel.database.format == kPasswordSafe || !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
@@ -510,7 +536,6 @@
     
     self.navigationController.toolbarHidden = NO;
     self.navigationController.toolbar.hidden = NO;
-    
     [self.navigationController setNavigationBarHidden:NO];
     self.navigationController.navigationBar.hidden = NO;
     self.navigationController.navigationBarHidden = NO;
@@ -539,11 +564,7 @@
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
-    NSArray<NSString*> *hierarchy = [vm getTitleHierarchy];
-    
-    NSString *path = [[hierarchy subarrayWithRange:NSMakeRange(0, hierarchy.count - 1)] componentsJoinedByString:@"/"];
-    
-    return hierarchy.count == 1 ? @"(in /)" : [NSString stringWithFormat:@"(in /%@)", path];
+    return [NSString stringWithFormat:@"(in %@)", [self.viewModel.database getGroupPathDisplayString:vm]];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -553,6 +574,17 @@
         vc.record = record;
         vc.parentGroup = self.currentGroup;
         vc.viewModel = self.viewModel;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToItemDetails"]) {
+        Node *record = (Node *)sender;
+
+        ItemDetailsViewController *vc = segue.destinationViewController;
+        
+        vc.createNewItem = record == nil;
+        vc.item = record;
+        vc.parentGroup = self.currentGroup;
+        vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
+        vc.databaseModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"sequeToSubgroup"])
     {
@@ -599,7 +631,17 @@
 }
 
 - (IBAction)onAddRecord:(id)sender {
-    [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
+    if (@available(iOS 11.0, *)) {
+        if(Settings.sharedInstance.useOldItemDetailsScene) {
+            [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
+        }
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
+    }
 }
 
 - (IBAction)onMove:(id)sender {

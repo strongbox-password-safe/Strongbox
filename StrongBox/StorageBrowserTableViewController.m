@@ -102,7 +102,7 @@
                 return NSOrderedDescending;
             }
             else {
-                return [Utils finderStringCompare:obj1.name string2:obj2.name];
+                return finderStringCompare(obj1.name, obj2.name);
             }
         }] mutableCopy];
         

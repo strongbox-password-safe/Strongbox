@@ -24,8 +24,12 @@
 @property (strong, nonatomic) NSArray<Node*> *items;
 @property (strong, nonatomic) UISearchController *searchController;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddCredential;
-
 @property NSTimer* timerRefreshOtp;
+
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+@property (nonatomic) NSInteger tapCount;
+@property (nonatomic) NSIndexPath *tappedIndexPath;
+@property (strong, nonatomic) NSTimer *tapTimer;
 
 @end
 
@@ -34,6 +38,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if(Settings.sharedInstance.hideTips) {
+        self.navigationItem.prompt = nil;
+    }
+    
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                initWithTarget:self
+                                action:@selector(handleLongPress:)];
+    self.longPressRecognizer.minimumPressDuration = 1;
+    self.longPressRecognizer.cancelsTouchesInView = YES;
+    
+    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
     
@@ -303,31 +319,6 @@
     return hierarchy.count == 1 ? @"(in /)" : [NSString stringWithFormat:@"(in /%@)", path];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Node* record = [[self getDataSource] objectAtIndex:indexPath.row];
-
-    if(record) {
-        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && record.otpToken) {
-            NSString* value = record.otpToken.password;
-            if (value.length) {
-                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                pasteboard.string = value;
-                NSLog(@"Copied TOTP to Pasteboard...");
-            }
-        }
-        
-        NSString* user = [self dereference:record.fields.username node:record];
-        NSString* password = [self dereference:record.fields.password node:record];
-        
-        //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
-
-        [self.rootViewController onCredentialSelected:user password:password];
-    }
-    else {
-        NSLog(@"WARN: DidSelectRow with no Record?!");
-    }
-}
-
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
     return [self.model.database dereference:text node:node];
 }
@@ -454,6 +445,116 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     
     NSString *searchTerm =  parts.count ? parts[0] : domain;
     return searchTerm;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Long Press
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
+    if (sender.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    
+    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
+    
+    if (!indexPath || indexPath.row >= [self getDataSource].count) {
+        NSLog(@"Not on a cell");
+        return;
+    }
+    
+    Node *item = [self getDataSource][indexPath.row];
+    
+    if (item.isGroup) {
+        NSLog(@"Item is group, cannot Fast PW Copy...");
+        return;
+    }
+    
+    NSLog(@"Fast Password Copy on %@", item.title);
+
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    BOOL copyTotp = (item.fields.password.length == 0 && item.otpToken);
+    pasteboard.string = copyTotp ? item.otpToken.password : [self dereference:item.fields.password node:item];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
+        [self.tapTimer invalidate];
+        
+        self.tapTimer = nil;
+        self.tapCount = 0;
+        self.tappedIndexPath = nil;
+        
+        [self handleDoubleTap:indexPath];
+    }
+    else if(self.tapCount == 0){
+        //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
+        self.tapCount = self.tapCount + 1;
+        self.tappedIndexPath = indexPath;
+        self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
+    }
+    else if(![self.tappedIndexPath isEqual:indexPath]){
+        //tap on new row
+        self.tapCount = 0;
+        self.tappedIndexPath = indexPath;
+        if(self.tapTimer != nil){
+            [self.tapTimer invalidate];
+            self.tapTimer = nil;
+        }
+    }
+}
+
+- (void)tapTimerFired:(NSTimer *)aTimer{
+    //timer fired, there was a single tap on indexPath.row = tappedRow
+    [self tapOnCell:self.tappedIndexPath];
+    
+    self.tapCount = 0;
+    self.tappedIndexPath = nil;
+    self.tapTimer = nil;
+}
+
+- (void)tapOnCell:(NSIndexPath *)indexPath  {
+    NSArray* arr = [self getDataSource];
+    if(indexPath.row >= arr.count) {
+        return;
+    }
+    Node *item = arr[indexPath.row];
+    if(item) {
+        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && item.otpToken) {
+            NSString* value = item.otpToken.password;
+            if (value.length) {
+                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                pasteboard.string = value;
+                NSLog(@"Copied TOTP to Pasteboard...");
+            }
+        }
+        
+        NSString* user = [self dereference:item.fields.username node:item];
+        NSString* password = [self dereference:item.fields.password node:item];
+        
+        //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
+        
+        [self.rootViewController onCredentialSelected:user password:password];
+    }
+    else {
+        NSLog(@"WARN: DidSelectRow with no Record?!");
+    }
+}
+
+- (void)handleDoubleTap:(NSIndexPath *)indexPath {
+    NSArray* arr = [self getDataSource];
+    if(indexPath.row >= arr.count) {
+        return;
+    }
+    Node *item = arr[indexPath.row];
+
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.string = [self dereference:item.fields.username node:item];
+    
+    NSLog(@"Fast Username Copy on %@", item.title);
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

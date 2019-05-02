@@ -1055,7 +1055,7 @@ static NSImage* kStrongBox256Image;
 
     NSArray<NSString*> *terms = [self.model getSearchTerms:searchText];
     
-    NSLog(@"Searching for Terms: [%@]", terms);
+    //NSLog(@"Searching for Terms: [%@]", terms);
     
     for (NSString* term in terms) {
         if (scope == kSearchScopeTitle) {

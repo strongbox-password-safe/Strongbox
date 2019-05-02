@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface BrowseGroupTableViewCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UIImageView *icon;
 @property (weak, nonatomic) IBOutlet UILabel *title;
+@property (weak, nonatomic) IBOutlet UILabel *childCount;
 
 @end
 

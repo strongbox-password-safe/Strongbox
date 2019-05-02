@@ -137,6 +137,28 @@ static NSString *const kQueryIssuerKey = @"issuer";
     return urlComponents.URL;
 }
 
++ (BOOL)areDifferent:(OTPToken*)a b:(OTPToken*)b {
+    if(a != nil && b == nil) {
+        return YES;
+    }
+    
+    if(a == nil && b != nil) {
+        return YES;
+    }
+    
+    if(a != nil && b != nil) {
+        NSString* otherTotpUrl = [b url:YES].absoluteString;
+        NSString* selfTotpUrl = [a url:YES].absoluteString;
+        
+        if(![selfTotpUrl isEqualToString:otherTotpUrl]) {
+            NSLog(@"TOTPs are different: [%@] != [%@]", selfTotpUrl, otherTotpUrl);
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
 @end
 
 
