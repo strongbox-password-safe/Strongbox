@@ -38,8 +38,8 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (void)addKeePassDefaultRootGroup:(Node*)rootGroup {
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup uuid:nil];
-    [rootGroup addChild:keePassRootGroup];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
 }
 
 - (nonnull StrongboxDatabase *)create:(nullable NSString *)password {
@@ -260,10 +260,10 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
             currentLevel = group.level;
         }
         
-        Node* node = [[Node alloc] initAsGroup:group.name parent:parentNode uuid:nil];
+        Node* node = [[Node alloc] initAsGroup:group.name parent:parentNode allowDuplicateGroupTitles:YES uuid:nil];
         node.iconId = group.imageId;
         node.linkedData = group;
-        [parentNode addChild:node];
+        [parentNode addChild:node allowDuplicateGroupTitles:YES];
         
         // Add Entries/Records for this group
         
@@ -276,7 +276,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         }];
         
         for (Node* childEntry in childEntries) {
-            [node addChild:childEntry];
+            [node addChild:childEntry allowDuplicateGroupTitles:YES];
         }
         
         lastNode = node;

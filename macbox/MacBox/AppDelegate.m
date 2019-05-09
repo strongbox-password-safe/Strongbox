@@ -57,7 +57,8 @@
     [self removeCopyDiagnosticDumpItem];
     
     [self removeShowSafesMetaDataItem];
-    //    BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
+    
+    // BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG 
     
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
@@ -80,22 +81,18 @@
     
     self.applicationHasFinishedLaunching = YES;
 
-//
-//
 //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
 //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
     
-    ///
-    
-    // TODO:
-    //    NSImage* statusImage = [NSImage imageNamed:@"Strongbox-36x26-inverted-bw"];
-    //    statusImage.size = NSMakeSize(18.0, 18.0);
-    //    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-    //    self.statusItem.image = statusImage;
-    //    self.statusItem.highlightMode = YES;
-    //    self.statusItem.enabled = YES;
-    //    self.statusItem.menu = self.systemTraymenu;
+    // TODO: System Tray Icon
+//    NSImage* statusImage = [NSImage imageNamed:@"Strongbox-36x26-inverted-bw"];
+//    statusImage.size = NSMakeSize(18.0, 18.0);
+//    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
+//    self.statusItem.image = statusImage;
+//    self.statusItem.highlightMode = YES;
+//    self.statusItem.enabled = YES;
+//    self.statusItem.menu = self.systemTraymenu;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

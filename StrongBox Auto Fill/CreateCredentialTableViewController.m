@@ -255,7 +255,7 @@ static NSString * trim(NSString *string) {
     
     Node* parentGroup = self.viewModel.database.rootGroup;
     Node* record = [[Node alloc] initAsRecord:trim(self.textFieldTitle.text) parent:parentGroup];
-    [parentGroup addChild:record];
+    [parentGroup addChild:record allowDuplicateGroupTitles:YES];
     
     record.fields.notes = self.textFieldNotes.text;
     record.fields.password = trim(self.textFieldPassword.text);

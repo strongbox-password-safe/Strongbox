@@ -175,8 +175,8 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
     NSString* password = [PasswordGenerator generatePassword:params];
     
-    Node* sampleFolder = [[Node alloc] initAsGroup:@"Sample Folder" parent:parent uuid:nil];
-    [parent addChild:sampleFolder];
+    Node* sampleFolder = [[Node alloc] initAsGroup:@"Sample Folder" parent:parent allowDuplicateGroupTitles:YES uuid:nil];
+    [parent addChild:sampleFolder allowDuplicateGroupTitles:NO];
     
     NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username"
                                                           url:@"https://strongboxsafe.com"
@@ -192,7 +192,8 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     [sampleFolder addChild:[[Node alloc] initAsRecord:@"Sample"
                                                  parent:sampleFolder
                                                  fields:fields
-                                                    uuid:nil]];
+                                                    uuid:nil]
+      allowDuplicateGroupTitles:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,12 +221,24 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
     }
     
-    return compiled; // isCompilable ? [NSString stringWithFormat:@"%@", compiled] : compiled;
+    return compiled ? compiled : @""; // Never return nil... just not expected at UI layer
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
+    NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
+    
+    Node* current = vm;
+    while (current != nil && current != self.rootGroup) {
+        [hierarchy insertObject:current.title atIndex:0];
+        current = current.parent;
+    }
+    
+    return hierarchy.count ? [hierarchy componentsJoinedByString:@"/"] : @"/";
+}
+
+- (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm {
     if(!vm || vm.parent == nil || vm.parent == self.rootGroup) {
         return @"/";
     }
@@ -349,6 +362,28 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     }];
 }
 
+- (NSArray<Node *> *)activeGroups {
+    if(self.format == kPasswordSafe) {
+        return self.allGroups;
+    }
+    else if(self.format == kKeePass1) {
+        // Filter Backup Group
+        // TODO: Expired
+        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return node.isGroup && (self.keePass1BackupNode == nil || (node != self.keePass1BackupNode && ![self.keePass1BackupNode contains:node]));
+        }];
+    }
+    else {
+        // Filter Recycle Bin
+        // TODO: Expired
+        Node* recycleBin = self.recycleBinNode;
+        
+        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return node.isGroup && (recycleBin == nil || (node != recycleBin && ![recycleBin contains:node]));
+        }];
+    }
+}
+
 - (NSArray<Node *> *)activeRecords {
     if(self.format == kPasswordSafe) {
         return self.allRecords;
@@ -370,6 +405,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         }];
     }
 }
+
 - (NSSet<NSString*> *)urlSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     

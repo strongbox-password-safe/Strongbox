@@ -23,7 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent
-                                  uuid:(nullable NSUUID*)uuid;
+             allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles
+                                  uuid:(NSUUID*_Nullable)uuid;
 
 - (nonnull instancetype)initAsRecord:(NSString *_Nonnull)title
                               parent:(Node* _Nonnull)parent;
@@ -46,7 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nonnull) NSUUID *uuid;
 @property (nullable) NSNumber* iconId;
 @property (nullable) NSUUID* customIconUuid;
-@property (nonatomic, strong, readonly, nonnull) NSString *serializationId; // Must remain save across serializations
 @property (nonatomic, strong, readonly, nonnull) NodeFields *fields;
 @property (nonatomic, strong, readonly, nullable) Node* parent;
 
@@ -55,14 +55,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childRecords;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildRecords;
 
+- (NSString*)getSerializationId:(BOOL)groupCanUseUuid;
+
 - (BOOL)contains:(Node*)test;
-- (BOOL)setTitle:(NSString*_Nonnull)title;
-- (BOOL)validateAddChild:(Node* _Nonnull)node;
-- (BOOL)addChild:(Node* _Nonnull)node;
+- (BOOL)setTitle:(NSString*_Nonnull)title allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+- (BOOL)validateAddChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+- (BOOL)addChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+
+- (BOOL)validateChangeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+- (BOOL)changeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+
 - (void)moveChild:(NSUInteger)from to:(NSUInteger)to;
 - (void)removeChild:(Node* _Nonnull)node; 
-- (BOOL)validateChangeParent:(Node*_Nonnull)parent;
-- (BOOL)changeParent:(Node*_Nonnull)parent;
+
 - (Node* _Nonnull)cloneForHistory;
 
 - (void)sortChildren:(BOOL)ascending;

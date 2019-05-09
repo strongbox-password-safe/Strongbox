@@ -802,7 +802,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 - (BOOL)instantPinUnlocking {
     NSNumber* obj = [[self getUserDefaults] objectForKey:kInstantPinUnlocking];
     
-    if(!obj) {
+    if(obj == nil) {
         // Try to be smart about default here... don't want to switch this on if user is
         // already using PINs but if they're not then I think this should be the default
         

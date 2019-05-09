@@ -17,7 +17,6 @@
 		4D29664121ADAC0B009B7936 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
 		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D44680C216CE08B00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
-		4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */; };
 		4D4AD4F521A02817002C33C6 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F221A02817002C33C6 /* UiAttachment.m */; };
 		4D4AD4F621A02817002C33C6 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F321A02817002C33C6 /* StrongboxDatabase.m */; };
 		4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */; };
@@ -221,8 +220,6 @@
 		4D446805216CDA4500F6358D /* NSArray+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "../model/NSArray+Extensions.m"; sourceTree = "<group>"; };
 		4D44680A216CE08A00F6358D /* Csv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = ../model/Csv.h; sourceTree = "<group>"; };
 		4D44680B216CE08A00F6358D /* Csv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = ../model/Csv.m; sourceTree = "<group>"; };
-		4D48C3591F4AECBF0041A47E /* LockedSafeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LockedSafeInfo.h; path = MacBox/LockedSafeInfo.h; sourceTree = "<group>"; };
-		4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LockedSafeInfo.m; path = MacBox/LockedSafeInfo.m; sourceTree = "<group>"; };
 		4D4AD4F021A027E5002C33C6 /* AbstractDatabaseFormatAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractDatabaseFormatAdaptor.h; path = ../model/AbstractDatabaseFormatAdaptor.h; sourceTree = "<group>"; };
 		4D4AD4F121A02817002C33C6 /* UiAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UiAttachment.h; path = ../UiAttachment.h; sourceTree = "<group>"; };
 		4D4AD4F221A02817002C33C6 /* UiAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UiAttachment.m; path = ../UiAttachment.m; sourceTree = "<group>"; };
@@ -842,7 +839,7 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
+				4D14A13B224D211400C71ABF /* Node Details */,
 				4DF59F651F30DB7A00D68BFE /* Info.plist */,
 				4D553B47219DB2E400AA4BAB /* CustomPasswordTextField.h */,
 				4D553B48219DB2E400AA4BAB /* CustomPasswordTextField.m */,
@@ -1086,14 +1083,14 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
-				4D7E39D32266420600EC940E /* InstalledWebBrowserHelper.h */,
-				4D7E39D42266420600EC940E /* InstalledWebBrowserHelper.m */,
-				4D14A13B224D211400C71ABF /* Node Details */,
-				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
-				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
 				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
+				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
+				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
+				4D7E39D32266420600EC940E /* InstalledWebBrowserHelper.h */,
+				4D7E39D42266420600EC940E /* InstalledWebBrowserHelper.m */,
 				4D58A45B207368B10061E046 /* PreferencesWindowController.xib */,
 				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
 				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
@@ -1145,8 +1142,6 @@
 				4D00B1F71F3DB03300D7560B /* Alerts.m */,
 				4D5AE1E81F432BBC000A34D7 /* Settings.h */,
 				4D5AE1E91F432BBC000A34D7 /* Settings.m */,
-				4D48C3591F4AECBF0041A47E /* LockedSafeInfo.h */,
-				4D48C35A1F4AECBF0041A47E /* LockedSafeInfo.m */,
 				4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */,
 				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
 				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
@@ -1466,7 +1461,6 @@
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
 				4D44680C216CE08B00F6358D /* Csv.m in Sources */,
-				4D48C35B1F4AECBF0041A47E /* LockedSafeInfo.m in Sources */,
 				4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */,
 				4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */,
 				4D524CD5219B47DB00C22CB4 /* Kdbx4SerializationData.m in Sources */,

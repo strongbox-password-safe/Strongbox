@@ -31,6 +31,7 @@
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent
+             allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles
                                   uuid:(NSUUID*)uuid {
     if(![title length]) {
         NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
@@ -38,7 +39,7 @@
     }
 
     for (Node* child in parent.children) {
-        if (child.isGroup && [child.title isEqualToString:title]) {
+        if (child.isGroup && !allowDuplicateGroupTitles && [child.title isEqualToString:title]) {
             NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
             return nil;
         }
@@ -123,7 +124,7 @@
     }] : [NSArray array];
 }
 
-- (BOOL)setTitle:(NSString*_Nonnull)title {
+- (BOOL)setTitle:(NSString*_Nonnull)title allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
     if(![title length]) {
         NSLog(@"setTitle: Cannot have empty title.");
         return NO;
@@ -131,7 +132,7 @@
     
     if(self.isGroup) {
         for (Node* child in self.parent.children) {
-            if (child.isGroup && [child.title isEqualToString:title]) {
+            if (child.isGroup && !allowDuplicateGroupTitles && [child.title isEqualToString:title]) {
                 NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", self.parent.title, title);
                 return NO;
             }
@@ -143,14 +144,14 @@
     return YES;
 }
 
-- (BOOL)validateAddChild:(Node* _Nonnull)node {
+- (BOOL)validateAddChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
     if(!node) {
         return NO;
     }
     
     if(node.isGroup) {
         for (Node* child in self.children) {
-            if (child.isGroup && [child.title isEqualToString:node.title]) {
+            if (child.isGroup && !allowDuplicateGroupTitles && [child.title isEqualToString:node.title]) {
                 NSLog(@"Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
                 return NO;
             }
@@ -163,8 +164,8 @@
     return YES;
 }
 
-- (BOOL)addChild:(Node* _Nonnull)node {
-    if(![self validateAddChild:node]) {
+- (BOOL)addChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
+    if(![self validateAddChild:node allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
         return NO;
     }
 
@@ -194,14 +195,14 @@
     _mutableChildren = [[_mutableChildren sortedArrayUsingComparator:ascending ? finderStyleNodeComparator : reverseFinderStyleNodeComparator] mutableCopy];
 }
 
-- (BOOL)validateChangeParent:(Node*)parent {
+- (BOOL)validateChangeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
     return  parent != self &&
             self.parent != parent &&
-            ![parent isChildOf:self] && [parent validateAddChild:self];
+            ![parent isChildOf:self] && [parent validateAddChild:self allowDuplicateGroupTitles:allowDuplicateGroupTitles];
 }
 
-- (BOOL)changeParent:(Node*)parent {
-    if(![self validateChangeParent:parent]) {
+- (BOOL)changeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
+    if(![self validateChangeParent:parent allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
         return NO;
     }
     
@@ -209,7 +210,7 @@
     
     _parent = parent;
     
-    if([parent addChild:self]) {
+    if([parent addChild:self allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
         return YES;
     }
     
@@ -229,9 +230,13 @@
     return NO;
 }
 
-- (NSString*)serializationId {
+- (NSString*)getSerializationId:(BOOL)groupCanUseUuid {
+    // Try to come up with a way to identify this node across serializations -
+    // UUID works for KeePass in both cases, but for Password Safe Groups there
+    // is no equivalent of UUID so we use the path
+
     NSString *identifier;
-    if(self.isGroup) {
+    if(self.isGroup && !groupCanUseUuid) {
         NSArray<NSString*> *titleHierarchy = [self getTitleHierarchy];
 
         identifier = [titleHierarchy componentsJoinedByString:@":"];

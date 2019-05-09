@@ -53,8 +53,8 @@ static const BOOL kLogVerbose = NO;
 -(StrongboxDatabase *)create:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
     Node* rootGroup = [[Node alloc] initAsRoot:nil];
     
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup uuid:nil];
-    [rootGroup addChild:keePassRootGroup];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
     

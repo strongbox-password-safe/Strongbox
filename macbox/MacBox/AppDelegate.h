@@ -16,6 +16,7 @@
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 
 - (void)showUpgradeModal:(NSInteger)delay;
+- (void)clearClipboardIfChangeCountMatches;
 
 @end
 

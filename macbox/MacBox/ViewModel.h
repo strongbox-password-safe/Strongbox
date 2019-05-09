@@ -29,14 +29,15 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 @interface ViewModel : NSObject
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype _Nullable )initNewWithSampleData:(Document*)document format:(DatabaseFormat)format password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest;
-- (instancetype _Nullable )initWithData:(NSData*)data document:(Document*)document;
-
+- (instancetype)initUnlockedWithDatabase:(Document *)document database:(DatabaseModel*_Nullable)database selectedItem:(NSString*_Nullable)selectedItem;
+- (instancetype)initLocked:(Document*)document;
+    
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
-- (BOOL)lock:(NSError**)error selectedItem:(NSString*_Nullable)selectedItem;
-- (BOOL)unlock:(NSString*)password selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError**)error;
-- (BOOL)unlock:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest selectedItem:(NSString*_Nullable*_Nonnull)selectedItem error:(NSError**)error;
+- (void)lock:(NSString*_Nullable)selectedItem;
+- (void)reloadAndUnlock:(NSString*_Nullable)password
+ keyFileDigest:(NSData*_Nullable)keyFileDigest
+    completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
@@ -64,12 +65,12 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (void)clearTotp:(Node *)item;
 
 - (BOOL)addNewRecord:(Node *)parentGroup;
-- (void)addNewGroup:(Node *)parentGroup;
+- (void)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 
 - (BOOL)deleteItem:(Node *)child;
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
-- (BOOL)validateChangeParent:(Node *)parent node:(Node *)node;
+- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node;
 - (BOOL)changeParent:(Node *)parent node:(Node *)node;
 
 - (Node*_Nullable)getItemFromSerializationId:(NSString*)serializationId;
@@ -83,8 +84,9 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
+- (NSString *)getGroupPathDisplayString:(Node *)node;
+
 @property (nonatomic, readonly) Document*  document;
-@property (nonatomic, readonly) BOOL dirty;
 @property (nonatomic, readonly) BOOL locked;
 @property (nonatomic, readonly) NSURL*  fileUrl;
 @property (nonatomic, readonly) Node*  rootGroup;
@@ -105,6 +107,7 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 // Convenience / Summary
 
 @property (readonly) NSArray<Node*>* activeRecords;
+@property (readonly) NSArray<Node*>* activeGroups;
 
 @property (nonatomic, readonly, copy) NSSet<NSString*> * usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * urlSet;
@@ -115,11 +118,13 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-@property (nonatomic, copy) void (^onNewItemAdded)(Node* node);
-@property (nonatomic, copy) void (^onDeleteItem)(Node* node);
-@property (nonatomic, copy) void (^onChangeParent)(Node* node);
-@property (nonatomic, copy) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
-@property (nonatomic, copy) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
+@property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL suppressNewItemPopup);
+@property (nonatomic, copy, nullable) void (^onDeleteItem)(Node* node);
+@property (nonatomic, copy, nullable) void (^onChangeParent)(Node* node);
+@property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
+@property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
+
+@property NSString* selectedItem;
 
 @end
 

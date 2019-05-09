@@ -55,8 +55,8 @@
     else {
         // No Proper Root Group found in Xml Model. We'll create one
         
-        Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootNode uuid:nil];
-        [rootNode addChild:keePassRootGroup];
+        Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootNode allowDuplicateGroupTitles:YES uuid:nil];
+        [rootNode addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     }
     
     return rootNode;
@@ -167,7 +167,7 @@
 }
 
 - (BOOL)buildGroup:(KeePassGroup*)group parentNode:(Node*)parentNode {
-    Node* groupNode = [[Node alloc] initAsGroup:group.name.text parent:parentNode uuid:group.uuid.uuid];
+    Node* groupNode = [[Node alloc] initAsGroup:group.name.text parent:parentNode allowDuplicateGroupTitles:YES uuid:group.uuid.uuid];
     groupNode.linkedData = group; // Original KeePass Document Group...
     
     if(group.customIcon) groupNode.customIconUuid = group.customIcon;
@@ -189,10 +189,10 @@
             return NO;
         }
         
-        [groupNode addChild:entryNode];
+        [groupNode addChild:entryNode allowDuplicateGroupTitles:YES];
     }
     
-    [parentNode addChild:groupNode];
+    [parentNode addChild:groupNode allowDuplicateGroupTitles:YES];
 
     return YES;
 }

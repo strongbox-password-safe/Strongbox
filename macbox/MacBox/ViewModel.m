@@ -8,15 +8,12 @@
 //
 
 #import "ViewModel.h"
-#import "LockedSafeInfo.h"
 #import "Csv.h"
 #import "DatabaseModel.h"
 #import "PasswordGenerator.h"
 #import "Settings.h"
 #import "Node+OtpToken.h"
 #import "OTPToken+Serialization.h"
-
-static NSString* kDefaultNewTitle = @"Untitled";
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -30,41 +27,60 @@ NSString* const kModelUpdateNotificationAttachmentsChanged = @"kModelUpdateNotif
 NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotificationTotpChanged";
 
 NSString* const kNotificationUserInfoKeyNode = @"node";
+static NSString* const kDefaultNewTitle = @"Untitled";
 
 @interface ViewModel ()
 
+// This is the initial load of an existing db uses encryptedDatabase. A new Database uses passwordDatabase
+// It will be decrypted and released on unlock. A lock discards the database and a full revert is required to unlock
+// again (loading the file from the original location)
+
 @property (strong, nonatomic) DatabaseModel* passwordDatabase;
-@property (strong, nonatomic) LockedSafeInfo* lockedSafeInfo;
 
 @end
 
 @implementation ViewModel
 
-- (instancetype)initNewWithSampleData:(Document *)document format:(DatabaseFormat)format password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
-    if (self = [super init]) {
-        self.passwordDatabase = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:keyFileDigest format:format];
-        self.lockedSafeInfo = nil;
-        
-        _document = document;
-        
-        return self;
-    }
-    
-    return nil;
+- (instancetype)initLocked:(Document *)document {
+    return [self initUnlockedWithDatabase:document database:nil selectedItem:nil];
 }
 
-- (instancetype)initWithData:(NSData*)data document:(Document*)document {
+- (instancetype)initUnlockedWithDatabase:(Document *)document database:(DatabaseModel*)database selectedItem:(NSString*)selectedItem {
     if (self = [super init]) {
-        NSError* error;
-        if([DatabaseModel isAValidSafe:data error:&error]) {
-            self.lockedSafeInfo = [[LockedSafeInfo alloc] initWithEncryptedData:data selectedItem:nil];
-            _document = document;
-            return self;
-        }
+        _document = document;
+        self.passwordDatabase = database;
+        self.selectedItem = selectedItem;
     }
     
-    return nil;
+    return self;
 }
+
+- (BOOL)locked {
+    return self.passwordDatabase == nil;
+}
+
+- (void)lock:(NSString*)selectedItem {
+    if(self.document.isDocumentEdited) {
+        NSLog(@"Cannot lock document with edits!");
+        return;
+    }
+    // Clear the UNDO stack otherwise the operations will fail
+    
+    [self.document.undoManager removeAllActions];
+    self.passwordDatabase = nil;
+    self.selectedItem = selectedItem;
+}
+
+- (void)reloadAndUnlock:(NSString*)password
+ keyFileDigest:(NSData*)keyFileDigest
+    completion:(void (^)(BOOL success, NSError* error))completion {
+    [self.document revertWithUnlock:password
+                      keyFileDigest:keyFileDigest
+                       selectedItem:self.selectedItem
+                         completion:completion]; // Full Reload from Disk to get latest version
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (NSArray<DatabaseAttachment *> *)attachments {
     return self.passwordDatabase.attachments;
@@ -86,52 +102,16 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return self.passwordDatabase.activeRecords;
 }
 
+- (NSString *)getGroupPathDisplayString:(Node *)node {
+    return [self.passwordDatabase getGroupPathDisplayString:node];
+}
+
+- (NSArray<Node*>*)activeGroups {
+    return self.passwordDatabase.activeGroups;
+}
+
 -(Node*)rootGroup {
     return self.passwordDatabase.rootGroup;
-}
-
-- (BOOL)locked {
-    return self.lockedSafeInfo != nil;
-}
-
-- (BOOL)lock:(NSError**)error selectedItem:(NSString*)selectedItem {
-    if(self.locked) {
-        return YES;
-    }
-    
-    NSData* data = [self.passwordDatabase getAsData:error];
-    if(!data) {
-        return NO;
-    }
-    
-    // Clear the UNDO stack otherwise the operations will fail
-    [self.document.undoManager removeAllActions];
-    
-    self.lockedSafeInfo = [[LockedSafeInfo alloc] initWithEncryptedData:data selectedItem:selectedItem];
-    self.passwordDatabase = nil;
-    
-    return YES;
-}
-
-- (BOOL)unlock:(NSString*)password selectedItem:(NSString**)selectedItem error:(NSError**)error {
-    return [self unlock:password keyFileDigest:nil selectedItem:selectedItem error:error];
-}
-
-- (BOOL)unlock:(NSString*)password keyFileDigest:(NSData*)keyFileDigest selectedItem:(NSString**)selectedItem error:(NSError**)error {
-    if(!self.locked) {
-        return YES;
-    }
-    
-    DatabaseModel *model = [[DatabaseModel alloc] initExistingWithDataAndPassword:self.lockedSafeInfo.encryptedData password:password keyFileDigest:keyFileDigest error:error];
-    *selectedItem = self.lockedSafeInfo.selectedItem;
-    
-    if(model != nil) {
-        self.passwordDatabase = model;
-        self.lockedSafeInfo = nil;
-        return YES;
-    }
-    
-    return NO;
 }
 
 - (BOOL)masterCredentialsSet {
@@ -246,7 +226,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSDate* oldModified = item.fields.modified;
     
     Node* cloneForHistory = [item cloneForHistory];
-    if([item setTitle:title]) {
+    if([item setTitle:title allowDuplicateGroupTitles:self.format != kPasswordSafe]) {
         item.fields.modified = modified ? modified : [[NSDate alloc] init];
         
         if(self.document.undoManager.isUndoing) {
@@ -509,7 +489,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     // TODO: This should be a function on Node - copyFromNode(Node* node) or something - also find it iOS app...
     
-    item.title = historicalItem.title;
+    [item setTitle:historicalItem.title allowDuplicateGroupTitles:YES];
     item.iconId = historicalItem.iconId;
     item.customIconUuid = historicalItem.customIconUuid;
     
@@ -533,6 +513,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex {
+    [self removeItemAttachment:item atIndex:atIndex modified:nil];
+}
+
+- (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -540,7 +524,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NodeFileAttachment* nodeAttachment = item.fields.attachments[atIndex];
     DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
     UiAttachment* old = [[UiAttachment alloc] initWithFilename:nodeAttachment.filename data:dbAttachment.data];
-    
+    NSDate* oldModified = item.fields.modified;
+
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
     }
@@ -549,13 +534,14 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item attachment:old];
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item attachment:old modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
         [self.document.undoManager setActionName:@"Remove Attachment"];
     }
 
     [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationAttachmentsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -563,6 +549,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment {
+    [self addItemAttachment:item attachment:attachment modified:nil];
+}
+
+- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -575,7 +565,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
     
+    NSDate* oldModified = item.fields.modified;
+
     [self.passwordDatabase addNodeAttachment:item attachment:attachment];
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
 
     // To Undo we need to find this attachment's index!
     
@@ -600,7 +593,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     NSLog(@"found attachment added at: %lu", (unsigned long)foundIndex);
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] removeItemAttachment:item atIndex:foundIndex];
+    [[self.document.undoManager prepareWithInvocationTarget:self] removeItemAttachment:item atIndex:foundIndex modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
         [self.document.undoManager setActionName:@"Add Attachment"];
@@ -612,12 +605,17 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value {
+    [self setCustomField:item key:key value:value modified:nil];
+}
+
+- (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
     StringValue* oldValue = [item.fields.customFields objectForKey:key];
-    
+    NSDate* oldModified = item.fields.modified;
+
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
     }
@@ -627,13 +625,14 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     [item.fields.customFields setObject:value forKey:key];
-    
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+
     if(oldValue) {
-        [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue];
+        [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
         [self.document.undoManager setActionName:@"Set Custom Field"];
     }
     else {
-        [[self.document.undoManager prepareWithInvocationTarget:self] removeCustomField:item key:key];
+        [[self.document.undoManager prepareWithInvocationTarget:self] removeCustomField:item key:key modified:oldModified];
         [self.document.undoManager setActionName:@"Add Custom Field"];
     }
 
@@ -643,12 +642,17 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)removeCustomField:(Node *)item key:(NSString *)key {
+    [self removeCustomField:item key:key modified:nil];
+}
+
+- (void)removeCustomField:(Node *)item key:(NSString *)key modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
 
     StringValue* oldValue = item.fields.customFields[key];
-    
+    NSDate* oldModified = item.fields.modified;
+
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
     }
@@ -658,8 +662,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     [item.fields.customFields removeObjectForKey:key];
+    item.fields.modified = modified ? modified : [[NSDate alloc] init];
 
-    [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
         [self.document.undoManager setActionName:@"Remove Custom Field"];
@@ -673,6 +678,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 - (void)setTotp:(Node *)item otp:(NSString *)otp {
     [self setTotp:item otp:otp modified:nil];
 }
+
 - (void)setTotp:(Node *)item otp:(NSString *)otp modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -698,6 +704,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 -(void)clearTotp:(Node *)item  {
     [self clearTotp:item modified:nil];
 }
+
 -(void)clearTotp:(Node *)item modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -769,38 +776,31 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
     Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
     
-    NSDate* date = [NSDate date];
-    record.fields.created = date;
-    record.fields.accessed = date;
-    record.fields.modified = date;
-    
-    if(![parentGroup validateAddChild:record]) {
+    if(![parentGroup validateAddChild:record allowDuplicateGroupTitles:YES]) {
         return NO;
     }
     
-    [self addItem:record parent:parentGroup];
+    [self addItem:record parent:parentGroup suppressNewItemPopup:NO];
     
     return YES;
 }
 
-- (void)addNewGroup:(Node *_Nonnull)parentGroup {
-    NSString *newGroupName = kDefaultNewTitle;
-    
+- (void)addNewGroup:(Node *)parentGroup title:(NSString *)title {
     NSInteger i = 0;
     BOOL success = NO;
     Node* newGroup;
     do {
-        newGroup = [[Node alloc] initAsGroup:newGroupName parent:parentGroup uuid:nil];
-        success =  newGroup && [parentGroup validateAddChild:newGroup];
+        newGroup = [[Node alloc] initAsGroup:title parent:parentGroup allowDuplicateGroupTitles:self.format != kPasswordSafe uuid:nil];
+        success =  newGroup && [parentGroup validateAddChild:newGroup allowDuplicateGroupTitles:self.format != kPasswordSafe];
         i++;
-        newGroupName = [NSString stringWithFormat:@"%@ %ld", kDefaultNewTitle, i];
-    }while (!success);
+        title = [NSString stringWithFormat:@"%@ %ld", title, i];
+    } while (!success);
     
-    [self addItem:newGroup parent:parentGroup];
+    [self addItem:newGroup parent:parentGroup suppressNewItemPopup:NO];
 }
 
-- (void)addItem:(Node*)item parent:(Node*)parent {
-    [parent addChild:item];
+- (void)addItem:(Node*)item parent:(Node*)parent suppressNewItemPopup:(BOOL)suppressNewItemPopup {
+    [parent addChild:item allowDuplicateGroupTitles:YES];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
     if(!self.document.undoManager.isUndoing) {
@@ -808,7 +808,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onNewItemAdded(item);
+        self.onNewItemAdded(item, suppressNewItemPopup);
     });
 }
 
@@ -824,7 +824,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     else {
         [child.parent removeChild:child];
         
-        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent];
+        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent suppressNewItemPopup:YES];
         if(!self.document.undoManager.isUndoing) {
             [self.document.undoManager setActionName:@"Delete Item"];
         }
@@ -853,7 +853,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node isRecycleOp:(BOOL)isRecycleOp {
-    if(![node validateChangeParent:parent]) {
+    if(![node validateChangeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe]) {
         return NO;
     }
 
@@ -862,7 +862,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [[self.document.undoManager prepareWithInvocationTarget:self] changeParent:old node:node isRecycleOp:isRecycleOp];
     [self.document.undoManager setActionName:isRecycleOp ? @"Delete Item" : @"Move Item"];
     
-    BOOL ret = [node changeParent:parent];
+    BOOL ret = [node changeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         self.onChangeParent(node);
@@ -903,7 +903,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         record.fields.accessed = date;
         record.fields.modified = date;
         
-        [self addItem:record parent:self.passwordDatabase.rootGroup];
+        [self addItem:record parent:self.passwordDatabase.rootGroup suppressNewItemPopup:YES];
     }
     
     [self.document.undoManager setActionName:@"Import Entries from CSV"];
@@ -913,7 +913,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    return [node validateChangeParent:parent];
+    return [node validateChangeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe];
 }
 
 NSString* getSmartFillTitle() {
@@ -969,8 +969,13 @@ NSString* getSmartFillNotes() {
 }
 
 - (Node*)getItemFromSerializationId:(NSString*)serializationId {
+    if(!serializationId) {
+        return nil;
+    }
+    
     return [self.rootGroup findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
-        return [node.serializationId isEqualToString:serializationId];
+        NSString* sid = [node getSerializationId:self.format != kPasswordSafe];
+        return [sid isEqualToString:serializationId];
     }];
 }
 

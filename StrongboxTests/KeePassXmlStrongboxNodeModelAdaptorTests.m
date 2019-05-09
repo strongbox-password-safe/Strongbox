@@ -267,7 +267,7 @@
     NSLog(@"%@", originalXml);
 
     Node* e = [[strongboxModel.children objectAtIndex:0].children objectAtIndex:0];
-    e.title = @"Changed!";
+    [e setTitle:@"Changed!" allowDuplicateGroupTitles:YES];
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
@@ -300,7 +300,8 @@
     NSLog(@"%@", originalXml);
     
     Node* e = [[strongboxModel.children objectAtIndex:0].children objectAtIndex:0];
-    e.title = @"Mark's New Title";
+    [e setTitle:@"Mark's New Title" allowDuplicateGroupTitles:YES];
+
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];

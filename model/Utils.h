@@ -31,7 +31,7 @@ NSString* keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
 
 NSString* friendlyFileSizeString(long long byteCount);
-NSString *frientlyDateString(NSDate *modDate);
+NSString *friendlyDateString(NSDate *modDate);
 BOOL isValidUrl(NSString* urlString);
 NSString* trim(NSString* str);
 + (NSString *)trim:(NSString*)string;

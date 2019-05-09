@@ -988,7 +988,7 @@ static NSString* const kTotpCell = @"TotpCell";
     self.item.fields.accessed = [[NSDate alloc] init];
     self.item.fields.modified = [[NSDate alloc] init];
     
-    self.item.title = historicalNode.title;
+    [self.item setTitle:historicalNode.title allowDuplicateGroupTitles:YES];
     self.item.iconId = historicalNode.iconId;
     self.item.customIconUuid = historicalNode.customIconUuid;
     
@@ -1225,8 +1225,8 @@ static NSString* const kTotpCell = @"TotpCell";
     if(format != kPasswordSafe) {
         [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
     }
-    [metadata addObject:[ItemMetadataEntry entryWithKey:@"Modified" value:frientlyDateString(item.fields.modified) copyable:NO]];
-    [metadata addObject:[ItemMetadataEntry entryWithKey:@"Created" value:frientlyDateString(item.fields.created) copyable:NO]];
+    [metadata addObject:[ItemMetadataEntry entryWithKey:@"Modified" value:friendlyDateString(item.fields.modified) copyable:NO]];
+    [metadata addObject:[ItemMetadataEntry entryWithKey:@"Created" value:friendlyDateString(item.fields.created) copyable:NO]];
     
     // Has History?
     
@@ -1270,7 +1270,7 @@ static NSString* const kTotpCell = @"TotpCell";
 - (void)saveChanges {
     if (self.createNewItem) {
         self.item.fields.created = [[NSDate alloc] init];
-        [self.parentGroup addChild:self.item];
+        [self.parentGroup addChild:self.item allowDuplicateGroupTitles:NO];
     }
     else { // Add History Entry for this change if appropriate...
         Node* originalNodeForHistory = [self.item cloneForHistory];
@@ -1279,7 +1279,8 @@ static NSString* const kTotpCell = @"TotpCell";
     
     self.item.fields.accessed = [[NSDate alloc] init];
     self.item.fields.modified = [[NSDate alloc] init];
-    self.item.title = self.model.title;
+    [self.item setTitle:self.model.title allowDuplicateGroupTitles:NO];
+    
     self.item.fields.username = self.model.username;
     self.item.fields.password = self.model.password;
     self.item.fields.url = self.model.url;

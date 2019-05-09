@@ -35,9 +35,12 @@ static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEdit
 static NSString* const kDereferenceInQuickView = @"dereferenceInQuickView";
 static NSString* const kDereferenceInOutlineView = @"dereferenceInOutlineView";
 static NSString* const kDereferenceDuringSearch = @"dereferenceDuringSearch";
-            
-static NSString* const kVisibleColumns = @"visibleColumns";
+static NSString* const kAutoReloadAfterForeignChanges = @"autoReloadAfterForeignChanges";
+static NSString* const kDetectForeignChanges = @"detectForeignChanges";
+static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
+static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 
+static NSString* const kVisibleColumns = @"visibleColumns";
 NSString* const kTitleColumn = @"TitleColumn";
 NSString* const kUsernameColumn = @"UsernameColumn";
 NSString* const kPasswordColumn = @"PasswordColumn";
@@ -415,6 +418,39 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setDereferenceDuringSearch:(BOOL)dereferenceDuringSearch {
     [self setBool:kDereferenceDuringSearch value:dereferenceDuringSearch];
+}
+
+- (BOOL)autoReloadAfterForeignChanges {
+    return [self getBool:kAutoReloadAfterForeignChanges fallback:NO];
+}
+
+- (void)setAutoReloadAfterForeignChanges:(BOOL)autoReloadAfterForeignChanges {
+    [self setBool:kAutoReloadAfterForeignChanges value:autoReloadAfterForeignChanges];
+}
+
+- (BOOL)detectForeignChanges {
+    return [self getBool:kDetectForeignChanges fallback:YES];
+}
+
+-(void)setDetectForeignChanges:(BOOL)detectForeignChanges {
+    [self setBool:kDetectForeignChanges value:detectForeignChanges];
+}
+
+- (BOOL)concealEmptyProtectedFields {
+    return [self getBool:kConcealEmptyProtectedFields fallback:YES];
+}
+
+- (void)setConcealEmptyProtectedFields:(BOOL)concealEmptyProtectedFields {
+    NSLog(@"Setting: %d", concealEmptyProtectedFields);
+    [self setBool:kConcealEmptyProtectedFields value:concealEmptyProtectedFields];
+}
+
+- (BOOL)showCustomFieldsOnQuickViewPanel {
+    return [self getBool:kShowCustomFieldsOnQuickView fallback:YES];
+}
+
+- (void)setShowCustomFieldsOnQuickViewPanel:(BOOL)showCustomFieldsOnQuickViewPanel {
+    return [self setBool:kShowCustomFieldsOnQuickView value:showCustomFieldsOnQuickViewPanel];
 }
 
 @end

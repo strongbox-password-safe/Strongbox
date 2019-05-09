@@ -52,8 +52,8 @@ static NSString* const kSampleReferencedNodeCustomFieldValue = @"Value";
     referencedEntry.fields.notes = kSampleReferencedNodeNotes;
     referencedEntry.fields.customFields[kSampleReferencedNodeCustomFieldKey] = [StringValue valueWithString:kSampleReferencedNodeCustomFieldValue];
     
-    [root addChild:entry];
-    [root addChild:referencedEntry];
+    [root addChild:entry allowDuplicateGroupTitles:YES];
+    [root addChild:referencedEntry allowDuplicateGroupTitles:YES];
     
     return root;
 }

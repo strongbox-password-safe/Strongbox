@@ -60,6 +60,7 @@ extern NSInteger const kSearchScopeAll;
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm;
+- (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
@@ -70,6 +71,7 @@ extern NSInteger const kSearchScopeAll;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeGroups;
 
 @property (nonatomic, retain, nullable) NSString *masterPassword;
 @property (nonatomic, retain, nullable) NSData *keyFileDigest;

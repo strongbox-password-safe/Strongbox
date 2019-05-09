@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeDetailsWindowController : NSWindowController
 
-+ (instancetype)showNode:(Node*)node model:(ViewModel*)model readOnly:(BOOL)readOnly parentViewController:(ViewController*)parentViewController;
++ (instancetype)showNode:(Node*)node model:(ViewModel*)model readOnly:(BOOL)readOnly parentViewController:(ViewController*)parentViewController newEntry:(BOOL)newEntry;
 
 @end
 

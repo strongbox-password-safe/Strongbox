@@ -19,6 +19,7 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "NodeDetailsWindowController.h"
+#import "BiometricIdHelper.h"
 
 @interface Document ()
 
@@ -26,23 +27,36 @@
 @property WindowController* windowController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *masterPasswordWindowController;
 
+@property NSString* passwordForRevertWithUnlock;
+@property NSData* keyFileDigestForRevertWithUnlock;
+@property NSString *selectedItemForUnlock;
+
 @end
 
 @implementation Document
 
++ (BOOL)autosavesInPlace {
+    return Settings.sharedInstance.autoSave;
+}
+
+- (BOOL)canAsynchronouslyWriteToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation {
+    return YES;
+}
+
++ (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName {
+    return YES;
+}
+
 - (instancetype)initWithCredentials:(DatabaseFormat)format password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest {
-    self = [super init];
-    
-    if (self) {
-        self.model = [[ViewModel alloc] initNewWithSampleData:self format:format password:password keyFileDigest:keyFileDigest];
+    if (self = [super init]) {
+        DatabaseModel *db = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:keyFileDigest format:format];
+        self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:nil];
     }
     
     return self;
 }
 
 - (void)makeWindowControllers {
-    // Override to return the Storyboard file name of the document.
-    
     self.windowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"Document Window Controller"];
     
     [self addWindowController:self.windowController];
@@ -50,18 +64,7 @@
     [self setWindowModel:self.model];
 }
 
-//- (void)foo:(Node*)item {
-//    if(!item || item.isGroup || self.model.format == kPasswordSafe) {
-//        return;
-//    }
-//    
-//    NodeDetailsWindowController* wc = [NodeDetailsWindowController showNode:item model:self.model readOnly:NO parentViewController:self];
-//    
-//    [self addWindowController:wc];
-//}
-
-- (IBAction)saveDocument:(id)sender
-{
+- (IBAction)saveDocument:(id)sender {
     if(self.model.locked) {
         [Alerts info:@"Cannot save database while it is locked." window:self.windowController.window];
         return;
@@ -85,6 +88,14 @@
     }
 }
 
+- (void)saveToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation completionHandler:(void (^)(NSError * _Nullable))completionHandler {
+    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError *error) {
+        completionHandler(error);
+        //self.lastKnownModifiedDate = self.fileModificationDate;
+        NSLog(@"saveToURL: %lu - [%@]", (unsigned long)saveOperation, self.fileModificationDate);
+    }];
+}
+
 - (SafeMetaData*)getSafeMetaData {
     if(!self.model || !self.model.fileUrl) {
         return nil;
@@ -96,70 +107,145 @@
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-//    NSLog(@"Start dataOfType");
-//    NSDate *methodStart = [NSDate date];
-//
     [self unblockUserInteraction];
-    
-    NSData* ret = [self.model getPasswordDatabaseAsData:outError];
-    
-//    NSDate *methodFinish = [NSDate date];
-//    NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
-//    NSLog(@"dataOfType executionTime = %f", executionTime);
-
-    return ret;
+    return [self.model getPasswordDatabaseAsData:outError];
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-    //NSLog(@"Start readFromData");
-    //NSDate *methodStart = [NSDate date];
-
-    self.model = [[ViewModel alloc] initWithData:data document:self];
-    
-    if(!self.model) {
+    NSError* error;
+    if(![DatabaseModel isAValidSafe:data error:&error]) {
         if(outError != nil) {
-            *outError = [Utils createNSError:@"This is not a valid file." errorCode:-1];
+            *outError = error;
         }
         
         return NO;
     }
+
+    if(self.passwordForRevertWithUnlock || self.keyFileDigestForRevertWithUnlock) {
+        DatabaseModel* db = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
+                                                      password:self.passwordForRevertWithUnlock
+                                                 keyFileDigest:self.keyFileDigestForRevertWithUnlock
+                                                         error:&error];
         
+        if(!db) {
+            if(outError != nil) {
+                *outError = error;
+            }
+            
+            self.passwordForRevertWithUnlock = nil;
+            self.keyFileDigestForRevertWithUnlock = nil;
+            self.selectedItemForUnlock = nil;
+            
+            if(self.model && !self.model.locked) {
+                self.model = [[ViewModel alloc] initLocked:self];
+                [self setWindowModel:self.model];
+            }
+            return NO;
+        }
+        
+        self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:self.selectedItemForUnlock];
+    }
+    else {
+        self.model = [[ViewModel alloc] initLocked:self];
+    }
+
+    self.passwordForRevertWithUnlock = nil;
+    self.keyFileDigestForRevertWithUnlock = nil;
+    self.selectedItemForUnlock = nil;
+    
     [self setWindowModel:self.model];
     
-    //NSDate *methodFinish = [NSDate date];
-    //NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
-    //NSLog(@"readFromData executionTime = %f", executionTime);
-
     return YES;
+}
+
+- (ViewController*)getViewController {
+    return (ViewController*)self.windowController.contentViewController;
 }
 
 - (void)setWindowModel:(ViewModel*)model {
-    ViewController *vc = (ViewController*)self.windowController.contentViewController;
-    
-    [vc setModel:self.model];
-}
-
-+ (BOOL)autosavesInPlace {
-    return Settings.sharedInstance.autoSave;
-}
-
-- (BOOL)canAsynchronouslyWriteToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation {
-    return YES;
-}
-
-+ (BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName {
-    return YES;
+    [[self getViewController] resetModel:self.model];
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
     if(fileWrapper.isDirectory) { // Strongbox crashes unless we check if someone is trying to open a package/wrapper...
         if(outError != nil) {
-            *outError = [Utils createNSError:@"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please dorectly select a KeePass or Password Safe database file." errorCode:-1];
+            *outError = [Utils createNSError:@"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please directly select a KeePass or Password Safe database file." errorCode:-1];
         }
         return NO;
     }
     
     return [super readFromFileWrapper:fileWrapper ofType:typeName error:outError];
+}
+
+- (void)presentedItemDidChange {
+    if(!Settings.sharedInstance.detectForeignChanges) {
+        return;
+    }
+    
+    if(!self.fileModificationDate) {
+        NSLog(@"presentedItemDidChange but NO self.lastKnownModifiedDate?");
+        return;
+    }
+    
+    if([self fileHasBeenModified]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+           [[self getViewController] onFileChangedByOtherApplication];
+        });
+    }
+}
+
+- (BOOL)fileHasBeenModified {
+    if(!self.fileURL) {
+        NSLog(@"fileUrl is nil!");
+        return NO;
+    }
+    
+    NSError* error;
+    NSDictionary<NSFileAttributeKey, id> *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:self.fileURL.path error:&error];
+    if(!attributes) {
+        NSLog(@"error: %@", error);
+        return NO;
+    }
+    
+    NSDate* mod = [attributes fileModificationDate];
+    if ([mod compare:self.fileModificationDate] == NSOrderedDescending) {
+        NSLog(@"X - Document Changed [%@]/[%@] - [%@] - XXXXXXXXXXXXX", mod, self.fileModificationDate, self.fileURL);
+        return YES;
+    }
+
+    return NO;
+}
+
+- (void)revertWithUnlock:(NSString*)password
+           keyFileDigest:(NSData*)keyFileDigest
+            selectedItem:(NSString*)selectedItem
+              completion:(void(^)(BOOL success, NSError*_Nullable error))completion {
+    self.passwordForRevertWithUnlock = password;
+    self.keyFileDigestForRevertWithUnlock = keyFileDigest;
+    self.selectedItemForUnlock = selectedItem;
+    
+    NSError* error;
+    
+    // The natural option here would be revertToContents... but it breaks sometimes with Google Drive :(
+    // So we try to do all the things it would do...
+    
+    //    BOOL success = [self revertToContentsOfURL:self.fileURL ofType:self.fileType error:&error];
+    [self.undoManager removeAllActions]; // Clear undo stack
+    NSFileWrapper* wrapper = [[NSFileWrapper alloc] initWithURL:self.fileURL options:NSFileWrapperReadingImmediate error:&error];
+    BOOL success = [self readFromFileWrapper:wrapper ofType:self.fileType error:&error];
+    if(success) {
+        self.fileModificationDate = wrapper.fileAttributes.fileModificationDate;
+    }
+    
+    self.passwordForRevertWithUnlock = nil;
+    self.keyFileDigestForRevertWithUnlock = nil;
+    self.selectedItemForUnlock = nil;
+
+    if(completion) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(success, error);
+        });
+    }
 }
 
 @end

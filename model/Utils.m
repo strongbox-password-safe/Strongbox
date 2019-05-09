@@ -100,7 +100,7 @@ NSString* friendlyFileSizeString(long long byteCount) {
     return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
 }
 
-NSString *frientlyDateString(NSDate *modDate) {
+NSString *friendlyDateString(NSDate *modDate) {
     if(!modDate) { return @""; }
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];

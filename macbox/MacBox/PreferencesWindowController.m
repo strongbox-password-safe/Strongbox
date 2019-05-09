@@ -31,7 +31,10 @@
 @property (weak) IBOutlet NSButton *checkboxDereferenceQuickView;
 @property (weak) IBOutlet NSButton *checkboxDereferenceOutlineView;
 @property (weak) IBOutlet NSButton *checkboxDereferenceSearch;
-
+@property (weak) IBOutlet NSButton *checkboxDetectForeignChanges;
+@property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
+@property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
+@property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
 
 @end
 
@@ -94,6 +97,10 @@
     self.checkboxDereferenceQuickView.state = Settings.sharedInstance.dereferenceInQuickView ? NSOnState : NSOffState;
     self.checkboxDereferenceOutlineView.state = Settings.sharedInstance.dereferenceInOutlineView ? NSOnState : NSOffState;
     self.checkboxDereferenceSearch.state = Settings.sharedInstance.dereferenceDuringSearch ? NSOnState : NSOffState;
+    self.checkboxDetectForeignChanges.state = Settings.sharedInstance.detectForeignChanges ? NSOnState : NSOffState;
+    self.checkboxReloadForeignChanges.state = Settings.sharedInstance.autoReloadAfterForeignChanges ? NSOnState : NSOffState;
+    self.checkboxConcealEmptyProtected.state = Settings.sharedInstance.concealEmptyProtectedFields ? NSOnState : NSOffState;
+    self.showCustomFieldsInQuickView.state = Settings.sharedInstance.showCustomFieldsOnQuickViewPanel ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -114,7 +121,11 @@
     Settings.sharedInstance.dereferenceInQuickView = self.checkboxDereferenceQuickView.state == NSOnState;
     Settings.sharedInstance.dereferenceInOutlineView = self.checkboxDereferenceOutlineView.state == NSOnState;
     Settings.sharedInstance.dereferenceDuringSearch = self.checkboxDereferenceSearch.state == NSOnState;
-
+    Settings.sharedInstance.detectForeignChanges = self.checkboxDetectForeignChanges.state == NSOnState;
+    Settings.sharedInstance.autoReloadAfterForeignChanges = Settings.sharedInstance.detectForeignChanges && (self.checkboxReloadForeignChanges.state == NSOnState);
+    Settings.sharedInstance.concealEmptyProtectedFields = self.checkboxConcealEmptyProtected.state == NSOnState;
+    Settings.sharedInstance.showCustomFieldsOnQuickViewPanel = self.showCustomFieldsInQuickView.state == NSOnState;
+    
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }

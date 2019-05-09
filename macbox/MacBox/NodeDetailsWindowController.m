@@ -6,6 +6,7 @@
 //  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
+#import "AppDelegate.h"
 #import "NodeDetailsWindowController.h"
 #import "CustomField.h"
 #import "Alerts.h"
@@ -32,7 +33,9 @@
                                             NSCollectionViewDataSource,
                                             NSCollectionViewDelegate,
                                             QLPreviewPanelDataSource,
-                                            QLPreviewPanelDelegate >
+                                            QLPreviewPanelDelegate,
+                                            NSComboBoxDataSource,
+                                            NSComboBoxDelegate>
 
 @property Node* node;
 @property ViewModel* model;
@@ -64,6 +67,13 @@
 @property (weak) IBOutlet NSTextField *labelTotp;
 @property (weak) IBOutlet NSProgressIndicator *progressTotp;
 @property NSTimer* timerRefreshOtp;
+@property BOOL newEntry;
+
+@property (weak) IBOutlet NSComboBox *comboGroup;
+@property NSArray<Node*>* groups;
+@property (weak) IBOutlet NSTextField *labelID;
+@property (weak) IBOutlet NSTextField *labelCreated;
+@property (weak) IBOutlet NSTextField *labelModified;
 
 @end
 
@@ -77,12 +87,17 @@ static NSImage* kDefaultAttachmentIcon;
     }
 }
 
-+ (instancetype)showNode:(Node*)node model:(ViewModel*)model readOnly:(BOOL)readOnly parentViewController:(ViewController*)parentViewController {
++ (instancetype)showNode:(Node*)node
+                   model:(ViewModel*)model
+                readOnly:(BOOL)readOnly
+    parentViewController:(ViewController*)parentViewController
+                newEntry:(BOOL)newEntry {
     NodeDetailsWindowController *window = [[NodeDetailsWindowController alloc] initWithWindowNibName:@"NodeDetailsWindowController"];
     
     window.node = node;
     window.model = model;
     window.readOnly = readOnly;
+    window.newEntry = newEntry;
     window.parentViewController = parentViewController;
     
     [window showWindow:nil];
@@ -185,11 +200,8 @@ static NSImage* kDefaultAttachmentIcon;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationNotesChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationPasswordChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationIconChanged object:nil];
-    
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onCustomFieldsChanged:) name:kModelUpdateNotificationCustomFieldsChanged object:nil];
-
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onAttachmentsChanged:) name:kModelUpdateNotificationAttachmentsChanged object:nil];
-
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onTotpChanged:) name:kModelUpdateNotificationTotpChanged object:nil];
 }
 
@@ -223,7 +235,9 @@ static NSImage* kDefaultAttachmentIcon;
     
     [self observeModelChanges];
     
-    [self.window makeFirstResponder:self.imageViewIcon]; // Take focus off Title so that edits require some effort...
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+    
+    [self.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; // Take focus off Title so that edits require some effort...
 }
 
 - (void)setupUi {
@@ -282,6 +296,28 @@ static NSImage* kDefaultAttachmentIcon;
         [self.textFieldPassword toggleTextShown:nil];
         self.imageViewShowHidePassword.image = [NSImage imageNamed:self.textFieldPassword.showsText ? @"hide" : @"show"];
     };
+    
+    //
+    
+    NSMutableArray* groups = [self.model.activeGroups mutableCopy];
+    [groups addObject:self.model.rootGroup];
+    
+    self.groups = [groups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        Node* n1 = (Node*)obj1;
+        Node* n2 = (Node*)obj2;
+        
+        NSString *p1 = [self.model getGroupPathDisplayString:n1];
+        NSString *p2 = [self.model getGroupPathDisplayString:n2];
+        
+        return finderStringCompare(p1, p2);
+    }];
+    
+    self.comboGroup.usesDataSource = YES;
+    self.comboGroup.dataSource = self;
+    
+    [self syncComboGroupWithNode];
+    
+    self.comboGroup.delegate = self; // Do This after the select - so we don't see it as a user effected change!
 }
 
 - (void)bindUiToNode {
@@ -291,6 +327,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)bindUiToSimpleFields {
+    self.window.title = self.node.title;
     self.textFieldTitle.stringValue = self.node.title;
     self.textFieldUsername.stringValue = self.node.fields.username;
     self.textFieldPassword.stringValue = self.node.fields.password;
@@ -302,6 +339,10 @@ static NSImage* kDefaultAttachmentIcon;
     self.imageViewIcon.clickable = self.model.format != kPasswordSafe;
     self.imageViewIcon.onClick = ^{ [self onEditNodeIcon]; };
     self.imageViewIcon.showClickableBorder = YES;
+    
+    self.labelID.stringValue = self.model.format == kPasswordSafe ? self.node.uuid.UUIDString : keePassStringIdFromUuid(self.node.uuid);
+    self.labelCreated.stringValue = friendlyDateString(self.node.fields.created);
+    self.labelModified.stringValue = friendlyDateString(self.node.fields.modified);
     
     [self validateTitleAndIndicateValidityInUI];
     
@@ -448,8 +489,8 @@ static NSImage* kDefaultAttachmentIcon;
         CustomFieldTableCellView* cell = [self.tableViewCustomFields makeViewWithIdentifier:cellId owner:nil];
         
         cell.value = field.value;
-        cell.protected = field.protected;
-        cell.valueHidden = field.protected; // Initially Hide the Value if it is protected
+        cell.protected = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
+        cell.valueHidden = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); // Initially Hide the Value if it is protected
         
         return cell;
     }
@@ -909,38 +950,45 @@ NSString* trimField(NSTextField* textField) {
     }
 }
 
-
 - (IBAction)onCopyTitle:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.title];
     [self showPopupToastNotification:@"Title Copied"];
 }
 
 - (IBAction)onCopyUsername:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.username];
     [self showPopupToastNotification:@"Username Copied"];
 }
 
 - (IBAction)onCopyEmail:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.email];
     [self showPopupToastNotification:@"Email Copied"];
 }
 
 - (IBAction)onCopyUrl:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.url];
     [self showPopupToastNotification:@"URL Copied"];
 }
 
 - (IBAction)onCopyNotes:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.notes];
     [self showPopupToastNotification:@"Notes Copied"];
 }
 
 - (IBAction)onCopyPassword:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.password];
     [self showPopupToastNotification:@"Password Copied"];
 }
 
 - (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
+    [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    
     [self copyToPasteboard:self.node.fields.password];
 
     NSString *urlString = [self.model dereference:self.node.fields.url node:self.node];
@@ -1023,6 +1071,7 @@ NSString* trimField(NSTextField* textField) {
         return;
     }
 
+    [self bindUiToSimpleFields]; // Update Modified Date
     [self bindUiToCustomFields];
     
     [self showPopupToastNotification:@"Custom Fields Changed"];
@@ -1033,6 +1082,7 @@ NSString* trimField(NSTextField* textField) {
         return;
     }
     
+    [self bindUiToSimpleFields]; // Update Modified Date
     [self bindUiToAttachments];
     
     [self showPopupToastNotification:@"Attachments Changed"];
@@ -1043,6 +1093,7 @@ NSString* trimField(NSTextField* textField) {
         return;
     }
     
+    [self bindUiToSimpleFields]; // Update Modified Date
     [self initializeTotp];
     
     [self showPopupToastNotification:@"TOTP Changed"];
@@ -1065,6 +1116,54 @@ NSString* trimField(NSTextField* textField) {
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [hud hide:YES];
+    });
+}
+
+// Combo Group
+
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)comboBox {
+    return self.groups.count;
+}
+
+- (id)comboBox:(NSComboBox *)comboBox objectValueForItemAtIndex:(NSInteger)index {
+    return [self.model getGroupPathDisplayString:self.groups[index]];
+}
+
+- (void)comboBoxSelectionDidChange:(NSNotification *)notification {
+    NSInteger idx = [self.comboGroup indexOfSelectedItem];
+    Node* group = self.groups[idx];
+    
+    //NSLog(@"Selected Group: [%@]", group.title);
+    
+    if(self.node.parent != group) {
+        if(![self.model validateChangeParent:group node:self.node]) { // Should never happen - but safety in case we someday cover groups?
+            [Alerts info:@"Could not change group! Validate failed..." window:self.window];
+            [self syncComboGroupWithNode];
+        }
+        else {
+            [self.model changeParent:group node:self.node];
+        }
+    }
+    else {
+        //NSLog(@"Ignoring Combo change to identical parent group");
+    }
+}
+
+- (void)syncComboGroupWithNode {
+    NSInteger origIdx = self.node.parent ? [self.groups indexOfObject:self.node.parent] : 0;
+    
+    if(origIdx != NSNotFound) {
+        [self.comboGroup selectItemAtIndex:origIdx];
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)onPreferencesChanged:(NSNotification*)notification {
+    NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableViewCustomFields reloadData];
     });
 }
 

@@ -393,9 +393,9 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         effectiveRoot = self.rootGroup; // This should never be able to happen but for safety
     }
 
-    Node* recycleBin = [[Node alloc] initAsGroup:@"Recycle Bin" parent:effectiveRoot uuid:nil];
+    Node* recycleBin = [[Node alloc] initAsGroup:@"Recycle Bin" parent:effectiveRoot allowDuplicateGroupTitles:YES uuid:nil];
     recycleBin.iconId = @(43);
-    [effectiveRoot addChild:recycleBin];
+    [effectiveRoot addChild:recycleBin allowDuplicateGroupTitles:YES];
     
     self.recycleBinNodeUuid = recycleBin.uuid;
     self.recycleBinChanged = [NSDate date];

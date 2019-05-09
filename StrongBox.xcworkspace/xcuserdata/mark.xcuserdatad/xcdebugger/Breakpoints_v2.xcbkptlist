@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ItemDetailsViewController.m"
-            timestampString = "578504525.020606"
+            filePath = "macbox/MacBox/Document.m"
+            timestampString = "578950428.76375"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1242"
-            endingLineNumber = "1242"
-            landmarkName = "-modelFromItem:"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
+            landmarkName = "-readFromData:ofType:error:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "CustomCells/EditPasswordTableViewCell.m"
-            timestampString = "578248812.453301"
+            filePath = "macbox/MacBox/ViewModel.m"
+            timestampString = "579037435.049946"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "38"
-            endingLineNumber = "38"
-            landmarkName = "-onSettings:"
+            startingLineNumber = "191"
+            endingLineNumber = "191"
+            landmarkName = "-setItemTitle:title:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -41,13 +41,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "CustomCells/EditPasswordTableViewCell.m"
-            timestampString = "578248812.4533499"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "579037435.050011"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "33"
-            endingLineNumber = "33"
-            landmarkName = "-onGenerate:"
+            startingLineNumber = "589"
+            endingLineNumber = "589"
+            landmarkName = "-bindDetailsPane"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -57,61 +57,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/PasswordHistoryViewController.m"
-            timestampString = "578321195.404569"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "579037435.050446"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "73"
-            endingLineNumber = "73"
-            landmarkName = "-save"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[PasswordHistoryViewController save]"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/PasswordHistoryViewController.m"
-                  timestampString = "578321195.91607"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "73"
-                  endingLineNumber = "73"
-                  offsetFromSymbolStart = "34">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__37-[PasswordHistoryViewController save]_block_invoke"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/PasswordHistoryViewController.m"
-                  timestampString = "578321195.919402"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "73"
-                  endingLineNumber = "73"
-                  offsetFromSymbolStart = "44">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "StrongBox/PasswordHistoryViewController.m"
-            timestampString = "578321206.418871"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "78"
-            endingLineNumber = "78"
-            landmarkName = "-save"
+            startingLineNumber = "2045"
+            endingLineNumber = "2045"
+            landmarkName = "-tableView:viewForTableColumn:row:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -121,13 +73,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ItemDetailsViewController.m"
-            timestampString = "578504525.020831"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "579037435.050773"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "525"
-            endingLineNumber = "525"
-            landmarkName = "-tableView:cellForRowAtIndexPath:"
+            startingLineNumber = "2025"
+            endingLineNumber = "2025"
+            landmarkName = "-numberOfRowsInTableView:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -137,61 +89,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/Settings.m"
-            timestampString = "578504525.020905"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "579037435.05107"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "809"
-            endingLineNumber = "809"
-            landmarkName = "-instantPinUnlocking"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[Settings instantPinUnlocking]"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/Settings.m"
-                  timestampString = "578496666.071219"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "808"
-                  endingLineNumber = "808"
-                  offsetFromSymbolStart = "176">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__31-[Settings instantPinUnlocking]_block_invoke"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/Settings.m"
-                  timestampString = "578496666.075249"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "808"
-                  endingLineNumber = "808"
-                  offsetFromSymbolStart = "44">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "StrongBox/Settings.m"
-            timestampString = "578504525.020965"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "813"
-            endingLineNumber = "813"
-            landmarkName = "-instantPinUnlocking"
+            startingLineNumber = "2056"
+            endingLineNumber = "2056"
+            landmarkName = "-tableView:viewForTableColumn:row:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -201,13 +105,29 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/PinEntryController.m"
-            timestampString = "578504525.021026"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "579037435.0513591"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "107"
-            endingLineNumber = "107"
-            landmarkName = "-onEditPin:"
+            startingLineNumber = "2044"
+            endingLineNumber = "2044"
+            landmarkName = "-tableView:viewForTableColumn:row:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "579037435.051652"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1480"
+            endingLineNumber = "1480"
+            landmarkName = "-onCopyCustomFieldValue:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

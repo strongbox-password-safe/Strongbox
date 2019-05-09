@@ -359,25 +359,25 @@ static NSArray *getDbAttachments(int n) {
 }
 
 static Node* getSampleNode(Node* root) {
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:root uuid:nil];
-    [root addChild:keePassRootGroup];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:root allowDuplicateGroupTitles:YES uuid:nil];
+    [root addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     
     NodeFields *fields = [[NodeFields alloc] init];
     Node* nodeWithAttachments = [[Node alloc] initAsRecord:@"Attachments" parent:keePassRootGroup fields:fields uuid:nil];
-    [keePassRootGroup addChild:nodeWithAttachments];
+    [keePassRootGroup addChild:nodeWithAttachments allowDuplicateGroupTitles:YES];
     
     return nodeWithAttachments;
 }
 
 static NSArray<Node*>* getSampleNodes(Node* root) {
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:root uuid:nil];
-    [root addChild:keePassRootGroup];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:root allowDuplicateGroupTitles:YES uuid:nil];
+    [root addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     
     Node* node1 = [[Node alloc] initAsRecord:@"Attachment-1" parent:keePassRootGroup fields:[[NodeFields alloc] init] uuid:nil];
-    [keePassRootGroup addChild:node1];
+    [keePassRootGroup addChild:node1 allowDuplicateGroupTitles:YES];
     
     Node* node2 = [[Node alloc] initAsRecord:@"Attachment-2" parent:keePassRootGroup fields:[[NodeFields alloc] init] uuid:nil];
-    [keePassRootGroup addChild:node2];
+    [keePassRootGroup addChild:node2 allowDuplicateGroupTitles:YES];
     
     return @[node1, node2];
 }

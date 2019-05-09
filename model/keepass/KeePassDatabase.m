@@ -46,8 +46,8 @@
     // Keepass has it's own root group to work off of, and doesn't allow entries at the actual root.
     // In the UI we don't display the actual root but the Keepass Root
     
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup uuid:nil];
-    [rootGroup addChild:keePassRootGroup];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     
     KeePassDatabaseMetadata* metadata = [[KeePassDatabaseMetadata alloc] init];
     

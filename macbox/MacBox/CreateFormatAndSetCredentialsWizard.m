@@ -146,8 +146,10 @@
     
     if(self.checkboxUseAPassword.state == NSOnState) {
         if(![self.textFieldNew.stringValue isEqualToString:self.textFieldConfirm.stringValue]) {
-            self.labelPasswordsMatch.stringValue = @"🛑 Passwords don't match";
-
+            if(self.textFieldConfirm.stringValue.length) {
+                self.labelPasswordsMatch.stringValue = @"🛑 Passwords don't match";
+            }
+            
             return NO; // No Further Validation For THe Moment
         }
     }

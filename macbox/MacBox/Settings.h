@@ -70,6 +70,11 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL dereferenceInOutlineView;
 @property BOOL dereferenceDuringSearch;
 
+@property BOOL detectForeignChanges;
+@property BOOL autoReloadAfterForeignChanges;
+@property BOOL concealEmptyProtectedFields;
+@property BOOL showCustomFieldsOnQuickViewPanel;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

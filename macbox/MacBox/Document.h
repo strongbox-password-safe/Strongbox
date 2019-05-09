@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCredentials:(DatabaseFormat)format password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest;
 
-//- (void)foo:(Node*)item;
+- (void)revertWithUnlock:(NSString*_Nullable)password
+           keyFileDigest:(NSData*_Nullable)keyFileDigest
+            selectedItem:(NSString*_Nullable)selectedItem
+              completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
 
 NS_ASSUME_NONNULL_END
 

@@ -206,7 +206,7 @@
     for(int i=0;i<1000;i++) {
         NodeFields *fields = [[NodeFields alloc] init];
         Node *childNode = [[Node alloc] initAsRecord:[NSString stringWithFormat:@"Title %d", i] parent:[db.rootGroup.childGroups objectAtIndex:0] fields:fields uuid:nil];
-        [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode];
+        [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
     }
     
     NSError* error;
@@ -238,7 +238,7 @@
     
     NodeFields *fields = [[NodeFields alloc] init];
     Node *childNode = [[Node alloc] initAsRecord:@"Title &<>'\\ Done" parent:[db.rootGroup.childGroups objectAtIndex:0] fields:fields uuid:nil];
-    [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode];
+    [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
     
     NSError* error;
     NSData* data = [adaptor save:db error:&error];
@@ -287,7 +287,7 @@
     NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username" url:@"url" password:@"ladder" notes:@"notes" email:@"email"];
     
     Node* record = [[Node alloc] initAsRecord:@"Title" parent:keePassRoot fields:fields uuid:nil];
-    [keePassRoot addChild:record];
+    [keePassRoot addChild:record allowDuplicateGroupTitles:YES];
     
     [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment1.txt" data:data1]];
     [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment2.txt" data:data2]];
@@ -379,7 +379,7 @@
     XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
     XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
 
-    testNode.title = @"New Entry13333576hg-6sqIXJVO;Q";
+    [testNode setTitle:@"New Entry13333576hg-6sqIXJVO;Q" allowDuplicateGroupTitles:YES];
     
     NSData* d = [adaptor save:db error:&error]; // [db getAsData:&error];
     StrongboxDatabase *b = [adaptor open:d password:@"a" error:&error];

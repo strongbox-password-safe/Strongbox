@@ -388,7 +388,12 @@ NSData* writeEntry(KdbEntry* entry) {
 }
 
 static NSData* stringtoKeePassData(NSString* str) {
-    return [NSData dataWithBytes:[str cStringUsingEncoding:NSUTF8StringEncoding] length:str.length+1];
+    NSString *foo = str ? str : @"";
+    
+    const char *utf8 = [foo cStringUsingEncoding:NSUTF8StringEncoding];
+    size_t len = strlen(utf8);
+    
+    return [NSData dataWithBytes:utf8 length:len];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

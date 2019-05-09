@@ -20,8 +20,9 @@
                                                 NSTableViewDelegate,
                                                 NSTableViewDataSource>
 
-@property (strong, nonatomic) ViewModel* model;
-//-(void)updateDocumentUrl;
+- (void)onFileChangedByOtherApplication;
+- (void)resetModel:(ViewModel *)model;
+
 @property (weak) IBOutlet ClickableImageView *imageViewGroupDetails;
 
 // App wide fields

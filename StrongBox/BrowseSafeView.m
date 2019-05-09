@@ -186,7 +186,7 @@
                                item.fields.accessed = [NSDate date];
                                item.fields.modified = [NSDate date];
                                
-                               item.title = text;
+                               [item setTitle:text allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe];
                                
                                [self saveChangesToSafeAndRefreshView];
                            }
@@ -564,7 +564,7 @@
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
-    return [NSString stringWithFormat:@"(in %@)", [self.viewModel.database getGroupPathDisplayString:vm]];
+    return [NSString stringWithFormat:@"(in %@)", [self.viewModel.database getSearchParentGroupPathDisplayString:vm]];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

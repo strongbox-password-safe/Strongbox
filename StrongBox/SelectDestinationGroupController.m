@@ -38,7 +38,7 @@
 - (BOOL)moveOfItemsIsValid:(Node*)group subgroupsValid:(BOOL)subgroupsValid  {
     BOOL ret = YES;
     for(Node* itemToMove in self.itemsToMove) {
-        if(![itemToMove validateChangeParent:group]) {
+        if(![itemToMove validateChangeParent:group allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe]) {
             ret = NO;
             break;
         }
@@ -68,7 +68,7 @@
 
 - (IBAction)onMoveHere:(id)sender {
     for(Node* itemToMove in self.itemsToMove) {
-        if(![itemToMove changeParent:self.currentGroup]) {
+        if(![itemToMove changeParent:self.currentGroup allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe]) {
             NSLog(@"Error Changing Parents.");
             [Alerts warn:self title:@"Error Changing Parents" message:@"Error Changing Parents" completion:^{
                 [self.navigationController dismissViewControllerAnimated:YES completion:nil];

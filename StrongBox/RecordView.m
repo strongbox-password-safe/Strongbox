@@ -968,7 +968,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.accessed = [[NSDate alloc] init];
     self.record.fields.modified = [[NSDate alloc] init];
     
-    self.record.title = historicalNode.title;
+    [self.record setTitle:historicalNode.title allowDuplicateGroupTitles:NO];
     self.record.iconId = historicalNode.iconId;
     self.record.customIconUuid = historicalNode.customIconUuid;
     
@@ -1128,14 +1128,14 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.modified = [[NSDate alloc] init];
     self.record.fields.notes = self.textViewNotes.text;
     self.record.fields.password = trim(self.textFieldPassword.text);
-    self.record.title = trim(self.textFieldTitle.text);
+    [self.record setTitle:trim(self.textFieldTitle.text) allowDuplicateGroupTitles:NO];
     self.record.fields.url = trim(self.textFieldUrl.text);
     self.record.fields.username = trim(self.textFieldUsername.text);
     self.record.fields.email = trim(self.textFieldEmail.text);
     
     if (self.editingNewRecord) {
         self.record.fields.created = [[NSDate alloc] init];
-        [self.parentGroup addChild:self.record];
+        [self.parentGroup addChild:self.record allowDuplicateGroupTitles:NO];
     }
     else { // Add History Entry for this change if appropriate...
         [self addHistoricalNode:originalNodeForHistory];
