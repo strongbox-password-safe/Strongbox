@@ -173,21 +173,23 @@ static NSString* const kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
     
     for(int i=0;i<parameters.xkcdWordCount;i++) {
         NSUInteger index = arc4random_uniform((u_int32_t)PasswordGenerator.xkcdGoogleWordList.count);
-    
         [randomString appendString:[[PasswordGenerator.xkcdGoogleWordList objectAtIndex:index] capitalizedString]];
+        if(i<parameters.xkcdWordCount - 1 && parameters.wordSeparator.length) {
+            [randomString appendString:parameters.wordSeparator];
+        }
     }
     
     return randomString;
 }
 
 + (NSString*)generateDicewareStylePassword:(NSString*)wordSeparator
-                                  wordList:(WordList)xKcdWordList
+                                  wordList:(WordList)wordList
                                  wordCount:(int)wordCount {
-    NSDictionary<NSNumber*, NSString*>* wordList = [PasswordGenerator getWordList:xKcdWordList];
+    NSDictionary<NSNumber*, NSString*>* w = [PasswordGenerator getWordList:wordList];
 
 //    int diceRolls =  [PasswordGenerator getDiceRollsForList:xKcdWordList];
     
-    return wordList[@(11111)];
+    return w[@(11111)];
 }
 
 + (int)getDiceRollsForList:(WordList)wordList {

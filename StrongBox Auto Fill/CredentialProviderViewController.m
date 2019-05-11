@@ -71,6 +71,8 @@
                                                                safe:safe
                                                   openAutoFillCache:YES
                                                 canConvenienceEnrol:NO
+                                                     isAutoFillOpen:YES
+                                             manualOpenOfflineCache:NO 
                                                          completion:^(Model * _Nullable model, NSError * _Nullable error) {
                 if(model) {
                     [self onOpenedQuickType:model identifier:identifier];

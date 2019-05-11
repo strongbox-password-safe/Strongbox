@@ -37,7 +37,6 @@ static const int kMinNotesCellHeight = 160;
 
     [self initializeUi];
     
-    // TODO: Setup Autocomplete's
     // TODO: Allow selection of Folder/Group
     // TODO: Ability to create new even during a search
 }

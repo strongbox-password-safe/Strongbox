@@ -29,7 +29,15 @@
     return sharedInstance;
 }
 
+- (void) stopMonitoringConnectivitity {
+    [self.internetReachabilityDetector stopNotifier];
+    self.internetReachabilityDetector = nil;
+    self.offline = NO;
+}
+    
 - (void) startMonitoringConnectivitity {
+    self.offline = NO;
+
     self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"www.google.com"];
     
     // Internet is reachable
@@ -37,6 +45,7 @@
     __weak typeof(self) weakSelf = self;
     self.internetReachabilityDetector.reachableBlock = ^(Reachability *reach)
     {
+        NSLog(@"OfflineDetector: We Are Online :)");
         weakSelf.offline = NO;
     };
     
@@ -44,6 +53,7 @@
     
     self.internetReachabilityDetector.unreachableBlock = ^(Reachability *reach)
     {
+        NSLog(@"OfflineDetector: We Are Offline :(");
         weakSelf.offline = YES;
     };
     

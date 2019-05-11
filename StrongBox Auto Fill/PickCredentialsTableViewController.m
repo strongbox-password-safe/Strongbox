@@ -8,7 +8,6 @@
 
 #import "PickCredentialsTableViewController.h"
 #import "NodeIconHelper.h"
-#import "BrowseSafeEntryTableViewCell.h"
 #import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "Node+OTPToken.h"
@@ -17,6 +16,10 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"
+#import "BrowseItemCell.h"
+#import "ItemDetailsViewController.h"
+
+static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -42,6 +45,8 @@
         self.navigationItem.prompt = nil;
     }
     
+    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
+    
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
                                 initWithTarget:self
                                 action:@selector(handleLongPress:)];
@@ -49,9 +54,12 @@
     self.longPressRecognizer.cancelsTouchesInView = YES;
     
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
-
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
+    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    
+    self.tableView.tableFooterView = [UIView new];
     
     self.buttonAddCredential.enabled = [self canCreateNewCredential];
     
@@ -256,58 +264,72 @@
     [self updateSearchResultsForSearchController:self.searchController];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewAutomaticDimension;  // Required for iOS 9 and 10
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    /* Return an estimated height or calculate
+     * estimated height dynamically on information
+     * that makes sense in your case.
+     */
+    return 60.0f; // Required for iOS 9 and 10
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [self getDataSource].count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
+    BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
+    
+    NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+    UIImage* icon = [NodeIconHelper getIconForNode:node database:self.model.database];
+    NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+    
     if(node.isGroup) {
-        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"FolderCell" forIndexPath:indexPath];
-        cell.textLabel.text = node.title;
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        cell.imageView.image = [NodeIconHelper getIconForNode:node database:self.model.database];
-
-        return cell;
+        BOOL italic = (self.model.database.recycleBinEnabled && node == self.model.database.recycleBinNode);
+        
+        NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
+        
+        [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
     }
     else {
-        BrowseSafeEntryTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-        
-        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
-        
-        if(Settings.sharedInstance.viewDereferencedFields) {
-            cell.title.text = [self dereference:node.title node:node];
-            cell.username.text = [self dereference:node.fields.username node:node];
+        NSString* username = @"";
+        if(Settings.sharedInstance.showUsernameInBrowse) {
+            username = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
         }
-        else {
-            cell.title.text = node.title;
-            cell.username.text = node.fields.username;
-        }
+        
+        NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
+        flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+        
+        [cell setRecord:title username:username icon:icon groupLocation:groupLocation flags:flags];
+        
+        [self setOtpCellProperties:cell node:node];
+    }
+    
+    return cell;
+}
 
-        cell.path.text = groupLocation;
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.icon.image = [NodeIconHelper getIconForNode:node database:self.model.database];
-        cell.flags.text = node.fields.attachments.count > 0 ? @"📎" : @"";
-        
-        if(!Settings.sharedInstance.hideTotpInAutoFill && node.otpToken) {
-            uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
-            
-            cell.otpCode.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
-            cell.otpCode.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
-            
-            cell.otpCode.alpha = 1;
-            
-            if(remainingSeconds < 16) {
-                [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-                    cell.otpCode.alpha = 0.5;
-                } completion:nil];
-            }
-        }
-        else {
-            cell.otpCode.text = @"";
-        }
+- (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {
+    if(!Settings.sharedInstance.hideTotpInAutoFill && node.otpToken) {
+        uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
 
-        return cell;
+        cell.otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+        cell.otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+
+        cell.otpLabel.alpha = 1;
+
+        if(remainingSeconds < 16) {
+            [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+                cell.otpLabel.alpha = 0.5;
+            } completion:nil];
+        }
+    }
+    else {
+        cell.otpLabel.text = @"";
     }
 }
 
@@ -324,48 +346,77 @@
 }
 
 - (IBAction)onAddCredential:(id)sender {
-    [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
+    [self segueToCreateNew];
+}
+
+- (void)segueToCreateNew {
+    if (@available(iOS 11.0, *)) {
+        if(Settings.sharedInstance.useOldItemDetailsScene) {
+            [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToAddNew" sender:nil];
+        }
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
+    }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    NSString* suggestedTitle = nil;
+    NSString* suggestedUrl = nil;
+    
+    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
+    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+    if(serviceId) {
+        if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
+            NSURL* url = [NSURL URLWithString:serviceId.identifier];
+            if(url && url.host.length) {
+                NSString* foo = getCompanyOrOrganisationNameFromDomain(url.host);
+                suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+                suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
+            }
+            else {
+                suggestedUrl = serviceId.identifier;
+            }
+        }
+        else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
+            NSString* foo = getCompanyOrOrganisationNameFromDomain(serviceId.identifier);
+            suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+            suggestedUrl = serviceId.identifier;
+        }
+    }
+
     if([segue.identifier isEqualToString:@"segueToAdd"]) {
         CreateCredentialTableViewController *vc = segue.destinationViewController;
         
         vc.viewModel = self.model;
         vc.rootViewController = self.rootViewController;
-
-        NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-        ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
-        if(serviceId) {
-            if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
-                NSURL* url = [NSURL URLWithString:serviceId.identifier];
-                if(url && url.host.length) {
-                    NSString* foo = getCompanyOrOrganisationNameFromDomain(url.host);
-                    vc.suggestedTitle = foo.length ? [foo capitalizedString] : foo;
-                    vc.suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
-                }
-                else {
-                    vc.suggestedUrl = serviceId.identifier;
-                }
-                return;
-            }
-            else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
-                NSString* foo = getCompanyOrOrganisationNameFromDomain(serviceId.identifier);
-                vc.suggestedTitle = foo.length ? [foo capitalizedString] : foo;
-                vc.suggestedUrl = serviceId.identifier;
-                return;
-            }
-        }
+        vc.suggestedUrl = suggestedUrl;
+        vc.suggestedTitle = suggestedTitle;
+    }
+    else {
+        ItemDetailsViewController* vc = segue.destinationViewController;
+        
+        vc.createNewItem = YES;
+        vc.item = nil;
+        vc.parentGroup = self.model.database.rootGroup;
+        vc.readOnly = NO;
+        vc.databaseModel = self.model;
+        vc.autoFillRootViewController = self.rootViewController;
+        vc.autoFillSuggestedUrl = suggestedUrl;
+        vc.autoFillSuggestedTitle = suggestedTitle;
     }
 }
 
 - (BOOL)canCreateNewCredential {
-    return [self.rootViewController isLiveAutoFillProvider:self.model.metadata.storageProvider];
+    return [self.rootViewController isLiveAutoFillProvider:self.model.metadata.storageProvider] && !self.model.isReadOnly;
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
     if([self canCreateNewCredential]) {
-        [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
+        [self segueToCreateNew];
     }
     else {
         [Alerts info:self title:@"Unsupported Storage" message:@"This database is stored on a Storage Provider that does not support Live editing in App Extensions. Cannot Create New Record."];

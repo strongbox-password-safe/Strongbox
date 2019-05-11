@@ -8,10 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "Kdbx4SerializationData.h"
+#import "CryptoParameters.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdbx4Serialization : NSObject
+
++ (CryptoParameters*)getCryptoParams:(NSData*)safeData; // Used to test AutoFill crash likelyhood without full decrypt
 
 + (nullable Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest ppError:(NSError**)ppError;
 + (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest ppError:(NSError**)ppError;

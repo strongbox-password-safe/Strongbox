@@ -198,9 +198,11 @@
     BOOL useAutoFillCache = ![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider];
     
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                        safe:safe
+                                                       safe:safe
                                           openAutoFillCache:useAutoFillCache
-                                          canConvenienceEnrol:NO
+                                        canConvenienceEnrol:NO
+                                             isAutoFillOpen:YES
+                                     manualOpenOfflineCache:NO 
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];

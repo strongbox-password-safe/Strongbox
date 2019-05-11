@@ -18,12 +18,13 @@
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 #import "NodeIconHelper.h"
-#import "BrowseSafeEntryTableViewCell.h"
-#import "BrowseGroupTableViewCell.h"
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
 #import "SetNodeIconUiHelper.h"
 #import "ItemDetailsViewController.h"
+#import "BrowseItemCell.h"
+
+static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 @interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -68,15 +69,22 @@
 
 - (IBAction)updateOtpCodes:(id)sender {
     if(![self.tableView isEditing]) { // DO not update during edit, cancels left swipe menu and edit selections!
-        [self.tableView reloadData]; // FUTURE: Only update OTP rows
+        NSArray<NSIndexPath*>* visible = [self.tableView indexPathsForVisibleRows];
+        
+        NSArray<Node*> *nodes = [self getDataSource];
+        NSArray* visibleOtpRows = [visible filter:^BOOL(NSIndexPath * _Nonnull obj) {
+            return nodes[obj.row].otpToken != nil;
+        }];
+        
+        [self.tableView reloadRowsAtIndexPaths:visibleOtpRows withRowAnimation:UITableViewRowAnimationNone];
     }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //self.customIconsCache = [NSMutableDictionary dictionary];
-    
+    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
+
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
                                 initWithTarget:self
                                 action:@selector(handleLongPress:)];
@@ -88,8 +96,10 @@
     self.tableView.allowsMultipleSelection = NO;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsSelectionDuringEditing = YES;
+    
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
+    
     self.tableView.tableFooterView = [UIView new];
     
     if(Settings.sharedInstance.hideTips) {
@@ -151,6 +161,19 @@
 
         [self enableDisableToolbarButtons]; // Disable moving/deletion if there's been a move
     }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewAutomaticDimension;  // Required for iOS 9 and 10
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    /* Return an estimated height or calculate
+     * estimated height dynamically on information
+     * that makes sense in your case.
+     */
+    return 60.0f; // Required for iOS 9 and 10
 }
 
 - (IBAction)onSortItems:(id)sender {
@@ -312,75 +335,57 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
-    if(node.isGroup) {
-        BrowseGroupTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"GroupCell" forIndexPath:indexPath];
-        
-        NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-        
-        cell.title.text = title;
-        cell.childCount.text = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
-        
-        if(self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode) {
-            cell.title.font = [UIFont italicSystemFontOfSize:cell.title.font.pointSize];
-        }
-        else {
-            cell.title.font = [UIFont systemFontOfSize:cell.title.font.pointSize];
-        }
+    BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
-        //NSLog(@"Group: %f", cell.frame.size.height);
+    NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+    UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+    NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+
+    if(node.isGroup) {
+        BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
+
+        NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
         
-        return cell;
+        
+        [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
     }
     else {
-        BrowseSafeEntryTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-
-        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+        NSString* username = @"";
+        if(Settings.sharedInstance.showUsernameInBrowse) {
+            username = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+        }
         
-        if(Settings.sharedInstance.viewDereferencedFields) {
-            cell.title.text = [self dereference:node.title node:node];
-            cell.username.text = [self dereference:node.fields.username node:node];
-        }
-        else {
-            cell.title.text = node.title;
-            cell.username.text = node.fields.username;
-        }
-
-        cell.path.text = groupLocation;
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.icon.image = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
-        cell.flags.text = node.fields.attachments.count > 0 ? @"📎" : @"";
+        NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
+        flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+        
+        [cell setRecord:title username:username icon:icon groupLocation:groupLocation flags:flags];
 
         [self setOtpCellProperties:cell node:node];
-        
-        //NSLog(@"Item: %f", cell.frame.size.height);
-        
-        return cell;
     }
+    
+    return cell;
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
     return [self.viewModel.database dereference:text node:node];
 }
 
-- (void)setOtpCellProperties:(BrowseSafeEntryTableViewCell*)cell node:(Node*)node {
+- (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {
     if(!Settings.sharedInstance.hideTotpInBrowse && node.otpToken) {
         uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
         
-        cell.otpCode.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
-        cell.otpCode.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
-        
-        cell.otpCode.alpha = 1;
+        cell.otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+        cell.otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+        cell.otpLabel.alpha = 1;
         
         if(remainingSeconds < 16) {
             [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-                cell.otpCode.alpha = 0.5;
+                cell.otpLabel.alpha = 0.5;
             } completion:nil];
         }
     }
     else {
-        cell.otpCode.text = @"";
+        cell.otpLabel.text = @"";
     }
 }
 
@@ -409,6 +414,9 @@
             self.tapTimer = nil;
         }
     }
+    
+//    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//    NSLog(@"Cell Height: %f - XXXXXXXXXXXXXXXXXXXXXXXXXXX", cell.frame.size.height);
 }
 
 - (void)tapTimerFired:(NSTimer *)aTimer{

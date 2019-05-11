@@ -124,6 +124,11 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL instantPinUnlocking;
 @property BOOL showChildCountOnFolderInBrowse;
 
+@property BOOL showFlagsInBrowse;
+@property BOOL showUsernameInBrowse;
+
+@property BOOL haveWarnedAboutAutoFillCrash;
+
 NS_ASSUME_NONNULL_END
 
 @end

@@ -10,6 +10,10 @@
 #import "Node.h"
 #import "Model.h"
 
+#ifdef IS_APP_EXTENSION
+#import "CredentialProviderViewController.h"
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const CellHeightsChangedNotification;
@@ -21,6 +25,12 @@ extern NSString *const CellHeightsChangedNotification;
 @property Node*_Nullable item;
 @property BOOL readOnly;
 @property Model* databaseModel;
+
+#ifdef IS_APP_EXTENSION
+@property (nonatomic, strong) CredentialProviderViewController *autoFillRootViewController;
+@property (nonatomic) NSString* autoFillSuggestedTitle;
+@property (nonatomic) NSString* autoFillSuggestedUrl;
+#endif
 
 @end
 

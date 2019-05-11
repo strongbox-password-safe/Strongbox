@@ -40,6 +40,8 @@
 @property NSString* masterPassword;
 @property NSData* keyFileDigest;
 @property BOOL keyFileSelectionModeAskForPasswordBeforeOpen;
+@property BOOL isAutoFillOpen;
+@property BOOL manualOpenOfflineCache;
 
 @end
 
@@ -49,29 +51,43 @@
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
                              completion:(CompletionBlock)completion {
-    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController safe:safe openAutoFillCache:NO canConvenienceEnrol:canConvenienceEnrol completion:completion];
+    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
+                                                       safe:safe
+                                          openAutoFillCache:NO
+                                        canConvenienceEnrol:canConvenienceEnrol
+                                             isAutoFillOpen:isAutoFillOpen
+                                     manualOpenOfflineCache:manualOpenOfflineCache
+                                                 completion:completion];
 }
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                       openAutoFillCache:(BOOL)openAutoFillCache
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
                              completion:(CompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
-                                                      safe:safe
-                                         openAutoFillCache:openAutoFillCache
-                                         canConvenienceEnrol:canConvenienceEnrol
-                                                completion:completion];
+                                                                                       safe:safe
+                                                                          openAutoFillCache:openAutoFillCache
+                                                                        canConvenienceEnrol:canConvenienceEnrol
+                                                                             isAutoFillOpen:isAutoFillOpen
+                                                                     manualOpenOfflineCache:manualOpenOfflineCache
+                                                                                 completion:completion];
     
     [helper beginSequence];
 }
 
 - (instancetype)initWithViewController:(UIViewController*)viewController
-                          safe:(SafeMetaData*)safe
-             openAutoFillCache:(BOOL)openAutoFillCache
-             canConvenienceEnrol:(BOOL)canConvenienceEnrol
-                    completion:(CompletionBlock)completion {
+                                  safe:(SafeMetaData*)safe
+                     openAutoFillCache:(BOOL)openAutoFillCache
+                   canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                        isAutoFillOpen:(BOOL)isAutoFillOpen
+                manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                            completion:(CompletionBlock)completion {
     self = [super init];
     if (self) {
         self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
@@ -81,6 +97,8 @@
         self.openAutoFillCache = openAutoFillCache;
         self.completion = completion;
         self.keyFileSelectionModeAskForPasswordBeforeOpen = NO;
+        self.isAutoFillOpen = isAutoFillOpen;
+        self.manualOpenOfflineCache = manualOpenOfflineCache;
     }
     
     return self;
@@ -552,6 +570,23 @@
                 [self onProviderReadDone:provider data:data error:error cacheMode:YES];
             }];
         }
+        else if (self.manualOpenOfflineCache) {
+            if(self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
+                [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:self.safe
+                                                                    viewController:self.viewController
+                                                                        completion:^(NSData *data, NSError *error)
+                 {
+                     if(data != nil) {
+                         [self onProviderReadDone:nil data:data error:error cacheMode:YES];
+                     }
+                 }];
+            }
+            else {
+                [Alerts warn:self.viewController title:@"Could Not Open Offline" message:@"Could not open this database in offline mode. Does the Offline Cache exist?"];
+                self.completion(nil, nil);
+            }
+            return;
+        }
         else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
             NSString * modDateStr = getLastCachedDate(self.safe);
             NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
@@ -585,9 +620,15 @@
             }
         }
         else {
-            [self openSafeWithData:data
-                          provider:provider
-                         cacheMode:cacheMode];
+            if(self.isAutoFillOpen && !Settings.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseModel isAutoFillLikelyToCrash:data]) {
+                [Alerts warn:self.viewController title:@"AutoFill Crash Likely" message:@"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB)." completion:^{
+                    Settings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
+                    [self openSafeWithData:data provider:provider cacheMode:cacheMode];
+                }];
+            }
+            else {
+                [self openSafeWithData:data provider:provider cacheMode:cacheMode];
+            }
         }
     });
 }

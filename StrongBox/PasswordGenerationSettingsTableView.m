@@ -35,6 +35,10 @@
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
+- (IBAction)onWordSeparatorChanged:(id)sender {
+    [self onChangeSettings:sender];
+}
+
 - (IBAction)onChangeSettings:(id)sender {
     PasswordGenerationParameters *params = [[PasswordGenerationParameters alloc] init];
     
@@ -76,6 +80,8 @@
     if(params.xkcdWordCount > 50){
         params.xkcdWordCount = 50;
     }
+    
+    params.wordSeparator = self.wordSeparatorTextField.text;
     
     if(!params.useLower && !params.useUpper && !params.useDigits && !params.useSymbols) {
         params.useLower = YES;
@@ -129,6 +135,7 @@
     self.labelMaxLen.enabled = params.algorithm == kBasic;
     
     self.labelXkcdWc.enabled = params.algorithm == kXkcd;
+    self.wordSeparatorTextField.text = params.wordSeparator ? params.wordSeparator : @"";
 }
 
 - (IBAction)onGenerate:(id)sender {

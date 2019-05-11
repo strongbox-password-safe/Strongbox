@@ -694,7 +694,7 @@ static NSImage* kStrongBox256Image;
     }
     else if([tableColumn.identifier isEqualToString:kTOTPColumn]) {
         NSString* totp = it.otpToken ? it.otpToken.password : @"";
-        NSLog(@"TOTP: %@", totp);
+        //NSLog(@"TOTP: %@", totp);
         NSTableCellView* cell = [self getReadOnlyCell:totp];
 
         if(it.otpToken) {

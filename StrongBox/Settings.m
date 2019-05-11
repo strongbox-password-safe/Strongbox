@@ -62,6 +62,9 @@ static NSString* const kCollapsedSections = @"collapsedSections";
 static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
 static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolderInBrowse";
+static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
+static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse";
+static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 
 @implementation Settings
 
@@ -826,6 +829,30 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setShowChildCountOnFolderInBrowse:(BOOL)showChildCountOnFolderInBrowse {
     [self setBool:kShowChildCountOnFolderInBrowse value:showChildCountOnFolderInBrowse];
+}
+
+- (BOOL)showFlagsInBrowse {
+    return [self getBool:kShowFlagsInBrowse fallback:YES];
+}
+
+- (void)setShowFlagsInBrowse:(BOOL)showFlagsInBrowse {
+    [self setBool:kShowFlagsInBrowse value:showFlagsInBrowse];
+}
+
+- (BOOL)showUsernameInBrowse {
+    return [self getBool:kShowUsernameInBrowse fallback:YES];
+}
+
+-(void)setShowUsernameInBrowse:(BOOL)showUsernameInBrowse {
+    [self setBool:kShowUsernameInBrowse value:showUsernameInBrowse];
+}
+
+- (BOOL)haveWarnedAboutAutoFillCrash {
+    return [self getBool:kHaveWarnedAboutAutoFillCrash];
+}
+
+- (void)setHaveWarnedAboutAutoFillCrash:(BOOL)haveWarnedAboutAutoFillCrash {
+    [self setBool:kHaveWarnedAboutAutoFillCrash value:haveWarnedAboutAutoFillCrash];
 }
 
 @end

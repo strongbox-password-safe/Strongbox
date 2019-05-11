@@ -33,6 +33,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelMinLen;
 @property (weak, nonatomic) IBOutlet UILabel *labelMaxLen;
 @property (weak, nonatomic) IBOutlet UILabel *labelXkcdWc;
+@property (weak, nonatomic) IBOutlet UITextField *wordSeparatorTextField;
+- (IBAction)onWordSeparatorChanged:(id)sender;
 
 - (IBAction)onChangeSettings:(id)sender;
 - (IBAction)onGenerate:(id)sender;

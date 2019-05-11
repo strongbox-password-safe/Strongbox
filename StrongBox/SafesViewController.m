@@ -256,6 +256,10 @@
         return;
     }
     
+    [self openSafeAtIndexPath:indexPath offline:NO];
+}
+
+- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath offline:(BOOL)offline {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
     if(safe.hasUnresolvedConflicts) {
@@ -264,7 +268,9 @@
     else {
         [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                            safe:safe
-                                              canConvenienceEnrol:YES
+                                            canConvenienceEnrol:YES
+                                                 isAutoFillOpen:NO
+                                         manualOpenOfflineCache:offline
                                                      completion:^(Model * _Nullable model, NSError * _Nullable error) {
             if(model) {
                 [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
@@ -274,7 +280,7 @@
          }];
     }
     
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -292,18 +298,35 @@
         [self onExportSafe:indexPath];
     }];
     
-    exportAction.backgroundColor = [UIColor orangeColor];
+    exportAction.backgroundColor = [UIColor orangeColor]; // TODO: Move export into Details Screen... too many actions here
+ 
+    NSMutableArray* actions = [NSMutableArray arrayWithArray:@[removeAction, renameAction, exportAction]];
     
-    UITableViewRowAction *removeKeyFileAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Remove Local Key File" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self removeLocalKeyFile:indexPath];
-    }];
-    
-    removeKeyFileAction.backgroundColor = [UIColor magentaColor];
-
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL hasKeyFile = [OpenSafeSequenceHelper findAssociatedLocalKeyFile:safe.fileName] != nil;
+    if(hasKeyFile) {
+        UITableViewRowAction *removeKeyFileAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Remove Local Key File" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+            [self removeLocalKeyFile:indexPath];
+        }];
+        removeKeyFileAction.backgroundColor = [UIColor magentaColor];
+
+        [actions addObject:removeKeyFileAction];
+    }
     
-    return hasKeyFile ? @[removeAction, renameAction, exportAction, removeKeyFileAction] : @[removeAction, renameAction, exportAction];
+    if(safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
+        UITableViewRowAction *openOffline = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Open Offline" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+            [self openOffline:indexPath];
+        }];
+        openOffline.backgroundColor = [UIColor darkGrayColor];
+
+        [actions addObject:openOffline];
+    }
+    
+    return actions;
+}
+
+- (void)openOffline:(NSIndexPath*)indexPath {
+    [self openSafeAtIndexPath:indexPath offline:YES];
 }
 
 - (void)removeLocalKeyFile:(NSIndexPath * _Nonnull)indexPath {

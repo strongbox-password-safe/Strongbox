@@ -33,8 +33,6 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDropbox];
 
-    [OfflineDetector.sharedInstance startMonitoringConnectivitity];
-
     [[Settings sharedInstance] incrementLaunchCount];
 
     if(Settings.sharedInstance.installDate == nil) {
@@ -100,10 +98,14 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
+    [OfflineDetector.sharedInstance stopMonitoringConnectivitity];
+
     [[self getInitialViewController] appResignActive];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity];
+
     [[self getInitialViewController] appBecameActive];
     
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];

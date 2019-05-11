@@ -20,6 +20,7 @@ extern NSInteger const kSearchScopeAll;
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
++ (BOOL)isAutoFillLikelyToCrash:(NSData*)data;
 
 + (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
 

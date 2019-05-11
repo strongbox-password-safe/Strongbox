@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
+- (void) stopMonitoringConnectivitity;
 - (void) startMonitoringConnectivitity;
 - (BOOL) isOffline;
 

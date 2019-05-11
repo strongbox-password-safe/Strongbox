@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) UIFont* easyReadFont;
 @property (readonly) UIFont* easyReadFontForTotp;
 @property (readonly) UIFont* regularFont;
+@property (readonly) UIFont* italicFont;
 @property (readonly) UIFont* configuredValueFont;
 
 @end

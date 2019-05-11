@@ -36,7 +36,10 @@ static NSString* const kEasyReadFontName = @"Menlo";
 
 - (void)buildFonts {
     _regularFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-    
+
+    UIFontDescriptor* desc = [self.regularFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+    _italicFont = [UIFont fontWithDescriptor:desc size:0];
+
     UIFont* customFont = [UIFont fontWithName:kEasyReadFontName size:UIFont.labelFontSize];
     if (@available(iOS 11.0, *)) {
         _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customFont];
@@ -44,6 +47,7 @@ static NSString* const kEasyReadFontName = @"Menlo";
         _easyReadFont = customFont;
     }
     _easyReadFontForTotp = [UIFont fontWithName:kEasyReadFontName size:26.0];
+    
     
     NSLog(@"Fonts built: [%@-%@-%@]", self.regularFont, self.easyReadFont, self.easyReadFontForTotp);
 }

@@ -15,11 +15,11 @@
 
 static NSString* const kParameterSalt = @"S";
 static NSString* const kParameterParallelism = @"P";
-static NSString* const kParameterMemory = @"M";
 static NSString* const kParameterIterations = @"I";
 static NSString* const kParameterVersion = @"V";
 static NSString* const kParameterSecretKey = @"K";
 static NSString* const kParameterAssocData = @"A";
+static NSString* const kParameterMemory = @"M";
 
 static const uint64_t kDefaultIterations = 2;
 static const uint64_t kDefaultMemory = 1024 * 1024;

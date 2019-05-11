@@ -21,19 +21,22 @@
 #import <QuickLook/QuickLook.h>
 #import "NodeIconHelper.h"
 #import "IconTableCell.h"
-#import "SetNodeIconUiHelper.h"
 #import "TotpCell.h"
 #import "OTPToken+Generation.h"
 #import "Alerts.h"
-#import "QRCodeScannerViewController.h"
 #import "Node+OtpToken.h"
-#import "ISMessages/ISMessages.h"
 #import "Settings.h"
 #import "NSDictionary+Extensions.h"
 #import "OTPToken+Serialization.h"
 #import "KeePassHistoryController.h"
 #import "PasswordHistoryViewController.h"
 #import "CollapsibleTableViewHeader.h"
+
+#ifndef IS_APP_EXTENSION
+#import "ISMessages/ISMessages.h"
+#import "SetNodeIconUiHelper.h"
+#import "QRCodeScannerViewController.h"
+#endif
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 
@@ -71,10 +74,13 @@ static NSString* const kTotpCell = @"TotpCell";
 @property ItemDetailsModel* model;
 @property ItemDetailsModel* preEditModelClone;
 @property BOOL passwordConcealedInUi;
-@property SetNodeIconUiHelper* sni;
 @property NSTimer* timerRefreshOtp;
 @property UIBarButtonItem* cancelOrDiscardBarButton;
 @property UIView* coverView;
+
+#ifndef IS_APP_EXTENSION
+@property SetNodeIconUiHelper* sni;
+#endif
 
 @end
 
@@ -89,24 +95,28 @@ static NSString* const kTotpCell = @"TotpCell";
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
- 
+
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
     [self.navigationController setNavigationBarHidden:NO];
     self.navigationController.navigationBar.hidden = NO;
     self.navigationController.navigationBarHidden = NO;
     self.navigationController.navigationBar.prefersLargeTitles = NO;
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onCellHeightChangedNotification)
                                                  name:CellHeightsChangedNotification
                                                object:nil];
     
+    [self.tableView reloadData];
+    
+    // Avoid Password Cell Glitch...
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
+    
     if(self.model.totp) {
         [self rescheduleTimer];
     }
-    
-    [self.tableView reloadData];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -158,6 +168,12 @@ static NSString* const kTotpCell = @"TotpCell";
     AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
     
     NSString *title = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
+
+#ifdef IS_APP_EXTENSION
+    if(self.autoFillSuggestedTitle.length) {
+        title = self.autoFillSuggestedTitle;
+    }
+#endif
     
     NSString* username = settings.usernameAutoFillMode == kNone ? @"" :
     settings.usernameAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularUsername : settings.usernameCustomAutoFill;
@@ -171,6 +187,13 @@ static NSString* const kTotpCell = @"TotpCell";
     settings.emailAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularEmail : settings.emailCustomAutoFill;
     
     NSString* url = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
+    
+#ifdef IS_APP_EXTENSION
+    if(self.autoFillSuggestedUrl.length) {
+        url = self.autoFillSuggestedUrl;
+    }
+#endif
+    
     NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
     
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
@@ -288,6 +311,7 @@ static NSString* const kTotpCell = @"TotpCell";
             
             cell.iconImage.image = [self getIconImageFromModel];
             
+#ifndef IS_APP_EXTENSION
             if(self.isEditing) {
                 cell.iconImage.layer.borderColor = UIColor.blueColor.CGColor;
                 cell.iconImage.layer.borderWidth = 0.5;
@@ -297,9 +321,12 @@ static NSString* const kTotpCell = @"TotpCell";
                 };
             }
             else {
+#endif
                 cell.iconImage.layer.borderWidth = 0;
                 cell.onIconTapped = nil;
+#ifndef IS_APP_EXTENSION
             }
+#endif
             
             return cell;
         }
@@ -455,6 +482,9 @@ static NSString* const kTotpCell = @"TotpCell";
             self.model.notes = notes;
             [self onModelEdited];
         };
+        cell.onNotesDoubleTap = ^{
+            [self copyToClipboard:self.model.notes message:@"Notes Copied"];
+        };
         
         return cell;
     }
@@ -583,7 +613,7 @@ static NSString* const kTotpCell = @"TotpCell";
         return @"Custom Fields";
     }
     else if (section == kNotesSectionIdx) {
-        return @"Notes";
+        return Settings.sharedInstance.hideTips ? @"Notes" : @"Notes - (Double Tap to Copy)";
     }
     else if (section == kAttachmentsSectionIdx) {
         return @"Attachments";
@@ -631,8 +661,14 @@ static NSString* const kTotpCell = @"TotpCell";
     BOOL shouldHideEmpty = Settings.sharedInstance.hideEmptyFieldsInDetailsView && !self.editing;
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
-        if(indexPath.row == kRowIcon && self.databaseModel.database.format == kPasswordSafe) {
-            return  0;
+        if(indexPath.row == kRowIcon) {
+#ifndef IS_APP_EXTENSION
+            if(self.databaseModel.database.format == kPasswordSafe) {
+                return  0;
+            }
+#else
+            return 0;
+#endif
         }
         else if(indexPath.row == kRowUsername && shouldHideEmpty && !self.model.username.length) {
             return 0;
@@ -646,9 +682,13 @@ static NSString* const kTotpCell = @"TotpCell";
             }
         }
         else if(indexPath.row == kRowTotp) {
+#ifndef IS_APP_EXTENSION
             if((!self.model.totp || Settings.sharedInstance.hideTotp) && !self.editing) {
                 return 0;
             }
+#else
+            return 0;
+#endif
         }
     }
     else if (indexPath.section == kNotesSectionIdx) {
@@ -656,6 +696,7 @@ static NSString* const kTotpCell = @"TotpCell";
             return 0;
         }
     }
+#ifndef IS_APP_EXTENSION
     else if(indexPath.section == kCustomFieldsSectionIdx && self.databaseModel.database.format == kPasswordSafe) {
         return 0;
     }
@@ -668,6 +709,14 @@ static NSString* const kTotpCell = @"TotpCell";
     else if(indexPath.section == kOtherSectionIdx && (!self.model.hasHistory || self.editing)) {
         return 0;
     }
+#else
+    if(indexPath.section == kCustomFieldsSectionIdx
+       || indexPath.section == kAttachmentsSectionIdx
+       || indexPath.section == kMetadataSectionIdx
+       || indexPath.section == kOtherSectionIdx) {
+        return 0;
+    }
+#endif
     
     return [super tableView:self.tableView heightForRowAtIndexPath:indexPath];
 }
@@ -681,6 +730,7 @@ static NSString* const kTotpCell = @"TotpCell";
     else if (section == kNotesSectionIdx && shouldHideEmpty && !self.model.notes.length) {
         return 0;
     }
+#ifndef IS_APP_EXTENSION
     else if(section == kCustomFieldsSectionIdx) {
         if(self.databaseModel.database.format == kPasswordSafe || (!self.editing && self.model.customFields.count == 0)) {
             return 0;
@@ -697,8 +747,16 @@ static NSString* const kTotpCell = @"TotpCell";
     else if(section == kOtherSectionIdx && (self.editing || !self.model.hasHistory)) {
         return 0;
     }
-    
-    return 28;
+#else
+    if(section == kCustomFieldsSectionIdx
+       || section == kAttachmentsSectionIdx
+       || section == kMetadataSectionIdx
+       || section == kOtherSectionIdx) {
+        return 0;
+    }
+#endif
+
+    return 40;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -814,7 +872,7 @@ static NSString* const kTotpCell = @"TotpCell";
             }
         }
         else if(indexPath.section == kNotesSectionIdx) {
-            [self copyToClipboard:self.model.notes message:@"Notes Copied"];
+            // NOP - Handled by the Text Field
         }
         else if(indexPath.section == kCustomFieldsSectionIdx) {
             CustomFieldViewModel* customField = self.model.customFields[indexPath.row];
@@ -1040,6 +1098,7 @@ static NSString* const kTotpCell = @"TotpCell";
                                  database:self.databaseModel.database];
 }
 
+#ifndef IS_APP_EXTENSION
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
     self.sni.customIcons = self.databaseModel.database.customIcons;
@@ -1060,6 +1119,7 @@ static NSString* const kTotpCell = @"TotpCell";
                   }
               }];
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1126,6 +1186,7 @@ static NSString* const kTotpCell = @"TotpCell";
 }
 
 - (void)onSetTotp {
+#ifndef IS_APP_EXTENSION
     [Alerts threeOptions:self title:@"How would you like to setup TOTP?" message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL" defaultButtonText:@"QR Code..." secondButtonText:@"Manually..." thirdButtonText:@"Cancel" action:^(int response) {
         if(response == 0){
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
@@ -1149,6 +1210,7 @@ static NSString* const kTotpCell = @"TotpCell";
             }];
         }
     }];
+#endif
 }
 
 - (void)setTotpWithString:(NSString*)string {
@@ -1174,7 +1236,8 @@ static NSString* const kTotpCell = @"TotpCell";
     
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     pasteboard.string = value;
-    
+
+#ifndef IS_APP_EXTENSION
     [ISMessages showCardAlertWithTitle:message
                                message:nil
                               duration:3.f
@@ -1183,6 +1246,7 @@ static NSString* const kTotpCell = @"TotpCell";
                              alertType:ISAlertTypeSuccess
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
+#endif
 }
 
 - (void)copyAndLaunchUrl {
@@ -1199,9 +1263,11 @@ static NSString* const kTotpCell = @"TotpCell";
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
+#ifndef IS_APP_EXTENSION
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
     });
+#endif
 }
 
 - (NSString*)maybeDereference:(NSString*)text {
@@ -1331,7 +1397,7 @@ static NSString* const kTotpCell = @"TotpCell";
     self.cancelOrDiscardBarButton.enabled = NO;
     [self.tableView setUserInteractionEnabled:NO];
     
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect screenRect = self.tableView.bounds; // [[UIScreen mainScreen] bounds];
     self.coverView = [[UIView alloc] initWithFrame:screenRect];
     self.coverView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
     [self.view addSubview:self.coverView];
@@ -1364,6 +1430,10 @@ static NSString* const kTotpCell = @"TotpCell";
     } completion:^(BOOL finished) {
         [self bindNavBar];
         [self rescheduleTimer];
+
+#ifdef IS_APP_EXTENSION
+        [self.autoFillRootViewController onCredentialSelected:self.item.fields.username password:self.item.fields.password];
+#endif
     }];
 }
 
@@ -1387,7 +1457,7 @@ static NSString* const kTotpCell = @"TotpCell";
     else if(self.createNewItem) {
         // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
         // grab a FavIcon?
-        
+#ifndef IS_APP_EXTENSION
         if(Settings.sharedInstance.isProOrFreeTrial &&
            Settings.sharedInstance.tryDownloadFavIconForNewRecord &&
            (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) &&
@@ -1406,6 +1476,7 @@ static NSString* const kTotpCell = @"TotpCell";
                               }];
             return;
         }
+#endif
     }
     
     completion();
@@ -1418,6 +1489,7 @@ static NSString* const kTotpCell = @"TotpCell";
     }
 }
 
+#ifndef IS_APP_EXTENSION
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     CollapsibleTableViewHeader* header = [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"header"];
     
@@ -1441,5 +1513,6 @@ static NSString* const kTotpCell = @"TotpCell";
 
     return header;
 }
+#endif
 
 @end

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		059A8E323BB4461DEF4E6FAB /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */; };
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
+		4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
+		4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
 		4D14A13A224D1A9400C71ABF /* NodeDetailsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D14A138224D1A9400C71ABF /* NodeDetailsWindowController.xib */; };
 		4D22DA3E22609CBB00561AF7 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D22DA3D22609CBB00561AF7 /* MBProgressHUD.m */; };
 		4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF2216136D10054C8D0 /* formatV3.txt */; };
@@ -17,8 +19,6 @@
 		4D29664121ADAC0B009B7936 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
 		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D44680C216CE08B00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
-		4D4AD4F521A02817002C33C6 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F221A02817002C33C6 /* UiAttachment.m */; };
-		4D4AD4F621A02817002C33C6 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F321A02817002C33C6 /* StrongboxDatabase.m */; };
 		4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
 		4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
@@ -197,6 +197,11 @@
 		0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.release.xcconfig"; sourceTree = "<group>"; };
 		4D00B1F61F3DB03300D7560B /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Alerts.h; path = MacBox/Alerts.h; sourceTree = "<group>"; };
 		4D00B1F71F3DB03300D7560B /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Alerts.m; path = MacBox/Alerts.m; sourceTree = "<group>"; };
+		4D0835A4228472D200CA7405 /* UiAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UiAttachment.h; path = ../StrongBox/UiAttachment.h; sourceTree = "<group>"; };
+		4D0835A5228472D200CA7405 /* UiAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UiAttachment.m; path = ../StrongBox/UiAttachment.m; sourceTree = "<group>"; };
+		4D0835A7228472FC00CA7405 /* KeyDerivationCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyDerivationCipher.h; path = ../model/KeyDerivationCipher.h; sourceTree = "<group>"; };
+		4D0835A82284732500CA7405 /* StrongboxDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = ../model/StrongboxDatabase.h; sourceTree = "<group>"; };
+		4D0835A92284732500CA7405 /* StrongboxDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxDatabase.m; path = ../model/StrongboxDatabase.m; sourceTree = "<group>"; };
 		4D14A138224D1A9400C71ABF /* NodeDetailsWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = NodeDetailsWindowController.xib; path = MacBox/NodeDetailsWindowController.xib; sourceTree = "<group>"; };
 		4D22DA3C22609CBB00561AF7 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = MBProgressHUDMac/MBProgressHUD.h; sourceTree = "<group>"; };
 		4D22DA3D22609CBB00561AF7 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = MBProgressHUDMac/MBProgressHUD.m; sourceTree = "<group>"; };
@@ -221,10 +226,6 @@
 		4D44680A216CE08A00F6358D /* Csv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = ../model/Csv.h; sourceTree = "<group>"; };
 		4D44680B216CE08A00F6358D /* Csv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = ../model/Csv.m; sourceTree = "<group>"; };
 		4D4AD4F021A027E5002C33C6 /* AbstractDatabaseFormatAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractDatabaseFormatAdaptor.h; path = ../model/AbstractDatabaseFormatAdaptor.h; sourceTree = "<group>"; };
-		4D4AD4F121A02817002C33C6 /* UiAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UiAttachment.h; path = ../UiAttachment.h; sourceTree = "<group>"; };
-		4D4AD4F221A02817002C33C6 /* UiAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UiAttachment.m; path = ../UiAttachment.m; sourceTree = "<group>"; };
-		4D4AD4F321A02817002C33C6 /* StrongboxDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxDatabase.m; path = ../StrongboxDatabase.m; sourceTree = "<group>"; };
-		4D4AD4F421A02817002C33C6 /* StrongboxDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = ../StrongboxDatabase.h; sourceTree = "<group>"; };
 		4D4AD4F721A02B0A002C33C6 /* KeePass2TagPackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePass2TagPackage.h; path = ../model/keepass/KeePass2TagPackage.h; sourceTree = "<group>"; };
 		4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePass2TagPackage.m; path = ../model/keepass/KeePass2TagPackage.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewModel.h; path = MacBox/ViewModel.h; sourceTree = "<group>"; };
@@ -301,7 +302,6 @@
 		4D524D08219B490100C22CB4 /* NodeFileAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFileAttachment.m; path = ../model/NodeFileAttachment.m; sourceTree = "<group>"; };
 		4D524D09219B490100C22CB4 /* NodeFileAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFileAttachment.h; path = ../model/NodeFileAttachment.h; sourceTree = "<group>"; };
 		4D524D0B219B497B00C22CB4 /* KdbxSerializationCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbxSerializationCommon.h; path = ../model/keepass/KdbxSerializationCommon.h; sourceTree = "<group>"; };
-		4D524D0C219B49C400C22CB4 /* KeyDerivationCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyDerivationCipher.h; path = ../KeyDerivationCipher.h; sourceTree = "<group>"; };
 		4D524D0D219B4A0800C22CB4 /* tomcrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt.h; path = ../model/pwsafe/twofish/tomcrypt.h; sourceTree = "<group>"; };
 		4D524D12219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "../resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
 		4D524D15219B4B2900C22CB4 /* argon2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = argon2.h; path = ../lib/argon2/argon2.h; sourceTree = "<group>"; };
@@ -706,8 +706,8 @@
 		4D524CDB219B47EA00C22CB4 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
+				4D0835A7228472FC00CA7405 /* KeyDerivationCipher.h */,
 				4D524D14219B4B1600C22CB4 /* Argon2 */,
-				4D524D0C219B49C400C22CB4 /* KeyDerivationCipher.h */,
 				4D9E097F21825107007BA1E7 /* InnerRandomStream.h */,
 				4D9E096021825104007BA1E7 /* AesCipher.h */,
 				4D9E096521825104007BA1E7 /* AesCipher.m */,
@@ -1024,6 +1024,10 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
+				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
+				4D0835A4228472D200CA7405 /* UiAttachment.h */,
+				4D0835A5228472D200CA7405 /* UiAttachment.m */,
 				4DBFD385225CFE2F00290488 /* NSDictionary+Extensions.h */,
 				4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */,
 				4DBFD382225CFE2F00290488 /* SprCompilation.h */,
@@ -1034,10 +1038,6 @@
 				4DC8D9B921B6F391004F1812 /* KeyFileParser.m */,
 				4D29663F21ADAC0B009B7936 /* CustomField.h */,
 				4D29664021ADAC0B009B7936 /* CustomField.m */,
-				4D4AD4F421A02817002C33C6 /* StrongboxDatabase.h */,
-				4D4AD4F321A02817002C33C6 /* StrongboxDatabase.m */,
-				4D4AD4F121A02817002C33C6 /* UiAttachment.h */,
-				4D4AD4F221A02817002C33C6 /* UiAttachment.m */,
 				4D4AD4F021A027E5002C33C6 /* AbstractDatabaseFormatAdaptor.h */,
 				4D524D09219B490100C22CB4 /* NodeFileAttachment.h */,
 				4D524D08219B490100C22CB4 /* NodeFileAttachment.m */,
@@ -1401,6 +1401,7 @@
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */,
 				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
+				4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */,
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
 				4D8DE9BE21F898470043DDC0 /* OTPToken+Persistence.m in Sources */,
@@ -1440,7 +1441,7 @@
 				4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */,
 				4D524D05219B48D300C22CB4 /* CustomIcon.m in Sources */,
 				4D9903C82237BFDA002C10EE /* MacNodeIconHelper.m in Sources */,
-				4D4AD4F521A02817002C33C6 /* UiAttachment.m in Sources */,
+				4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
@@ -1512,7 +1513,6 @@
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
-				4D4AD4F621A02817002C33C6 /* StrongboxDatabase.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
 				4D9E099021825108007BA1E7 /* GenericTextStringElementHandler.m in Sources */,
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,

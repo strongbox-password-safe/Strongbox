@@ -15,7 +15,9 @@
 #import "IconsCollectionViewController.h"
 #import "Settings.h"
 
+//#ifndef IS_APP_EXTENSION
 @import FavIcon;
+//#endif
 
 static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 

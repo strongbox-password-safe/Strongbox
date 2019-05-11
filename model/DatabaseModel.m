@@ -11,6 +11,8 @@
 #import "SprCompilation.h"
 #import "NSArray+Extensions.h"
 #import "NSMutableArray+Extensions.h"
+#import "Kdbx4Serialization.h"
+#import "KeePassCiphers.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,6 +66,27 @@ NSInteger const kSearchScopeAll = 4;
     }
     
     return ret;
+}
+
++ (BOOL)isAutoFillLikelyToCrash:(NSData*)data {
+    if([Kdbx4Database isAValidSafe:data error:nil]) {
+        CryptoParameters* params = [Kdbx4Serialization getCryptoParams:data];
+        
+        if(params && params.kdfParameters && [params.kdfParameters.uuid isEqual:argon2CipherUuid()]) {
+            static NSString* const kParameterMemory = @"M";
+            static uint64_t const kMaxArgon2Memory =  64 * 1024 * 1024;
+                        
+            VariantObject* vo = params.kdfParameters.parameters[kParameterMemory];
+            if(vo && vo.theObject) {
+                uint64_t memory = ((NSNumber*)vo.theObject).longLongValue;
+                if(memory > kMaxArgon2Memory) {
+                    return YES;
+                }
+            }
+        }
+    }
+
+    return NO;
 }
 
 + (NSString*)getLikelyFileExtension:(NSData *)candidate {

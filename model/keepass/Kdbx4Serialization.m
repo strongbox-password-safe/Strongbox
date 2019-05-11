@@ -155,6 +155,16 @@ static const BOOL kLogVerbose = NO;
     return ret;
 }
 
++ (CryptoParameters*)getCryptoParams:(NSData*)safeData {
+    size_t endOfHeadersOffset;
+    NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);
+    if(!headerEntries){
+        return nil;
+    }
+    
+    return [[CryptoParameters alloc] initFromHeaders:headerEntries];
+}
+
 + (Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest ppError:(NSError**)ppError {
     size_t endOfHeadersOffset;
     NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);

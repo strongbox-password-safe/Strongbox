@@ -76,8 +76,7 @@
         
         // Last check was successful and was less than a week ago... no need to check again so soon
         
-        if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 7) // TODO: Reduce Days?
-        {
+        if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 7) {
             NSLog(@"We had a successful check recently, not rechecking...");
             return;
         }
@@ -88,7 +87,7 @@
 
     NSLog(@"Performing Scheduled Check of Entitlements...");
     
-    if(Settings.sharedInstance.numberOfEntitlementCheckFails < 15) { // TODO: Reduce count?
+    if(Settings.sharedInstance.numberOfEntitlementCheckFails < 10) { 
         [self checkReceiptAndProEntitlements:vc];
     }
     else {

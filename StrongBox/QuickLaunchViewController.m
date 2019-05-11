@@ -180,7 +180,9 @@
     
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
-                                          canConvenienceEnrol:YES
+                                        canConvenienceEnrol:YES
+                                             isAutoFillOpen:NO
+                                     manualOpenOfflineCache:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
         if(model) {
             [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];

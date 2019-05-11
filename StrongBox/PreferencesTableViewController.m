@@ -35,6 +35,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *showChildCountOnFolder;
+@property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
+@property (weak, nonatomic) IBOutlet UISwitch *showUsernameInBrowse;
 
 @end
 
@@ -53,6 +55,8 @@
     Settings.sharedInstance.easyReadFontForAll = self.easyReadFontForAll.on;
     Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     Settings.sharedInstance.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
+    Settings.sharedInstance.showUsernameInBrowse = self.showUsernameInBrowse.on;
+    Settings.sharedInstance.showFlagsInBrowse = self.showFlagsInBrowse.on;
 }
 
 - (void)bindGenericPreferencesChanged {
@@ -61,6 +65,8 @@
     self.easyReadFontForAll.on = Settings.sharedInstance.easyReadFontForAll;
     self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
     self.showChildCountOnFolder.on = Settings.sharedInstance.showChildCountOnFolderInBrowse;
+    self.showUsernameInBrowse.on = Settings.sharedInstance.showUsernameInBrowse;
+    self.showFlagsInBrowse.on = Settings.sharedInstance.showFlagsInBrowse;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
