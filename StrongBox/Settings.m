@@ -39,9 +39,6 @@ static NSString* const kHideTips = @"hideTips";
 static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
-static NSString* const kAppLockMode = @"appLockMode";
-static NSString* const kAppLockPin = @"appLockPin";
-static NSString* const kAppLockDelay = @"appLockDelay";
 static NSString* const kHideTotp = @"hideTotp";
 static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
 static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
@@ -65,6 +62,10 @@ static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolde
 static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
 static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse";
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
+
+static NSString* const kAppLockMode = @"appLockMode2.0";
+static NSString* const kAppLockPin = @"appLockPin2.0";
+static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 @implementation Settings
 
@@ -453,12 +454,12 @@ static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFill
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
     
-    self.biometricAuthInProgress = YES;
+    self.suppressPrivacyScreen = YES;
     [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
                                    completion(success, error);
-                                    self.biometricAuthInProgress = NO;
+                                    self.suppressPrivacyScreen = NO;
                                }];
 }
 
@@ -595,35 +596,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 -(void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
     [[self getUserDefaults] setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
-    [[self getUserDefaults] synchronize];
-}
-
-- (AppLockMode)appLockMode {
-    return kNoLock;
-    //return [[self getUserDefaults] integerForKey:kAppLockMode];
-}
-
-- (void)setAppLockMode:(AppLockMode)appLockMode {
-    [[self getUserDefaults] setInteger:appLockMode forKey:kAppLockMode];
-    [[self getUserDefaults] synchronize];
-}
-
-- (NSString *)appLockPin {
-    return [[self getUserDefaults] objectForKey:kAppLockPin];
-}
-
--(void)setAppLockPin:(NSString *)appLockPin {
-    [[self getUserDefaults] setObject:appLockPin forKey:kAppLockPin];
-    [[self getUserDefaults] synchronize];
-}
-
-- (NSInteger)appLockDelay {
-    NSInteger ret =  [[self getUserDefaults] integerForKey:kAppLockDelay];
-    return ret;
-}
-
--(void)setAppLockDelay:(NSInteger)appLockDelay {
-    [[self getUserDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
     [[self getUserDefaults] synchronize];
 }
 
@@ -853,6 +825,36 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setHaveWarnedAboutAutoFillCrash:(BOOL)haveWarnedAboutAutoFillCrash {
     [self setBool:kHaveWarnedAboutAutoFillCrash value:haveWarnedAboutAutoFillCrash];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (AppLockMode)appLockMode {
+    return [[self getUserDefaults] integerForKey:kAppLockMode];
+}
+
+- (void)setAppLockMode:(AppLockMode)appLockMode {
+    [[self getUserDefaults] setInteger:appLockMode forKey:kAppLockMode];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSString *)appLockPin {
+    return [[self getUserDefaults] objectForKey:kAppLockPin];
+}
+
+-(void)setAppLockPin:(NSString *)appLockPin {
+    [[self getUserDefaults] setObject:appLockPin forKey:kAppLockPin];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSInteger)appLockDelay {
+    NSInteger ret =  [[self getUserDefaults] integerForKey:kAppLockDelay];
+    return ret;
+}
+
+-(void)setAppLockDelay:(NSInteger)appLockDelay {
+    [[self getUserDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
+    [[self getUserDefaults] synchronize];
 }
 
 @end

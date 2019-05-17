@@ -348,7 +348,6 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     
 }
 
-
 - (BOOL)canChangeKeyFile {
     return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache || self.viewModel.database.format == kPasswordSafe);
 }

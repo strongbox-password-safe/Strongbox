@@ -24,8 +24,9 @@
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #import "InitialViewController.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
-@interface SelectStorageProviderController ()
+@interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
 @property (nonatomic, copy, nonnull) NSArray<id<SafeStorageProvider>> *providers;
 
@@ -83,6 +84,8 @@
                                [LocalDeviceStorageProvider sharedInstance]];
         }
     }
+    
+    self.tableView.tableFooterView = [UIView new];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -90,7 +93,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.providers.count + (self.existing ? 1 : 0);
+    return self.providers.count + (self.existing ? 2 : 0);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -99,6 +102,10 @@
     if(indexPath.row == self.providers.count) {
         cell.text.text = @"Copy from URL...";
         cell.image.image =  [UIImage imageNamed:@"Disconnect-32x32"];
+    }
+    else if(indexPath.row == self.providers.count + 1) {
+        cell.text.text = @"Files...";
+        cell.image.image =  [UIImage imageNamed:@"ios11-files-app-icon"];
     }
     else {
         id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
@@ -113,6 +120,9 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.row == self.providers.count) {
         [self initiateManualImportFromUrl];
+    }
+    else if(indexPath.row == self.providers.count + 1) {
+        [self onAddThroughFilesApp];
     }
     else {
         id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
@@ -136,6 +146,25 @@
             [self segueToBrowserOrAdd:provider];
         }
     }
+}
+
+- (void)onAddThroughFilesApp {
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
+    vc.delegate = self;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    if(controller.documentPickerMode == UIDocumentPickerModeOpen) {
+        NSURL* url = [urls objectAtIndex:0];
+        [[self getInitialViewController] import:url canOpenInPlace:YES];
+    }
+}
+
+- (InitialViewController *)getInitialViewController {
+    InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
+    return ivc;
 }
 
 - (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {

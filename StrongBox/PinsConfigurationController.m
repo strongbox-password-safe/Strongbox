@@ -186,9 +186,6 @@
                 else {
                     [Alerts warn:self title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please select another."];
                 }
-            }
-            else {
-                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. Please try again."];
             }}];
     };
     

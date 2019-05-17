@@ -38,6 +38,11 @@
 @property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *showUsernameInBrowse;
 
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAutoClearClipboard;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLockDelay;
+@property (weak, nonatomic) IBOutlet UISwitch *appLockOnPreferences;
+
 @end
 
 @implementation PreferencesTableViewController {
@@ -57,6 +62,9 @@
     Settings.sharedInstance.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
     Settings.sharedInstance.showUsernameInBrowse = self.showUsernameInBrowse.on;
     Settings.sharedInstance.showFlagsInBrowse = self.showFlagsInBrowse.on;
+    Settings.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
+    
+    [self bindGenericPreferencesChanged];
 }
 
 - (void)bindGenericPreferencesChanged {
@@ -67,6 +75,7 @@
     self.showChildCountOnFolder.on = Settings.sharedInstance.showChildCountOnFolderInBrowse;
     self.showUsernameInBrowse.on = Settings.sharedInstance.showUsernameInBrowse;
     self.showFlagsInBrowse.on = Settings.sharedInstance.showFlagsInBrowse;
+    self.appLockOnPreferences.on = Settings.sharedInstance.appLockAppliesToPreferences;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +117,6 @@
     self.switchUseQuickTypeAutoFill.on = !Settings.sharedInstance.doNotUseQuickTypeAutoFill;
 }
 
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -126,7 +134,9 @@
 
     _appLockDelayList = @{ @0 : @0,
                            @60 : @1,
-                           @600 :@2 };
+                           @180 : @2,
+                           @300 : @3,
+                           @600 : @4 };
     
     _autoClearClipboardIndex = @{   @0 : @0,
                                     @30 : @1,
@@ -153,7 +163,6 @@
     [self bindShowKeePass1BackupFolder];
     [self bindHideTips];
     [self bindClearClipboard];
-    [self bindAppLock];
     [self bindHideTotp];
     [self bindKeePassNoSorting];
     [self bindAutoFavIcon];
@@ -164,8 +173,10 @@
     [self bindViewDereferenced];
     [self bindSearchDereferenced];
     
-    [self bindGenericPreferencesChanged];
-    //[self customizeAppLockSectionFooter];
+    [self bindAppLock];
+    [self customizeAppLockSectionFooter];
+    
+    [self bindGenericPreferencesChanged];    
 }
 
 - (void)customizeAppLockSectionFooter {
@@ -429,48 +440,52 @@
 }
 
 - (IBAction)onAppLockChanged:(id)sender {
-    if(self.segmentAppLock.selectedSegmentIndex == kPinCode) {
-        PinEntryController *vc1 = [[PinEntryController alloc] init];
-        vc1.info = @"Please Enter a PIN";
-        vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if(response == kOk) {
-                    PinEntryController *vc2 = [[PinEntryController alloc] init];
-                    vc2.info = @"Please Confirm Your PIN";
-                    vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
-                        [self dismissViewControllerAnimated:YES completion:^{
-                            if(response2 == kOk) {
-                                if ([pin isEqualToString:confirmPin]) {
-                                    Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
-                                    Settings.sharedInstance.appLockPin = pin;
-                                    [self bindAppLock];
-                                }
-                                else {
-                                    // TODO: Believe this message string is incorrect copy/pasta mistaje
-                                    [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Database Settings." completion:nil];
-                                    [self bindAppLock];
-                                }
-                            }
-                            else {
-                                [self bindAppLock];
-                            }
-                        }];
-                    };
-                    
-                    [self presentViewController:vc2 animated:YES completion:nil];
-                }
-                else {
-                    [self bindAppLock];
-                }
-            }];
-        };
-        
-        [self presentViewController:vc1 animated:YES completion:nil];
+    if(self.segmentAppLock.selectedSegmentIndex == kPinCode || self.segmentAppLock.selectedSegmentIndex == kBoth) {
+        [self requestAppLockPinCodeAndConfirm];
     }
     else {
         Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
         [self bindAppLock];
     }
+}
+
+- (void)requestAppLockPinCodeAndConfirm {
+    PinEntryController *vc1 = [[PinEntryController alloc] init];
+    vc1.info = @"Please Enter a PIN";
+    vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            if(response == kOk) {
+                PinEntryController *vc2 = [[PinEntryController alloc] init];
+                vc2.info = @"Please Confirm Your PIN";
+                vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
+                    [self dismissViewControllerAnimated:YES completion:^{
+                        if(response2 == kOk) {
+                            if ([pin isEqualToString:confirmPin]) {
+                                Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+                                Settings.sharedInstance.appLockPin = pin;
+                                [self bindAppLock];
+                            }
+                            else {
+                                // TODO: Believe this message string is incorrect copy/pasta mistaje
+                                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Database Settings." completion:nil];
+                                [self bindAppLock];
+                            }
+                        }
+                        else {
+                            [self bindAppLock];
+                        }
+                    }];
+                };
+                
+                [self presentViewController:vc2 animated:YES completion:nil];
+            }
+            else {
+                [self bindAppLock];
+            }
+        }];
+    };
+    
+    [self presentViewController:vc1 animated:YES completion:nil];
 }
 
 - (IBAction)onAppLockDelayChanged:(id)sender {

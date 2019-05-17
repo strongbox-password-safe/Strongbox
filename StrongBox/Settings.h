@@ -24,7 +24,9 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 - (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion;
 - (void)requestBiometricId:(NSString  *)reason fallbackTitle:(NSString*_Nullable)fallbackTitle completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
-@property BOOL biometricAuthInProgress;
+
+@property BOOL suppressPrivacyScreen;
+
 + (BOOL)isBiometricIdAvailable;
 
 
@@ -92,10 +94,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
 
-@property AppLockMode appLockMode;
-@property NSString* appLockPin;
-@property NSInteger appLockDelay;
-
 @property BOOL hideTotp;
 @property BOOL hideTotpInBrowse;
 @property BOOL hideTotpInAutoFill;
@@ -128,6 +126,11 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL showUsernameInBrowse;
 
 @property BOOL haveWarnedAboutAutoFillCrash;
+
+@property AppLockMode appLockMode;
+@property NSString* appLockPin;
+@property NSInteger appLockDelay;
+@property BOOL appLockAppliesToPreferences;
 
 NS_ASSUME_NONNULL_END
 

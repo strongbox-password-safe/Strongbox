@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="MhI-9d-S3D">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="MhI-9d-S3D">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,18 +17,23 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="Igj-81-rat">
-                                <rect key="frame" x="20" y="20" width="335" height="627"/>
-                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="7" translatesAutoresizingMaskIntoConstraints="NO" id="Jxw-i9-EUD">
+                                <rect key="frame" x="59.5" y="205.5" width="256" height="256"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="Igj-81-rat" userLabel="Logo">
+                                        <rect key="frame" x="0.0" y="0.0" width="256" height="256"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="256" id="KCf-DU-ZZv"/>
+                                            <constraint firstAttribute="height" constant="256" id="jW1-mp-03G"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="Igj-81-rat" firstAttribute="top" secondItem="jPk-vo-SuY" secondAttribute="top" constant="20" id="CuU-hN-4nz"/>
-                            <constraint firstItem="Igj-81-rat" firstAttribute="centerY" secondItem="jPk-vo-SuY" secondAttribute="centerY" id="IDc-iy-Ivv"/>
-                            <constraint firstAttribute="trailing" secondItem="Igj-81-rat" secondAttribute="trailing" constant="20" id="MIB-TJ-z26"/>
-                            <constraint firstItem="Igj-81-rat" firstAttribute="centerX" secondItem="jPk-vo-SuY" secondAttribute="centerX" id="rPx-mt-2Eb"/>
-                            <constraint firstAttribute="bottom" secondItem="Igj-81-rat" secondAttribute="bottom" constant="20" id="rkm-FU-rte"/>
-                            <constraint firstItem="Igj-81-rat" firstAttribute="leading" secondItem="jPk-vo-SuY" secondAttribute="leading" constant="20" id="zvR-uA-kFd"/>
+                            <constraint firstItem="Jxw-i9-EUD" firstAttribute="centerX" secondItem="jPk-vo-SuY" secondAttribute="centerX" id="9o3-Z8-XhL"/>
+                            <constraint firstItem="Jxw-i9-EUD" firstAttribute="centerY" secondItem="jPk-vo-SuY" secondAttribute="centerY" id="oqq-hZ-g4U"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="z1O-Zw-xeX"/>
                     </view>
@@ -39,6 +44,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Strongbox-1024x1024-new" width="1024" height="1024"/>
+        <image name="Strongbox-1024x1024-new" width="512" height="512"/>
     </resources>
 </document>

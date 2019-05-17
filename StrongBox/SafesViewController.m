@@ -25,6 +25,7 @@
 #import "StrongboxUIDocument.h"
 #import "SVProgressHUD.h"
 #import "AutoFillManager.h"
+#import "PinEntryController.h"
 
 @interface SafesViewController () <UIDocumentPickerDelegate>
 
@@ -501,20 +502,7 @@
 }
 
 - (void)onAddExistingSafe {
-    [Alerts threeOptions:self
-                   title:@"Select your Import Method"
-                 message:@"Strongbox can import from several natively supported providers or alternatively you can browse through the built in Files app which supports many custom options."
-       defaultButtonText:@"Strongbox Local & Cloud..."
-        secondButtonText:@"Files..."
-         thirdButtonText:@"Cancel"
-                  action:^(int response) {
-                      if(response == 0) {
-                          [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];
-                      }
-                      else if(response == 1) {
-                          [self onAddThroughFilesApp];
-                      }
-                  }];
+    [self performSegueWithIdentifier:@"segueToStorageType" sender:@"Existing"];
 }
 
 - (void)onCreateNewSafe {
@@ -541,43 +529,30 @@
     }];
 }
 
-- (void)onAddThroughFilesApp {
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
-    vc.delegate = self;
-    
-    [self presentViewController:vc animated:YES completion:nil];
-}
-
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     //NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    if(controller.documentPickerMode == UIDocumentPickerModeOpen) {
-        NSURL* url = [urls objectAtIndex:0];
-        [[self getInitialViewController] import:url canOpenInPlace:YES];
+    NSURL* url = [urls objectAtIndex:0];
+    NSError* error;
+    NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
+    
+    if(!data || error) {
+        [Alerts error:self title:@"Error Exporting" error:error];
+        NSLog(@"%@", error);
+        return;
     }
-    else {
-        NSURL* url = [urls objectAtIndex:0];
-        NSError* error;
-        NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
-        
-        if(!data || error) {
-            [Alerts error:self title:@"Error Exporting" error:error];
-            NSLog(@"%@", error);
-            return;
+    
+    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
+    
+    [document saveToURL:url forSaveOperation:UIDocumentSaveForCreating | UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+        if(!success) {
+            [Alerts warn:self title:@"Error Exporting" message:@""];
         }
-        
-        StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
-        
-        [document saveToURL:url forSaveOperation:UIDocumentSaveForCreating | UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
-            if(!success) {
-                [Alerts warn:self title:@"Error Exporting" message:@""];
-            }
-            else {
-                [Alerts info:self title:@"Export Successful" message:@"Your Database was successfully exported."];
-            }
-        }];
-        
-        [document closeWithCompletionHandler:nil];
-    }
+        else {
+            [Alerts info:self title:@"Export Successful" message:@"Your Database was successfully exported."];
+        }
+    }];
+    
+    [document closeWithCompletionHandler:nil];
 }
 
 - (void)onExportSafe:(NSIndexPath*)indexPath {
@@ -717,6 +692,62 @@
     InitialViewController * ivc = [self getInitialViewController];
     
     [ivc showQuickLaunchView];
+}
+
+- (IBAction)onPreferences:(id)sender {
+    if (!Settings.sharedInstance.appLockAppliesToPreferences || Settings.sharedInstance.appLockMode == kNoLock) {
+        [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
+        return;
+    }
+    
+    if((Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) && Settings.isBiometricIdAvailable) {
+        [self requestBiometric];
+    }
+    else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
+        [self requestPin];
+    }
+}
+
+- (void)requestBiometric {
+    [Settings.sharedInstance requestBiometricId:@"Identify to Open Strongbox" completion:^(BOOL success, NSError * _Nullable error) {
+        if (success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
+                    [self requestPin];
+                }
+                else {
+                    [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
+                }
+            });
+        }}];
+}
+
+- (void)requestPin {
+    PinEntryController *vc = [[PinEntryController alloc] init];
+    
+    __weak PinEntryController* weakVc = vc;
+    
+    vc.info = @"Please enter your PIN to access Preferences";
+    vc.pinLength = Settings.sharedInstance.appLockPin.length;
+    
+    vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+        if(response == kOk) {
+            if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
+                [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
+            else {
+                [Alerts info:weakVc title:@"PIN Incorrect" message:@"That is not the correct PIN code." completion:^{
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }];
+            }
+        }
+        else {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+    };
+    
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 @end

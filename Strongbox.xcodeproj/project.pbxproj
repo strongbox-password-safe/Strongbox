@@ -62,8 +62,6 @@
 		4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */; };
 		4D0F122021C1418000C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
 		4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */; };
-		4D10154F21F7315400D2F711 /* LockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D10154C21F7315400D2F711 /* LockViewController.m */; };
-		4D10155021F7315400D2F711 /* LockViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D10154E21F7315400D2F711 /* LockViewController.xib */; };
 		4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
@@ -219,6 +217,8 @@
 		4D3AC320219074C40010CFCD /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC31E219072C90010CFCD /* VariantObject.m */; };
 		4D3AC32321908D4A0010CFCD /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
 		4D3AC32421908D4A0010CFCD /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
+		4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */; };
+		4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
@@ -670,9 +670,6 @@
 		4D0F121B21C1400500C4451D /* SFTPSessionConfigurationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPSessionConfigurationViewController.h; path = StrongBox/SFTPSessionConfigurationViewController.h; sourceTree = "<group>"; };
 		4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPSessionConfigurationViewController.m; path = StrongBox/SFTPSessionConfigurationViewController.m; sourceTree = "<group>"; };
 		4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SFTPSessionConfigurationViewController.xib; path = StrongBox/SFTPSessionConfigurationViewController.xib; sourceTree = "<group>"; };
-		4D10154C21F7315400D2F711 /* LockViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LockViewController.m; path = StrongBox/LockViewController.m; sourceTree = "<group>"; };
-		4D10154D21F7315400D2F711 /* LockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LockViewController.h; path = StrongBox/LockViewController.h; sourceTree = "<group>"; };
-		4D10154E21F7315400D2F711 /* LockViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LockViewController.xib; path = StrongBox/LockViewController.xib; sourceTree = "<group>"; };
 		4D108BFC224A40EC00C17095 /* AesKdfCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesKdfCipher.h; path = model/keepass/AesKdfCipher.h; sourceTree = "<group>"; };
 		4D108BFD224A40EC00C17095 /* AesKdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesKdfCipher.m; path = model/keepass/AesKdfCipher.m; sourceTree = "<group>"; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BrowseSafeView.h; path = StrongBox/BrowseSafeView.h; sourceTree = "<group>"; };
@@ -829,6 +826,9 @@
 		4D3AC31E219072C90010CFCD /* VariantObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VariantObject.m; path = model/keepass/VariantObject.m; sourceTree = "<group>"; };
 		4D3AC32121908D4A0010CFCD /* Keys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Keys.h; path = model/keepass/Keys.h; sourceTree = "<group>"; };
 		4D3AC32221908D4A0010CFCD /* Keys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Keys.m; path = model/keepass/Keys.m; sourceTree = "<group>"; };
+		4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivacyViewController.h; path = StrongBox/PrivacyViewController.h; sourceTree = "<group>"; };
+		4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PrivacyViewController.m; path = StrongBox/PrivacyViewController.m; sourceTree = "<group>"; };
+		4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PrivacyViewController.xib; path = StrongBox/PrivacyViewController.xib; sourceTree = "<group>"; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppleICloudOrLocalSafeFile.h; path = StrongBox/AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppleICloudOrLocalSafeFile.m; path = StrongBox/AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
 		4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxSerializationCommon.m; path = model/keepass/KdbxSerializationCommon.m; sourceTree = SOURCE_ROOT; };
@@ -1446,8 +1446,6 @@
 				4D06E12022859F0100A754F5 /* BrowseItemCell.xib */,
 				4D4554AC2285C0BB0015C236 /* BrowseItemCell.h */,
 				4D4554AD2285C0BB0015C236 /* BrowseItemCell.m */,
-				4D6C51961F6407580035640E /* SafeDetailsView.h */,
-				4D6C51971F6407580035640E /* SafeDetailsView.m */,
 				4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */,
 				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
 			);
@@ -1483,6 +1481,8 @@
 				4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */,
 				4D25673021E8B086006260B7 /* PinsConfigurationController.h */,
 				4D25673121E8B086006260B7 /* PinsConfigurationController.m */,
+				4D6C51961F6407580035640E /* SafeDetailsView.h */,
+				4D6C51971F6407580035640E /* SafeDetailsView.m */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -2550,6 +2550,11 @@
 		4DED20C72168BF1800A5800A /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				4DED20C12168AC9A00A5800A /* InitialViewController.h */,
+				4DED20C22168AC9A00A5800A /* InitialViewController.m */,
+				4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */,
+				4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */,
+				4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */,
 				4D25674921E8C65D006260B7 /* PinEntryController.h */,
 				4D25674A21E8C65D006260B7 /* PinEntryController.m */,
 				4D25674B21E8C65D006260B7 /* PinEntryController.xib */,
@@ -2557,11 +2562,6 @@
 				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
 				4D1A5BFD1F7924C30036684C /* SafeItemTableCell.h */,
 				4D1A5BFE1F7924C30036684C /* SafeItemTableCell.m */,
-				4D10154D21F7315400D2F711 /* LockViewController.h */,
-				4D10154C21F7315400D2F711 /* LockViewController.m */,
-				4D10154E21F7315400D2F711 /* LockViewController.xib */,
-				4DED20C12168AC9A00A5800A /* InitialViewController.h */,
-				4DED20C22168AC9A00A5800A /* InitialViewController.m */,
 				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
 				4D1757B01C8361D300E6356F /* SafesViewController.m */,
 				4DED20C42168B63200A5800A /* QuickLaunchViewController.h */,
@@ -2856,7 +2856,6 @@
 				4D766D6122204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
-				4D10155021F7315400D2F711 /* LockViewController.xib in Resources */,
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D0835EB22847BD100CA7405 /* beale.wordlist.txt in Resources */,
@@ -2874,6 +2873,7 @@
 				4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
+				4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */,
 				4D0835ED22847BD100CA7405 /* diceware.wordlist.txt in Resources */,
 				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
@@ -3102,7 +3102,7 @@
 				4D27D74C21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
 				4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */,
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
-				4D10154F21F7315400D2F711 /* LockViewController.m in Sources */,
+				4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */,
 				4D5F5B76218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D664DB42179C53B0023FF0C /* XmlTree.m in Sources */,
 				4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,

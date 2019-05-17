@@ -89,12 +89,18 @@ static NSString* const kTotpCell = @"TotpCell";
 @implementation ItemDetailsViewController
 
 - (void)onCellHeightChangedNotification {
+//    [UIView setAnimationsEnabled:NO];
+
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
+
+//    [UIView setAnimationsEnabled:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+
+   // [UIView setAnimationsEnabled:NO];
 
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
@@ -117,6 +123,8 @@ static NSString* const kTotpCell = @"TotpCell";
     if(self.model.totp) {
         [self rescheduleTimer];
     }
+    
+ //   [UIView setAnimationsEnabled:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -129,6 +137,8 @@ static NSString* const kTotpCell = @"TotpCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+//    [UIView setAnimationsEnabled:NO];
     
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
@@ -162,6 +172,8 @@ static NSString* const kTotpCell = @"TotpCell";
     if(self.createNewItem) {
         [self setEditing:YES animated:YES];
     }
+    
+//    [UIView setAnimationsEnabled:YES];
 }
 
 - (Node*)createNewRecord {
@@ -1491,6 +1503,10 @@ static NSString* const kTotpCell = @"TotpCell";
 
 #ifndef IS_APP_EXTENSION
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if(self.editing) {
+        return nil; // [self.tableView viewFo
+    }
+    
     CollapsibleTableViewHeader* header = [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"header"];
     
     if(!header) {

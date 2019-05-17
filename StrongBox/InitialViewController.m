@@ -27,76 +27,99 @@
 #import "StrongboxUIDocument.h"
 #import "QuickLaunchViewController.h"
 #import "StorageBrowserTableViewController.h"
-#import "LockViewController.h"
+#import "PrivacyViewController.h"
 
 @interface InitialViewController ()
 
 @property (nonatomic, strong) NSDate *enterBackgroundTime;
-//@property (nonatomic, strong) LockViewController *privacyScreen;
 @property BOOL privacyScreenSuppressedForBiometricAuth;
-
-//@property BOOL hasAppearedOnce;
-//@property BOOL isAppStartupLaunchOfPrivacyScreen;
-@property UIImageView *imageView;
+@property PrivacyViewController* privacyAndLockVc;
+@property BOOL hasAppearedOnce; // Used for App Lock initial load
 
 @end
 
 @implementation InitialViewController
 
-- (void)showPrivacyScreen {
-    // TODO: Position this more in line with Splash Screen
+- (void)showPrivacyScreen:(BOOL)startupLockMode {
+    if(self.privacyAndLockVc) {
+        NSLog(@"Privacy Screen Already Up... No need to re show");
+        return;
+    }
     
-    self.imageView = [[UIImageView alloc] initWithFrame:self.view.window.frame];
-    self.imageView.image = [UIImage imageNamed:@"Strongbox-1024x1024-new"];
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.imageView.opaque = NO;
-    self.imageView.backgroundColor = [UIColor whiteColor];
-    [self.view.window addSubview:self.imageView];
+    self.enterBackgroundTime = [[NSDate alloc] init];
+
+    __weak InitialViewController* weakSelf = self;
+    self.privacyAndLockVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
+    self.privacyAndLockVc.onUnlockDone = ^{
+        [weakSelf hidePrivacyScreen];
+    };
+    
+    self.privacyAndLockVc.startupLockMode = startupLockMode;
+    
+    // Visible will be top most - usually the current nav top controller but can be another modal like Custom Fields editor
+    
+    UINavigationController* nav = [self selectedViewController];
+    UIViewController* visible = nav.visibleViewController;
+    
+    [visible presentViewController:self.privacyAndLockVc animated:NO completion:nil];
 }
 
 - (void)hidePrivacyScreen {
-    if(self.imageView) {
-        [self.imageView removeFromSuperview];
+    if (self.privacyAndLockVc) {
+        if ([self shouldLockSafes]) {
+            UINavigationController* nav = [self selectedViewController];
+            [nav popToRootViewControllerAnimated:NO];
+
+            // This dismisses all modals including the privacy screen which is what we want
+            [self dismissViewControllerAnimated:NO completion:^{
+                [self onPrivacyScreenDismissed];
+            }];
+        }
+        else {
+            [self.privacyAndLockVc.presentingViewController dismissViewControllerAnimated:NO completion:^{
+                [self onPrivacyScreenDismissed];
+            }];
+        }
+        
+        self.enterBackgroundTime = nil;
     }
-    self.imageView = nil;
+}
+
+- (void)onPrivacyScreenDismissed {
+    self.privacyAndLockVc = nil;
+
+    if([self isInQuickLaunchViewMode]) {
+        [self openQuickLaunchPrimarySafe];
+    }
+
+    [self checkICloudAvailability];
 }
 
 - (void)appResignActive {
     NSLog(@"appResignActive");
 
     self.privacyScreenSuppressedForBiometricAuth = NO;
-    if(Settings.sharedInstance.biometricAuthInProgress)
+    if(Settings.sharedInstance.suppressPrivacyScreen)
     {
-        NSLog(@"appResignActive biometricAuthInProgress... suppressing privacy and lock screens");
+        NSLog(@"appResignActive suppressPrivacyScreen... suppressing privacy and lock screen");
         self.privacyScreenSuppressedForBiometricAuth = YES;
         return;
     }
-
-    self.enterBackgroundTime = [[NSDate alloc] init];
     
-    [self showPrivacyScreen];
+    [self showPrivacyScreen:NO];
 }
 
 - (void)appBecameActive {
     NSLog(@"appBecameActive");
-    
-    // User may have just switched to our app after updating iCloud settings...
-    [self checkICloudAvailability];
     
     if(self.privacyScreenSuppressedForBiometricAuth) {
         NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
         self.privacyScreenSuppressedForBiometricAuth = NO;
         return;
     }
-
-    [self lockAnyOpenSafesIfAppropriate];
-
-    [self hidePrivacyScreen];
     
-    self.enterBackgroundTime = nil;
-
-    if([self isInQuickLaunchViewMode]) {
-        [self openQuickLaunchPrimarySafe];
+    if(self.privacyAndLockVc) {
+        [self.privacyAndLockVc onAppBecameActive];
     }
 }
 
@@ -110,7 +133,7 @@
     });
 }
 
-- (void)lockAnyOpenSafesIfAppropriate {
+- (BOOL)shouldLockSafes {
     if (self.enterBackgroundTime) {
         NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
         NSNumber *seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
@@ -118,13 +141,11 @@
         if (seconds.longValue != -1  && secondsBetween > seconds.longValue) // -1 = never
         {
             NSLog(@"Autolock Time [%@s] exceeded, locking safe.", seconds);
-            
-            UINavigationController* nav = [self selectedViewController];
-            [nav dismissViewControllerAnimated:NO completion:nil]; // Custom Fields and Attachments are presented over the view controller, need to be dismissed...
-            [nav popToRootViewControllerAnimated:NO];
-            
+            return YES;
         }
     }
+    
+    return NO;
 }
 
 - (void)showQuickLaunchView {
@@ -161,7 +182,7 @@
         
         if([Settings.sharedInstance getLaunchCount] == 1) {
             [Alerts info:self title:@"Welcome!"
-                 message:@"Hi, Welcome to Strongbox Pro!\n\nI hope you will enjoy the app!\n-Mark"];
+                 message:@"Hi, Welcome to Strongbox!\n\nI hope you will enjoy the app!\n-Mark"];
         }
         else if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 6) {
             if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
@@ -198,27 +219,25 @@
     [super viewWillAppear:animated];
     
     self.tabBar.hidden = YES;
-    
-    [self checkICloudAvailability];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+
+    if(!self.hasAppearedOnce) {
+        if (Settings.sharedInstance.appLockMode != kNoLock) {
+            [self showPrivacyScreen:YES];
+        }
+        else {
+            if([self isInQuickLaunchViewMode]) {
+                [self openQuickLaunchPrimarySafe];
+            }
+        }
+    }
     
-//    if(!self.hasAppearedOnce) {
-//        if (Settings.sharedInstance.appLockMode != kNoLock)
-//        {
-//            self.isAppStartupLaunchOfPrivacyScreen = YES;
-//            [self showPrivacyScreen];
-//        }
-//        else {
-//            if([self isInQuickLaunchViewMode]) {
-//                [self openQuickLaunchPrimarySafe];
-//            }
-//        }
-//    }
-    
-//    self.hasAppearedOnce = YES;
+    self.hasAppearedOnce = YES;
+
+    [self checkICloudAvailability];
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
@@ -596,29 +615,6 @@
     //NSLog(@"Primary Safe: [%@]", safe);
     
     return safe.hasUnresolvedConflicts ? nil : safe;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)openAppStoreForOldReview {
-    int appId = 897283731;
-    
-    static NSString *const iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%d?action=write-review";
-    static NSString *const iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%d&action=write-review";
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]];
-    
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        if (@available(iOS 10.0, *)) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-        }
-        else {
-            [[UIApplication sharedApplication] openURL:url];
-        }
-    }
-    else {
-        [Alerts info:self title:@"Cannot open App Store" message:@"Please find Strongbox in the App Store and you can write a review there. Much appreciated! -Mark"];
-    }
 }
 
 @end

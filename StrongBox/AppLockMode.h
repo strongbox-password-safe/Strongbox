@@ -13,6 +13,7 @@ typedef NS_ENUM (NSUInteger, AppLockMode) {
     kNoLock,
     kPinCode,
     kBiometric,
+    kBoth
 };
 
 #endif /* AppLockMode_h */

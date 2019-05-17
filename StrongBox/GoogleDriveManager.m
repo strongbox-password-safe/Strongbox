@@ -11,6 +11,7 @@
 #import "GTMSessionFetcherService.h"
 #import "SVProgressHUD/SVProgressHUD.h"
 #import "real-secrets.h"
+#import "Settings.h"
 
 static NSString *const kMimeType = @"application/octet-stream";
 
@@ -39,7 +40,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
         
         GIDSignIn *signIn = [GIDSignIn sharedInstance];
         
-        signIn.delegate = self;
+        signIn.delegate = nil;
         signIn.scopes = @[kGTLRAuthScopeDrive];
         
         authenticationcompletion = nil;
@@ -73,16 +74,18 @@ typedef void (^Authenticationcompletion)(NSError *error);
     [[GIDSignIn sharedInstance] disconnect];
 }
 
-- (void)authenticate:(id<GIDSignInUIDelegate>)viewController completion:(void (^)(NSError *error))completion {
+- (void)authenticate:(UIViewController*)viewController completion:(void (^)(NSError *error))completion {
     GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
     signIn.delegate = self;
-    signIn.uiDelegate = viewController;
+    signIn.uiDelegate = (id<GIDSignInUIDelegate>)viewController;
+    
     signIn.scopes = @[kGTLRAuthScopeDrive];
 
     authenticationcompletion = completion;
 
     dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main queue
+        Settings.sharedInstance.suppressPrivacyScreen = YES;
         [signIn signIn];
     });
 }
@@ -91,13 +94,20 @@ typedef void (^Authenticationcompletion)(NSError *error);
     didSignInForUser:(GIDGoogleUser *)user
            withError:(NSError *)error {
     if (error != nil) {
+        //NSLog(@"Google Sign In Error: %@", error);
         self.driveService.authorizer = nil;
     }
     else {
         self.driveService.authorizer = user.authentication.fetcherAuthorizer;
     }
 
+    if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
+        return; // Do not call completion if this is a silenet sign and there is no Auth in Key...
+    }
+    
     if (authenticationcompletion) {
+        Settings.sharedInstance.suppressPrivacyScreen = NO;
+        //NSLog(@"Google Callback: %@", authenticationcompletion);
         authenticationcompletion(error);
         authenticationcompletion = nil;
     }
@@ -116,7 +126,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     return trimmed;
 }
 
-- (void)  create:(id<GIDSignInUIDelegate>)viewController
+- (void)  create:(UIViewController*)viewController
        withTitle:(NSString *)titleNick
         withData:(NSData *)data
     parentFolder:(NSObject *)parentFolder
@@ -171,13 +181,13 @@ typedef void (^Authenticationcompletion)(NSError *error);
     }];
 }
 
-- (void)readWithOnlyFileId:(id<GIDSignInUIDelegate>)viewController
+- (void)readWithOnlyFileId:(UIViewController*)viewController
             fileIdentifier:(NSString *)fileIdentifier
                 completion:(void (^)(NSData *data, NSError *error))handler {
     [self getFile:fileIdentifier handler:handler];
 }
 
-- (void)            read:(id<GIDSignInUIDelegate>)viewController
+- (void)            read:(UIViewController*)viewController
     parentFileIdentifier:(NSString *)parentFileIdentifier
                 fileName:(NSString *)fileName
               completion:(void (^)(NSData *data, NSError *error))handler {
@@ -291,7 +301,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     }];
 }
 
-- (void)getFilesAndFolders:(id<GIDSignInUIDelegate>)viewController
+- (void)getFilesAndFolders:(UIViewController*)viewController
           withParentFolder:(NSString *)parentFolderIdentifier
                 completion:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler {
     parentFolderIdentifier = parentFolderIdentifier ? parentFolderIdentifier : @"root";
@@ -299,8 +309,8 @@ typedef void (^Authenticationcompletion)(NSError *error);
     [self authenticate:viewController
             completion:^(NSError *error) {
                 if (error) {
-                NSLog(@"%@", error);
-                handler(nil, nil, error);
+                    NSLog(@"%@", error);
+                    handler(nil, nil, error);
                 }
                 else {
                     [self _getFilesAndFolders:parentFolderIdentifier

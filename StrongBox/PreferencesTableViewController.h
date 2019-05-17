@@ -24,6 +24,7 @@
 - (IBAction)onFaq:(id)sender;
 - (IBAction)onPrivacyPolicy:(id)sender;
 - (IBAction)onAutoAddNewLocalSafesChanged:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
@@ -32,7 +33,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoAddNewLocalSafes;
 @property (weak, nonatomic) IBOutlet UIButton *buttonAbout;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
-//@property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePassCreateOption;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
@@ -43,9 +43,6 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePass1BackupFolder;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTips;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAutoClearClipboard;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLockDelay;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpAutoFill;
