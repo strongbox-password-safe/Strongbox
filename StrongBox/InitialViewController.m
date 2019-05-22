@@ -36,6 +36,9 @@
 @property PrivacyViewController* privacyAndLockVc;
 @property BOOL hasAppearedOnce; // Used for App Lock initial load
 
+@property NSURL* enqueuedUrl;
+@property BOOL enqueuedCanOpenInPlace;
+
 @end
 
 @implementation InitialViewController
@@ -238,6 +241,15 @@
     self.hasAppearedOnce = YES;
 
     [self checkICloudAvailability];
+    
+    if(self.enqueuedUrl) {
+        NSURL* url = self.enqueuedUrl;
+        self.enqueuedUrl = nil; // Nil this out as quick as possible to avoid duplicates or a race condition
+
+        [self import:url canOpenInPlace:self.enqueuedCanOpenInPlace];
+        
+        self.enqueuedCanOpenInPlace = NO;
+    }
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
@@ -387,6 +399,12 @@
     [self checkForLocalFileOverwriteOrGetNickname:importedData url:importURL editInPlace:NO];
 }
 
+- (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
+    NSLog(@"enqueueImport: [%@]-%d", url, canOpenInPlace);
+    self.enqueuedUrl = url;
+    self.enqueuedCanOpenInPlace = canOpenInPlace;
+}
+
 - (void)import:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
     UINavigationController* nav = [self selectedViewController];
     [nav popToRootViewControllerAnimated:YES];
@@ -427,6 +445,7 @@
 
 -(void)importSafe:(StrongboxUIDocument*)document url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
     NSError* error;
+    
     if (![DatabaseModel isAValidSafe:document.data error:&error]) {
         [Alerts error:self
                 title:[NSString stringWithFormat:@"Invalid Database - [%@]", url.lastPathComponent]
@@ -439,7 +458,8 @@
     }
     
     if(canOpenInPlace) {
-        [Alerts threeOptions:self title:@"Edit or Copy?"
+        [Alerts threeOptions:self
+                       title:@"Edit or Copy?"
                      message:@"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?"
            defaultButtonText:@"Edit in Place"
             secondButtonText:@"Make a Copy"

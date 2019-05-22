@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/GoogleDriveManager.m"
-            timestampString = "579709338.8767149"
+            filePath = "StrongBox/WebDAVStorageProvider.m"
+            timestampString = "580237322.087321"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
-            landmarkName = "-authenticate:completion:"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
+            landmarkName = "-connect:viewController:completion:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/GoogleDriveManager.m"
-            timestampString = "579709338.877113"
+            filePath = "StrongBox/WebDAVStorageProvider.m"
+            timestampString = "580237322.088012"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
-            landmarkName = "-signIn:didSignInForUser:withError:"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "-readWithProviderData:viewController:completion:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -41,14 +41,46 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/PrivacyViewController.m"
-            timestampString = "579718695.751691"
+            filePath = "StrongBox/WebDAVStorageProvider.m"
+            timestampString = "580237322.088343"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "54"
-            endingLineNumber = "54"
-            landmarkName = "-beginUnlockSequence"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
+            landmarkName = "-readWithProviderData:viewController:completion:"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__72-[WebDAVStorageProvider readWithProviderData:viewController:completion:]_block_invoke_2"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/WebDAVStorageProvider.m"
+                  timestampString = "580237254.130905"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "277"
+                  endingLineNumber = "277"
+                  offsetFromSymbolStart = "148">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__72-[WebDAVStorageProvider readWithProviderData:viewController:completion:]_block_invoke_3"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/WebDAVStorageProvider.m"
+                  timestampString = "580237254.132797"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "277"
+                  endingLineNumber = "277"
+                  offsetFromSymbolStart = "44">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

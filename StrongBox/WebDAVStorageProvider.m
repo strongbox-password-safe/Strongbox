@@ -330,7 +330,9 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     NSString* json = metaData.fileIdentifier;
     
     NSError* error;
-    NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]  options:kNilOptions error:&error];
+    NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
+                                                               options:kNilOptions
+                                                                 error:&error];
     
     WebDAVProviderData* foo = [WebDAVProviderData fromSerializationDictionary:dictionary];
     

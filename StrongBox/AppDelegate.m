@@ -80,11 +80,11 @@
                                           annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
     }
     else {
-        InitialViewController *tabController = (InitialViewController *)self.window.rootViewController;
+        InitialViewController *tabController = [self getInitialViewController];
 
         NSNumber* num = [options objectForKey:UIApplicationOpenURLOptionsOpenInPlaceKey];
         
-        [tabController import:url canOpenInPlace:num ? num.boolValue : NO];
+        [tabController enqueueImport:url canOpenInPlace:num ? num.boolValue : NO];
 
         return YES;
     }
