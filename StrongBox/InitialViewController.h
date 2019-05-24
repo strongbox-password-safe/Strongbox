@@ -17,9 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)importFromManualUiUrl:(NSURL *)importURL;
 
-- (void)enqueueImport:(NSURL *)importURL canOpenInPlace:(BOOL)openInPlace; // Used when opened from iOS Files or another App... Must be done after Privacy/Lock Screen is down, so we queue it up and execute on viewDidAppear...
+// Must be done after Privacy/Lock Screen is down, so we queue it up and execute on viewDidAppear or onPrivacyDismissed
 
-- (void)import:(NSURL *)importURL canOpenInPlace:(BOOL)openInPlace;
+- (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace;
+- (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace;
 
 - (void)showQuickLaunchView;
 - (void)showSafesListView;

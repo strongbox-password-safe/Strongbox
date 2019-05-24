@@ -26,4 +26,6 @@
 - (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
 - (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
 
+- (void)deleteAll;
+
 @end

@@ -157,7 +157,7 @@
 
 - (void)setConveniencePin:(NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
-    
+
     if(conveniencePin) {
         [JNKeychain saveValue:conveniencePin forKey:key];
     }
@@ -180,6 +180,13 @@
     else {
         [JNKeychain deleteValueForKey:key];
     }
+}
+
+- (void)clearKeychainItems {
+    self.convenienceMasterPassword = nil;
+    self.convenenienceKeyFileDigest = nil;
+    self.duressPin = nil;
+    self.conveniencePin = nil;
 }
 
 @end

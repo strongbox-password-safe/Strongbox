@@ -158,6 +158,7 @@
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
     if(controller.documentPickerMode == UIDocumentPickerModeOpen) {
         NSURL* url = [urls objectAtIndex:0];
+        [self.navigationController popToRootViewControllerAnimated:YES];
         [[self getInitialViewController] import:url canOpenInPlace:YES];
     }
 }

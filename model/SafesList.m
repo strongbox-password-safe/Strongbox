@@ -181,4 +181,15 @@ static NSUserDefaults* getUserDefaults() {
     }]];
 }
 
+- (void)deleteAll {
+    for(SafeMetaData* database in self.snapshot) {
+        [database clearKeychainItems];
+    }
+    
+    dispatch_barrier_async(self.dataQueue, ^{
+        [self.data removeAllObjects];
+        [self serialize];
+    });
+}
+
 @end

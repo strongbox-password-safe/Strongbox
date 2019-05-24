@@ -92,7 +92,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     self.longPressRecognizer.cancelsTouchesInView = YES;
     
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
-    
+
     self.tableView.allowsMultipleSelection = NO;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsSelectionDuringEditing = YES;
@@ -390,16 +390,20 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
+    if(self.tapCount == 2 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]) {
         [self.tapTimer invalidate];
-
         self.tapTimer = nil;
         self.tapCount = 0;
         self.tappedIndexPath = nil;
-
-        [self handleDoubleTap:indexPath];
+        
+        [self handleTripleTap:indexPath];
     }
-    else if(self.tapCount == 0){
+    else if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
+        [self.tapTimer invalidate];
+        self.tapCount = self.tapCount + 1;
+        self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
+    }
+    else if(self.tapCount == 0) {
         //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
         self.tapCount = self.tapCount + 1;
         self.tappedIndexPath = indexPath;
@@ -414,14 +418,15 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             self.tapTimer = nil;
         }
     }
-    
-//    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
-//    NSLog(@"Cell Height: %f - XXXXXXXXXXXXXXXXXXXXXXXXXXX", cell.frame.size.height);
 }
 
 - (void)tapTimerFired:(NSTimer *)aTimer{
-    //timer fired, there was a single tap on indexPath.row = tappedRow
-    [self tapOnCell:self.tappedIndexPath];
+    if(self.tapCount == 1) {
+        [self tapOnCell:self.tappedIndexPath];
+    }
+    else if(self.tapCount == 2) {
+        [self handleDoubleTap:self.tappedIndexPath];
+    }
     
     self.tapCount = 0;
     self.tappedIndexPath = nil;
@@ -766,6 +771,42 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     [self setEditing:false];
 }
 
+- (void)handleTripleTap:(NSIndexPath *)indexPath {
+    Node *item = [self getDataSource][indexPath.row];
+    
+    if (item.isGroup) {
+        NSLog(@"Item is group, cannot Fast Username Copy...");
+        
+        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+        
+        return;
+    }
+ 
+    if(!item.otpToken) { // No TOTP - Treat this as a double tap
+        [self handleDoubleTap:indexPath];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        
+        pasteboard.string = item.otpToken.password;
+        
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ TOTP Copied", [self dereference:item.title node:item]]
+                                   message:nil
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+        
+        NSLog(@"Fast TOTP Copy on %@", item.title);
+        
+        if(!self.isEditing) {
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
+    }
+}
+
 - (void)handleDoubleTap:(NSIndexPath *)indexPath {
     Node *item = [self getDataSource][indexPath.row];
     
@@ -779,7 +820,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    pasteboard.string = [self dereference:item.fields.username node:item]   ;
+    pasteboard.string = [self dereference:item.fields.username node:item];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Username Copied", [self dereference:item.title node:item]]
                                message:nil

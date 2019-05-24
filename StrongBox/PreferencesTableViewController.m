@@ -7,17 +7,19 @@
 //
 
 #import "PreferencesTableViewController.h"
-#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
-#import "GoogleDriveManager.h"
 #import "Alerts.h"
 #import "Utils.h"
 #import "Settings.h"
 #import <MessageUI/MessageUI.h>
 #import "SafesList.h"
-#import "OneDriveStorageProvider.h"
 #import "PinEntryController.h"
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
+#import "SelectStringViewController.h"
+
+#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
+#import "GoogleDriveManager.h"
+#import "OneDriveStorageProvider.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -30,7 +32,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
 @property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
-@property (weak, nonatomic) IBOutlet UISwitch *switchUseOldItemDetailsEditor;
 @property (weak, nonatomic) IBOutlet UISwitch *hideEmptyFields;
 @property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
@@ -42,6 +43,14 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLockDelay;
 @property (weak, nonatomic) IBOutlet UISwitch *appLockOnPreferences;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchDeleteDataEnabled;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDeleteDataAttempts;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellCloudSessions;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutVersion;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutHelp;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailSupport;
 
 @end
 
@@ -55,7 +64,7 @@
 
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
-    Settings.sharedInstance.useOldItemDetailsScene = self.switchUseOldItemDetailsEditor.on;
+
     Settings.sharedInstance.hideEmptyFieldsInDetailsView = self.hideEmptyFields.on;
     Settings.sharedInstance.easyReadFontForAll = self.easyReadFontForAll.on;
     Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
@@ -68,7 +77,6 @@
 }
 
 - (void)bindGenericPreferencesChanged {
-    self.switchUseOldItemDetailsEditor.on = Settings.sharedInstance.useOldItemDetailsScene;
     self.hideEmptyFields.on = Settings.sharedInstance.hideEmptyFieldsInDetailsView;
     self.easyReadFontForAll.on = Settings.sharedInstance.easyReadFontForAll;
     self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
@@ -143,16 +151,7 @@
                                     @60 : @2,
                                     @120 :@3 };
     
-    [self.buttonUnlinkDropbox setTitle:@"(No Current Dropbox Session)" forState:UIControlStateDisabled];
-    [self.buttonUnlinkDropbox setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    
-    [self.buttonSignoutGoogleDrive setTitle:@"(No Current Google Drive Session)" forState:UIControlStateDisabled];
-    [self.buttonSignoutGoogleDrive setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-
-    [self.buttonSignoutOneDrive setTitle:@"(No Current OneDrive Session)" forState:UIControlStateDisabled];
-    [self.buttonSignoutOneDrive setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-
-    [self bindUseICloud];
+    [self bindCloudSessions];
     [self bindAboutButton];
     [self bindLongTouchCopy];
     [self bindAllowPinCodeOpen];
@@ -172,15 +171,18 @@
     [self bindQuickTypeAutoFill];
     [self bindViewDereferenced];
     [self bindSearchDereferenced];
-    
     [self bindAppLock];
+    [self bindDeleteOnFailedUnlock];
+    
     [self customizeAppLockSectionFooter];
     
-    [self bindGenericPreferencesChanged];    
+    [self bindGenericPreferencesChanged];
 }
 
 - (void)customizeAppLockSectionFooter {
+    [self.segmentAppLock setEnabled:[Settings isBiometricIdAvailable] forSegmentAtIndex:2];
     [self.segmentAppLock setTitle:[Settings.sharedInstance getBiometricIdName] forSegmentAtIndex:2];
+    [self.segmentAppLock setEnabled:[Settings isBiometricIdAvailable] forSegmentAtIndex:3]; // Both
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -190,9 +192,7 @@
 
     self.navigationController.toolbar.hidden = YES;
     
-    self.buttonUnlinkDropbox.enabled = (DBClientsManager.authorizedClient != nil);
-    self.buttonSignoutGoogleDrive.enabled =  [[GoogleDriveManager sharedInstance] isAuthorized];
-    self.buttonSignoutOneDrive.enabled = [[OneDriveStorageProvider sharedInstance] isSignedIn];
+    [self bindCloudSessions];
 }
 
 - (void)bindAboutButton {
@@ -202,7 +202,7 @@
     }
     else {
         if([[Settings sharedInstance] isFreeTrial]) {
-            aboutString = [NSString stringWithFormat:@"Version %@ (Trial - %ld Days Left)",
+            aboutString = [NSString stringWithFormat:@"Version %@ (Trial - %ld days left)",
                            [Utils getAppVersion], (long)[[Settings sharedInstance] getFreeTrialDaysRemaining]];
         }
         else {
@@ -210,11 +210,19 @@
         }
     }
     
-    [self.buttonAbout setTitle:aboutString forState:UIControlStateNormal];
-    [self.buttonAbout setTitle:aboutString forState:UIControlStateHighlighted];
+    self.cellAboutVersion.textLabel.text = aboutString;
 }
 
-- (void)bindUseICloud {
+- (void)bindCloudSessions {
+    int cloudSessionCount = 0;
+    cloudSessionCount += [[GoogleDriveManager sharedInstance] isAuthorized] ? 1 : 0;
+    cloudSessionCount += (DBClientsManager.authorizedClient != nil) ? 1 : 0;
+    cloudSessionCount += [[OneDriveStorageProvider sharedInstance] isSignedIn] ? 1 : 0;
+
+    self.cellCloudSessions.userInteractionEnabled = (cloudSessionCount > 0);
+    self.cellCloudSessions.textLabel.enabled = (cloudSessionCount > 0);
+    self.cellCloudSessions.textLabel.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:@"Native Cloud Sessions (%d)", cloudSessionCount] : @"No Sessions";
+    
     self.switchUseICloud.on = [[Settings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
     
@@ -352,17 +360,6 @@
     [self bindHideTips];
 }
 
-- (IBAction)onHowTo:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/how-to-guide"]];
-}
-
-- (IBAction)onFaq:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"]];
-}
-
-- (IBAction)onPrivacyPolicy:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/privacy-policy"]];
-}
 
 - (void)bindAllowPinCodeOpen {
     self.switchAllowPinCodeOpen.on = !Settings.sharedInstance.disallowAllPinCodeOpens;
@@ -502,54 +499,21 @@
     NSNumber* seconds = @(Settings.sharedInstance.appLockDelay);
     NSNumber* index = [_appLockDelayList objectForKey:seconds];
     
-    [self.segmentAppLock setSelectedSegmentIndex:mode];
+    if (mode == kBiometric && !Settings.isBiometricIdAvailable) {
+        [self.segmentAppLock setSelectedSegmentIndex:kNoLock];
+    }
+    else if(mode == kBoth && !Settings.isBiometricIdAvailable) {
+        [self.segmentAppLock setSelectedSegmentIndex:kPinCode];
+    }
+    else {
+        [self.segmentAppLock setSelectedSegmentIndex:mode];
+    }
+    
     [self.segmentAppLockDelay setSelectedSegmentIndex:index.integerValue];
     
     NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
 }
 
-- (IBAction)onUnlinkDropbox:(id)sender {
-    if (DBClientsManager.authorizedClient) {
-        [Alerts yesNo:self
-                title:@"Unlink Dropbox?"
-              message:@"Are you sure you want to unlink Strongbox from Dropbox?"
-               action:^(BOOL response) {
-                   if (response) {
-                       [DBClientsManager unlinkAndResetClients];
-                       self.buttonUnlinkDropbox.enabled = NO;
-                       
-                       [Alerts info:self
-                              title:@"Unlink Successful"
-                            message:@"You have successfully unlinked Strongbox from Dropbox."];
-                   }
-               }];
-    }
-}
-
-- (IBAction)onSignoutOneDrive:(id)sender {
-    if ([OneDriveStorageProvider.sharedInstance isSignedIn]) {
-        [Alerts yesNo:self
-                title:@"Sign out of OneDrive?"
-              message:@"Are you sure you want to sign out of One Drive?"
-               action:^(BOOL response) {
-                   if (response) {
-                       [OneDriveStorageProvider.sharedInstance signout:^(NSError *error) {
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               if(!error) {
-                                   self.buttonSignoutOneDrive.enabled = NO;
-                                   [Alerts info:self
-                                          title:@"Signout Successful"
-                                        message:@"You have successfully signed out of OneDrive."];
-                               }
-                               else {
-                                   [Alerts error:self title:@"Error Signing out of OneDrive" error:error];
-                               }
-                           });
-                       }];
-                   }
-               }];
-   }
-}
 
 - (BOOL)hasLocalOrICloudSafes {
     return ([SafesList.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesList.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
@@ -569,7 +533,7 @@
             if(response) {
                 [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
                 
-                [self bindUseICloud];
+                [self bindCloudSessions];
             }
             else {
                 self.switchUseICloud.on = !self.switchUseICloud.on;
@@ -579,29 +543,11 @@
     else {
         [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
         
-        [self bindUseICloud];
+        [self bindCloudSessions];
     }
 }
 
-- (IBAction)onSignoutGoogleDrive:(id)sender {
-    if ([[GoogleDriveManager sharedInstance] isAuthorized]) {
-        [Alerts yesNo:self
-                title:@"Sign Out of Google Drive?"
-              message:@"Are you sure you want to sign out of Google Drive?"
-               action:^(BOOL response) {
-                   if (response) {
-                       [[GoogleDriveManager sharedInstance] signout];
-                       self.buttonSignoutGoogleDrive.enabled = NO;
-                       
-                       [Alerts info:self
-                              title:@"Sign Out Successful"
-                            message:@"You have been successfully been signed out of Google Drive."];
-                   }
-               }];
-    }
-}
-
-- (IBAction)onContactSupport:(id)sender {
+- (void)onContactSupport {
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
                title:@"Email Not Available"
@@ -661,10 +607,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-//- (IBAction)onBecomeAPatron:(id)sender {
-//    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.patreon.com/strongboxpasswordsafe"]];
-//}
-
 - (void)bindHideTotp {
     self.switchHideTotp.on = Settings.sharedInstance.hideTotp;
     self.switchHideTotpBrowseView.on = Settings.sharedInstance.hideTotpInBrowse;
@@ -712,5 +654,72 @@
 - (void)bindCopyTotpAutoFill {
     self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
 }
+
+- (void)bindDeleteOnFailedUnlock {
+    BOOL enabled = Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
+    
+    self.switchDeleteDataEnabled.on = enabled;
+    self.cellDeleteDataAttempts.userInteractionEnabled = enabled;
+    
+    NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
+    self.cellDeleteDataAttempts.detailTextLabel.text = enabled ? str : @"Disabled";
+}
+
+- (IBAction)onDeleteDataChanged:(id)sender {
+    if(self.switchDeleteDataEnabled.on) {
+        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; // Default
+        
+        [Alerts info:self title:@"DATA DELETION: Care Required" message:@"Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device safes and settings."];
+    }
+    else {
+        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; // Off
+    }
+    
+    [self bindDeleteOnFailedUnlock];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    if(cell == self.cellDeleteDataAttempts) {
+        SelectStringViewController *vc = [[SelectStringViewController alloc] init];
+        
+        NSArray<NSNumber*>* options = @[@3, @5, @10, @15];
+        vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+            return obj.stringValue;
+        }];
+        NSInteger i = [options indexOfObject:@(Settings.sharedInstance.deleteDataAfterFailedUnlockCount)];
+        
+        vc.currentlySelectedIndex = i;
+        vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
+            if (success) {
+                Settings.sharedInstance.deleteDataAfterFailedUnlockCount = options[selectedIndex].integerValue;
+            }
+            
+            [self dismissViewControllerAnimated:YES completion:^{
+                [self bindDeleteOnFailedUnlock];
+            }];
+        };
+        
+        [self presentViewController:vc animated:YES completion:nil];
+    }
+    else if(cell == self.cellAboutVersion) {
+
+    }
+    else if(cell == self.cellAboutHelp) {
+        [self onFaq];
+    }
+    else if(cell == self.cellEmailSupport) {
+        [self onContactSupport];
+    }
+}
+
+
+- (void)onFaq {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"]];
+}
+
 
 @end

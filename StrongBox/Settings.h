@@ -22,13 +22,18 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 + (Settings *)sharedInstance;
 - (NSUserDefaults*)getUserDefaults;
 
-- (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion;
-- (void)requestBiometricId:(NSString  *)reason fallbackTitle:(NSString*_Nullable)fallbackTitle completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
+- (void)requestBiometricId:(NSString*)reason
+     allowDevicePinInstead:(BOOL)allowDevicePinInstead
+                completion:(void(^)(BOOL success, NSError * __nullable error))completion;
+
+- (void)requestBiometricId:(NSString  *)reason
+             fallbackTitle:(NSString*_Nullable)fallbackTitle
+     allowDevicePinInstead:(BOOL)allowDevicePinInstead
+                completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
 
 @property BOOL suppressPrivacyScreen;
 
 + (BOOL)isBiometricIdAvailable;
-
 
 - (BOOL)isShowPasswordByDefaultOnEditScreen;
 - (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value;
@@ -131,6 +136,9 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property NSString* appLockPin;
 @property NSInteger appLockDelay;
 @property BOOL appLockAppliesToPreferences;
+
+@property NSInteger deleteDataAfterFailedUnlockCount;
+@property NSUInteger failedUnlockAttempts;
 
 NS_ASSUME_NONNULL_END
 

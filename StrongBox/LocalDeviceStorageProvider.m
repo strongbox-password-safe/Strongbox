@@ -633,4 +633,35 @@ static NSString* getAutoFillFilePath(SafeMetaData* safeMetaData) {
     }
 }
 
+//
+
+- (void)deleteAllLocalAndAppGroupFiles {
+    [self deleteAllInDirectory:[IOsUtils applicationDocumentsDirectory]];
+
+    [self deleteAllInDirectory:[IOsUtils applicationSupportDirectory]];
+
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:kAppGroupName];
+    
+    [self deleteAllInDirectory:url];
+}
+
+- (void)deleteAllInDirectory:(NSURL*)url { 
+    NSLog(@"Deleting Files at [%@]", url);
+
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    NSString *directory = url.path;
+    NSError *error = nil;
+    for (NSString *file in [fm contentsOfDirectoryAtPath:directory error:&error]) {
+        NSString* path = [NSString pathWithComponents:@[directory, file]];
+        
+        NSLog(@"Removing File: [%@]", path);
+        
+        BOOL success = [fm removeItemAtPath:path error:&error];
+        if (!success || error) {
+            NSLog(@"Failed to remove [%@]: [%@]", file, error);
+        }
+    }
+}
+
 @end

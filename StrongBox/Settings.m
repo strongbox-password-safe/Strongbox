@@ -62,6 +62,8 @@ static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolde
 static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
 static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse";
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
+static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
+static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -444,18 +446,26 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     return YES;
 }
 
-- (void)requestBiometricId:(NSString*)reason completion:(void(^)(BOOL success, NSError * __nullable error))completion {
-    [self requestBiometricId:reason fallbackTitle:nil completion:completion];
+- (void)requestBiometricId:(NSString*)reason
+     allowDevicePinInstead:(BOOL)allowDevicePinInstead
+                completion:(void(^)(BOOL success, NSError * __nullable error))completion {
+    [self requestBiometricId:reason fallbackTitle:nil allowDevicePinInstead:allowDevicePinInstead completion:completion];
 }
 
-- (void)requestBiometricId:(NSString*)reason fallbackTitle:(NSString*)fallbackTitle completion:(void(^)(BOOL success, NSError * __nullable error))completion {
+- (void)requestBiometricId:(NSString*)reason
+             fallbackTitle:(NSString*)fallbackTitle
+     allowDevicePinInstead:(BOOL)allowDevicePinInstead
+                completion:(void(^)(BOOL success, NSError * __nullable error))completion {
     LAContext *localAuthContext = [[LAContext alloc] init];
     if(fallbackTitle) {
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
+    else {
+        localAuthContext.localizedFallbackTitle = @"";
+    }
     
     self.suppressPrivacyScreen = YES;
-    [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+    [localAuthContext evaluatePolicy:allowDevicePinInstead ? LAPolicyDeviceOwnerAuthentication : LAPolicyDeviceOwnerAuthenticationWithBiometrics
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
                                    completion(success, error);
@@ -854,6 +864,24 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 -(void)setAppLockDelay:(NSInteger)appLockDelay {
     [[self getUserDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSInteger)deleteDataAfterFailedUnlockCount {
+    return [[self getUserDefaults] integerForKey:kDeleteDataAfterFailedUnlockCount];
+}
+
+- (void)setDeleteDataAfterFailedUnlockCount:(NSInteger)deleteDataAfterFailedUnlockCount {
+    [[self getUserDefaults] setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSUInteger)failedUnlockAttempts {
+    return [[self getUserDefaults] integerForKey:kFailedUnlockAttempts];
+}
+
+- (void)setFailedUnlockAttempts:(NSUInteger)failedUnlockAttempts {
+    [[self getUserDefaults] setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
     [[self getUserDefaults] synchronize];
 }
 

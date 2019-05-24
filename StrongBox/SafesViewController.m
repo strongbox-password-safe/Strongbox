@@ -128,7 +128,8 @@
         [self.tableView reloadData];
         
         self.buttonToggleEdit.enabled = (self.collection.count > 0);
-        
+        [self.buttonToggleEdit setTintColor:(self.collection.count > 0) ? nil : [UIColor clearColor]];
+
         if([[self getInitialViewController] getPrimarySafe]) {
             [self.barButtonQuickLaunchView setEnabled:YES];
             [self.barButtonQuickLaunchView setTintColor:nil];
@@ -661,7 +662,7 @@
         if([[Settings sharedInstance] isFreeTrial]) {
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
-            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days Left)",
+            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days left)",
                                   (long)daysLeft];
             
             if(daysLeft < 10) {
@@ -701,15 +702,17 @@
     }
     
     if((Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) && Settings.isBiometricIdAvailable) {
-        [self requestBiometric];
+        [self requestBiometricBeforeOpeningPreferences];
     }
     else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
         [self requestPin];
     }
 }
 
-- (void)requestBiometric {
-    [Settings.sharedInstance requestBiometricId:@"Identify to Open Strongbox" completion:^(BOOL success, NSError * _Nullable error) {
+- (void)requestBiometricBeforeOpeningPreferences {
+    [Settings.sharedInstance requestBiometricId:@"Identify to Open Preferences"
+                          allowDevicePinInstead:NO 
+                                     completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {

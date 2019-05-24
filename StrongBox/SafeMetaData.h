@@ -17,6 +17,8 @@
                         fileName:(NSString*)fileName
                   fileIdentifier:(NSString*)fileIdentifier;
 
+- (void)clearKeychainItems;
+
 @property (nonatomic, strong) NSString *uuid;
 @property (nonatomic, strong) NSString *nickName;
 @property (nonatomic, strong) NSString *fileName;

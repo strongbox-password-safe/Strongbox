@@ -249,7 +249,8 @@
 
 - (void)showBiometricAuthentication {
     [Settings.sharedInstance requestBiometricId:@"Identify to Login"
-                                  fallbackTitle:@"Manual Authentication..."
+                                  fallbackTitle:@"Enter Database Master Password..."
+                          allowDevicePinInstead:NO 
                                      completion:^(BOOL success, NSError * _Nullable error) {
         [self onBiometricAuthenticationDone:success error:error];
     }];
@@ -673,6 +674,9 @@
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
                 self.safe.convenenienceKeyFileDigest = nil;
+                self.safe.conveniencePin = nil;
+                self.safe.isTouchIdEnabled = NO;
+                self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
                 
                 [SafesList.sharedInstance update:self.safe];
                 

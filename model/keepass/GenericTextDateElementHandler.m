@@ -29,10 +29,21 @@ static NSDate* dotNetBaseEpochDate;
 
 + (void) initialize {
     if (self == [GenericTextDateElementHandler class]) {
+        // MMcG: Weirdly the way Microsoft and Apple calculate their intervals from the reference date
+        // is different (off by exactly 2 days) - This led to an issue where dates were being displayed
+        // as 2 days behind when edited in Windows (KeePass) and then displayed on Windows as being
+        // 2 days in the future when edited with Strongbox. This also only happened for KDBX4 files
+        // Bit of a cryptic one but for reference:
+        //
+        // https://github.com/mmcguill/Strongbox/issues/117
+        //
+        // We now use the below Midnight 3rd January 0001 as the base epoch for .Net Dates to keep in line
+        // with KeePass on Windows (.NET)
+        
         formatter = [[NSISO8601DateFormatter alloc] init];
         formatter.formatOptions = kFormatOptions;
         formatter.timeZone = [NSTimeZone timeZoneWithName:@"UTC"];
-        dotNetBaseEpochDate = [formatter dateFromString:@"0001-01-01T00:00:00Z"];
+        dotNetBaseEpochDate = [formatter dateFromString:@"0001-01-03T00:00:00Z"];
     }
 }
 

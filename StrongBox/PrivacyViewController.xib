@@ -13,6 +13,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PrivacyViewController">
             <connections>
                 <outlet property="buttonUnlock" destination="Fap-Qc-ou6" id="yQL-MZ-cin"/>
+                <outlet property="labelUnlockAttemptsRemaining" destination="J0z-Pz-6EH" id="K7z-FM-5Lu"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -22,7 +23,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ofD-cb-hDR">
-                    <rect key="frame" x="79" y="234" width="256" height="294"/>
+                    <rect key="frame" x="79" y="222" width="256" height="318"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="Iwi-Le-imh">
                             <rect key="frame" x="0.0" y="0.0" width="256" height="256"/>
@@ -38,6 +39,12 @@
                                 <action selector="onUnlock:" destination="-1" eventType="touchUpInside" id="4af-qG-wWP"/>
                             </connections>
                         </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unlock Attempts Remaining: 2" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J0z-Pz-6EH">
+                            <rect key="frame" x="36.5" y="302" width="183" height="16"/>
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                     </subviews>
                 </stackView>
             </subviews>

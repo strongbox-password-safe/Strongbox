@@ -186,6 +186,12 @@ static NSString* const kOtpAuthScheme = @"otpauth";
             NSString* secret = params[@"key"];
             
             if(secret.length) {
+                // KeeOTP sometimes URL escapes '+' in this base32 encoded string, check for that and decode
+                
+                if([secret containsString:@"%3d"]) {
+                    secret = [secret stringByRemovingPercentEncoding];
+                }
+                
                 OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:secret] name:@"<Unknown>" issuer:@"<Unknown>"];
                 
                 if(params[@"step"]) {

@@ -86,4 +86,6 @@
 
 - (void)excludeDirectoriesFromBackup;
 
+- (void)deleteAllLocalAndAppGroupFiles;
+
 @end

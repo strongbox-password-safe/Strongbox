@@ -24,6 +24,9 @@
 		4D004CEB21F4F7BE00E2B194 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
 		4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD021F4C26700E2B194 /* OTPAlgorithm.m */; };
 		4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
+		4D036E462298243700AC892B /* SelectStringViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E442298243700AC892B /* SelectStringViewController.m */; };
+		4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D036E452298243700AC892B /* SelectStringViewController.xib */; };
+		4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E492298443100AC892B /* CloudSessionsTableViewController.m */; };
 		4D06943922083E5200FB826C /* ProUpgradeIAPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */; };
 		4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D06E12022859F0100A754F5 /* BrowseItemCell.xib */; };
 		4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D06E12022859F0100A754F5 /* BrowseItemCell.xib */; };
@@ -627,6 +630,11 @@
 		4D004CE121F4F58300E2B194 /* Node+OtpToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Node+OtpToken.h"; path = "model/Node+OtpToken.h"; sourceTree = "<group>"; };
 		4D004CE221F4F58300E2B194 /* Node+OtpToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "Node+OtpToken.m"; path = "model/Node+OtpToken.m"; sourceTree = "<group>"; };
 		4D004CE521F4F67D00E2B194 /* OtpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OtpTests.m; path = StrongboxTests/OtpTests.m; sourceTree = "<group>"; };
+		4D036E432298243700AC892B /* SelectStringViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectStringViewController.h; path = StrongBox/SelectStringViewController.h; sourceTree = "<group>"; };
+		4D036E442298243700AC892B /* SelectStringViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectStringViewController.m; path = StrongBox/SelectStringViewController.m; sourceTree = "<group>"; };
+		4D036E452298243700AC892B /* SelectStringViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SelectStringViewController.xib; path = StrongBox/SelectStringViewController.xib; sourceTree = "<group>"; };
+		4D036E482298443100AC892B /* CloudSessionsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CloudSessionsTableViewController.h; path = "StrongBox Auto Fill/CloudSessionsTableViewController.h"; sourceTree = "<group>"; };
+		4D036E492298443100AC892B /* CloudSessionsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CloudSessionsTableViewController.m; path = "StrongBox Auto Fill/CloudSessionsTableViewController.m"; sourceTree = "<group>"; };
 		4D06943722083E5200FB826C /* ProUpgradeIAPManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProUpgradeIAPManager.h; path = StrongBox/ProUpgradeIAPManager.h; sourceTree = "<group>"; };
 		4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProUpgradeIAPManager.m; path = StrongBox/ProUpgradeIAPManager.m; sourceTree = "<group>"; };
 		4D06E12022859F0100A754F5 /* BrowseItemCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = BrowseItemCell.xib; path = StrongBox/BrowseItemCell.xib; sourceTree = "<group>"; };
@@ -1483,6 +1491,8 @@
 				4D25673121E8B086006260B7 /* PinsConfigurationController.m */,
 				4D6C51961F6407580035640E /* SafeDetailsView.h */,
 				4D6C51971F6407580035640E /* SafeDetailsView.m */,
+				4D036E482298443100AC892B /* CloudSessionsTableViewController.h */,
+				4D036E492298443100AC892B /* CloudSessionsTableViewController.m */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -1824,7 +1834,7 @@
 			name = RMStore;
 			sourceTree = "<group>";
 		};
-		4D62D6941C85F2B50051E13B /* ViewControllers */ = {
+		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
@@ -1837,8 +1847,11 @@
 				4DAE986A2270B39100A811C4 /* Item Details */,
 				4D06943622083E2000FB826C /* Upgrade */,
 				4D0835DE2284770900CA7405 /* Select Icon */,
+				4D036E432298243700AC892B /* SelectStringViewController.h */,
+				4D036E442298243700AC892B /* SelectStringViewController.m */,
+				4D036E452298243700AC892B /* SelectStringViewController.xib */,
 			);
-			name = ViewControllers;
+			name = UI;
 			sourceTree = "<group>";
 		};
 		4D62D6961C85F35E0051E13B /* StorageProviders */ = {
@@ -1915,9 +1928,6 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4D62D6961C85F35E0051E13B /* StorageProviders */,
-				4D78AC241FB1E23B00A68A92 /* PwSafe */,
-				4D78AC251FB1E24D00A68A92 /* Keepass */,
 				4D0835D32284750900CA7405 /* StrongboxDatabase.h */,
 				4D0835D42284750900CA7405 /* StrongboxDatabase.m */,
 				4D0835BC2284744B00CA7405 /* UiAttachment.h */,
@@ -2430,8 +2440,11 @@
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
-				4D62D6941C85F2B50051E13B /* ViewControllers */,
+				4D62D6941C85F2B50051E13B /* UI */,
 				4DE48A57216F54A300C9C991 /* Auto-Fill-Extension */,
+				4D78AC241FB1E23B00A68A92 /* PwSafe */,
+				4D78AC251FB1E24D00A68A92 /* Keepass */,
+				4D62D6961C85F35E0051E13B /* StorageProviders */,
 				4D326EA1223032C800DCD8C7 /* Libraries */,
 				4D78AC231FB1E22C00A68A92 /* Model */,
 				4D25E8EC2175F4CE00ACF108 /* Tests */,
@@ -2848,6 +2861,7 @@
 			files = (
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
+				4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
 				4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */,
@@ -3242,6 +3256,7 @@
 				4D3652142184A24700A56519 /* regdom.c in Sources */,
 				4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
+				4D036E462298243700AC892B /* SelectStringViewController.m in Sources */,
 				4D74B929218C40B000FC369E /* V3Binary.m in Sources */,
 				4DE498B52271AD28007EF98C /* AddAttachmentHelper.m in Sources */,
 				4D0835BD2284744B00CA7405 /* UiAttachment.m in Sources */,
@@ -3271,6 +3286,7 @@
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
 				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
+				4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */,
 				4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */,
 				4D3E14A121832D5500A41CA0 /* ref.c in Sources */,

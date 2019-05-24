@@ -36,8 +36,8 @@
 @property PrivacyViewController* privacyAndLockVc;
 @property BOOL hasAppearedOnce; // Used for App Lock initial load
 
-@property NSURL* enqueuedUrl;
-@property BOOL enqueuedCanOpenInPlace;
+@property NSURL* enqueuedImportUrl;
+@property BOOL enqueuedImportCanOpenInPlace;
 
 @end
 
@@ -91,11 +91,16 @@
 - (void)onPrivacyScreenDismissed {
     self.privacyAndLockVc = nil;
 
-    if([self isInQuickLaunchViewMode]) {
-        [self openQuickLaunchPrimarySafe];
+    if(self.enqueuedImportUrl) {
+        [self processEnqueuedImport]; // Maybe we need to process an import
     }
+    else {
+        if([self isInQuickLaunchViewMode]) {
+            [self openQuickLaunchPrimarySafe];
+        }
 
-    [self checkICloudAvailability];
+        [self checkICloudAvailability];
+    }
 }
 
 - (void)appResignActive {
@@ -227,29 +232,22 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    if(!self.hasAppearedOnce) {
-        if (Settings.sharedInstance.appLockMode != kNoLock) {
-            [self showPrivacyScreen:YES];
+    if(!self.hasAppearedOnce && Settings.sharedInstance.appLockMode != kNoLock) {
+        [self showPrivacyScreen:YES];
+    }
+    else {
+        if(self.enqueuedImportUrl) {
+            [self processEnqueuedImport];
         }
         else {
             if([self isInQuickLaunchViewMode]) {
                 [self openQuickLaunchPrimarySafe];
             }
+            
+            [self checkICloudAvailability];
         }
     }
-    
     self.hasAppearedOnce = YES;
-
-    [self checkICloudAvailability];
-    
-    if(self.enqueuedUrl) {
-        NSURL* url = self.enqueuedUrl;
-        self.enqueuedUrl = nil; // Nil this out as quick as possible to avoid duplicates or a race condition
-
-        [self import:url canOpenInPlace:self.enqueuedCanOpenInPlace];
-        
-        self.enqueuedCanOpenInPlace = NO;
-    }
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
@@ -400,37 +398,52 @@
 }
 
 - (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
-    NSLog(@"enqueueImport: [%@]-%d", url, canOpenInPlace);
-    self.enqueuedUrl = url;
-    self.enqueuedCanOpenInPlace = canOpenInPlace;
+    self.enqueuedImportUrl = url;
+    self.enqueuedImportCanOpenInPlace = canOpenInPlace;
 }
 
-- (void)import:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
-    UINavigationController* nav = [self selectedViewController];
-    [nav popToRootViewControllerAnimated:YES];
+- (void)processEnqueuedImport {
+    if(!self.enqueuedImportUrl) {
+        return;
+    }
     
+    NSURL* copy = self.enqueuedImportUrl;
+    self.enqueuedImportUrl = nil;
+    
+    [self import:copy canOpenInPlace:self.enqueuedImportCanOpenInPlace];
+}
+
+- (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     [document openWithCompletionHandler:^(BOOL success) {
-        if(!success) {
-            [Alerts warn:self title:@"Error Opening" message:@"Could not access this file."];
-            return;
-        }
+        NSData* data = document.data;
         
-        if([url.pathExtension caseInsensitiveCompare:@"key"] ==  NSOrderedSame) {
-            [self importKey:document url:url];
-        }
-        else {
-            [self importSafe:document url:url canOpenInPlace:canOpenInPlace];
-        }
+        [document closeWithCompletionHandler:nil];
+        
+        [self onReadImportedFile:success data:data url:url];
     }];
 }
 
-- (void)importKey:(StrongboxUIDocument*)document url:(NSURL*)url  {
+- (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url {
+    if(!success || !data) {
+        [Alerts warn:self title:@"Error Opening" message:@"Could not access this file."];
+    }
+    else {
+        if([url.pathExtension caseInsensitiveCompare:@"key"] ==  NSOrderedSame) {
+            [self importKey:data url:url];
+        }
+        else {
+            [self importSafe:data url:url canOpenInPlace:self.enqueuedImportCanOpenInPlace];
+        }
+    }
+}
+
+- (void)importKey:(NSData*)data url:(NSURL*)url  {
     NSString* filename = url.lastPathComponent;
     NSString* path = [[IOsUtils applicationDocumentsDirectory].path stringByAppendingPathComponent:filename];
     
     NSError *error;
-    [document.data writeToFile:path options:kNilOptions error:&error];
+    [data writeToFile:path options:kNilOptions error:&error];
     
     if(!error) {
         [Alerts info:self title:@"Key File Copied" message:@"This key file has been copied to Strongbox's local documents directory"];
@@ -438,22 +451,15 @@
     else {
         [Alerts error:self title:@"Problem Copying Key File" error:error];
     }
-    
-    [document closeWithCompletionHandler:nil];
-    [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
 }
 
--(void)importSafe:(StrongboxUIDocument*)document url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
+-(void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
     NSError* error;
     
-    if (![DatabaseModel isAValidSafe:document.data error:&error]) {
+    if (![DatabaseModel isAValidSafe:data error:&error]) {
         [Alerts error:self
                 title:[NSString stringWithFormat:@"Invalid Database - [%@]", url.lastPathComponent]
                 error:error];
-
-        [document closeWithCompletionHandler:nil];
-        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
-
         return;
     }
     
@@ -465,22 +471,13 @@
             secondButtonText:@"Make a Copy"
              thirdButtonText:@"Cancel"
                       action:^(int response) {
-                          [document closeWithCompletionHandler:^(BOOL success) {
-                              if(response != 2) {
-                                  [self checkForLocalFileOverwriteOrGetNickname:document.data url:url editInPlace:response == 0];
-                              }
-                              [document closeWithCompletionHandler:nil];
-                              [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
-                          }];
+                          if(response != 2) {
+                              [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0];
+                          }
                       }];
     }
     else {
-        [document closeWithCompletionHandler:^(BOOL success) {
-            [self checkForLocalFileOverwriteOrGetNickname:document.data url:url editInPlace:NO];
-            
-            [document closeWithCompletionHandler:nil];
-            [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
-        }];
+        [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:NO];
     }
 }
 

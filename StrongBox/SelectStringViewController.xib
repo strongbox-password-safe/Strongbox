@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SelectStringViewController">
+            <connections>
+                <outlet property="tableView" destination="rdb-I2-WPl" id="JhV-H5-O13"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="rdb-I2-WPl">
+                    <rect key="frame" x="0.0" y="44" width="414" height="748"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </tableView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mt2-LJ-sDR">
+                    <rect key="frame" x="183" y="812" width="48" height="30"/>
+                    <state key="normal" title="Cancel"/>
+                    <connections>
+                        <action selector="onCancel:" destination="-1" eventType="touchUpInside" id="2Pu-9q-GNm"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="rdb-I2-WPl" secondAttribute="trailing" id="076-hR-zWS"/>
+                <constraint firstItem="rdb-I2-WPl" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="Ddm-sg-9Pc"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="Mt2-LJ-sDR" secondAttribute="bottom" constant="20" id="eyJ-Ou-q0y"/>
+                <constraint firstItem="Mt2-LJ-sDR" firstAttribute="top" secondItem="rdb-I2-WPl" secondAttribute="bottom" constant="20" id="ioP-lo-fpo"/>
+                <constraint firstItem="rdb-I2-WPl" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="nRU-td-rRv"/>
+                <constraint firstItem="rdb-I2-WPl" firstAttribute="centerX" secondItem="Mt2-LJ-sDR" secondAttribute="centerX" id="x2F-b8-IlU"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <point key="canvasLocation" x="131.8840579710145" y="144.64285714285714"/>
+        </view>
+    </objects>
+</document>

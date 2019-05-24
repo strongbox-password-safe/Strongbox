@@ -42,7 +42,9 @@
 
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
 
-    [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems]; // Inbox should be empty
+    if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
+        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems]; // Inbox should be empty
+    }
     
     [self registerForClipboardClearingNotifications];
     
@@ -62,7 +64,9 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     NSLog(@"openURL: [%@] => [%@]", options, url);
+    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     
     if ([url.absoluteString hasPrefix:@"db"]) {
         DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];
@@ -80,11 +84,11 @@
                                           annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
     }
     else {
-        InitialViewController *tabController = [self getInitialViewController];
+        InitialViewController *initialViewController = [self getInitialViewController];
 
         NSNumber* num = [options objectForKey:UIApplicationOpenURLOptionsOpenInPlaceKey];
-        
-        [tabController enqueueImport:url canOpenInPlace:num ? num.boolValue : NO];
+
+        [initialViewController enqueueImport:url canOpenInPlace:num ? num.boolValue : NO];
 
         return YES;
     }
