@@ -58,7 +58,7 @@
     
     [self removeShowSafesMetaDataItem];
     
-    // BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG 
+    // BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
     
     if(![Settings sharedInstance].fullVersion) {
         [self getValidIapProducts];
@@ -311,12 +311,8 @@
         [self getValidIapProducts];
     }
     else {
-        SKProduct* product = [_validProducts objectAtIndex:0];
-        
-        if([UpgradeWindowController run:product cancelDelay:delay]) {
-            [[Settings sharedInstance] setFullVersion:YES];
-            [self removeUpgradeMenuItem];
-        };
+        SKProduct* product = [_validProducts objectAtIndex:0];        
+        [UpgradeWindowController show:product cancelDelay:delay];
     }
 }
 

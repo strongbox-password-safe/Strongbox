@@ -49,11 +49,12 @@
     }];
 }
 
-+ (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion {
-    //NSAlert *alert = [NSAlert alertWithMessageText:info defaultButton:@"No" alternateButton:@"Yes" otherButton:nil informativeTextWithFormat:@""];
++ (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion {
     NSAlert *alert = [[NSAlert alloc] init];
     
-    [alert setMessageText:info];
+    if (informativeText) [alert setInformativeText:informativeText];
+    if (messageText) [alert setMessageText:messageText];
+    
     [alert setAlertStyle:NSAlertStyleInformational];
     
     [alert addButtonWithTitle:@"No"];
@@ -65,6 +66,10 @@
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         completion(returnCode == NSAlertSecondButtonReturn);
     }];
+}
+
++ (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion {
+    [Alerts yesNo:info informativeText:nil window:window completion:completion];
 }
 
 + (void)error:(NSError*)error window:(NSWindow*)window {

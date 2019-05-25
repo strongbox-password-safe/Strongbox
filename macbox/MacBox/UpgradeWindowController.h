@@ -11,7 +11,7 @@
 
 @interface UpgradeWindowController : NSWindowController<SKPaymentTransactionObserver>
 
-+ (BOOL)run:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay;
++ (void)show:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay;
 
 @property (weak) IBOutlet NSButton *buttonNoThanks;
 @property (weak) IBOutlet NSButton *buttonUpgrade;

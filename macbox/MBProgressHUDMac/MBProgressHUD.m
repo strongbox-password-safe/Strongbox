@@ -550,6 +550,8 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	if (animated) {
         [NSAnimationContext beginGrouping];
         [[NSAnimationContext currentContext] setDuration:0.30];
+
+        
         [[self animator] setAlphaValue:1.0f];
         if (animationType == MBProgressHUDAnimationZoomIn || animationType == MBProgressHUDAnimationZoomOut) {
 			[(CALayer *)[self animator] setAffineTransform:rotationTransform];

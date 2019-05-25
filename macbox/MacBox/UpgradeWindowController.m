@@ -8,6 +8,7 @@
 
 #import "UpgradeWindowController.h"
 #import "Alerts.h"
+#import "Settings.h"
 
 #define kFontName @"Futura-Bold"
 
@@ -19,34 +20,48 @@
 
 @end
 
+static UpgradeWindowController* currentInstance;
+
 @implementation UpgradeWindowController
 
-+ (BOOL)run:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay
+static UpgradeWindowController *sharedInstance = nil;
+
++ (void)show:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay
 {
-    UpgradeWindowController* windowController = [[UpgradeWindowController alloc] initWithWindowNibName:@"UpgradeWindowController"];
-    windowController.product = product;
-    windowController.cancelDelay = cancelDelay;
-    
-    NSModalResponse response = [NSApp runModalForWindow:windowController.window];
-    
-    if (response) {
-        return YES; 
+    if (!sharedInstance)
+    {
+        sharedInstance = [[UpgradeWindowController alloc] initWithWindowNibName:@"UpgradeWindowController"];
+        sharedInstance.product = product;
+        sharedInstance.cancelDelay = cancelDelay;
     }
-    
-    return NO;
+ 
+    [sharedInstance showWindow:nil];
+}
+
+- (void)windowWillClose:(NSNotification *)notification
+{
+    if ([notification object] == [self window] && self == sharedInstance) {
+        sharedInstance = nil;
+    }
 }
 
 - (void)close:(BOOL)ret {
     [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
     
-    [NSApp stopModalWithCode:ret];
+    if(ret) {
+        Settings.sharedInstance.fullVersion = YES;
+    }
     
     [self.window close];
 }
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
+
+    [self.window makeKeyAndOrderFront:nil];
+    [self.window center];
+    [self.window setLevel:NSModalPanelWindowLevel]; //NSFloatingWindowLevel];
+
     [self customizeButtonsBasedOnProduct];
     
     [[SKPaymentQueue defaultQueue] addTransactionObserver:self];

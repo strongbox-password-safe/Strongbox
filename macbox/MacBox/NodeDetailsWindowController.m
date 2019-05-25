@@ -39,7 +39,6 @@
 
 @property Node* node;
 @property ViewModel* model;
-@property BOOL readOnly;
 @property ViewController* parentViewController;
 @property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
@@ -75,6 +74,8 @@
 @property (weak) IBOutlet NSTextField *labelCreated;
 @property (weak) IBOutlet NSTextField *labelModified;
 
+@property dispatch_block_t passwordChangedNotifyTask;
+
 @end
 
 static NSImage* kDefaultAttachmentIcon;
@@ -89,14 +90,12 @@ static NSImage* kDefaultAttachmentIcon;
 
 + (instancetype)showNode:(Node*)node
                    model:(ViewModel*)model
-                readOnly:(BOOL)readOnly
     parentViewController:(ViewController*)parentViewController
                 newEntry:(BOOL)newEntry {
     NodeDetailsWindowController *window = [[NodeDetailsWindowController alloc] initWithWindowNibName:@"NodeDetailsWindowController"];
     
     window.node = node;
     window.model = model;
-    window.readOnly = readOnly;
     window.newEntry = newEntry;
     window.parentViewController = parentViewController;
     
@@ -110,21 +109,42 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)promptToSaveSimpleUIChangesBeforeClose {
-    [Alerts yesNo:@"There are unsaved changes present. Would you like to save those before exiting?"
-           window:self.window completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                   [self setModelForEditField:self.currentlyEditingUIControl];
-                   [self close];
+    NSString* message = self.newEntry ? @"Discard New Entry?" : @"Save Changes?";
+    
+    NSString* informative = self.newEntry ? @"You have made no changes to this new entry, do you want to discard?" : @"There are unsaved changes present. Would you like to save those before exiting?";
+    
+    [Alerts yesNo:message
+  informativeText:informative
+            window:self.window
+       completion:^(BOOL yesNo) {
+               if(self.newEntry) {
+                   if(yesNo) {
+                       // Delete New Entry if discarding changes
+                       [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                       [self.model deleteItem:self.node];
+                       [self close];
+                   }
+                   else {
+                       [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                       [self setModelForEditField:self.currentlyEditingUIControl];
+                       [self close];
+                   }
                }
                else {
-                   [self close];
+                   if(yesNo) {
+                       [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                       [self setModelForEditField:self.currentlyEditingUIControl];
+                       [self close];
+                   }
+                   else {
+                       [self close];
+                   }
                }
            }];
 }
 
 - (void)cancel:(id)sender { // Pick up escape key
-    if([self changesInSimpleUICurrentEditor]) {
+    if([self shouldPromptToSaveSimpleChanges]) {
         [self promptToSaveSimpleUIChangesBeforeClose];
     }
     else {
@@ -132,7 +152,11 @@ static NSImage* kDefaultAttachmentIcon;
     }
 }
 
-- (BOOL)changesInSimpleUICurrentEditor {
+- (BOOL)shouldPromptToSaveSimpleChanges {
+    if(self.newEntry) {
+        return YES; // If this is a brand new entry then ask if you really want to save
+    }
+    
     BOOL changes = NO;
     
     if(self.tabView.selectedTabViewItem == self.tabView.tabViewItems[0]) { // Simple Tab
@@ -173,7 +197,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 -(BOOL)windowShouldClose:(NSWindow *)sender {
-    if([self changesInSimpleUICurrentEditor]) {
+    if([self shouldPromptToSaveSimpleChanges]) {
         [self promptToSaveSimpleUIChangesBeforeClose];
         return NO;
     }
@@ -209,16 +233,11 @@ static NSImage* kDefaultAttachmentIcon;
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (BOOL)canEdit {
-    return !self.readOnly;
-}
-
 - (void)windowDidLoad {
     [super windowDidLoad];
     
     NSString* title =[self.model dereference:self.node.title node:self.node];
-    
-    self.window.title = self.readOnly ? [NSString stringWithFormat:@"%@ [Read-Only]", title] : title;
+    self.window.title = title;
     
     [self.window makeKeyAndOrderFront:nil];
     [self.window center];
@@ -228,8 +247,6 @@ static NSImage* kDefaultAttachmentIcon;
     [self setupUi];
     
     [self setupAutoCompletes];
-    
-    [self enableDisableFieldsForEditing];
     
     [self bindUiToNode];
     
@@ -424,25 +441,6 @@ static NSImage* kDefaultAttachmentIcon;
     self.textFieldUsername.completionEnabled = !Settings.sharedInstance.doNotShowAutoCompleteSuggestions;
 }
 
-- (void)enableDisableFieldsForEditing {
-    [self enableDisableSimpleForEditing];
-    [self enableDisableCustomFieldsForEditing];
-    [self enableDisableAttachmentsForEditing];
-}
-
-- (void)enableDisableAttachmentsForEditing {
-    // TODO:
-}
-
-- (void)enableDisableSimpleForEditing {
-    // TODO:
-}
-
-- (void)enableDisableCustomFieldsForEditing {
-    self.buttonAddCustomField.enabled = [self canEdit];
-    self.buttonRemoveCustomField.enabled = [self canEdit];
-}
-
 - (void)setupCustomFieldsUI {
     self.customFields = [NSArray array];
 
@@ -511,17 +509,13 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onEditCustomField:(CustomField*)field {
-    //NSLog(@"onEditCustomField: %@", field);
+    Alerts* alert = [[Alerts alloc] init];
     
-    if([self canEdit]) {
-        Alerts* alert = [[Alerts alloc] init];
-        
-        [alert inputKeyValue:@"Edit Custom Field" initKey:field.key initValue:field.value initProtected:field.protected placeHolder:NO completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
-            if(yesNo) {
-                [self setCustomField:key value:value allowUpdate:YES protected:protected];
-            }
-        }];
-    }
+    [alert inputKeyValue:@"Edit Custom Field" initKey:field.key initValue:field.value initProtected:field.protected placeHolder:NO completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
+        if(yesNo) {
+            [self setCustomField:key value:value allowUpdate:YES protected:protected];
+        }
+    }];
 }
 
 - (IBAction)onCopyCustomFieldKey:(id)sender {
@@ -613,13 +607,7 @@ static NSImage* kDefaultAttachmentIcon;
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     SEL theAction = [menuItem action];
     
-    if (theAction == @selector(onDeleteCustomField:)) {
-        return [self canEdit];
-    }
-    else if (theAction == @selector(onEditField:)) {
-        return [self canEdit];
-    }
-    else if (theAction == @selector(onPreviewAttachment:)) {
+   if (theAction == @selector(onPreviewAttachment:)) {
         return [self.attachmentsView.selectionIndexes count] != 0;
     }
     else if (theAction == @selector(onSaveAttachment:)) {
@@ -681,8 +669,6 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)setModelForEditField:(NSView*)obj {
-    // NSLog(@"setModelForEditField for [%@]", obj);
-    
     if(obj == self.textFieldTitle) {
         if(![self.node.title isEqualToString:trimField(self.textFieldTitle)]) {
             if(![self.model setItemTitle:self.node title:trimField(self.textFieldTitle)]) {
@@ -716,9 +702,6 @@ static NSImage* kDefaultAttachmentIcon;
             [self.model setItemNotes:self.node notes:updated];
         }
     }
-    else {
-        // NSLog(@"NOP for setModelForEditField");
-    }
 }
 
 NSString* trimField(NSTextField* textField) {
@@ -731,6 +714,8 @@ NSString* trimField(NSTextField* textField) {
     if(self.model.format == kPasswordSafe) {
         return;
     }
+    
+    [self setModelForEditField:self.currentlyEditingUIControl]; // Save any ongoing current edit
     
     __weak NodeDetailsWindowController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
@@ -1042,6 +1027,8 @@ NSString* trimField(NSTextField* textField) {
     if(node == self.node) {
         [self bindUiToSimpleFields];
 
+        self.newEntry = NO;
+        
         if(notification.name == kModelUpdateNotificationTitleChanged) {
             [self showPopupToastNotification:@"Title Changed"];
         }
@@ -1058,7 +1045,19 @@ NSString* trimField(NSTextField* textField) {
             [self showPopupToastNotification:@"Notes Changed"];
         }
         else if(notification.name == kModelUpdateNotificationPasswordChanged){
-            [self showPopupToastNotification:@"Password Changed"];
+            // Blocks UI if we notify... couldn't find a really satisfactory solution to get this working without blcok UI :(
+            
+            //            if(self.passwordChangedNotifyTask) {
+//                dispatch_block_cancel(self.passwordChangedNotifyTask);
+//            }
+//
+//            self.passwordChangedNotifyTask = dispatch_block_create(0, ^{
+//                self.passwordChangedNotifyTask = nil;
+//                [self showPopupToastNotification:@"Password Changed" duration:0.35];
+//            });
+//
+//            dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC));
+//            dispatch_after(when, dispatch_get_main_queue(), self.passwordChangedNotifyTask);
         }
         else if(notification.name == kModelUpdateNotificationIconChanged){
             [self showPopupToastNotification:@"Icon Changed"];
@@ -1074,6 +1073,8 @@ NSString* trimField(NSTextField* textField) {
     [self bindUiToSimpleFields]; // Update Modified Date
     [self bindUiToCustomFields];
     
+    self.newEntry = NO;
+    
     [self showPopupToastNotification:@"Custom Fields Changed"];
 }
 
@@ -1084,6 +1085,8 @@ NSString* trimField(NSTextField* textField) {
     
     [self bindUiToSimpleFields]; // Update Modified Date
     [self bindUiToAttachments];
+    
+    self.newEntry = NO;
     
     [self showPopupToastNotification:@"Attachments Changed"];
 }
@@ -1096,15 +1099,22 @@ NSString* trimField(NSTextField* textField) {
     [self bindUiToSimpleFields]; // Update Modified Date
     [self initializeTotp];
     
+    self.newEntry = NO;
+    
     [self showPopupToastNotification:@"TOTP Changed"];
 }
 
 - (void)showPopupToastNotification:(NSString*)message {
+    [self showPopupToastNotification:message duration:0.75];
+}
+
+- (void)showPopupToastNotification:(NSString*)message duration:(CGFloat)duration {
     if(Settings.sharedInstance.doNotShowChangeNotifications) {
         return;
     }
     
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window.contentView animated:YES];
+   
     hud.labelText = @"";
     hud.detailsLabelText = message;
     hud.color = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
@@ -1112,9 +1122,9 @@ NSString* trimField(NSTextField* textField) {
     hud.margin = 2.f;
     hud.yOffset = -210.f;
     hud.removeFromSuperViewOnHide = YES;
-    hud.dismissible = YES;
+    hud.dismissible = NO;
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [hud hide:YES];
     });
 }
@@ -1142,6 +1152,7 @@ NSString* trimField(NSTextField* textField) {
         }
         else {
             [self.model changeParent:group node:self.node];
+            self.newEntry = NO;
         }
     }
     else {

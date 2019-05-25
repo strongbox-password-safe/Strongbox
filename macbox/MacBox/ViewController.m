@@ -135,7 +135,7 @@ static NSImage* kStrongBox256Image;
         [wc showWindow:nil];
     }
     else {
-        wc = [NodeDetailsWindowController showNode:item model:self.model readOnly:NO parentViewController:self newEntry:newEntry];
+        wc = [NodeDetailsWindowController showNode:item model:self.model parentViewController:self newEntry:newEntry];
         NSLog(@"Adding Details WindowController to List: [%@]", wc);
         self.detailsWindowControllers[item.uuid] = wc;
     }
@@ -500,8 +500,8 @@ static NSImage* kStrongBox256Image;
 
 - (void)startObservingModelChanges {
     __weak ViewController* weakSelf = self;
-    self.model.onNewItemAdded = ^(Node * _Nonnull node, BOOL suppressNewItemPopup) {
-        [weakSelf onNewItemAdded:node suppressNewItemPopup:suppressNewItemPopup];
+    self.model.onNewItemAdded = ^(Node * _Nonnull node, BOOL newRecord) {
+        [weakSelf onNewItemAdded:node newRecord:newRecord];
     };
     self.model.onDeleteItem = ^(Node * _Nonnull node) {
         [weakSelf onDeleteItem:node];
@@ -1699,7 +1699,7 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-- (void)onNewItemAdded:(Node*)node suppressNewItemPopup:(BOOL)suppressNewItemPopup {
+- (void)onNewItemAdded:(Node*)node newRecord:(BOOL)newRecord {
     self.itemsCache = nil; // Clear items cache
     self.searchField.stringValue = @""; // Clear any ongoing search...
     [self.outlineView reloadData];
@@ -1712,7 +1712,7 @@ static NSImage* kStrongBox256Image;
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
     }
 
-    if(!suppressNewItemPopup) {
+    if(newRecord) {
         [self openItemDetails:node newEntry:YES];
     }
 }
@@ -1736,7 +1736,7 @@ static NSImage* kStrongBox256Image;
     }
     else {
         BOOL willRecycle = self.model.recycleBinEnabled;        
-        [Alerts yesNo:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%lu' items to the Recycle Bin?" : @"Are you sure you want to delete '%lu' items?", (unsigned long)rows.count]
+        [Alerts yesNo:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send %lu items to the Recycle Bin?" : @"Are you sure you want to delete %lu items?", (unsigned long)rows.count]
                window:self.view.window
            completion:^(BOOL yesNo) {
             if(yesNo) {

@@ -62,7 +62,7 @@
     }
     else if([tableColumn.identifier isEqualToString:@"Username"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryPlainCellIdentifier" owner:nil];
-        cell.textField.stringValue = item.fields.username; // TODO: do we have to worry about Nils?
+        cell.textField.stringValue = item.fields.username;
     }
     else if([tableColumn.identifier isEqualToString:@"Password"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryPlainCellIdentifier" owner:nil];

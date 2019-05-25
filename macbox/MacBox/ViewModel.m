@@ -780,7 +780,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         return NO;
     }
     
-    [self addItem:record parent:parentGroup suppressNewItemPopup:NO];
+    [self addItem:record parent:parentGroup newRecord:YES];
     
     return YES;
 }
@@ -796,10 +796,10 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         title = [NSString stringWithFormat:@"%@ %ld", title, i];
     } while (!success);
     
-    [self addItem:newGroup parent:parentGroup suppressNewItemPopup:NO];
+    [self addItem:newGroup parent:parentGroup newRecord:NO];
 }
 
-- (void)addItem:(Node*)item parent:(Node*)parent suppressNewItemPopup:(BOOL)suppressNewItemPopup {
+- (void)addItem:(Node*)item parent:(Node*)parent newRecord:(BOOL)newRecord {
     [parent addChild:item allowDuplicateGroupTitles:YES];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
@@ -808,7 +808,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onNewItemAdded(item, suppressNewItemPopup);
+        self.onNewItemAdded(item, newRecord);
     });
 }
 
@@ -824,7 +824,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     else {
         [child.parent removeChild:child];
         
-        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent suppressNewItemPopup:YES];
+        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent newRecord:NO];
         if(!self.document.undoManager.isUndoing) {
             [self.document.undoManager setActionName:@"Delete Item"];
         }
@@ -903,7 +903,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         record.fields.accessed = date;
         record.fields.modified = date;
         
-        [self addItem:record parent:self.passwordDatabase.rootGroup suppressNewItemPopup:YES];
+        [self addItem:record parent:self.passwordDatabase.rootGroup newRecord:NO];
     }
     
     [self.document.undoManager setActionName:@"Import Entries from CSV"];

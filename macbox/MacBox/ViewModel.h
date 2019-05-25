@@ -118,7 +118,7 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-@property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL suppressNewItemPopup);
+@property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL newRecord);
 @property (nonatomic, copy, nullable) void (^onDeleteItem)(Node* node);
 @property (nonatomic, copy, nullable) void (^onChangeParent)(Node* node);
 @property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
