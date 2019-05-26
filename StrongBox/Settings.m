@@ -64,6 +64,7 @@ static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse";
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
+static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -785,20 +786,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 }
 
 - (BOOL)instantPinUnlocking {
-    NSNumber* obj = [[self getUserDefaults] objectForKey:kInstantPinUnlocking];
-    
-    if(obj == nil) {
-        // Try to be smart about default here... don't want to switch this on if user is
-        // already using PINs but if they're not then I think this should be the default
-        
-        BOOL userAlreadyUsingPins = [SafesList.sharedInstance.snapshot anyMatch:^BOOL(SafeMetaData *obj) {
-            return obj.conveniencePin != nil;
-        }];
-        
-        [self setInstantPinUnlocking:!userAlreadyUsingPins];
-    }
-    
-    return [self getBool:kInstantPinUnlocking];
+    return [self getBool:kInstantPinUnlocking fallback:YES];
 }
 
 - (void)setInstantPinUnlocking:(BOOL)instantPinUnlocking {
@@ -883,6 +871,14 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 - (void)setFailedUnlockAttempts:(NSUInteger)failedUnlockAttempts {
     [[self getUserDefaults] setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
     [[self getUserDefaults] synchronize];
+}
+
+- (BOOL)appLockAppliesToPreferences {
+    return [self getBool:kAppLockAppliesToPreferences];
+}
+
+- (void)setAppLockAppliesToPreferences:(BOOL)appLockAppliesToPreferences {
+    [self setBool:kAppLockAppliesToPreferences value:YES];
 }
 
 @end

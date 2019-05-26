@@ -275,6 +275,7 @@
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D4D6B57222EF3E80056514E /* RMStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D6AF6222EF3E80056514E /* RMStore.m */; };
 		4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
+		4D51ED7F229ABDC4002B05A7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D51ED7E229ABDC4002B05A7 /* AudioToolbox.framework */; };
 		4D51EEFD21B94CC100623CA1 /* xml-keyfile.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D51EEFB21B94CC100623CA1 /* xml-keyfile.kdbx */; };
 		4D51EEFE21B94CC100623CA1 /* xml-keyfile.key in Resources */ = {isa = PBXBuildFile; fileRef = 4D51EEFC21B94CC100623CA1 /* xml-keyfile.key */; };
 		4D51EF0021B94E7200623CA1 /* DatabaseModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D51EEFF21B94E7200623CA1 /* DatabaseModelTests.m */; };
@@ -900,6 +901,7 @@
 		4D4D6AF6222EF3E80056514E /* RMStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RMStore.m; path = lib/RMStore/RMStore/RMStore.m; sourceTree = "<group>"; };
 		4D4F184A2165125B00578F0E /* NSArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "model/NSArray+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		4D4F184B2165125B00578F0E /* NSArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "model/NSArray+Extensions.m"; sourceTree = SOURCE_ROOT; };
+		4D51ED7E229ABDC4002B05A7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		4D51EEFB21B94CC100623CA1 /* xml-keyfile.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "xml-keyfile.kdbx"; sourceTree = "<group>"; };
 		4D51EEFC21B94CC100623CA1 /* xml-keyfile.key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "xml-keyfile.key"; sourceTree = "<group>"; };
 		4D51EEFF21B94E7200623CA1 /* DatabaseModelTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseModelTests.m; path = StrongboxTests/DatabaseModelTests.m; sourceTree = "<group>"; };
@@ -1368,6 +1370,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D51ED7F229ABDC4002B05A7 /* AudioToolbox.framework in Frameworks */,
 				4D326E9F2230311A00DCD8C7 /* libz.1.dylib in Frameworks */,
 				4DA5F8F72221DABE00B6C650 /* FavIcon.framework in Frameworks */,
 				4D326E9922302BED00DCD8C7 /* libssh2.a in Frameworks */,
@@ -1573,6 +1576,26 @@
 				4D5F5B75218B39BF00A0739A /* InnerRandomStreamFactory.m */,
 			);
 			name = Xml;
+			sourceTree = "<group>";
+		};
+		4D20E7A72299593E00ABFC89 /* PIN Code */ = {
+			isa = PBXGroup;
+			children = (
+				4D25674921E8C65D006260B7 /* PinEntryController.h */,
+				4D25674A21E8C65D006260B7 /* PinEntryController.m */,
+				4D25674B21E8C65D006260B7 /* PinEntryController.xib */,
+			);
+			name = "PIN Code";
+			sourceTree = "<group>";
+		};
+		4D20E7A822995B5E00ABFC89 /* Privacy and Lock */ = {
+			isa = PBXGroup;
+			children = (
+				4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */,
+				4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */,
+				4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */,
+			);
+			name = "Privacy and Lock";
 			sourceTree = "<group>";
 		};
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
@@ -1840,6 +1863,8 @@
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D25675021EBD094006260B7 /* LaunchScreen.storyboard */,
+				4D20E7A72299593E00ABFC89 /* PIN Code */,
+				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DED20C72168BF1800A5800A /* Home */,
 				4D81FAD42284836E00A0B4CF /* Add Safe */,
 				4D0835DF2284773C00CA7405 /* Preferences */,
@@ -2565,12 +2590,6 @@
 			children = (
 				4DED20C12168AC9A00A5800A /* InitialViewController.h */,
 				4DED20C22168AC9A00A5800A /* InitialViewController.m */,
-				4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */,
-				4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */,
-				4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */,
-				4D25674921E8C65D006260B7 /* PinEntryController.h */,
-				4D25674A21E8C65D006260B7 /* PinEntryController.m */,
-				4D25674B21E8C65D006260B7 /* PinEntryController.xib */,
 				4D1A5C001F7927D60036684C /* VersionConflictController.h */,
 				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
 				4D1A5BFD1F7924C30036684C /* SafeItemTableCell.h */,
@@ -2641,6 +2660,7 @@
 		C28E68E855D68D8BECCE3B5B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D51ED7E229ABDC4002B05A7 /* AudioToolbox.framework */,
 				4DF2C81522735B9200CF13B5 /* SearchTextField.framework */,
 				4D326E9E2230311A00DCD8C7 /* libz.1.dylib */,
 				4D326E9C22302E7F00DCD8C7 /* libz.tbd */,

@@ -138,9 +138,9 @@
             NSLog(@"Downgrading App as Entitlement NOT found in Receipt...");
             
             if(vc) {
-                [Alerts info:vc title:@"Strongbox Downgrade" message:@"It looks like this app is no longer entitled to all the Pro features. These will be limited again soon. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this and prevent the downgrade."];
+                [Alerts info:vc title:@"Strongbox Downgrade" message:@"It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt."];
             }
-            // [Settings.sharedInstance setPro:NO]; // TODO: Enable Downgrade in next release
+            [Settings.sharedInstance setPro:NO];
         }
         else {
             NSLog(@"App Pro Entitlement not found in Receipt... leaving downgraded...");

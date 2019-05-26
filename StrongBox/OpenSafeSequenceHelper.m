@@ -133,11 +133,10 @@
     
     PinEntryController *vc = [[PinEntryController alloc] init];
     vc.pinLength = self.safe.conveniencePin.length;
-    vc.info = @"Please enter your PIN to Unlock Database";
     vc.showFallbackOption = YES;
     
     if(self.safe.failedPinAttempts > 0) {
-        vc.warning = [NSString stringWithFormat:@"%d attempts remaining before PIN is disabled", maxFailedPinAttempts - self.safe.failedPinAttempts];
+        vc.warning = [NSString stringWithFormat:@"%d attempts remaining", maxFailedPinAttempts - self.safe.failedPinAttempts];
     }
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
@@ -151,14 +150,23 @@
                     
                     [SafesList.sharedInstance update:self.safe];
                     
+                    UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                    [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
+
                     [self openSafe];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
+                    UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                    [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
+
                     [self performDuressAction];
                 }
                 else {
                     self.safe.failedPinAttempts++;
                     [SafesList.sharedInstance update:self.safe];
+
+                    UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                    [gen notificationOccurred:UINotificationFeedbackTypeError];
 
                     if (self.safe.failedPinAttempts >= maxFailedPinAttempts) {
                         self.safe.failedPinAttempts = 0;
@@ -189,8 +197,9 @@
             }
         }];
     };
-         
-     [self.viewController presentViewController:vc animated:YES completion:nil];
+    
+    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    [self.viewController presentViewController:vc animated:YES completion:nil];
 }
 
 -(void)performDuressAction {
@@ -801,7 +810,6 @@
                           provider:(id)provider
                               data:(NSData *)data {
     PinEntryController *vc1 = [[PinEntryController alloc] init];
-    vc1.info = @"Please Enter a Convenience PIN";
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
@@ -828,6 +836,7 @@
         }];
     };
 
+    vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self.viewController presentViewController:vc1 animated:YES completion:nil];
 }
 

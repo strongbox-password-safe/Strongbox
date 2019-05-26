@@ -43,11 +43,6 @@
     }
 }
 
--(void)viewDidLoad {
-    [super viewDidLoad];
-    NSLog(@"viewDidLoad");
-}
-
 // QuickType Support...
 
 -(void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
@@ -74,8 +69,12 @@
                                                      isAutoFillOpen:YES
                                              manualOpenOfflineCache:NO 
                                                          completion:^(Model * _Nullable model, NSError * _Nullable error) {
+                                                             NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
                 if(model) {
                     [self onOpenedQuickType:model identifier:identifier];
+                }
+                else if(error == nil) {
+                    [self cancel:nil]; // User cancelled
                 }
                 else {
                     [Alerts error:self title:@"Strongbox: Error Opening Database" error:error completion:^{

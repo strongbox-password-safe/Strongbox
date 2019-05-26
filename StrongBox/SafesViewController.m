@@ -470,7 +470,7 @@
     
     // Create New
     
-    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:@"Create New Database (Advanced)..."
+    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:@"New Database (Advanced)..."
                                                      style:UIAlertActionStyleDefault
                                                    handler:^(UIAlertAction *a) {
                                                        [self onCreateNewSafe];
@@ -480,7 +480,7 @@
     // Express
     
     if(Settings.sharedInstance.iCloudAvailable && Settings.sharedInstance.iCloudOn) {
-        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"⚡ New Database (Express)"
+        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"New Database (Express)"
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
                                                                     [self onNewExpressSafe];
@@ -730,16 +730,21 @@
     
     __weak PinEntryController* weakVc = vc;
     
-    vc.info = @"Please enter your PIN to access Preferences";
     vc.pinLength = Settings.sharedInstance.appLockPin.length;
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
+                UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
+            
                 [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
                 [self dismissViewControllerAnimated:YES completion:nil];
             }
             else {
+                UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                [gen notificationOccurred:UINotificationFeedbackTypeError];
+                
                 [Alerts info:weakVc title:@"PIN Incorrect" message:@"That is not the correct PIN code." completion:^{
                     [self dismissViewControllerAnimated:YES completion:nil];
                 }];
@@ -750,6 +755,7 @@
         }
     };
     
+    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self presentViewController:vc animated:YES completion:nil];
 }
 

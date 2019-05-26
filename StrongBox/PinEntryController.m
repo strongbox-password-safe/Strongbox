@@ -11,8 +11,26 @@
 
 @interface PinEntryController ()
 
-@property UIBarButtonItem* okButton;
-@property UIToolbar* numberToolbar;
+@property (weak, nonatomic) IBOutlet UIButton *button1;
+@property (weak, nonatomic) IBOutlet UIButton *button2;
+@property (weak, nonatomic) IBOutlet UIButton *button3;
+@property (weak, nonatomic) IBOutlet UIButton *button4;
+@property (weak, nonatomic) IBOutlet UIButton *button5;
+@property (weak, nonatomic) IBOutlet UIButton *button6;
+@property (weak, nonatomic) IBOutlet UIButton *button7;
+@property (weak, nonatomic) IBOutlet UIButton *button8;
+@property (weak, nonatomic) IBOutlet UIButton *button9;
+@property (weak, nonatomic) IBOutlet UIButton *button0;
+@property (weak, nonatomic) IBOutlet UIButton *buttonDelete;
+@property (weak, nonatomic) IBOutlet UIView *containerView;
+@property (weak, nonatomic) IBOutlet UILabel *labelWarning;
+
+@property (weak, nonatomic) IBOutlet UIButton *buttonDone;
+@property (weak, nonatomic) IBOutlet UIButton *buttonFallback;
+@property (weak, nonatomic) IBOutlet UIButton *buttonCancel;
+
+@property NSString* enteredText;
+@property (weak, nonatomic) IBOutlet UILabel *labelEnteredText;
 
 @end
 
@@ -21,99 +39,115 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    //[self setupAccessoryViewToolbar];
 
-    self.buttonMasterFallback.hidden = !self.showFallbackOption;
-    self.labelSubtitle.text = self.info.length ? self.info : @"Please Enter Your PIN";
+    [self setupUi];
+
+    self.buttonFallback.hidden = !self.showFallbackOption;
+    
+    // If we're not in auto mode or we're setting PIN then show the done button
+    
+    self.buttonDone.hidden = self.pinLength > 0 && Settings.sharedInstance.instantPinUnlocking;
+    
     self.labelWarning.text = self.warning;
-    [self validatePin];
-}
-
-- (void)setupAccessoryViewToolbar {
-    self.numberToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
-    self.numberToolbar.barStyle = UIBarStyleDefault;
-
-    self.okButton = [[UIBarButtonItem alloc]initWithTitle:@"OK" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithNumberPad)];
-
-    if(self.showFallbackOption) {
-        self.numberToolbar.items = @[[[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(cancelNumberPad)],
-                                [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                                [[UIBarButtonItem alloc]initWithTitle:@"Master Credentials..." style:UIBarButtonItemStylePlain target:self action:@selector(fallback)],
-                                [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                                self.okButton];
-    }
-    else {
-        self.numberToolbar.items = @[[[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(cancelNumberPad)],
-                                [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                                self.okButton];
-    }
-
-    [self.numberToolbar sizeToFit];
-    self.textFieldPin.inputAccessoryView = self.numberToolbar;
-}
-
-- (void)validatePin {
-    NSCharacterSet *numbersOnly = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
-    NSCharacterSet *characterSetFromTextField = [NSCharacterSet characterSetWithCharactersInString:self.textFieldPin.text];
+    self.labelWarning.hidden = self.warning.length == 0;
     
-    self.okButton.enabled = self.textFieldPin.text.length > 3 && [numbersOnly isSupersetOfSet:characterSetFromTextField];
-    self.buttonOK.enabled = self.textFieldPin.text.length > 3 && [numbersOnly isSupersetOfSet:characterSetFromTextField];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-
-    [self.textFieldPin becomeFirstResponder];
-}
-
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
+    self.enteredText = @"";
     
-    [self.textFieldPin becomeFirstResponder];
+    [self updateEnteredTextLabel];
+    [self validateButtonsUi];
 }
 
--(void)cancelNumberPad{
-    [self.textFieldPin resignFirstResponder];
-    self.onDone(kCancel, nil);
+- (void)setupUi {
+    [self styleKeyPadButton:self.button1];
+    [self styleKeyPadButton:self.button2];
+    [self styleKeyPadButton:self.button3];
+    [self styleKeyPadButton:self.button4];
+    [self styleKeyPadButton:self.button5];
+    [self styleKeyPadButton:self.button6];
+    [self styleKeyPadButton:self.button7];
+    [self styleKeyPadButton:self.button8];
+    [self styleKeyPadButton:self.button9];
+    [self styleKeyPadButton:self.button0];
+
+    self.containerView.layer.cornerRadius = 8;
+    self.containerView.layer.borderColor = UIColor.darkGrayColor.CGColor;
+    self.containerView.layer.borderWidth = 1;
 }
 
--(void)fallback{
-    [self.textFieldPin resignFirstResponder];
-    self.onDone(kFallback, nil);
+- (void)styleKeyPadButton:(UIButton*)button {
+    CGFloat ROUND_BUTTON_WIDTH_HEIGHT = 65.0; // Must Match Storyboard constraints
+    
+    button.clipsToBounds = YES;
+    button.layer.cornerRadius = ROUND_BUTTON_WIDTH_HEIGHT/2.0f;
+    button.layer.borderWidth = 1.0f;
+    button.layer.borderColor = UIColor.darkGrayColor.CGColor;
+    
+    [button setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
+    [button setTitleColor:UIColor.whiteColor forState:UIControlStateHighlighted];
 }
 
--(void)doneWithNumberPad{
-    [self.textFieldPin resignFirstResponder];
-    self.onDone(kOk, self.textFieldPin.text);
+- (void)validateButtonsUi {
+    self.buttonDone.enabled = self.enteredText.length > 3;
+    self.buttonDelete.enabled = self.enteredText.length > 0;
+
+    [self.buttonDelete setTitleColor:self.enteredText.length > 0 ? UIColor.darkGrayColor : UIColor.lightGrayColor forState:UIControlStateNormal];
 }
 
 - (IBAction)onOK:(id)sender {
-    [self.textFieldPin resignFirstResponder];
-    self.onDone(kOk, self.textFieldPin.text);
+    self.onDone(kOk, self.enteredText);
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.textFieldPin resignFirstResponder];
     self.onDone(kCancel, nil);
 }
 
 - (IBAction)onUseMasterCredentials:(id)sender {
-    [self.textFieldPin resignFirstResponder];
     self.onDone(kFallback, nil);
 }
 
-- (IBAction)onEditPin:(id)sender {
-    [self validatePin];
+- (IBAction)onKeyPadButton:(id)sender {
+    UIButton* button = (UIButton*)sender;
     
-    // Instant Unlock Mode?
+    if(button.tag >= 0 && button.tag <= 9) {
+        self.enteredText = [self.enteredText stringByAppendingFormat:@"%ld", (long)button.tag];
+        [self performLightHapticFeedback];
+    }
+    else {
+        // Assume it's the del button
+        if(self.enteredText.length > 0) {
+            self.enteredText = [self.enteredText substringToIndex:self.enteredText.length-1];
+            [self performLightHapticFeedback];
+        }
+    }
     
-    if(self.pinLength > 0 && self.textFieldPin.text.length == self.pinLength && Settings.sharedInstance.instantPinUnlocking) {
+    [self updateEnteredTextLabel];
+    
+    [self validateButtonsUi];
+    
+    if(self.pinLength > 0 && self.enteredText.length == self.pinLength && Settings.sharedInstance.instantPinUnlocking) {
         // We auto submit at the matching length - This prevents repeated attempts bny using the 3 strikes failure mode
         // If we didn't do this then an attacker could try as many combinations as he liked if he knew you were using
         // Instant PIN mode...
         
-        self.onDone(kOk, self.textFieldPin.text);
+        self.onDone(kOk, self.enteredText);
+    }
+}
+
+- (void)performLightHapticFeedback {
+    UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
+    [gen impactOccurred];
+}
+
+- (void)updateEnteredTextLabel {
+    if(self.enteredText.length) {
+        NSString *masked = [@"" stringByPaddingToLength:self.enteredText.length withString:@"●" startingAtIndex:0];
+        
+        self.labelEnteredText.text = masked;
+        self.labelEnteredText.textColor = UIColor.darkTextColor;
+    }
+    else {
+        self.labelEnteredText.text = self.info.length ? self.info : @"Enter PIN";
+        self.labelEnteredText.textColor = UIColor.lightGrayColor;
     }
 }
 

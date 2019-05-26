@@ -47,10 +47,14 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchDeleteDataEnabled;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDeleteDataAttempts;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCloudSessions;
+@property (weak, nonatomic) IBOutlet UILabel *labelDeleteDataAttemptCount;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutVersion;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutHelp;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailSupport;
+@property (weak, nonatomic) IBOutlet UILabel *labelVersion;
+
+@property (weak, nonatomic) IBOutlet UILabel *labelCloudSessions;
 
 @end
 
@@ -210,7 +214,7 @@
         }
     }
     
-    self.cellAboutVersion.textLabel.text = aboutString;
+    self.labelVersion.text = aboutString;
 }
 
 - (void)bindCloudSessions {
@@ -220,9 +224,9 @@
     cloudSessionCount += [[OneDriveStorageProvider sharedInstance] isSignedIn] ? 1 : 0;
 
     self.cellCloudSessions.userInteractionEnabled = (cloudSessionCount > 0);
-    self.cellCloudSessions.textLabel.enabled = (cloudSessionCount > 0);
-    self.cellCloudSessions.textLabel.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:@"Native Cloud Sessions (%d)", cloudSessionCount] : @"No Sessions";
-    
+    self.labelCloudSessions.enabled = (cloudSessionCount > 0);
+    self.labelCloudSessions.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:@"Native Cloud Sessions (%d)", cloudSessionCount] : @"No Sessions";
+
     self.switchUseICloud.on = [[Settings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
     
@@ -448,12 +452,11 @@
 
 - (void)requestAppLockPinCodeAndConfirm {
     PinEntryController *vc1 = [[PinEntryController alloc] init];
-    vc1.info = @"Please Enter a PIN";
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 PinEntryController *vc2 = [[PinEntryController alloc] init];
-                vc2.info = @"Please Confirm Your PIN";
+                vc2.info = @"Confirm PIN";
                 vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
                     [self dismissViewControllerAnimated:YES completion:^{
                         if(response2 == kOk) {
@@ -474,6 +477,7 @@
                     }];
                 };
                 
+                vc2.modalPresentationStyle = UIModalPresentationOverCurrentContext;
                 [self presentViewController:vc2 animated:YES completion:nil];
             }
             else {
@@ -482,6 +486,7 @@
         }];
     };
     
+    vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self presentViewController:vc1 animated:YES completion:nil];
 }
 
@@ -662,14 +667,14 @@
     self.cellDeleteDataAttempts.userInteractionEnabled = enabled;
     
     NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
-    self.cellDeleteDataAttempts.detailTextLabel.text = enabled ? str : @"Disabled";
+        self.labelDeleteDataAttemptCount.text = enabled ? str : @"Disabled";
 }
 
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; // Default
         
-        [Alerts info:self title:@"DATA DELETION: Care Required" message:@"Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device safes and settings."];
+        [Alerts info:self title:@"DATA DELETION: Care Required" message:@"Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences."];
     }
     else {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; // Off

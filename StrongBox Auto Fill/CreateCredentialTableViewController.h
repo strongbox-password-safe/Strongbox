@@ -17,8 +17,8 @@ API_AVAILABLE(ios(12.0))
 
 @property (nonatomic) Model *viewModel;
 @property (nonatomic, strong) CredentialProviderViewController *rootViewController;
-@property (nonatomic) NSString* suggestedTitle;
-@property (nonatomic) NSString* suggestedUrl;
+@property (nonatomic, nullable) NSString* suggestedTitle;
+@property (nonatomic, nullable) NSString* suggestedUrl;
 
 @end
 

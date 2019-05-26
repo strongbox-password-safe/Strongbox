@@ -13,23 +13,48 @@
         <!--Credential Provider View Controller-->
         <scene sceneID="Uma-9u-xWV">
             <objects>
-                <viewController extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" providesPresentationContextTransitionStyle="YES" id="Xki-Si-B7m" customClass="CredentialProviderViewController" sceneMemberID="viewController">
+                <viewController extendedLayoutIncludesOpaqueBars="YES" providesPresentationContextTransitionStyle="YES" id="Xki-Si-B7m" customClass="CredentialProviderViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BuU-Ak-iZz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="PgB-Jk-Hsc" userLabel="Logo">
-                                <rect key="frame" x="62.666666666666657" y="64" width="249.99999999999997" height="250"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="AOX-Ad-9LE"/>
-                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="BFD-7m-ERP"/>
-                                </constraints>
-                            </imageView>
+                            <view alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MqR-uP-Vzi" userLabel="Translucent">
+                                <rect key="frame" x="0.0" y="44" width="375" height="734"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="RbE-gg-rFH">
+                                <rect key="frame" x="62.666666666666657" y="155.00000000000003" width="249.99999999999997" height="306.66666666666674"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="PgB-Jk-Hsc" userLabel="Logo">
+                                        <rect key="frame" x="0.0" y="0.0" width="250" height="250"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="AOX-Ad-9LE"/>
+                                            <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="BFD-7m-ERP"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Strongbox Auto Fill" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fzd-J4-5oN">
+                                        <rect key="frame" x="0.0" y="258" width="250" height="20.333333333333314"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BfQ-ej-A4t">
+                                        <rect key="frame" x="0.0" y="286.33333333333331" width="250" height="20.333333333333314"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="PgB-Jk-Hsc" firstAttribute="top" secondItem="Ky8-vK-JVj" secondAttribute="top" constant="20" id="Js8-Nr-J4B"/>
-                            <constraint firstItem="PgB-Jk-Hsc" firstAttribute="centerX" secondItem="BuU-Ak-iZz" secondAttribute="centerX" id="gtN-lc-DQ8"/>
+                            <constraint firstItem="MqR-uP-Vzi" firstAttribute="leading" secondItem="Ky8-vK-JVj" secondAttribute="leading" id="6lY-bN-5UQ"/>
+                            <constraint firstItem="RbE-gg-rFH" firstAttribute="centerX" secondItem="MqR-uP-Vzi" secondAttribute="centerX" id="D1u-GQ-Kwd"/>
+                            <constraint firstItem="Ky8-vK-JVj" firstAttribute="trailing" secondItem="MqR-uP-Vzi" secondAttribute="trailing" id="H62-H0-Rd9"/>
+                            <constraint firstItem="RbE-gg-rFH" firstAttribute="centerY" secondItem="MqR-uP-Vzi" secondAttribute="centerY" multiplier="0.75" id="YJL-w4-R7A"/>
+                            <constraint firstItem="Ky8-vK-JVj" firstAttribute="bottom" secondItem="MqR-uP-Vzi" secondAttribute="bottom" id="uNl-Ix-XI3"/>
+                            <constraint firstItem="MqR-uP-Vzi" firstAttribute="top" secondItem="Ky8-vK-JVj" secondAttribute="top" id="xgM-iW-lFY"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Ky8-vK-JVj"/>
                     </view>
@@ -46,7 +71,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RwB-HB-TSk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="308" y="134"/>
+            <point key="canvasLocation" x="308" y="133.74384236453201"/>
         </scene>
         <!--Select Your Safe-->
         <scene sceneID="FrF-Ab-s53">
@@ -101,7 +126,7 @@
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="c82-cz-CuT"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Select Your Database" prompt="Strongbox" id="F9U-mp-PMJ">
-                        <barButtonItem key="rightBarButtonItem" title="⚡" id="5w0-Ls-VNT">
+                        <barButtonItem key="rightBarButtonItem" image="rocket" id="5w0-Ls-VNT">
                             <connections>
                                 <action selector="onShowQuickLaunchView:" destination="GnU-eV-N6f" id="jEt-pU-Q4S"/>
                             </connections>
@@ -172,7 +197,7 @@
                                 <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="753" text="⚡ Quick Launch Mode ⚡" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLT-zq-mNc" userLabel="ExplainerHeader">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="753" text="Quick Launch Mode" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLT-zq-mNc" userLabel="ExplainerHeader">
                                 <rect key="frame" x="16" y="89" width="343" height="20.333333333333329"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1033,6 +1058,7 @@
         <image name="arrow_circle_left_64" width="64" height="64"/>
         <image name="magnifier_64" width="64" height="64"/>
         <image name="product32" width="32" height="32"/>
+        <image name="rocket" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="Ale-OO-C6r"/>

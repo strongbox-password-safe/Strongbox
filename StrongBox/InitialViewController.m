@@ -420,6 +420,11 @@
         
         [document closeWithCompletionHandler:nil];
         
+        // Inbox should be empty whenever possible so that we can detect the
+        // re-importation of a certain file and ask if user wants to create a
+        // new copy or just update an old one...
+        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
+
         [self onReadImportedFile:success data:data url:url];
     }];
 }

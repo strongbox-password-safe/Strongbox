@@ -164,7 +164,7 @@
 
 - (void)getNewPin:(BOOL)duressPin {
     PinEntryController *vc1 = [[PinEntryController alloc] init];
-    vc1.info = duressPin ? @"Please Enter a new Duress PIN" : @"Please Enter a new PIN";
+    vc1.info = duressPin ? @"Enter Duress PIN" : @"";
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
@@ -189,6 +189,7 @@
             }}];
     };
     
+    vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self presentViewController:vc1 animated:YES completion:nil];
 }
 

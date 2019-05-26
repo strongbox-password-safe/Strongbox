@@ -118,28 +118,40 @@
     
     __weak PinEntryController* weakVc = vc;
     
-    vc.info = @"Please enter your PIN to Unlock Strongbox";
     vc.pinLength = Settings.sharedInstance.appLockPin.length;
+    
+    if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && Settings.sharedInstance.failedUnlockAttempts > 0) {
+        NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;
+        
+        if(remaining > 0) {
+            vc.warning = [NSString stringWithFormat:@"%ld Attempts Remaining", (long)remaining];
+        }
+    }
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
                 Settings.sharedInstance.failedUnlockAttempts = 0;
                 self.onUnlockDone();
+                
+                UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
             }
             else {
-                [Alerts info:weakVc title:@"PIN Incorrect" message:@"That is not the correct PIN code." completion:^{
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                }];
-                
                 [self incrementFailedUnlockCount];
+
+                UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+                [gen notificationOccurred:UINotificationFeedbackTypeError];
+
+                [self dismissViewControllerAnimated:YES completion:nil];
             }
         }
         else {
             [self dismissViewControllerAnimated:YES completion:nil];
         }
     };
-    
+
+    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self presentViewController:vc animated:YES completion:nil];
 }
 

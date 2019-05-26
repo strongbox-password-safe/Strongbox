@@ -28,8 +28,8 @@ extern NSString *const CellHeightsChangedNotification;
 
 #ifdef IS_APP_EXTENSION
 @property (nonatomic, strong) CredentialProviderViewController *autoFillRootViewController;
-@property (nonatomic) NSString* autoFillSuggestedTitle;
-@property (nonatomic) NSString* autoFillSuggestedUrl;
+@property (nonatomic, nullable) NSString* autoFillSuggestedTitle;
+@property (nonatomic, nullable) NSString* autoFillSuggestedUrl;
 #endif
 
 @end

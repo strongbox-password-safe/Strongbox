@@ -1270,12 +1270,12 @@ static NSString* const kTotpCell = @"TotpCell";
     NSString* pw = [self dereference:self.model.password];
     [self copyToClipboard:pw message:@"Password Copied. Launching URL..."];
     
+#ifndef IS_APP_EXTENSION
     if (![urlString.lowercaseString hasPrefix:@"http://"] &&
         ![urlString.lowercaseString hasPrefix:@"https://"]) {
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
-#ifndef IS_APP_EXTENSION
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
     });
