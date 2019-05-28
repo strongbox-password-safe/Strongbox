@@ -558,7 +558,7 @@ static NSString* const kTotpCell = @"TotpCell";
                     }
                 }
                 else {
-                    cell.image.image = [UIImage imageNamed:@"page_white_text-48x48"];
+                    cell.image.image = [UIImage imageNamed:@"document"];
                 }
                 
                 return cell;
@@ -583,7 +583,7 @@ static NSString* const kTotpCell = @"TotpCell";
                     }
                 }
                 else {
-                    cell.imageView.image = [UIImage imageNamed:@"page_white_text-48x48"];
+                    cell.imageView.image = [UIImage imageNamed:@"document"];
                 }
                 
                 return cell;
@@ -670,7 +670,7 @@ static NSString* const kTotpCell = @"TotpCell";
         return 0;
     }
 
-    BOOL shouldHideEmpty = Settings.sharedInstance.hideEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowIcon) {
@@ -734,7 +734,7 @@ static NSString* const kTotpCell = @"TotpCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    BOOL shouldHideEmpty = Settings.sharedInstance.hideEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
     
     if(section == kSimpleFieldsSectionIdx) {
         return 0;

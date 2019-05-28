@@ -35,7 +35,7 @@
 - (instancetype)init {
     if (self = [super init]) {
         _displayName = @"Local Device";
-        _icon = @"phone";
+        _icon = @"iphone_x";
         _storageId = kLocalDevice;
         _cloudBased = NO;
         _providesIcons = NO;

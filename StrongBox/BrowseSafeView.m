@@ -863,29 +863,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     NSLog(@"Fast Password Copy on %@", item.title);
     
-    BOOL promptedForCopyPw = [[Settings sharedInstance] isHasPromptedForCopyPasswordGesture];
-    BOOL copyPw = [[Settings sharedInstance] isCopyPasswordOnLongPress];
-    
-    NSLog(@"Long press detected on Record. Copy Featured is [%@]", copyPw ? @"Enabled" : @"Disabled");
-    
-    if (!copyPw && !promptedForCopyPw) { // If feature is turned off (or never set) and we haven't prompted user about it... prompt
-        [Alerts yesNo:self
-                title:@"Copy Password?"
-              message:@"By Touching and Holding an entry for 2 seconds you can quickly copy the password to the clipboard. Would you like to enable this feature?"
-               action:^(BOOL response) {
-                   [[Settings sharedInstance] setCopyPasswordOnLongPress:response];
-                   
-                   if (response) {
-                       [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
-                   }
-               }];
-        
-        [[Settings sharedInstance] setHasPromptedForCopyPasswordGesture:YES];
-    }
-    else if (copyPw)
-    {
-        [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
-    }
+    [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
 }
 
 - (void)copyPasswordOnLongPress:(Node *)item withTapLocation:(CGPoint)tapLocation {

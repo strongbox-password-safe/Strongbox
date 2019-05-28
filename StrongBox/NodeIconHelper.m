@@ -18,8 +18,8 @@ static NSArray<UIImage*> *kKeePassIconSet;
 
 + (void)initialize {
     if(self == [NodeIconHelper class]) {
-        kDefaultFolderImage = [UIImage imageNamed:@"folder-48x48.png"];
-        kDefaultRecordImage = [UIImage imageNamed:@"lock-48.png"];
+        kDefaultFolderImage = [UIImage imageNamed:@"folder"];
+        kDefaultRecordImage = [UIImage imageNamed:@"document"];
         kKeePassIconSet = getKeePassIconSet();
     }
 }

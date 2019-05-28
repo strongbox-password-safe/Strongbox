@@ -257,6 +257,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)showBiometricAuthentication {
+    NSLog(@"REQUEST-BIOMETRIC: Open Safe");
     [Settings.sharedInstance requestBiometricId:@"Identify to Login"
                                   fallbackTitle:@"Enter Database Master Password..."
                           allowDevicePinInstead:NO 

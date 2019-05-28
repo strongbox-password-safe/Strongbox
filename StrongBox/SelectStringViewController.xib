@@ -22,7 +22,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="rdb-I2-WPl">
-                    <rect key="frame" x="0.0" y="44" width="414" height="748"/>
+                    <rect key="frame" x="0.0" y="64" width="414" height="728"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </tableView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mt2-LJ-sDR">
@@ -35,8 +35,8 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="rdb-I2-WPl" secondAttribute="trailing" id="076-hR-zWS"/>
-                <constraint firstItem="rdb-I2-WPl" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="Ddm-sg-9Pc"/>
+                <constraint firstAttribute="trailing" secondItem="rdb-I2-WPl" secondAttribute="trailingMargin" constant="20" id="076-hR-zWS"/>
+                <constraint firstItem="rdb-I2-WPl" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="20" id="Ddm-sg-9Pc"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="Mt2-LJ-sDR" secondAttribute="bottom" constant="20" id="eyJ-Ou-q0y"/>
                 <constraint firstItem="Mt2-LJ-sDR" firstAttribute="top" secondItem="rdb-I2-WPl" secondAttribute="bottom" constant="20" id="ioP-lo-fpo"/>
                 <constraint firstItem="rdb-I2-WPl" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="nRU-td-rRv"/>

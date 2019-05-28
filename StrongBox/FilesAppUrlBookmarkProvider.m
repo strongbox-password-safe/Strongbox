@@ -25,7 +25,7 @@
 - (instancetype)init {
     if (self = [super init]) {
         _displayName = @"Files App URL Bookmark";
-        _icon = @"external-link-32"; //@"files-external-32x32";
+        _icon = @"lock"; 
         _storageId = kFilesAppUrlBookmark;
         _cloudBased = NO;
         _providesIcons = NO;

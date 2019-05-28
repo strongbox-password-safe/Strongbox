@@ -91,16 +91,18 @@
 - (void)onPrivacyScreenDismissed {
     self.privacyAndLockVc = nil;
 
-    if(self.enqueuedImportUrl) {
-        [self processEnqueuedImport]; // Maybe we need to process an import
-    }
-    else {
-        if([self isInQuickLaunchViewMode]) {
-            [self openQuickLaunchPrimarySafe];
-        }
-
-        [self checkICloudAvailability];
-    }
+    // This is handled by viewDidAppear now...
+    
+//    if(self.enqueuedImportUrl) {
+//        [self processEnqueuedImport]; // Maybe we need to process an import
+//    }
+//    else {
+//        if([self isInQuickLaunchViewMode]) {
+//            [self openQuickLaunchPrimarySafe];
+//        }
+//
+//        [self checkICloudAvailability];
+//    }
 }
 
 - (void)appResignActive {
@@ -231,7 +233,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-
+    
     if(!self.hasAppearedOnce && Settings.sharedInstance.appLockMode != kNoLock) {
         [self showPrivacyScreen:YES];
     }

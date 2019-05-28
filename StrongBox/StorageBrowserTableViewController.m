@@ -40,8 +40,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _defaultFolderImage = [UIImage imageNamed:@"folder-48x48"];
-    _defaultFileImage = [UIImage imageNamed:@"page_white_text-48x48"];
+    _defaultFolderImage = [UIImage imageNamed:@"folder"];
+    _defaultFileImage = [UIImage imageNamed:@"document"];
     _iconsCache = [[NSMutableDictionary alloc] init];
 
     NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];

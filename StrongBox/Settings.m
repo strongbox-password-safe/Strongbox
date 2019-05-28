@@ -465,11 +465,14 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
         localAuthContext.localizedFallbackTitle = @"";
     }
     
+    NSLog(@"REQUEST-BIOMETRIC: %d", self.suppressPrivacyScreen);
+    
     self.suppressPrivacyScreen = YES;
     [localAuthContext evaluatePolicy:allowDevicePinInstead ? LAPolicyDeviceOwnerAuthentication : LAPolicyDeviceOwnerAuthenticationWithBiometrics
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
-                                   completion(success, error);
+                                    completion(success, error);
+                                    NSLog(@"REQUEST-BIOMETRIC DONE: %d", success);
                                     self.suppressPrivacyScreen = NO;
                                }];
 }
@@ -647,7 +650,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 }
 
 -(BOOL)tryDownloadFavIconForNewRecord {
-    return [[self getUserDefaults] boolForKey:kTryDownloadFavIconForNewRecord];
+    return [self getBool:kTryDownloadFavIconForNewRecord fallback:YES];
 }
 
 - (void)setTryDownloadFavIconForNewRecord:(BOOL)tryDownloadFavIconForNewRecord {
@@ -758,11 +761,11 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)hideEmptyFieldsInDetailsView {
+- (BOOL)showEmptyFieldsInDetailsView {
     return [self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
 }
 
-- (void)setHideEmptyFieldsInDetailsView:(BOOL)hideEmptyFieldsInDetailsView {
+- (void)setShowEmptyFieldsInDetailsView:(BOOL)hideEmptyFieldsInDetailsView {
     [self setBool:kHideEmptyFieldsInDetailsView value:hideEmptyFieldsInDetailsView];
 }
 
@@ -878,7 +881,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 }
 
 - (void)setAppLockAppliesToPreferences:(BOOL)appLockAppliesToPreferences {
-    [self setBool:kAppLockAppliesToPreferences value:YES];
+    [self setBool:kAppLockAppliesToPreferences value:appLockAppliesToPreferences];
 }
 
 @end

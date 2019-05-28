@@ -58,15 +58,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 - (NSNumber*)getAutoLockTimeoutSeconds;
 - (void)setAutoLockTimeoutSeconds:(NSNumber*)value;
 
-- (NSInteger)isUserHasBeenPromptedForReview;
-- (void)setUserHasBeenPromptedForReview:(NSInteger)value;
-
-- (BOOL)isHasPromptedForCopyPasswordGesture;
-- (void)setHasPromptedForCopyPasswordGesture:(BOOL)value;
-
-- (BOOL)isCopyPasswordOnLongPress;
-- (void)setCopyPasswordOnLongPress:(BOOL)value;
-
 @property (nonatomic) BOOL neverShowForMacAppMessage;
 @property (nonatomic) BOOL iCloudOn;
 @property (nonatomic) BOOL iCloudWasOn;
@@ -119,7 +110,7 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL searchDereferencedFields;
 
 @property BOOL useOldItemDetailsScene;
-@property BOOL hideEmptyFieldsInDetailsView;
+@property BOOL showEmptyFieldsInDetailsView;
 
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
 @property BOOL easyReadFontForAll;

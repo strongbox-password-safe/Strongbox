@@ -23,55 +23,48 @@
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoDetectKeyFiles;
-
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInBrowse;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
-@property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
-@property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
-@property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
-@property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
 @property (weak, nonatomic) IBOutlet UISwitch *hideEmptyFields;
 @property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
-@property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *showChildCountOnFolder;
 @property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *showUsernameInBrowse;
-
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAutoClearClipboard;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLockDelay;
 @property (weak, nonatomic) IBOutlet UISwitch *appLockOnPreferences;
-
 @property (weak, nonatomic) IBOutlet UISwitch *switchDeleteDataEnabled;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDeleteDataAttempts;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCloudSessions;
 @property (weak, nonatomic) IBOutlet UILabel *labelDeleteDataAttemptCount;
-
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutVersion;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutHelp;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailSupport;
 @property (weak, nonatomic) IBOutlet UILabel *labelVersion;
-
 @property (weak, nonatomic) IBOutlet UILabel *labelCloudSessions;
+@property (weak, nonatomic) IBOutlet UISwitch *clearClipboardEnabled;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellClearClipboardDelay;
+@property (weak, nonatomic) IBOutlet UILabel *labelClearClipboardDelay;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
+@property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAppLockDelay;
+@property (weak, nonatomic) IBOutlet UILabel *labelAppLockDelay;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
+@property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
+@property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpBrowseView;
 
 @end
 
-@implementation PreferencesTableViewController {
-    NSDictionary<NSNumber*, NSNumber*> *_autoLockList;
-    NSDictionary<NSNumber*, NSNumber*> *_appLockDelayList;
-    NSDictionary<NSNumber*, NSNumber*> *_autoClearClipboardIndex;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@implementation PreferencesTableViewController
 
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
 
-    Settings.sharedInstance.hideEmptyFieldsInDetailsView = self.hideEmptyFields.on;
+    Settings.sharedInstance.showEmptyFieldsInDetailsView = !self.hideEmptyFields.on;
     Settings.sharedInstance.easyReadFontForAll = self.easyReadFontForAll.on;
-    Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     Settings.sharedInstance.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
     Settings.sharedInstance.showUsernameInBrowse = self.showUsernameInBrowse.on;
     Settings.sharedInstance.showFlagsInBrowse = self.showFlagsInBrowse.on;
@@ -81,9 +74,8 @@
 }
 
 - (void)bindGenericPreferencesChanged {
-    self.hideEmptyFields.on = Settings.sharedInstance.hideEmptyFieldsInDetailsView;
+    self.hideEmptyFields.on = !Settings.sharedInstance.showEmptyFieldsInDetailsView;
     self.easyReadFontForAll.on = Settings.sharedInstance.easyReadFontForAll;
-    self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
     self.showChildCountOnFolder.on = Settings.sharedInstance.showChildCountOnFolderInBrowse;
     self.showUsernameInBrowse.on = Settings.sharedInstance.showUsernameInBrowse;
     self.showFlagsInBrowse.on = Settings.sharedInstance.showFlagsInBrowse;
@@ -92,94 +84,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)bindViewDereferenced {
-    self.switchViewDereferenced.on = Settings.sharedInstance.viewDereferencedFields;
-}
-
-- (void)bindSearchDereferenced {
-    self.switchSearchDereferenced.on = Settings.sharedInstance.searchDereferencedFields;
-}
-
-- (IBAction)onViewDereferenced:(id)sender {
-    NSLog(@"Setting viewDereferencedFields to %d", self.switchViewDereferenced.on);
-
-    Settings.sharedInstance.viewDereferencedFields = self.switchViewDereferenced.on;
-    [self bindViewDereferenced];
-}
-
-- (IBAction)onSearchDereferenced:(id)sender {
-    NSLog(@"Setting searchDereferencedFields to %d", self.switchSearchDereferenced.on);
-
-    Settings.sharedInstance.searchDereferencedFields = self.switchSearchDereferenced.on;
-    [self bindSearchDereferenced];
-}
-
-- (IBAction)onUseQuickTypeAutoFill:(id)sender {
-    NSLog(@"Setting doNotUseQuickTypeAutoFill to %d", !self.switchUseQuickTypeAutoFill.on);
-    Settings.sharedInstance.doNotUseQuickTypeAutoFill = !self.switchUseQuickTypeAutoFill.on;
-    
-    if(!self.switchUseQuickTypeAutoFill.on) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
-    
-    [self bindQuickTypeAutoFill];
-}
-
-- (void)bindQuickTypeAutoFill {
-    self.switchUseQuickTypeAutoFill.on = !Settings.sharedInstance.doNotUseQuickTypeAutoFill;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationController.toolbar.hidden = NO;
-    self.navigationController.toolbarHidden = NO;
-
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = YES;
-    }
-    
-    _autoLockList = @{  @-1 : @0,
-                        @0 : @1,
-                        @60 : @2,
-                        @600 :@3 };
-
-    _appLockDelayList = @{ @0 : @0,
-                           @60 : @1,
-                           @180 : @2,
-                           @300 : @3,
-                           @600 : @4 };
-    
-    _autoClearClipboardIndex = @{   @0 : @0,
-                                    @30 : @1,
-                                    @60 : @2,
-                                    @120 :@3 };
-    
     [self bindCloudSessions];
     [self bindAboutButton];
-    [self bindLongTouchCopy];
     [self bindAllowPinCodeOpen];
     [self bindAllowBiometric];
-    [self bindShowPasswordOnDetails];
-    [self bindAutoLock];
-    [self bindAutoAddNewLocalSafes];
-    [self bindShowKeePass1BackupFolder];
+    [self bindDatabaseLock];
     [self bindHideTips];
     [self bindClearClipboard];
     [self bindHideTotp];
-    [self bindKeePassNoSorting];
-    [self bindAutoFavIcon];
-    [self bindAutoDetectKeyFiles];
     [self bindShowRecycleBin];
-    [self bindCopyTotpAutoFill];
-    [self bindQuickTypeAutoFill];
-    [self bindViewDereferenced];
-    [self bindSearchDereferenced];
     [self bindAppLock];
     [self bindDeleteOnFailedUnlock];
-    
     [self customizeAppLockSectionFooter];
-    
     [self bindGenericPreferencesChanged];
 }
 
@@ -225,37 +144,13 @@
 
     self.cellCloudSessions.userInteractionEnabled = (cloudSessionCount > 0);
     self.labelCloudSessions.enabled = (cloudSessionCount > 0);
-    self.labelCloudSessions.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:@"Native Cloud Sessions (%d)", cloudSessionCount] : @"No Sessions";
+    self.labelCloudSessions.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:@"Sessions (%d)", cloudSessionCount] : @"No Sessions";
 
     self.switchUseICloud.on = [[Settings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
     
     self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ? @"Use iCloud" : @"Use iCloud (Unavailable)";
     self.labelUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
-}
-
-- (void)bindAutoDetectKeyFiles {
-    self.switchAutoDetectKeyFiles.on = !Settings.sharedInstance.doNotAutoDetectKeyFiles;
-}
-
-- (IBAction)onAutoDetectKeyFiles:(id)sender {
-    NSLog(@"Setting autoDetectKeyFiles to %d", self.switchAutoDetectKeyFiles.on);
-    
-    Settings.sharedInstance.doNotAutoDetectKeyFiles = !self.switchAutoDetectKeyFiles.on;
-
-    [self bindAutoDetectKeyFiles];
-}
-
-- (void)bindLongTouchCopy {
-    self.switchLongTouchCopy.on = [[Settings sharedInstance] isCopyPasswordOnLongPress];
-}
-
-- (IBAction)onLongTouchCopy:(id)sender {
-    NSLog(@"Setting longTouchCopyEnabled to %d", self.switchLongTouchCopy.on);
-     
-    [[Settings sharedInstance] setCopyPasswordOnLongPress:self.switchLongTouchCopy.on];
-     
-    [self bindLongTouchCopy];
 }
 
 - (IBAction)onAllowPinCodeOpen:(id)sender {
@@ -331,113 +226,22 @@
     }
 }
 
-- (void)bindAutoFavIcon {
-    self.switchAutoFavIcon.on = [[Settings sharedInstance] tryDownloadFavIconForNewRecord];
-}
-
-- (IBAction)onAutoFavIcon:(id)sender {
-    NSLog(@"Setting tryDownloadFavIconForNewRecord to %d", self.switchAutoFavIcon.on);
-    
-    Settings.sharedInstance.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
-    
-    [self bindAutoFavIcon];
-}
-
-- (void)bindShowKeePass1BackupFolder {
-    self.switchShowKeePass1BackupFolder.on = [[Settings sharedInstance] showKeePass1BackupGroup];
-}
-
-- (IBAction)onShowKeePass1BackupFolder:(id)sender {
-    NSLog(@"Setting ShowKeePass1BackupFolder to %d", self.switchShowKeePass1BackupFolder.on);
-
-    Settings.sharedInstance.showKeePass1BackupGroup = !self.switchShowKeePass1BackupFolder.on;
-
-    [self bindShowKeePass1BackupFolder];
-}
-
 - (void)bindHideTips {
-    self.switchHideTips.on = Settings.sharedInstance.hideTips;
+    self.switchShowTips.on = !Settings.sharedInstance.hideTips;
 }
 
 - (IBAction)onHideTips:(id)sender {
-    Settings.sharedInstance.hideTips = self.switchHideTips.on;
+    Settings.sharedInstance.hideTips = !self.switchShowTips.on;
     [self bindHideTips];
 }
-
 
 - (void)bindAllowPinCodeOpen {
     self.switchAllowPinCodeOpen.on = !Settings.sharedInstance.disallowAllPinCodeOpens;
 }
 
 - (void)bindAllowBiometric {
-    self.labelAllowBiometric.text = [NSString stringWithFormat:@"Allow %@ Open", [Settings.sharedInstance getBiometricIdName]];
+    self.labelAllowBiometric.text = [NSString stringWithFormat:@"Allow %@", [Settings.sharedInstance getBiometricIdName]];
     self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;
-}
-
-- (void)bindShowPasswordOnDetails {
-    self.switchShowPasswordOnDetails.on = [[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
-}
-
-- (void)bindAutoAddNewLocalSafes {
-    self.switchAutoAddNewLocalSafes.on = !Settings.sharedInstance.doNotAutoAddNewLocalSafes;
-}
-
-- (IBAction)onShowPasswordOnDetails:(id)sender {
-    NSLog(@"Setting showPasswordOnDetails to %d", self.switchShowPasswordOnDetails.on);
-    
-    [[Settings sharedInstance] setShowPasswordByDefaultOnEditScreen:self.switchShowPasswordOnDetails.on];
-    
-    [self bindShowPasswordOnDetails];
-}
-
-- (IBAction)onAutoAddNewLocalSafesChanged:(id)sender {
-    NSLog(@"Setting doNotAutoAddNewLocalSafes to %d", !self.switchAutoAddNewLocalSafes.on);
-    
-    Settings.sharedInstance.doNotAutoAddNewLocalSafes = !self.switchAutoAddNewLocalSafes.on;
-    
-    [self bindAutoAddNewLocalSafes];
-}
-
-- (IBAction)onSegmentAutoLockChanged:(id)sender {
-    NSArray<NSNumber *> *keys = [_autoLockList allKeysForObject:@(self.segmentAutoLock.selectedSegmentIndex)];
-    NSNumber *seconds = keys[0];
-
-    NSLog(@"Setting Auto Lock Time to %@ Seconds", seconds);
-    
-    [[Settings sharedInstance] setAutoLockTimeoutSeconds: seconds];
-
-    [self bindAutoLock];
-}
-
--(void)bindAutoLock {
-    NSNumber* seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
-    NSNumber* index = [_autoLockList objectForKey:seconds];
-    [self.segmentAutoLock setSelectedSegmentIndex:index.integerValue];
-}
-
-- (IBAction)onSegmentClearClipboardChanged:(id)sender {
-    NSArray<NSNumber *> *keys = [_autoClearClipboardIndex allKeysForObject:@(self.segmentAutoClearClipboard.selectedSegmentIndex)];
-    NSNumber *seconds = keys[0];
-    
-    Settings.sharedInstance.clearClipboardEnabled = seconds.integerValue != 0;
-    Settings.sharedInstance.clearClipboardAfterSeconds = seconds.integerValue;
-    
-    [self bindClearClipboard];
-}
-
-- (void)bindClearClipboard {
-    NSInteger seconds = Settings.sharedInstance.clearClipboardAfterSeconds;
-    BOOL enabled = Settings.sharedInstance.clearClipboardEnabled;
-
-    NSLog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
-    
-    if(!enabled) {
-        seconds = 0;
-    }
-    
-    NSNumber* index = [_autoClearClipboardIndex objectForKey:@(seconds)];
-    index = index == nil ? @(2) : index;
-    [self.segmentAutoClearClipboard setSelectedSegmentIndex:index.integerValue];
 }
 
 - (IBAction)onAppLockChanged:(id)sender {
@@ -489,36 +293,6 @@
     vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self presentViewController:vc1 animated:YES completion:nil];
 }
-
-- (IBAction)onAppLockDelayChanged:(id)sender {
-    NSArray<NSNumber *> *keys = [_appLockDelayList allKeysForObject:@(self.segmentAppLockDelay.selectedSegmentIndex)];
-    NSNumber *seconds = keys[0];
-    
-    Settings.sharedInstance.appLockDelay = seconds.integerValue;
-    
-    [self bindAppLock];
-}
-
-- (void)bindAppLock {
-    NSInteger mode = Settings.sharedInstance.appLockMode;
-    NSNumber* seconds = @(Settings.sharedInstance.appLockDelay);
-    NSNumber* index = [_appLockDelayList objectForKey:seconds];
-    
-    if (mode == kBiometric && !Settings.isBiometricIdAvailable) {
-        [self.segmentAppLock setSelectedSegmentIndex:kNoLock];
-    }
-    else if(mode == kBoth && !Settings.isBiometricIdAvailable) {
-        [self.segmentAppLock setSelectedSegmentIndex:kPinCode];
-    }
-    else {
-        [self.segmentAppLock setSelectedSegmentIndex:mode];
-    }
-    
-    [self.segmentAppLockDelay setSelectedSegmentIndex:index.integerValue];
-    
-    NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
-}
-
 
 - (BOOL)hasLocalOrICloudSafes {
     return ([SafesList.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesList.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
@@ -613,51 +387,22 @@
 }
 
 - (void)bindHideTotp {
-    self.switchHideTotp.on = Settings.sharedInstance.hideTotp;
-    self.switchHideTotpBrowseView.on = Settings.sharedInstance.hideTotpInBrowse;
-    self.switchHideTotpAutoFill.on = Settings.sharedInstance.hideTotpInAutoFill;
+    self.switchShowTotpBrowseView.on = !Settings.sharedInstance.hideTotpInBrowse;
 }
 
 - (IBAction)onChangeHideTotp:(id)sender {
-    Settings.sharedInstance.hideTotp = self.switchHideTotp.on;
-    Settings.sharedInstance.hideTotpInBrowse = self.switchHideTotpBrowseView.on;
-    Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
-
-    [self bindHideTotp];
-}
-
-- (void)bindKeePassNoSorting {
-    self.switchNoSortingKeePassInBrowse.on = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-}
-
-- (IBAction)onKeePassNoSortingChanged:(id)sender {
-    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
+    Settings.sharedInstance.hideTotpInBrowse = !self.switchShowTotpBrowseView.on;
     
-    [self bindKeePassNoSorting];
+    [self bindHideTotp];
 }
 
 -(void)bindShowRecycleBin {
     self.switchShowRecycleBinInBrowse.on = !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
-    self.switchShowRecycleBinInSearch.on = Settings.sharedInstance.showRecycleBinInSearchResults;
 }
 
 - (IBAction)onShowRecycleBinInBrowse:(id)sender {
     Settings.sharedInstance.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
     [self bindShowRecycleBin];
-}
-
-- (IBAction)onShowRecycleBinInSearch:(id)sender {
-    Settings.sharedInstance.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
-    [self bindShowRecycleBin];
-}
-
-- (IBAction)onCopyTotpAutoFill:(id)sender {
-    Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
-    [self bindCopyTotpAutoFill];
-}
-
-- (void)bindCopyTotpAutoFill {
-    self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
 }
 
 - (void)bindDeleteOnFailedUnlock {
@@ -689,29 +434,18 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 
     if(cell == self.cellDeleteDataAttempts) {
-        SelectStringViewController *vc = [[SelectStringViewController alloc] init];
-        
-        NSArray<NSNumber*>* options = @[@3, @5, @10, @15];
-        vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-            return obj.stringValue;
-        }];
-        NSInteger i = [options indexOfObject:@(Settings.sharedInstance.deleteDataAfterFailedUnlockCount)];
-        
-        vc.currentlySelectedIndex = i;
-        vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
-            if (success) {
-                Settings.sharedInstance.deleteDataAfterFailedUnlockCount = options[selectedIndex].integerValue;
-            }
-            
-            [self dismissViewControllerAnimated:YES completion:^{
-                [self bindDeleteOnFailedUnlock];
-            }];
-        };
-        
-        [self presentViewController:vc animated:YES completion:nil];
+        [self promptForInteger:@[@3, @5, @10, @15]
+             formatAsIntervals:NO
+                  currentValue:Settings.sharedInstance.deleteDataAfterFailedUnlockCount
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            Settings.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
+                        }
+                        [self bindDeleteOnFailedUnlock];
+                    }];
     }
     else if(cell == self.cellAboutVersion) {
-
+        // Auto Segue
     }
     else if(cell == self.cellAboutHelp) {
         [self onFaq];
@@ -719,12 +453,156 @@
     else if(cell == self.cellEmailSupport) {
         [self onContactSupport];
     }
+    else if (cell == self.cellClearClipboardDelay) {
+        [self promptForInteger:@[@30, @45, @60, @90, @120, @180]
+             formatAsIntervals:YES
+                  currentValue:Settings.sharedInstance.clearClipboardAfterSeconds
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            Settings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
+                        }
+                        [self bindClearClipboard];
+                    }];
+    }
+    else if (cell == self.cellDatabaseAutoLockDelay) {
+        [self promptForInteger:@[@0, @30, @60, @120, @180, @300, @600]
+             formatAsIntervals:YES
+                  currentValue:[Settings.sharedInstance getAutoLockTimeoutSeconds].integerValue
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            [Settings.sharedInstance setAutoLockTimeoutSeconds:@(selectedValue)];
+                        }
+                        [self bindDatabaseLock];
+                    }];
+    }
+    else if (cell == self.cellAppLockDelay) {
+        [self promptForInteger:@[@0, @60, @120, @180, @300, @600, @900]
+             formatAsIntervals:YES
+                  currentValue:Settings.sharedInstance.appLockDelay
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            Settings.sharedInstance.appLockDelay = selectedValue;
+                        }
+                        [self bindAppLock];
+                    }];
+    }
 }
 
+- (void)promptForInteger:(NSArray<NSNumber*>*)options
+        formatAsIntervals:(BOOL)formatAsIntervals
+            currentValue:(NSInteger)currentValue
+              completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
+    SelectStringViewController *vc = [[SelectStringViewController alloc] init];
+    
+    vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return formatAsIntervals ? [self formatTimeInterval:obj.integerValue] : obj.stringValue;
+    }];
+    
+    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
+    vc.currentlySelectedIndex = currentlySelectIndex;
+    vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
+        NSInteger selectedValue = -1;
+        if (success) {
+            selectedValue = options[selectedIndex].integerValue;
+        }
+        
+        [self dismissViewControllerAnimated:YES completion:^{
+            completion(success, selectedValue);
+        }];
+    };
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
 
 - (void)onFaq {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"]];
 }
 
+- (IBAction)onSwitchClearClipboardEnable:(id)sender {
+    Settings.sharedInstance.clearClipboardEnabled = self.clearClipboardEnabled.on;
+    
+    [self bindClearClipboard];
+}
+
+- (void)bindClearClipboard {
+    NSInteger seconds = Settings.sharedInstance.clearClipboardAfterSeconds;
+    BOOL enabled = Settings.sharedInstance.clearClipboardEnabled;
+    
+    self.clearClipboardEnabled.on = enabled;
+    self.cellClearClipboardDelay.userInteractionEnabled = enabled;
+    
+    NSLog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
+    
+    if(!enabled) {
+        self.labelClearClipboardDelay.text = @"Disabled";
+        self.labelClearClipboardDelay.textColor = UIColor.darkGrayColor;
+    }
+    else {
+        self.labelClearClipboardDelay.text = [self formatTimeInterval:seconds];
+        self.labelClearClipboardDelay.textColor = UIColor.darkTextColor;
+    }
+}
+
+- (NSString*)formatTimeInterval:(NSInteger)seconds {
+    if(seconds == 0) {
+        return @"None";
+    }
+    
+    NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
+    
+    fmt.allowedUnits =  NSCalendarUnitMinute | NSCalendarUnitSecond;
+    fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
+
+    return [fmt stringFromTimeInterval:seconds];
+}
+
+//////
+
+- (IBAction)onSwitchDatabaseAutoLockEnabled:(id)sender {
+    [Settings.sharedInstance setAutoLockTimeoutSeconds:self.switchDatabaseAutoLockEnabled.on ? @(60) : @(-1)];
+    [self bindDatabaseLock];
+}
+
+-(void)bindDatabaseLock {
+    NSNumber* seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
+    
+    if(seconds.integerValue == -1) {
+        self.switchDatabaseAutoLockEnabled.on = NO;
+        self.labelDatabaseAutoLockDelay.text = @"Disabled";
+        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
+        self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
+    }
+    else {
+        self.switchDatabaseAutoLockEnabled.on = YES;
+        self.labelDatabaseAutoLockDelay.text = [self formatTimeInterval:seconds.integerValue];
+        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkTextColor;
+        self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
+    }
+}
+
+//////
+
+- (void)bindAppLock {
+    NSInteger mode = Settings.sharedInstance.appLockMode;
+    NSNumber* seconds = @(Settings.sharedInstance.appLockDelay);
+
+    NSInteger effectiveMode = mode;
+    if (mode == kBiometric && !Settings.isBiometricIdAvailable) {
+        effectiveMode = kNoLock;
+    }
+    else if(mode == kBoth && !Settings.isBiometricIdAvailable) {
+        effectiveMode = kPinCode;
+    }
+
+    [self.segmentAppLock setSelectedSegmentIndex:effectiveMode];
+    
+    self.labelAppLockDelay.text = effectiveMode == kNoLock ? @"Disabled" : [self formatTimeInterval:seconds.integerValue];
+    self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.lightGrayColor : UIColor.darkTextColor;
+    self.cellAppLockDelay.userInteractionEnabled = effectiveMode != kNoLock;
+    
+    self.appLockOnPreferences.enabled = effectiveMode != kNoLock;
+    
+    NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
+}
 
 @end

@@ -94,6 +94,7 @@
 }
 
 - (void)requestBiometric {
+    NSLog(@"REQUEST-BIOMETRIC: Privacy Screen");
     [Settings.sharedInstance requestBiometricId:@"Identify to Open Strongbox"
                           allowDevicePinInstead:NO
                                      completion:^(BOOL success, NSError * _Nullable error) {

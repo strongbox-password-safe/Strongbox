@@ -199,7 +199,7 @@
         }
     }
     else {
-        cell.imageView.image = [UIImage imageNamed:@"page_white_text-48x48"];
+        cell.imageView.image = [UIImage imageNamed:@"document"];
     }
     
     return cell;

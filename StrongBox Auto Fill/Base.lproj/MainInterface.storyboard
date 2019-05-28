@@ -384,7 +384,7 @@
                                                         <constraint firstAttribute="width" constant="40" id="dL8-G2-p95"/>
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                    <state key="normal" image="arrow_circle_left_64"/>
+                                                    <state key="normal" image="syncronize"/>
                                                     <connections>
                                                         <action selector="onGeneratePassword:" destination="weD-H7-pMo" eventType="touchUpInside" id="lTP-2U-knm"/>
                                                     </connections>
@@ -630,7 +630,7 @@
                                                                 <constraint firstAttribute="width" constant="40" id="NoB-JC-Arc"/>
                                                             </constraints>
                                                             <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                            <state key="normal" image="arrow_circle_left_64"/>
+                                                            <state key="normal" image="syncronize"/>
                                                             <connections>
                                                                 <action selector="onGenerate:" destination="G41-3C-G4w" eventType="touchUpInside" id="0h4-Oy-ZvL"/>
                                                             </connections>
@@ -1050,15 +1050,15 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CRF-ed-5rz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3074" y="935"/>
+            <point key="canvasLocation" x="3234" y="740"/>
         </scene>
     </scenes>
     <resources>
         <image name="Strongbox-1024x1024-new" width="512" height="512"/>
-        <image name="arrow_circle_left_64" width="64" height="64"/>
         <image name="magnifier_64" width="64" height="64"/>
         <image name="product32" width="32" height="32"/>
         <image name="rocket" width="30" height="30"/>
+        <image name="syncronize" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="Ale-OO-C6r"/>

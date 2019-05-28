@@ -130,7 +130,7 @@
     cell.userInteractionEnabled = validMove;
     cell.contentView.alpha = validMove ? 1.0f : 0.5f;
 
-    cell.imageView.image = [UIImage imageNamed:@"folder-80.png"];
+    cell.imageView.image = [UIImage imageNamed:@"folder"];
 
     return cell;
 }
