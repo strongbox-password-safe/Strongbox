@@ -163,9 +163,11 @@
 }
 
 - (void)getNewPin:(BOOL)duressPin {
-    PinEntryController *vc1 = [[PinEntryController alloc] init];
-    vc1.info = duressPin ? @"Enter Duress PIN" : @"";
-    vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
+    
+    pinEntryVc.info = duressPin ? @"Enter Duress PIN" : @"";
+    pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 NSString* otherPin = duressPin ? self.viewModel.metadata.conveniencePin : self.viewModel.metadata.duressPin;
@@ -189,8 +191,7 @@
             }}];
     };
     
-    vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    [self presentViewController:vc1 animated:YES completion:nil];
+    [self presentViewController:pinEntryVc animated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

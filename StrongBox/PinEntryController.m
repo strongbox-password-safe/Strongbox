@@ -22,7 +22,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *button9;
 @property (weak, nonatomic) IBOutlet UIButton *button0;
 @property (weak, nonatomic) IBOutlet UIButton *buttonDelete;
-@property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UILabel *labelWarning;
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonDone;
@@ -31,6 +30,8 @@
 
 @property NSString* enteredText;
 @property (weak, nonatomic) IBOutlet UILabel *labelEnteredText;
+@property (weak, nonatomic) IBOutlet UIImageView *logo;
+@property (weak, nonatomic) IBOutlet UIStackView *stackView;
 
 @end
 
@@ -50,6 +51,14 @@
     
     self.labelWarning.text = self.warning;
     self.labelWarning.hidden = self.warning.length == 0;
+    if(self.warning.length) {
+        if (@available(iOS 11.0, *)) {
+            [self.stackView setCustomSpacing:8 afterView:self.logo];
+        }
+        else {
+            [self.stackView setSpacing:4]; // Some small screens pre ios 11 might make the cancel button unreachable / warning invisible
+        }
+    }
     
     self.enteredText = @"";
     
@@ -68,10 +77,6 @@
     [self styleKeyPadButton:self.button8];
     [self styleKeyPadButton:self.button9];
     [self styleKeyPadButton:self.button0];
-
-    self.containerView.layer.cornerRadius = 8;
-    self.containerView.layer.borderColor = UIColor.darkGrayColor.CGColor;
-    self.containerView.layer.borderWidth = 1;
 }
 
 - (void)styleKeyPadButton:(UIButton*)button {
@@ -146,7 +151,7 @@
         self.labelEnteredText.textColor = UIColor.darkTextColor;
     }
     else {
-        self.labelEnteredText.text = self.info.length ? self.info : @"Enter PIN";
+        self.labelEnteredText.text = self.info.length ? self.info : @"PIN";
         self.labelEnteredText.textColor = UIColor.lightGrayColor;
     }
 }

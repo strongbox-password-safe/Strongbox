@@ -26,6 +26,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchNoSortingKeePassInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoAddNewLocalSafes;
+@property (weak, nonatomic) IBOutlet UISwitch *switchEmptyPassword;
+@property (weak, nonatomic) IBOutlet UISwitch *switchEmergencyUseOldUnlock;
 
 @end
 
@@ -59,15 +61,17 @@
     Settings.sharedInstance.doNotAutoDetectKeyFiles = !self.switchAutoDetectKeyFiles.on;
     Settings.sharedInstance.doNotUseQuickTypeAutoFill = !self.switchUseQuickTypeAutoFill.on;
     Settings.sharedInstance.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
-    Settings.sharedInstance.showKeePass1BackupGroup = !self.switchShowKeePass1BackupFolder.on;
-    [[Settings sharedInstance] setShowPasswordByDefaultOnEditScreen:self.switchShowPasswordOnDetails.on];
+    Settings.sharedInstance.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
+    Settings.sharedInstance.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
     Settings.sharedInstance.doNotAutoAddNewLocalSafes = !self.switchAutoAddNewLocalSafes.on;
     Settings.sharedInstance.hideTotp = self.switchHideTotp.on;
     Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
     Settings.sharedInstance.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
     Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
-
+    Settings.sharedInstance.temporaryUseOldUnlock = self.switchEmergencyUseOldUnlock.on;
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchEmptyPassword.on;
+    
     if(!self.switchUseQuickTypeAutoFill.on) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     }
@@ -81,15 +85,17 @@
     self.switchSearchDereferenced.on = Settings.sharedInstance.searchDereferencedFields;
     self.switchUseQuickTypeAutoFill.on = !Settings.sharedInstance.doNotUseQuickTypeAutoFill;
     self.switchAutoDetectKeyFiles.on = !Settings.sharedInstance.doNotAutoDetectKeyFiles;
-    self.switchAutoFavIcon.on = [[Settings sharedInstance] tryDownloadFavIconForNewRecord];
-    self.switchShowKeePass1BackupFolder.on = [[Settings sharedInstance] showKeePass1BackupGroup];
-    self.switchShowPasswordOnDetails.on = [[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
+    self.switchAutoFavIcon.on = Settings.sharedInstance.tryDownloadFavIconForNewRecord;
+    self.switchShowKeePass1BackupFolder.on = Settings.sharedInstance.showKeePass1BackupGroup;
+    self.switchShowPasswordOnDetails.on = Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
     self.switchAutoAddNewLocalSafes.on = !Settings.sharedInstance.doNotAutoAddNewLocalSafes;
     self.switchHideTotp.on = Settings.sharedInstance.hideTotp;
     self.switchHideTotpAutoFill.on = Settings.sharedInstance.hideTotpInAutoFill;
     self.switchNoSortingKeePassInBrowse.on = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
     self.switchShowRecycleBinInSearch.on = Settings.sharedInstance.showRecycleBinInSearchResults;
     self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
+    self.switchEmergencyUseOldUnlock.on = Settings.sharedInstance.temporaryUseOldUnlock;
+    self.switchEmptyPassword.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
 }
 
 @end

@@ -255,11 +255,13 @@
 }
 
 - (void)requestAppLockPinCodeAndConfirm {
-    PinEntryController *vc1 = [[PinEntryController alloc] init];
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* vc1 = (PinEntryController*)[storyboard instantiateInitialViewController];
+    
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
-                PinEntryController *vc2 = [[PinEntryController alloc] init];
+                PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
                 vc2.info = @"Confirm PIN";
                 vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
                     [self dismissViewControllerAnimated:YES completion:^{
@@ -281,7 +283,6 @@
                     }];
                 };
                 
-                vc2.modalPresentationStyle = UIModalPresentationOverCurrentContext;
                 [self presentViewController:vc2 animated:YES completion:nil];
             }
             else {
@@ -289,8 +290,7 @@
             }
         }];
     };
-    
-    vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+
     [self presentViewController:vc1 animated:YES completion:nil];
 }
 

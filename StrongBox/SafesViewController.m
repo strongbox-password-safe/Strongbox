@@ -151,7 +151,7 @@
     // A little trick for removing the cell separators
     self.tableView.tableFooterView = [UIView new];
     
-    self.tableView.rowHeight = 65.0f;
+    self.tableView.rowHeight = 55.0f;
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onProStatusChanged:)
@@ -726,13 +726,14 @@
 }
 
 - (void)requestPin {
-    PinEntryController *vc = [[PinEntryController alloc] init];
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
-    __weak PinEntryController* weakVc = vc;
+    __weak PinEntryController* weakVc = pinEntryVc;
     
-    vc.pinLength = Settings.sharedInstance.appLockPin.length;
+    pinEntryVc.pinLength = Settings.sharedInstance.appLockPin.length;
     
-    vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+    pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
@@ -755,8 +756,7 @@
         }
     };
     
-    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    [self presentViewController:vc animated:YES completion:nil];
+    [self presentViewController:pinEntryVc animated:YES completion:nil];
 }
 
 @end

@@ -435,7 +435,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
              [Alerts error:self title:@"There was an error reading the Key File" error:error completion:nil];
          }
          else {
-             NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+             NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Broken for XML KDB
              [self changeKeyFile:keyFileDigest];
          }
      }];
@@ -455,7 +455,7 @@ static NSString *getLastCachedDate(NSDate *modDate) {
         [Alerts error:self title:@"There was an error reading the Key File" error:error completion:nil];
     }
     else {
-        NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+        NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Broken for XML KDB
         [self changeKeyFile:keyFileDigest];
     }
 }

@@ -33,7 +33,7 @@ static const int kMinNotesCellHeight = 160;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
+    self.hidePassword = !Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
 
     [self initializeUi];
     

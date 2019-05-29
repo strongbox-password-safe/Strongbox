@@ -33,7 +33,7 @@
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
     
-    self.tableView.rowHeight = 65.0f;
+    self.tableView.rowHeight = 55.0f;
     
     [SVProgressHUD setViewForExtension:self.view];
 }

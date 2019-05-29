@@ -342,7 +342,7 @@ static const int kMinNotesCellHeight = 160;
     self.userSelectedNewExistingCustomIconId = nil;
     self.userSelectedNewCustomIcon = nil;
     
-    self.hidePassword = ![[Settings sharedInstance] isShowPasswordByDefaultOnEditScreen];
+    self.hidePassword = !Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
 
     if(!self.record) {
         self.record = [self createNewRecord];
@@ -355,6 +355,7 @@ static const int kMinNotesCellHeight = 160;
         [self setEditing:self.editingNewRecord animated:YES];
     }
     else {
+        self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.readOnlyMode);
         [self enableDisableUiForEditing];
     }
 }

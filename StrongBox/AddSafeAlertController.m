@@ -39,21 +39,25 @@
     validation:(BOOL (^) (NSString *name, NSString *password))validation
     completion:(void (^) (NSString *name, NSString *password, BOOL response))completion {
     _newValidation = validation;
-    _alertController = [UIAlertController alertControllerWithTitle:@"Add New Database"
+    _alertController = [UIAlertController alertControllerWithTitle:@"Create New Database"
                                                            message:@"Enter a name for this database, and a master password"
                                                     preferredStyle:UIAlertControllerStyleAlert];
 
+    NSString *suggestedName = [self getSuggestedSafeName];
+    __block UITextField* nameTextField;
+
     __weak typeof(self) weakSelf = self;
     [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField addTarget:weakSelf  action:@selector(validateAddNewFieldNotEmpty:)
+                          [textField addTarget:weakSelf
+                                        action:@selector(validateAddNewFieldNotEmpty:)
                                 forControlEvents:UIControlEventEditingChanged];
-                            NSString *suggestedName = [weakSelf getSuggestedSafeName];
-                            if(suggestedName) {
+                            if(suggestedName.length) {
                                 textField.text = suggestedName;
                             }
                             else {
                                 textField.placeholder = @"Database Name";
                             }
+        nameTextField = textField;
                       }];
 
     __block UITextField* passwordTextField;
@@ -67,7 +71,7 @@
                           [textField becomeFirstResponder];
                       }];
 
-    _defaultAction = [UIAlertAction actionWithTitle:@"Add Database"
+    _defaultAction = [UIAlertAction actionWithTitle:@"Create"
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *a) {
                                                 completion((self->_alertController.textFields[0]).text, (self->_alertController.textFields[1]).text, true);
@@ -84,7 +88,12 @@
     [_alertController addAction:cancelAction];
 
     [viewController presentViewController:_alertController animated:YES completion:^{
-        [passwordTextField becomeFirstResponder];
+        if(suggestedName.length) {
+            [passwordTextField becomeFirstResponder];
+        }
+        else {
+            [nameTextField becomeFirstResponder];
+        }
     }];
 }
 

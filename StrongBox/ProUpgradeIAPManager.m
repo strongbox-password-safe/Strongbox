@@ -91,7 +91,7 @@
         [self checkReceiptAndProEntitlements:vc];
     }
     else {
-        // TODO: We should probably message and downgrade now... Something very funny is up
+        // TODO: We should probably downgrade now... Something very funny is up
         // For now - we will warn and ask to message support so we can handle this gracefully if someone is struggling...
         [Alerts info:vc title:@"Strongbox Entitlements Error" message:@"Strongbox is having trouble verifying its App Store entitlements. This could lead to a future App downgrade. Please contact support@strongboxsafe.com to get some help with this."];
     

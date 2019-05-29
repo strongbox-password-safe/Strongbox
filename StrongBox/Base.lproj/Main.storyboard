@@ -592,7 +592,7 @@
         <!--Preferences-->
         <scene sceneID="1nk-SD-liu">
             <objects>
-                <tableViewController wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="gAY-yV-Xd6" customClass="PreferencesTableViewController" sceneMemberID="viewController">
+                <tableViewController wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" modalPresentationStyle="formSheet" hidesBottomBarWhenPushed="YES" id="gAY-yV-Xd6" customClass="PreferencesTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" bounces="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" estimatedRowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="yIU-Kp-eIB">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1092,7 +1092,7 @@
                                         <rect key="frame" x="0.0" y="1237" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="MRT-sz-6pn" id="OBw-b1-laG">
-                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Delay" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xca-L6-qCz">
@@ -1131,7 +1131,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="1zq-Mt-PJ4">
-                                                    <rect key="frame" x="20" y="7" width="374" height="29"/>
+                                                    <rect key="frame" x="20" y="8" width="374" height="29"/>
                                                     <segments>
                                                         <segment title="No Lock"/>
                                                         <segment title="PIN Code"/>
@@ -1154,7 +1154,7 @@
                                         <rect key="frame" x="0.0" y="1416.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1Fc-Te-VmG" id="RkE-Sx-yZ3">
-                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Delay" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5dL-hE-Hld">
@@ -1248,7 +1248,7 @@
                                         <rect key="frame" x="0.0" y="1672" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="i5R-Ga-iR5" id="Egx-x7-URJ">
-                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Attempts" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KDr-Rd-JbV">
@@ -1312,7 +1312,7 @@
                                         <rect key="frame" x="0.0" y="1867.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lie-Md-PQ2" id="x3E-S9-oql">
-                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sessions (1)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="egk-ZZ-NuY">
@@ -1350,7 +1350,7 @@
                                         <rect key="frame" x="0.0" y="1995.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Z5C-HU-Nps" id="ld8-Zm-Tka">
-                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version 1.28.3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="guP-of-0MI">
@@ -3598,7 +3598,7 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MVG-7Q-Ejm">
-                                                    <rect key="frame" x="47" y="11" width="320" height="93"/>
+                                                    <rect key="frame" x="47" y="8" width="320" height="98.5"/>
                                                     <color key="backgroundColor" red="0.0" green="0.54117647059999996" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="320" id="h78-qs-ElP"/>
@@ -3804,7 +3804,7 @@ Cg
         <!--About-->
         <scene sceneID="BMA-yx-CBv">
             <objects>
-                <viewController wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="Bzv-qW-qZx" sceneMemberID="viewController">
+                <viewController wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" modalPresentationStyle="formSheet" hidesBottomBarWhenPushed="YES" id="Bzv-qW-qZx" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BPq-uq-x0h">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -4258,11 +4258,11 @@ Copyright (c) 2013 Jeremias Nunez &lt;</string>
                                         </attributes>
                                     </fragment>
                                     <fragment>
-                                        <string key="content">&gt; 
+                                        <mutableString key="content">&gt; 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
-</string>
+</mutableString>
                                         <attributes>
                                             <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="HelveticaNeue"/>
@@ -4309,7 +4309,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPL
                                         </attributes>
                                     </fragment>
                                     <fragment>
-                                        <string key="content"> 
+                                        <mutableString key="content"> 
 Copyright (c) 2011-2013, Tony Million. 
 All rights reserved. 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
@@ -4319,7 +4319,7 @@ and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-</string>
+</mutableString>
                                         <attributes>
                                             <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="HelveticaNeue"/>
@@ -4461,7 +4461,7 @@ Argon2, ChaCha20, and Salsa20 Crypto under the ISC licence:
                                         </attributes>
                                     </fragment>
                                     <fragment>
-                                        <string key="content">/*
+                                        <mutableString key="content">/*
  * ISC License
  *
  * Copyright (c) 2013-2018
@@ -4478,7 +4478,7 @@ Argon2, ChaCha20, and Salsa20 Crypto under the ISC licence:
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/</string>
+*/</mutableString>
                                         <attributes>
                                             <font key="NSFont" size="11" name="CourierNewPSMT"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" tailIndent="451" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
@@ -4593,7 +4593,7 @@ Lightweight XML Writer
                                             <color key="NSUnderlineColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </attributes>
                                     </fragment>
-                                    <fragment content="FavIcon">
+                                    <fragment content="Icons8">
                                         <attributes>
                                             <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="HelveticaNeue-Bold"/>
@@ -4606,6 +4606,32 @@ Lightweight XML Writer
                                     </fragment>
                                     <fragment>
                                         <string key="content">
+https://icons8.com/license
+
+</string>
+                                        <attributes>
+                                            <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <font key="NSFont" size="12" name="HelveticaNeue"/>
+                                            <real key="NSKern" value="0.0"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="justified" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="14" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                            <color key="NSUnderlineColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment content="FavIcon">
+                                        <attributes>
+                                            <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <font key="NSFont" size="12" name="HelveticaNeue-Bold"/>
+                                            <real key="NSKern" value="0.0"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="justified" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="14" defaultTabInterval="36" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
+                                                <tabStops/>
+                                            </paragraphStyle>
+                                            <color key="NSUnderlineColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </attributes>
+                                    </fragment>
+                                    <fragment>
+                                        <mutableString key="content">
 Copyright (C) 2018 Leon Breedt
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -4618,7 +4644,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.</string>
+limitations under the License.</mutableString>
                                         <attributes>
                                             <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <font key="NSFont" size="12" name="HelveticaNeue"/>
@@ -5450,7 +5476,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="taw-Dw-q2B">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onGenericPreferencesChanged:" destination="gAY-yV-Xd6" eventType="valueChanged" id="c56-iM-fOk"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="vOr-9X-VRI"/>
                                                     </connections>
                                                 </switch>
@@ -5481,7 +5506,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2KF-V0-ZLe">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onAutoDetectKeyFiles:" destination="gAY-yV-Xd6" eventType="valueChanged" id="JLU-jX-hVg"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="RFg-Mu-4FL"/>
                                                     </connections>
                                                 </switch>
@@ -5513,7 +5537,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="tNA-3c-qBQ"/>
-                                                        <action selector="onSearchDereferenced:" destination="gAY-yV-Xd6" eventType="valueChanged" id="dO5-KA-1K8"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -5544,7 +5567,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="l2t-jt-5zM"/>
-                                                        <action selector="onViewDereferenced:" destination="gAY-yV-Xd6" eventType="valueChanged" id="n0a-Rg-nr1"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -5574,8 +5596,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3fw-Ll-ysX">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onChangeHideTotp:" destination="gAY-yV-Xd6" eventType="valueChanged" id="Uz7-pQ-hN3"/>
-                                                        <action selector="onCopyTotpAutoFill:" destination="gAY-yV-Xd6" eventType="valueChanged" id="WDO-pq-w0H"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="Cpd-1z-gNt"/>
                                                     </connections>
                                                 </switch>
@@ -5606,7 +5626,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GmR-dl-w3K">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onChangeHideTotp:" destination="gAY-yV-Xd6" eventType="valueChanged" id="6dL-DN-xBn"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="74a-4H-b6J"/>
                                                     </connections>
                                                 </switch>
@@ -5637,7 +5656,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yo5-Rb-KWU">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onChangeHideTotp:" destination="gAY-yV-Xd6" eventType="valueChanged" id="1bL-AY-5Rg"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="cQq-2K-826"/>
                                                     </connections>
                                                 </switch>
@@ -5669,7 +5687,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="cWK-L7-ZYW"/>
-                                                        <action selector="onShowRecycleBinInSearch:" destination="gAY-yV-Xd6" eventType="valueChanged" id="oKA-xA-KCh"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -5700,7 +5717,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="uka-Ye-igO"/>
-                                                        <action selector="onShowKeePass1BackupFolder:" destination="gAY-yV-Xd6" eventType="valueChanged" id="pj1-iT-JPB"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -5730,7 +5746,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gV1-ui-h7Q">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onAutoFavIcon:" destination="gAY-yV-Xd6" eventType="valueChanged" id="yZP-l4-mMo"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="wI7-lg-uiw"/>
                                                     </connections>
                                                 </switch>
@@ -5762,8 +5777,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="1eD-T1-tIH"/>
-                                                        <action selector="onShowPasswordOnDetails:" destination="gAY-yV-Xd6" eventType="valueChanged" id="Jm3-p2-iVz"/>
-                                                        <action selector="onTogglePasswordHistoryEnabled:" destination="nJM-pW-a0b" eventType="valueChanged" id="UFt-W4-xOD"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -5794,7 +5807,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="WmK-2h-8sb"/>
-                                                        <action selector="onUseQuickTypeAutoFill:" destination="gAY-yV-Xd6" eventType="valueChanged" id="60O-zY-FTW"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -5824,7 +5836,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ak4-Ko-LtY">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onKeePassNoSortingChanged:" destination="gAY-yV-Xd6" eventType="valueChanged" id="HuP-Ls-Yyi"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="kTA-Pa-uPP"/>
                                                     </connections>
                                                 </switch>
@@ -5855,7 +5866,6 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l3t-Ur-516">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onAutoAddNewLocalSafesChanged:" destination="gAY-yV-Xd6" eventType="valueChanged" id="doo-hq-7U4"/>
                                                         <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="w5n-lp-DHA"/>
                                                     </connections>
                                                 </switch>
@@ -5867,6 +5877,66 @@ Supports Predefined Icons &amp; Attachments</string>
                                                 <constraint firstItem="4js-7K-wgt" firstAttribute="bottom" secondItem="mQ0-Su-3wl" secondAttribute="bottomMargin" id="Ru0-Lx-RXU"/>
                                                 <constraint firstItem="4js-7K-wgt" firstAttribute="leading" secondItem="mQ0-Su-3wl" secondAttribute="leading" constant="20" id="U7i-Y3-GzD"/>
                                                 <constraint firstItem="l3t-Ur-516" firstAttribute="trailing" secondItem="mQ0-Su-3wl" secondAttribute="trailing" constant="-20" id="oEh-iD-t0i"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="B2t-dZ-Qbv" userLabel="Allow Empty or No Password Unlock">
+                                        <rect key="frame" x="0.0" y="616" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="B2t-dZ-Qbv" id="HCK-Ab-Fue">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Allow Empty or No Password Unlock" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fmR-92-LWQ" userLabel="Allow Empty or No Password Unlock">
+                                                    <rect key="frame" x="20" y="11" width="276.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t6d-tJ-n7N">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="KLa-YX-egn"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="fmR-92-LWQ" firstAttribute="centerY" secondItem="t6d-tJ-n7N" secondAttribute="centerY" id="7mI-vp-BQp"/>
+                                                <constraint firstItem="t6d-tJ-n7N" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="fmR-92-LWQ" secondAttribute="trailing" constant="8" symbolic="YES" id="Lo0-Pp-MD8"/>
+                                                <constraint firstItem="fmR-92-LWQ" firstAttribute="bottom" secondItem="HCK-Ab-Fue" secondAttribute="bottomMargin" id="MEC-yc-GsI"/>
+                                                <constraint firstItem="t6d-tJ-n7N" firstAttribute="trailing" secondItem="HCK-Ab-Fue" secondAttribute="trailing" constant="-20" id="ak0-6z-EiC"/>
+                                                <constraint firstItem="fmR-92-LWQ" firstAttribute="leading" secondItem="HCK-Ab-Fue" secondAttribute="leading" constant="20" id="br5-1v-aQa"/>
+                                                <constraint firstItem="fmR-92-LWQ" firstAttribute="top" secondItem="HCK-Ab-Fue" secondAttribute="topMargin" id="q3D-Z7-XL1"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Wbq-0Y-K6k" userLabel="Emergency: Use Old Unlock UI">
+                                        <rect key="frame" x="0.0" y="660" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Wbq-0Y-K6k" id="Juh-DO-Vg8">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Emergency: Use Old Unlock UI" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-0T-dkb">
+                                                    <rect key="frame" x="20" y="11" width="234.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h8z-53-wel">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="5Dc-0x-xtj" eventType="valueChanged" id="4qH-es-FBf"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="FUV-0T-dkb" firstAttribute="bottom" secondItem="Juh-DO-Vg8" secondAttribute="bottomMargin" id="9WP-uH-RxP"/>
+                                                <constraint firstItem="h8z-53-wel" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="FUV-0T-dkb" secondAttribute="trailing" constant="8" symbolic="YES" id="BKy-EM-fc1"/>
+                                                <constraint firstItem="FUV-0T-dkb" firstAttribute="top" secondItem="Juh-DO-Vg8" secondAttribute="topMargin" id="MFn-Xb-bYJ"/>
+                                                <constraint firstItem="FUV-0T-dkb" firstAttribute="leading" secondItem="Juh-DO-Vg8" secondAttribute="leading" constant="20" id="PtN-2L-2rl"/>
+                                                <constraint firstItem="FUV-0T-dkb" firstAttribute="centerY" secondItem="h8z-53-wel" secondAttribute="centerY" id="WTy-eY-vbC"/>
+                                                <constraint firstItem="h8z-53-wel" firstAttribute="trailing" secondItem="Juh-DO-Vg8" secondAttribute="trailing" constant="-20" id="wBM-ar-A56"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -5884,6 +5954,8 @@ Supports Predefined Icons &amp; Attachments</string>
                         <outlet property="switchAutoDetectKeyFiles" destination="2KF-V0-ZLe" id="Ei8-es-gSa"/>
                         <outlet property="switchAutoFavIcon" destination="gV1-ui-h7Q" id="PtL-Iq-2hJ"/>
                         <outlet property="switchCopyTotpAutoFill" destination="3fw-Ll-ysX" id="xBJ-3b-cbD"/>
+                        <outlet property="switchEmergencyUseOldUnlock" destination="h8z-53-wel" id="ppF-d2-p6y"/>
+                        <outlet property="switchEmptyPassword" destination="t6d-tJ-n7N" id="adI-oB-0yU"/>
                         <outlet property="switchHideTotp" destination="GmR-dl-w3K" id="4gw-CM-hU4"/>
                         <outlet property="switchHideTotpAutoFill" destination="Yo5-Rb-KWU" id="MlE-OP-2c5"/>
                         <outlet property="switchNoSortingKeePassInBrowse" destination="ak4-Ko-LtY" id="Weg-J4-maM"/>
@@ -6405,7 +6477,7 @@ Supports Predefined Icons &amp; Attachments</string>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8pJ-19-apM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3371" y="1862"/>
+            <point key="canvasLocation" x="-3291" y="1872"/>
         </scene>
         <!--Initial View Controller-->
         <scene sceneID="A2h-Qc-mpt">
@@ -6674,12 +6746,12 @@ Supports Predefined Icons &amp; Attachments</string>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="VNu-1Y-XNb"/>
-        <segue reference="B0D-Y9-Jhh"/>
-        <segue reference="okm-JQ-5uE"/>
+        <segue reference="Yf0-U4-iru"/>
+        <segue reference="pfC-It-asC"/>
         <segue reference="hDV-D2-02z"/>
         <segue reference="sMl-ZC-YfU"/>
         <segue reference="mpb-pU-y6e"/>
         <segue reference="3gw-Ha-Q6v"/>
-        <segue reference="aYd-mP-3oX"/>
+        <segue reference="aI5-1C-HAz"/>
     </inferredMetricsTieBreakers>
 </document>

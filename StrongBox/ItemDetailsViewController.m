@@ -161,7 +161,7 @@ static NSString* const kTotpCell = @"TotpCell";
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.tableFooterView = [UIView new];
 
-    self.passwordConcealedInUi = !Settings.sharedInstance.isShowPasswordByDefaultOnEditScreen;
+    self.passwordConcealedInUi = !Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
     
     if(self.createNewItem) {
         self.item = [self createNewRecord];

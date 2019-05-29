@@ -65,6 +65,9 @@ static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFill
 static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
 static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
+static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
+static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
+static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -114,16 +117,16 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)isShowPasswordByDefaultOnEditScreen {
+- (BOOL)showPasswordByDefaultOnEditScreen {
     NSUserDefaults *userDefaults = [self getUserDefaults];
-   
+    
     return [userDefaults boolForKey:kShowPasswordByDefaultOnEditScreen];
 }
 
-- (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value {
+- (void)setShowPasswordByDefaultOnEditScreen:(BOOL)showPasswordByDefaultOnEditScreen {
     NSUserDefaults *userDefaults = [self getUserDefaults];
     
-    [userDefaults setBool:value forKey:kShowPasswordByDefaultOnEditScreen];
+    [userDefaults setBool:showPasswordByDefaultOnEditScreen forKey:kShowPasswordByDefaultOnEditScreen];
     
     [userDefaults synchronize];
 }
@@ -412,7 +415,7 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 - (NSString*)getFlagsStringForDiagnostics {
     return [NSString stringWithFormat:@"[%d%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
-    self.isShowPasswordByDefaultOnEditScreen,
+    self.showPasswordByDefaultOnEditScreen,
     self.isHavePromptedAboutFreeTrial,
     self.isProOrFreeTrial,
     self.isPro,
@@ -882,6 +885,30 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setAppLockAppliesToPreferences:(BOOL)appLockAppliesToPreferences {
     [self setBool:kAppLockAppliesToPreferences value:appLockAppliesToPreferences];
+}
+
+- (BOOL)showAdvancedUnlockOptions {
+    return [self getBool:kShowAdvancedUnlockOptions fallback:NO];
+}
+
+- (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
+    [self setBool:kShowAdvancedUnlockOptions value:showAdvancedUnlockOptions];
+}
+
+- (BOOL)allowEmptyOrNoPasswordEntry {
+    return [self getBool:kAllowEmptyOrNoPasswordEntry fallback:NO];
+}
+
+- (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
+    [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
+}
+
+- (BOOL)temporaryUseOldUnlock {
+    return [self getBool:kTemporaryUseOldUnlock];
+}
+
+- (void)setTemporaryUseOldUnlock:(BOOL)temporaryUseOldUnlock {
+    [self setBool:kTemporaryUseOldUnlock value:temporaryUseOldUnlock];
 }
 
 @end

@@ -5,6 +5,7 @@
 //  Created by Mark on 06/10/2018.
 //  Copyright © 2018 Mark McGuill. All rights reserved.
 //
+
 #import "InitialViewController.h"
 #import "Alerts.h"
 #import "DatabaseModel.h"
@@ -91,18 +92,15 @@
 - (void)onPrivacyScreenDismissed {
     self.privacyAndLockVc = nil;
 
-    // This is handled by viewDidAppear now...
+//    NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
     
-//    if(self.enqueuedImportUrl) {
-//        [self processEnqueuedImport]; // Maybe we need to process an import
-//    }
-//    else {
-//        if([self isInQuickLaunchViewMode]) {
-//            [self openQuickLaunchPrimarySafe];
-//        }
-//
-//        [self checkICloudAvailability];
-//    }
+    if(!self.enqueuedImportUrl) {
+        if([self isInQuickLaunchViewMode]) {
+            [self openQuickLaunchPrimarySafe];
+        }
+
+        [self checkICloudAvailability];
+    }
 }
 
 - (void)appResignActive {
@@ -234,18 +232,28 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    if(!self.hasAppearedOnce && Settings.sharedInstance.appLockMode != kNoLock) {
-        [self showPrivacyScreen:YES];
+//    NSLog(@"XXXXXXXXXXXXXXXXXX - View Did Appear");
+
+    if(!self.hasAppearedOnce) {
+        if (Settings.sharedInstance.appLockMode != kNoLock) {
+            [self showPrivacyScreen:YES];
+        }
+        else {
+            if(self.enqueuedImportUrl) {
+                [self processEnqueuedImport];
+            }
+            else {
+                if([self isInQuickLaunchViewMode]) {
+                    [self openQuickLaunchPrimarySafe];
+                }
+            }
+        }
     }
     else {
         if(self.enqueuedImportUrl) {
             [self processEnqueuedImport];
         }
         else {
-            if([self isInQuickLaunchViewMode]) {
-                [self openQuickLaunchPrimarySafe];
-            }
-            
             [self checkICloudAvailability];
         }
     }
@@ -382,7 +390,7 @@
    [[iCloudSafesCoordinator sharedInstance] startQuery];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSData *importedData = [NSData dataWithContentsOfURL:importURL];
@@ -427,11 +435,11 @@
         // new copy or just update an old one...
         [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
 
-        [self onReadImportedFile:success data:data url:url];
+        [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace];
     }];
 }
 
-- (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url {
+- (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
     if(!success || !data) {
         [Alerts warn:self title:@"Error Opening" message:@"Could not access this file."];
     }
@@ -440,7 +448,7 @@
             [self importKey:data url:url];
         }
         else {
-            [self importSafe:data url:url canOpenInPlace:self.enqueuedImportCanOpenInPlace];
+            [self importSafe:data url:url canOpenInPlace:canOpenInPlace];
         }
     }
 }
@@ -524,32 +532,32 @@
 }
 
 - (void)promptForNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
-    [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Database Name"
-                            title:@"Enter a Name"
-                          message:@"What would you like to call this database?"
-                       completion:^(NSString *text, BOOL response) {
-                           if (response) {
-                               NSString *nickName = [SafesList sanitizeSafeNickName:text];
-                               
-                               if (![[SafesList sharedInstance] isValidNickName:nickName]) {
-                                   [Alerts   info:self
-                                            title:@"Invalid Nickname"
-                                          message:@"That nickname may already exist, or is invalid, please try a different nickname."
-                                       completion:^{
-                                           [self promptForNickname:data url:url editInPlace:editInPlace];
-                                       }];
-                               }
-                               else {
-                                   if(editInPlace) {
-                                       [self addExternalFileReferenceSafe:nickName url:url];
-                                   }
-                                   else {
-                                       [self copyAndAddImportedSafe:nickName data:data url:url];
-                                   }
-                               }
-                           }
-                       }];
+[Alerts OkCancelWithTextField:self
+            textFieldPlaceHolder:@"Database Name"
+                        title:@"Enter a Name"
+                        message:@"What would you like to call this database?"
+                    completion:^(NSString *text, BOOL response) {
+                        if (response) {
+                            NSString *nickName = [SafesList sanitizeSafeNickName:text];
+                            
+                            if (![[SafesList sharedInstance] isValidNickName:nickName]) {
+                                [Alerts   info:self
+                                        title:@"Invalid Nickname"
+                                        message:@"That nickname may already exist, or is invalid, please try a different nickname."
+                                    completion:^{
+                                        [self promptForNickname:data url:url editInPlace:editInPlace];
+                                    }];
+                            }
+                            else {
+                                if(editInPlace) {
+                                    [self addExternalFileReferenceSafe:nickName url:url];
+                                }
+                                else {
+                                    [self copyAndAddImportedSafe:nickName data:data url:url];
+                                }
+                            }
+                        }
+                    }];
 }
 
 - (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {

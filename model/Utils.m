@@ -112,6 +112,18 @@ NSString *friendlyDateString(NSDate *modDate) {
     return [df stringFromDate:modDate];
 }
 
+NSString *friendlyDateStringVeryShort(NSDate *modDate) {
+    if(!modDate) { return @""; }
+    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = NSDateFormatterShortStyle;
+    df.dateStyle = NSDateFormatterShortStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+    
+    return [df stringFromDate:modDate];
+}
+
 NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     // 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C => 46C9B1FFBD4ABC4BBB260C6190BAD20C
     

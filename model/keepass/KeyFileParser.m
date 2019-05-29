@@ -16,7 +16,7 @@ static NSString* const kDataElementName = @"Data";
 
 @implementation KeyFileParser
 
-+ (NSData *)getKeyFileDigestFromFileData:(NSData *)data {
++ (NSData *)getKeyFileDigestFromFileData:(NSData *)data checkForXml:(BOOL)checkForXml {
     if(!data) {
         return nil;
     }
@@ -25,11 +25,13 @@ static NSString* const kDataElementName = @"Data";
     
     // 1. XML file with 32-byte key encoded as Base64 string
     
-    NSData* xml = [KeyFileParser getXmlKey:data];
-    if(xml) {
-        return xml;
+    if(checkForXml) {
+        NSData* xml = [KeyFileParser getXmlKey:data];
+        if(xml) {
+            return xml;
+        }
     }
-
+    
     // 2. 32 byte binary file - this is the digest directly
 
     if (data.length == 32) {

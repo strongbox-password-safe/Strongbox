@@ -39,7 +39,7 @@
         Settings.sharedInstance.installDate = [NSDate date];
     }
     self.appLaunchTime = [NSDate date];
-
+    
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
 
     if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
@@ -67,9 +67,7 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-    NSLog(@"openURL: [%@] => [%@]", options, url);
-    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    //NSLog(@"openURL: [%@] => [%@]", options, url);
     
     if ([url.absoluteString hasPrefix:@"db"]) {
         DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];

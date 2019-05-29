@@ -89,17 +89,17 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="dvf-G9-7Rb">
-                                            <rect key="frame" x="63" y="28.666666666666664" width="35" height="21.666666666666668"/>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="dvf-G9-7Rb">
+                                            <rect key="frame" x="63" y="29" width="33.333333333333336" height="20.333333333333332"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="wYj-ns-Tje">
-                                            <rect key="frame" x="63" y="53.666666666666671" width="32.666666666666664" height="14.333333333333334"/>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" id="wYj-ns-Tje">
+                                            <rect key="frame" x="63" y="52.333333333333329" width="35" height="15.666666666666666"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -192,7 +192,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="249" verticalCompressionResistancePriority="755" text="Primary Database Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="14" translatesAutoresizingMaskIntoConstraints="NO" id="QwD-TW-iTr" userLabel="Safe Name">
-                                <rect key="frame" x="16" y="227" width="343" height="38"/>
+                                <rect key="frame" x="16" y="129.33333333333334" width="343" height="38.333333333333343"/>
                                 <fontDescription key="fontDescription" name="ArialRoundedMTBold" family="Arial Rounded MT Bold" pointSize="33"/>
                                 <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
@@ -203,14 +203,14 @@
                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalCompressionResistancePriority="749" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="MIf-Kg-59w" userLabel="Logo">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" verticalHuggingPriority="260" verticalCompressionResistancePriority="745" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="MIf-Kg-59w" userLabel="Logo">
                                 <rect key="frame" x="62.666666666666657" y="281" width="249.99999999999997" height="250"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="j9u-Qf-gdF"/>
                                     <constraint firstAttribute="height" relation="lessThanOrEqual" constant="250" id="orv-Ub-2SL"/>
                                 </constraints>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XJY-fc-zJ2" userLabel="Open Button">
+                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="753" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XJY-fc-zJ2" userLabel="Open Button">
                                 <rect key="frame" x="145.66666666666666" y="536" width="84" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <state key="normal" title="Tap to Open">
@@ -220,8 +220,8 @@
                                     <action selector="onOpenPrimarySafe:" destination="ZXE-qS-cIr" eventType="touchUpInside" id="8N6-ab-wPg"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWT-S1-Ufn" userLabel="Safes List Button">
-                                <rect key="frame" x="158" y="695" width="201" height="34"/>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LWT-S1-Ufn" userLabel="Safes List Button">
+                                <rect key="frame" x="158" y="675" width="201" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="Back to Databases List &gt;">
                                     <color key="titleColor" red="0.99953407049999998" green="0.98835557699999999" blue="0.47265523669999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -245,11 +245,12 @@
                             <constraint firstItem="MLT-zq-mNc" firstAttribute="top" secondItem="qNc-6j-WBk" secondAttribute="bottom" constant="8" id="Inc-V7-VPT"/>
                             <constraint firstItem="kCg-Ld-ACZ" firstAttribute="trailing" secondItem="QwD-TW-iTr" secondAttribute="trailing" constant="16" id="Lzu-FV-XNQ"/>
                             <constraint firstItem="MIf-Kg-59w" firstAttribute="top" relation="greaterThanOrEqual" secondItem="kCg-Ld-ACZ" secondAttribute="top" constant="20" id="Ovn-Pn-Oxn"/>
-                            <constraint firstItem="kCg-Ld-ACZ" firstAttribute="bottom" secondItem="LWT-S1-Ufn" secondAttribute="bottom" id="QnE-Pw-cwL"/>
+                            <constraint firstItem="kCg-Ld-ACZ" firstAttribute="bottom" secondItem="LWT-S1-Ufn" secondAttribute="bottom" constant="20" id="QnE-Pw-cwL"/>
                             <constraint firstItem="kCg-Ld-ACZ" firstAttribute="trailing" secondItem="LWT-S1-Ufn" secondAttribute="trailing" constant="16" id="VfT-dC-fpF"/>
                             <constraint firstItem="kCg-Ld-ACZ" firstAttribute="trailing" secondItem="qNc-6j-WBk" secondAttribute="trailing" constant="16" id="Yjc-p0-4Ek"/>
+                            <constraint firstItem="QwD-TW-iTr" firstAttribute="top" secondItem="MLT-zq-mNc" secondAttribute="bottom" constant="20" id="bC2-zC-jT7"/>
                             <constraint firstItem="XJY-fc-zJ2" firstAttribute="top" secondItem="MIf-Kg-59w" secondAttribute="bottom" constant="5" id="caO-UJ-BOT"/>
-                            <constraint firstItem="MIf-Kg-59w" firstAttribute="top" secondItem="QwD-TW-iTr" secondAttribute="bottom" constant="16" id="dGq-bJ-Syy"/>
+                            <constraint firstItem="MIf-Kg-59w" firstAttribute="top" relation="greaterThanOrEqual" secondItem="QwD-TW-iTr" secondAttribute="bottom" constant="16" id="dGq-bJ-Syy"/>
                             <constraint firstItem="LWT-S1-Ufn" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="kCg-Ld-ACZ" secondAttribute="leading" symbolic="YES" id="mJJ-g6-BmD"/>
                             <constraint firstItem="kCg-Ld-ACZ" firstAttribute="trailing" secondItem="MLT-zq-mNc" secondAttribute="trailing" constant="16" id="mzN-Oa-0g2"/>
                             <constraint firstItem="QwD-TW-iTr" firstAttribute="leading" secondItem="kCg-Ld-ACZ" secondAttribute="leading" constant="16" id="nL4-un-3ey"/>

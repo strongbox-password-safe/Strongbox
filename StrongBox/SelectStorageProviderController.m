@@ -156,11 +156,10 @@
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    if(controller.documentPickerMode == UIDocumentPickerModeOpen) {
-        NSURL* url = [urls objectAtIndex:0];
-        [self.navigationController popToRootViewControllerAnimated:YES];
-        [[self getInitialViewController] import:url canOpenInPlace:YES];
-    }
+    
+    NSURL* url = [urls objectAtIndex:0];
+    [self.navigationController popToRootViewControllerAnimated:YES];
+    [[self getInitialViewController] import:url canOpenInPlace:YES];
 }
 
 - (InitialViewController *)getInitialViewController {
@@ -294,6 +293,5 @@
                         });
      }];
 }
-
 
 @end

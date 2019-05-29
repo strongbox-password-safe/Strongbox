@@ -67,6 +67,12 @@
 		4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */; };
 		4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
+		4D11409F229D649D00DEECF3 /* MasterCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D11409E229D649D00DEECF3 /* MasterCredentials.storyboard */; };
+		4D1140A0229D649D00DEECF3 /* MasterCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D11409E229D649D00DEECF3 /* MasterCredentials.storyboard */; };
+		4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */; };
+		4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */; };
+		4D1140AB229D7EDD00DEECF3 /* MasterCredentialsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140AA229D7EDD00DEECF3 /* MasterCredentialsViewController.m */; };
+		4D1140AC229D7EDD00DEECF3 /* MasterCredentialsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140AA229D7EDD00DEECF3 /* MasterCredentialsViewController.m */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
 		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
@@ -126,8 +132,6 @@
 		4D210F5121959F3300B061B1 /* Database-1.kdb in Resources */ = {isa = PBXBuildFile; fileRef = 4D210F5021959F3300B061B1 /* Database-1.kdb */; };
 		4D25673221E8B086006260B7 /* PinsConfigurationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25673121E8B086006260B7 /* PinsConfigurationController.m */; };
 		4D25674C21E8C65D006260B7 /* PinEntryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25674A21E8C65D006260B7 /* PinEntryController.m */; };
-		4D25674E21E8C65D006260B7 /* PinEntryController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D25674B21E8C65D006260B7 /* PinEntryController.xib */; };
-		4D25674F21E8C65D006260B7 /* PinEntryController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D25674B21E8C65D006260B7 /* PinEntryController.xib */; };
 		4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D25675021EBD094006260B7 /* LaunchScreen.storyboard */; };
 		4D25675221EBD094006260B7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D25675021EBD094006260B7 /* LaunchScreen.storyboard */; };
 		4D25E8EE2175F4CE00ACF108 /* KeePassXmlSerializationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25E8ED2175F4CE00ACF108 /* KeePassXmlSerializationTests.m */; };
@@ -223,6 +227,8 @@
 		4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */; };
 		4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
+		4D3DB9BA229ECBFB000D4742 /* PinEntry.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */; };
+		4D3DB9BB229ECBFB000D4742 /* PinEntry.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */; };
 		4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4D3E147C2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E147B2183049E00A41CA0 /* Kdbx4Serialization.m */; };
@@ -472,6 +478,10 @@
 		4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C0217B376F00FE9DD9 /* Root.m */; };
 		4DC5B9C9217B47C500FE9DD9 /* GenericTextDateElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C8217B47C500FE9DD9 /* GenericTextDateElementHandler.m */; };
 		4DC5B9CA217B47C500FE9DD9 /* GenericTextDateElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C8217B47C500FE9DD9 /* GenericTextDateElementHandler.m */; };
+		4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */; };
+		4DC66F3A229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */; };
+		4DC66F3D229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */; };
+		4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */; };
 		4DC74105221066E1009C32F0 /* UpgradeTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC74104221066E1009C32F0 /* UpgradeTableViewController.m */; };
 		4DC8D9A621B6E444004F1812 /* KeyFileParsingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9A521B6E444004F1812 /* KeyFileParsingTests.m */; };
 		4DC8D9A821B6E4B6004F1812 /* sample-xml.key in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8D9A721B6E4B6004F1812 /* sample-xml.key */; };
@@ -681,6 +691,11 @@
 		4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SFTPSessionConfigurationViewController.xib; path = StrongBox/SFTPSessionConfigurationViewController.xib; sourceTree = "<group>"; };
 		4D108BFC224A40EC00C17095 /* AesKdfCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesKdfCipher.h; path = model/keepass/AesKdfCipher.h; sourceTree = "<group>"; };
 		4D108BFD224A40EC00C17095 /* AesKdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesKdfCipher.m; path = model/keepass/AesKdfCipher.m; sourceTree = "<group>"; };
+		4D11409E229D649D00DEECF3 /* MasterCredentials.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = MasterCredentials.storyboard; path = StrongBox/MasterCredentials.storyboard; sourceTree = "<group>"; };
+		4D1140A5229D7D1F00DEECF3 /* KeyFilesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeyFilesTableViewController.h; path = StrongBox/KeyFilesTableViewController.h; sourceTree = "<group>"; };
+		4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyFilesTableViewController.m; path = StrongBox/KeyFilesTableViewController.m; sourceTree = "<group>"; };
+		4D1140A9229D7EDD00DEECF3 /* MasterCredentialsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MasterCredentialsViewController.h; path = StrongBox/MasterCredentialsViewController.h; sourceTree = "<group>"; };
+		4D1140AA229D7EDD00DEECF3 /* MasterCredentialsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MasterCredentialsViewController.m; path = StrongBox/MasterCredentialsViewController.m; sourceTree = "<group>"; };
 		4D17578F1C8361D200E6356F /* BrowseSafeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BrowseSafeView.h; path = StrongBox/BrowseSafeView.h; sourceTree = "<group>"; };
 		4D1757901C8361D200E6356F /* BrowseSafeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BrowseSafeView.m; path = StrongBox/BrowseSafeView.m; sourceTree = "<group>"; };
 		4D1757971C8361D200E6356F /* GoogleDriveManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GoogleDriveManager.h; path = StrongBox/GoogleDriveManager.h; sourceTree = "<group>"; };
@@ -735,7 +750,6 @@
 		4D25673321E8B45B006260B7 /* DuressAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuressAction.h; path = StrongBox/DuressAction.h; sourceTree = "<group>"; };
 		4D25674921E8C65D006260B7 /* PinEntryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PinEntryController.h; path = StrongBox/PinEntryController.h; sourceTree = "<group>"; };
 		4D25674A21E8C65D006260B7 /* PinEntryController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PinEntryController.m; path = StrongBox/PinEntryController.m; sourceTree = "<group>"; };
-		4D25674B21E8C65D006260B7 /* PinEntryController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PinEntryController.xib; path = StrongBox/PinEntryController.xib; sourceTree = "<group>"; };
 		4D25675021EBD094006260B7 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = StrongBox/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4D25E8EB2175F4CD00ACF108 /* StrongboxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrongboxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D25E8ED2175F4CE00ACF108 /* KeePassXmlSerializationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlSerializationTests.m; path = StrongboxTests/KeePassXmlSerializationTests.m; sourceTree = "<group>"; };
@@ -840,6 +854,7 @@
 		4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PrivacyViewController.xib; path = StrongBox/PrivacyViewController.xib; sourceTree = "<group>"; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppleICloudOrLocalSafeFile.h; path = StrongBox/AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppleICloudOrLocalSafeFile.m; path = StrongBox/AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
+		4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PinEntry.storyboard; sourceTree = "<group>"; };
 		4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxSerializationCommon.m; path = model/keepass/KdbxSerializationCommon.m; sourceTree = SOURCE_ROOT; };
 		4D3E147A2183049E00A41CA0 /* Kdbx4Serialization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kdbx4Serialization.h; path = model/keepass/Kdbx4Serialization.h; sourceTree = SOURCE_ROOT; };
 		4D3E147B2183049E00A41CA0 /* Kdbx4Serialization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Kdbx4Serialization.m; path = model/keepass/Kdbx4Serialization.m; sourceTree = SOURCE_ROOT; };
@@ -1244,6 +1259,10 @@
 		4DC5B9C0217B376F00FE9DD9 /* Root.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Root.m; path = model/keepass/Root.m; sourceTree = SOURCE_ROOT; };
 		4DC5B9C7217B47C500FE9DD9 /* GenericTextDateElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextDateElementHandler.h; path = model/keepass/GenericTextDateElementHandler.h; sourceTree = SOURCE_ROOT; };
 		4DC5B9C8217B47C500FE9DD9 /* GenericTextDateElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextDateElementHandler.m; path = model/keepass/GenericTextDateElementHandler.m; sourceTree = SOURCE_ROOT; };
+		4DC66F37229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TPKeyboardAvoidingScrollView.h; sourceTree = "<group>"; };
+		4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TPKeyboardAvoidingScrollView.m; sourceTree = "<group>"; };
+		4DC66F3B229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+TPKeyboardAvoidingAdditions.h"; sourceTree = "<group>"; };
+		4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+TPKeyboardAvoidingAdditions.m"; sourceTree = "<group>"; };
 		4DC74103221066E1009C32F0 /* UpgradeTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UpgradeTableViewController.h; path = StrongBox/UpgradeTableViewController.h; sourceTree = "<group>"; };
 		4DC74104221066E1009C32F0 /* UpgradeTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UpgradeTableViewController.m; path = StrongBox/UpgradeTableViewController.m; sourceTree = "<group>"; };
 		4DC8D9A521B6E444004F1812 /* KeyFileParsingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyFileParsingTests.m; path = StrongboxTests/KeyFileParsingTests.m; sourceTree = "<group>"; };
@@ -1562,6 +1581,18 @@
 			name = WebDAV;
 			sourceTree = "<group>";
 		};
+		4D114096229D5EE200DEECF3 /* Master Credentials */ = {
+			isa = PBXGroup;
+			children = (
+				4D11409E229D649D00DEECF3 /* MasterCredentials.storyboard */,
+				4D1140A5229D7D1F00DEECF3 /* KeyFilesTableViewController.h */,
+				4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */,
+				4D1140A9229D7EDD00DEECF3 /* MasterCredentialsViewController.h */,
+				4D1140AA229D7EDD00DEECF3 /* MasterCredentialsViewController.m */,
+			);
+			name = "Master Credentials";
+			sourceTree = "<group>";
+		};
 		4D196787217F0BEE0057DF06 /* Xml */ = {
 			isa = PBXGroup;
 			children = (
@@ -1585,7 +1616,7 @@
 			children = (
 				4D25674921E8C65D006260B7 /* PinEntryController.h */,
 				4D25674A21E8C65D006260B7 /* PinEntryController.m */,
-				4D25674B21E8C65D006260B7 /* PinEntryController.xib */,
+				4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */,
 			);
 			name = "PIN Code";
 			sourceTree = "<group>";
@@ -1735,6 +1766,7 @@
 		4D326EA1223032C800DCD8C7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				4DC66F3F229E71C800EC83C6 /* TPKeyboardAvoidingScrollView */,
 				4D326EA2223037A200DCD8C7 /* GZIP */,
 				4D8E42592173C5A800878540 /* PSL */,
 				4D4598D02193085000792EF7 /* TwoFish */,
@@ -1865,6 +1897,7 @@
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D25675021EBD094006260B7 /* LaunchScreen.storyboard */,
+				4D114096229D5EE200DEECF3 /* Master Credentials */,
 				4D20E7A72299593E00ABFC89 /* PIN Code */,
 				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DED20C72168BF1800A5800A /* Home */,
@@ -2551,6 +2584,17 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		4DC66F3F229E71C800EC83C6 /* TPKeyboardAvoidingScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				4DC66F3B229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.h */,
+				4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */,
+				4DC66F37229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.h */,
+				4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */,
+			);
+			name = TPKeyboardAvoidingScrollView;
+			sourceTree = "<group>";
+		};
 		4DD41FBB2182FCAB00FDDBB5 /* Kdbx4 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2882,6 +2926,7 @@
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */,
+				4D3DB9BA229ECBFB000D4742 /* PinEntry.storyboard in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
 				4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */,
@@ -2893,7 +2938,6 @@
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D0835EB22847BD100CA7405 /* beale.wordlist.txt in Resources */,
-				4D25674E21E8C65D006260B7 /* PinEntryController.xib in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */,
 				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
@@ -2903,6 +2947,7 @@
 				4D0835EC22847BD100CA7405 /* eff_large_wordlist.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
+				4D11409F229D649D00DEECF3 /* MasterCredentials.storyboard in Resources */,
 				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -2919,7 +2964,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D25674F21E8C65D006260B7 /* PinEntryController.xib in Resources */,
 				4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4D8EC42E22302649008EE004 /* LICENSE in Resources */,
 				4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
@@ -2931,10 +2975,12 @@
 				4DAE98B92270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
 				4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
+				4D1140A0229D649D00DEECF3 /* MasterCredentials.storyboard in Resources */,
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
 				4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
+				4D3DB9BB229ECBFB000D4742 /* PinEntry.storyboard in Resources */,
 				4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
@@ -3137,6 +3183,7 @@
 				4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */,
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
 				4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */,
+				4DC66F3D229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D5F5B76218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D664DB42179C53B0023FF0C /* XmlTree.m in Sources */,
 				4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
@@ -3151,6 +3198,7 @@
 				4DF97F2221BF101B0090A55E /* DAVListingParser.m in Sources */,
 				4D5B1EA32194A56300ECAF0D /* KdbGroup.m in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
+				4D1140AB229D7EDD00DEECF3 /* MasterCredentialsViewController.m in Sources */,
 				4DA12F02219837830000CEBB /* CustomIconList.m in Sources */,
 				4D0835B92284742000CA7405 /* MBAutoGrowingTextView.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
@@ -3257,6 +3305,7 @@
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
 				4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
+				4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */,
@@ -3338,6 +3387,7 @@
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */,
 				4D876B4321AC36F800805DED /* CustomField.m in Sources */,
+				4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CDF21F4C26700E2B194 /* OTPToken+Generation.m in Sources */,
 				4DD696A5218F0B170082DC08 /* AttachmentsRationalizer.m in Sources */,
 				4DF97F2321BF101B0090A55E /* DAVRequestGroup.m in Sources */,
@@ -3376,6 +3426,8 @@
 				4D33FA3B2287210C006C31B2 /* ItemMetadataEntry.m in Sources */,
 				4D47670C217905AB00C4358F /* Meta.m in Sources */,
 				4D33FA402287232B006C31B2 /* EditPasswordTableViewCell.m in Sources */,
+				4DC66F3A229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
+				4D1140AC229D7EDD00DEECF3 /* MasterCredentialsViewController.m in Sources */,
 				4D2962B4223173FC0082897D /* History.m in Sources */,
 				4D004CEB21F4F7BE00E2B194 /* OTPTokenType.m in Sources */,
 				4D0835CC228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */,
@@ -3489,6 +3541,7 @@
 				4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */,
 				4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */,
+				4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,
 				4D1884D021709DF3001AE6B0 /* Node.m in Sources */,
 				4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */,
@@ -3553,6 +3606,7 @@
 				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
 				4D5F5B77218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */,
+				4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D56D91021B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4D3AC320219074C40010CFCD /* VariantObject.m in Sources */,
 				4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */,

@@ -35,9 +35,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 + (BOOL)isBiometricIdAvailable;
 
-- (BOOL)isShowPasswordByDefaultOnEditScreen;
-- (void)setShowPasswordByDefaultOnEditScreen:(BOOL)value;
-
 - (void)setHavePromptedAboutFreeTrial:(BOOL)value;
 - (BOOL)isHavePromptedAboutFreeTrial;
 - (BOOL)isProOrFreeTrial;
@@ -57,6 +54,8 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 - (NSNumber*)getAutoLockTimeoutSeconds;
 - (void)setAutoLockTimeoutSeconds:(NSNumber*)value;
+
+@property (nonatomic) BOOL showPasswordByDefaultOnEditScreen;
 
 @property (nonatomic) BOOL neverShowForMacAppMessage;
 @property (nonatomic) BOOL iCloudOn;
@@ -130,6 +129,10 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 @property NSInteger deleteDataAfterFailedUnlockCount;
 @property NSUInteger failedUnlockAttempts;
+
+@property BOOL showAdvancedUnlockOptions;
+@property BOOL temporaryUseOldUnlock;
+@property BOOL allowEmptyOrNoPasswordEntry; 
 
 NS_ASSUME_NONNULL_END
 

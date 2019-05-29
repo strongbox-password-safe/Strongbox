@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeyFileParser : NSObject
 
-+ (nullable NSData*)getKeyFileDigestFromFileData:(NSData*)data;
++ (nullable NSData *)getKeyFileDigestFromFileData:(NSData *)data checkForXml:(BOOL)checkForXml;
 
 @end
 

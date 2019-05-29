@@ -30,6 +30,10 @@
     
     if(!self.startupLockMode) {
         self.buttonUnlock.hidden = YES; // Will be show on re-activation
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            self.buttonUnlock.hidden = NO; // Just in case
+        });
     }
     else {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -115,21 +119,20 @@
 }
 
 - (void)requestPin {
-    PinEntryController *vc = [[PinEntryController alloc] init];
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
-    __weak PinEntryController* weakVc = vc;
-    
-    vc.pinLength = Settings.sharedInstance.appLockPin.length;
+    pinEntryVc.pinLength = Settings.sharedInstance.appLockPin.length;
     
     if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && Settings.sharedInstance.failedUnlockAttempts > 0) {
         NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;
         
         if(remaining > 0) {
-            vc.warning = [NSString stringWithFormat:@"%ld Attempts Remaining", (long)remaining];
+            pinEntryVc.warning = [NSString stringWithFormat:@"%ld Attempts Remaining", (long)remaining];
         }
     }
     
-    vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+    pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
                 Settings.sharedInstance.failedUnlockAttempts = 0;
@@ -152,8 +155,7 @@
         }
     };
 
-    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    [self presentViewController:vc animated:YES completion:nil];
+    [self presentViewController:pinEntryVc animated:YES completion:nil];
 }
 
 - (BOOL)shouldLock {

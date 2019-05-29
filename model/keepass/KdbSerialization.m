@@ -390,10 +390,17 @@ NSData* writeEntry(KdbEntry* entry) {
 static NSData* stringtoKeePassData(NSString* str) {
     NSString *foo = str ? str : @"";
     
-    const char *utf8 = [foo cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *utf8 = foo.UTF8String;
     size_t len = strlen(utf8);
     
-    return [NSData dataWithBytes:utf8 length:len];
+    return [NSData dataWithBytes:utf8 length:len + 1]; // Null Term
+}
+
+static NSString* keePassDataToString(uint8_t *data) {
+    NSString* ret = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+    
+    // TODO: Remove after patching up databases? Or is this pretty safe to assume we can remove these garbage characters?
+    return [ret stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\0x03\0x05\0x06\0x07\0x08\0x09"]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,7 +465,7 @@ void updateGroupWithField(uint16_t type, uint32_t length, uint8_t *data, KdbGrou
             group.groupId = littleEndian4BytesToInt32(data);
             break;
         case 0x0002:
-            group.name = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            group.name = keePassDataToString(data);
             break;
         case 0x0003:
             group.creation = keePass1TimeToDate(data);
@@ -501,19 +508,19 @@ void updateEntryWithField(uint16_t type, uint32_t length, uint8_t *data, KdbEntr
             entry.imageId = @(littleEndian4BytesToInt32(data));
             break;
         case 0x0004:
-            entry.title = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            entry.title = keePassDataToString(data);
             break;
         case 0x0005:
-            entry.url = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            entry.url = keePassDataToString(data);
             break;
         case 0x0006:
-            entry.username = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            entry.username = keePassDataToString(data);
             break;
         case 0x0007:
-            entry.password = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            entry.password = keePassDataToString(data);
             break;
         case 0x0008:
-            entry.notes = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            entry.notes = keePassDataToString(data);
             break;
         case 0x0009:
             entry.creation = keePass1TimeToDate(data);
@@ -528,7 +535,7 @@ void updateEntryWithField(uint16_t type, uint32_t length, uint8_t *data, KdbEntr
             entry.expired = keePass1TimeToDate(data);
             break;
         case 0x000D:
-            entry.binaryFileName = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
+            entry.binaryFileName = keePassDataToString(data);
             break;
         case 0x000E:
             entry.binaryData = [NSData dataWithBytes:data length:length];

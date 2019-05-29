@@ -96,7 +96,7 @@
             return;
         }
 
-        _confirmedKeyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+        _confirmedKeyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong for XML KDB Only
     }
     else {
         _confirmedKeyFileDigest = nil;

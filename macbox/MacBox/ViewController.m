@@ -1117,7 +1117,7 @@ static NSImage* kStrongBox256Image;
                 return;
             }
             
-            NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+            NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong KDB Xml
             [self reloadAndUnlock:password keyFileDigest:keyFileDigest isBiometricOpen:NO];
         }
     }];

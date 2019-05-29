@@ -21,6 +21,7 @@
 #import "AppleICloudProvider.h"
 #import "DuressDummyStorageProvider.h"
 #import "AutoFillManager.h"
+#import "MasterCredentialsViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -131,7 +132,9 @@
 - (void)promptForConveniencePin {
     const int maxFailedPinAttempts = 3;
     
-    PinEntryController *vc = [[PinEntryController alloc] init];
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* vc = (PinEntryController*)[storyboard instantiateInitialViewController];
+    
     vc.pinLength = self.safe.conveniencePin.length;
     vc.showFallbackOption = YES;
     
@@ -198,7 +201,7 @@
         }];
     };
     
-    vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
     [self.viewController presentViewController:vc animated:YES completion:nil];
 }
 
@@ -316,18 +319,15 @@
     }
 }
 
-- (void)promptForManualCredentials {
-    self.isConvenienceUnlock = NO;
-    [self promptForPasswordAndOrKeyFile];
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// TODO: Remove these
 
 + (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
     NSString* veryLastFilename = [filename lastPathComponent];
     NSString* filenameOnly = [veryLastFilename stringByDeletingPathExtension];
     NSString* expectedKeyFileName = [filenameOnly stringByAppendingPathExtension:@"key"];
-
+    
     return  expectedKeyFileName;
 }
 
@@ -337,20 +337,20 @@
     }
     
     NSString* expectedKeyFileName = [OpenSafeSequenceHelper getExpectedAssociatedLocalKeyFileName:filename];
-
+    
     NSLog(@"Looking for key file: [%@] in local documents directory:", expectedKeyFileName);
     
     NSData* fileData = [LocalDeviceStorageProvider.sharedInstance readWithCaseInsensitiveFilename:expectedKeyFileName];
-
-    return [KeyFileParser getKeyFileDigestFromFileData:fileData];
+    
+    return [KeyFileParser getKeyFileDigestFromFileData:fileData checkForXml:YES]; // TODO: THis is incorrect for KDB - Xml files are not supported in the way the are in KDBX
 }
 
 - (UIAlertController*)getAlertControllerWithPasswordField {
     NSString *title = [NSString stringWithFormat:@"Password for %@", self.safe.nickName];
     
     UIAlertController* ret = [UIAlertController alertControllerWithTitle:title
-                                        message:@"Please Provide Credentials"
-                                 preferredStyle:UIAlertControllerStyleAlert];
+                                                                 message:@"Please Provide Credentials"
+                                                          preferredStyle:UIAlertControllerStyleAlert];
     
     __weak OpenSafeSequenceHelper *weakSelf = self;
     
@@ -379,8 +379,67 @@
         [textField setTag:-1];
         textField.secureTextEntry = YES;
     }];
-
+    
     return ret;
+}
+
+- (void)promptForManualCredentials {
+    self.isConvenienceUnlock = NO;
+    if(Settings.sharedInstance.temporaryUseOldUnlock) {
+        [self promptForPasswordAndOrKeyFile]; // TODO: Delete
+    }
+    else {
+        [self newPromptForPasswordAndOrKeyFile];
+    }
+}
+
+- (void)newPromptForPasswordAndOrKeyFile {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MasterCredentials" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    MasterCredentialsViewController *mcvc = (MasterCredentialsViewController*)nav.topViewController;
+    
+    mcvc.onDone = ^(BOOL success, NSString * _Nullable password, NSData * _Nullable keyFileData, BOOL openOffline) {
+        [self.viewController dismissViewControllerAnimated:YES completion:^{
+            if(success) {
+                BOOL notKdbXmlHack = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"KDB"] != NSOrderedSame;
+                self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:notKdbXmlHack]; // TODO: This is wrong for KDB XML Files - Fix in next iteration- Digest shouldn't be done until we know what kind of db it is
+                
+                self.manualOpenOfflineCache = openOffline;
+                self.masterPassword = password;
+
+                if(self.masterPassword.length == 0) {
+                    [Alerts twoOptionsWithCancel:self.viewController
+                                           title:@"Empty or No Password?"
+                                         message:@"There are two ways to interpret no password entry. Is your password an empty password or do you use no password at all?"
+                               defaultButtonText:@"Empty Password"
+                                secondButtonText:@"No Password"
+                                          action:^(int response) {
+                                              if(response == 0) {
+                                                  self.masterPassword = @"";
+                                              }
+                                              else if (response == 1) {
+                                                  self.masterPassword = nil;
+                                              }
+                                              else {
+                                                  self.completion(nil, nil);
+                                                  return;
+                                              }
+                                              
+                                              [self openSafe];
+                                          }];
+                }
+                else {
+                    [self openSafe];
+                }
+            }
+            else {
+                self.completion(nil, nil);
+            }
+        }];
+    };
+    
+    mcvc.database = self.safe;
+    [self.viewController presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)promptForPasswordAndOrKeyFile {
@@ -443,7 +502,7 @@
     [self.viewController presentViewController:self.alertController animated:YES completion:nil];
 }
 
-- (IBAction)toggleShowHidePasswordText:(UIButton*)sender {
+- (void)toggleShowHidePasswordText:(UIButton*)sender {
     if(sender.selected){
         [sender setSelected:FALSE];
     } else {
@@ -473,7 +532,7 @@
                          BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
                          
                          if(!available) {
-                             [Alerts info:self.viewController title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"]; // TODO: Not an NSError
+                             [Alerts info:self.viewController title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"]; 
                              self.completion(nil, nil);
                              return;
                          }
@@ -500,7 +559,8 @@
              self.completion(nil, error);
          }
          else {
-             self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+             
+             self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: THis is incorrect for KDB - Xml files are not supported in the way the are in KDBX
              [self openSafe];
          }
      }];
@@ -533,7 +593,7 @@
         }];
     }
     else {
-        self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data];
+        self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: THis is incorrect for KDB - Xml files are not supported in the way the are in KDBX
         [self openSafe];
     }
 }
@@ -810,8 +870,10 @@
                          cacheMode:(BOOL)cacheMode
                           provider:(id)provider
                               data:(NSData *)data {
-    PinEntryController *vc1 = [[PinEntryController alloc] init];
-    vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
+    
+    pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
@@ -837,8 +899,7 @@
         }];
     };
 
-    vc1.modalPresentationStyle = UIModalPresentationOverCurrentContext;
-    [self.viewController presentViewController:vc1 animated:YES completion:nil];
+    [self.viewController presentViewController:pinEntryVc animated:YES completion:nil];
 }
 
 -(void)onSuccessfulSafeOpen:(BOOL)cacheMode
@@ -907,7 +968,8 @@ static NSString *getLastCachedDate(SafeMetaData *safe) {
 }
 
 BOOL providerCanFallbackToOfflineCache(id<SafeStorageProvider> provider, SafeMetaData* safe) {
-    BOOL basic = provider && provider.cloudBased &&
+    BOOL basic =    provider &&
+                    provider.cloudBased &&
     !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
     safe.offlineCacheEnabled && safe.offlineCacheAvailable;
     
