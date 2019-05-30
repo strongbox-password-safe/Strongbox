@@ -400,7 +400,7 @@ static NSString* keePassDataToString(uint8_t *data) {
     NSString* ret = [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
     
     // TODO: Remove after patching up databases? Or is this pretty safe to assume we can remove these garbage characters?
-    return [ret stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\0x03\0x05\0x06\0x07\0x08\0x09"]];
+    return [ret stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\x03\x05\x06\x07\x08\x09"]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
