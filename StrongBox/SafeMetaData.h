@@ -47,7 +47,7 @@
 @property (nonatomic) BOOL readOnly;
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
-
+@property NSURL* keyFileUrl;
 
 @end
 

@@ -297,20 +297,41 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
     }
     else {
-        NSString* username = @"";
-        if(Settings.sharedInstance.showUsernameInBrowse) {
-            username = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
-        }
-        
+        NSString* subtitle = [self getItemSubtitle:node];
         NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
         flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
         
-        [cell setRecord:title username:username icon:icon groupLocation:groupLocation flags:flags];
+        [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
         
         [self setOtpCellProperties:cell node:node];
     }
     
     return cell;
+}
+
+- (NSString*)getItemSubtitle:(Node*)node {
+    switch (Settings.sharedInstance.browseItemSubtitleField) {
+        case kNoField:
+            return @"";
+            break;
+        case kUsername:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+            break;
+        case kPassword:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
+            break;
+        case kUrl:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
+            break;
+        case kEmail:
+            return node.fields.email;
+            break;
+        case kModified:
+            return friendlyDateString(node.fields.modified);
+        default:
+            return @"";
+            break;
+    }
 }
 
 - (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {

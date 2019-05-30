@@ -304,17 +304,7 @@
  
     NSMutableArray* actions = [NSMutableArray arrayWithArray:@[removeAction, renameAction, exportAction]];
     
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    BOOL hasKeyFile = [OpenSafeSequenceHelper findAssociatedLocalKeyFile:safe.fileName] != nil;
-    if(hasKeyFile) {
-        UITableViewRowAction *removeKeyFileAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Remove Local Key File" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-            [self removeLocalKeyFile:indexPath];
-        }];
-        removeKeyFileAction.backgroundColor = [UIColor magentaColor];
-
-        [actions addObject:removeKeyFileAction];
-    }
-    
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];    
     if(safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
         UITableViewRowAction *openOffline = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Open Offline" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
             [self openOffline:indexPath];
@@ -329,18 +319,6 @@
 
 - (void)openOffline:(NSIndexPath*)indexPath {
     [self openSafeAtIndexPath:indexPath offline:YES];
-}
-
-- (void)removeLocalKeyFile:(NSIndexPath * _Nonnull)indexPath {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    NSString* fileName = [OpenSafeSequenceHelper getExpectedAssociatedLocalKeyFileName:safe.fileName];
-    
-    if([LocalDeviceStorageProvider.sharedInstance deleteWithCaseInsensitiveFilename:fileName]) {
-        [Alerts info:self title:@"Key File Removed" message:@"The associated local key file was removed."];
-    }
-    else {
-        [Alerts info:self title:@"Key File Not Removed" message:@"The associated local key file could not be removed. Either it was not found or there was an issue deleting. Try using iTunes File Sharing to remove or check if present."];
-    }
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -487,7 +465,7 @@
                                                                 }];
         
         // [quickAndEasyAction setValue:[UIColor greenColor] forKey:@"titleTextColor"];
-        //[quickAndEasyAction setValue:[UIImage imageNamed:@"fast-forward-2-32"] forKey:@"image"];
+        // [quickAndEasyAction setValue:[UIImage imageNamed:@"fast-forward-2-32"] forKey:@"image"];
         [alertController addAction:quickAndEasyAction];
     }
     

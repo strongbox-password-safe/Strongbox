@@ -10,11 +10,10 @@
 #import "Settings.h"
 #import "Utils.h"
 #import "Alerts.h"
-#import <MobileCoreServices/MobileCoreServices.h>
+#import "KeyFilesTableViewController.h"
+#import "IOsUtils.h"
 
-// TODO: do we need a way to clear the key file?    Not needed right now, but in phase 2 yeah I think
-
-@interface MasterCredentialsViewController () <UITextFieldDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface MasterCredentialsViewController () <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *labelMasterPassword;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPassword;
@@ -34,9 +33,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonChevron;
 @property (weak, nonatomic) IBOutlet UIView *advancedOptionsRow;
 @property (weak, nonatomic) IBOutlet UILabel *labelOfflineCache;
-@property NSData* keyFileData;
 @property (weak, nonatomic) IBOutlet UILabel *keyFileTip;
 @property (weak, nonatomic) IBOutlet UIView *keyFileInfoRow;
+
+@property NSData* oneTimeKeyFileData;
+@property NSURL* selectedKeyFileUrl;
 
 @end
 
@@ -103,18 +104,31 @@
     self.textFieldPassword.enablesReturnKeyAutomatically = !Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
     [self.buttonUnlockOrSet setTitleColor:UIColor.lightGrayColor forState:UIControlStateDisabled];
 
-    // Key-File Auto Detected
-    
-    NSData* autoDetectedKeyFileDigest = [self findAssociatedLocalKeyFile:self.database.fileName];
-
-    if(autoDetectedKeyFileDigest) {
-        self.keyFileData = autoDetectedKeyFileDigest;
-        [self.buttonKeyFile setTitle:[NSString stringWithFormat:@"Auto-Detected"] forState:UIControlStateNormal];
+    NSString* keyFileButtonTitle = @"Select...";
+    if(self.database.keyFileUrl) {
+        NSLog(@"Configured: %@", self.database.keyFileUrl.path);
+        
+        if ([NSFileManager.defaultManager fileExistsAtPath:self.database.keyFileUrl.path]) {
+            self.selectedKeyFileUrl = self.database.keyFileUrl;
+            keyFileButtonTitle = Settings.sharedInstance.hideKeyFileOnUnlock ? @"(Configured)" : self.database.keyFileUrl.lastPathComponent;
+        }
+        else {
+            keyFileButtonTitle = [NSString stringWithFormat:@"Select... (Configured not available)"];
+        }
     }
     else {
-        [self.buttonKeyFile setTitle:@"Select..." forState:UIControlStateNormal];
+        if(!Settings.sharedInstance.doNotAutoDetectKeyFiles) {
+            NSURL* autoDetectedKeyFileUrl = [self getAutoDetectedKeyFileUrl];
+            if(autoDetectedKeyFileUrl) {
+                self.selectedKeyFileUrl  = autoDetectedKeyFileUrl;
+                
+                keyFileButtonTitle = Settings.sharedInstance.hideKeyFileOnUnlock ? @"(Auto Detected)" : [NSString stringWithFormat:@"%@ (Auto-Detected)", autoDetectedKeyFileUrl.lastPathComponent];
+            }
+        }
     }
     
+    [self.buttonKeyFile setTitle:keyFileButtonTitle forState:UIControlStateNormal];
+
     // Checkbox Defaults
     
     self.switchReadOnly.on = self.database.readOnly;
@@ -126,7 +140,7 @@
     if (@available(iOS 11.0, *)) {
         [self.stackView setCustomSpacing:4 afterView:self.labelMasterPassword];
         [self.stackView setCustomSpacing:8 afterView:self.advancedOptionsRow];
-        [self.stackView setCustomSpacing:4 afterView:self.keyFileInfoRow];
+        [self.stackView setCustomSpacing:8 afterView:self.keyFileInfoRow];
     
         self.dummySpacerPreIOS11.hidden = YES;
     } else {
@@ -210,13 +224,6 @@
     }
 }
 
-- (IBAction)onUnlockOrSet:(id)sender {
-    if(self.onDone) {
-        BOOL openOfflineCache = self.switchOpenOfflineCache.on && self.database.offlineCacheEnabled && self.database.offlineCacheAvailable;
-        self.onDone(YES, self.textFieldPassword.text, self.keyFileData, openOfflineCache);
-    }
-}
-
 - (IBAction)onKeyFileTip:(id)sender {
     self.keyFileTip.hidden = !self.keyFileTip.hidden;
     
@@ -230,86 +237,44 @@
 // Key Files
 
 - (IBAction)askForKeyFile:(id)sender {
-    [Alerts threeOptions:self
-               title:@"Key File Source"
-             message:@"Select where you would like to choose your Key File from"
-   defaultButtonText:@"Files..."
-    secondButtonText:@"Photo Library..."
-     thirdButtonText:@"Cancel"
-              action:^(int response) {
-                  if(response == 0) {
-                      UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
-                      vc.delegate = self;
-                      [self presentViewController:vc animated:YES completion:nil];
-                  }
-                  else if (response == 1) {
-                      UIImagePickerController *vc = [[UIImagePickerController alloc] init];
-                      vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
-                      vc.delegate = self;
-                      BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
-                      
-                      if(!available) {
-                          [Alerts info:self
-                                 title:@"Photo Library Unavailable"
-                               message:@"Could not access Photo Library. Does Strongbox have Permission?"];
-                          return;
-                      }
-                      
-                      vc.mediaTypes = @[(NSString*)kUTTypeImage];
-                      vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-                      
-                      [self presentViewController:vc animated:YES completion:nil];
-                  }
-              }];
+    [self performSegueWithIdentifier:@"segueToKeyFiles" sender:nil];
 }
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
-    [picker dismissViewControllerAnimated:YES completion:^{
-        NSError* error;
-        NSData* data = [Utils getImageDataFromPickedImage:info error:&error];
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueToKeyFiles"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        KeyFilesTableViewController* vc = (KeyFilesTableViewController*)nav.topViewController;
+        vc.selectedUrl = Settings.sharedInstance.hideKeyFileOnUnlock ? nil : self.selectedKeyFileUrl;
         
-        if(!data) {
-            NSLog(@"Error: %@", error);
-            [Alerts error:self title:@"Error Reading Image" error:error];
-        }
-        else {
-            NSLog(@"info = [%@]", info);
-            
-            self.keyFileData = data; 
-            [self.buttonKeyFile setTitle:@"Selected Image" forState:UIControlStateNormal];
-            
-//            if (@available(iOS 11.0, *)) {
-//                NSURL *url = info[UIImagePickerControllerImageURL];
-//                self.textFieldKeyFile.text = url ? url.lastPathComponent : @"<Unknown Image File>";
-//            } else {
-//                NSURL *url = info[UIImagePickerControllerReferenceURL]; // Not sure if this is much use?
-//                self.textFieldKeyFile.text = @"<Unknown Image File>";
-//            }
-        }
-    }];
+        vc.onDone = ^(BOOL success, NSURL * _Nullable url, NSData * _Nullable oneTimeData) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(success) {
+                    [self onKeyFileSelected:url oneTimeData:oneTimeData];
+                }
+            }];
+        };
+    }
 }
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    
-    NSURL* url = [urls objectAtIndex:0];
-    NSString *filename = [url lastPathComponent];
-    
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
-    
-    if(!data) {
-        NSLog(@"Error: %@", error);
-        [Alerts error:self title:@"There was an error reading the Key File" error:error completion:nil];
+- (void)onKeyFileSelected:(NSURL* _Nullable)url oneTimeData:(NSData * _Nullable)oneTimeData {
+    if(url == nil && oneTimeData == nil) {
+        self.oneTimeKeyFileData = nil;
+        self.selectedKeyFileUrl = nil;
+        [self.buttonKeyFile setTitle:@"Select..." forState:UIControlStateNormal];
+    }
+    else if(oneTimeData) {
+        self.oneTimeKeyFileData = oneTimeData;
+        self.selectedKeyFileUrl = nil;
+        [self.buttonKeyFile setTitle:@"Key File Selected (Once-Off)" forState:UIControlStateNormal];
     }
     else {
-        self.keyFileData = data;
-        [self.buttonKeyFile setTitle:filename forState:UIControlStateNormal];
+        self.oneTimeKeyFileData = nil;
+        self.selectedKeyFileUrl = url;
+        [self.buttonKeyFile setTitle:[NSString stringWithFormat:@"%@", url.lastPathComponent] forState:UIControlStateNormal];
     }
+    
+    self.database.keyFileUrl = url;
+    [SafesList.sharedInstance update:self.database];
 }
 
 - (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
@@ -320,19 +285,53 @@
     return  expectedKeyFileName;
 }
 
-- (NSData*)findAssociatedLocalKeyFile:(NSString*)filename {
-    if(Settings.sharedInstance.doNotAutoDetectKeyFiles) {
+- (NSURL*)getAutoDetectedKeyFileUrl {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *directory = [IOsUtils applicationDocumentsDirectory];
+    NSError* error;
+    
+    NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:self.database.fileName];
+
+    NSArray<NSString*>* files = [fm contentsOfDirectoryAtPath:directory.path error:&error];
+    
+    if(!files) {
+        NSLog(@"Error looking for auto detected key file url: %@", error);
         return nil;
     }
     
-    NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:filename];
+    for (NSString *file in files) {
+        if([file caseInsensitiveCompare:expectedKeyFileName] == NSOrderedSame) {
+            return [directory URLByAppendingPathComponent:file];
+        }
+    }
     
-    NSLog(@"Looking for key file: [%@] in local documents directory:", expectedKeyFileName);
-    
-    NSData* fileData = [LocalDeviceStorageProvider.sharedInstance readWithCaseInsensitiveFilename:expectedKeyFileName];
-    
-    return fileData;
+    return nil;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction)onUnlockOrSet:(id)sender {
+    BOOL openOfflineCache = self.switchOpenOfflineCache.on && self.database.offlineCacheEnabled && self.database.offlineCacheAvailable;
+
+    if(self.oneTimeKeyFileData) {
+        self.onDone(YES, self.textFieldPassword.text, self.oneTimeKeyFileData, openOfflineCache);
+    }
+    else {
+        if(self.selectedKeyFileUrl) {
+            NSError* error;
+            NSData* data = [NSData dataWithContentsOfURL:self.selectedKeyFileUrl options:kNilOptions error:&error];
+            
+            if(!data) {
+                [Alerts error:self title:@"Error Reading Key File" error:error];
+            }
+            else {
+                self.onDone(YES, self.textFieldPassword.text, data, openOfflineCache);
+            }
+        }
+        else {
+            self.onDone(YES, self.textFieldPassword.text, nil, openOfflineCache);
+        }
+    }
+}
 
 @end

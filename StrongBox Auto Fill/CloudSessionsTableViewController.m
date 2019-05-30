@@ -36,6 +36,10 @@
     self.rows = @[@"Clear Google Drive Session", @"Unlink Dropbox", @"Clear OneDrive Session"];
 }
 
+- (IBAction)onDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

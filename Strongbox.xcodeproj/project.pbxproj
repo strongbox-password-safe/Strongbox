@@ -359,6 +359,9 @@
 		4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A65222EF46A00250086 /* RMStoreKeychainPersistence.m */; };
 		4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */; };
 		4D7C21D22180EAC200458A5B /* funky.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C21D12180EAC200458A5B /* funky.xml */; };
+		4D7D2193229FD9DE00C1C925 /* SelectItem.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */; };
+		4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
+		4D7D219922A02CBC00C1C925 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D219822A02CBC00C1C925 /* AboutViewController.m */; };
 		4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
 		4D7E39DC22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
 		4D8144B42199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
@@ -1003,6 +1006,12 @@
 		4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMStoreUserDefaultsPersistence.m; sourceTree = "<group>"; };
 		4D792A68222EF46A00250086 /* RMStoreTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreTransaction.h; sourceTree = "<group>"; };
 		4D7C21D12180EAC200458A5B /* funky.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = funky.xml; sourceTree = "<group>"; };
+		4D7D2191229FD15800C1C925 /* BrowseItemSubtitleField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseItemSubtitleField.h; path = StrongBox/BrowseItemSubtitleField.h; sourceTree = "<group>"; };
+		4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SelectItem.storyboard; sourceTree = "<group>"; };
+		4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectItemTableViewController.h; path = StrongBox/SelectItemTableViewController.h; sourceTree = "<group>"; };
+		4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectItemTableViewController.m; path = StrongBox/SelectItemTableViewController.m; sourceTree = "<group>"; };
+		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutViewController.h; path = StrongBox/AboutViewController.h; sourceTree = "<group>"; };
+		4D7D219822A02CBC00C1C925 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutViewController.m; path = StrongBox/AboutViewController.m; sourceTree = "<group>"; };
 		4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+Extensions.h"; path = "model/NSMutableArray+Extensions.h"; sourceTree = "<group>"; };
 		4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+Extensions.m"; path = "model/NSMutableArray+Extensions.m"; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
@@ -1517,6 +1526,15 @@
 				4D036E492298443100AC892B /* CloudSessionsTableViewController.m */,
 				4DB7D51E229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.h */,
 				4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */,
+				4D7D2191229FD15800C1C925 /* BrowseItemSubtitleField.h */,
+				4D036E432298243700AC892B /* SelectStringViewController.h */,
+				4D036E442298243700AC892B /* SelectStringViewController.m */,
+				4D036E452298243700AC892B /* SelectStringViewController.xib */,
+				4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */,
+				4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */,
+				4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */,
+				4D7D219722A02CBC00C1C925 /* AboutViewController.h */,
+				4D7D219822A02CBC00C1C925 /* AboutViewController.m */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -1907,9 +1925,6 @@
 				4DAE986A2270B39100A811C4 /* Item Details */,
 				4D06943622083E2000FB826C /* Upgrade */,
 				4D0835DE2284770900CA7405 /* Select Icon */,
-				4D036E432298243700AC892B /* SelectStringViewController.h */,
-				4D036E442298243700AC892B /* SelectStringViewController.m */,
-				4D036E452298243700AC892B /* SelectStringViewController.xib */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -2949,6 +2964,7 @@
 				4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
 				4D11409F229D649D00DEECF3 /* MasterCredentials.storyboard in Resources */,
 				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
+				4D7D2193229FD9DE00C1C925 /* SelectItem.storyboard in Resources */,
 				4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
@@ -3235,6 +3251,7 @@
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlTreeSerializer.m in Sources */,
+				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D2F6C2821807C53007931E4 /* KeePassXmlParserDelegate.m in Sources */,
 				4DFAA3871EDDBFA8003FB355 /* AddSafeAlertController.m in Sources */,
@@ -3357,6 +3374,7 @@
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */,
 				4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
+				4D7D219922A02CBC00C1C925 /* AboutViewController.m in Sources */,
 				4DED20C62168B63200A5800A /* QuickLaunchViewController.m in Sources */,
 				4D3E14A121832D5500A41CA0 /* ref.c in Sources */,
 				4D9CD55E2211D2F9000F30E9 /* CreateCredentialTableViewController.m in Sources */,

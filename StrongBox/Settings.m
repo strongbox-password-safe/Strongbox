@@ -60,7 +60,7 @@ static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
 static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolderInBrowse";
 static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
-static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse";
+static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse"; // DEAD
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
@@ -68,6 +68,10 @@ static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferen
 static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
 static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock";
+static NSString* const kImmediateSearchOnBrowse = @"immediateSearchOnBrowse";
+static NSString* const kBrowseItemSubtitleField = @"browseItemSubtitleField";
+static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
+static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -103,6 +107,20 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 - (void)setBool:(NSString*)key value:(BOOL)value {
     [[self getUserDefaults] setBool:value forKey:key];
+    [[self getUserDefaults] synchronize];
+}
+
+- (NSInteger)getInteger:(NSString*)key {
+    return [[self getUserDefaults] integerForKey:key];
+}
+
+- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
+    NSNumber* obj = [[self getUserDefaults] objectForKey:key];
+    return obj != nil ? obj.integerValue : fallback;
+}
+
+- (void)setInteger:(NSString*)key value:(NSInteger)value {
+    [[self getUserDefaults] setInteger:value forKey:key];
     [[self getUserDefaults] synchronize];
 }
 
@@ -909,6 +927,40 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setTemporaryUseOldUnlock:(BOOL)temporaryUseOldUnlock {
     [self setBool:kTemporaryUseOldUnlock value:temporaryUseOldUnlock];
+}
+
+- (BOOL)immediateSearchOnBrowse {
+    return [self getBool:kImmediateSearchOnBrowse];
+}
+
+- (void)setImmediateSearchOnBrowse:(BOOL)immediateSearchOnBrowse {
+    [self setBool:kImmediateSearchOnBrowse value:immediateSearchOnBrowse];
+    
+}
+
+- (BrowseItemSubtitleField)browseItemSubtitleField {
+    BrowseItemSubtitleField deflt = Settings.sharedInstance.showUsernameInBrowse ? kUsername : kNoField;
+    return (BrowseItemSubtitleField)[self getInteger:kBrowseItemSubtitleField fallback:deflt];
+}
+
+- (void)setBrowseItemSubtitleField:(BrowseItemSubtitleField)browseItemSubtitleField {
+    [self setInteger:kBrowseItemSubtitleField value:browseItemSubtitleField];
+}
+
+- (BOOL)showAllFilesInLocalKeyFiles {
+    return [self getBool:kShowAllFilesInLocalKeyFiles];
+}
+
+- (void)setShowAllFilesInLocalKeyFiles:(BOOL)showAllFilesInLocalKeyFiles {
+    [self setBool:kShowAllFilesInLocalKeyFiles value:showAllFilesInLocalKeyFiles];
+}
+
+- (BOOL)hideKeyFileOnUnlock {
+    return [self getBool:kHideKeyFileOnUnlock];
+}
+
+- (void)setHideKeyFileOnUnlock:(BOOL)hideKeyFileOnUnlock {
+    [self setBool:kHideKeyFileOnUnlock value:hideKeyFileOnUnlock];
 }
 
 @end

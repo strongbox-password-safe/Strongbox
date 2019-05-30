@@ -66,6 +66,7 @@
     [encoder encodeInteger:self.failedPinAttempts forKey:@"failedPinAttempts"];
 
     [encoder encodeBool:self.useQuickTypeAutoFill forKey:@"useQuickTypeAutoFill"];
+    [encoder encodeObject:self.keyFileUrl forKey:@"keyFileUrl"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -112,6 +113,10 @@
         
         if([decoder containsValueForKey:@"useQuickTypeAutoFill"]) {
             self.useQuickTypeAutoFill = [decoder decodeBoolForKey:@"useQuickTypeAutoFill"];
+        }
+        
+        if([decoder containsValueForKey:@"keyFileUrl"]) {
+            self.keyFileUrl = [decoder decodeObjectForKey:@"keyFileUrl"];
         }
     }
     

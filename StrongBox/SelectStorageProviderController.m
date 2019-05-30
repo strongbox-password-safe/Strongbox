@@ -234,10 +234,10 @@
         return;
     }
     
-    [self promptForImportedSafeNickName:importedData];
+    [self promptForManualUrlNickName:importedData];
 }
 
-- (void)promptForImportedSafeNickName:(NSData *)data {
+- (void)promptForManualUrlNickName:(NSData *)data {
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:@"Database Name"
                             title:@"Enter a Name"
@@ -251,17 +251,17 @@
                                             title:@"Invalid Nickname"
                                           message:@"That nickname may already exist, or is invalid, please try a different nickname."
                                        completion:^{
-                                           [self promptForImportedSafeNickName:data];
+                                           [self promptForManualUrlNickName:data];
                                        }];
                                }
                                else {
-                                   [self copyAndAddImportedSafe:nickName data:data];
+                                   [self copyAndAddManualUrlDatabase:nickName data:data];
                                }
                            }
                        }];
 }
 
-- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data {
+- (void)copyAndAddManualUrlDatabase:(NSString *)nickName data:(NSData *)data {
     id<SafeStorageProvider> provider;
     
     if(Settings.sharedInstance.iCloudOn) {

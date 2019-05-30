@@ -13,6 +13,7 @@
 #import "ItemDetailsViewController.h"
 #import "Settings.h"
 #import "BrowseItemCell.h"
+#import "Utils.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -72,18 +73,47 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
     NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
-    NSString* username = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+    
+    
+    NSString* subtitle = [self getItemSubtitle:node];
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
 
     NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
     flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
     
-    [cell setRecord:title username:username icon:icon groupLocation:groupLocation flags:flags];
+    [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
     
     cell.otpLabel.text = @"";
     
     return cell;
+}
+
+// This is duplicated - TODO: fix
+
+- (NSString*)getItemSubtitle:(Node*)node {
+    switch (Settings.sharedInstance.browseItemSubtitleField) {
+        case kNoField:
+            return @"";
+            break;
+        case kUsername:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+            break;
+        case kPassword:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
+            break;
+        case kUrl:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
+            break;
+        case kEmail:
+            return node.fields.email;
+            break;
+        case kModified:
+            return friendlyDateString(node.fields.modified);
+        default:
+            return @"";
+            break;
+    }
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {

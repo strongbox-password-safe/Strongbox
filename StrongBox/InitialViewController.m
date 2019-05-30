@@ -246,6 +246,11 @@
                 if([self isInQuickLaunchViewMode]) {
                     [self openQuickLaunchPrimarySafe];
                 }
+                else {
+                    [self checkICloudAvailability];
+                    
+                    // TODO: Trigger onboarding here - if it has not already been dismissed / and we have zero safes?
+                }
             }
         }
     }
@@ -283,72 +288,75 @@
 }
 
 - (void)checkICloudAvailability {
-   [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
-       Settings.sharedInstance.iCloudAvailable = available;
-       
-       if (!Settings.sharedInstance.iCloudAvailable) {
-           // If iCloud isn't available, set promoted to no (so we can ask them next time it becomes available)
-           [Settings sharedInstance].iCloudPrompted = NO;
-           
-           if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
-               [Alerts warn:self
-                      title:@"iCloud no longer available"
-                    message:@"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud."];
-               
-               [self removeAllICloudSafes];
-           }
-           
-           // No matter what, iCloud isn't available so switch it to off.???
-           [Settings sharedInstance].iCloudOn = NO;
-           [Settings sharedInstance].iCloudWasOn = NO;
-       }
-       else {
-           // Ask user if want to turn on iCloud if it's available and we haven't asked already and we're not already presenting a view controller
-           if (![Settings sharedInstance].iCloudOn && ![Settings sharedInstance].iCloudPrompted && self.presentedViewController == nil) {
-               [Settings sharedInstance].iCloudPrompted = YES;
-               
-               BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
-               BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
-               
-               NSString *message = existingLocalDeviceSafes ?
-               (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
-                @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
-               (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
-               
-               [Alerts twoOptions:self
-                            title:@"iCloud is Now Available"
-                          message:message
-                defaultButtonText:@"Use iCloud"
-                 secondButtonText:@"Local Only" action:^(BOOL response) {
-                     if(response) {
-                         [Settings sharedInstance].iCloudOn = YES;
-                     }
-                     [self continueICloudAvailableProcedure];
-                 }];
-           }
-           else {
-               [self continueICloudAvailableProcedure];
-           }
-       }
-   }];
+    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
+        Settings.sharedInstance.iCloudAvailable = available;
+        
+        if (!Settings.sharedInstance.iCloudAvailable) {
+            [self onICloudNotAvailable];
+        }
+        else {
+            [self onICloudAvailable];
+        }
+    }];
 }
 
-- (void)showiCloudMigrationUi:(BOOL)show {
-   if(show) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-           [SVProgressHUD showWithStatus:@"Migrating..."];
-       });
-   }
-   else {
-       dispatch_async(dispatch_get_main_queue(), ^{
-           [SVProgressHUD dismiss];
-       });
-   }
+- (void)onICloudNotAvailable {
+    // If iCloud isn't available, set promoted to no (so we can ask them next time it becomes available)
+    [Settings sharedInstance].iCloudPrompted = NO;
+    
+    if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
+        [Alerts warn:self
+               title:@"iCloud no longer available"
+             message:@"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud."];
+        
+        [self removeAllICloudSafes];
+    }
+    
+    // No matter what, iCloud isn't available so switch it to off.???
+    [Settings sharedInstance].iCloudOn = NO;
+    [Settings sharedInstance].iCloudWasOn = NO;
 }
 
-- (void)continueICloudAvailableProcedure {
+- (void)onICloudAvailable {
+    if (!Settings.sharedInstance.iCloudOn &&
+        !Settings.sharedInstance.iCloudPrompted &&
+        self.presentedViewController == nil) { // Not presenting any modal
+
+        [Settings sharedInstance].iCloudPrompted = YES;
+
+        BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
+        BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
+        
+        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { // Empty Databases - Assume user wants iCloud on
+            Settings.sharedInstance.iCloudOn = YES; // Empty
+            [self onICloudAvailableContinuation];
+            return;
+        }
+
+        NSString *message = existingLocalDeviceSafes ?
+        (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
+         @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
+        (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
+        
+        [Alerts twoOptions:self
+                     title:@"iCloud is Now Available"
+                   message:message
+         defaultButtonText:@"Use iCloud"
+          secondButtonText:@"Local Only" action:^(BOOL response) {
+              if(response) {
+                  Settings.sharedInstance.iCloudOn = YES;
+              }
+              [self onICloudAvailableContinuation];
+          }];
+    }
+    else {
+        [self onICloudAvailableContinuation];
+    }
+}
+
+- (void)onICloudAvailableContinuation {
    // If iCloud newly switched on, move local docs to iCloud
-   if ([Settings sharedInstance].iCloudOn && ![Settings sharedInstance].iCloudWasOn && [self getLocalDeviceSafes].count) {
+   if (Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
        [Alerts twoOptions:self title:@"iCloud Available" message:@"Would you like to migrate your current local device databases to iCloud?"
         defaultButtonText:@"Migrate to iCloud"
          secondButtonText:@"Keep Local" action:^(BOOL response) {
@@ -361,7 +369,7 @@
    }
    
    // If iCloud newly switched off, move iCloud docs to local
-   if (![Settings sharedInstance].iCloudOn && [Settings sharedInstance].iCloudWasOn && [self getICloudSafes].count) {
+   if (!Settings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
        [Alerts threeOptions:self
                       title:@"iCloud Unavailable"
                     message:@"What would you like to do with the databases currently on this device?"
@@ -386,8 +394,21 @@
                      }];
    }
    
-   [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
+   Settings.sharedInstance.iCloudWasOn = Settings.sharedInstance.iCloudOn;
    [[iCloudSafesCoordinator sharedInstance] startQuery];
+}
+
+- (void)showiCloudMigrationUi:(BOOL)show {
+    if(show) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Migrating..."];
+        });
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

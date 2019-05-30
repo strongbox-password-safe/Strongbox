@@ -52,11 +52,11 @@
     self.bottomRow.hidden = groupLocation.length == 0;
 }
 
-- (void)setRecord:(NSString *)title username:(NSString *)username icon:(UIImage *)icon groupLocation:(NSString *)groupLocation flags:(NSString*)flags {
+- (void)setRecord:(NSString *)title subtitle:(NSString *)subtitle icon:(UIImage *)icon groupLocation:(NSString *)groupLocation flags:(NSString*)flags {
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
     self.iconImageView.image = icon;
-    self.usernameLabel.text = username;
+    self.usernameLabel.text = subtitle;
     self.pathLabel.text = groupLocation;
     self.accessoryType = UITableViewCellAccessoryNone;
     self.flagsLabel.text = flags;
@@ -66,7 +66,7 @@
     self.otpLabel.text = @"";
     self.otpLabel.hidden = NO;
 
-    self.bottomRow.hidden = username.length == 0 && groupLocation.length == 0;
+    self.bottomRow.hidden = subtitle.length == 0 && groupLocation.length == 0;
 }
 
 @end

@@ -15,8 +15,7 @@
 #import "PinEntryController.h"
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
-#import "SelectStringViewController.h"
-
+#import "SelectItemTableViewController.h"
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "GoogleDriveManager.h"
 #import "OneDriveStorageProvider.h"
@@ -28,7 +27,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
 @property (weak, nonatomic) IBOutlet UISwitch *showChildCountOnFolder;
 @property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
-@property (weak, nonatomic) IBOutlet UISwitch *showUsernameInBrowse;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
 @property (weak, nonatomic) IBOutlet UISwitch *appLockOnPreferences;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDeleteDataEnabled;
@@ -55,10 +53,19 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpBrowseView;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellReviewStrongbox;
+@property (weak, nonatomic) IBOutlet UISwitch *switchStartWithSearch;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellBrowseItemSubtitle;
+@property (weak, nonatomic) IBOutlet UILabel *labelBrowseItemSubtitle;
 
 @end
 
 @implementation PreferencesTableViewController
+
+- (IBAction)onDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
@@ -66,9 +73,9 @@
     Settings.sharedInstance.showEmptyFieldsInDetailsView = !self.hideEmptyFields.on;
     Settings.sharedInstance.easyReadFontForAll = self.easyReadFontForAll.on;
     Settings.sharedInstance.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
-    Settings.sharedInstance.showUsernameInBrowse = self.showUsernameInBrowse.on;
     Settings.sharedInstance.showFlagsInBrowse = self.showFlagsInBrowse.on;
     Settings.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
+    Settings.sharedInstance.immediateSearchOnBrowse = self.switchStartWithSearch.on;
     
     [self bindGenericPreferencesChanged];
 }
@@ -77,9 +84,9 @@
     self.hideEmptyFields.on = !Settings.sharedInstance.showEmptyFieldsInDetailsView;
     self.easyReadFontForAll.on = Settings.sharedInstance.easyReadFontForAll;
     self.showChildCountOnFolder.on = Settings.sharedInstance.showChildCountOnFolderInBrowse;
-    self.showUsernameInBrowse.on = Settings.sharedInstance.showUsernameInBrowse;
     self.showFlagsInBrowse.on = Settings.sharedInstance.showFlagsInBrowse;
     self.appLockOnPreferences.on = Settings.sharedInstance.appLockAppliesToPreferences;
+    self.switchStartWithSearch.on = Settings.sharedInstance.immediateSearchOnBrowse;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +107,73 @@
     [self bindDeleteOnFailedUnlock];
     [self customizeAppLockSectionFooter];
     [self bindGenericPreferencesChanged];
+    [self bindBrowseItemSubtitle];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    if(cell == self.cellDeleteDataAttempts) {
+        [self promptForInteger:@[@3, @5, @10, @15]
+             formatAsIntervals:NO
+                  currentValue:Settings.sharedInstance.deleteDataAfterFailedUnlockCount
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            Settings.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
+                        }
+                        [self bindDeleteOnFailedUnlock];
+                    }];
+    }
+    else if(cell == self.cellAboutVersion) {
+        // Auto Segue
+    }
+    else if(cell == self.cellAboutHelp) {
+        [self onFaq];
+    }
+    else if(cell == self.cellEmailSupport) {
+        [self onContactSupport];
+    }
+    else if (cell == self.cellClearClipboardDelay) {
+        [self promptForInteger:@[@30, @45, @60, @90, @120, @180]
+             formatAsIntervals:YES
+                  currentValue:Settings.sharedInstance.clearClipboardAfterSeconds
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            Settings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
+                        }
+                        [self bindClearClipboard];
+                    }];
+    }
+    else if (cell == self.cellDatabaseAutoLockDelay) {
+        [self promptForInteger:@[@0, @30, @60, @120, @180, @300, @600]
+             formatAsIntervals:YES
+                  currentValue:[Settings.sharedInstance getAutoLockTimeoutSeconds].integerValue
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            [Settings.sharedInstance setAutoLockTimeoutSeconds:@(selectedValue)];
+                        }
+                        [self bindDatabaseLock];
+                    }];
+    }
+    else if (cell == self.cellAppLockDelay) {
+        [self promptForInteger:@[@0, @60, @120, @180, @300, @600, @900]
+             formatAsIntervals:YES
+                  currentValue:Settings.sharedInstance.appLockDelay
+                    completion:^(BOOL success, NSInteger selectedValue) {
+                        if (success) {
+                            Settings.sharedInstance.appLockDelay = selectedValue;
+                        }
+                        [self bindAppLock];
+                    }];
+    }
+    else if (cell == self.cellReviewStrongbox) {
+        [self onReviewInAppStore];
+    }
+    else if (cell == self.cellBrowseItemSubtitle) {
+        [self onChangeBrowseItemSubtitle];
+    }
 }
 
 - (void)customizeAppLockSectionFooter {
@@ -113,7 +187,7 @@
 
     [self.navigationController setNavigationBarHidden:NO];
 
-    self.navigationController.toolbar.hidden = YES;
+    //self.navigationController.toolbar.hidden = YES;
     
     [self bindCloudSessions];
 }
@@ -428,92 +502,6 @@
     [self bindDeleteOnFailedUnlock];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
-
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-
-    if(cell == self.cellDeleteDataAttempts) {
-        [self promptForInteger:@[@3, @5, @10, @15]
-             formatAsIntervals:NO
-                  currentValue:Settings.sharedInstance.deleteDataAfterFailedUnlockCount
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            Settings.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
-                        }
-                        [self bindDeleteOnFailedUnlock];
-                    }];
-    }
-    else if(cell == self.cellAboutVersion) {
-        // Auto Segue
-    }
-    else if(cell == self.cellAboutHelp) {
-        [self onFaq];
-    }
-    else if(cell == self.cellEmailSupport) {
-        [self onContactSupport];
-    }
-    else if (cell == self.cellClearClipboardDelay) {
-        [self promptForInteger:@[@30, @45, @60, @90, @120, @180]
-             formatAsIntervals:YES
-                  currentValue:Settings.sharedInstance.clearClipboardAfterSeconds
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            Settings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
-                        }
-                        [self bindClearClipboard];
-                    }];
-    }
-    else if (cell == self.cellDatabaseAutoLockDelay) {
-        [self promptForInteger:@[@0, @30, @60, @120, @180, @300, @600]
-             formatAsIntervals:YES
-                  currentValue:[Settings.sharedInstance getAutoLockTimeoutSeconds].integerValue
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            [Settings.sharedInstance setAutoLockTimeoutSeconds:@(selectedValue)];
-                        }
-                        [self bindDatabaseLock];
-                    }];
-    }
-    else if (cell == self.cellAppLockDelay) {
-        [self promptForInteger:@[@0, @60, @120, @180, @300, @600, @900]
-             formatAsIntervals:YES
-                  currentValue:Settings.sharedInstance.appLockDelay
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            Settings.sharedInstance.appLockDelay = selectedValue;
-                        }
-                        [self bindAppLock];
-                    }];
-    }
-}
-
-- (void)promptForInteger:(NSArray<NSNumber*>*)options
-        formatAsIntervals:(BOOL)formatAsIntervals
-            currentValue:(NSInteger)currentValue
-              completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
-    SelectStringViewController *vc = [[SelectStringViewController alloc] init];
-    
-    vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return formatAsIntervals ? [self formatTimeInterval:obj.integerValue] : obj.stringValue;
-    }];
-    
-    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
-    vc.currentlySelectedIndex = currentlySelectIndex;
-    vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
-        NSInteger selectedValue = -1;
-        if (success) {
-            selectedValue = options[selectedIndex].integerValue;
-        }
-        
-        [self dismissViewControllerAnimated:YES completion:^{
-            completion(success, selectedValue);
-        }];
-    };
-    
-    [self presentViewController:vc animated:YES completion:nil];
-}
-
 - (void)onFaq {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"]];
 }
@@ -603,6 +591,121 @@
     self.appLockOnPreferences.enabled = effectiveMode != kNoLock;
     
     NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
+}
+
+- (void)onReviewInAppStore {
+    int appId = 897283731;
+    
+    static NSString *const iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%d?action=write-review";
+    static NSString *const iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%d&action=write-review";
+    
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]];
+    
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        if (@available(iOS 10.0, *)) {
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }
+        else {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }
+    else {
+        [Alerts info:self title:@"Cannot open App Store" message:@"Please find Strongbox in the App Store and you can write a review there. Much appreciated! -Mark"];
+    }
+}
+
+//
+
+- (void)onChangeBrowseItemSubtitle {
+    NSArray<NSNumber*>* options = @[@(kNoField), @(kUsername), @(kPassword), @(kUrl), @(kEmail), @(kModified)];
+    NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return [self getBrowseItemSubtitleFieldName:(BrowseItemSubtitleField)obj.integerValue];
+    }];
+
+    [self promptForString:optionStrings
+             currentIndex:Settings.sharedInstance.browseItemSubtitleField
+               completion:^(BOOL success, NSInteger selectedIdx) {
+        if (success) {
+            Settings.sharedInstance.browseItemSubtitleField = (BrowseItemSubtitleField)selectedIdx;
+        }
+                   
+        [self bindBrowseItemSubtitle];
+    }];
+}
+
+- (void)bindBrowseItemSubtitle {
+    self.labelBrowseItemSubtitle.text = [self getBrowseItemSubtitleFieldName:Settings.sharedInstance.browseItemSubtitleField];
+}
+
+- (NSString*)getBrowseItemSubtitleFieldName:(BrowseItemSubtitleField)field {
+    switch (field) {
+        case kNoField:
+            return @"None";
+            break;
+        case kUsername:
+            return @"Username";
+            break;
+        case kPassword:
+            return @"Plaintext Password (Careful)";
+            break;
+        case kUrl:
+            return @"URL";
+            break;
+        case kEmail:
+            return @"Email (Password Safe Only)";
+            break;
+        case kModified:
+            return @"Date Modified";
+        default:
+            return @"None";
+            break;
+    }
+}
+
+- (void)promptForInteger:(NSArray<NSNumber*>*)options
+       formatAsIntervals:(BOOL)formatAsIntervals
+            currentValue:(NSInteger)currentValue
+              completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+    
+    vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return formatAsIntervals ? [self formatTimeInterval:obj.integerValue] : obj.stringValue;
+    }];
+    
+    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
+    vc.currentlySelectedIndex = currentlySelectIndex;
+    vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
+        NSInteger selectedValue = -1;
+        if (success) {
+            selectedValue = options[selectedIndex].integerValue;
+        }
+        
+        [self dismissViewControllerAnimated:YES completion:^{
+            completion(success, selectedValue);
+        }];
+    };
+    
+    [self presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)promptForString:(NSArray<NSString*>*)options
+           currentIndex:(NSInteger)currentIndex
+             completion:(void(^)(BOOL success, NSInteger selectedIdx))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+
+    vc.items = options;
+    vc.currentlySelectedIndex = currentIndex;
+    vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            completion(success, selectedIndex);
+        }];
+    };
+    
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 @end

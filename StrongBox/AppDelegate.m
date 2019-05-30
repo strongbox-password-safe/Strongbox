@@ -53,6 +53,8 @@
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
     
+//    NSLog(@"Documents Directory: [%@]", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    
     return YES;
 }
 

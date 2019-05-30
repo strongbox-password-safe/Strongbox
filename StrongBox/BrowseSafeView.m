@@ -44,9 +44,23 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 @property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
 @property BOOL sortOrderDescending;
 
+@property BOOL hasAlreadyAppeared;
+
 @end
 
 @implementation BrowseSafeView
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:YES];
+    
+    if(!self.hasAlreadyAppeared && Settings.sharedInstance.immediateSearchOnBrowse && self.currentGroup == self.viewModel.database.rootGroup) {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self.searchController.searchBar becomeFirstResponder];
+        });
+    }
+    
+    self.hasAlreadyAppeared = YES;
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -350,20 +364,41 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
     }
     else {
-        NSString* username = @"";
-        if(Settings.sharedInstance.showUsernameInBrowse) {
-            username = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
-        }
-        
+        NSString* subtitle = [self getItemSubtitle:node];        
         NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
         flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
         
-        [cell setRecord:title username:username icon:icon groupLocation:groupLocation flags:flags];
+        [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
 
         [self setOtpCellProperties:cell node:node];
     }
     
     return cell;
+}
+
+- (NSString*)getItemSubtitle:(Node*)node {
+    switch (Settings.sharedInstance.browseItemSubtitleField) {
+        case kNoField:
+            return @"";
+            break;
+        case kUsername:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+            break;
+        case kPassword:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
+            break;
+        case kUrl:
+            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
+            break;
+        case kEmail:
+            return node.fields.email;
+            break;
+        case kModified:
+            return friendlyDateString(node.fields.modified);
+        default:
+            return @"";
+            break;
+    }
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
@@ -523,9 +558,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     // Display
     
-    [self updateSearchResultsForSearchController:self.searchController];
-    
-    [self.tableView reloadData];
+    if(self.searchController.isActive) {
+        [self updateSearchResultsForSearchController:self.searchController];
+    }
+    else {
+        [self.tableView reloadData];
+    }
     
     self.navigationItem.rightBarButtonItem = (!self.viewModel.isUsingOfflineCache &&
                                               !self.viewModel.isReadOnly &&
@@ -539,8 +577,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             
             self.navigationItem.searchController = self.searchController;
             
-            // We want the search bar visible all the time.
-            self.navigationItem.hidesSearchBarWhenScrolling = NO;
+            // We want the search bar visible immediately for Root
+            
+            self.navigationItem.hidesSearchBarWhenScrolling = self.currentGroup != self.viewModel.database.rootGroup;
         } else {
             self.tableView.tableHeaderView = self.searchController.searchBar;
             [self.searchController.searchBar sizeToFit];

@@ -28,6 +28,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoAddNewLocalSafes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchEmptyPassword;
 @property (weak, nonatomic) IBOutlet UISwitch *switchEmergencyUseOldUnlock;
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
 
 @end
 
@@ -51,6 +53,9 @@
     
     [self bindPreferences];
 }
+- (IBAction)onDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Advanced Preference Changed: [%@]", sender);
@@ -71,6 +76,8 @@
     Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
     Settings.sharedInstance.temporaryUseOldUnlock = self.switchEmergencyUseOldUnlock.on;
     Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchEmptyPassword.on;
+    Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
+    Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     
     if(!self.switchUseQuickTypeAutoFill.on) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -96,6 +103,8 @@
     self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
     self.switchEmergencyUseOldUnlock.on = Settings.sharedInstance.temporaryUseOldUnlock;
     self.switchEmptyPassword.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
+    self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
 }
 
 @end

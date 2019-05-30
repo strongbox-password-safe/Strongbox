@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeyFilesTableViewController : UITableViewController
 
+@property (nonatomic, copy) void (^onDone)(BOOL success, NSURL* _Nullable url, NSData* _Nullable oneTimeData);
+@property NSURL* selectedUrl;
+
 @end
 
 NS_ASSUME_NONNULL_END

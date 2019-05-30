@@ -11,6 +11,7 @@
 #import "AutoFillNewRecordSettings.h"
 #import "SFTPSessionConfiguration.h"
 #import "AppLockMode.h"
+#import "BrowseItemSubtitleField.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,23 +56,27 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 - (NSNumber*)getAutoLockTimeoutSeconds;
 - (void)setAutoLockTimeoutSeconds:(NSNumber*)value;
 
+- (NSString*)getFlagsStringForDiagnostics;
+- (NSString*)getBiometricIdName;
+
 @property (nonatomic) BOOL showPasswordByDefaultOnEditScreen;
 
 @property (nonatomic) BOOL neverShowForMacAppMessage;
+
 @property (nonatomic) BOOL iCloudOn;
 @property (nonatomic) BOOL iCloudWasOn;
 @property (nonatomic) BOOL iCloudPrompted;
 @property (nonatomic) BOOL iCloudAvailable;
+
 @property (nonatomic) BOOL doNotAutoAddNewLocalSafes;
         
-- (NSString*)getFlagsStringForDiagnostics;
-- (NSString*)getBiometricIdName;
 
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property (nonatomic) BOOL safesMigratedToNewSystem; 
 
 @property (nonatomic) NSDate* installDate;
 @property (nonatomic, readonly) NSInteger daysInstalled;
+
 
 - (void)clearInstallDate;
 
@@ -116,9 +121,8 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 @property BOOL instantPinUnlocking;
 @property BOOL showChildCountOnFolderInBrowse;
-
 @property BOOL showFlagsInBrowse;
-@property BOOL showUsernameInBrowse;
+//@property BOOL showUsernameInBrowse;
 
 @property BOOL haveWarnedAboutAutoFillCrash;
 
@@ -133,6 +137,13 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL showAdvancedUnlockOptions;
 @property BOOL temporaryUseOldUnlock;
 @property BOOL allowEmptyOrNoPasswordEntry; 
+
+@property BOOL immediateSearchOnBrowse;
+
+@property BrowseItemSubtitleField browseItemSubtitleField;
+
+@property BOOL showAllFilesInLocalKeyFiles;
+@property BOOL hideKeyFileOnUnlock;
 
 NS_ASSUME_NONNULL_END
 
