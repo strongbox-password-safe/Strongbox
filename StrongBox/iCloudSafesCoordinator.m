@@ -98,7 +98,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         }
         
         self.showMigrationUi(NO);
-        self.onSafesCollectionUpdated();
+//        self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
     });
@@ -118,7 +118,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         }
         
         self.showMigrationUi(NO);
-        self.onSafesCollectionUpdated();
+//        self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
     });
@@ -337,7 +337,8 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     BOOL added = [self addAnyNewICloudSafes:files];
     
     if(added || removed || updated) {
-        self.onSafesCollectionUpdated();
+        // This is now done via NSNotificationCenter
+        // self.onSafesCollectionUpdated();
     }
 }
 

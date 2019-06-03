@@ -84,7 +84,7 @@
                       @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
 
     [self performTaskWithAuthorizationIfNecessary:viewController
-                                             task:^(NSError *error) {
+                                             task:^(BOOL userCancelled, NSError *error) {
                                                  if (error) {
                                                      completion(nil, error);
                                                  }
@@ -174,9 +174,9 @@
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
-    [self performTaskWithAuthorizationIfNecessary:viewController task:^(NSError *error) {
+    [self performTaskWithAuthorizationIfNecessary:viewController task:^(BOOL userCancelled, NSError *error) {
         if (error) {
-            completion(NO, nil, error);
+            completion(userCancelled, nil, error);
         }
         else {
             [self listFolder:parentFolder completion:completion];
@@ -185,7 +185,7 @@
 }
 
 - (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
-                                           task:(void (^)(NSError *error))task {
+                                           task:(void (^)(BOOL userCancelled, NSError *error))task {
     if (!DBClientsManager.authorizedClient) {
 #ifndef IS_APP_EXTENSION
         NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
@@ -198,13 +198,13 @@
   
             if (DBClientsManager.authorizedClient) {
                 NSLog(@"Linked");
-                task(nil);
+                task(NO, nil);
             }
             else {
                 NSLog(@"Not Linked");
                 DBOAuthResult *authResult = (DBOAuthResult *)note.object;
                 NSLog(@"Error: %@", authResult);
-                task([Utils createNSError:@"Could not create link to Dropbox." errorCode:-1]);
+                task(authResult.tag == DBAuthCancel, [Utils createNSError:[NSString stringWithFormat:@"Could not create link to Dropbox: [%@]", authResult] errorCode:-1]);
             }
         }];
 
@@ -218,12 +218,12 @@
 #else
         NSLog(@"Dropbox not fully available with App Extension. Displaying Alert.");
         
-        task([Utils createNSError:@"Could not create link to Dropbox. Dropbox is not fully available in App Extension."
+        task(NO, [Utils createNSError:@"Could not create link to Dropbox. Dropbox is not fully available in App Extension."
                         errorCode:-1]);
 #endif
     }
     else {
-        task(nil);
+        task(NO, nil);
     }
 }
 

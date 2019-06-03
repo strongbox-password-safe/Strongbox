@@ -124,12 +124,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     Node* node = self.items[indexPath.row];
 
     if (@available(iOS 11.0, *)) {
-        if(Settings.sharedInstance.useOldItemDetailsScene) {
-            [self performSegueWithIdentifier:@"segueToRecordView" sender:node];
-        }
-        else {
-            [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:node];
-        }
+        [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:node];
     }
     else {
         [self performSegueWithIdentifier:@"segueToRecordView" sender:node];

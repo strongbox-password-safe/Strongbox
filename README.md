@@ -51,3 +51,4 @@ I use many different libraries in the app here are just a few:
 - RMStore (https://github.com/robotmedia/RMStore)
 - GZIP (https://github.com/nicklockwood/GZIP)
 - TPKeyboardAvoiding (https://github.com/michaeltyson/TPKeyboardAvoiding)
+- StaticDataTableViewController (https://github.com/peterpaulis/StaticDataTableViewController)

@@ -480,12 +480,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
         if (!item.isGroup) {
             if (@available(iOS 11.0, *)) {
-                if(Settings.sharedInstance.useOldItemDetailsScene) {
-                    [self performSegueWithIdentifier:@"segueToRecord" sender:item];
-                }
-                else {
-                    [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
-                }
+                [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
             }
             else {
                 [self performSegueWithIdentifier:@"segueToRecord" sender:item];
@@ -658,7 +653,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     }
     else if ([segue.identifier isEqualToString:@"segueToSafeSettings"])
     {
-        SafeDetailsView *vc = segue.destinationViewController;
+        UINavigationController* nav = segue.destinationViewController;
+        SafeDetailsView *vc = (SafeDetailsView *)nav.topViewController;
         vc.viewModel = self.viewModel;
     }
 }
@@ -684,12 +680,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (IBAction)onAddRecord:(id)sender {
     if (@available(iOS 11.0, *)) {
-        if(Settings.sharedInstance.useOldItemDetailsScene) {
-            [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
-        }
-        else {
-            [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
-        }
+        [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
     }
     else {
         [self performSegueWithIdentifier:@"segueToRecord" sender:nil];

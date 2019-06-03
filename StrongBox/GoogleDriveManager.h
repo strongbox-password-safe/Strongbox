@@ -36,7 +36,7 @@
 
 - (void)getFilesAndFolders:(UIViewController *)viewController
           withParentFolder:(NSString *)parentFolderIdentifier
-                completion:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler;
+                completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler;
 
 - (void)fetchUrl:(UIViewController *)viewController withUrl:(NSString *)url completion:(void (^)(NSData *data, NSError *error))handler;
 

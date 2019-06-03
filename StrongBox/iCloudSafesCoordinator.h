@@ -17,7 +17,6 @@
 - (void)initializeiCloudAccessWithCompletion:(void (^)(BOOL available)) completion;
 - (void)startQuery;
 
-@property (nonatomic, copy) void (^onSafesCollectionUpdated)(void);
 @property (nonatomic, copy) void (^showMigrationUi)(BOOL show);
 
 -(NSURL*)getFullICloudURLWithFileName:(NSString *)filename;

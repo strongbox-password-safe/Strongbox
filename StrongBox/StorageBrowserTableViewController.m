@@ -7,10 +7,8 @@
 //
 
 #import "StorageBrowserTableViewController.h"
-#import "AddSafeAlertController.h"
 #import "Alerts.h"
 #import "DatabaseModel.h"
-#import "SafesList.h"
 #import "Utils.h"
 
 @interface StorageBrowserTableViewController ()
@@ -61,13 +59,24 @@
     
     self.navigationItem.prompt = self.existing ? @"Please Select Database File" : @"Select Folder For New Database";
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
+    // HACK: This seems to be necessary for Dropbox sign-in - Not super clear on why :(
+    
+    if(self.safeStorageProvider.storageId == kDropbox && self.parentFolder == nil) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
+            [self.safeStorageProvider list:self.parentFolder
+                            viewController:self
+                                completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error) {
+                                    [self onList:userCancelled items:items error:error];
+                                }];
+        });
+    }
+    else {
         [self.safeStorageProvider list:self.parentFolder
                         viewController:self
                             completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error) {
                                 [self onList:userCancelled items:items error:error];
-        }];
-    });
+                            }];
+    }
 }
 
 - (void)onList:(BOOL)userCancelled items:(NSArray<StorageBrowserItem *> *)items error:(NSError *)error {
@@ -75,18 +84,12 @@
 
     if(userCancelled) {
         NSLog(@"User Cancelled Listing... Returning to Root");
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self.navigationController popToRootViewControllerAnimated:YES]; 
-        });
+        self.onDone([SelectedStorageParameters userCancelled]);
         return;
     }
     
     if(items == nil || error) {
-        [Alerts error:self title:@"Problem Listing Files & Folders" error:error completion:^{
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self.navigationController popToRootViewControllerAnimated:YES];
-            });
-        }];
+        self.onDone([SelectedStorageParameters error:error withProvider:self.safeStorageProvider]); 
     }
     else {
         NSArray *tmp = [items filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (id object, NSDictionary *bindings)
@@ -112,8 +115,6 @@
         });
     }
 }
-
-#pragma mark - Table view data source
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text =  self.listDone ? @"No Files or Folders Found" : @"Loading...";
@@ -169,38 +170,46 @@
     return cell;
 }
 
-- (IBAction)onSelectThisFolder:(id)sender {
-    AddSafeAlertController *controller = [[AddSafeAlertController alloc] init];
-
-    [controller addNew:self
-            validation:^BOOL (NSString *name, NSString *password) {
-        return [[SafesList sharedInstance] isValidNickName:name] && password.length;
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    StorageBrowserItem *file = _items[indexPath.row];
+    
+    if (file.folder) {
+        if(self.safeStorageProvider.rootFolderOnly) {
+            [Alerts info:self title:@"Root Folder Only" message:@"You can only have databases in the Root folder for this storage type."];
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
+        else {
+            [self performSegueWithIdentifier:@"recursiveSegue" sender:nil];
+        }
     }
-            completion:^(NSString *name, NSString *password, BOOL response) {
-                if (response) {
-                    NSString *nickName = [SafesList sanitizeSafeNickName:name];
-                    [self addNewSafeAndPopToRoot:nickName password:password];
-                }
-            }];
+    else {
+        [self validateSelectedDatabase:file indexPath:indexPath];
+    }
 }
 
-- (void)validateAndAddExistingSafe:(StorageBrowserItem *)file indexPath:(NSIndexPath *)indexPath  {
-    if(self.safeStorageProvider.storageId == kLocalDevice) {
-        NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
-        NSMutableSet *existing = [NSMutableSet set];
-        for (SafeMetaData* safe in localSafes) {
-            [existing addObject:safe.fileName];
-        }
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+    // Should just use a manual segue instead of a Cell Segue to avoid this?
+    // ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
+    return (sender == self);
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"recursiveSegue"]) {
+        NSIndexPath *ip = (self.tableView).indexPathForSelectedRow;
+        StorageBrowserItem *file = _items[ip.row];
         
-        if([existing containsObject:file.name]) {
-            [Alerts warn:self title:@"Database Already Present" message:@"This file is already in your existing set of databases. No need to add it again, it will automatically pick up any updates made via iTunes File Sharing etc."];
-            
-            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-            
-            return;
-        }
+        StorageBrowserTableViewController *vc = segue.destinationViewController;
+        
+        vc.parentFolder = file.providerData;
+        vc.existing = self.existing;
+        vc.safeStorageProvider = self.safeStorageProvider;
+        vc.onDone = self.onDone;
     }
-    
+}
+
+//
+
+- (void)validateSelectedDatabase:(StorageBrowserItem *)file indexPath:(NSIndexPath *)indexPath  {
     [self.safeStorageProvider readWithProviderData:file.providerData
                                     viewController:self
                                         completion:^(NSData *data, NSError *error) {
@@ -214,124 +223,20 @@
     if (error == nil) {
         NSError* err;
         if ([DatabaseModel isAValidSafe:data error:&err]) {
-            AddSafeAlertController *controller = [[AddSafeAlertController alloc] init];
-
-            [controller addExisting:self
-                         validation:^BOOL (NSString *name) {
-                return [[SafesList sharedInstance] isValidNickName:name];
-            }
-                         completion:^(NSString *name, BOOL response) {
-                             if (response) {
-                             NSString *nickName = [SafesList sanitizeSafeNickName:name];
-
-                             [self addExistingSafeAndPopToRoot:file
-                                                 name:nickName];
-                             }
-                         }];
+            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file]);
         }
         else {
-            [Alerts error:self
-                    title:@"Invalid Database File"
-                    error:err];
+            [Alerts error:self title:@"Invalid Database File" error:err];
         }
     }
     else {
         NSLog(@"%@", error);
-
         [Alerts error:self title:@"Error Reading Database File" error:error];
     }
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    StorageBrowserItem *file = _items[indexPath.row];
-
-    if (file.folder) {
-        if(self.safeStorageProvider.rootFolderOnly) {
-            [Alerts info:self title:@"Root Folder Only" message:@"You can only have databases in the Root folder for this storage type."];
-            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-        }
-        else {
-            [self performSegueWithIdentifier:@"recursiveSegue" sender:nil];
-        }
-    }
-    else {
-        [self validateAndAddExistingSafe:file indexPath:indexPath];
-    }
-}
-
-- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
-    //ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
-    return (sender == self);
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"recursiveSegue"]) {
-        NSIndexPath *ip = (self.tableView).indexPathForSelectedRow;
-        StorageBrowserItem *file = _items[ip.row];
-
-        StorageBrowserTableViewController *vc = segue.destinationViewController;
-    
-        vc.parentFolder = file.providerData;
-        vc.existing = self.existing;
-        vc.format = self.format;
-        vc.safeStorageProvider = self.safeStorageProvider;
-    }
-}
-
-- (void)addExistingSafeAndPopToRoot:(StorageBrowserItem *)item name:(NSString *)name {
-    SafeMetaData *safe = [self.safeStorageProvider getSafeMetaData:name providerData:item.providerData];
-
-    [[SafesList sharedInstance] add:safe];
-
-    [self.navigationController popToRootViewControllerAnimated:YES];
-}
-
-- (void)addNewSafeAndPopToRoot:(NSString *)name password:(NSString *)password {
-    NSLog(@"Create New Database with Format: %d", self.format);
-    
-    DatabaseModel *newSafe = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:nil format:self.format];
- 
-    NSError *error;
-    NSData *data = [newSafe getAsData:&error];
-
-    if (data == nil) {
-        [Alerts error:self
-                title:@"Error Saving Database"
-                error:error];
-
-        return;
-    }
-
-    // The Saving must be done on the main GUI thread!
-
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self saveNewSafe:name data:data safe:newSafe];
-    });
-}
-
-- (void)saveNewSafe:(NSString *)nickName data:(NSData *)data safe:(DatabaseModel*)safe {
-    [self.safeStorageProvider create:nickName
-                           extension:safe.fileExtension
-                                data:data
-                        parentFolder:self.parentFolder
-                      viewController:self
-                          completion:^(SafeMetaData *metadata, NSError *error)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if (error == nil) {
-                [[SafesList sharedInstance] add:metadata];
-            }
-            else {
-                NSLog(@"An error occurred: %@", error);
-
-                [Alerts error:self
-                        title:@"Error Saving Database"
-                        error:error];
-            }
-
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        });
-    }];
+- (IBAction)onSelectThisFolder:(id)sender {
+    self.onDone([SelectedStorageParameters parametersForNativeProviderCreate:self.safeStorageProvider folder:self.parentFolder]);
 }
 
 @end

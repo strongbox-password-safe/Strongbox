@@ -10,6 +10,8 @@
 
 @interface PasswordGenerationSettingsTableView : UITableViewController
 
+@property (nonatomic, copy) void (^onDone)(void);
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseLowercase;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseUppercase;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseDigits;

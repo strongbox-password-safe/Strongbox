@@ -17,6 +17,7 @@
 @end
 
 static NSString* const kSafesList = @"safesList";
+NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChanged";
 
 @implementation SafesList
 
@@ -60,6 +61,10 @@ static NSUserDefaults* getUserDefaults() {
     NSUserDefaults * defaults = getUserDefaults();
     [defaults setObject:encodedObject forKey:kSafesList];
     [defaults synchronize];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
+    });
 }
 
 - (void)add:(SafeMetaData *_Nonnull)safe {

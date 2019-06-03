@@ -271,7 +271,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
-            completion(NO, nil, error);
+            completion(error.code == ODAuthCanceled, nil, error);
             return;
         }
         

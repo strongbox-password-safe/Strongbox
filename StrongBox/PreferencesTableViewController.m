@@ -20,6 +20,12 @@
 #import "GoogleDriveManager.h"
 #import "OneDriveStorageProvider.h"
 
+#import "PasswordGenerationSettingsTableView.h"
+#import "AutoFillNewRecordSettingsController.h"
+#import "CloudSessionsTableViewController.h"
+#import "AboutViewController.h"
+#import "AdvancedPreferencesTableViewController.h"
+
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInBrowse;
@@ -64,7 +70,7 @@
 @implementation PreferencesTableViewController
 
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onDone();
 }
 
 - (IBAction)onGenericPreferencesChanged:(id)sender {
@@ -346,8 +352,7 @@
                                 [self bindAppLock];
                             }
                             else {
-                                // TODO: Believe this message string is incorrect copy/pasta mistaje
-                                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match. You can try again from Database Settings." completion:nil];
+                                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match." completion:nil];
                                 [self bindAppLock];
                             }
                         }
@@ -706,6 +711,29 @@
     };
     
     [self presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if([segue.identifier isEqualToString:@"seguePrefToPasswordPrefs"]) {
+        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)segue.destinationViewController;
+        vc.onDone = self.onDone;
+    }
+    else if ([segue.identifier isEqualToString:@"seguePrefsToNewEntryDefaults"]) {
+        AutoFillNewRecordSettingsController* vc = (AutoFillNewRecordSettingsController*)segue.destinationViewController;
+        vc.onDone = self.onDone;
+    }
+    else if ([segue.identifier isEqualToString:@"seguePrefsToAdvanced"]) {
+        AdvancedPreferencesTableViewController* vc = (AdvancedPreferencesTableViewController*)segue.destinationViewController;
+        vc.onDone = self.onDone;
+    }
+    else if ([segue.identifier isEqualToString:@"seguePrefsToCloudSessions"]) {
+        CloudSessionsTableViewController* vc = (CloudSessionsTableViewController*)segue.destinationViewController;
+        vc.onDone = self.onDone;
+    }
+    else if ([segue.identifier isEqualToString:@"seguePrefsToAbout"]) {
+        AboutViewController* vc = (AboutViewController*)segue.destinationViewController;
+        vc.onDone = self.onDone;
+    }
 }
 
 @end

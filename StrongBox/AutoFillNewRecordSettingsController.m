@@ -382,7 +382,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onDone();
 }
 
 @end

@@ -60,7 +60,6 @@ static NSString* kSafesList = @"safesList";
 - (void)add:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
         [self.data addObject:safe];
-        
         [self serialize];
     });
 }
@@ -84,7 +83,6 @@ static NSString* kSafesList = @"safesList";
         
         if([duplicates count] == 0) {
             [self.data addObject:safe];
-            
             [self serialize];
         }
     });

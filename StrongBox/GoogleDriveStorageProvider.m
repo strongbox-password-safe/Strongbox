@@ -122,7 +122,7 @@
 
     [[GoogleDriveManager sharedInstance] getFilesAndFolders:viewController
                                            withParentFolder:(parent ? parent.identifier : nil)
-                                                 completion:^(NSArray *folders, NSArray *files, NSError *error)
+                                                 completion:^(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error)
     {
         if (error == nil) {
             NSArray *sorted = [folders sortedArrayUsingComparator:^NSComparisonResult (id obj1, id obj2) {
@@ -149,8 +149,7 @@
         }
         else {
             [[GoogleDriveManager sharedInstance] signout];
-            
-            completion(NO, nil, error);
+            completion(userCancelled, nil, error);
         }
     }];
 }

@@ -292,7 +292,7 @@
 }
 
 - (void)updateAutoFillQuickTypeDatabase {
-    if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill && self.metadata.useQuickTypeAutoFill) {
+    if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
     }
 }

@@ -16,57 +16,47 @@
 			<key>CFBundleTypeRole</key>
 			<string>None</string>
 			<key>LSHandlerRank</key>
-			<string>Default</string>
+			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.markmcguill.strongbox.key</string>
+				<string>public.content</string>
 			</array>
 		</dict>
 		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array/>
 			<key>CFBundleTypeName</key>
-			<string>Strongbox KeePass 1 Database</string>
+			<string>Strongbox KeePass Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
-			<string>Default</string>
+			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.markmcguill.strongbox.kdb</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Strongbox KeePass 2 Database</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-			<key>LSItemContentTypes</key>
-			<array>
 				<string>com.markmcguill.strongbox.kdbx</string>
+				<string>com.keepassium.kdb</string>
+				<string>com.keepassium.kdbx</string>
+				<string>com.jflan.MiniKeePass.kdb</string>
+				<string>com.jflan.MiniKeePass.kdbx</string>
+				<string>com.kptouch.kdb</string>
+				<string>com.kptouch.kdbx</string>
+				<string>be.kyuran.kypass.kdb</string>
 			</array>
 		</dict>
 		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array/>
 			<key>CFBundleTypeName</key>
 			<string>Strongbox Password Safe 3 Database</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
-			<string>Default</string>
+			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.markmcguill.strongbox.dat</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Strongbox Password Safe 3 Database</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-			<key>LSItemContentTypes</key>
-			<array>
 				<string>com.markmcguill.strongbox.psafe3</string>
 			</array>
 		</dict>
@@ -86,7 +76,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.29.3</string>
+	<string>1.30.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -120,7 +110,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2669</string>
+	<string>2670</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>
@@ -195,7 +185,9 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox KeePass Key File</string>
+			<string></string>
+			<key>UTTypeIconFiles</key>
+			<array/>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.key</string>
 			<key>UTTypeTagSpecification</key>
@@ -210,9 +202,12 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
+				<string>public.content</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox KeePass Database</string>
+			<string>Strongbox Database (KDB)</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.kdb</string>
 			<key>UTTypeTagSpecification</key>
@@ -227,9 +222,12 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
+				<string>public.content</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox KeePass Database</string>
+			<string>Strongbox Database (KDBX)</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.kdbx</string>
 			<key>UTTypeTagSpecification</key>
@@ -244,9 +242,12 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
+				<string>public.content</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox Password Safe Database</string>
+			<string>Strongbox Database (dat)</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.dat</string>
 			<key>UTTypeTagSpecification</key>
@@ -261,9 +262,12 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
+				<string>public.content</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox Password Safe Database</string>
+			<string>Strongbox Database (PSAFE3)</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
 			<key>UTTypeIdentifier</key>
 			<string>com.markmcguill.strongbox.psafe3</string>
 			<key>UTTypeTagSpecification</key>
@@ -273,6 +277,81 @@
 				<key>public.mime-type</key>
 				<string>application/strongbox</string>
 			</dict>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.jflan.MiniKeePass.kdb</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.jflan.MiniKeePass.kdb</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.jflan.MiniKeePass.kdbx</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.jflan.MiniKeePass.kdbx</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.kptouch.kdb</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.kptouch.kdb</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.kptouch.kdbx</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>com.kptouch.kdbx</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>be.kyuran.kypass.kdb</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>be.kyuran.kypass.kdb</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.keepassium.kdbx</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string></string>
+			<key>UTTypeIconFiles</key>
+			<array/>
+			<key>UTTypeIdentifier</key>
+			<string>com.keepassium.kdbx</string>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.keepassium.kdb</string>
+			</array>
+			<key>UTTypeIconFiles</key>
+			<array/>
+			<key>UTTypeIdentifier</key>
+			<string>com.keepassium.kdb</string>
 		</dict>
 	</array>
 </dict>

@@ -10,4 +10,6 @@
 
 @interface PreferencesTableViewController : UITableViewController
 
+@property (nonatomic, copy) void (^onDone)(void);
+
 @end

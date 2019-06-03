@@ -19,7 +19,6 @@
         self.failedPinAttempts = 0;
         self.offlineCacheEnabled = YES;
         self.autoFillCacheEnabled = YES;
-        self.useQuickTypeAutoFill = YES;
     }
     
     return self;
@@ -65,7 +64,7 @@
     [encoder encodeBool:self.hasBeenPromptedForConvenience forKey:@"hasBeenPromptedForConvenience"];
     [encoder encodeInteger:self.failedPinAttempts forKey:@"failedPinAttempts"];
 
-    [encoder encodeBool:self.useQuickTypeAutoFill forKey:@"useQuickTypeAutoFill"];
+//    [encoder encodeBool:self.useQuickTypeAutoFill forKey:@"useQuickTypeAutoFill"];
     [encoder encodeObject:self.keyFileUrl forKey:@"keyFileUrl"];
 }
 
@@ -111,9 +110,9 @@
             self.failedPinAttempts = (int)[decoder decodeIntegerForKey:@"failedPinAttempts"];
         }
         
-        if([decoder containsValueForKey:@"useQuickTypeAutoFill"]) {
-            self.useQuickTypeAutoFill = [decoder decodeBoolForKey:@"useQuickTypeAutoFill"];
-        }
+//        if([decoder containsValueForKey:@"useQuickTypeAutoFill"]) {
+//            self.useQuickTypeAutoFill = [decoder decodeBoolForKey:@"useQuickTypeAutoFill"];
+//        }
         
         if([decoder containsValueForKey:@"keyFileUrl"]) {
             self.keyFileUrl = [decoder decodeObjectForKey:@"keyFileUrl"];

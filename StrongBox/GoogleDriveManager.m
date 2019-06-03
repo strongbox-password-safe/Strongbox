@@ -15,7 +15,7 @@
 
 static NSString *const kMimeType = @"application/octet-stream";
 
-typedef void (^Authenticationcompletion)(NSError *error);
+typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
 
 @implementation GoogleDriveManager {
     Authenticationcompletion authenticationcompletion;
@@ -74,7 +74,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     [[GIDSignIn sharedInstance] disconnect];
 }
 
-- (void)authenticate:(UIViewController*)viewController completion:(void (^)(NSError *error))completion {
+- (void)authenticate:(UIViewController*)viewController completion:(void (^)(BOOL userCancelled, NSError *error))completion {
     GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
     signIn.delegate = self;
@@ -108,7 +108,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     if (authenticationcompletion) {
         Settings.sharedInstance.suppressPrivacyScreen = NO;
         //NSLog(@"Google Callback: %@", authenticationcompletion);
-        authenticationcompletion(error);
+        authenticationcompletion(error.code == kGIDSignInErrorCodeCanceled, error);
         authenticationcompletion = nil;
     }
 }
@@ -194,7 +194,7 @@ typedef void (^Authenticationcompletion)(NSError *error);
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
     [self authenticate:viewController
-            completion:^(NSError *error) {
+            completion:^(BOOL userCancelled, NSError *error) {
                 if (error) {
                     NSLog(@"%@", error);
                     handler(nil, error);
@@ -303,24 +303,23 @@ typedef void (^Authenticationcompletion)(NSError *error);
 
 - (void)getFilesAndFolders:(UIViewController*)viewController
           withParentFolder:(NSString *)parentFolderIdentifier
-                completion:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler {
+                completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler {
     parentFolderIdentifier = parentFolderIdentifier ? parentFolderIdentifier : @"root";
 
     [self authenticate:viewController
-            completion:^(NSError *error) {
+            completion:^(BOOL userCancelled, NSError *error) {
                 if (error) {
                     NSLog(@"%@", error);
-                    handler(nil, nil, error);
+                    handler(userCancelled, nil, nil, error);
                 }
                 else {
-                    [self _getFilesAndFolders:parentFolderIdentifier
-                           completion:handler];
+                    [self _getFilesAndFolders:parentFolderIdentifier completion:handler];
                 }
             }];
 }
 
 - (void)_getFilesAndFolders:(NSString *)parentFileIdentifier
-                 completion:(void (^)(NSArray *folders, NSArray *files, NSError *error))handler {
+                 completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler {
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD show];
     });
@@ -363,12 +362,12 @@ typedef void (^Authenticationcompletion)(NSError *error);
                 }
             }
 
-            handler(driveFolders, driveFiles, error);
+            handler(NO, driveFolders, driveFiles, error);
         }
         else {
             NSLog(@"An error occurred: %@", error);
 
-            handler(nil, nil, error);
+            handler(NO, nil, nil, error);
         }
     }];
 }

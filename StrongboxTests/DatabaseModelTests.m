@@ -21,7 +21,7 @@
     NSData *key = [CommonTesting getDataFromBundleFile:@"xml-keyfile" ofType:@"key"];
     XCTAssert(key);
     
-    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:key];
+    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:key checkForXml:YES];
     XCTAssert(digest);
     
     NSData *data = [CommonTesting getDataFromBundleFile:@"xml-keyfile" ofType:@"kdbx"];

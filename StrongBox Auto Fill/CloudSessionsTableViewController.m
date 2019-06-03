@@ -37,7 +37,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onDone();
 }
 
 #pragma mark - Table view data source
@@ -150,6 +150,5 @@
                }];
     }
 }
-
 
 @end

@@ -68,9 +68,7 @@ static NSString* const kMailToScheme = @"mailto";
                     [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node database:database databaseUuid:databaseUuid]];
                 }
                 
-                NSInteger databasesUsingQuickType = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                    return obj.useQuickTypeAutoFill;
-                }].count;
+                NSInteger databasesUsingQuickType = SafesList.sharedInstance.snapshot.count;
                 
                 if(databasesUsingQuickType < 2) { // We can safely replace all, otherwise must append... This isn't ideal in the multiple scenario as we end up with stales :(
                     [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {

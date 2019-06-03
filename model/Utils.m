@@ -152,6 +152,25 @@ NSString* trim(NSString* str) {
     return trim(string);
 }
 
+NSString* xmlCleanupAndTrim(NSString* foo) {
+    // Some apps (KeeWeb) seem to prefix crap to the XML :( NSXMLParser is extremely strict about this, so if the XML
+    // Doesn't being with <?xml we do a quick search for it a small prefix at the start and start there instead if it's
+    // present
+    
+    static NSString* const kXmlPrefix = @"<?xml";
+    if(![foo hasPrefix:kXmlPrefix]) {
+        NSLog(@"WARNING: XML does not conform to XML Standard, does not being with \"<?xml\". Searching short initial prefix for this string for this prefix...");
+        
+        NSRange foundPrefix = [[foo substringWithRange:NSMakeRange(0, 16)] rangeOfString:kXmlPrefix];
+        if(foundPrefix.location != NSNotFound) {
+            NSLog(@"WARNING: Found prefix at %lu, starting from here instead...", (unsigned long)foundPrefix.location);
+            return [foo substringFromIndex:foundPrefix.location];
+        }
+    }
+    
+    return foo;
+}
+
 NSComparator finderStringComparator = ^(id obj1, id obj2)
 {
     return finderStringCompare(obj1, obj2);
@@ -479,6 +498,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
     
     return data;
 }
+
 #endif
 
 //    [[Settings sharedInstance] setPro:NO];

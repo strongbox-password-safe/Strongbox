@@ -18,14 +18,17 @@
 #import "AppleICloudProvider.h"
 #import "SafeStorageProviderFactory.h"
 #import "OpenSafeSequenceHelper.h"
-#import "NewSafeFormatController.h"
+#import "SelectDatabaseFormatTableViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "AddNewSafeHelper.h"
-#import "AddSafeAlertController.h"
 #import "StrongboxUIDocument.h"
 #import "SVProgressHUD.h"
 #import "AutoFillManager.h"
 #import "PinEntryController.h"
+#import "CASGTableViewController.h"
+#import "PreferencesTableViewController.h"
+
+static const DatabaseFormat kDefaultFormat = kKeePass4;
 
 @interface SafesViewController () <UIDocumentPickerDelegate>
 
@@ -45,8 +48,6 @@
 }
 
 - (void)syncLocalSafesWithFileSystem {
-    BOOL changedSomething = NO;
-    
     // Add any new
     
     NSArray<StorageBrowserItem*> *items = [LocalDeviceStorageProvider.sharedInstance scanForNewSafes];
@@ -58,8 +59,6 @@
                                                                                providerData:item.providerData];
             [[SafesList sharedInstance] add:safe];
         }
-        
-        changedSomething = YES;
     }
     
     // Remove deleted
@@ -70,19 +69,14 @@
         if(![LocalDeviceStorageProvider.sharedInstance fileExists:localSafe]) {
             NSLog(@"Removing Safe [%@] because underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
             [SafesList.sharedInstance remove:localSafe.uuid];
-            changedSomething = YES;
         }
-    }
-    
-    if(changedSomething) {
-        [self reloadSafes];
     }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    [self reloadSafes];
+    [self refresh];
     
     self.navigationController.navigationBar.hidden = NO;
     self.navigationItem.hidesBackButton = YES;
@@ -96,49 +90,33 @@
     
     [self bindProOrFreeTrialUi];
     
-    if(!Settings.sharedInstance.doNotAutoAddNewLocalSafes) {
-        [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory:^{
-            NSLog(@"File Change Detected! Scanning for New Safes");
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                [self syncLocalSafesWithFileSystem];
-            });
-        }];
-        
-        [self syncLocalSafesWithFileSystem];
-    }
-    
     [self segueToNagScreenIfAppropriate];
     
     [[self getInitialViewController] checkICloudAvailability];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    if(!Settings.sharedInstance.doNotAutoAddNewLocalSafes) {
-        [LocalDeviceStorageProvider.sharedInstance stopMonitoringDocumentsDirectory];
-    }
+- (void)refresh {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self internalRefresh];
+    });
 }
 
-- (void)reloadSafes {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        self.collection = SafesList.sharedInstance.snapshot;
-        
-        [self.tableView reloadData];
-        
-        self.buttonToggleEdit.enabled = (self.collection.count > 0);
-        [self.buttonToggleEdit setTintColor:(self.collection.count > 0) ? nil : [UIColor clearColor]];
-
-        if([[self getInitialViewController] getPrimarySafe]) {
-            [self.barButtonQuickLaunchView setEnabled:YES];
-            [self.barButtonQuickLaunchView setTintColor:nil];
-        }
-        else {
-            [self.barButtonQuickLaunchView setEnabled:NO];
-            [self.barButtonQuickLaunchView setTintColor: [UIColor clearColor]];
-        }
-    });
+- (void)internalRefresh {
+    self.collection = SafesList.sharedInstance.snapshot;
+    
+    [self.tableView reloadData];
+    
+    self.buttonToggleEdit.enabled = (self.collection.count > 0);
+    [self.buttonToggleEdit setTintColor:(self.collection.count > 0) ? nil : [UIColor clearColor]];
+    
+    if([[self getInitialViewController] getPrimarySafe]) {
+        [self.barButtonQuickLaunchView setEnabled:YES];
+        [self.barButtonQuickLaunchView setTintColor:nil];
+    }
+    else {
+        [self.barButtonQuickLaunchView setEnabled:NO];
+        [self.barButtonQuickLaunchView setTintColor: [UIColor clearColor]];
+    }
 }
 
 - (void)viewDidLoad {
@@ -148,7 +126,7 @@
     
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
-    // A little trick for removing the cell separators
+    
     self.tableView.tableFooterView = [UIView new];
     
     self.tableView.rowHeight = 55.0f;
@@ -157,6 +135,24 @@
                                            selector:@selector(onProStatusChanged:)
                                                name:kProStatusChangedNotificationKey
                                              object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(refresh)
+                                               name:kDatabasesListChangedNotification
+                                             object:nil];
+    
+    
+    [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory:^{
+        NSLog(@"File Change Detected! Scanning for New Safes");
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self syncLocalSafesWithFileSystem];
+        });
+    }];
+    
+    [self syncLocalSafesWithFileSystem];
+    
+    [self internalRefresh];
 }
 
 - (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
@@ -220,7 +216,6 @@
         NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
         [SafesList.sharedInstance move:sourceIndexPath.row to:destinationIndexPath.row];
-        [self reloadSafes];
     }
 }
 
@@ -277,8 +272,6 @@
             if(model) {
                 [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
             }
-                                                         
-            [self reloadSafes]; // Duress might have remove a safe
          }];
     }
     
@@ -322,24 +315,8 @@
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    
-    [Alerts OkCancelWithTextField:self
-                    textFieldText:safe.nickName
-                            title:@"Rename Database"
-                          message:@"Please enter a new name for this database"
-                       completion:^(NSString *text, BOOL response) {
-        if(response) {
-            if([SafesList.sharedInstance isValidNickName:text]) {
-                safe.nickName = text;
-                [SafesList.sharedInstance update:safe];
-                [self reloadSafes];
-            }
-            else {
-                [Alerts warn:self title:@"Invalid Name" message:@"That is an invalid name, possibly because one with that name already exists, or because it contains invalid characters. Please try again."];
-            }
-        }
-    }];
+    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+    [self performSegueWithIdentifier:@"segueToRenameDatabase" sender:database];
 }
 
 - (void)removeSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -399,13 +376,9 @@
                                                                   }];
     }
     
-    if(safe.useQuickTypeAutoFill) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
          
     [[SafesList sharedInstance] remove:safe.uuid];
-
-    [self reloadSafes];
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -419,15 +392,226 @@
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
     {
-        SelectStorageProviderController *vc = segue.destinationViewController;
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        SelectStorageProviderController *vc = (SelectStorageProviderController*)nav.topViewController;
         
         NSString *newOrExisting = (NSString *)sender;
-        vc.existing = [newOrExisting isEqualToString:@"Existing"];
+        BOOL existing = [newOrExisting isEqualToString:@"Existing"];
+        vc.existing = existing;
+        
+        vc.onDone = ^(SelectedStorageParameters *params) {
+            params.createMode = !existing;
+            [self onSelectedStorageLocation:params];
+        };
     }
     else if ([segue.identifier isEqualToString:@"segueToVersionConflictResolution"]) {
         VersionConflictController* vc = (VersionConflictController*)segue.destinationViewController;
         vc.url = (NSString*)sender;
     }
+    else if ([segue.identifier isEqualToString:@"segueFromSafesToPreferences"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        PreferencesTableViewController* vc = (PreferencesTableViewController*)nav.topViewController;
+        
+        vc.onDone = ^{
+            [self dismissViewControllerAnimated:YES completion:^{
+                [[self getInitialViewController] checkICloudAvailability];
+            }];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToRenameDatabase"]) {
+        SafeMetaData* database = (SafeMetaData*)sender;
+        
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
+        scVc.mode = kCASGModeRenameDatabase;
+        scVc.initialName = database.nickName;
+        
+        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(success) {
+                    database.nickName = creds.name;
+                    [SafesList.sharedInstance update:database];
+                }
+            }];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToCreateDatabase"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
+        SelectedStorageParameters* params = (SelectedStorageParameters*)sender;
+        BOOL expressMode = params == nil;
+        BOOL createMode = params == nil || params.createMode;
+        
+        scVc.mode = createMode ? (expressMode ? kCASGModeCreateExpress : kCASGModeCreate) : kCASGModeAddExisting;
+        scVc.initialFormat = kDefaultFormat;
+        
+        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(success) {
+                    [self onCreateOrAddDialogDismissedSuccessfully:params credentials:creds];
+                }
+            }];
+        };
+    }
+}
+
+- (void)onCreateOrAddDialogDismissedSuccessfully:(SelectedStorageParameters*)storageParams
+                                     credentials:(CASGParams*)credentials {
+    BOOL expressMode = storageParams == nil;
+    
+    if(expressMode || storageParams.createMode) {
+        if(expressMode) {
+            [self onCreateNewExpressDatabaseDone:credentials.name
+                                        password:credentials.password
+                                             url:credentials.keyFileUrl
+                                  onceOffKeyFile:credentials.oneTimeKeyFileData
+                                          format:credentials.format];
+        }
+        else {
+            [self onCreateNewDatabaseDone:storageParams
+                                     name:credentials.name
+                                 password:credentials.password
+                                      url:credentials.keyFileUrl
+                           onceOffKeyFile:credentials.oneTimeKeyFileData
+                                   format:credentials.format];
+        }
+    }
+    else {
+        [self onAddExistingDatabaseUiDone:storageParams name:credentials.name];
+    }
+}
+
+- (void)onSelectedStorageLocation:(SelectedStorageParameters*)params {
+    NSLog(@"onSelectedStorageLocation: [%@] - [%@]", params.createMode ? @"Create" : @"Add", params);
+    
+    if(params.method == kStorageMethodUserCancelled) {
+        NSLog(@"onSelectedStorageLocation: User Cancelled");
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    else if (params.method == kStorageMethodErrorOccurred) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [Alerts error:self title:@"Error Selecting Storage Location" error:params.error];
+        }];
+    }
+    else if (params.method == kStorageMethodFilesAppUrl) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            NSLog(@"Files App: [%@]", params.url);
+            [[self getInitialViewController] import:params.url canOpenInPlace:YES];
+        }];
+    }
+    else if (params.method == kStorageMethodManualUrlDownloadedData || params.method == kStorageMethodNativeStorageProvider) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:params];
+        }];
+    }
+}
+
+- (void)onAddExistingDatabaseUiDone:(SelectedStorageParameters*)storageParams
+                               name:(NSString*)name {
+    if(storageParams.data) { // Manual URL Download and Add
+        [self addManuallyDownloadedUrlDatabase:name data:storageParams.data];
+    }
+    else { // Standard Native Storage add
+        SafeMetaData* database = [storageParams.provider getSafeMetaData:name providerData:storageParams.file.providerData];
+        
+        if(database == nil) {
+            [Alerts warn:self title:@"Error Adding" message:@"An unknown error occurred while adding this database. getMetaData."];
+        }
+        else {
+            [SafesList.sharedInstance add:database];
+        }
+    }
+}
+
+- (void)onCreateNewDatabaseDone:(SelectedStorageParameters*)storageParams
+                           name:(NSString*)name
+                       password:(NSString*)password
+                            url:(NSURL*)url
+                 onceOffKeyFile:(NSData*)onceOffKeyFile
+                         format:(DatabaseFormat)format {
+    [AddNewSafeHelper createNewDatabase:self
+                                   name:name
+                               password:password
+                             keyFileUrl:url
+                     onceOffKeyFileData:onceOffKeyFile
+                          storageParams:storageParams
+                                 format:format
+                             completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+                                 [self onCreatedDatabase:metadata error:error];
+                             }];
+}
+
+- (void)onCreateNewExpressDatabaseDone:(NSString*)name
+                              password:(NSString*)password
+                                   url:(NSURL*)url
+                        onceOffKeyFile:(NSData*)onceOffKeyFile
+                                format:(DatabaseFormat)format {
+    [AddNewSafeHelper createNewExpressDatabase:self
+                                          name:name
+                                      password:password
+                                    keyFileUrl:url
+                            onceOffKeyFileData:onceOffKeyFile
+                                        format:format
+                                    completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+                                        [self onCreatedDatabase:metadata error:error];
+                                         // TODO: Need a prettier way to do this than an alert!
+                                         // Anyway to handhold more and point at your new DB?
+                                         [Alerts info:self
+                                                title:@"Ready To Go!"
+                                              message:@"Your new database is now ready to use! Just tap on it to get started...\n\nNB: It is VITALLY important that you remember your master password, as without it there is no hope of opening the database.\n\nYou could consider writing this password down and storing offline in a physically secure location."];
+                         }];
+}
+
+- (void)onCreatedDatabase:(SafeMetaData*)metadata error:(NSError*)error {
+    if(!metadata) {
+        NSLog(@"An error occurred: %@", error);
+        [Alerts error:self title:@"Error Creating Database" error:error];
+    }
+    else if (metadata.storageProvider == kiCloud) {
+        NSUInteger existing = [SafesList.sharedInstance.snapshot indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return obj.storageProvider == kiCloud && [obj.fileName isEqualToString:metadata.fileName];
+        }];
+        
+        if(existing == NSNotFound) { // May have already been added by our iCloud watch thread.
+            NSLog(@"Adding as this iCloud filename is not already present.");
+            [[SafesList sharedInstance] add:metadata];
+        }
+        else {
+            NSLog(@"Not Adding as this iCloud filename is already present. Probably picked up by Watch Thread.");
+        }
+    }
+    else {
+        [[SafesList sharedInstance] add:metadata];
+    }
+}
+
+- (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName data:(NSData *)data {
+    id<SafeStorageProvider> provider;
+
+    if(Settings.sharedInstance.iCloudOn) {
+        provider = AppleICloudProvider.sharedInstance;
+    }
+    else {
+        provider = LocalDeviceStorageProvider.sharedInstance;
+    }
+
+    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
+
+    [provider create:nickName
+           extension:extension
+                data:data
+        parentFolder:nil
+      viewController:self
+          completion:^(SafeMetaData *metadata, NSError *error) {
+         dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if (error == nil) {
+                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+            }
+            else {
+                [Alerts error:self title:@"Error Importing Database" error:error];
+            }
+        });
+     }];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,7 +645,7 @@
         UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"New Database (Express)"
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
-                                                                    [self onNewExpressSafe];
+                                                                    [self onNewExpressDatabase];
                                                                 }];
         
         // [quickAndEasyAction setValue:[UIColor greenColor] forKey:@"titleTextColor"];
@@ -485,27 +669,11 @@
 }
 
 - (void)onCreateNewSafe {
-    [self performSegueWithIdentifier:@"segueToSelectNewSafeFormat" sender:self];
+    [self performSegueWithIdentifier:@"segueToStorageType" sender:nil];
 }
 
-- (void)onNewExpressSafe {
-    AddSafeAlertController* prompt = [[AddSafeAlertController alloc] init];
-
-    [prompt addNew:self
-        validation:^BOOL(NSString *name, NSString *password) {
-            return [[SafesList sharedInstance] isValidNickName:name] && password.length;
-        }
-        completion:^(NSString *name, NSString *password, BOOL response) {
-            if(response) {
-                [AddNewSafeHelper addNewSafeAndPopToRoot:self
-                                                    name:name
-                                                password:password
-                                                provider:AppleICloudProvider.sharedInstance
-                                                  format:kKeePass];
-                
-                [Alerts info:self title:@"New Database Ready!" message:@"Your new database is now ready to use! Just tap on it to get started...\n\nNB: It is VITALLY important that you remember your master password, as without it there is no hope of opening the database.\n\nYou could consider writing this password down and storing offline in a physically secure location."];
-            }
-    }];
+- (void)onNewExpressDatabase {
+    [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:nil];
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
@@ -640,7 +808,7 @@
         if([[Settings sharedInstance] isFreeTrial]) {
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
-            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days left)",
+            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld 'Pro' days left)",
                                   (long)daysLeft];
             
             if(daysLeft < 10) {

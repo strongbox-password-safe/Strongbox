@@ -28,7 +28,7 @@ static NSString* const kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
 static NSString* const kPasswordGenerationParameters = @"passwordGenerationSettings";
 static NSString* const kInstallDate = @"installDate";
 static NSString* const kDisallowBiometricId = @"disallowBiometricId";
-static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes";
+static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes"; // Dead
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
@@ -53,7 +53,7 @@ static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSel
 static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill";
 static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
 static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
-static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene";
+static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene"; // DEAD
 static NSString* const kHideEmptyFieldsInDetailsView = @"hideEmptyFieldsInDetailsView";
 static NSString* const kCollapsedSections = @"collapsedSections";
 static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
@@ -533,15 +533,6 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)doNotAutoAddNewLocalSafes {
-    return [[self getUserDefaults] boolForKey:kDoNotAutoAddNewLocalSafes];
-}
-
-- (void)setDoNotAutoAddNewLocalSafes:(BOOL)doNotAutoAddNewLocalSafes {
-    [[self getUserDefaults] setBool:doNotAutoAddNewLocalSafes forKey:kDoNotAutoAddNewLocalSafes];
-    [[self getUserDefaults] synchronize];
-}
-
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
     NSData *data = [[self getUserDefaults] objectForKey:kAutoFillNewRecordSettings];
     
@@ -768,15 +759,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setSearchDereferencedFields:(BOOL)searchDereferencedFields {
     [[self getUserDefaults] setBool:searchDereferencedFields forKey:kSearchDereferencedFields];
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)useOldItemDetailsScene {
-    return [[self getUserDefaults] boolForKey:kUseOldItemDetailsScene];
-}
-
-- (void)setUseOldItemDetailsScene:(BOOL)useOldItemDetailsScene {
-    [[self getUserDefaults] setBool:useOldItemDetailsScene forKey:kUseOldItemDetailsScene];
     [[self getUserDefaults] synchronize];
 }
 

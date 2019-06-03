@@ -85,7 +85,7 @@ viewController:(UIViewController*)viewController
                 }];
             };
 
-            
+            vc.modalPresentationStyle = UIModalPresentationFormSheet;
             [viewController presentViewController:vc animated:YES completion:nil];
             return;
         }

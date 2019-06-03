@@ -21,7 +21,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"sample-xml" ofType:@"key"];
     XCTAssert(blob);
 
-    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob];
+    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob checkForXml:YES];
 
 //    NSMutableString *str = [[NSMutableString alloc] init];
 //    uint8_t *current = (uint8_t*)digest.bytes;
@@ -43,7 +43,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"sample-32-binary" ofType:@"key"];
     XCTAssert(blob);
     
-    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob];
+    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob checkForXml:YES];
     
     XCTAssert([[digest base64EncodedStringWithOptions:kNilOptions] isEqualToString:@"FQK8UFYMILsFSw0J2j0TizBuKdZuBbAwdC3QWg8AddY="]);
 }
@@ -52,7 +52,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"sample-hex-text" ofType:@"key"];
     XCTAssert(blob);
     
-    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob];
+    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob checkForXml:YES];
     
     XCTAssert([[digest base64EncodedStringWithOptions:kNilOptions] isEqualToString:@"FQK8UFYMILsFSw0J2j0TizBuKdZuBbAwdC3QWg8AddY="]);
 }
@@ -61,7 +61,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"];
     XCTAssert(blob);
     
-    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob];
+    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob checkForXml:YES];
     
     //NSLog(@"%@", [digest base64EncodedStringWithOptions:kNilOptions]);
     

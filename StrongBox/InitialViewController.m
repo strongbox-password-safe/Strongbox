@@ -29,6 +29,7 @@
 #import "QuickLaunchViewController.h"
 #import "StorageBrowserTableViewController.h"
 #import "PrivacyViewController.h"
+#import "CASGTableViewController.h"
 
 @interface InitialViewController ()
 
@@ -201,26 +202,10 @@
             }
         }
     }
-    
-    //
-    
-    [iCloudSafesCoordinator sharedInstance].onSafesCollectionUpdated = ^{
-        [self updateCurrentRootSafesView];
-    };
 }
 
 - (BOOL)isInQuickLaunchViewMode { 
     return self.selectedIndex == 1;
-}
-
-- (void)updateCurrentRootSafesView {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        if(self.selectedIndex == 0) {
-            UINavigationController* nav = [self selectedViewController];
-            SafesViewController* safesList = (SafesViewController*)nav.viewControllers[0];
-            [safesList reloadSafes];
-        }
-    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -283,8 +268,6 @@
     for (SafeMetaData *item in icloudSafesToRemove) {
         [SafesList.sharedInstance remove:item.uuid];
     }
-    
-    [self updateCurrentRootSafesView];
 }
 
 - (void)checkICloudAvailability {
@@ -380,8 +363,6 @@
                          if(response == 2) {           // @"Switch iCloud Back On"
                              [Settings sharedInstance].iCloudOn = YES;
                              [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
-                             
-                             [self updateCurrentRootSafesView];
                          }
                          else if(response == 1) {      // @"Keep a Local Copy"
                              [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
@@ -553,32 +534,37 @@
 }
 
 - (void)promptForNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
-[Alerts OkCancelWithTextField:self
-            textFieldPlaceHolder:@"Database Name"
-                        title:@"Enter a Name"
-                        message:@"What would you like to call this database?"
-                    completion:^(NSString *text, BOOL response) {
-                        if (response) {
-                            NSString *nickName = [SafesList sanitizeSafeNickName:text];
-                            
-                            if (![[SafesList sharedInstance] isValidNickName:nickName]) {
-                                [Alerts   info:self
-                                        title:@"Invalid Nickname"
-                                        message:@"That nickname may already exist, or is invalid, please try a different nickname."
-                                    completion:^{
-                                        [self promptForNickname:data url:url editInPlace:editInPlace];
-                                    }];
-                            }
-                            else {
-                                if(editInPlace) {
-                                    [self addExternalFileReferenceSafe:nickName url:url];
-                                }
-                                else {
-                                    [self copyAndAddImportedSafe:nickName data:data url:url];
-                                }
-                            }
-                        }
-                    }];
+    [self performSegueWithIdentifier:@"segueFromInitialToAddDatabase"
+                              sender:@{ @"editInPlace" : @(editInPlace),
+                                                @"url" : url,
+                                               @"data" : data }];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueFromInitialToAddDatabase"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
+        scVc.mode = kCASGModeAddExisting;
+        
+        NSDictionary<NSString*, id> *params = (NSDictionary<NSString*, id> *)sender;
+        NSURL* url = params[@"url"];
+        NSData* data = params[@"data"];
+        NSNumber* numEIP = params[@"editInPlace"];
+        BOOL editInPlace = numEIP.boolValue;
+        
+        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(success) {
+                    if(editInPlace) {
+                        [self addExternalFileReferenceSafe:creds.name url:url];
+                    }
+                    else {
+                        [self copyAndAddImportedSafe:creds.name data:data url:url];
+                    }
+                }
+            }];
+        };
+    }
 }
 
 - (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {
@@ -600,7 +586,6 @@
                             {
                                 if (error == nil) {
                                     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                                    [self updateCurrentRootSafesView];
                                 }
                                 else {
                                     [Alerts error:self title:@"Error Importing Database" error:error];
@@ -620,7 +605,6 @@
                                                    dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (error == nil) {
                     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                    [self updateCurrentRootSafesView];
                 }
                 else {
                     [Alerts error:self title:@"Error Importing Database" error:error];
@@ -656,10 +640,6 @@
     SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];
     
     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-    
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self updateCurrentRootSafesView];
-    });
 }
 
 - (SafeMetaData*)getPrimarySafe {

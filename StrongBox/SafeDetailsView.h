@@ -22,11 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel * labelMostPopularUsername;
 @property (weak, nonatomic) IBOutlet UILabel * labelNumberOfUniqueEmails;
 @property (weak, nonatomic) IBOutlet UILabel * labelMostPopularEmail;
-
 @property (weak, nonatomic) IBOutlet UILabel *labelExportByEmail;
-@property (weak, nonatomic) IBOutlet UILabel *labelChangeMasterPassword;
-@property (weak, nonatomic) IBOutlet UILabel *labelChangeKeyFile;
-@property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 
 @end
 

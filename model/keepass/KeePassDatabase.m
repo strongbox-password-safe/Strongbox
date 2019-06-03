@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "KeePassDatabase.h"
 #import "Utils.h"
-#import "Utils.h"
 #import "PwSafeSerialization.h"
 #import "KdbxSerialization.h"
 #import "RootXmlDomainObject.h"
@@ -72,8 +71,10 @@
     
     // 2. Convert the Xml to a more usable Xml Model
     
-    //NSLog(@"%@", serializationData.xml);
+//    NSLog(@"%@", serializationData.xml);
     //[[serializationData.xml dataUsingEncoding:NSUTF8StringEncoding] writeToFile:@"/Users/mark/Desktop/keepass.xml" atomically:NO];
+    
+    serializationData.xml = xmlCleanupAndTrim(serializationData.xml);
     
     RootXmlDomainObject* xmlDoc = parseKeePassXml(  serializationData.innerRandomStreamId,
                                                            serializationData.protectedStreamKey,

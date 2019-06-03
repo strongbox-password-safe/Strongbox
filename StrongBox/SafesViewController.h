@@ -25,6 +25,4 @@
 - (IBAction)onTogglePro:(id)sender;
 - (IBAction)onToggleEdit:(id)sender;
 
-- (void)reloadSafes; // Called by InitialViewController sometimes - e.g. import from url/email, iCloud Updates
-
 @end

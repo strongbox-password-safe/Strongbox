@@ -85,9 +85,8 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    if(self.onDone) {
-        self.onDone(NO, nil, nil);
-    }
+    self.onDone(NO, nil, nil);
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)onAddKeyFile:(id)sender {
@@ -145,6 +144,7 @@
 
             if(self.onDone) {
                 self.onDone(YES, nil, data);
+                [self.navigationController popViewControllerAnimated:YES];
             }
         }
     }];
@@ -188,10 +188,12 @@
         }
         else {
             self.onDone(YES, localUrl, nil);
+            [self.navigationController popViewControllerAnimated:YES];
         }
     }
     else {
         self.onDone(YES, nil, data);
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
@@ -302,6 +304,8 @@
         NSURL* url = self.otherFiles[indexPath.row];
         self.onDone(YES, url, nil);
     }
+    
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {

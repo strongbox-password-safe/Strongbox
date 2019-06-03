@@ -68,9 +68,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property (nonatomic) BOOL iCloudPrompted;
 @property (nonatomic) BOOL iCloudAvailable;
 
-@property (nonatomic) BOOL doNotAutoAddNewLocalSafes;
-        
-
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property (nonatomic) BOOL safesMigratedToNewSystem; 
 
@@ -113,7 +110,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL viewDereferencedFields;
 @property BOOL searchDereferencedFields;
 
-@property BOOL useOldItemDetailsScene;
 @property BOOL showEmptyFieldsInDetailsView;
 
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
@@ -122,7 +118,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL instantPinUnlocking;
 @property BOOL showChildCountOnFolderInBrowse;
 @property BOOL showFlagsInBrowse;
-//@property BOOL showUsernameInBrowse;
 
 @property BOOL haveWarnedAboutAutoFillCrash;
 

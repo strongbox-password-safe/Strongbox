@@ -25,7 +25,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePass1BackupFolder;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchNoSortingKeePassInBrowse;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoAddNewLocalSafes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchEmptyPassword;
 @property (weak, nonatomic) IBOutlet UISwitch *switchEmergencyUseOldUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
@@ -53,8 +52,9 @@
     
     [self bindPreferences];
 }
+
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onDone();
 }
 
 - (IBAction)onPreferencesChanged:(id)sender {
@@ -68,7 +68,6 @@
     Settings.sharedInstance.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
     Settings.sharedInstance.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
     Settings.sharedInstance.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
-    Settings.sharedInstance.doNotAutoAddNewLocalSafes = !self.switchAutoAddNewLocalSafes.on;
     Settings.sharedInstance.hideTotp = self.switchHideTotp.on;
     Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
@@ -95,7 +94,6 @@
     self.switchAutoFavIcon.on = Settings.sharedInstance.tryDownloadFavIconForNewRecord;
     self.switchShowKeePass1BackupFolder.on = Settings.sharedInstance.showKeePass1BackupGroup;
     self.switchShowPasswordOnDetails.on = Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
-    self.switchAutoAddNewLocalSafes.on = !Settings.sharedInstance.doNotAutoAddNewLocalSafes;
     self.switchHideTotp.on = Settings.sharedInstance.hideTotp;
     self.switchHideTotpAutoFill.on = Settings.sharedInstance.hideTotpInAutoFill;
     self.switchNoSortingKeePassInBrowse.on = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;

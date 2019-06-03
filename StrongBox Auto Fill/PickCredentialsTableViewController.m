@@ -372,12 +372,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (void)segueToCreateNew {
     if (@available(iOS 11.0, *)) {
-        if(Settings.sharedInstance.useOldItemDetailsScene) {
-            [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
-        }
-        else {
-            [self performSegueWithIdentifier:@"segueToAddNew" sender:nil];
-        }
+        [self performSegueWithIdentifier:@"segueToAddNew" sender:nil];
     }
     else {
         [self performSegueWithIdentifier:@"segueToAdd" sender:nil];

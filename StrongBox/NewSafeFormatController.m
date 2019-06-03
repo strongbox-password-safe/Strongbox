@@ -6,21 +6,33 @@
 //  Copyright © 2018 Mark McGuill. All rights reserved.
 //
 
-#import "NewSafeFormatController.h"
+#import "SelectDatabaseFormatTableViewController.h"
 #import "SelectStorageProviderController.h"
 
-@interface NewSafeFormatController ()
+@interface SelectDatabaseFormatTableViewController ()
 
-@property DatabaseFormat selectedFormat;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellKeePass2Advanced;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellKeePass2Classic;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordSafe;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellKeePass1;
 
 @end
 
-@implementation NewSafeFormatController
+@implementation SelectDatabaseFormatTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.tableView.delegate = self;
+
+    [self bindExistingFormat];
+}
+
+- (void)bindExistingFormat {
+    self.cellKeePass2Advanced.accessoryType = (self.existingFormat == kKeePass4) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellKeePass2Classic.accessoryType = (self.existingFormat == kKeePass) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellPasswordSafe.accessoryType = (self.existingFormat == kPasswordSafe) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellKeePass1.accessoryType = (self.existingFormat == kKeePass1) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -31,33 +43,32 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    DatabaseFormat selectedFormat;
+    
     switch (indexPath.row) {
         case 0:
-            self.selectedFormat = kKeePass;
+            selectedFormat = kKeePass4;
             break;
         case 1:
-            self.selectedFormat = kKeePass4;
+            selectedFormat = kKeePass;
             break;
         case 2:
-            self.selectedFormat = kPasswordSafe;
+            selectedFormat = kPasswordSafe;
             break;
         case 3:
-            self.selectedFormat = kKeePass1;
+            selectedFormat = kKeePass1;
             break;
         default:
+            selectedFormat = kKeePass4;
             NSLog(@"WARN: Unknown Index Path!!");
             break;
     }
     
-    NSLog(@"Selected: %d", self.selectedFormat);
-    
-    [self performSegueWithIdentifier:@"segueToSelectStorage" sender:nil];
-}
+    NSLog(@"Selected: %d", selectedFormat);
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    SelectStorageProviderController *vc = segue.destinationViewController;
-    vc.existing = NO;
-    vc.format = self.selectedFormat;
+    [self bindExistingFormat];
+    
+    self.onSelectedFormat(selectedFormat);    
 }
 
 @end

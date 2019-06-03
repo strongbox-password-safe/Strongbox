@@ -10,13 +10,14 @@
 #import "SafeStorageProvider.h"
 #import "AbstractDatabaseFormatAdaptor.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
+#import "SelectStorageProviderController.h"
 
 @interface StorageBrowserTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property (nonatomic) NSObject *parentFolder;
 @property (nonatomic) BOOL existing;
 @property (nonatomic) id<SafeStorageProvider> safeStorageProvider;
-@property (nonatomic) DatabaseFormat format;
+@property (nonatomic, copy) SelectStorageCompletion onDone;
 
 - (IBAction)onSelectThisFolder:(id)sender;
 

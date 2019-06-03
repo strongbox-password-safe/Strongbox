@@ -75,9 +75,17 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    // NSLog(@"XML: \n\n%@\n\n", serializationData.xml);
-    
+//    NSLog(@"XML: \n\n%@\n\n", serializationData.xml);
+//
+//    NSError *er;
+//    NSData *df = [serializationData.xml dataUsingEncoding:NSUTF8StringEncoding];
+//    NSString* loc = [NSTemporaryDirectory() stringByAppendingPathComponent:@"kp.xml"];
+//    [df writeToFile:loc options:kNilOptions error:&er];
+//    NSLog(@"%@ => %@", loc, er);
+//
     // 2. Convert the Xml to a more usable Xml Model
+
+    serializationData.xml = xmlCleanupAndTrim(serializationData.xml);
 
     RootXmlDomainObject* xmlDoc = parseKeePassXml(serializationData.innerRandomStreamId,
                                                    serializationData.innerRandomStreamKey,

@@ -11,10 +11,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NewSafeFormatController : UITableViewController
+@interface SelectDatabaseFormatTableViewController : UITableViewController
 
-//@property (readonly) DatabaseFormat selectedFormat;
-//@property dispatch_block_t onSelectedFormat;
+@property DatabaseFormat existingFormat;
+@property (nonatomic, copy) void (^onSelectedFormat)(DatabaseFormat format);
 
 @end
 

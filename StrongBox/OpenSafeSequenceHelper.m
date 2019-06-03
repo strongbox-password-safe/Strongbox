@@ -21,7 +21,8 @@
 #import "AppleICloudProvider.h"
 #import "DuressDummyStorageProvider.h"
 #import "AutoFillManager.h"
-#import "MasterCredentialsViewController.h"
+#import "CASGTableViewController.h"
+#import "AddNewSafeHelper.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -389,57 +390,119 @@
         [self promptForPasswordAndOrKeyFile]; // TODO: Delete
     }
     else {
-        [self newPromptForPasswordAndOrKeyFile];
+        [self newerPromptForPasswordAndOrKeyFile];
     }
 }
 
-- (void)newPromptForPasswordAndOrKeyFile {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MasterCredentials" bundle:nil];
-    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
-    MasterCredentialsViewController *mcvc = (MasterCredentialsViewController*)nav.topViewController;
+- (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
+    NSString* veryLastFilename = [filename lastPathComponent];
+    NSString* filenameOnly = [veryLastFilename stringByDeletingPathExtension];
+    NSString* expectedKeyFileName = [filenameOnly stringByAppendingPathExtension:@"key"];
     
-    mcvc.onDone = ^(BOOL success, NSString * _Nullable password, NSData * _Nullable keyFileData, BOOL openOffline) {
+    return  expectedKeyFileName;
+}
+
+- (NSURL*)getAutoDetectedKeyFileUrl {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *directory = [IOsUtils applicationDocumentsDirectory];
+    NSError* error;
+    
+    NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:self.safe.fileName];
+    
+    NSArray<NSString*>* files = [fm contentsOfDirectoryAtPath:directory.path error:&error];
+    
+    if(!files) {
+        NSLog(@"Error looking for auto detected key file url: %@", error);
+        return nil;
+    }
+    
+    for (NSString *file in files) {
+        if([file caseInsensitiveCompare:expectedKeyFileName] == NSOrderedSame) {
+            return [directory URLByAppendingPathComponent:file];
+        }
+    }
+    
+    return nil;
+}
+
+- (void)newerPromptForPasswordAndOrKeyFile {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CreateDatabaseOrSetCredentials" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    CASGTableViewController *scVc = (CASGTableViewController*)nav.topViewController;
+    
+    scVc.mode = kCASGModeGetCredentials;
+    scVc.initialKeyFileUrl = self.safe.keyFileUrl;
+    scVc.initialReadOnly = self.safe.readOnly;
+    scVc.initialOfflineCache = self.manualOpenOfflineCache;
+    
+    // Less than ideal
+    BOOL probablyPasswordSafe = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
+    scVc.initialFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; // Not Ideal
+    
+    if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
+        scVc.offlineCacheDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.safe];
+    }
+    
+    // Auto Detect Key File?
+    
+    if(!self.safe.keyFileUrl) {
+        if(!Settings.sharedInstance.doNotAutoDetectKeyFiles) {
+            NSURL* autoDetectedKeyFileUrl = [self getAutoDetectedKeyFileUrl];
+            if(autoDetectedKeyFileUrl) {
+                scVc.autoDetectedKeyFileUrl = YES;
+                scVc.initialKeyFileUrl = autoDetectedKeyFileUrl;
+            }
+        }
+    }
+    
+    scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(success) {
-                BOOL notKdbXmlHack = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"KDB"] != NSOrderedSame;
-                self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:notKdbXmlHack]; // TODO: This is wrong for KDB XML Files - Fix in next iteration- Digest shouldn't be done until we know what kind of db it is
-                
-                self.manualOpenOfflineCache = openOffline;
-                self.masterPassword = password;
-
-                if(self.masterPassword.length == 0) {
-                    [Alerts twoOptionsWithCancel:self.viewController
-                                           title:@"Empty or No Password?"
-                                         message:@"There are two ways to interpret no password entry. Is your password an empty password or do you use no password at all?"
-                               defaultButtonText:@"Empty Password"
-                                secondButtonText:@"No Password"
-                                          action:^(int response) {
-                                              if(response == 0) {
-                                                  self.masterPassword = @"";
-                                              }
-                                              else if (response == 1) {
-                                                  self.masterPassword = nil;
-                                              }
-                                              else {
-                                                  self.completion(nil, nil);
-                                                  return;
-                                              }
-                                              
-                                              [self openSafe];
-                                          }];
-                }
-                else {
-                    [self openSafe];
-                }
+                [self onGotManualCredentials:creds.password keyFileUrl:creds.keyFileUrl oneTimeKeyFileData:creds.oneTimeKeyFileData readOnly:creds.readOnly openOffline:creds.offlineCache];
             }
             else {
                 self.completion(nil, nil);
             }
         }];
     };
-    
-    mcvc.database = self.safe;
+
     [self.viewController presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)onGotManualCredentials:(NSString*)password
+                    keyFileUrl:(NSURL*)keyFileUrl
+            oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+                      readOnly:(BOOL)readOnly
+                   openOffline:(BOOL)openOffline {
+    BOOL notKdbXmlHack = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"KDB"] != NSOrderedSame;
+    
+    if(keyFileUrl || oneTimeKeyFileData) {
+        NSError *error;
+        
+        // TODO: This is wrong for KDB XML Files - Fix in next iteration- Digest shouldn't be done until we know what kind of db it is
+        
+        self.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, notKdbXmlHack, &error);
+        if(self.keyFileDigest == nil) {
+            // TODO: Move error messaging out of here
+            [Alerts error:self.viewController title:@"Error Reading Key File" error:error completion:^{
+                self.completion(nil, error);
+            }];
+            return;
+        }
+    }
+    
+    // Change in Read-Only or Key File Setting? Save
+    
+    if(self.safe.readOnly != readOnly || ![self.safe.keyFileUrl isEqual:keyFileUrl]) {
+        self.safe.readOnly = readOnly;
+        self.safe.keyFileUrl = keyFileUrl;
+        [SafesList.sharedInstance update:self.safe];
+    }
+    
+    self.manualOpenOfflineCache = openOffline;
+    self.masterPassword = password;
+    
+    [self openSafe];
 }
 
 - (void)promptForPasswordAndOrKeyFile {
@@ -920,7 +983,7 @@
             [viewModel updateAutoFillCacheWithData:data];
         }
 
-        if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill && self.safe.useQuickTypeAutoFill) {
+        if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }
     }

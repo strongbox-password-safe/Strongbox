@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ndq-FV-qPb">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Select Storage Location-->
+        <scene sceneID="k2T-KP-77A">
+            <objects>
+                <tableViewController storyboardIdentifier="SelectStorageProviderControllerStoryboardID" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" modalPresentationStyle="formSheet" hidesBottomBarWhenPushed="YES" id="a7e-of-es7" customClass="SelectStorageProviderController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="rp3-IA-lb4">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="storageProviderReuseIdentifier" id="x8w-u9-aCY" customClass="CustomStorageProviderTableViewCell">
+                                <rect key="frame" x="0.0" y="28" width="414" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="x8w-u9-aCY" id="zaR-VW-LTk">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="product32" translatesAutoresizingMaskIntoConstraints="NO" id="TC7-L9-gNE">
+                                            <rect key="frame" x="20" y="6" width="32" height="32"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="32" id="Bal-4A-In9"/>
+                                                <constraint firstAttribute="height" constant="32" id="r7z-rU-Ihw"/>
+                                            </constraints>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="This is a fairly long provider text" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="65L-Di-ago">
+                                            <rect key="frame" x="60" y="12" width="334" height="20"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="65L-Di-ago" firstAttribute="centerY" secondItem="zaR-VW-LTk" secondAttribute="centerY" id="4hh-jw-PKa"/>
+                                        <constraint firstItem="65L-Di-ago" firstAttribute="trailing" secondItem="zaR-VW-LTk" secondAttribute="trailingMargin" id="DPI-Vg-ZsZ"/>
+                                        <constraint firstItem="TC7-L9-gNE" firstAttribute="leading" secondItem="zaR-VW-LTk" secondAttribute="leadingMargin" id="FKE-QS-Bbd"/>
+                                        <constraint firstItem="65L-Di-ago" firstAttribute="leading" secondItem="TC7-L9-gNE" secondAttribute="trailing" constant="8" id="KqO-Kb-1sZ"/>
+                                        <constraint firstItem="TC7-L9-gNE" firstAttribute="centerY" secondItem="zaR-VW-LTk" secondAttribute="centerY" id="pyw-r0-nqc"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="image" destination="TC7-L9-gNE" id="WCX-Ql-WBs"/>
+                                    <outlet property="text" destination="65L-Di-ago" id="VbP-UD-jh3"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="a7e-of-es7" id="sTx-O9-VpB"/>
+                            <outlet property="delegate" destination="a7e-of-es7" id="eg1-RB-1bg"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Select Storage Location" prompt="Select Where You Would Like to Store Your Database" id="yFP-XA-jum">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="cBe-cY-RGn">
+                            <connections>
+                                <action selector="onCancel:" destination="a7e-of-es7" id="3Xs-Ty-XDm"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics"/>
+                    <connections>
+                        <segue destination="WCV-cO-CwF" kind="show" identifier="SegueToBrowser" id="Hko-nO-Jgc"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pyy-HJ-1be" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-452.17391304347831" y="292.63392857142856"/>
+        </scene>
+        <!--Storage Browser-->
+        <scene sceneID="5ad-ai-VYe">
+            <objects>
+                <tableViewController title="Storage Browser" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" modalPresentationStyle="formSheet" id="WCV-cO-CwF" customClass="StorageBrowserTableViewController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="BCd-TU-Hho">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="StorageBrowserItemCell" textLabel="aXI-hl-I3Z" style="IBUITableViewCellStyleDefault" id="b9H-W2-whc">
+                                <rect key="frame" x="0.0" y="22" width="414" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="b9H-W2-whc" id="XuE-gm-rNU">
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aXI-hl-I3Z">
+                                            <rect key="frame" x="20" y="0.0" width="356" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="WCV-cO-CwF" kind="show" identifier="recursiveSegue" id="TJR-pG-fHA"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="WCV-cO-CwF" id="h3D-hS-kX5"/>
+                            <outlet property="delegate" destination="WCV-cO-CwF" id="hVT-U9-djX"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems>
+                        <barButtonItem systemItem="flexibleSpace" id="0Iu-K2-Igm"/>
+                        <barButtonItem title="Select This Folder" id="c3E-XJ-xgJ">
+                            <connections>
+                                <action selector="onSelectThisFolder:" destination="WCV-cO-CwF" id="34f-3U-MiL"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="qVP-PG-1aG"/>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" id="5JU-2R-qe1"/>
+                    <connections>
+                        <outlet property="buttonSelectThis" destination="c3E-XJ-xgJ" id="rIc-Tl-Z8I"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5EG-ck-5Og" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="355.07246376811599" y="292.63392857142856"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="hl5-di-eeh">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" definesPresentationContext="YES" modalPresentationStyle="formSheet" id="Ndq-FV-qPb" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="gGW-YG-kBV">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="a7e-of-es7" kind="relationship" relationship="rootViewController" id="g5q-KL-55z"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="okC-K1-jKN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1362.3188405797102" y="292.63392857142856"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="product32" width="32" height="32"/>
+    </resources>
+</document>

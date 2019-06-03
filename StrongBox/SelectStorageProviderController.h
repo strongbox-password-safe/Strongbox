@@ -8,10 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "AbstractDatabaseFormatAdaptor.h"
+#import "SelectedStorageParameters.h"
+
+typedef void (^SelectStorageCompletion)(SelectedStorageParameters *params);
 
 @interface SelectStorageProviderController : UITableViewController
 
 @property (nonatomic) BOOL existing;
-@property (nonatomic) DatabaseFormat format;
+@property (nonatomic, copy) SelectStorageCompletion onDone;
 
 @end

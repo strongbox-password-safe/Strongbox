@@ -26,6 +26,7 @@
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
+#import "PasswordGenerationSettingsTableView.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -769,6 +770,13 @@ static const int kMinNotesCellHeight = 160;
         __weak CustomFieldsViewController* weakRef = vc;
         vc.onDoneWithChanges = ^{
             [self onCustomFieldsChanged:self.record items:weakRef.items];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToPwSettings"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)[nav topViewController];
+        vc.onDone = ^{
+            [self dismissViewControllerAnimated:YES completion:nil];
         };
     }
 }

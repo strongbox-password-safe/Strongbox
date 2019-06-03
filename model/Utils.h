@@ -34,6 +34,8 @@ NSString* friendlyFileSizeString(long long byteCount);
 NSString *friendlyDateString(NSDate *modDate);
 NSString *friendlyDateStringVeryShort(NSDate *modDate);
 
+NSString* xmlCleanupAndTrim(NSString* foo);
+
 BOOL isValidUrl(NSString* urlString);
 NSString* trim(NSString* str);
 + (NSString *)trim:(NSString*)string;

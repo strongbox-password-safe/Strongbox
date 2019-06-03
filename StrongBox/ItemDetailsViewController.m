@@ -31,6 +31,7 @@
 #import "KeePassHistoryController.h"
 #import "PasswordHistoryViewController.h"
 #import "CollapsibleTableViewHeader.h"
+#import "PasswordGenerationSettingsTableView.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -1018,6 +1019,13 @@ static NSString* const kTotpCell = @"TotpCell";
 
         vc.deleteHistoryItem = ^(Node * historicalNode) {
             [self onDeleteHistoryItem:historicalNode];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToPasswordGenerationSettings"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)[nav topViewController];
+        vc.onDone = ^{
+            [self dismissViewControllerAnimated:YES completion:nil];
         };
     }
 }

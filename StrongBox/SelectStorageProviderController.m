@@ -7,23 +7,18 @@
 //
 
 #import "SelectStorageProviderController.h"
-#import "SafeStorageProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "CustomStorageProviderTableViewCell.h"
-#import "AddSafeAlertController.h"
 #import "DatabaseModel.h"
 #import "Alerts.h"
 #import "StorageBrowserTableViewController.h"
 #import "AppleICloudProvider.h"
 #import "Settings.h"
-#import "SafesList.h"
 #import "OneDriveStorageProvider.h"
-#import "AddNewSafeHelper.h"
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
-#import "InitialViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
@@ -62,8 +57,7 @@
                            [DropboxV2StorageProvider sharedInstance],
                            [OneDriveStorageProvider sharedInstance],
                            webDavProvider,
-                           sftpProviderWithFastListing,
-                           [LocalDeviceStorageProvider sharedInstance]];
+                           sftpProviderWithFastListing];
     }
     else {
         if ([Settings sharedInstance].iCloudOn) {
@@ -148,60 +142,6 @@
     }
 }
 
-- (void)onAddThroughFilesApp {
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
-    vc.delegate = self;
-    [self presentViewController:vc animated:YES completion:nil];
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    
-    NSURL* url = [urls objectAtIndex:0];
-    [self.navigationController popToRootViewControllerAnimated:YES];
-    [[self getInitialViewController] import:url canOpenInPlace:YES];
-}
-
-- (InitialViewController *)getInitialViewController {
-    InitialViewController *ivc = (InitialViewController*)self.navigationController.parentViewController;
-    return ivc;
-}
-
-- (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
-    if ((self.existing && provider.browsableExisting) || (!self.existing && provider.browsableNew)) {
-        [self performSegueWithIdentifier:@"SegueToBrowser" sender:provider];
-    }
-    else {
-        AddSafeAlertController *controller = [[AddSafeAlertController alloc] init];
-        
-        [controller addNew:self
-                validation:^BOOL (NSString *name, NSString *password) {
-                    return [[SafesList sharedInstance] isValidNickName:name] && password.length;
-                }
-                completion:^(NSString *name, NSString *password, BOOL response) {
-                    if (response) {
-                        NSString *nickName = [SafesList sanitizeSafeNickName:name];
-                        
-                        [AddNewSafeHelper addNewSafeAndPopToRoot:self name:nickName password:password provider:provider format:self.format];
-                    }
-                }];
-    }
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"SegueToBrowser"]) {
-        StorageBrowserTableViewController *vc = segue.destinationViewController;
-        
-        vc.existing = self.existing;
-        
-        NSLog(@"Setting Storage Browser FOrmat: %d", self.format);
-        
-        vc.format = self.format;
-        vc.safeStorageProvider = sender;
-        vc.parentFolder = nil;
-    }
-}
-
 - (void)initiateManualImportFromUrl {
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:@"URL"
@@ -215,6 +155,23 @@
                                [self importFromManualUiUrl:url];
                            }
                        }];
+}
+
+- (void)onAddThroughFilesApp {
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
+    vc.delegate = self;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Three different methods of adding/creating
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    
+    NSURL* url = [urls objectAtIndex:0];
+    
+    self.onDone([SelectedStorageParameters parametersForFilesApp:url]);
 }
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
@@ -234,64 +191,38 @@
         return;
     }
     
-    [self promptForManualUrlNickName:importedData];
+    self.onDone([SelectedStorageParameters parametersForManualDownload:importedData]);
 }
 
-- (void)promptForManualUrlNickName:(NSData *)data {
-    [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Database Name"
-                            title:@"Enter a Name"
-                          message:@"What would you like to call this database?"
-                       completion:^(NSString *text, BOOL response) {
-                           if (response) {
-                               NSString *nickName = [SafesList sanitizeSafeNickName:text];
-                               
-                               if (![[SafesList sharedInstance] isValidNickName:nickName]) {
-                                   [Alerts   info:self
-                                            title:@"Invalid Nickname"
-                                          message:@"That nickname may already exist, or is invalid, please try a different nickname."
-                                       completion:^{
-                                           [self promptForManualUrlNickName:data];
-                                       }];
-                               }
-                               else {
-                                   [self copyAndAddManualUrlDatabase:nickName data:data];
-                               }
-                           }
-                       }];
-}
+- (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
+    BOOL storageBrowseRequired = (self.existing && provider.browsableExisting) || (!self.existing && provider.browsableNew);
 
-- (void)copyAndAddManualUrlDatabase:(NSString *)nickName data:(NSData *)data {
-    id<SafeStorageProvider> provider;
-    
-    if(Settings.sharedInstance.iCloudOn) {
-        provider = AppleICloudProvider.sharedInstance;
+    if (storageBrowseRequired) {
+        [self performSegueWithIdentifier:@"SegueToBrowser" sender:provider];
     }
     else {
-        provider = LocalDeviceStorageProvider.sharedInstance;
+        if(self.existing) {
+            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:provider file:nil]);
+        }
+        else {
+            self.onDone([SelectedStorageParameters parametersForNativeProviderCreate:provider folder:nil]);
+        }
     }
-    
-    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    
-    [provider create:nickName
-           extension:extension
-                data:data
-        parentFolder:nil
-      viewController:self
-          completion:^(SafeMetaData *metadata, NSError *error)
-     {
-         dispatch_async(dispatch_get_main_queue(), ^(void)
-                        {
-                            if (error == nil) {
-                                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                            }
-                            else {
-                                [Alerts error:self title:@"Error Importing Database" error:error];
-                            }
-                            
-                            [self.navigationController popToRootViewControllerAnimated:YES];
-                        });
-     }];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"SegueToBrowser"]) {
+        StorageBrowserTableViewController *vc = segue.destinationViewController;
+        
+        vc.existing = self.existing;
+        vc.safeStorageProvider = sender;
+        vc.parentFolder = nil;
+        vc.onDone = self.onDone;
+    }
+}
+
+- (IBAction)onCancel:(id)sender {
+    self.onDone([SelectedStorageParameters userCancelled]);
 }
 
 @end

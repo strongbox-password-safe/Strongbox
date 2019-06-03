@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "SafeMetaData.h"
 
+extern NSString* _Nonnull const kDatabasesListChangedNotification;
+
 @interface SafesList : NSObject
 
 + (instancetype _Nullable)sharedInstance;

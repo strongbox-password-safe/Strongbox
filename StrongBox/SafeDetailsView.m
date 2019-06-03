@@ -19,6 +19,8 @@
 #import "KeyFileParser.h"
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
+#import "CASGTableViewController.h"
+#import "AddNewSafeHelper.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -27,6 +29,7 @@
 @end
 
 @interface SafeDetailsView () <MFMailComposeViewControllerDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodes;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
@@ -35,27 +38,127 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowOfflineCache;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowQuickTypeAutoFill;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeMasterCredentials;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
 
 @end
 
 @implementation SafeDetailsView
 
-- (IBAction)onSwitchAllowQuickTypeAutoFill:(id)sender {
-    self.viewModel.metadata.useQuickTypeAutoFill = self.switchAllowQuickTypeAutoFill.on;
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
-    if(self.switchAllowQuickTypeAutoFill.on) {
-        if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
-            [self.viewModel updateAutoFillQuickTypeDatabase];
-        }
+    [self bindAllowBiometricUnlock];
+    [self bindAllowAutoFillCache];
+    [self bindAllowOfflineCache];
+    
+    self.cellChangeMasterCredentials.userInteractionEnabled = [self canSetCredentials];
+    self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
+    self.cellChangeMasterCredentials.textLabel.text = self.viewModel.database.format == kPasswordSafe ? @"Change Master Password" : @"Change Master Credentials";
+    
+    self.cellChangeMasterCredentials.tintColor =  [self canSetCredentials] ? nil : UIColor.lightGrayColor;
+    
+    // This must be done in code as Interface builder setting is not respected on iPhones
+    // until cell gets selected
+
+    self.cellChangeMasterCredentials.imageView.image = [UIImage imageNamed:@"key"];
+    self.cellPinCodes.imageView.image = [UIImage imageNamed:@"keypad"];
+    self.cellExport.imageView.image = [UIImage imageNamed:@"upload"];
+
+    //
+    self.navigationController.toolbarHidden = YES;
+    self.navigationController.toolbar.hidden = YES;
+    [self.navigationController setNavigationBarHidden:NO];
+
+    self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : @"<None>";
+    self.labelMostPopularEmail.text = self.viewModel.database.mostPopularEmail ? self.viewModel.database.mostPopularEmail : @"<None>";
+    self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
+    self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.emailSet count]];
+    self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.passwordSet count]];
+    self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfGroups];
+    self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfRecords];
+}
+
+- (IBAction)onDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+//
+
+- (void)onChangeMasterCredentials {
+    [self performSegueWithIdentifier:@"segueToSetCredentials" sender:nil];
+}
+
+- (BOOL)canSetCredentials {
+    return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if([segue.identifier isEqualToString:@"segueToPinsConfiguration"]) {
+        PinsConfigurationController* vc = (PinsConfigurationController*)segue.destinationViewController;
+        vc.viewModel = self.viewModel;
     }
-    else {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    else if([segue.identifier isEqualToString:@"segueToSetCredentials"]) {
+        NSLog(@"Set Creds - XXXXXXXX");
+        
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
+        
+        scVc.mode = kCASGModeSetCredentials;
+        scVc.initialFormat = self.viewModel.database.format;
+        scVc.initialKeyFileUrl = self.viewModel.metadata.keyFileUrl;
+        
+        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(success) {
+                    [self setCredentials:creds.password keyFileUrl:creds.keyFileUrl oneTimeKeyFileData:creds.oneTimeKeyFileData];
+                }
+            }];
+        };
     }
 }
 
-- (void)bindAllowQuickTypeAutoFill {
-    self.switchAllowQuickTypeAutoFill.on = self.viewModel.metadata.useQuickTypeAutoFill;
+- (void)setCredentials:(NSString*)password keyFileUrl:(NSURL*)keyFileUrl oneTimeKeyFileData:(NSData*)oneTimeKeyFileData {
+    if(keyFileUrl != nil || oneTimeKeyFileData != nil) {
+        NSError* error;
+        self.viewModel.database.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
+        
+        if(self.viewModel.database.keyFileDigest == nil) {
+            [Alerts error:self title:@"Could not change credentials" error:error];
+            return;
+        }
+    }
+    else {
+        self.viewModel.database.keyFileDigest = nil;
+    }
+
+    self.viewModel.database.masterPassword = password;
+    
+    [self.viewModel update:^(NSError *error) {
+        if (error == nil) {
+            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
+                self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
+                self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
+                
+                NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
+            }
+            
+            self.viewModel.metadata.keyFileUrl = keyFileUrl; 
+            [SafesList.sharedInstance update:self.viewModel.metadata];
+
+            [ISMessages showCardAlertWithTitle:self.viewModel.database.format == kPasswordSafe ? @"Master Password Changed" : @"Master Credentials Changed"
+                                       message:nil
+                                      duration:3.f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeSuccess
+                                 alertPosition:ISAlertPositionTop
+                                       didHide:nil];
+        }
+        else {
+            [Alerts error:self title:@"Could not change credentials" error:error];
+        }
+    }];
 }
 
 - (void)bindAllowBiometricUnlock {
@@ -219,76 +322,24 @@
     }
 }
 
-- (void)bindReadOnly {
-    self.switchReadOnly.on = self.viewModel.metadata.readOnly;
-}
-
-- (IBAction)onReadOnly:(id)sender {
-    self.viewModel.metadata.readOnly = self.switchReadOnly.on;
-    
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
-    
-    [self bindReadOnly];
-    
-    [Alerts info:self title:@"Re-Open Required" message:@"Please re open this database for this read only change to take effect."];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [self bindAllowBiometricUnlock];
-    [self bindAllowAutoFillCache];
-    [self bindReadOnly];
-    [self bindAllowOfflineCache];
-    [self bindAllowQuickTypeAutoFill];
-    
-    self.labelChangeMasterPassword.enabled = [self canChangeMasterPassword];
-    self.labelChangeKeyFile.enabled = [self canChangeKeyFile];
-
-    self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : @"<None>";
-    self.labelMostPopularEmail.text = self.viewModel.database.mostPopularEmail ? self.viewModel.database.mostPopularEmail : @"<None>";
-    self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
-    self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.emailSet count]];
-    self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.passwordSet count]];
-    self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfGroups];
-    self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfRecords];
-    
-    self.navigationController.toolbarHidden = YES;
-    self.navigationController.toolbar.hidden = YES;
-    [self.navigationController setNavigationBarHidden:NO];
-}
-
-static NSString *getLastCachedDate(NSDate *modDate) {
-    if(!modDate) { return @""; }
-    
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.timeStyle = NSDateFormatterShortStyle;
-    df.dateStyle = NSDateFormatterShortStyle;
-    df.doesRelativeDateFormatting = YES;
-    df.locale = NSLocale.currentLocale;
-    
-    NSString *modDateStr = [df stringFromDate:modDate];
-    return [NSString stringWithFormat:@"(Cached %@)", modDateStr];
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 1) {
-        if(indexPath.row == 0 && [self canChangeMasterPassword]) { // Change Master Password {
-            [self onChangeMasterPassword];
-        }
-        if(indexPath.row == 1 && [self canChangeKeyFile]) { // Change Master Password {
-            [self onChangeKeyFile];
-        }
-        else if (indexPath.row == 2) { // Export Safe
-            [self onExport];
-        }
+    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    
+    if(cell == self.cellChangeMasterCredentials) {
+        [self onChangeMasterCredentials];
+    }
+    else if (cell == self.cellPinCodes) {
+        [self performSegueWithIdentifier:@"segueToPinsConfiguration" sender:nil];
+    }
+    else if (cell == self.cellExport) {
+        [self onExport];
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     
-    if(indexPath.section == 3) {
+    if(indexPath.section == 2) {
         BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
 
         if(indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
@@ -302,10 +353,9 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
-    if(indexPath.section == 3 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
+    if(indexPath.section == 2 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
     {
         return 0;
     }
@@ -348,183 +398,12 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     
 }
 
-- (BOOL)canChangeKeyFile {
-    return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache || self.viewModel.database.format == kPasswordSafe);
-}
-
-- (BOOL)canChangeMasterPassword {
-    return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
-}
-
 - (BOOL)canToggleTouchId {
     return Settings.isBiometricIdAvailable && !self.viewModel.isReadOnly;
 }
 
 - (BOOL)canToggleOfflineCache {
     return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
-}
-
-- (void)onChangeKeyFile {
-    BOOL using = self.viewModel.database.keyFileDigest != nil;
-    
-    if(using) {
-        [Alerts threeOptions:self title:@"Change Key File"
-                     message:nil
-           defaultButtonText:using ? @"Select a new Key File" : @"Start using a Key File"
-            secondButtonText:@"Stop using the Key File"
-             thirdButtonText:@"Cancel" action:^(int response) {
-                 if(response == 0) {
-                     [self onSelectNewKeyFile];
-                 }
-                 else if(response == 1) {
-                     dispatch_async(dispatch_get_main_queue(), ^{
-                         [Alerts yesNo:self title:@"Are you sure?" message:@"Are you sure you want to stop using a Key File?" action:^(BOOL response) {
-                             if(response) {
-                                 [self changeKeyFile:nil];
-                             }
-                         }];
-                     });
-                 }
-             }];
-    }
-    else {
-        [self onSelectNewKeyFile];
-    }
-}
-
-- (void)onSelectNewKeyFile {
-    [Alerts threeOptions:self
-                   title:@"Key File Source"
-                 message:@"Select where you would like to choose your Key File from"
-       defaultButtonText:@"Files..."
-        secondButtonText:@"Photo Library..."
-         thirdButtonText:@"Cancel"
-                  action:^(int response) {
-                      if(response == 0) {
-                          UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
-                          vc.delegate = self;
-                          [self presentViewController:vc animated:YES completion:nil];
-                      }
-                      else if (response == 1) {
-                          UIImagePickerController *vc = [[UIImagePickerController alloc] init];
-                          vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
-                          vc.delegate = self;
-                          BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
-                          
-                          if(!available) {
-                              [Alerts info:self title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"];
-                              return;
-                          }
-                          
-                          vc.mediaTypes = @[(NSString*)kUTTypeImage];
-                          vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-                          
-                          [self presentViewController:vc animated:YES completion:nil];
-                      }
-                  }];
-}
-
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
-    [picker dismissViewControllerAnimated:YES completion:^
-     {
-         NSError* error;
-         NSData* data = [Utils getImageDataFromPickedImage:info error:&error];
-   
-         if(!data) {
-             NSLog(@"Error: %@", error);
-             [Alerts error:self title:@"There was an error reading the Key File" error:error completion:nil];
-         }
-         else {
-             NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Broken for XML KDB
-             [self changeKeyFile:keyFileDigest];
-         }
-     }];
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    //NSLog(@"didPickDocumentsAtURLs: %@", urls);
-
-    NSURL* url = [urls objectAtIndex:0];
-    // NSString *filename = [url.absoluteString lastPathComponent];
-
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
-
-    if(!data) {
-        NSLog(@"Error: %@", error);
-        [Alerts error:self title:@"There was an error reading the Key File" error:error completion:nil];
-    }
-    else {
-        NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Broken for XML KDB
-        [self changeKeyFile:keyFileDigest];
-    }
-}
-
-- (void)changeKeyFile:(NSData *)keyFileDigest {
-    self.viewModel.database.keyFileDigest = keyFileDigest;
-    
-    [self.viewModel update:^(NSError *error) {
-        if (error == nil) {
-            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-                self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
-                NSLog(@"Keychain updated on Key File changed for touch id enabled and enrolled safe.");
-            }
-            
-            [ISMessages             showCardAlertWithTitle:@"Key File Changed"
-                                                   message:nil
-                                                  duration:3.f
-                                               hideOnSwipe:YES
-                                                 hideOnTap:YES
-                                                 alertType:ISAlertTypeSuccess
-                                             alertPosition:ISAlertPositionTop
-                                                   didHide:nil];
-        }
-        else {
-            [Alerts             error:self
-                                title:@"Key File NOT Changed!"
-                                error:error];
-        }
-    }];
-}
-
-- (void)changeMasterPassword:(NSString *)password {
-    self.viewModel.database.masterPassword = password;
-    
-    [self.viewModel update:^(NSError *error) {
-        if (error == nil) {
-            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-                self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
-                NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
-            }
-            
-            [ISMessages             showCardAlertWithTitle:@"Master Password Changed"
-                                                   message:nil
-                                                  duration:3.f
-                                               hideOnSwipe:YES
-                                                 hideOnTap:YES
-                                                 alertType:ISAlertTypeSuccess
-                                             alertPosition:ISAlertPositionTop
-                                                   didHide:nil];
-        }
-        else {
-            [Alerts             error:self
-                                title:@"Master Password NOT Changed!"
-                                error:error];
-        }
-    }];
-}
-
-- (void)onChangeMasterPassword {
-    Alerts *alerts = [[Alerts alloc] initWithTitle:@"Change Master Password"
-                                           message:@"Enter the new password:"];
-    
-    [alerts OkCancelWithPasswordAndConfirm:self
-                                allowEmpty:!(self.viewModel.database.format == kKeePass1 || self.viewModel.database.format == kPasswordSafe)
-                                completion:^(NSString *password, BOOL response) {
-                                    if (response) {
-                                        [self changeMasterPassword:password];
-                                    }
-                                }];
 }
 
 - (void)exportEncryptedSafeByEmail {
@@ -569,12 +448,19 @@ static NSString *getLastCachedDate(NSDate *modDate) {
     [self dismissViewControllerAnimated:YES completion:^{ }];
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if([segue.identifier isEqualToString:@"segueToPinsConfiguration"]) {
-        PinsConfigurationController* vc = (PinsConfigurationController*)segue.destinationViewController;
-        vc.viewModel = self.viewModel;
-    }
+
+static NSString *getLastCachedDate(NSDate *modDate) {
+    if(!modDate) { return @""; }
+    
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = NSDateFormatterShortStyle;
+    df.dateStyle = NSDateFormatterShortStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+    
+    NSString *modDateStr = [df stringFromDate:modDate];
+    return [NSString stringWithFormat:@"(Cached %@)", modDateStr];
 }
 
-@end
 
+@end

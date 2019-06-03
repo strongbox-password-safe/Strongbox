@@ -91,15 +91,6 @@
     return [UIImage imageNamed:@"Strongbox-180x180-greyed"];
 }
 
-- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
-    NSDictionary *attributes = @{
-                                 NSFontAttributeName: [UIFont boldSystemFontOfSize:21.0f],
-                                 NSForegroundColorAttributeName: [UIColor blueColor]
-                                 };
-    
-    return [[NSAttributedString alloc] initWithString:@"Got It, Take Me Back" attributes:attributes];
-}
-
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
     NSString *text = @"You Have No Strongbox Databases :(";
