@@ -220,6 +220,8 @@
             attachment.index = binaryIndex;
             attachment.linkedObject = binary;
             
+//            NSLog(@"Found attachment for: %@", childEntry.title);
+            
             [fields.attachments addObject:attachment];
         }
     }
