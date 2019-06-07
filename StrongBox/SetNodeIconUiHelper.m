@@ -183,18 +183,17 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 - (void)presentKeePassAndDatabaseIconSets {
     IconsCollectionViewController* vc = [[IconsCollectionViewController alloc] init];
     vc.customIcons = self.customIcons;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
     
     vc.onDone = ^(BOOL response, NSInteger selectedIndex, NSUUID * _Nullable selectedCustomIconId) {
-        [self.viewController dismissViewControllerAnimated:YES completion:nil];
-        
-        //NSLog(@"%ld", (long)selectedIndex);
-        
-        if(response) {
-            self.completionBlock(YES, @(selectedIndex), selectedCustomIconId, nil);
-        }
-        else {
-            self.completionBlock(NO, nil, nil, nil);
-        }
+        [self.viewController dismissViewControllerAnimated:YES completion:^{
+            if(response) {
+                self.completionBlock(YES, @(selectedIndex), selectedCustomIconId, nil);
+            }
+            else {
+                self.completionBlock(NO, nil, nil, nil);
+            }
+        }];
     };
     
     [self.viewController presentViewController:vc animated:YES completion:nil];
@@ -204,6 +203,8 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
     UIImagePickerController *vc = [[UIImagePickerController alloc] init];
     vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
     vc.delegate = self;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    
     BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
     
     if(!available) {

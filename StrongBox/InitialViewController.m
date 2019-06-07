@@ -66,6 +66,10 @@
     UINavigationController* nav = [self selectedViewController];
     UIViewController* visible = nav.visibleViewController;
     
+    NSLog(@"Presenting Privacy Screen on [%@]", [visible class]);
+    
+    self.privacyAndLockVc.modalPresentationStyle = UIModalPresentationOverFullScreen; // This stops the view controller interfering with UIAlertController if we happen to present on that. Less than Ideal?
+    
     [visible presentViewController:self.privacyAndLockVc animated:NO completion:nil];
 }
 
@@ -179,29 +183,6 @@
     self.tabBar.hidden = YES;
     
     [self showConfiguredInitialView];
-    
-    // Pro or Free?
-    
-    if(![[Settings sharedInstance] isPro]) {
-        if([[Settings sharedInstance] getEndFreeTrialDate] == nil) {
-            NSCalendar *cal = [NSCalendar currentCalendar];
-            NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:3 toDate:[NSDate date] options:0];
-            [[Settings sharedInstance] setEndFreeTrialDate:date];
-        }
-        
-        if([Settings.sharedInstance getLaunchCount] == 1) {
-            [Alerts info:self title:@"Welcome!"
-                 message:@"Hi, Welcome to Strongbox!\n\nI hope you will enjoy the app!\n-Mark"];
-        }
-        else if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 6) {
-            if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
-                [Alerts info:self title:@"Strongbox Pro"
-                     message:@"Hi there!\nYou are currently using Strongbox Pro. You can evaluate this version over the next three months. I hope you like it.\n\nAfter this I would ask you to contribute to its development. If you choose not to support the app, you will then be transitioned to a little bit more limited version. You won't lose any of your databases or passwords.\n\nTo find out more you can tap the Upgrade button at anytime below. I hope you enjoy the app, and will choose to support it!\n-Mark"];
-                
-                [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
-            }
-        }
-    }
 }
 
 - (BOOL)isInQuickLaunchViewMode { 
@@ -217,8 +198,6 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-//    NSLog(@"XXXXXXXXXXXXXXXXXX - View Did Appear");
-
     if(!self.hasAppearedOnce) {
         if (Settings.sharedInstance.appLockMode != kNoLock) {
             [self showPrivacyScreen:YES];
@@ -233,8 +212,6 @@
                 }
                 else {
                     [self checkICloudAvailability];
-                    
-                    // TODO: Trigger onboarding here - if it has not already been dismissed / and we have zero safes?
                 }
             }
         }
@@ -280,6 +257,19 @@
         else {
             [self onICloudAvailable];
         }
+        
+        if(![[Settings sharedInstance] isPro]) {
+            if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
+                if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 2) {
+                    [self performSegueWithIdentifier:@"segueToProExplanation" sender:nil];
+                    
+                    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
+                }
+            }
+            else {
+                [self segueToNagScreenIfAppropriate];
+            }
+        }
     }];
 }
 
@@ -301,10 +291,7 @@
 }
 
 - (void)onICloudAvailable {
-    if (!Settings.sharedInstance.iCloudOn &&
-        !Settings.sharedInstance.iCloudPrompted &&
-        self.presentedViewController == nil) { // Not presenting any modal
-
+    if (!Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
         [Settings sharedInstance].iCloudPrompted = YES;
 
         BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
@@ -315,22 +302,23 @@
             [self onICloudAvailableContinuation];
             return;
         }
-
-        NSString *message = existingLocalDeviceSafes ?
-        (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
-         @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
-        (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
-        
-        [Alerts twoOptions:self
-                     title:@"iCloud is Now Available"
-                   message:message
-         defaultButtonText:@"Use iCloud"
-          secondButtonText:@"Local Only" action:^(BOOL response) {
-              if(response) {
-                  Settings.sharedInstance.iCloudOn = YES;
-              }
-              [self onICloudAvailableContinuation];
-          }];
+        else if(self.presentedViewController == nil) {
+            NSString *message = existingLocalDeviceSafes ?
+            (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
+             @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
+            (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
+            
+            [Alerts twoOptions:self
+                         title:@"iCloud is Now Available"
+                       message:message
+             defaultButtonText:@"Use iCloud"
+              secondButtonText:@"Local Only" action:^(BOOL response) {
+                  if(response) {
+                      Settings.sharedInstance.iCloudOn = YES;
+                  }
+                  [self onICloudAvailableContinuation];
+              }];
+        }
     }
     else {
         [self onICloudAvailableContinuation];
@@ -556,7 +544,7 @@
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
                     if(editInPlace) {
-                        [self addExternalFileReferenceSafe:creds.name url:url];
+                        [self addExternalFileReferenceSafe:creds.name data:data url:url];
                     }
                     else {
                         [self copyAndAddImportedSafe:creds.name data:data url:url];
@@ -571,7 +559,8 @@
     id<SafeStorageProvider> provider;
     
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-
+    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    
     if(Settings.sharedInstance.iCloudOn) {
         provider = AppleICloudProvider.sharedInstance;
 
@@ -585,6 +574,7 @@
              dispatch_async(dispatch_get_main_queue(), ^(void)
                             {
                                 if (error == nil) {
+                                    metadata.likelyFormat = format;
                                     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
                                 }
                                 else {
@@ -604,6 +594,7 @@
                                                completion:^(SafeMetaData *metadata, NSError *error) {
                                                    dispatch_async(dispatch_get_main_queue(), ^(void) {
                 if (error == nil) {
+                    metadata.likelyFormat = format;
                     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
                 }
                 else {
@@ -614,7 +605,7 @@
     }
 }
 
-- (void)addExternalFileReferenceSafe:(NSString *)nickName url:(NSURL*)url {
+- (void)addExternalFileReferenceSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url {
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     if (!securitySucceeded) {
         NSLog(@"Could not access secure scoped resource!");
@@ -639,6 +630,9 @@
     
     SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];
     
+    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    metadata.likelyFormat = format;
+    
     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
 }
 
@@ -648,6 +642,22 @@
     //NSLog(@"Primary Safe: [%@]", safe);
     
     return safe.hasUnresolvedConflicts ? nil : safe;
+}
+
+- (void)segueToNagScreenIfAppropriate {
+    if(Settings.sharedInstance.isProOrFreeTrial) {
+        return;
+    }
+
+    NSInteger random = arc4random_uniform(100);
+
+    //NSLog(@"Random: %ld", (long)random);
+
+    if(random < 15) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
+        });
+    }
 }
 
 @end

@@ -29,6 +29,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchEmergencyUseOldUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseOldNonSplitView;
 
 @end
 
@@ -77,6 +78,7 @@
     Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchEmptyPassword.on;
     Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
+    Settings.sharedInstance.doNotUseNewSplitViewController = self.switchUseOldNonSplitView.on;
     
     if(!self.switchUseQuickTypeAutoFill.on) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -103,6 +105,7 @@
     self.switchEmptyPassword.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
     self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
+    self.switchUseOldNonSplitView.on = Settings.sharedInstance.doNotUseNewSplitViewController;
 }
 
 @end

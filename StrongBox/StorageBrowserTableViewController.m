@@ -10,6 +10,7 @@
 #import "Alerts.h"
 #import "DatabaseModel.h"
 #import "Utils.h"
+#import "NodeIconHelper.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -141,6 +142,7 @@
 
     if (_safeStorageProvider.providesIcons) {
         NSValue *myKey = [NSValue valueWithNonretainedObject:file];
+        cell.imageView.tintColor = nil;
 
         if (!_iconsCache[myKey]) {
             [_safeStorageProvider loadIcon:file.providerData
@@ -150,7 +152,6 @@
                                         self->_iconsCache[myKey] = image;
 
                                         cell.imageView.image = image;
-
                                         NSArray *rowsToReload = @[indexPath];
                                         [self.tableView reloadRowsAtIndexPaths:rowsToReload
                                               withRowAnimation:UITableViewRowAnimationNone];
@@ -163,6 +164,7 @@
     }
     else {
         cell.imageView.image = file.folder ? _defaultFolderImage : _defaultFileImage;
+        cell.imageView.tintColor = file.folder ? NodeIconHelper.folderTintColor : nil;
     }
 
     cell.accessoryType = file.folder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
@@ -223,7 +225,9 @@
     if (error == nil) {
         NSError* err;
         if ([DatabaseModel isAValidSafe:data error:&err]) {
-            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file]);
+            DatabaseFormat likelyFormat = [DatabaseModel getLikelyDatabaseFormat:data];
+            
+            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file likelyFormat:likelyFormat]);
         }
         else {
             [Alerts error:self title:@"Invalid Database File" error:err];

@@ -89,6 +89,24 @@ NSInteger const kSearchScopeAll = 4;
     return NO;
 }
 
++ (DatabaseFormat)getLikelyDatabaseFormat:(NSData *)candidate {
+    NSError* error;
+    if([PwSafeDatabase isAValidSafe:candidate error:&error]) {
+        return kPasswordSafe;
+    }
+    else if ([KeePassDatabase isAValidSafe:candidate error:&error]) {
+        return kKeePass;
+    }
+    else if([Kdbx4Database isAValidSafe:candidate error:&error]) {
+        return kKeePass4;
+    }
+    else if([Kdb1Database isAValidSafe:candidate error:&error]) {
+        return kKeePass1;
+    }
+    
+    return kFormatUnknown;
+}
+
 + (NSString*)getLikelyFileExtension:(NSData *)candidate {
     NSError* error;
     if([PwSafeDatabase isAValidSafe:candidate error:&error]) {

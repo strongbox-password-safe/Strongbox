@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CASGTableViewController : StaticDataTableViewController
 
++ (NSString*)getSuggestedDatabaseName;
+
 @property CASGMode mode;
 @property DatabaseFormat initialFormat;
 @property NSURL* initialKeyFileUrl;

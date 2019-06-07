@@ -32,6 +32,7 @@
 #import "PasswordHistoryViewController.h"
 #import "CollapsibleTableViewHeader.h"
 #import "PasswordGenerationSettingsTableView.h"
+#import "BrowseSafeView.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -101,7 +102,7 @@ static NSString* const kTotpCell = @"TotpCell";
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-   // [UIView setAnimationsEnabled:NO];
+    [UIView setAnimationsEnabled:NO];
 
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
@@ -125,7 +126,11 @@ static NSString* const kTotpCell = @"TotpCell";
         [self rescheduleTimer];
     }
     
- //   [UIView setAnimationsEnabled:YES];
+    [UIView setAnimationsEnabled:YES];
+    
+    if(self.splitViewController) {
+        self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -222,7 +227,17 @@ static NSString* const kTotpCell = @"TotpCell";
                     self.model = self.preEditModelClone;
                     
                     if(self.createNewItem) {
-                        [self.navigationController popViewControllerAnimated:YES];
+                        if(self.splitViewController) {
+                            if(self.splitViewController.isCollapsed) { // We can just pop back
+                                [self.navigationController.navigationController popViewControllerAnimated:YES];
+                            }
+                            else {
+                                [self performSegueWithIdentifier:@"segueToEmptyDetails" sender:nil];
+                            }
+                        }
+                        else {
+                            [self.navigationController popViewControllerAnimated:YES];
+                        }
                     }
                     else {
                         [self setEditing:NO];
@@ -232,7 +247,17 @@ static NSString* const kTotpCell = @"TotpCell";
         }
         else {
             if(self.createNewItem) {
-                [self.navigationController popViewControllerAnimated:YES];
+                if(self.splitViewController) {
+                    if(self.splitViewController.isCollapsed) { // We can just pop back
+                        [self.navigationController.navigationController popViewControllerAnimated:YES];
+                    }
+                    else {
+                        [self performSegueWithIdentifier:@"segueToEmptyDetails" sender:nil];
+                    }
+                }
+                else {
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
             }
             else {
                 [self setEditing:NO];
@@ -252,14 +277,17 @@ static NSString* const kTotpCell = @"TotpCell";
 
 - (void)bindNavBar {
     if(self.isEditing) {
+        self.navigationItem.leftItemsSupplementBackButton = NO;
         BOOL isDifferent = [self.model isDifferentFrom:self.preEditModelClone];
         BOOL saveable = [self.model isValid] && (isDifferent || self.createNewItem);
         self.editButtonItem.enabled = saveable;
         self.navigationItem.leftBarButtonItem = self.cancelOrDiscardBarButton;
     }
     else {
+        self.navigationItem.leftItemsSupplementBackButton = YES;
         self.editButtonItem.enabled = !self.readOnly;
-        self.navigationItem.leftBarButtonItem = nil;
+        self.navigationItem.leftBarButtonItem = self.splitViewController ? self.splitViewController.displayModeButtonItem : nil;
+        
         self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title], self.readOnly ? @" (Read Only)" : @""];
     }
 }
@@ -923,6 +951,8 @@ static NSString* const kTotpCell = @"TotpCell";
     v.dataSource = self;
     v.currentPreviewItemIndex = index;
     v.delegate = self;
+    v.modalPresentationStyle = UIModalPresentationFormSheet;
+    
     [self presentViewController:v animated:YES completion:nil];
 }
 
@@ -1090,6 +1120,13 @@ static NSString* const kTotpCell = @"TotpCell";
             }];
             NSLog(@"%@", error);
         }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                if(self.onChanged) {
+                    self.onChanged();
+                }
+            });
+        }
     }];
 }
 
@@ -1103,6 +1140,9 @@ static NSString* const kTotpCell = @"TotpCell";
     [self.databaseModel update:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(error);
+            if(self.onChanged) {
+                self.onChanged();
+            }
         });
     }];
 }
@@ -1210,6 +1250,8 @@ static NSString* const kTotpCell = @"TotpCell";
     [Alerts threeOptions:self title:@"How would you like to setup TOTP?" message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL" defaultButtonText:@"QR Code..." secondButtonText:@"Manually..." thirdButtonText:@"Cancel" action:^(int response) {
         if(response == 0){
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
+            vc.modalPresentationStyle = UIModalPresentationFormSheet;
+            
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
@@ -1435,7 +1477,7 @@ static NSString* const kTotpCell = @"TotpCell";
     
     [self killTotpUpdateTimer];
 
-    if (error != nil) {
+    if (error != nil) { // TODO: This may not be correct for Split View
         [Alerts error:self title:@"Problem Saving" error:error completion:^{
             [self.navigationController popToRootViewControllerAnimated:YES];
         }];
@@ -1451,6 +1493,10 @@ static NSString* const kTotpCell = @"TotpCell";
         [self bindNavBar];
         [self rescheduleTimer];
 
+        if(self.onChanged) {
+            self.onChanged();
+        }
+        
 #ifdef IS_APP_EXTENSION
         [self.autoFillRootViewController onCredentialSelected:self.item.fields.username password:self.item.fields.password];
 #endif

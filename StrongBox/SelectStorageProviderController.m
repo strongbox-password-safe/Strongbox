@@ -202,7 +202,8 @@
     }
     else {
         if(self.existing) {
-            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:provider file:nil]);
+            // How can we get here?! - I don't think this is possible
+            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:provider file:nil likelyFormat:kFormatUnknown]);
         }
         else {
             self.onDone([SelectedStorageParameters parametersForNativeProviderCreate:provider folder:nil]);

@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
                      iconId:(NSNumber*)iconId
                    database:(DatabaseModel *)database;
 
++ (UIColor*)folderTintColor;
 + (NSArray<UIImage*>*)iconSet;
 + (nullable UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
 

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="HOc-E3-CoK">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Browse-->
+        <scene sceneID="not-Ng-p9u">
+            <objects>
+                <tableViewController extendedLayoutIncludesOpaqueBars="YES" id="HOc-E3-CoK" userLabel="Browse" customClass="BrowseSafeView" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" allowsMultipleSelectionDuringEditing="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" id="Lsd-qd-IQA">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="not-used-at-all" id="lMY-bl-voF" userLabel="Keep This Cell for the Recursive Segue">
+                                <rect key="frame" x="0.0" y="28" width="414" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="lMY-bl-voF" id="L1N-s1-eQF">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="HOc-E3-CoK" kind="show" identifier="sequeToSubgroup" id="LMy-Mg-Tjp"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="HOc-E3-CoK" id="aQb-By-K4n"/>
+                            <outlet property="delegate" destination="HOc-E3-CoK" id="Dyw-9a-X7A"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems>
+                        <barButtonItem title="Move" id="xfT-gV-3qh">
+                            <connections>
+                                <action selector="onMove:" destination="HOc-E3-CoK" id="hqL-zD-Mb6"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="mIx-KX-HYK"/>
+                        <barButtonItem systemItem="trash" id="q9o-sg-anC">
+                            <connections>
+                                <action selector="onDeleteToolbarButton:" destination="HOc-E3-CoK" id="lHZ-yT-uie"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="omU-xo-iSU"/>
+                        <barButtonItem title="Item" image="sort-32" id="3Mz-oA-Fxf">
+                            <connections>
+                                <action selector="onSortItems:" destination="HOc-E3-CoK" id="eC7-FQ-hXD"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="P20-4X-Rdu"/>
+                        <barButtonItem systemItem="organize" id="Dce-Xl-qQu">
+                            <connections>
+                                <action selector="onAddGroup:" destination="HOc-E3-CoK" id="7Ca-Bj-0Hz"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="lyK-Xe-qJc"/>
+                        <barButtonItem systemItem="add" id="l4b-eD-mGt">
+                            <connections>
+                                <action selector="onAddRecord:" destination="HOc-E3-CoK" id="oCq-x8-wAS"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="WfE-z2-YTr"/>
+                        <barButtonItem image="maintenance" id="YZa-t7-Q9A">
+                            <connections>
+                                <segue destination="tH9-ae-xkY" kind="presentation" identifier="segueToSafeSettings" id="Vt6-Gg-48O"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="&lt;Group Name&gt;" prompt="Fast-Copy: Long Press-Password, Double Tap-Username, Triple Tap-TOTP" largeTitleDisplayMode="never" id="5B9-6k-HF7">
+                        <barButtonItem key="backBarButtonItem" title=" " id="qr0-gB-Oln"/>
+                        <barButtonItem key="leftBarButtonItem" title="Close" id="QGn-9Z-cSb">
+                            <connections>
+                                <action selector="onClose:" destination="HOc-E3-CoK" id="ofa-Uf-2Su"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <connections>
+                        <outlet property="buttonAddGroup" destination="Dce-Xl-qQu" id="f26-RL-XhW"/>
+                        <outlet property="buttonAddRecord" destination="l4b-eD-mGt" id="aiU-Vc-Ypi"/>
+                        <outlet property="buttonDelete" destination="q9o-sg-anC" id="80H-mr-zl2"/>
+                        <outlet property="buttonMove" destination="xfT-gV-3qh" id="aJn-aU-nVz"/>
+                        <outlet property="buttonSafeSettings" destination="YZa-t7-Q9A" id="Qcl-nf-bCe"/>
+                        <outlet property="buttonSortItems" destination="3Mz-oA-Fxf" id="nmN-r8-Kbt"/>
+                        <outlet property="closeBarButton" destination="QGn-9Z-cSb" id="XHy-88-Ye0"/>
+                        <segue destination="Zdq-as-J37" kind="presentation" identifier="segueToSelectDestination" id="Ge5-Lg-xHt"/>
+                        <segue destination="hCV-rQ-boH" kind="show" identifier="segueToRecord" id="whO-zx-LJG"/>
+                        <segue destination="xBb-lQ-IKW" kind="show" identifier="segueToItemDetails" id="UW5-fZ-zGF"/>
+                        <segue destination="Xvc-2n-sub" kind="showDetail" identifier="segueMasterDetailToDetail" id="QiY-Jy-N4s"/>
+                        <segue destination="PvG-5f-Mg9" kind="showDetail" identifier="segueMasterDetailToEmptyDetail" id="JRT-Bg-hOL"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aJp-lr-fNs" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1196" y="1669"/>
+        </scene>
+        <!--RecordView-->
+        <scene sceneID="Tir-qu-JI5">
+            <objects>
+                <viewControllerPlaceholder storyboardName="RecordView" id="hCV-rQ-boH" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bDD-pg-kO8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-618" y="1600"/>
+        </scene>
+        <!--EmptyDetailsID-->
+        <scene sceneID="aYJ-f7-hzt">
+            <objects>
+                <viewControllerPlaceholder storyboardName="MasterDetail" referencedIdentifier="EmptyDetailsID" id="PvG-5f-Mg9" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SEq-Tk-F52" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-201" y="1669"/>
+        </scene>
+        <!--ItemDetails-->
+        <scene sceneID="8mi-9m-7Mq">
+            <objects>
+                <viewControllerPlaceholder storyboardName="ItemDetails" id="xBb-lQ-IKW" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="MOf-p9-EZ5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-620" y="1769"/>
+        </scene>
+        <!--ItemDetails-->
+        <scene sceneID="Iu1-Da-dmc">
+            <objects>
+                <viewControllerPlaceholder storyboardName="ItemDetails" id="Ewt-OQ-fUB" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="dBU-b4-H8M"/>
+                </viewControllerPlaceholder>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bdo-Vo-vAl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="306" y="2177"/>
+        </scene>
+        <!--Select Move To Destination-->
+        <scene sceneID="R9j-0v-k55">
+            <objects>
+                <tableViewController extendedLayoutIncludesOpaqueBars="YES" id="yN7-Xg-vQi" userLabel="Select Move To Destination" customClass="SelectDestinationGroupController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" allowsMultipleSelectionDuringEditing="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" id="CUb-oO-JQk">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationWidth="0.0" reuseIdentifier="OpenSafeViewCell" textLabel="K9P-j2-L7I" imageView="wp2-E8-JPT" style="IBUITableViewCellStyleDefault" id="qqF-92-gWn">
+                                <rect key="frame" x="0.0" y="28" width="414" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qqF-92-gWn" id="80P-Y1-wJd">
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="K9P-j2-L7I">
+                                            <rect key="frame" x="79" y="0.0" width="297" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="Strongbox-80x80-new" id="wp2-E8-JPT">
+                                            <rect key="frame" x="20" y="0.0" width="44" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </imageView>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="yN7-Xg-vQi" kind="show" identifier="segueRecurse" id="NV2-8R-ANe"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="yN7-Xg-vQi" id="9Ki-Rh-bGg"/>
+                            <outlet property="delegate" destination="yN7-Xg-vQi" id="LSA-9W-B7I"/>
+                        </connections>
+                    </tableView>
+                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
+                    <toolbarItems>
+                        <barButtonItem systemItem="cancel" id="jfu-qV-jGE">
+                            <connections>
+                                <action selector="onCancel:" destination="yN7-Xg-vQi" id="3fc-Mt-k51"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="M3G-8j-gC9"/>
+                        <barButtonItem title="Move Here" style="done" id="LRN-ai-y1k">
+                            <connections>
+                                <action selector="onMoveHere:" destination="yN7-Xg-vQi" id="ndu-9b-mG9"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem systemItem="flexibleSpace" id="abs-cu-6yn"/>
+                        <barButtonItem systemItem="organize" id="oye-9q-aaM">
+                            <connections>
+                                <action selector="onAddGroup:" destination="yN7-Xg-vQi" id="9cr-sk-sl2"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Select Destination" id="Zem-1r-Ve6"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="buttonMove" destination="LRN-ai-y1k" id="q8V-8i-kEt"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="etQ-EU-4Sg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController searchResultsTitle="" id="OQI-p7-dqJ">
+                    <connections>
+                        <outlet property="delegate" destination="yN7-Xg-vQi" id="bvE-tQ-szT"/>
+                        <outlet property="searchContentsController" destination="yN7-Xg-vQi" id="Gyn-qt-qiy"/>
+                        <outlet property="searchResultsDataSource" destination="yN7-Xg-vQi" id="Pe3-Np-yWk"/>
+                        <outlet property="searchResultsDelegate" destination="yN7-Xg-vQi" id="BR5-Yz-2hz"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+            <point key="canvasLocation" x="394" y="1083"/>
+        </scene>
+        <!--DatabaseOperations-->
+        <scene sceneID="onQ-WH-fXo">
+            <objects>
+                <viewControllerPlaceholder storyboardName="DatabaseOperations" id="tH9-ae-xkY" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="N1K-RK-sFM" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-922" y="2069"/>
+        </scene>
+        <!--Search For Group Destination Nav-->
+        <scene sceneID="ABd-4Y-wqA">
+            <objects>
+                <navigationController toolbarHidden="NO" id="Zdq-as-J37" userLabel="Search For Group Destination Nav" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="Gq3-tr-Pv8">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="elQ-aP-sAX">
+                        <rect key="frame" x="0.0" y="813" width="414" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="yN7-Xg-vQi" kind="relationship" relationship="rootViewController" id="jcK-HJ-OeY"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ruj-sg-6pp" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-313" y="1084"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="MZq-Cv-J9e">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Xvc-2n-sub" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="cas-qD-bqU">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Ewt-OQ-fUB" kind="relationship" relationship="rootViewController" id="llF-5i-rPN"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fTQ-Tq-dgD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-325" y="2177"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Strongbox-80x80-new" width="80" height="80"/>
+        <image name="maintenance" width="30" height="30"/>
+        <image name="sort-32" width="32" height="32"/>
+    </resources>
+</document>

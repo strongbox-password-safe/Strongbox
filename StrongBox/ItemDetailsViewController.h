@@ -26,6 +26,8 @@ extern NSString *const CellHeightsChangedNotification;
 @property BOOL readOnly;
 @property Model* databaseModel;
 
+@property (nonatomic, copy) void (^onChanged)(void);
+
 #ifdef IS_APP_EXTENSION
 @property (nonatomic, strong) CredentialProviderViewController *autoFillRootViewController;
 @property (nonatomic, nullable) NSString* autoFillSuggestedTitle;

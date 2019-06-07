@@ -13,6 +13,7 @@
 static UIImage* kDefaultFolderImage;
 static UIImage* kDefaultRecordImage;
 static NSArray<UIImage*> *kKeePassIconSet;
+static UIColor *kSandyFolderColor;
 
 @implementation NodeIconHelper
 
@@ -21,6 +22,7 @@ static NSArray<UIImage*> *kKeePassIconSet;
         kDefaultFolderImage = [UIImage imageNamed:@"folder"];
         kDefaultRecordImage = [UIImage imageNamed:@"document"];
         kKeePassIconSet = getKeePassIconSet();
+        kSandyFolderColor = UIColorFromRGB(0xFAB805);
     }
 }
 
@@ -98,6 +100,10 @@ static NSArray<UIImage*>* getKeePassIconSet() {
     return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return [UIImage imageNamed:obj];
     }];
+}
+
++ (UIColor*)folderTintColor {
+    return kSandyFolderColor;
 }
 
 + (UIImage *)getIconForNode:(Node *)vm database:(DatabaseModel *)database {

@@ -12,7 +12,6 @@
 #import "NSArray+Extensions.h"
 #import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
-#import "CreateCredentialTableViewController.h"
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"
@@ -371,12 +370,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (void)segueToCreateNew {
-    if (@available(iOS 11.0, *)) {
-        [self performSegueWithIdentifier:@"segueToAddNew" sender:nil];
-    }
-    else {
-        [self performSegueWithIdentifier:@"segueToAdd" sender:nil];
-    }
+    [self performSegueWithIdentifier:@"segueToAddNew" sender:nil];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -404,26 +398,16 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         }
     }
 
-    if([segue.identifier isEqualToString:@"segueToAdd"]) {
-        CreateCredentialTableViewController *vc = segue.destinationViewController;
-        
-        vc.viewModel = self.model;
-        vc.rootViewController = self.rootViewController;
-        vc.suggestedUrl = suggestedUrl;
-        vc.suggestedTitle = suggestedTitle;
-    }
-    else {
-        ItemDetailsViewController* vc = segue.destinationViewController;
-        
-        vc.createNewItem = YES;
-        vc.item = nil;
-        vc.parentGroup = self.model.database.rootGroup;
-        vc.readOnly = NO;
-        vc.databaseModel = self.model;
-        vc.autoFillRootViewController = self.rootViewController;
-        vc.autoFillSuggestedUrl = suggestedUrl;
-        vc.autoFillSuggestedTitle = suggestedTitle;
-    }
+    ItemDetailsViewController* vc = segue.destinationViewController;
+    
+    vc.createNewItem = YES;
+    vc.item = nil;
+    vc.parentGroup = self.model.database.rootGroup;
+    vc.readOnly = NO;
+    vc.databaseModel = self.model;
+    vc.autoFillRootViewController = self.rootViewController;
+    vc.autoFillSuggestedUrl = suggestedUrl;
+    vc.autoFillSuggestedTitle = suggestedTitle;
 }
 
 - (BOOL)canCreateNewCredential {

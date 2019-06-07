@@ -76,6 +76,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     if(response == 2) {
         UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
         vc.delegate = self;
+        vc.modalPresentationStyle = UIModalPresentationFormSheet;
         
         [self.parentViewController presentViewController:vc animated:YES completion:nil];
     }
@@ -83,6 +84,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
         UIImagePickerController *vc = [[UIImagePickerController alloc] init];
         vc.delegate = self;
         vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
+        vc.modalPresentationStyle = UIModalPresentationFormSheet;
         
         BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
         

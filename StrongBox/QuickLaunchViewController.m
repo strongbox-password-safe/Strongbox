@@ -67,8 +67,6 @@
     
     [self bindProOrFreeTrialUi];
     
-    [self segueToNagScreenIfAppropriate];
-    
     [[self getInitialViewController] checkICloudAvailability];
 }
 
@@ -76,22 +74,6 @@
     [super viewDidAppear:animated];
     
     [self refreshView];
-}
-
-- (void)segueToNagScreenIfAppropriate {
-    if(Settings.sharedInstance.isProOrFreeTrial) {
-        return;
-    }
-    
-    NSInteger random = arc4random_uniform(100);
-    
-    //NSLog(@"Random: %ld", (long)random);
-    
-    if(random < 15) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self performSegueWithIdentifier:@"segueQuickLaunchToUpgrade" sender:nil];
-        });
-    }
 }
 
 - (void)onProStatusChanged:(id)param {
@@ -112,8 +94,13 @@
         if([[Settings sharedInstance] isFreeTrial]) {
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
-            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days left)",
+            if(daysLeft > 30) {
+                upgradeButtonTitle = @"Upgrade";
+            }
+            else {
+                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days left)",
                                   (long)daysLeft];
+            }
             
             if(daysLeft < 10) {
                 [self.buttonUpgrade setTintColor: [UIColor redColor]];
@@ -185,7 +172,18 @@
                                      manualOpenOfflineCache:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
         if(model) {
-            [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];
+            // TODO: Open this to all devices not jsut iPads soon...
+            if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
+                if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && !Settings.sharedInstance.doNotUseNewSplitViewController) {
+                    [self performSegueWithIdentifier:@"segueToMasterDetailFromQuick" sender:model];
+                }
+                else {
+                    [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];
+                }
+            }
+            else {
+                [self performSegueWithIdentifier:@"segueToBrowseFromQuick" sender:model];
+            }
         }
                                                      
         [self refreshView]; // Duress might have removed the safe
@@ -195,6 +193,14 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToBrowseFromQuick"]) {
         BrowseSafeView *vc = segue.destinationViewController;
+        vc.viewModel = (Model *)sender;
+        vc.currentGroup = vc.viewModel.database.rootGroup;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToMasterDetailFromQuick"]) {
+        UISplitViewController *svc = segue.destinationViewController;
+        UINavigationController *nav = [svc.viewControllers firstObject];
+        
+        BrowseSafeView *vc = (BrowseSafeView*)nav.topViewController;
         vc.viewModel = (Model *)sender;
         vc.currentGroup = vc.viewModel.database.rootGroup;
     }

@@ -72,6 +72,8 @@ static NSString* const kImmediateSearchOnBrowse = @"immediateSearchOnBrowse";
 static NSString* const kBrowseItemSubtitleField = @"browseItemSubtitleField";
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
+static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController";
+static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -895,14 +897,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [self setBool:kShowAdvancedUnlockOptions value:showAdvancedUnlockOptions];
 }
 
-- (BOOL)allowEmptyOrNoPasswordEntry {
-    return [self getBool:kAllowEmptyOrNoPasswordEntry fallback:NO];
-}
-
-- (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
-    [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
-}
-
 - (BOOL)temporaryUseOldUnlock {
     return [self getBool:kTemporaryUseOldUnlock];
 }
@@ -943,6 +937,30 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setHideKeyFileOnUnlock:(BOOL)hideKeyFileOnUnlock {
     [self setBool:kHideKeyFileOnUnlock value:hideKeyFileOnUnlock];
+}
+
+- (BOOL)doNotUseNewSplitViewController {
+    return [self getBool:kDoNotUseNewSplitViewController];
+}
+
+- (void)setDoNotUseNewSplitViewController:(BOOL)doNotUseNewSplitViewController {
+    return [self setBool:kDoNotUseNewSplitViewController value:doNotUseNewSplitViewController];
+}
+
+- (BOOL)allowEmptyOrNoPasswordEntry {
+    return [self getBool:kAllowEmptyOrNoPasswordEntry fallback:NO];
+}
+
+- (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
+    [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
+}
+
+- (BOOL)interpretEmptyPasswordAsNoPassword {
+    return [self getBool:kInterpretEmptyPasswordAsNoPassword fallback:NO];
+}
+
+- (void)setInterpretEmptyPasswordAsNoPassword:(BOOL)interpretEmptyPasswordAsNoPassword {
+    [self setBool:kInterpretEmptyPasswordAsNoPassword value:interpretEmptyPasswordAsNoPassword];
 }
 
 @end

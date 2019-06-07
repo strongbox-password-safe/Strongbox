@@ -19,6 +19,7 @@ typedef enum {
     kKeePass,
     kKeePass4,
     kKeePass1,
+    kFormatUnknown,
 } DatabaseFormat;
 
 @protocol AbstractDatabaseFormatAdaptor <NSObject>

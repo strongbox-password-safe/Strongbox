@@ -27,10 +27,12 @@
 #import "PinEntryController.h"
 #import "CASGTableViewController.h"
 #import "PreferencesTableViewController.h"
+#import "FontManager.h"
+#import "WelcomeViewController.h"
+#import "WelcomeCreateDoneViewController.h"
+#import "NSArray+Extensions.h"
 
-static const DatabaseFormat kDefaultFormat = kKeePass4;
-
-@interface SafesViewController () <UIDocumentPickerDelegate>
+@interface SafesViewController () <UIDocumentPickerDelegate, DZNEmptyDataSetDelegate>
 
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
 @property NSURL* temporaryExportUrl;
@@ -89,8 +91,6 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     }
     
     [self bindProOrFreeTrialUi];
-    
-    [self segueToNagScreenIfAppropriate];
     
     [[self getInitialViewController] checkICloudAvailability];
 }
@@ -153,35 +153,52 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     [self syncLocalSafesWithFileSystem];
     
     [self internalRefresh];
-}
-
-- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
-    return [UIImage imageNamed:@"Strongbox-215x215"];
+    
+    if([Settings.sharedInstance getLaunchCount] == 1) {
+        [self startOnboarding];
+    }
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"No Password Databases Here Yet";
+    NSString *text = @"No Databases";
     
-    NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
-                                 NSForegroundColorAttributeName: [UIColor darkGrayColor]};
+    NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor]};
     
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"Tap the + button in the top right corner to get started!";
-    
+    NSString *text = @"Tap below to get started";
+
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
     paragraph.alignment = NSTextAlignmentCenter;
-    
-    NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14.0f],
+
+    NSDictionary *attributes = @{NSFontAttributeName: FontManager.sharedInstance.regularFont,
                                  NSForegroundColorAttributeName: [UIColor lightGrayColor],
                                  NSParagraphStyleAttributeName: paragraph};
-    
+
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
+    NSDictionary *attributes = @{
+                                    NSFontAttributeName : FontManager.sharedInstance.regularFont,
+                                    NSForegroundColorAttributeName : UIColor.blueColor
+                                    };
+    
+    return [[NSAttributedString alloc] initWithString:@"Get Started..." attributes:attributes];
+}
+
+- (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
+    [self startOnboarding];
+}
+
+- (void)startOnboarding {
+    [self performSegueWithIdentifier:@"segueToWelcome" sender:nil];
 }
 
 - (BOOL)isReasonablyNewUser {
@@ -258,7 +275,13 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
 
 - (void)openSafeAtIndexPath:(NSIndexPath*)indexPath offline:(BOOL)offline {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    [self openDatabase:safe offline:offline];
     
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)openDatabase:(SafeMetaData*)safe offline:(BOOL)offline {
     if(safe.hasUnresolvedConflicts) {
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
@@ -270,12 +293,21 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
                                          manualOpenOfflineCache:offline
                                                      completion:^(Model * _Nullable model, NSError * _Nullable error) {
             if(model) {
-                [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
+                // TODO: Open this to all devices not jsut iPads soon...
+                if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
+                    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && !Settings.sharedInstance.doNotUseNewSplitViewController) {
+                        [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
+                    }
+                    else {
+                        [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
+                    }
+                }
+                else {
+                    [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
+                }
             }
          }];
     }
-    
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -387,7 +419,14 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     if ([segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
         BrowseSafeView *vc = segue.destinationViewController;
         vc.viewModel = (Model *)sender;
+        vc.currentGroup = vc.viewModel.database.rootGroup;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToMasterDetail"]) {
+        UISplitViewController *svc = segue.destinationViewController;
+        UINavigationController *nav = [svc.viewControllers firstObject];
         
+        BrowseSafeView *vc = (BrowseSafeView*)nav.topViewController;
+        vc.viewModel = (Model *)sender;
         vc.currentGroup = vc.viewModel.database.rootGroup;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
@@ -453,6 +492,36 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
             }];
         };
     }
+    else if ([segue.identifier isEqualToString:@"segueToWelcome"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        WelcomeViewController* vc = (WelcomeViewController*)nav.topViewController;
+        vc.onDone = ^(BOOL addExisting, SafeMetaData * _Nonnull databaseToOpen) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(addExisting) {
+                    [self onAddExistingSafe];
+                }
+                else if(databaseToOpen) {
+                    [self openDatabase:databaseToOpen offline:NO];
+                }
+            }];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToCreateExpressDone"]) {
+        WelcomeCreateDoneViewController* wcdvc = (WelcomeCreateDoneViewController*)segue.destinationViewController;
+        
+        NSDictionary *d = sender; // @{@"database" : metadata, @"password" : password}
+        
+        wcdvc.database = d[@"database"];
+        wcdvc.password = d[@"password"];
+        
+        wcdvc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if(databaseToOpen) {
+                     [self openDatabase:databaseToOpen offline:NO];
+                }
+            }];
+        };
+    }
 }
 
 - (void)onCreateOrAddDialogDismissedSuccessfully:(SelectedStorageParameters*)storageParams
@@ -462,10 +531,7 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     if(expressMode || storageParams.createMode) {
         if(expressMode) {
             [self onCreateNewExpressDatabaseDone:credentials.name
-                                        password:credentials.password
-                                             url:credentials.keyFileUrl
-                                  onceOffKeyFile:credentials.oneTimeKeyFileData
-                                          format:credentials.format];
+                                        password:credentials.password];
         }
         else {
             [self onCreateNewDatabaseDone:storageParams
@@ -513,6 +579,7 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     }
     else { // Standard Native Storage add
         SafeMetaData* database = [storageParams.provider getSafeMetaData:name providerData:storageParams.file.providerData];
+        database.likelyFormat = storageParams.likelyFormat;
         
         if(database == nil) {
             [Alerts warn:self title:@"Error Adding" message:@"An unknown error occurred while adding this database. getMetaData."];
@@ -537,52 +604,45 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
                           storageParams:storageParams
                                  format:format
                              completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
-                                 [self onCreatedDatabase:metadata error:error];
+                                 if(error || !metadata) {
+                                     [Alerts error:self title:@"Error Creating Database" error:error];
+                                 }
+                                 else {
+                                     [self addDatabaseWithiCloudRaceCheck:metadata];
+                                 }
                              }];
 }
 
 - (void)onCreateNewExpressDatabaseDone:(NSString*)name
-                              password:(NSString*)password
-                                   url:(NSURL*)url
-                        onceOffKeyFile:(NSData*)onceOffKeyFile
-                                format:(DatabaseFormat)format {
+                              password:(NSString*)password {
     [AddNewSafeHelper createNewExpressDatabase:self
                                           name:name
                                       password:password
-                                    keyFileUrl:url
-                            onceOffKeyFileData:onceOffKeyFile
-                                        format:format
                                     completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
-                                        [self onCreatedDatabase:metadata error:error];
-                                         // TODO: Need a prettier way to do this than an alert!
-                                         // Anyway to handhold more and point at your new DB?
-                                         [Alerts info:self
-                                                title:@"Ready To Go!"
-                                              message:@"Your new database is now ready to use! Just tap on it to get started...\n\nNB: It is VITALLY important that you remember your master password, as without it there is no hope of opening the database.\n\nYou could consider writing this password down and storing offline in a physically secure location."];
+                                        if(error || !metadata) {
+                                            [Alerts error:self title:@"Error Creating Database" error:error];
+                                        }
+                                        else {
+                                            metadata = [self addDatabaseWithiCloudRaceCheck:metadata];
+                                            [self performSegueWithIdentifier:@"segueToCreateExpressDone" sender:@{@"database" : metadata, @"password" : password} ];
+                                        }
                          }];
 }
 
-- (void)onCreatedDatabase:(SafeMetaData*)metadata error:(NSError*)error {
-    if(!metadata) {
-        NSLog(@"An error occurred: %@", error);
-        [Alerts error:self title:@"Error Creating Database" error:error];
-    }
-    else if (metadata.storageProvider == kiCloud) {
-        NSUInteger existing = [SafesList.sharedInstance.snapshot indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+- (SafeMetaData*)addDatabaseWithiCloudRaceCheck:(SafeMetaData*)metadata {
+    if (metadata.storageProvider == kiCloud) {
+        SafeMetaData* existing = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
             return obj.storageProvider == kiCloud && [obj.fileName isEqualToString:metadata.fileName];
         }];
         
-        if(existing == NSNotFound) { // May have already been added by our iCloud watch thread.
-            NSLog(@"Adding as this iCloud filename is not already present.");
-            [[SafesList sharedInstance] add:metadata];
-        }
-        else {
+        if(existing) { // May have already been added by our iCloud watch thread.
             NSLog(@"Not Adding as this iCloud filename is already present. Probably picked up by Watch Thread.");
+            return existing;
         }
     }
-    else {
-        [[SafesList sharedInstance] add:metadata];
-    }
+    
+    [[SafesList sharedInstance] add:metadata];
+    return metadata;
 }
 
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName data:(NSData *)data {
@@ -596,7 +656,8 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     }
 
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-
+    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    
     [provider create:nickName
            extension:extension
                 data:data
@@ -605,6 +666,7 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
           completion:^(SafeMetaData *metadata, NSError *error) {
          dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error == nil) {
+                metadata.likelyFormat = format;
                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
             }
             else {
@@ -641,7 +703,7 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     
     // Express
     
-    if(Settings.sharedInstance.iCloudAvailable && Settings.sharedInstance.iCloudOn) {
+//    if(Settings.sharedInstance.iCloudAvailable && Settings.sharedInstance.iCloudOn) {
         UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"New Database (Express)"
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
@@ -651,7 +713,7 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
         // [quickAndEasyAction setValue:[UIColor greenColor] forKey:@"titleTextColor"];
         // [quickAndEasyAction setValue:[UIImage imageNamed:@"fast-forward-2-32"] forKey:@"image"];
         [alertController addAction:quickAndEasyAction];
-    }
+  //  }
     
     // Cancel
     
@@ -733,32 +795,8 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)segueToNagScreenIfAppropriate {
-    if(Settings.sharedInstance.isProOrFreeTrial) {
-        return;
-    }
-    
-    NSInteger random = arc4random_uniform(100);
-    
-    //NSLog(@"Random: %ld", (long)random);
-    
-    if(random < 15) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-        });
-    }
-}
-
 - (IBAction)onUpgrade:(id)sender {
     [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-}
-
-- (IBAction)onTogglePro:(id)sender {
-    BOOL isPro = [[Settings sharedInstance] isPro];
-    
-    [[Settings sharedInstance] setPro:!isPro];
-
-    [self bindProOrFreeTrialUi];
 }
 
 -(void)addToolbarButton:(UIBarButtonItem*)button {
@@ -787,13 +825,6 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
     self.navigationController.toolbarHidden =  [[Settings sharedInstance] isPro];
     self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
     
-    //[self.buttonTogglePro setTitle:(![[Settings sharedInstance] isProOrFreeTrial] ? @"Go Pro" : @"Go Free")];
-    //[self.buttonTogglePro setEnabled:NO];
-    //[self.buttonTogglePro setTintColor: [UIColor clearColor]];
-    //[self.buttonTogglePro setEnabled:YES];
-    //[self.buttonTogglePro setTintColor:nil];
-    [self removeToolbarButton:self.buttonTogglePro];
-    
     if([[Settings sharedInstance] isProOrFreeTrial]) {
         [self.navItemHeader setTitle:@"Databases"];
     }
@@ -808,8 +839,13 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
         if([[Settings sharedInstance] isFreeTrial]) {
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
-            upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld 'Pro' days left)",
+            if(daysLeft > 30) {
+                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade"];
+            }
+            else {
+                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld 'Pro' days left)",
                                   (long)daysLeft];
+            }
             
             if(daysLeft < 10) {
                 [self.buttonUpgrade setTintColor: [UIColor redColor]];
@@ -884,9 +920,9 @@ static const DatabaseFormat kDefaultFormat = kKeePass4;
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
-            
-                [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
-                [self dismissViewControllerAnimated:YES completion:nil];
+                [self dismissViewControllerAnimated:YES completion:^{
+                    [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
+                }];
             }
             else {
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];

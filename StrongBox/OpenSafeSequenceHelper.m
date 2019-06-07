@@ -40,10 +40,13 @@
 @property (nonnull) CompletionBlock completion;
 @property BOOL isConvenienceUnlock;
 @property NSString* masterPassword;
-@property NSData* keyFileDigest;
+
 @property BOOL keyFileSelectionModeAskForPasswordBeforeOpen;
 @property BOOL isAutoFillOpen;
 @property BOOL manualOpenOfflineCache;
+
+@property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
+@property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
 
 @end
 
@@ -154,9 +157,6 @@
                     
                     [SafesList.sharedInstance update:self.safe];
                     
-                    UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
-                    [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
-
                     [self openSafe];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
@@ -436,8 +436,11 @@
     scVc.initialOfflineCache = self.manualOpenOfflineCache;
     
     // Less than ideal
+    
     BOOL probablyPasswordSafe = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
-    scVc.initialFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; // Not Ideal
+    DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; // Not Ideal
+    
+    scVc.initialFormat = self.safe.likelyFormat != kFormatUnknown ? self.safe.likelyFormat : heuristicFormat;
     
     if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
         scVc.offlineCacheDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.safe];
@@ -474,15 +477,14 @@
             oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                       readOnly:(BOOL)readOnly
                    openOffline:(BOOL)openOffline {
-    BOOL notKdbXmlHack = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"KDB"] != NSOrderedSame;
-    
     if(keyFileUrl || oneTimeKeyFileData) {
         NSError *error;
         
         // TODO: This is wrong for KDB XML Files - Fix in next iteration- Digest shouldn't be done until we know what kind of db it is
         
-        self.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, notKdbXmlHack, &error);
-        if(self.keyFileDigest == nil) {
+        self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
+
+        if(self.undigestedKeyFileData == nil) {
             // TODO: Move error messaging out of here
             [Alerts error:self.viewController title:@"Error Reading Key File" error:error completion:^{
                 self.completion(nil, error);
@@ -505,7 +507,7 @@
     [self openSafe];
 }
 
-- (void)promptForPasswordAndOrKeyFile {
+- (void)promptForPasswordAndOrKeyFile { // TODO: Delete
     NSData* autoDetectedKeyFileDigest = [OpenSafeSequenceHelper findAssociatedLocalKeyFile:self.safe.fileName];
     
     self.alertController = [self getAlertControllerWithPasswordField];
@@ -515,7 +517,7 @@
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
                                                               self.masterPassword = self.alertController.textFields[0].text;
-                                                              self.keyFileDigest = autoDetectedKeyFileDigest;
+                                                              self.undigestedKeyFileData = autoDetectedKeyFileDigest;
                                                               [self openSafe];
                                                           }];
     
@@ -772,6 +774,11 @@
                cacheMode:(BOOL)cacheMode {
     [SVProgressHUD showWithStatus:@"Decrypting..."];
     
+    if(self.undigestedKeyFileData) {
+        DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+        self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
+    }
+    
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSError *error;
         DatabaseModel *openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
@@ -969,6 +976,9 @@
                    provider:(id)provider
                  openedSafe:(DatabaseModel *)openedSafe
                        data:(NSData *)data {
+    UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+    [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
+
     Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
                                                   metaData:self.safe
                                            storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
@@ -983,6 +993,10 @@
             [viewModel updateAutoFillCacheWithData:data];
         }
 
+        NSLog(@"Setting likelyFormat to [%u]", openedSafe.format);
+        self.safe.likelyFormat = openedSafe.format;
+        [SafesList.sharedInstance update:self.safe];
+        
         if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }

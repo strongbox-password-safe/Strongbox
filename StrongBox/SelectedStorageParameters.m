@@ -47,12 +47,13 @@
     return ret;
 }
 
-+ (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem*)file {
++ (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem*)file likelyFormat:(DatabaseFormat)likelyFormat {
     SelectedStorageParameters* ret = [[SelectedStorageParameters alloc] init];
     
     ret.method = kStorageMethodNativeStorageProvider;
     ret.provider = provider;
     ret.file = file;
+    ret.likelyFormat = likelyFormat;
     
     return ret;
 }

@@ -38,11 +38,23 @@
 @implementation PinEntryController
 
 - (BOOL)shouldAutorotate {
-    return NO;
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        return YES; /* Device is iPad */
+    }
+    else {
+        return NO;
+    }
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        return UIInterfaceOrientationMaskAll; /* Device is iPad */
+    }
+    else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
 }
 
 - (void)viewDidLoad

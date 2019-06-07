@@ -33,21 +33,13 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDropbox];
 
-    [[Settings sharedInstance] incrementLaunchCount];
+    [self initializeInstallSettingsAndLaunchCount];   
+     
+    // Do not backup local safes, caches or key files
 
-    if(Settings.sharedInstance.installDate == nil) {
-        Settings.sharedInstance.installDate = [NSDate date];
-    }
-    self.appLaunchTime = [NSDate date];
+    [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup];
     
-    [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup]; // Do not backup local safes, caches or key files
-
-    if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
-        // Inbox should be empty whenever possible so that we can detect the
-        // re-importation of a certain file and ask if user wants to create a
-        // new copy or just update an old one...
-        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];        
-    }
+    [self cleanupInbox:launchOptions];
     
     [self registerForClipboardClearingNotifications];
     
@@ -56,6 +48,31 @@
 //    NSLog(@"Documents Directory: [%@]", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
     
     return YES;
+}
+
+- (void)cleanupInbox:(NSDictionary *)launchOptions {
+    if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
+        // Inbox should be empty whenever possible so that we can detect the
+        // re-importation of a certain file and ask if user wants to create a
+        // new copy or just update an old one...
+        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
+    }
+}
+
+- (void)initializeInstallSettingsAndLaunchCount {
+    [[Settings sharedInstance] incrementLaunchCount];
+    
+    if(Settings.sharedInstance.installDate == nil) {
+        Settings.sharedInstance.installDate = [NSDate date];
+    }
+    
+    if([Settings.sharedInstance getEndFreeTrialDate] == nil) {
+        NSCalendar *cal = [NSCalendar currentCalendar];
+        NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:3 toDate:[NSDate date] options:0];
+        [Settings.sharedInstance setEndFreeTrialDate:date];
+    }
+    
+    self.appLaunchTime = [NSDate date];
 }
 
 - (void)registerForClipboardClearingNotifications {
@@ -115,11 +132,14 @@
 
     [[self getInitialViewController] appBecameActive];
     
+    [self performedScheduledEntitlementsCheck];
+}
+
+- (void)performedScheduledEntitlementsCheck {
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
     double minutes = timeDifference / 60;
     double hoursSinceLaunch = minutes / 60;
 
-    
     if(hoursSinceLaunch > 2) { // Stuff we'd like to do, but definitely not immediately on first launch...
         // Do not request review immediately on launch but after a while and after user has used app for a bit
         NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
@@ -129,13 +149,6 @@
                 [SKStoreReviewController requestReview];
             }
 
-            //                NSCalendar *cal = [NSCalendar currentCalendar];
-            //                NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-2 toDate:[NSDate date] options:0];
-            //    Settings.sharedInstance.lastEntitlementCheckAttempt = date;
-            //    Settings.sharedInstance.numberOfEntitlementCheckFails = 1;
-            //    NSDate *d2 = [cal dateByAddingUnit:NSCalendarUnitDay value:90 toDate:[NSDate date] options:0];
-            //    [[Settings sharedInstance] setEndFreeTrialDate:d2];
-            
             [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate:self.window.rootViewController];
         }
     }

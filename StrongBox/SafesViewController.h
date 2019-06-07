@@ -11,7 +11,6 @@
 
 @interface SafesViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
-@property (strong, nonatomic) IBOutlet UIBarButtonItem *barButtonFlexibleSpace;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
@@ -21,8 +20,6 @@
 - (IBAction)onAddSafe:(id)sender;
 - (IBAction)onUpgrade:(id)sender;
 
-@property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonTogglePro; // strong outlet because we remove/add from toolbar
-- (IBAction)onTogglePro:(id)sender;
 - (IBAction)onToggleEdit:(id)sender;
 
 @end

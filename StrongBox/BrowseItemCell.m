@@ -33,10 +33,16 @@
       childCount:(NSString*)childCount
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation {
+    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil];
+}
+
+- (void)setGroup:(NSString *)title icon:(UIImage *)icon childCount:(NSString *)childCount italic:(BOOL)italic groupLocation:(NSString *)groupLocation tintColor:(UIColor*)tintColor {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
     
     self.iconImageView.image = icon;
+    self.iconImageView.tintColor = tintColor;
+    
     self.usernameLabel.text = @"";
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
@@ -56,6 +62,8 @@
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
     self.iconImageView.image = icon;
+    self.iconImageView.tintColor = nil;
+
     self.usernameLabel.text = subtitle;
     self.pathLabel.text = groupLocation;
     self.accessoryType = UITableViewCellAccessoryNone;

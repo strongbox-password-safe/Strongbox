@@ -64,6 +64,7 @@
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBrowseItemSubtitle;
 @property (weak, nonatomic) IBOutlet UILabel *labelBrowseItemSubtitle;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordGeneration;
 
 @end
 
@@ -179,6 +180,9 @@
     }
     else if (cell == self.cellBrowseItemSubtitle) {
         [self onChangeBrowseItemSubtitle];
+    }
+    else if (cell == self.cellPasswordGeneration) {
+        [self performSegueWithIdentifier:@"seguePrefToPasswordPrefs" sender:nil];
     }
 }
 

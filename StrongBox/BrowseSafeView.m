@@ -23,6 +23,7 @@
 #import "SetNodeIconUiHelper.h"
 #import "ItemDetailsViewController.h"
 #import "BrowseItemCell.h"
+#import "MasterDetailViewController.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -46,6 +47,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 @property BOOL hasAlreadyAppeared;
 
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
+
 @end
 
 @implementation BrowseSafeView
@@ -58,18 +61,15 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             [self.searchController.searchBar becomeFirstResponder];
         });
     }
-    
     self.hasAlreadyAppeared = YES;
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
     
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
+    self.navigationController.toolbarHidden = NO;
+    self.navigationController.toolbar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO];
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationController.navigationBarHidden = NO;
     
-    [self refresh];
+    [self updateDetailsView:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -97,25 +97,110 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
+    [self setupTableview];
+    
+    [self setupTips];
+    
+    [self setupNavBar];
+    
+    [self setupSearchBar];
+    
+    [self refreshItems];
+    
+    if(self.splitViewController) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showDetailTargetDidChange:) name:UIViewControllerShowDetailTargetDidChangeNotification object:self.splitViewController];
+    }
+}
 
-    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                initWithTarget:self
-                                action:@selector(handleLongPress:)];
-    self.longPressRecognizer.minimumPressDuration = 1;
-    self.longPressRecognizer.cancelsTouchesInView = YES;
-    
-    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+- (void)showDetailTargetDidChange:(NSNotification *)notification{
+    NSLog(@"showDetailTargetDidChange");
+    if(!self.splitViewController.isCollapsed) {
+        NSIndexPath *ip = [self.tableView indexPathForSelectedRow];
+        if(ip) {
+            Node* item = [self getDataSource][ip.row];
+            [self updateDetailsView:item];
+        }
+        else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self updateDetailsView:nil];
+            });
+        }
+    }
+}
 
-    self.tableView.allowsMultipleSelection = NO;
-    self.tableView.allowsMultipleSelectionDuringEditing = YES;
-    self.tableView.allowsSelectionDuringEditing = YES;
+- (void)updateDetailsView:(Node*)item {
+    if(self.splitViewController) {
+        if(item) {
+            if(item.isGroup) {
+                [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+            }
+            else{
+                [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:item];
+            }
+        }
+        else if(!self.splitViewController.isCollapsed) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToEmptyDetail" sender:nil];
+        }
+    }
+}
+
+- (void)setupNavBar {
+    if(self.splitViewController) {
+        if(self.currentGroup != self.viewModel.database.rootGroup) {
+            self.closeBarButton.enabled = NO;
+            [self.closeBarButton setTintColor:UIColor.clearColor];
+        }
+    }
+    else {
+        self.closeBarButton.enabled = NO;
+        [self.closeBarButton setTintColor:UIColor.clearColor];
+    }
+    self.navigationItem.leftItemsSupplementBackButton = YES;
+
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
+                                 (self.currentGroup.parent == nil) ?
+                                 self.viewModel.metadata.nickName : self.currentGroup.title,
+                                 self.viewModel.isUsingOfflineCache ? @" (Offline)" : @"",
+                                 self.viewModel.isReadOnly ? @" (Read Only)" : @""];
     
-    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
-    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+    self.navigationController.toolbarHidden = NO;
+    self.navigationController.toolbar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO];
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationController.navigationBarHidden = NO;
+}
+
+- (void)setupSearchBar {
+    self.extendedLayoutIncludesOpaqueBars = YES;
+    self.definesPresentationContext = YES;
     
-    self.tableView.tableFooterView = [UIView new];
+    self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+    self.searchController.searchResultsUpdater = self;
+    self.searchController.dimsBackgroundDuringPresentation = NO;
+    self.searchController.searchBar.delegate = self;
+    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
+    self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
     
+    if ([[Settings sharedInstance] isProOrFreeTrial]) {
+        if (@available(iOS 11.0, *)) {
+            self.navigationItem.searchController = self.searchController;
+            
+            // We want the search bar visible immediately for Root
+            
+            self.navigationItem.hidesSearchBarWhenScrolling = self.currentGroup != self.viewModel.database.rootGroup;
+        } else {
+            self.tableView.tableHeaderView = self.searchController.searchBar;
+            [self.searchController.searchBar sizeToFit];
+        }
+    }
+    
+    [self.searchController setActive:NO];
+}
+
+- (void)setupTips {
     if(Settings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
@@ -142,16 +227,33 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                                        didHide:nil];
         }
     }
+}
+
+- (void)setupTableview {
+    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
     
-    self.extendedLayoutIncludesOpaqueBars = YES;
-    self.definesPresentationContext = YES;
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                initWithTarget:self
+                                action:@selector(handleLongPress:)];
+    self.longPressRecognizer.minimumPressDuration = 1;
+    self.longPressRecognizer.cancelsTouchesInView = YES;
     
-    self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
-    self.searchController.searchResultsUpdater = self;
-    self.searchController.dimsBackgroundDuringPresentation = NO;
-    self.searchController.searchBar.delegate = self;
-    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
-    self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
+    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+    
+    self.tableView.allowsMultipleSelection = NO;
+    self.tableView.allowsMultipleSelectionDuringEditing = YES;
+    self.tableView.allowsSelectionDuringEditing = YES;
+    
+    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.tableFooterView = [UIView new];
+    
+    self.clearsSelectionOnViewWillAppear = YES;
+}
+
+- (IBAction)onClose:(id)sender {
+    MasterDetailViewController* master = (MasterDetailViewController*)self.splitViewController;
+    [master onClose];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -335,7 +437,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                                        includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
 
     [self.tableView reloadData];
-    
     [self startOtpRefreshTimerIfAppropriate];
 }
 
@@ -360,8 +461,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
         NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
         
-        
-        [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
+        [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil];
     }
     else {
         NSString* subtitle = [self getItemSubtitle:node];        
@@ -478,16 +578,23 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         
         Node *item = arr[indexPath.row];
 
-        if (!item.isGroup) {
-            if (@available(iOS 11.0, *)) {
-                [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
-            }
-            else {
-                [self performSegueWithIdentifier:@"segueToRecord" sender:item];
-            }
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+        if(self.splitViewController) {
+            [self updateDetailsView:item];
         }
         else {
-            [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+            if (!item.isGroup) {
+                if (@available(iOS 11.0, *)) {
+                    [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
+                }
+                else {
+                    [self performSegueWithIdentifier:@"segueToRecord" sender:item];
+                }
+            }
+            else {
+                [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+            }
         }
     }
     else {
@@ -509,47 +616,43 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     (self.buttonAddGroup).enabled = !ro && !self.isEditing;
 }
 
-- (void)refresh {
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
-                                 (self.currentGroup.parent == nil) ?
-                                 self.viewModel.metadata.nickName : self.currentGroup.title,
-                                 self.viewModel.isUsingOfflineCache ? @" (Offline)" : @"",
-                                 self.viewModel.isReadOnly ? @" (Read Only)" : @""];
-
-    NSMutableArray* unsorted = [[NSMutableArray alloc] initWithArray:self.currentGroup.children];
-    BOOL sortNodes = self.viewModel.database.format == kPasswordSafe || !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-    if(sortNodes) {
-        [unsorted sortUsingComparator:finderStyleNodeComparator];
+- (NSArray<Node*>*)getNoneSearchItems {
+    NSArray* ret = self.currentGroup.children;
+    
+    if(self.viewModel.database.format == kKeePass1 && !Settings.sharedInstance.showKeePass1BackupGroup) {
+        Node* backupGroup = self.viewModel.database.keePass1BackupNode;
+        
+        if(backupGroup) {
+            if([self.currentGroup contains:backupGroup]) {
+                ret = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
+                    return obj != backupGroup;
+                }];
+            }
+        }
     }
-    self.items = unsorted;
-    
-    // Filter KeePass1 Backup Group if so configured...
-    
-    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
-        if (self.viewModel.database.format == kKeePass1) {
-            Node* backupGroup = self.viewModel.database.keePass1BackupNode;
-            
-            if(backupGroup) {
-                if([self.currentGroup contains:backupGroup]) {
-                    self.items = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
-                        return obj != backupGroup;
-                    }];
-                }
+    else if(self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4) {
+        Node* recycleBin = self.viewModel.database.recycleBinNode;
+        
+        if(Settings.sharedInstance.doNotShowRecycleBinInBrowse && recycleBin) {
+            if([self.currentGroup contains:recycleBin]) {
+                ret = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
+                    return obj != recycleBin;
+                }];
             }
         }
     }
     
-    // Filter Recycle Bin?
-
-    Node* recycleBin = self.viewModel.database.recycleBinNode;
-    
-    if(Settings.sharedInstance.doNotShowRecycleBinInBrowse && recycleBin) {
-        if([self.currentGroup contains:recycleBin]) {
-            self.items = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
-                return obj != recycleBin;
-            }];
-        }
+    BOOL sortNodes = self.viewModel.database.format == kPasswordSafe || !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
+    if(sortNodes) {
+        return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
     }
+    else {
+        return ret;
+    }
+}
+
+- (void)refreshItems {
+    self.items = [self getNoneSearchItems];
     
     // Display
     
@@ -565,27 +668,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                                               [self getDataSource].count > 0) ? self.editButtonItem : nil;
     
     [self enableDisableToolbarButtons];
-
-    if ([[Settings sharedInstance] isProOrFreeTrial]) {
-        if (@available(iOS 11.0, *)) {
-            self.navigationController.navigationBar.prefersLargeTitles = YES;
-            
-            self.navigationItem.searchController = self.searchController;
-            
-            // We want the search bar visible immediately for Root
-            
-            self.navigationItem.hidesSearchBarWhenScrolling = self.currentGroup != self.viewModel.database.rootGroup;
-        } else {
-            self.tableView.tableHeaderView = self.searchController.searchBar;
-            [self.searchController.searchBar sizeToFit];
-        }
-    }
-    
-    self.navigationController.toolbarHidden = NO;
-    self.navigationController.toolbar.hidden = NO;
-    [self.navigationController setNavigationBarHidden:NO];
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationController.navigationBarHidden = NO;
     
     // Any OTPs we should start a refresh timer if so...
     
@@ -632,11 +714,27 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         vc.parentGroup = self.currentGroup;
         vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
         vc.databaseModel = self.viewModel;
+        vc.onChanged = ^{
+            [self refreshItems];
+        };
     }
-    else if ([segue.identifier isEqualToString:@"sequeToSubgroup"])
-    {
-        BrowseSafeView *vc = segue.destinationViewController;
+    else if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"]) {
+        Node *record = (Node *)sender;
         
+        UINavigationController* nav = segue.destinationViewController;
+        ItemDetailsViewController *vc = (ItemDetailsViewController*)nav.topViewController;
+        
+        vc.createNewItem = record == nil;
+        vc.item = record;
+        vc.parentGroup = self.currentGroup;
+        vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
+        vc.databaseModel = self.viewModel;
+        vc.onChanged = ^{
+            [self refreshItems];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"sequeToSubgroup"]){
+        BrowseSafeView *vc = segue.destinationViewController;
         vc.currentGroup = (Node *)sender;
         vc.viewModel = self.viewModel;
     }
@@ -680,7 +778,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (IBAction)onAddRecord:(id)sender {
     if (@available(iOS 11.0, *)) {
-        [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
+        if(self.splitViewController) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:nil];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
+        }
     }
     else {
         [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
@@ -743,13 +846,15 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (void)saveChangesToSafeAndRefreshView {
-    [self refresh];
+    [self refreshItems];
     
     [self.viewModel update:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self setEditing:NO animated:YES];
             
-            [self refresh];
+            [self refreshItems];
+            
+            [self updateDetailsView:nil];
             
             if (error) {
                 [Alerts error:self title:@"Error Saving" error:error];

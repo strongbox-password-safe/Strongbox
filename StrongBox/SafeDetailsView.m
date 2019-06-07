@@ -40,17 +40,47 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeMasterCredentials;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
+@property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 
 @end
 
 @implementation SafeDetailsView
 
+- (IBAction)onSettingChanged:(id)sender {
+    self.viewModel.metadata.readOnly = self.switchReadOnly.on;
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+    
+    [Alerts info:self title:@"Re-Open Required" message:@"You must close and reopen this database for Read-Only changes to take effect."];
+}
+
+- (void)bindSettings {
+    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
+    self.labelAllowBiometricSetting.text = [NSString stringWithFormat:@"Allow %@ Unlock", biometricIdName];
+    self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.darkTextColor : UIColor.lightGrayColor;
+    
+    self.switchAllowBiometric.enabled = [self canToggleTouchId];
+    self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
+
+
+    NSDate* modDate = [[LocalDeviceStorageProvider sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
+    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
+    self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillCacheEnabled;
+
+    modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
+    self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
+    
+    self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
+    self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
+    self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
+
+    
+    self.switchReadOnly.on = self.viewModel.metadata.readOnly;
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self bindAllowBiometricUnlock];
-    [self bindAllowAutoFillCache];
-    [self bindAllowOfflineCache];
+    [self bindSettings];
     
     self.cellChangeMasterCredentials.userInteractionEnabled = [self canSetCredentials];
     self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
@@ -82,8 +112,6 @@
 - (IBAction)onDone:(id)sender {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
-
-//
 
 - (void)onChangeMasterCredentials {
     [self performSegueWithIdentifier:@"segueToSetCredentials" sender:nil];
@@ -161,15 +189,6 @@
     }];
 }
 
-- (void)bindAllowBiometricUnlock {
-    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
-    self.labelAllowBiometricSetting.text = [NSString stringWithFormat:@"Allow %@ Unlock", biometricIdName];
-    self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.darkTextColor : UIColor.lightGrayColor;
-    
-    self.switchAllowBiometric.enabled = [self canToggleTouchId];
-    self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
-}
-
 - (IBAction)onSwitchBiometricUnlock:(id)sender {
     NSString* bIdName = [[Settings sharedInstance] getBiometricIdName];
     
@@ -203,7 +222,7 @@
                                                   didHide:nil];
                    }
                    
-                   [self bindAllowBiometricUnlock];
+                   [self bindSettings];
                }];
     }
     else {
@@ -213,7 +232,7 @@
         self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];
-        [self bindAllowBiometricUnlock];
+        [self bindSettings];
 
         [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
                                    message:[NSString stringWithFormat:@"%@ has been enabled for this database.", bIdName]
@@ -226,12 +245,6 @@
     }
 }
 
-- (void)bindAllowAutoFillCache {
-    NSDate* modDate = [[LocalDeviceStorageProvider sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
-    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
-    self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillCacheEnabled;
-}
-
 - (IBAction)onSwitchAllowAutoFillCache:(id)sender {
     if (!self.switchAllowAutoFillCache.on) {
         [Alerts yesNo:self
@@ -240,7 +253,7 @@
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearAutoFillCache];
-                      [self bindAllowAutoFillCache];
+                       [self bindSettings];
                        
                        [ISMessages showCardAlertWithTitle:@"AutoFill Cache Disabled"
                                                   message:nil
@@ -252,14 +265,14 @@
                                                   didHide:nil];
                    }
                    else {
-                      [self bindAllowAutoFillCache];
+                      [self bindSettings];
                    }
                }];
     }
     else {
         [self.viewModel enableAutoFillCache];
         [self.viewModel updateAutoFillCache:^{
-            [self bindAllowAutoFillCache];
+            [self bindSettings];
             
             [ISMessages                 showCardAlertWithTitle:@"AutoFill Cache Enabled"
                                                        message:nil
@@ -273,15 +286,6 @@
     }
 }
 
-- (void)bindAllowOfflineCache {
-    NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
-    self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
-
-    self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
-    self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
-    self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
-}
-
 - (IBAction)onSwitchAllowOfflineCache:(id)sender {
     if (!self.switchAllowOfflineCache.on) {
         [Alerts yesNo:self
@@ -290,7 +294,7 @@
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearOfflineCache];
-                       [self bindAllowOfflineCache];
+                       [self bindSettings];
                        [ISMessages showCardAlertWithTitle:@"Offline Cache Disabled"
                                                   message:nil
                                                  duration:3.f
@@ -301,14 +305,14 @@
                                                   didHide:nil];
                    }
                    else {
-                      [self bindAllowOfflineCache];
+                      [self bindSettings];
                    }
                }];
     }
     else {
         [self.viewModel enableOfflineCache];
         [self.viewModel updateOfflineCache:^{
-            [self bindAllowOfflineCache];
+            [self bindSettings];
             
             [ISMessages                 showCardAlertWithTitle:@"Offline Cache Enabled"
                                                        message:nil

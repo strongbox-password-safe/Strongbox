@@ -19,6 +19,7 @@
         self.failedPinAttempts = 0;
         self.offlineCacheEnabled = YES;
         self.autoFillCacheEnabled = YES;
+        self.likelyFormat = kFormatUnknown;
     }
     
     return self;
@@ -33,6 +34,7 @@
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
+        self.likelyFormat = kFormatUnknown;
     }
     
     return self;
@@ -66,6 +68,8 @@
 
 //    [encoder encodeBool:self.useQuickTypeAutoFill forKey:@"useQuickTypeAutoFill"];
     [encoder encodeObject:self.keyFileUrl forKey:@"keyFileUrl"];
+    
+    [encoder encodeInteger:self.likelyFormat forKey:@"likelyFormat"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -116,6 +120,13 @@
         
         if([decoder containsValueForKey:@"keyFileUrl"]) {
             self.keyFileUrl = [decoder decodeObjectForKey:@"keyFileUrl"];
+        }
+        
+        if([decoder containsValueForKey:@"likelyFormat"]) {
+            self.likelyFormat = (DatabaseFormat)[decoder decodeIntegerForKey:@"likelyFormat"];
+        }
+        else {
+            self.likelyFormat = kFormatUnknown;
         }
     }
     

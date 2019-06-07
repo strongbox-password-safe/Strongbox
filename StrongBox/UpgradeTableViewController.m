@@ -46,7 +46,7 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.labelBiometricIdFeature.text = [NSString stringWithFormat:@"🗝 Open with %@", [[Settings sharedInstance] getBiometricIdName]];
+    self.labelBiometricIdFeature.text = [NSString stringWithFormat:@"🗝 %@", [[Settings sharedInstance] getBiometricIdName]];
     
     [self initializeUi];
     [self updateUi];
@@ -367,31 +367,7 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
 
 - (IBAction)onNoThanks:(id)sender {
     [SVProgressHUD dismiss];
-    [self.navigationController popToRootViewControllerAnimated:YES];
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
-//
-//- (IBAction)onHaveLicenceCode:(id)sender {
-//    [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Licence Code" title:@"Licence Code" message:@"Please Enter Your Licence Code" completion:^(NSString *text, BOOL response) {
-//        if(response) {
-//            [self enableButtons:NO];
-//            [SVProgressHUD showWithStatus:@"Verifying Licence..."];
-//
-//            [LicenceCodeManager.sharedInstance verifyCode:text completion:^(BOOL success, NSError * _Nullable error) {
-//                dispatch_async(dispatch_get_main_queue(), ^(void) {
-//                    [self enableButtons:YES];
-//                    [SVProgressHUD dismiss];
-//
-//                    if(success) {
-//                        // Set Pro...
-//
-//                        [self.navigationController popToRootViewControllerAnimated:YES];
-//                    }
-//                    else {
-//                        [Alerts error:self title:@"Licence Code Error" error:error];
-//                    }});
-//            }];
-//        }
-//    }];
-// }
 
 @end

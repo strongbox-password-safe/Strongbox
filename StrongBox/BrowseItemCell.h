@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel *otpLabel;
 
 - (void)setGroup:(NSString *)title icon:(UIImage*)icon childCount:(NSString*)childCount italic:(BOOL)italic groupLocation:(NSString*)groupLocation;
+- (void)setGroup:(NSString *)title icon:(UIImage*)icon childCount:(NSString*)childCount italic:(BOOL)italic groupLocation:(NSString*)groupLocation tintColor:(UIColor* _Nullable )tintColor;
+
 - (void)setRecord:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon groupLocation:(NSString*)groupLocation flags:(NSString*)flags;
 
 @end

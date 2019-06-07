@@ -31,6 +31,11 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 @property (weak, nonatomic) IBOutlet UISwitch *switchOpenOffline;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellInterpretEmpty;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowEmpty;
+@property (weak, nonatomic) IBOutlet UISwitch *switchInterpretEmpty;
+
 @property (nullable) NSString* selectedName;
 @property (nullable) NSString* selectedPassword;
 @property (nullable) NSURL* selectedKeyFileUrl;
@@ -55,8 +60,8 @@
     self.switchReadOnly.on = self.initialReadOnly;
     self.switchOpenOffline.on = self.initialOfflineCache;
     
-    self.textFieldName.text = self.selectedName.length ? self.selectedName : [self getSuggestedDatabaseName];
-    
+    self.textFieldName.text = self.selectedName.length ? self.selectedName : [CASGTableViewController getSuggestedDatabaseName];
+  
     [self bindUi];
 }
 
@@ -110,6 +115,7 @@
 }
 
 - (void)bindUi {
+    [self bindAdvanced];
     [self bindFormat];
     [self bindKeyFile];
     [self bindPasswordFields];
@@ -150,6 +156,10 @@
     self.onDone(NO, nil);
 }
 
+- (BOOL)keyFileIsSet {
+    return self.selectedOneTimeKeyFileData != nil || self.selectedKeyFileUrl != nil;
+}
+
 - (IBAction)onDone:(id)sender {
     self.selectedName = [SafesList sanitizeSafeNickName:self.textFieldName.text];
     self.selectedPassword = self.textFieldPassword.text;
@@ -159,41 +169,21 @@
         return;
     }
     
-    // Password is Empty... A few  different scenarios here, simplest case is get where we ask if the key file is set
-    // otherwise it has to be @"" empty
+    // Password is Empty... A few  different scenarios here
     
-    BOOL keyFileIsSet = self.selectedOneTimeKeyFileData != nil || self.selectedKeyFileUrl != nil;
+    if(self.selectedFormat == kKeePass1 && [self keyFileIsSet]) {
+        self.selectedPassword = nil; // Cannot ever have empty password in KeePass 1
+    }
+    else if([self keyFileIsSet]) { // Must be KeePass 2
+        if(self.mode == kCASGModeGetCredentials) {
+            self.selectedPassword = Settings.sharedInstance.interpretEmptyPasswordAsNoPassword ? nil : @"";
+        }
+        else {
+            [self askAboutEmptyOrNonePasswordAndContinue];
+        }
+    }
 
-    if(self.mode == kCASGModeGetCredentials) {
-        if(keyFileIsSet) {
-            [self askAboutEmptyOrNonePasswordAndContinue];
-        }
-        else {
-            [self moveToDoneOrNext];
-        }
-        return;
-    }
-    
-    // Second Case is the setting of the password and it depends on the format and whether the key file is set
-    //
-    // KeePass 1 and Password Safe don't allow empty:
-    // Validation will prevent Password Safe from getting here
-    // but KeePass1 allows none if using a key file.
-    // If user enters empty and we are using KeePass1 with a keyFile set then count that as "None"...
-    
-    if(self.selectedFormat == kKeePass1 && keyFileIsSet) {
-        self.selectedPassword = nil;
-        [self moveToDoneOrNext];
-    }
-    else if (self.selectedFormat == kKeePass || self.selectedFormat == kKeePass4) {
-        if(keyFileIsSet) {
-            [self askAboutEmptyOrNonePasswordAndContinue];
-        }
-        else {
-            self.selectedPassword = @"";
-            [self moveToDoneOrNext];
-        }
-    }
+    [self moveToDoneOrNext];
 }
 
 - (void)askAboutEmptyOrNonePasswordAndContinue {
@@ -229,6 +219,11 @@
 }
 
 - (void)bindTableView {
+    BOOL showAllowEmpty = (self.selectedFormat == kKeePass1 && [self keyFileIsSet]) ||
+    self.selectedFormat == kKeePass4 ||
+    self.selectedFormat == kKeePass ||
+    self.selectedFormat == kFormatUnknown;
+
     if(self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
         [self cell:self.cellKeyFile setHidden:YES];
         [self cell:self.cellFormat setHidden:YES];
@@ -236,6 +231,8 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
+        [self cell:self.cellAllowEmpty setHidden:YES];
+        [self cell:self.cellInterpretEmpty setHidden:YES];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
@@ -244,6 +241,9 @@
         [self cell:self.cellFormat setHidden:self.mode == kCASGModeCreateExpress];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
+        
+        [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
+        [self cell:self.cellInterpretEmpty setHidden:YES]; // We will ask after submit
     }
     else if(self.mode == kCASGModeSetCredentials) {
         [self cell:self.cellDatabaseName setHidden:YES];
@@ -251,8 +251,16 @@
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
+        
+        [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
+        [self cell:self.cellInterpretEmpty setHidden:YES];
     }
     else if(self.mode == kCASGModeGetCredentials) {
+        [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
+        
+        BOOL showInterpretEmptyAsNone = showAllowEmpty && Settings.sharedInstance.allowEmptyOrNoPasswordEntry && [self keyFileIsSet] && self.initialFormat != kKeePass1;
+        [self cell:self.cellInterpretEmpty setHidden:!showInterpretEmptyAsNone];
+
         [self cell:self.cellDatabaseName setHidden:YES];
         [self cell:self.cellFormat setHidden:YES];
         [self cell:self.cellConfirmPassword setHidden:YES];
@@ -402,22 +410,18 @@
     UIGraphicsEndImageContext();
 }
 
-- (NSString*)getSuggestedDatabaseName {
++ (NSString*)getSuggestedDatabaseName {
     NSString* name = [IOsUtils nameFromDeviceName];
-    
-    if(name.length > 0) {
-        NSString *suggestion = [NSString stringWithFormat:@"%@'s Database", name];
-        
-        int attempt = 2;
-        
-        while(![[SafesList sharedInstance] isValidNickName:suggestion] && attempt < 50) {
-            suggestion = [NSString stringWithFormat:@"%@'s Database %d", name, attempt++];
-        }
-        
-        return [[SafesList sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
+    name = [SafesList sanitizeSafeNickName:name];
+
+    NSString *suggestion = name.length ? [NSString stringWithFormat:@"%@'s Database", name] : @"My Database";
+   
+    int attempt = 2;
+    while(![[SafesList sharedInstance] isValidNickName:suggestion] && attempt < 100) {
+        suggestion = [NSString stringWithFormat:@"%@'s Database %d", name, attempt++];
     }
     
-    return nil;
+    return [[SafesList sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
 }
 
 - (void)textFieldNameDidChange:(id)sender {
@@ -533,7 +537,12 @@
 }
 
 - (BOOL)canGet {
-    return self.textFieldPassword.text.length || Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    BOOL formatAllowsEmptyOrNone =   self.initialFormat == kKeePass4 ||
+                        self.initialFormat == kKeePass ||
+                        self.initialFormat == kFormatUnknown ||
+                        (self.initialFormat == kKeePass1 && [self keyFileIsSet]);
+    
+    return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && Settings.sharedInstance.allowEmptyOrNoPasswordEntry);
 }
 
 - (BOOL)canSet {
@@ -557,12 +566,23 @@
 
 - (BOOL)credentialsValidForDatabaseFormat {
     if(self.selectedFormat == kKeePass1) {
-        BOOL keyFileIsSet = self.selectedOneTimeKeyFileData != nil || self.selectedKeyFileUrl != nil;
-        return [self passwordIsValid] && (self.textFieldPassword.text.length > 0 || keyFileIsSet);
+        return [self passwordIsValid] && (self.textFieldPassword.text.length > 0 || [self keyFileIsSet]);
     }
     else {
         return [self passwordIsValid];
     }
+}
+
+- (IBAction)onAdvancedChanged:(id)sender {
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
+    Settings.sharedInstance.interpretEmptyPasswordAsNoPassword = self.switchInterpretEmpty.on;
+    
+    [self bindUi];
+}
+
+- (void)bindAdvanced {
+    self.switchAllowEmpty.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.switchInterpretEmpty.on = Settings.sharedInstance.interpretEmptyPasswordAsNoPassword;
 }
 
 // TODO: Might be nice to resize?

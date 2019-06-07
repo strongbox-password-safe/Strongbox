@@ -25,7 +25,7 @@ typedef NS_ENUM (unsigned int, DatabaseStorageMethod) {
 + (instancetype)error:(NSError*)error withProvider:(id<SafeStorageProvider>)provider;
 + (instancetype)parametersForFilesApp:(NSURL*)url;
 + (instancetype)parametersForManualDownload:(NSData*)data;
-+ (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem* _Nullable)file;
++ (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem* _Nullable)file likelyFormat:(DatabaseFormat)likelyFormat;
 + (instancetype)parametersForNativeProviderCreate:(id<SafeStorageProvider>)provider folder:(NSObject* _Nullable)folder;
 
 @property DatabaseStorageMethod method;
@@ -36,6 +36,7 @@ typedef NS_ENUM (unsigned int, DatabaseStorageMethod) {
 @property (nullable) NSObject *parentFolder;
 @property (nullable) NSError* error;
 @property BOOL createMode;
+@property DatabaseFormat likelyFormat;
 
 @end
 

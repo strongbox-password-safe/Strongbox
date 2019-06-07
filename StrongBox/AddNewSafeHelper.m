@@ -10,33 +10,35 @@
 #import "Alerts.h"
 #import "KeyFileParser.h"
 #import "AppleICloudProvider.h"
+#import "Settings.h"
+#import "LocalDeviceStorageProvider.h"
+
+const DatabaseFormat kDefaultFormat = kKeePass4;
 
 @implementation AddNewSafeHelper
 
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
                         password:(NSString *)password
-                      keyFileUrl:(NSURL*)keyFileUrl
-              onceOffKeyFileData:(NSData*)onceOffKeyFileData
-                          format:(DatabaseFormat)format
                       completion:(void (^)(SafeMetaData* metadata, NSError* error))completion {
     NSError* error;
-    DatabaseModel *database = getNewDatabase(password, keyFileUrl, onceOffKeyFileData, format, &error);
+    DatabaseModel *database = getNewDatabase(password, nil, nil, kDefaultFormat, &error);
     
     if(!database) {
         completion(nil, error);
         return;
     }
     
+    BOOL iCloud = Settings.sharedInstance.iCloudOn;
+    
     [AddNewSafeHelper createDatabase:vc
                                 name:name
                           keyFileUrl:nil
                             database:database
-                            provider:AppleICloudProvider.sharedInstance // TODO: Or Local?
+                            provider:iCloud ? AppleICloudProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance
                         parentFolder:nil
                           completion:completion];
 }
-
 
 + (void)createNewDatabase:(UIViewController *)vc
                      name:(NSString *)name
@@ -87,6 +89,8 @@
               completion:^(SafeMetaData *metadata, NSError *error)
          {
              metadata.keyFileUrl = keyFileUrl;
+             metadata.likelyFormat = database.format;
+             
              dispatch_async(dispatch_get_main_queue(), ^(void) {
                  completion(metadata, error);
              });
@@ -95,7 +99,7 @@
 }
 
 static DatabaseModel* getNewDatabase(NSString* password, NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
-    NSData* keyFileDigest = getKeyFileDigest2(keyFileUrl, onceOffKeyFileData, format, error);
+    NSData* keyFileDigest = getKeyFileDigest(keyFileUrl, onceOffKeyFileData, format, error);
     
     if(*error) {
         return nil;
@@ -104,11 +108,15 @@ static DatabaseModel* getNewDatabase(NSString* password, NSURL* keyFileUrl, NSDa
     return [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:keyFileDigest format:format];
 }
 
-NSData* getKeyFileDigest2(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
-    return getKeyFileDigest(keyFileUrl, onceOffKeyFileData, format != kKeePass1, error);
+NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
+    NSData* keyFileData = getKeyFileData(keyFileUrl, onceOffKeyFileData, error);
+    
+    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
+
+    return keyFileDigest;
 }
 
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, BOOL checkForXml, NSError** error) {
+NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
     NSData* keyFileData = nil;
     if (keyFileUrl) {
         keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
@@ -117,9 +125,7 @@ NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, BOOL che
         keyFileData = onceOffKeyFileData;
     }
     
-    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:checkForXml] : nil;
-
-    return keyFileDigest;
+    return keyFileData;
 }
 
 @end

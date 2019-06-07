@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "StorageProvider.h"
 #import "DuressAction.h"
+#import "AbstractDatabaseFormatAdaptor.h"
 
 @interface SafeMetaData : NSObject
 
@@ -47,6 +48,7 @@
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
 @property NSURL* keyFileUrl;
+@property DatabaseFormat likelyFormat;
 
 @end
 

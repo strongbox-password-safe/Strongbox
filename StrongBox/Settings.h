@@ -131,7 +131,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 @property BOOL showAdvancedUnlockOptions;
 @property BOOL temporaryUseOldUnlock;
-@property BOOL allowEmptyOrNoPasswordEntry; 
 
 @property BOOL immediateSearchOnBrowse;
 
@@ -139,6 +138,11 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL hideKeyFileOnUnlock;
+
+@property BOOL doNotUseNewSplitViewController;
+
+@property BOOL allowEmptyOrNoPasswordEntry;
+@property BOOL interpretEmptyPasswordAsNoPassword;
 
 NS_ASSUME_NONNULL_END
 

@@ -60,7 +60,7 @@
     
     //BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
     
-    if(![Settings sharedInstance].fullVersion) {
+    if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
         if(![Settings sharedInstance].freeTrial){

@@ -11,6 +11,8 @@
 #import "DatabaseModel.h"
 #import "SelectedStorageParameters.h"
 
+extern const DatabaseFormat kDefaultFormat;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AddNewSafeHelper : NSObject
@@ -27,12 +29,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
                         password:(NSString *)password
-                      keyFileUrl:(NSURL*)keyFileUrl
-              onceOffKeyFileData:(NSData*)onceOffKeyFileData
-                          format:(DatabaseFormat)format
                       completion:(void (^)(SafeMetaData* metadata, NSError* error))completion;
 
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, BOOL checkForXml, NSError** error);
+NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
+NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error);
 
 @end
 
