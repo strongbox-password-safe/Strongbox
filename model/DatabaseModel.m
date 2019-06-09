@@ -571,9 +571,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         [self filterForWord:results
                  searchText:word
                       scope:scope
-                dereference:dereference
-      includeKeePass1Backup:includeKeePass1Backup
-          includeRecycleBin:includeRecycleBin];
+                dereference:dereference];
     }
     
     [self filterExcludedSearchItems:results includeKeePass1Backup:includeKeePass1Backup includeRecycleBin:includeRecycleBin];
@@ -598,9 +596,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 - (void)filterForWord:(NSMutableArray<Node*>*)searchNodes
            searchText:(NSString *)searchText
                 scope:(NSInteger)scope
-          dereference:(BOOL)dereference
-includeKeePass1Backup:(BOOL)includeKeePass1Backup
-    includeRecycleBin:(BOOL)includeRecycleBin {
+          dereference:(BOOL)dereference {
     if (scope == kSearchScopeTitle) {
         [self searchTitle:searchNodes searchText:searchText dereference:dereference];
     }

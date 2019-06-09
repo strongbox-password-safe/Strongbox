@@ -215,6 +215,7 @@
 		4D3652142184A24700A56519 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3652122184A24700A56519 /* regdom.c */; };
 		4D3652152184A24700A56519 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3652122184A24700A56519 /* regdom.c */; };
 		4D3652172184A34600A56519 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3652162184A34600A56519 /* AppDelegate.m */; };
+		4D376E4722AC4B4000BDB93A /* BrowsePreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */; };
 		4D376F7A2242534D0031049E /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376F792242534D0031049E /* GenericTextBooleanElementHandler.m */; };
 		4D376F7B2242534D0031049E /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376F792242534D0031049E /* GenericTextBooleanElementHandler.m */; };
 		4D376F8222425A050031049E /* empty-recycle-bin-values.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D376F7F224259D10031049E /* empty-recycle-bin-values.xml */; };
@@ -278,6 +279,8 @@
 		4D47670C217905AB00C4358F /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47670A217905AB00C4358F /* Meta.m */; };
 		4D47670F2179070A00C4358F /* GenericTextStringElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47670E2179070A00C4358F /* GenericTextStringElementHandler.m */; };
 		4D4767102179070A00C4358F /* GenericTextStringElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47670E2179070A00C4358F /* GenericTextStringElementHandler.m */; };
+		4D48C6ED22AD16F9002B502E /* ItemDetailsPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D48C6EC22AD16F9002B502E /* ItemDetailsPreferences.storyboard */; };
+		4D48C6F022AD186D002B502E /* ItemDetailsPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */; };
 		4D4ACAE322A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE222A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard */; };
 		4D4ACAE622A1275700D486B0 /* CASGTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
@@ -868,6 +871,8 @@
 		4D3652122184A24700A56519 /* regdom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = regdom.c; path = lib/psl/regdom.c; sourceTree = SOURCE_ROOT; };
 		4D3652132184A24700A56519 /* tld-canon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tld-canon.h"; path = "lib/psl/tld-canon.h"; sourceTree = SOURCE_ROOT; };
 		4D3652162184A34600A56519 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = StrongBox/AppDelegate.m; sourceTree = "<group>"; };
+		4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowsePreferencesTableViewController.h; path = StrongBox/BrowsePreferencesTableViewController.h; sourceTree = "<group>"; };
+		4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BrowsePreferencesTableViewController.m; path = StrongBox/BrowsePreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D376F782242534D0031049E /* GenericTextBooleanElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextBooleanElementHandler.h; path = model/keepass/GenericTextBooleanElementHandler.h; sourceTree = "<group>"; };
 		4D376F792242534D0031049E /* GenericTextBooleanElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextBooleanElementHandler.m; path = model/keepass/GenericTextBooleanElementHandler.m; sourceTree = "<group>"; };
 		4D376F7F224259D10031049E /* empty-recycle-bin-values.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "empty-recycle-bin-values.xml"; sourceTree = "<group>"; };
@@ -938,6 +943,9 @@
 		4D47670A217905AB00C4358F /* Meta.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Meta.m; path = model/keepass/Meta.m; sourceTree = SOURCE_ROOT; };
 		4D47670D2179070A00C4358F /* GenericTextStringElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextStringElementHandler.h; path = model/keepass/GenericTextStringElementHandler.h; sourceTree = SOURCE_ROOT; };
 		4D47670E2179070A00C4358F /* GenericTextStringElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextStringElementHandler.m; path = model/keepass/GenericTextStringElementHandler.m; sourceTree = SOURCE_ROOT; };
+		4D48C6EC22AD16F9002B502E /* ItemDetailsPreferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ItemDetailsPreferences.storyboard; sourceTree = "<group>"; };
+		4D48C6EE22AD186D002B502E /* ItemDetailsPreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ItemDetailsPreferencesViewController.h; path = StrongBox/ItemDetailsPreferencesViewController.h; sourceTree = "<group>"; };
+		4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ItemDetailsPreferencesViewController.m; path = StrongBox/ItemDetailsPreferencesViewController.m; sourceTree = "<group>"; };
 		4D4ACAE222A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CreateDatabaseOrSetCredentials.storyboard; sourceTree = "<group>"; };
 		4D4ACAE422A1275700D486B0 /* CASGTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CASGTableViewController.h; path = StrongBox/CASGTableViewController.h; sourceTree = "<group>"; };
 		4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CASGTableViewController.m; path = StrongBox/CASGTableViewController.m; sourceTree = "<group>"; };
@@ -1038,8 +1046,8 @@
 		4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SelectItem.storyboard; sourceTree = "<group>"; };
 		4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectItemTableViewController.h; path = StrongBox/SelectItemTableViewController.h; sourceTree = "<group>"; };
 		4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectItemTableViewController.m; path = StrongBox/SelectItemTableViewController.m; sourceTree = "<group>"; };
-		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutViewController.h; path = StrongBox/AboutViewController.h; sourceTree = "<group>"; };
-		4D7D219822A02CBC00C1C925 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutViewController.m; path = StrongBox/AboutViewController.m; sourceTree = "<group>"; };
+		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
+		4D7D219822A02CBC00C1C925 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
 		4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+Extensions.h"; path = "model/NSMutableArray+Extensions.h"; sourceTree = "<group>"; };
 		4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+Extensions.m"; path = "model/NSMutableArray+Extensions.m"; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
@@ -1533,6 +1541,8 @@
 				4D4554AD2285C0BB0015C236 /* BrowseItemCell.m */,
 				4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */,
 				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
+				4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */,
+				4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */,
 			);
 			name = Browse;
 			sourceTree = "<group>";
@@ -1574,8 +1584,6 @@
 				4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */,
 				4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */,
 				4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */,
-				4D7D219722A02CBC00C1C925 /* AboutViewController.h */,
-				4D7D219822A02CBC00C1C925 /* AboutViewController.m */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -1965,6 +1973,15 @@
 			name = XmlParsing;
 			sourceTree = "<group>";
 		};
+		4D48C6EB22AD0DE9002B502E /* About */ = {
+			isa = PBXGroup;
+			children = (
+				4D7D219722A02CBC00C1C925 /* AboutViewController.h */,
+				4D7D219822A02CBC00C1C925 /* AboutViewController.m */,
+			);
+			path = About;
+			sourceTree = "<group>";
+		};
 		4D4D6AF4222EF3D80056514E /* RMStore */ = {
 			isa = PBXGroup;
 			children = (
@@ -1994,6 +2011,7 @@
 				4D20E7A72299593E00ABFC89 /* PIN Code */,
 				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DBA028022A3EECA00BAC858 /* Database Management */,
+				4D48C6EB22AD0DE9002B502E /* About */,
 				4D0835DF2284773C00CA7405 /* Preferences */,
 				4DE2688E22A65C8B00A1D158 /* Password Generation */,
 				4D06943622083E2000FB826C /* Upgrade */,
@@ -2519,6 +2537,9 @@
 				4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */,
 				4DBC7A482279DC1600CA534D /* CollapsibleTableViewHeader.h */,
 				4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */,
+				4D48C6EC22AD16F9002B502E /* ItemDetailsPreferences.storyboard */,
+				4D48C6EE22AD186D002B502E /* ItemDetailsPreferencesViewController.h */,
+				4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */,
 			);
 			name = "Item Details";
 			sourceTree = "<group>";
@@ -3086,6 +3107,7 @@
 				4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */,
 				4D0835ED22847BD100CA7405 /* diceware.wordlist.txt in Resources */,
 				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
+				4D48C6ED22AD16F9002B502E /* ItemDetailsPreferences.storyboard in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
 				4DAE98B42270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 			);
@@ -3409,6 +3431,7 @@
 				4D3E14A62183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
 				4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
+				4D48C6F022AD186D002B502E /* ItemDetailsPreferencesViewController.m in Sources */,
 				4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
 				4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */,
@@ -3427,6 +3450,7 @@
 				4D3E1484218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
+				4D376E4722AC4B4000BDB93A /* BrowsePreferencesTableViewController.m in Sources */,
 				4D3AC32321908D4A0010CFCD /* Keys.m in Sources */,
 				4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */,
 				4D2F6C4421807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */,

@@ -10,6 +10,14 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--ItemDetailsPreferences-->
+        <scene sceneID="E0y-di-oqg">
+            <objects>
+                <viewControllerPlaceholder storyboardName="ItemDetailsPreferences" id="EyE-JR-ywl" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T66-QS-NSL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="836" y="1907"/>
+        </scene>
         <!--Item Details-->
         <scene sceneID="GPt-GZ-6qb">
             <objects>
@@ -24,7 +32,15 @@
                             <outlet property="delegate" destination="LUp-85-BZf" id="glb-zL-jlf"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Acme Inc." prompt="Tip: Tap Field to Copy" id="Wu5-96-gRh"/>
+                    <navigationItem key="navigationItem" title="Acme Inc." prompt="Tip: Tap Field to Copy" id="Wu5-96-gRh">
+                        <barButtonItem key="rightBarButtonItem" title="Details View Preferences" image="list" id="rL6-Dh-Vni">
+                            <connections>
+                                <segue destination="EyE-JR-ywl" kind="popoverPresentation" identifier="segueToViewPreferences" popoverAnchorBarButtonItem="rL6-Dh-Vni" id="GFW-Mm-qNk">
+                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                </segue>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <segue destination="gCU-Xb-8zj" kind="presentation" identifier="segueToCustomFieldEditor" id="IMX-G4-VLQ"/>
@@ -36,7 +52,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p2Y-zL-eqZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1987" y="1996"/>
+            <point key="canvasLocation" x="1994" y="1425"/>
         </scene>
         <!--EmptyDetailsID-->
         <scene sceneID="gIj-aC-8oS">
@@ -211,4 +227,7 @@
             <point key="canvasLocation" x="2409" y="2486"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="list" width="30" height="30"/>
+    </resources>
 </document>

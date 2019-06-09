@@ -27,7 +27,7 @@
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
 #import "PasswordGenerationSettingsTableView.h"
-
+#import "ItemDetailsPreferencesViewController.h"
 static const int kMinNotesCellHeight = 160;
 
 @interface RecordView () <UITextViewDelegate, UITextFieldDelegate>
@@ -53,6 +53,7 @@ static const int kMinNotesCellHeight = 160;
 @property UIBarButtonItem *navBack;
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 @property (readonly) BOOL readOnlyMode;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
 @end
 
@@ -305,8 +306,8 @@ static const int kMinNotesCellHeight = 160;
         self.navigationController.navigationBar.prefersLargeTitles = NO;
     }
 
-    self.navigationController.toolbar.hidden = YES;
-    self.navigationController.toolbarHidden = YES;
+    self.navigationController.toolbar.hidden = NO;
+    self.navigationController.toolbarHidden = NO;
     self.navigationController.navigationBar.hidden = NO;
     [self.navigationController setNavigationBarHidden:NO animated:NO];
     self.navigationController.navigationBarHidden = NO;
@@ -531,6 +532,8 @@ static const int kMinNotesCellHeight = 160;
     // Password Generation Settings
     
     self.buttonPasswordGenerationSettings.hidden = !self.isEditing;
+    
+    self.buttonViewPreferences.enabled = !self.editing;
 }
 
 - (void)setTitleTextFieldUIValidationIndicator {
@@ -702,8 +705,14 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil))
-    {
+    if ([segue.identifier isEqual:@"segueToViewPreferences"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        ItemDetailsPreferencesViewController* vc = (ItemDetailsPreferencesViewController*)nav.topViewController;
+        vc.onPreferencesChanged = ^{
+            [self bindUiToRecord];
+        };
+    }
+    else if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil)) {
         PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.record.fields.passwordHistory;
         vc.readOnly = self.readOnlyMode;

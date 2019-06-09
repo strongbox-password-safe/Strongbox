@@ -16,4 +16,6 @@
 @property NSArray<Node*> * _Nonnull itemsToMove;
 @property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonMove;
 
+@property (nonatomic, copy, nonnull) void (^onDone)(void);
+
 @end

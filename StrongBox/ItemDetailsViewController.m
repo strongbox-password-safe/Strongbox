@@ -33,6 +33,7 @@
 #import "CollapsibleTableViewHeader.h"
 #import "PasswordGenerationSettingsTableView.h"
 #import "BrowseSafeView.h"
+#import "ItemDetailsPreferencesViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -144,9 +145,10 @@ static NSString* const kTotpCell = @"TotpCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-//    [UIView setAnimationsEnabled:NO];
+    NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
+    [rightBarButtons insertObject:self.editButtonItem atIndex:0];
     
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.rightBarButtonItems = rightBarButtons;
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
     self.navigationController.navigationBar.prefersLargeTitles = NO;
     if(Settings.sharedInstance.hideTips) {
@@ -699,7 +701,7 @@ static NSString* const kTotpCell = @"TotpCell";
         return 0;
     }
 
-    BOOL shouldHideEmpty = Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = !Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowIcon) {
@@ -763,7 +765,7 @@ static NSString* const kTotpCell = @"TotpCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    BOOL shouldHideEmpty = Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = !Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
     
     if(section == kSimpleFieldsSectionIdx) {
         return 0;
@@ -994,7 +996,14 @@ static NSString* const kTotpCell = @"TotpCell";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if([segue.identifier isEqualToString:@"segueToCustomFieldEditor"]) {
+    if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
+        UINavigationController *nav = segue.destinationViewController;
+        ItemDetailsPreferencesViewController* vc = (ItemDetailsPreferencesViewController*)nav.topViewController;
+        vc.onPreferencesChanged = ^{
+            [self performFullReload];
+        };
+    }
+    else if([segue.identifier isEqualToString:@"segueToCustomFieldEditor"]) {
         UINavigationController *nav = segue.destinationViewController;
         CustomFieldEditorViewController* vc = (CustomFieldEditorViewController*)[nav topViewController];
         

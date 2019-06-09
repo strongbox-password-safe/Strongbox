@@ -106,6 +106,9 @@
 
         [self checkICloudAvailability];
     }
+    else {
+        [self processEnqueuedImport];
+    }
 }
 
 - (void)appResignActive {

@@ -24,6 +24,7 @@
 #import "ItemDetailsViewController.h"
 #import "BrowseItemCell.h"
 #import "MasterDetailViewController.h"
+#import "BrowsePreferencesTableViewController.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -48,6 +49,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 @property BOOL hasAlreadyAppeared;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
 @end
 
@@ -69,6 +71,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     self.navigationController.navigationBar.hidden = NO;
     self.navigationController.navigationBarHidden = NO;
     
+    [self refreshItems];
     [self updateDetailsView:nil];
 }
 
@@ -103,6 +106,10 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     [self setupNavBar];
     
+    NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
+    [rightBarButtons insertObject:self.editButtonItem atIndex:0];
+    self.navigationItem.rightBarButtonItems = rightBarButtons;
+
     [self setupSearchBar];
     
     [self refreshItems];
@@ -607,7 +614,10 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     (self.buttonAddRecord).enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
     (self.buttonSafeSettings).enabled = !self.isEditing;
-    (self.buttonMove).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
+    
+
+    self.buttonMove.enabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
+
     (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
     
     (self.buttonSortItems).enabled = !ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
@@ -663,9 +673,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         [self.tableView reloadData];
     }
     
-    self.navigationItem.rightBarButtonItem = (!self.viewModel.isUsingOfflineCache &&
-                                              !self.viewModel.isReadOnly &&
-                                              [self getDataSource].count > 0) ? self.editButtonItem : nil;
+    self.editButtonItem.enabled = (!self.viewModel.isUsingOfflineCache &&
+                                   !self.viewModel.isReadOnly &&
+                                   [self getDataSource].count > 0);
     
     [self enableDisableToolbarButtons];
     
@@ -743,17 +753,30 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         NSArray *itemsToMove = (NSArray *)sender;
         
         UINavigationController *nav = segue.destinationViewController;
-        SelectDestinationGroupController *vc = nav.viewControllers.firstObject;
+        SelectDestinationGroupController *vc = (SelectDestinationGroupController*)nav.topViewController;
         
         vc.currentGroup = self.viewModel.database.rootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
+        vc.onDone = ^{
+            [self dismissViewControllerAnimated:YES completion:^{
+                [self refreshItems];
+            }];
+        };
     }
     else if ([segue.identifier isEqualToString:@"segueToSafeSettings"])
     {
         UINavigationController* nav = segue.destinationViewController;
         SafeDetailsView *vc = (SafeDetailsView *)nav.topViewController;
         vc.viewModel = self.viewModel;
+    }
+    else if([segue.identifier isEqualToString:@"segueToViewSettings"]) {
+        UINavigationController* nav = segue.destinationViewController;
+        BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)nav.topViewController;
+        vc.format = self.viewModel.database.format;
+        vc.onPreferencesChanged = ^{
+            [self refreshItems];
+        };
     }
 }
 
@@ -791,14 +814,16 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (IBAction)onMove:(id)sender {
-    NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
-    
-    if (selectedRows.count > 0) {
-        NSArray<Node *> *itemsToMove = [self getSelectedItems:selectedRows];
+    if(self.editing) {
+        NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
         
-        [self performSegueWithIdentifier:@"segueToSelectDestination" sender:itemsToMove];
-        
-        [self setEditing:NO animated:YES];
+        if (selectedRows.count > 0) {
+            NSArray<Node *> *itemsToMove = [self getSelectedItems:selectedRows];
+            
+            [self performSegueWithIdentifier:@"segueToSelectDestination" sender:itemsToMove];
+            
+            [self setEditing:NO animated:YES];
+        }
     }
 }
 
@@ -1015,6 +1040,10 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                              alertType:ISAlertTypeSuccess
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
+}
+
+- (IBAction)onViewPreferences:(id)sender {
+    [self performSegueWithIdentifier:@"segueToViewSettings" sender:nil];
 }
 
 @end

@@ -607,12 +607,18 @@
                         </connections>
                     </tableView>
                     <toolbarItems>
+                        <barButtonItem title="View Preferences" image="list" id="Xz5-GU-xg0">
+                            <connections>
+                                <segue destination="09S-EB-q9r" kind="popoverPresentation" identifier="segueToViewPreferences" popoverAnchorBarButtonItem="Xz5-GU-xg0" id="v0O-Bp-66G">
+                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                </segue>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem systemItem="flexibleSpace" id="BTo-i3-xKS"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="&lt;Title&gt;" prompt=" " id="gBH-U2-aRK">
-                        <barButtonItem key="backBarButtonItem" title=" " id="Tca-RN-pCP"/>
-                    </navigationItem>
-                    <nil key="simulatedBottomBarMetrics"/>
+                    <navigationItem key="navigationItem" title="&lt;Title&gt;" leftItemsSupplementBackButton="YES" id="gBH-U2-aRK"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <connections>
                         <outlet property="buttonCopyAndLaunchUrl" destination="aXA-Op-gVa" id="YuD-qc-1Kl"/>
                         <outlet property="buttonCopyEmail" destination="GOE-E9-6zf" id="jiV-7S-1Q3"/>
@@ -623,6 +629,7 @@
                         <outlet property="buttonHistory" destination="kgX-Wp-dMK" id="scf-4B-TCO"/>
                         <outlet property="buttonPasswordGenerationSettings" destination="1WI-OO-ZCE" id="n2d-oB-txB"/>
                         <outlet property="buttonSetOtp" destination="lef-cn-Pa9" id="S5J-Dr-aW8"/>
+                        <outlet property="buttonViewPreferences" destination="Xz5-GU-xg0" id="uOJ-Ht-MGc"/>
                         <outlet property="iconAndTitleView" destination="L94-fJ-JHH" id="DMB-re-TCX"/>
                         <outlet property="imageViewIcon" destination="ofk-yi-Ueo" id="3zK-7W-1LV"/>
                         <outlet property="labelAttachmentCount" destination="En0-DE-6md" id="5ZW-L7-D5a"/>
@@ -646,16 +653,29 @@
             </objects>
             <point key="canvasLocation" x="1665" y="1060"/>
         </scene>
+        <!--ItemDetailsPreferences-->
+        <scene sceneID="tDy-sk-VyT">
+            <objects>
+                <viewControllerPlaceholder storyboardName="ItemDetailsPreferences" id="09S-EB-q9r" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cqC-Qv-4dp" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="727" y="1044"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="ALi-TC-7cz">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="tJE-Py-cEL" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="tJE-Py-cEL" sceneMemberID="viewController">
                     <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Z0d-IS-buH">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="G28-UI-b8g">
+                        <rect key="frame" x="0.0" y="813" width="414" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="QJb-WH-W2Q" kind="relationship" relationship="rootViewController" id="Qgh-ge-jMN"/>
                     </connections>
@@ -688,6 +708,7 @@
         <image name="clock_64" width="64" height="64"/>
         <image name="copy_64" width="64" height="64"/>
         <image name="document" width="30" height="30"/>
+        <image name="list" width="30" height="30"/>
         <image name="services" width="30" height="30"/>
         <image name="show-24" width="24" height="24"/>
         <image name="syncronize" width="30" height="30"/>

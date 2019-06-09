@@ -13,19 +13,11 @@
 @interface AdvancedPreferencesTableViewController ()
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoDetectKeyFiles;
-@property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
-@property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpAutoFill;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
-@property (weak, nonatomic) IBOutlet UISwitch *switchHideTotp;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowPasswordOnDetails;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePass1BackupFolder;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchNoSortingKeePassInBrowse;
-@property (weak, nonatomic) IBOutlet UISwitch *switchEmptyPassword;
 @property (weak, nonatomic) IBOutlet UISwitch *switchEmergencyUseOldUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
@@ -62,20 +54,12 @@
     NSLog(@"Advanced Preference Changed: [%@]", sender);
     
     Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
-    Settings.sharedInstance.viewDereferencedFields = self.switchViewDereferenced.on;
-    Settings.sharedInstance.searchDereferencedFields = self.switchSearchDereferenced.on;
     Settings.sharedInstance.doNotAutoDetectKeyFiles = !self.switchAutoDetectKeyFiles.on;
     Settings.sharedInstance.doNotUseQuickTypeAutoFill = !self.switchUseQuickTypeAutoFill.on;
-    Settings.sharedInstance.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
-    Settings.sharedInstance.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
-    Settings.sharedInstance.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
-    Settings.sharedInstance.hideTotp = self.switchHideTotp.on;
     Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
-    Settings.sharedInstance.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
     Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
     Settings.sharedInstance.temporaryUseOldUnlock = self.switchEmergencyUseOldUnlock.on;
-    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchEmptyPassword.on;
     Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     Settings.sharedInstance.doNotUseNewSplitViewController = self.switchUseOldNonSplitView.on;
@@ -89,20 +73,12 @@
 
 - (void)bindPreferences {
     self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
-    self.switchViewDereferenced.on = Settings.sharedInstance.viewDereferencedFields;
-    self.switchSearchDereferenced.on = Settings.sharedInstance.searchDereferencedFields;
     self.switchUseQuickTypeAutoFill.on = !Settings.sharedInstance.doNotUseQuickTypeAutoFill;
     self.switchAutoDetectKeyFiles.on = !Settings.sharedInstance.doNotAutoDetectKeyFiles;
-    self.switchAutoFavIcon.on = Settings.sharedInstance.tryDownloadFavIconForNewRecord;
-    self.switchShowKeePass1BackupFolder.on = Settings.sharedInstance.showKeePass1BackupGroup;
-    self.switchShowPasswordOnDetails.on = Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
-    self.switchHideTotp.on = Settings.sharedInstance.hideTotp;
     self.switchHideTotpAutoFill.on = Settings.sharedInstance.hideTotpInAutoFill;
     self.switchNoSortingKeePassInBrowse.on = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-    self.switchShowRecycleBinInSearch.on = Settings.sharedInstance.showRecycleBinInSearchResults;
     self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
     self.switchEmergencyUseOldUnlock.on = Settings.sharedInstance.temporaryUseOldUnlock;
-    self.switchEmptyPassword.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
     self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchUseOldNonSplitView.on = Settings.sharedInstance.doNotUseNewSplitViewController;

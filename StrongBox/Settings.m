@@ -766,12 +766,12 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)showEmptyFieldsInDetailsView {
-    return [self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
+-(BOOL)showEmptyFieldsInDetailsView {
+    return ![self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
 }
 
-- (void)setShowEmptyFieldsInDetailsView:(BOOL)hideEmptyFieldsInDetailsView {
-    [self setBool:kHideEmptyFieldsInDetailsView value:hideEmptyFieldsInDetailsView];
+- (void)setShowEmptyFieldsInDetailsView:(BOOL)showEmptyFieldsInDetailsView {
+    [self setBool:kHideEmptyFieldsInDetailsView value:!showEmptyFieldsInDetailsView];
 }
 
 - (NSArray<NSNumber *> *)detailsViewCollapsedSections {

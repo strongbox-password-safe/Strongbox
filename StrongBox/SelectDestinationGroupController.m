@@ -23,6 +23,11 @@
     [self refresh];
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.tableView.tableFooterView = [UIView new];
+}
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)refresh {
@@ -71,7 +76,7 @@
         if(![itemToMove changeParent:self.currentGroup allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe]) {
             NSLog(@"Error Changing Parents.");
             [Alerts warn:self title:@"Error Changing Parents" message:@"Error Changing Parents" completion:^{
-                [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+                self.onDone();
             }];
             return;
         }
@@ -82,7 +87,7 @@
             [Alerts error:self title:@"Error Saving" error:error];
         }
 
-        [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+        self.onDone();
     }];
 }
 
@@ -144,6 +149,7 @@
         vc.currentGroup = item;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = self.itemsToMove;
+        vc.onDone = self.onDone;
     }
 }
 

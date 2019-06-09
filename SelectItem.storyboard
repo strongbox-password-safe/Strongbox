@@ -32,13 +32,7 @@
                             <outlet property="delegate" destination="udU-tn-V0j" id="J0L-H7-UMI"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="pNS-Sm-SAS">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="wHc-vh-s7O">
-                            <connections>
-                                <action selector="onCancel:" destination="udU-tn-V0j" id="OhS-Sl-y4r"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="pNS-Sm-SAS"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1C4-Ix-fGn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

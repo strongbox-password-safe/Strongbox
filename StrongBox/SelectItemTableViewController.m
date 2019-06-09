@@ -27,12 +27,6 @@
     self.clearsSelectionOnViewWillAppear = NO;
 }
 
-- (IBAction)onCancel:(id)sender {
-    if(self.onDone) {
-        self.onDone(NO, -1);
-    }
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.items.count;
 }
