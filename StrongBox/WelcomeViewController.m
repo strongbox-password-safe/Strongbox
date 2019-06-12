@@ -97,17 +97,4 @@
     }
 }
 
-//if([Settings.sharedInstance getLaunchCount] == 1) {
-//    [Alerts info:self title:@"Welcome!"
-//         message:@"Hi, Welcome to Strongbox!\n\nI hope you will enjoy the app!\n-Mark"];
-//}
-//else if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 6) {
-//    if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
-//        [Alerts info:self title:@"Strongbox Pro"
-//             message:@"Hi there!\nYou are currently using Strongbox Pro. You can evaluate this version over the next three months. I hope you like it.\n\nAfter this I would ask you to contribute to its development. If you choose not to support the app, you will then be transitioned to a little bit more limited version. You won't lose any of your databases or passwords.\n\nTo find out more you can tap the Upgrade button at anytime below. I hope you enjoy the app, and will choose to support it!\n-Mark"];
-//
-//        [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
-//    }
-//}
-
 @end

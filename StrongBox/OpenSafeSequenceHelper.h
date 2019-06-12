@@ -33,9 +33,6 @@ typedef void(^CompletionBlock)(Model*_Nullable model, NSError*_Nullable error);
                  manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
                              completion:(CompletionBlock)completion;
 
-+ (nullable NSData*)findAssociatedLocalKeyFile:(NSString*)filename;
-+ (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename;
-
 @end
 
 NS_ASSUME_NONNULL_END

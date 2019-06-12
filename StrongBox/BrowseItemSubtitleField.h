@@ -10,12 +10,14 @@
 #define BrowseItemSubtitleField_h
 
 typedef NS_ENUM (unsigned int, BrowseItemSubtitleField) {
-    kNoField,
-    kUsername,
-    kPassword,
-    kUrl,
-    kEmail,
-    kModified
+    kBrowseItemSubtitleNoField,
+    kBrowseItemSubtitleUsername,
+    kBrowseItemSubtitlePassword,
+    kBrowseItemSubtitleUrl,
+    kBrowseItemSubtitleEmail,
+    kBrowseItemSubtitleModified,
+    kBrowseItemSubtitleCreated,
+    kBrowseItemSubtitleNotes,
 };
 
 #endif /* BrowseItemSubtitleField_h */

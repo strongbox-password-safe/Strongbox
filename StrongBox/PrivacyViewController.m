@@ -12,6 +12,7 @@
 #import "Alerts.h"
 #import "SafesList.h"
 #import "LocalDeviceStorageProvider.h"
+#import "AutoFillManager.h"
 
 @interface PrivacyViewController ()
 
@@ -185,7 +186,10 @@
 }
 
 - (void)deleteAllData {
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    
     [SafesList.sharedInstance deleteAll]; // This also removes Key Chain Entries
+    
     [LocalDeviceStorageProvider.sharedInstance deleteAllLocalAndAppGroupFiles]; // Key Files, Caches, etc
 }
 

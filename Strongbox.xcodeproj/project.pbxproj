@@ -371,6 +371,7 @@
 		4D8144B42199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B62199B7790044E617 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
+		4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */; };
 		4D87569C2222B46B00D6B8EA /* CustomNavigationItemTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */; };
 		4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B3E21AC30BA00805DED /* CustomFieldsViewController.m */; };
 		4D876B4321AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
@@ -1007,6 +1008,7 @@
 		4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Kdb1Database.m; path = model/keepass/Kdb1Database.m; sourceTree = "<group>"; };
 		4D6FE2C62194469600EB9997 /* KdbDatabaseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbDatabaseTests.m; path = StrongboxTests/KdbDatabaseTests.m; sourceTree = "<group>"; };
 		4D6FE2C9219446B800EB9997 /* Database-twofish.kdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Database-twofish.kdb"; sourceTree = "<group>"; };
+		4D73231F22B13885003DB568 /* BrowseSortField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BrowseSortField.h; sourceTree = "<group>"; };
 		4D74B927218C40B000FC369E /* V3Binary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = V3Binary.h; path = model/keepass/V3Binary.h; sourceTree = "<group>"; };
 		4D74B928218C40B000FC369E /* V3Binary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = V3Binary.m; path = model/keepass/V3Binary.m; sourceTree = "<group>"; };
 		4D74B92B218C438800FC369E /* V3BinariesList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = V3BinariesList.h; path = model/keepass/V3BinariesList.h; sourceTree = "<group>"; };
@@ -1052,6 +1054,8 @@
 		4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+Extensions.m"; path = "model/NSMutableArray+Extensions.m"; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
 		4D8144B32199B4A80044E617 /* NodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
+		4D82332922B01BE200A37BAC /* SortOrderTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SortOrderTableViewController.h; path = StrongBox/SortOrderTableViewController.h; sourceTree = "<group>"; };
+		4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SortOrderTableViewController.m; path = StrongBox/SortOrderTableViewController.m; sourceTree = "<group>"; };
 		4D87569A2222B46A00D6B8EA /* CustomNavigationItemTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomNavigationItemTitleView.h; path = StrongBox/CustomNavigationItemTitleView.h; sourceTree = "<group>"; };
 		4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomNavigationItemTitleView.m; path = StrongBox/CustomNavigationItemTitleView.m; sourceTree = "<group>"; };
 		4D876B3D21AC30BA00805DED /* CustomFieldsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldsViewController.h; path = StrongBox/CustomFieldsViewController.h; sourceTree = "<group>"; };
@@ -1543,6 +1547,9 @@
 				4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */,
 				4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */,
 				4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */,
+				4D82332922B01BE200A37BAC /* SortOrderTableViewController.h */,
+				4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */,
+				4D73231F22B13885003DB568 /* BrowseSortField.h */,
 			);
 			name = Browse;
 			sourceTree = "<group>";
@@ -3343,6 +3350,7 @@
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
 				4D29E46F206D350300AD537E /* PasswordGenerator.m in Sources */,
+				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
 				4DF97F2021BF101B0090A55E /* DAVRequest.m in Sources */,
 				4D25674C21E8C65D006260B7 /* PinEntryController.m in Sources */,
 				4D3E148D21832B7400A41CA0 /* argon2.c in Sources */,

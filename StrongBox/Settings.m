@@ -50,7 +50,7 @@ static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementChe
 static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
 static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
 static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
-static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill";
+//static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill"; // Dead
 static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
 static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
 static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene"; // DEAD
@@ -65,15 +65,19 @@ static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFill
 static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
 static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
-static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
+//static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
-static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock";
+//static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock"; // DEAD
 static NSString* const kImmediateSearchOnBrowse = @"immediateSearchOnBrowse";
 static NSString* const kBrowseItemSubtitleField = @"browseItemSubtitleField";
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController";
-static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword";
+//static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword"; // DEAD
+
+static NSString* const kBrowseSortField = @"browseSortField";
+static NSString* const kBrowseSortOrderDescending = @"browseSortOrderDescending";
+static NSString* const kBrowseSortFoldersSeparately = @"browseSortFoldersSeparately";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -654,15 +658,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)uiDoNotSortKeePassNodesInBrowseView {
-    return [[self getUserDefaults] boolForKey:kUiDoNotSortKeePassNodesInBrowseView];
-}
-
-- (void)setUiDoNotSortKeePassNodesInBrowseView:(BOOL)uiDoNotSortKeePassNodesInBrowseView {
-    [[self getUserDefaults] setBool:uiDoNotSortKeePassNodesInBrowseView forKey:kUiDoNotSortKeePassNodesInBrowseView];
-    [[self getUserDefaults] synchronize];
-}
-
 -(BOOL)tryDownloadFavIconForNewRecord {
     return [self getBool:kTryDownloadFavIconForNewRecord fallback:YES];
 }
@@ -734,15 +729,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setDoNotCopyOtpCodeOnAutoFillSelect:(BOOL)copyOtpCodeOnAutoFillSelect {
     [[self getUserDefaults] setBool:copyOtpCodeOnAutoFillSelect forKey:kCopyOtpCodeOnAutoFillSelect];
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)doNotUseQuickTypeAutoFill {
-    return [[self getUserDefaults] boolForKey:kDoNotUseQuickTypeAutoFill];
-}
-
-- (void)setDoNotUseQuickTypeAutoFill:(BOOL)doNotUseQuickTypeAutoFill {
-    [[self getUserDefaults] setBool:doNotUseQuickTypeAutoFill forKey:kDoNotUseQuickTypeAutoFill];
     [[self getUserDefaults] synchronize];
 }
 
@@ -889,22 +875,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [self setBool:kAppLockAppliesToPreferences value:appLockAppliesToPreferences];
 }
 
-- (BOOL)showAdvancedUnlockOptions {
-    return [self getBool:kShowAdvancedUnlockOptions fallback:NO];
-}
-
-- (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
-    [self setBool:kShowAdvancedUnlockOptions value:showAdvancedUnlockOptions];
-}
-
-- (BOOL)temporaryUseOldUnlock {
-    return [self getBool:kTemporaryUseOldUnlock];
-}
-
-- (void)setTemporaryUseOldUnlock:(BOOL)temporaryUseOldUnlock {
-    [self setBool:kTemporaryUseOldUnlock value:temporaryUseOldUnlock];
-}
-
 - (BOOL)immediateSearchOnBrowse {
     return [self getBool:kImmediateSearchOnBrowse];
 }
@@ -915,7 +885,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 }
 
 - (BrowseItemSubtitleField)browseItemSubtitleField {
-    BrowseItemSubtitleField deflt = Settings.sharedInstance.showUsernameInBrowse ? kUsername : kNoField;
+    BrowseItemSubtitleField deflt = Settings.sharedInstance.showUsernameInBrowse ? kBrowseItemSubtitleUsername : kBrowseItemSubtitleNoField;
     return (BrowseItemSubtitleField)[self getInteger:kBrowseItemSubtitleField fallback:deflt];
 }
 
@@ -955,12 +925,39 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
 }
 
-- (BOOL)interpretEmptyPasswordAsNoPassword {
-    return [self getBool:kInterpretEmptyPasswordAsNoPassword fallback:NO];
+//- (BOOL)interpretEmptyPasswordAsNoPassword {
+//    return [self getBool:kInterpretEmptyPasswordAsNoPassword fallback:NO];
+//}
+//
+//- (void)setInterpretEmptyPasswordAsNoPassword:(BOOL)interpretEmptyPasswordAsNoPassword {
+//    [self setBool:kInterpretEmptyPasswordAsNoPassword value:interpretEmptyPasswordAsNoPassword];
+//}
+
+- (BrowseSortField)browseSortField {
+    BOOL oldDoNotSort = [[self getUserDefaults] boolForKey:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while
+    
+    return (BrowseSortField)[self getInteger:kBrowseSortField fallback:oldDoNotSort ? kBrowseSortFieldNone : kBrowseSortFieldTitle];
 }
 
-- (void)setInterpretEmptyPasswordAsNoPassword:(BOOL)interpretEmptyPasswordAsNoPassword {
-    [self setBool:kInterpretEmptyPasswordAsNoPassword value:interpretEmptyPasswordAsNoPassword];
+- (void)setBrowseSortField:(BrowseSortField)browseSortField {
+    [self setInteger:kBrowseSortField value:browseSortField];
+}
+
+- (BOOL)browseSortOrderDescending {
+    return [self getBool:kBrowseSortOrderDescending fallback:NO];
+}
+
+- (void)setBrowseSortOrderDescending:(BOOL)browseSortOrderDescending {
+    [self setBool:kBrowseSortOrderDescending value:browseSortOrderDescending];
+}
+
+
+- (BOOL)browseSortFoldersSeparately {
+    return [self getBool:kBrowseSortFoldersSeparately fallback:YES];
+}
+
+- (void)setBrowseSortFoldersSeparately:(BOOL)browseSortFoldersSeparately {
+    [self setBool:kBrowseSortFoldersSeparately value:browseSortFoldersSeparately];
 }
 
 @end

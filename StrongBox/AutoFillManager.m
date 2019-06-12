@@ -38,15 +38,7 @@ static NSString* const kMailToScheme = @"mailto";
         
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
             if(state.enabled) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD showWithStatus:@"Clearing AutoFill..."];
-                });
-                
                 [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
             }
         }];
     }

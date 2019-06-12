@@ -14,7 +14,6 @@
 #import "SafeStorageProviderFactory.h"
 #import "OfflineDetector.h"
 #import <SVProgressHUD/SVProgressHUD.h>
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "KeyFileParser.h"
 #import "Utils.h"
 #import "PinEntryController.h"
@@ -28,30 +27,27 @@
 #import "ISMessages/ISMessages.h"
 #endif
 
-@interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface OpenSafeSequenceHelper ()
 
 @property (nonatomic, strong) NSString* biometricIdName;
-@property (nonatomic, strong) UIAlertController *alertController;
-@property (nonatomic, strong) UITextField* textFieldPassword;
 @property (nonnull) UIViewController* viewController;
 @property (nonnull) SafeMetaData* safe;
 @property BOOL canConvenienceEnrol;
 @property BOOL openAutoFillCache;
-@property (nonnull) CompletionBlock completion;
-@property BOOL isConvenienceUnlock;
-@property NSString* masterPassword;
 
-@property BOOL keyFileSelectionModeAskForPasswordBeforeOpen;
+@property (nonnull) CompletionBlock completion;
+
+@property BOOL isConvenienceUnlock;
 @property BOOL isAutoFillOpen;
 @property BOOL manualOpenOfflineCache;
 
+@property NSString* masterPassword;
 @property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
 
 @end
 
 @implementation OpenSafeSequenceHelper
-
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
@@ -101,7 +97,6 @@
         self.canConvenienceEnrol = canConvenienceEnrol;
         self.openAutoFillCache = openAutoFillCache;
         self.completion = completion;
-        self.keyFileSelectionModeAskForPasswordBeforeOpen = NO;
         self.isAutoFillOpen = isAutoFillOpen;
         self.manualOpenOfflineCache = manualOpenOfflineCache;
     }
@@ -255,6 +250,7 @@
         [[LocalDeviceStorageProvider sharedInstance] deleteAutoFillCache:self.safe completion:nil];
     }
     
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     [[SafesList sharedInstance] remove:self.safe.uuid];
 }
 
@@ -322,76 +318,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: Remove these
-
-+ (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
-    NSString* veryLastFilename = [filename lastPathComponent];
-    NSString* filenameOnly = [veryLastFilename stringByDeletingPathExtension];
-    NSString* expectedKeyFileName = [filenameOnly stringByAppendingPathExtension:@"key"];
-    
-    return  expectedKeyFileName;
-}
-
-+ (NSData*)findAssociatedLocalKeyFile:(NSString*)filename {
-    if(Settings.sharedInstance.doNotAutoDetectKeyFiles) {
-        return nil;
-    }
-    
-    NSString* expectedKeyFileName = [OpenSafeSequenceHelper getExpectedAssociatedLocalKeyFileName:filename];
-    
-    NSLog(@"Looking for key file: [%@] in local documents directory:", expectedKeyFileName);
-    
-    NSData* fileData = [LocalDeviceStorageProvider.sharedInstance readWithCaseInsensitiveFilename:expectedKeyFileName];
-    
-    return [KeyFileParser getKeyFileDigestFromFileData:fileData checkForXml:YES]; // TODO: THis is incorrect for KDB - Xml files are not supported in the way the are in KDBX
-}
-
-- (UIAlertController*)getAlertControllerWithPasswordField {
-    NSString *title = [NSString stringWithFormat:@"Password for %@", self.safe.nickName];
-    
-    UIAlertController* ret = [UIAlertController alertControllerWithTitle:title
-                                                                 message:@"Please Provide Credentials"
-                                                          preferredStyle:UIAlertControllerStyleAlert];
-    
-    __weak OpenSafeSequenceHelper *weakSelf = self;
-    
-    [ret addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-        weakSelf.textFieldPassword = textField;
-        
-        // Create button
-        UIButton *checkbox = [UIButton buttonWithType:UIButtonTypeCustom];
-        [checkbox setFrame:CGRectMake(2 , 2, 18, 18)];  // Not sure about size
-        [checkbox setTag:1];
-        [checkbox addTarget:weakSelf action:@selector(toggleShowHidePasswordText:) forControlEvents:UIControlEventTouchUpInside];
-        
-        // Setup image for button
-        [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
-        [checkbox setImage:[UIImage imageNamed:@"show.png"] forState:UIControlStateNormal];
-        [checkbox setImage:[UIImage imageNamed:@"hide.png"] forState:UIControlStateSelected];
-        [checkbox setImage:[UIImage imageNamed:@"hide.png"] forState:UIControlStateHighlighted];
-        [checkbox setAdjustsImageWhenHighlighted:TRUE];
-        
-        // Setup the right view in the text field
-        [textField setClearButtonMode:UITextFieldViewModeAlways];
-        [textField setRightViewMode:UITextFieldViewModeAlways];
-        [textField setRightView:checkbox];
-        
-        // Setup Tag so the textfield can be identified
-        [textField setTag:-1];
-        textField.secureTextEntry = YES;
-    }];
-    
-    return ret;
-}
-
 - (void)promptForManualCredentials {
     self.isConvenienceUnlock = NO;
-    if(Settings.sharedInstance.temporaryUseOldUnlock) {
-        [self promptForPasswordAndOrKeyFile]; // TODO: Delete
-    }
-    else {
-        [self newerPromptForPasswordAndOrKeyFile];
-    }
+    [self promptForPasswordAndOrKeyFile];
 }
 
 - (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
@@ -403,6 +332,8 @@
 }
 
 - (NSURL*)getAutoDetectedKeyFileUrl {
+    // TODO: Will be wrong if/when move key files into shared App group
+    
     NSFileManager *fm = [NSFileManager defaultManager];
     NSURL *directory = [IOsUtils applicationDocumentsDirectory];
     NSError* error;
@@ -425,7 +356,7 @@
     return nil;
 }
 
-- (void)newerPromptForPasswordAndOrKeyFile {
+- (void)promptForPasswordAndOrKeyFile {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CreateDatabaseOrSetCredentials" bundle:nil];
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     CASGTableViewController *scVc = (CASGTableViewController*)nav.topViewController;
@@ -435,7 +366,7 @@
     scVc.initialReadOnly = self.safe.readOnly;
     scVc.initialOfflineCache = self.manualOpenOfflineCache;
     
-    // Less than ideal
+    // Less than perfect but helpful
     
     BOOL probablyPasswordSafe = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
     DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; // Not Ideal
@@ -479,9 +410,6 @@
                    openOffline:(BOOL)openOffline {
     if(keyFileUrl || oneTimeKeyFileData) {
         NSError *error;
-        
-        // TODO: This is wrong for KDB XML Files - Fix in next iteration- Digest shouldn't be done until we know what kind of db it is
-        
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
 
         if(self.undigestedKeyFileData == nil) {
@@ -507,196 +435,9 @@
     [self openSafe];
 }
 
-- (void)promptForPasswordAndOrKeyFile { // TODO: Delete
-    NSData* autoDetectedKeyFileDigest = [OpenSafeSequenceHelper findAssociatedLocalKeyFile:self.safe.fileName];
-    
-    self.alertController = [self getAlertControllerWithPasswordField];
-    self.alertController.message = autoDetectedKeyFileDigest == nil ? @"Please Provide Credentials" : @"Please Provide Credentials\n\n(*Key File has been auto-detected)";
-    
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"Unlock"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-                                                              self.masterPassword = self.alertController.textFields[0].text;
-                                                              self.undigestedKeyFileData = autoDetectedKeyFileDigest;
-                                                              [self openSafe];
-                                                          }];
-    
-    UIAlertAction *keyFileOnlyAction = [UIAlertAction actionWithTitle:autoDetectedKeyFileDigest ? @"No Password (Use Key File Only)" : @"Advanced Options..."
-                                                            style:kNilOptions
-                                                          handler:^(UIAlertAction *a) {
-                                                              self.masterPassword = nil;
-                                                              if(autoDetectedKeyFileDigest) {
-                                                                  self.keyFileDigest = autoDetectedKeyFileDigest;
-                                                                  [self openSafe];
-                                                              }
-                                                              else {
-                                                                  __weak OpenSafeSequenceHelper *weakSelf = self;
-                                                                  
-                                                                  [Alerts twoOptionsWithCancel:weakSelf.viewController
-                                                                                         title:@"Advanced Unlock"
-                                                                                       message:@"Select an advanced Unlock method"
-                                                                             defaultButtonText:@"Password & Key File..."
-                                                                              secondButtonText:@"No Password, Just a Key File..."
-                                                                                        action:^(int response) {
-                                                                                            if(response == 0) {
-                                                                                                self.keyFileSelectionModeAskForPasswordBeforeOpen = YES;
-                                                                                                [self onUseKeyFile:weakSelf.viewController];
-                                                                                            }
-                                                                                            else if(response == 1) {
-                                                                                                [self onUseKeyFile:weakSelf.viewController];
-                                                                                            }
-                                                                                            else {
-                                                                                                weakSelf.completion(nil, nil);
-                                                                                            }
-                                                                                        }];
-                                                              }
-                                                          }];
-
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             self.completion(nil, nil);
-                                                         }];
-    
-    [self.alertController addAction:defaultAction];
-    [self.alertController addAction:keyFileOnlyAction];
-    [self.alertController addAction:cancelAction];
-    
-    self.alertController.preferredAction = defaultAction; // Return leads to the default action
-    
-    [self.viewController presentViewController:self.alertController animated:YES completion:nil];
-}
-
-- (void)toggleShowHidePasswordText:(UIButton*)sender {
-    if(sender.selected){
-        [sender setSelected:FALSE];
-    } else {
-        [sender setSelected:TRUE];
-    }
-    
-    self.textFieldPassword.secureTextEntry = !sender.selected;
-}
-
-- (void)onUseKeyFile:(UIViewController*)parentVc {
-    [Alerts threeOptions:self.viewController
-                   title:@"Key File Source"
-                 message:@"Select where you would like to choose your Key File from"
-       defaultButtonText:@"Files..."
-        secondButtonText:@"Photo Library..."
-         thirdButtonText:@"Cancel"
-                  action:^(int response) {
-                     if(response == 0) {
-                         UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
-                         vc.delegate = self;
-                         [parentVc presentViewController:vc animated:YES completion:nil];
-                     }
-                     else if (response == 1) {
-                         UIImagePickerController *vc = [[UIImagePickerController alloc] init];
-                         vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
-                         vc.delegate = self;
-                         BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
-                         
-                         if(!available) {
-                             [Alerts info:self.viewController title:@"Photo Library Unavailable" message:@"Could not access Photo Library. Does Strongbox have Permission?"]; 
-                             self.completion(nil, nil);
-                             return;
-                         }
-                         
-                         vc.mediaTypes = @[(NSString*)kUTTypeImage];
-                         vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-                         
-                         [self.viewController presentViewController:vc animated:YES completion:nil];
-                     }
-                     else {
-                         self.completion(nil, nil);
-                     }
-                 }];
-}
-
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
-    [picker dismissViewControllerAnimated:YES completion:^{
-         NSError* error;
-         NSData* data = [Utils getImageDataFromPickedImage:info error:&error];
-
-         if(!data) {
-             NSLog(@"Error: %@", error);
-             [Alerts error:self.viewController title:@"Error Reading Image" error:error];
-             self.completion(nil, error);
-         }
-         else {
-             
-             self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: THis is incorrect for KDB - Xml files are not supported in the way the are in KDBX
-             [self openSafe];
-         }
-     }];
-}
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:YES completion:^
-     {
-         self.completion(nil, nil);
-     }];
-}
-
-- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
-    self.completion(nil, nil);
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    //NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    
-    NSURL* url = [urls objectAtIndex:0];
-    // NSString *filename = [url.absoluteString lastPathComponent];
-    
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
-    
-    if(!data) {
-        NSLog(@"Error: %@", error);
-        [Alerts error:self.viewController title:@"There was an error reading the Key File" error:error completion:^{
-            self.completion(nil, nil);
-        }];
-    }
-    else {
-        self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: THis is incorrect for KDB - Xml files are not supported in the way the are in KDBX
-        [self openSafe];
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)openSafe {
-    if(self.keyFileSelectionModeAskForPasswordBeforeOpen) {
-        [self requestPasswordAfterKeySelectionAndOpenSafe];
-    }
-    else {
-        [self actuallyOpenSafe];
-    }
-}
-
-- (void)requestPasswordAfterKeySelectionAndOpenSafe {
-    self.alertController = [self getAlertControllerWithPasswordField];
-    
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"Unlock"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-                                                              self.masterPassword = self.alertController.textFields[0].text;
-                                                              [self actuallyOpenSafe];
-                                                          }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             self.completion(nil, nil);
-                                                         }];
-    
-    [self.alertController addAction:defaultAction];
-    [self.alertController addAction:cancelAction];
-    
-    [self.viewController presentViewController:self.alertController animated:YES completion:nil];
-}
-
-- (void)actuallyOpenSafe {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
         
@@ -738,7 +479,8 @@
 }
 
 - (void)onProviderReadDone:(id<SafeStorageProvider>)provider
-                      data:(NSData *)data error:(NSError *)error
+                      data:(NSData *)data
+                     error:(NSError *)error
                  cacheMode:(BOOL)cacheMode {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (error != nil || data == nil) {
@@ -773,18 +515,42 @@
                 provider:(id)provider
                cacheMode:(BOOL)cacheMode {
     [SVProgressHUD showWithStatus:@"Decrypting..."];
-    
-    if(self.undigestedKeyFileData) {
-        DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+
+    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    if (self.undigestedKeyFileData) {
         self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
     }
-    
+
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSError *error;
-        DatabaseModel *openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
-                                                                                  password:self.masterPassword
-                                                                             keyFileDigest:self.keyFileDigest
-                                                                                     error:&error];
+        DatabaseModel *openedSafe = nil;
+
+        if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) && self.masterPassword.length == 0 && self.keyFileDigest) {
+            // KeePass 2 allows empty and nil/none... we need to try both to figure out what the user meant.
+            // We will try empty first which is what will have come from the View Controller and then nil.
+            
+            openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
+                                                                       password:self.masterPassword // Will be @""
+                                                                  keyFileDigest:self.keyFileDigest
+                                                                          error:&error];
+            
+            if(openedSafe == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
+                openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
+                                                                           password:nil
+                                                                      keyFileDigest:self.keyFileDigest
+                                                                              error:&error];
+                
+                if(openedSafe) {
+                    self.masterPassword = nil;
+                }
+            }
+        }
+        else {
+            openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
+                                                                       password:self.masterPassword
+                                                                  keyFileDigest:self.keyFileDigest
+                                                                          error:&error];
+        }
         
         dispatch_async(dispatch_get_main_queue(), ^(void){
             [self openSafeWithDataDone:error
@@ -996,10 +762,8 @@
         NSLog(@"Setting likelyFormat to [%u]", openedSafe.format);
         self.safe.likelyFormat = openedSafe.format;
         [SafesList.sharedInstance update:self.safe];
-        
-        if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
-        }
+    
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
     }
     
     self.completion(viewModel, nil);

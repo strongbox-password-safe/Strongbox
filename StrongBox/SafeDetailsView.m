@@ -15,7 +15,6 @@
 #import "ISMessages.h"
 #import "Utils.h"
 #import "Csv.h"
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "KeyFileParser.h"
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
@@ -28,9 +27,9 @@
 
 @end
 
-@interface SafeDetailsView () <MFMailComposeViewControllerDelegate, UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodes;
+@interface SafeDetailsView () <MFMailComposeViewControllerDelegate>
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
 @property (weak, nonatomic) IBOutlet UILabel *labelOfflineCacheTime;
@@ -101,9 +100,7 @@
     [self.navigationController setNavigationBarHidden:NO];
 
     self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : @"<None>";
-    self.labelMostPopularEmail.text = self.viewModel.database.mostPopularEmail ? self.viewModel.database.mostPopularEmail : @"<None>";
     self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
-    self.labelNumberOfUniqueEmails.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.emailSet count]];
     self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.passwordSet count]];
     self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfGroups];
     self.labelNumberOfRecords.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfRecords];
@@ -403,7 +400,7 @@
 }
 
 - (BOOL)canToggleTouchId {
-    return Settings.isBiometricIdAvailable && !self.viewModel.isReadOnly;
+    return Settings.isBiometricIdAvailable;
 }
 
 - (BOOL)canToggleOfflineCache {

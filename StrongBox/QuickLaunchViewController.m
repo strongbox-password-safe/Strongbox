@@ -95,7 +95,7 @@
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
             if(daysLeft > 30) {
-                upgradeButtonTitle = @"Upgrade";
+                upgradeButtonTitle = @"Upgrade Info";
             }
             else {
                 upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days left)",

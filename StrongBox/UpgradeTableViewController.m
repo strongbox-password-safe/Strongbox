@@ -27,9 +27,9 @@ static NSString* const kFontName =  @"Futura-Bold";
 @property (weak, nonatomic) IBOutlet UIButton *button3Months;
 @property (weak, nonatomic) IBOutlet UIButton *buttonYearly;
 @property (weak, nonatomic) IBOutlet UIButton *buttonLifetime;
-@property (weak, nonatomic) IBOutlet UIButton *buttonHaveLicenceCode;
 @property (weak, nonatomic) IBOutlet UIButton *buttonRestorePrevious;
 @property (weak, nonatomic) IBOutlet UILabel *labelBiometricIdFeature;
+@property (weak, nonatomic) IBOutlet UILabel *labelDevMessage;
 
 @end
 
@@ -70,11 +70,17 @@ static NSString* const kFontName =  @"Futura-Bold";
     self.buttonYearly.layer.cornerRadius = 25;
     self.buttonLifetime.layer.cornerRadius = 25;
 
-//    [self.buttonNope setEnabled:NO];
+    [self.buttonNope setEnabled:YES];
     
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self.buttonNope setEnabled:YES];
-//    });
+    NSString* devMessage;
+    if(Settings.sharedInstance.isFreeTrial) {
+        devMessage = [NSString stringWithFormat:@"Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark", (long)[Settings.sharedInstance getFreeTrialDaysRemaining]];
+    }
+    else {
+        devMessage = @"Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark";
+    }
+    
+    self.labelDevMessage.text = devMessage;
 }
 
 - (void)enableButtons:(BOOL)enable {
@@ -82,7 +88,6 @@ static NSString* const kFontName =  @"Futura-Bold";
     self.button1Month.enabled = enable;
     self.button3Months.enabled = enable;
     self.buttonYearly.enabled = enable;
-    self.buttonHaveLicenceCode.enabled = enable;
     self.buttonRestorePrevious.enabled = enable;
 }
 

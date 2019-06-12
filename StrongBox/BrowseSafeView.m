@@ -25,6 +25,7 @@
 #import "BrowseItemCell.h"
 #import "MasterDetailViewController.h"
 #import "BrowsePreferencesTableViewController.h"
+#import "SortOrderTableViewController.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -44,7 +45,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 
 @property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
-@property BOOL sortOrderDescending;
+@property BOOL sortOrderForAutomaticSortDuringEditing;
 
 @property BOOL hasAlreadyAppeared;
 
@@ -67,10 +68,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     self.navigationController.toolbarHidden = NO;
     self.navigationController.toolbar.hidden = NO;
-    [self.navigationController setNavigationBarHidden:NO];
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationController.navigationBarHidden = NO;
-    
     [self refreshItems];
     [self updateDetailsView:nil];
 }
@@ -110,6 +107,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
     self.navigationItem.rightBarButtonItems = rightBarButtons;
 
+//    self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    
     [self setupSearchBar];
     
     [self refreshItems];
@@ -269,11 +268,10 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
+    return self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.browseSortField == kBrowseSortFieldNone; 
 }
 
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
-{
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     if(![sourceIndexPath isEqual:destinationIndexPath]) {
         NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
@@ -291,21 +289,25 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    /* Return an estimated height or calculate
-     * estimated height dynamically on information
-     * that makes sense in your case.
-     */
     return 60.0f; // Required for iOS 9 and 10
 }
 
 - (IBAction)onSortItems:(id)sender {
-    self.reorderItemOperations = nil; // Discard existing reordering ops...
-    
-    self.sortOrderDescending = !self.sortOrderDescending;
-    [self.currentGroup sortChildren:self.sortOrderDescending];
-    
-    [self saveChangesToSafeAndRefreshView];
+    if(self.isEditing) {
+        [Alerts yesNo:self
+                title:@"Sort Items By Title?"
+              message:@"Do you want to sort all the items in this folder by Title? This will set the order in which they are stored in your database." action:^(BOOL response) {
+            if(response) {
+                self.reorderItemOperations = nil; // Discard existing reordering ops...
+                self.sortOrderForAutomaticSortDuringEditing = !self.sortOrderForAutomaticSortDuringEditing;
+                [self.currentGroup sortChildren:self.sortOrderForAutomaticSortDuringEditing];
+                [self saveChangesToSafeAndRefreshView];
+            }
+        }];
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToSortOrder" sender:nil];
+    }
 }
 
 - (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
@@ -471,7 +473,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil];
     }
     else {
-        NSString* subtitle = [self getItemSubtitle:node];        
+        NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];        
         NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
         flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
         
@@ -481,31 +483,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     }
     
     return cell;
-}
-
-- (NSString*)getItemSubtitle:(Node*)node {
-    switch (Settings.sharedInstance.browseItemSubtitleField) {
-        case kNoField:
-            return @"";
-            break;
-        case kUsername:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
-            break;
-        case kPassword:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
-            break;
-        case kUrl:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
-            break;
-        case kEmail:
-            return node.fields.email;
-            break;
-        case kModified:
-            return friendlyDateString(node.fields.modified);
-        default:
-            return @"";
-            break;
-    }
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
@@ -612,22 +589,25 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 - (void)enableDisableToolbarButtons {
     BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
     
-    (self.buttonAddRecord).enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
-    (self.buttonSafeSettings).enabled = !self.isEditing;
+    self.buttonAddRecord.enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
+    self.buttonSafeSettings.enabled = !self.isEditing;
+    self.buttonViewPreferences.enabled = !self.isEditing;
     
-
     self.buttonMove.enabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
-
-    (self.buttonDelete).enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
+    self.buttonDelete.enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
     
-    (self.buttonSortItems).enabled = !ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-    [self.buttonSortItems setImage:self.sortOrderDescending ? [UIImage imageNamed:@"sort-32-descending"] : [UIImage imageNamed:@"sort-32"]];
+    self.buttonSortItems.enabled = !self.isEditing ||
+        (!ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.browseSortField == kBrowseSortFieldNone);
+    
+    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-32-descending" : @"sort-32"] : [UIImage imageNamed:Settings.sharedInstance.browseSortOrderDescending ? @"sort-descending" : @"sort-ascending"];
+    
+    [self.buttonSortItems setImage:sortImage];
         
-    (self.buttonAddGroup).enabled = !ro && !self.isEditing;
+    self.buttonAddGroup.enabled = !ro && !self.isEditing;
 }
 
-- (NSArray<Node*>*)getNoneSearchItems {
-    NSArray* ret = self.currentGroup.children;
+- (NSArray<Node*>*)getItems {
+    NSArray<Node*>* ret = self.currentGroup.children;
     
     if(self.viewModel.database.format == kKeePass1 && !Settings.sharedInstance.showKeePass1BackupGroup) {
         Node* backupGroup = self.viewModel.database.keePass1BackupNode;
@@ -652,17 +632,11 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         }
     }
     
-    BOOL sortNodes = self.viewModel.database.format == kPasswordSafe || !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-    if(sortNodes) {
-        return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
-    }
-    else {
-        return ret;
-    }
+    return [self.viewModel.database sortItemsForBrowse:ret];
 }
 
 - (void)refreshItems {
-    self.items = [self getNoneSearchItems];
+    self.items = [self getItems];
     
     // Display
     
@@ -775,6 +749,21 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)nav.topViewController;
         vc.format = self.viewModel.database.format;
         vc.onPreferencesChanged = ^{
+            [self refreshItems];
+        };
+    }
+    else if([segue.identifier isEqualToString:@"segueToSortOrder"]){
+        UINavigationController* nav = segue.destinationViewController;
+        SortOrderTableViewController* vc = (SortOrderTableViewController*)nav.topViewController;
+        vc.format = self.viewModel.database.format;
+        vc.field = Settings.sharedInstance.browseSortField;
+        vc.descending = Settings.sharedInstance.browseSortOrderDescending;
+        vc.foldersSeparately = Settings.sharedInstance.browseSortFoldersSeparately;
+        
+        vc.onChangedOrder = ^(BrowseSortField field, BOOL descending, BOOL foldersSeparately) {
+            Settings.sharedInstance.browseSortField = field;
+            Settings.sharedInstance.browseSortOrderDescending = descending;
+            Settings.sharedInstance.browseSortFoldersSeparately = foldersSeparately;
             [self refreshItems];
         };
     }

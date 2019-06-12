@@ -64,6 +64,9 @@ extern NSInteger const kSearchScopeAll;
 - (NSString *)getGroupPathDisplayString:(Node *)vm;
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
 
+- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items;
+- (NSString*)getBrowseItemSubtitle:(Node*)node;
+
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
@@ -98,6 +101,7 @@ extern NSInteger const kSearchScopeAll;
 - (void)createNewRecycleBinNode;
 
 @property (nullable, readonly) Node* keePass1BackupNode;
+
 
 @end
 

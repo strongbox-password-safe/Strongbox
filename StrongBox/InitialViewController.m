@@ -265,7 +265,6 @@
             if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
                 if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 2) {
                     [self performSegueWithIdentifier:@"segueToProExplanation" sender:nil];
-                    
                     [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
                 }
             }
@@ -656,7 +655,7 @@
 
     //NSLog(@"Random: %ld", (long)random);
 
-    if(random < 15) {
+    if(random < 5) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
         });

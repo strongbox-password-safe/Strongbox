@@ -16,9 +16,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideTotpAutoFill;
-@property (weak, nonatomic) IBOutlet UISwitch *switchUseQuickTypeAutoFill;
-@property (weak, nonatomic) IBOutlet UISwitch *switchNoSortingKeePassInBrowse;
-@property (weak, nonatomic) IBOutlet UISwitch *switchEmergencyUseOldUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseOldNonSplitView;
@@ -55,30 +52,20 @@
     
     Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     Settings.sharedInstance.doNotAutoDetectKeyFiles = !self.switchAutoDetectKeyFiles.on;
-    Settings.sharedInstance.doNotUseQuickTypeAutoFill = !self.switchUseQuickTypeAutoFill.on;
     Settings.sharedInstance.hideTotpInAutoFill = self.switchHideTotpAutoFill.on;
-    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.switchNoSortingKeePassInBrowse.on;
     Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
-    Settings.sharedInstance.temporaryUseOldUnlock = self.switchEmergencyUseOldUnlock.on;
     Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     Settings.sharedInstance.doNotUseNewSplitViewController = self.switchUseOldNonSplitView.on;
-    
-    if(!self.switchUseQuickTypeAutoFill.on) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
     
     [self bindPreferences];
 }
 
 - (void)bindPreferences {
     self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
-    self.switchUseQuickTypeAutoFill.on = !Settings.sharedInstance.doNotUseQuickTypeAutoFill;
     self.switchAutoDetectKeyFiles.on = !Settings.sharedInstance.doNotAutoDetectKeyFiles;
     self.switchHideTotpAutoFill.on = Settings.sharedInstance.hideTotpInAutoFill;
-    self.switchNoSortingKeePassInBrowse.on = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
     self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
-    self.switchEmergencyUseOldUnlock.on = Settings.sharedInstance.temporaryUseOldUnlock;
     self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchUseOldNonSplitView.on = Settings.sharedInstance.doNotUseNewSplitViewController;

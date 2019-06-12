@@ -106,7 +106,9 @@
     [[LocalDeviceStorageProvider sharedInstance] deleteAutoFillCache:_metadata completion:^(NSError *error) {
           self.metadata.autoFillCacheEnabled = NO;
           self.metadata.autoFillCacheAvailable = NO;
-          
+        
+          [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+        
           [[SafesList sharedInstance] update:self.metadata];
       }];
 }
@@ -292,9 +294,7 @@
 }
 
 - (void)updateAutoFillQuickTypeDatabase {
-    if(!Settings.sharedInstance.doNotUseQuickTypeAutoFill) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
-    }
+    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
 }
 
 @end

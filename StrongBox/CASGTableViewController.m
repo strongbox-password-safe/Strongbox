@@ -32,9 +32,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchOpenOffline;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellInterpretEmpty;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowEmpty;
-@property (weak, nonatomic) IBOutlet UISwitch *switchInterpretEmpty;
 
 @property (nullable) NSString* selectedName;
 @property (nullable) NSString* selectedPassword;
@@ -174,13 +172,10 @@
     if(self.selectedFormat == kKeePass1 && [self keyFileIsSet]) {
         self.selectedPassword = nil; // Cannot ever have empty password in KeePass 1
     }
-    else if([self keyFileIsSet]) { // Must be KeePass 2
-        if(self.mode == kCASGModeGetCredentials) {
-            self.selectedPassword = Settings.sharedInstance.interpretEmptyPasswordAsNoPassword ? nil : @"";
-        }
-        else {
-            [self askAboutEmptyOrNonePasswordAndContinue];
-        }
+    else if([self keyFileIsSet] && (self.mode != kCASGModeGetCredentials)) {
+        // Must be KeePass 2 can have empty or none in this situation - Get mode will auto figure this out, but for set/create we need to ask
+        [self askAboutEmptyOrNonePasswordAndContinue];
+        return;
     }
 
     [self moveToDoneOrNext];
@@ -232,7 +227,6 @@
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
-        [self cell:self.cellInterpretEmpty setHidden:YES];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
@@ -243,7 +237,6 @@
         [self cell:self.cellOpenOffline setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
-        [self cell:self.cellInterpretEmpty setHidden:YES]; // We will ask after submit
     }
     else if(self.mode == kCASGModeSetCredentials) {
         [self cell:self.cellDatabaseName setHidden:YES];
@@ -253,18 +246,14 @@
         [self cell:self.cellOpenOffline setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
-        [self cell:self.cellInterpretEmpty setHidden:YES];
     }
     else if(self.mode == kCASGModeGetCredentials) {
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
         
-        BOOL showInterpretEmptyAsNone = showAllowEmpty && Settings.sharedInstance.allowEmptyOrNoPasswordEntry && [self keyFileIsSet] && self.initialFormat != kKeePass1;
-        [self cell:self.cellInterpretEmpty setHidden:!showInterpretEmptyAsNone];
-
         [self cell:self.cellDatabaseName setHidden:YES];
         [self cell:self.cellFormat setHidden:YES];
         [self cell:self.cellConfirmPassword setHidden:YES];
-        [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe]; // This is sort of a hacky way to try hide the key file if we think the Database is probably Password Safe
+        [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         
         if(self.offlineCacheDate) {
             self.labelOfflineCache.text = [NSString stringWithFormat:@"Open Offline Cache (%@)",friendlyDateStringVeryShort(self.offlineCacheDate)];
@@ -305,7 +294,7 @@
     if(self.selectedOneTimeKeyFileData) {
         self.cellKeyFile.textLabel.text = @"Selected Key File";
         self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
-        self.cellKeyFile.detailTextLabel.text = @"Once Off";
+        self.cellKeyFile.detailTextLabel.text = @"One Off";
         self.cellKeyFile.detailTextLabel.textColor = nil;
     }
     else if (self.selectedKeyFileUrl) {
@@ -575,14 +564,11 @@
 
 - (IBAction)onAdvancedChanged:(id)sender {
     Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
-    Settings.sharedInstance.interpretEmptyPasswordAsNoPassword = self.switchInterpretEmpty.on;
-    
     [self bindUi];
 }
 
 - (void)bindAdvanced {
     self.switchAllowEmpty.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
-    self.switchInterpretEmpty.on = Settings.sharedInstance.interpretEmptyPasswordAsNoPassword;
 }
 
 // TODO: Might be nice to resize?

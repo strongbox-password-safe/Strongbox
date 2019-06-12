@@ -192,15 +192,15 @@
 - (void)bindAboutButton {
     NSString *aboutString;
     if([[Settings sharedInstance] isPro]) {
-        aboutString = [NSString stringWithFormat:@"Version %@", [Utils getAppVersion]];
+        aboutString = [NSString stringWithFormat:@"Pro Version %@", [Utils getAppVersion]];
     }
     else {
         if([[Settings sharedInstance] isFreeTrial]) {
-            aboutString = [NSString stringWithFormat:@"Version %@ (Trial - %ld days left)",
+            aboutString = [NSString stringWithFormat:@"Pro Version %@ (Trial - %ld days left)",
                            [Utils getAppVersion], (long)[[Settings sharedInstance] getFreeTrialDaysRemaining]];
         }
         else {
-            aboutString = [NSString stringWithFormat:@"Version %@ (Lite - Please Upgrade)", [Utils getAppVersion]];
+            aboutString = [NSString stringWithFormat:@"Lite Version %@ (Please Upgrade)", [Utils getAppVersion]];
         }
     }
     

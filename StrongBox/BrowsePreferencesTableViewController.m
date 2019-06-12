@@ -85,7 +85,7 @@
     self.switchShowRecycleBinInSearch.on = Settings.sharedInstance.showRecycleBinInSearchResults;
     
     BrowseItemSubtitleField current = Settings.sharedInstance.browseItemSubtitleField;
-    BrowseItemSubtitleField effective = (current == kEmail && self.format != kPasswordSafe) ? kNoField : current;
+    BrowseItemSubtitleField effective = (current == kBrowseItemSubtitleEmail && self.format != kPasswordSafe) ? kBrowseItemSubtitleNoField : current;
     self.labelBrowseItemSubtitle.text = [self getBrowseItemSubtitleFieldName:effective];
     
     self.switchShowTotpBrowseView.on = !Settings.sharedInstance.hideTotpInBrowse;
@@ -103,16 +103,31 @@
 }
 
 - (void)onChangeBrowseItemSubtitle {
-    NSArray<NSNumber*>* options = self.format != kPasswordSafe ?    @[@(kNoField), @(kUsername), @(kPassword), @(kUrl), @(kModified)] :
-                                                                    @[@(kNoField), @(kUsername), @(kPassword), @(kUrl), @(kEmail), @(kModified)];
+    NSArray<NSNumber*>* options = self.format != kPasswordSafe ?
+        @[@(kBrowseItemSubtitleNoField),
+          @(kBrowseItemSubtitleUsername),
+          @(kBrowseItemSubtitlePassword),
+          @(kBrowseItemSubtitleUrl),
+          @(kBrowseItemSubtitleNotes),
+          @(kBrowseItemSubtitleCreated),
+          @(kBrowseItemSubtitleModified)] :
+    
+            @[@(kBrowseItemSubtitleNoField),
+              @(kBrowseItemSubtitleUsername),
+              @(kBrowseItemSubtitlePassword),
+              @(kBrowseItemSubtitleUrl),
+              @(kBrowseItemSubtitleEmail),
+              @(kBrowseItemSubtitleNotes),
+              @(kBrowseItemSubtitleCreated),
+              @(kBrowseItemSubtitleModified)];
     
     NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [self getBrowseItemSubtitleFieldName:(BrowseItemSubtitleField)obj.integerValue];
     }];
     
     BrowseItemSubtitleField current = Settings.sharedInstance.browseItemSubtitleField;
-    if(current == kEmail && self.format != kPasswordSafe) {
-        current = kNoField;
+    if(current == kBrowseItemSubtitleEmail && self.format != kPasswordSafe) {
+        current = kBrowseItemSubtitleNoField;
     }
     
     NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -133,23 +148,29 @@
 
 - (NSString*)getBrowseItemSubtitleFieldName:(BrowseItemSubtitleField)field {
     switch (field) {
-        case kNoField:
+        case kBrowseItemSubtitleNoField:
             return @"None";
             break;
-        case kUsername:
+        case kBrowseItemSubtitleUsername:
             return @"Username";
             break;
-        case kPassword:
+        case kBrowseItemSubtitlePassword:
             return @"Password";
             break;
-        case kUrl:
+        case kBrowseItemSubtitleUrl:
             return @"URL";
             break;
-        case kEmail:
+        case kBrowseItemSubtitleEmail:
             return @"Email";
             break;
-        case kModified:
+        case kBrowseItemSubtitleModified:
             return @"Date Modified";
+        case kBrowseItemSubtitleNotes:
+            return @"Notes";
+            break;
+        case kBrowseItemSubtitleCreated:
+            return @"Date Created";
+            break;
         default:
             return @"None";
             break;

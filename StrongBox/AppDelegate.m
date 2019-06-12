@@ -34,7 +34,7 @@
     [self initializeDropbox];
 
     [self initializeInstallSettingsAndLaunchCount];   
-     
+    
     // Do not backup local safes, caches or key files
 
     [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup];

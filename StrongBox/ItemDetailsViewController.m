@@ -110,7 +110,9 @@ static NSString* const kTotpCell = @"TotpCell";
     [self.navigationController setNavigationBarHidden:NO];
     self.navigationController.navigationBar.hidden = NO;
     self.navigationController.navigationBarHidden = NO;
-    self.navigationController.navigationBar.prefersLargeTitles = NO;
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    } 
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onCellHeightChangedNotification)

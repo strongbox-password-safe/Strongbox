@@ -12,6 +12,7 @@
 #import "SFTPSessionConfiguration.h"
 #import "AppLockMode.h"
 #import "BrowseItemSubtitleField.h"
+#import "BrowseSortField.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -94,7 +95,9 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL hideTotp;
 @property BOOL hideTotpInBrowse;
 @property BOOL hideTotpInAutoFill;
-@property BOOL uiDoNotSortKeePassNodesInBrowseView;
+
+//@property BOOL uiDoNotSortKeePassNodesInBrowseView;
+
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL doNotAutoDetectKeyFiles;
 
@@ -104,8 +107,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
 @property BOOL doNotCopyOtpCodeOnAutoFillSelect;
-
-@property BOOL doNotUseQuickTypeAutoFill;
 
 @property BOOL viewDereferencedFields;
 @property BOOL searchDereferencedFields;
@@ -129,9 +130,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property NSInteger deleteDataAfterFailedUnlockCount;
 @property NSUInteger failedUnlockAttempts;
 
-@property BOOL showAdvancedUnlockOptions;
-@property BOOL temporaryUseOldUnlock;
-
 @property BOOL immediateSearchOnBrowse;
 
 @property BrowseItemSubtitleField browseItemSubtitleField;
@@ -142,7 +140,11 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL doNotUseNewSplitViewController;
 
 @property BOOL allowEmptyOrNoPasswordEntry;
-@property BOOL interpretEmptyPasswordAsNoPassword;
+//@property BOOL interpretEmptyPasswordAsNoPassword;
+
+@property BrowseSortField browseSortField;
+@property BOOL browseSortOrderDescending;
+@property BOOL browseSortFoldersSeparately;
 
 NS_ASSUME_NONNULL_END
 

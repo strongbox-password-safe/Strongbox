@@ -407,9 +407,9 @@
                                         </subviews>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4av-wA-ATn">
-                                        <rect key="frame" x="101" y="370.66666666666663" width="172" height="33"/>
+                                        <rect key="frame" x="60" y="370.66666666666663" width="254" height="33"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                        <state key="normal" title="Print Master Password">
+                                        <state key="normal" title="Print Emergency Password Sheet">
                                             <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
@@ -452,7 +452,9 @@
                                     <constraint firstItem="Rc5-qF-ste" firstAttribute="top" secondItem="4av-wA-ATn" secondAttribute="bottom" constant="8" id="7CJ-7o-SMe"/>
                                     <constraint firstItem="XkY-eg-GFU" firstAttribute="leading" secondItem="hDB-qH-zSJ" secondAttribute="leading" id="7pR-iW-xLP"/>
                                     <constraint firstItem="Rc5-qF-ste" firstAttribute="centerX" secondItem="hDB-qH-zSJ" secondAttribute="centerX" id="ErL-zY-D3b"/>
+                                    <constraint firstItem="4av-wA-ATn" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hDB-qH-zSJ" secondAttribute="leading" id="HN1-5q-p4i"/>
                                     <constraint firstAttribute="bottom" secondItem="Rc5-qF-ste" secondAttribute="bottom" id="SAY-98-JY4"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4av-wA-ATn" secondAttribute="trailing" id="Ue0-if-Mhk"/>
                                     <constraint firstItem="ocd-gC-bRp" firstAttribute="leading" secondItem="hDB-qH-zSJ" secondAttribute="leading" id="g5d-ap-zkF"/>
                                     <constraint firstAttribute="trailing" secondItem="ocd-gC-bRp" secondAttribute="trailing" id="gD5-rD-ONk"/>
                                     <constraint firstItem="Ich-NG-HwE" firstAttribute="centerX" secondItem="hDB-qH-zSJ" secondAttribute="centerX" id="i6z-vK-Wpl"/>
