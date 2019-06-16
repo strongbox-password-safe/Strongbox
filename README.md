@@ -28,7 +28,7 @@ The official PasswordSafe github repository is here:
 
 https://github.com/pwsafe
 
-Kudos to Rony Shapiro, Bruce Schneier and all the Password Safe team for their amazing work and the original Password Safe format and applicaiton.
+Kudos to Rony Shapiro, Bruce Schneier and all the Password Safe team for their amazing work and the original Password Safe format and application.
 
 The official KeePass site is here:
 
