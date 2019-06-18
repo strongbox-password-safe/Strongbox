@@ -540,8 +540,38 @@
                         <sections>
                             <tableViewSection headerTitle="General" id="F2X-Ry-32P">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="bsk-lD-wkE" userLabel="Item Subtitle">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="rFQ-3X-ErW" userLabel="View As">
                                         <rect key="frame" x="0.0" y="55.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="rFQ-3X-ErW" id="pKP-qf-8ja">
+                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="View As" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1BU-T8-wFP">
+                                                    <rect key="frame" x="20" y="11" width="61" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Folder Hierarchy" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yxs-mQ-Cm1" userLabel="Browse View Type">
+                                                    <rect key="frame" x="249.5" y="11.5" width="126.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Yxs-mQ-Cm1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="1BU-T8-wFP" secondAttribute="trailing" constant="8" symbolic="YES" id="9HD-Q5-Bb7"/>
+                                                <constraint firstItem="1BU-T8-wFP" firstAttribute="leading" secondItem="pKP-qf-8ja" secondAttribute="leading" constant="20" id="MTm-Ry-v5e"/>
+                                                <constraint firstItem="1BU-T8-wFP" firstAttribute="top" secondItem="pKP-qf-8ja" secondAttribute="topMargin" id="fpK-fq-es1"/>
+                                                <constraint firstItem="1BU-T8-wFP" firstAttribute="bottom" secondItem="pKP-qf-8ja" secondAttribute="bottomMargin" id="gV2-U2-clS"/>
+                                                <constraint firstAttribute="trailing" secondItem="Yxs-mQ-Cm1" secondAttribute="trailing" id="i53-Eu-P7e"/>
+                                                <constraint firstItem="Yxs-mQ-Cm1" firstAttribute="centerY" secondItem="pKP-qf-8ja" secondAttribute="centerY" id="m7F-Iv-aAa"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="bsk-lD-wkE" userLabel="Item Subtitle">
+                                        <rect key="frame" x="0.0" y="99.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bsk-lD-wkE" id="4Zo-3s-BF9">
                                             <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
@@ -571,7 +601,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="hcO-SF-dkG" userLabel="Start with Search">
-                                        <rect key="frame" x="0.0" y="99.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="143.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hcO-SF-dkG" id="RJy-zM-CZJ">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -601,7 +631,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="wyi-tC-J6m" userLabel="Show TOTP">
-                                        <rect key="frame" x="0.0" y="143.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="187.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wyi-tC-J6m" id="iSt-vZ-cyf">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -631,7 +661,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="UWi-SP-7zl" userLabel="Show Child Count">
-                                        <rect key="frame" x="0.0" y="187.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="231.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="UWi-SP-7zl" id="t77-aA-PNO">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -661,7 +691,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="8Wy-Fm-RyH" userLabel="Show flags">
-                                        <rect key="frame" x="0.0" y="231.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="275.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8Wy-Fm-RyH" id="g6V-Xf-Hqe">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -691,7 +721,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="2us-UW-5wB" userLabel="Show KeePass 1 Backup Folder">
-                                        <rect key="frame" x="0.0" y="275.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="319.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2us-UW-5wB" id="AD3-HK-mX2">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -725,7 +755,7 @@
                             <tableViewSection headerTitle="Recycle Bin" id="9hi-n3-gAk">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="p1l-FU-I3N" userLabel="Show Recycle Bin in Browse">
-                                        <rect key="frame" x="0.0" y="375.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="419.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="p1l-FU-I3N" id="Dn9-R7-She">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -755,7 +785,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="wbr-ll-leJ" userLabel="Show 'Recycle Bin' in Search Results">
-                                        <rect key="frame" x="0.0" y="419.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="463.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wbr-ll-leJ" id="2hy-nA-Maw">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -789,7 +819,7 @@
                             <tableViewSection headerTitle="Field Dereferencing" id="rF2-Qb-rIF">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Pwa-P0-zyI" userLabel="View Dereferenced Fields">
-                                        <rect key="frame" x="0.0" y="519.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="563.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Pwa-P0-zyI" id="3qV-ed-tJO">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -819,7 +849,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="YHX-bF-TyV" userLabel="Dereference Fields for Search">
-                                        <rect key="frame" x="0.0" y="563.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="607.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="YHX-bF-TyV" id="kfX-Pd-gc1">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -873,7 +903,9 @@
                         <outlet property="cellShowBackupFolder" destination="2us-UW-5wB" id="DRk-Sf-z6C"/>
                         <outlet property="cellShowRecycleBin" destination="p1l-FU-I3N" id="b0Q-RT-okp"/>
                         <outlet property="cellShowRecycleBinInSearch" destination="wbr-ll-leJ" id="COo-z7-aZ9"/>
+                        <outlet property="cellViewAs" destination="rFQ-3X-ErW" id="bMe-Jq-VM5"/>
                         <outlet property="labelBrowseItemSubtitle" destination="gg0-ep-FLv" id="3Vm-t2-dNS"/>
+                        <outlet property="labelViewAs" destination="Yxs-mQ-Cm1" id="P9P-IJ-UN5"/>
                         <outlet property="showChildCountOnFolder" destination="R5T-wR-a2v" id="qkx-zK-a2p"/>
                         <outlet property="showFlagsInBrowse" destination="9La-H6-tpp" id="QrI-YP-cgr"/>
                         <outlet property="switchSearchDereferenced" destination="6m6-bz-lhZ" id="z4B-ch-sNo"/>

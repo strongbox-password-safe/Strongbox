@@ -20,6 +20,7 @@
         self.offlineCacheEnabled = YES;
         self.autoFillCacheEnabled = YES;
         self.likelyFormat = kFormatUnknown;
+        self.browseViewType = kBrowseViewTypeHierarchy;
     }
     
     return self;
@@ -34,7 +35,6 @@
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
-        self.likelyFormat = kFormatUnknown;
     }
     
     return self;
@@ -70,6 +70,7 @@
     [encoder encodeObject:self.keyFileUrl forKey:@"keyFileUrl"];
     
     [encoder encodeInteger:self.likelyFormat forKey:@"likelyFormat"];
+    [encoder encodeInteger:self.browseViewType forKey:@"browseViewType"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -114,10 +115,6 @@
             self.failedPinAttempts = (int)[decoder decodeIntegerForKey:@"failedPinAttempts"];
         }
         
-//        if([decoder containsValueForKey:@"useQuickTypeAutoFill"]) {
-//            self.useQuickTypeAutoFill = [decoder decodeBoolForKey:@"useQuickTypeAutoFill"];
-//        }
-        
         if([decoder containsValueForKey:@"keyFileUrl"]) {
             self.keyFileUrl = [decoder decodeObjectForKey:@"keyFileUrl"];
         }
@@ -127,6 +124,10 @@
         }
         else {
             self.likelyFormat = kFormatUnknown;
+        }
+        
+        if([decoder containsValueForKey:@"browseViewType"]) {
+            self.browseViewType = (BrowseViewType)[decoder decodeIntegerForKey:@"browseViewType"];
         }
     }
     

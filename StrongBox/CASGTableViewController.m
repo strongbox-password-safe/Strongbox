@@ -571,19 +571,4 @@
     self.switchAllowEmpty.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
 }
 
-// TODO: Might be nice to resize?
-//- (void)resizePreferredContentSize {
-//    CGFloat oldHeight = self.stackView.frame.size.height;
-//
-//    [self.stackView setNeedsLayout];
-//    [self.stackView layoutIfNeeded];
-//
-//    CGFloat diff = oldHeight - self.stackView.frame.size.height;
-//
-//    [self setPreferredContentSize:CGSizeMake(self.preferredContentSize.width, self.preferredContentSize.height - diff)];
-//
-//    [self.navigationController.presentationController.containerView setNeedsLayout];
-//    [self.navigationController.presentationController.containerView layoutIfNeeded];
-//}
-
 @end

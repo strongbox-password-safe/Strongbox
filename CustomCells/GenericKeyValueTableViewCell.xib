@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="GenericKeyValueTableViewCell" rowHeight="151" id="d4d-x7-3AI" customClass="GenericKeyValueTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="424" height="151"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="d4d-x7-3AI" id="nSv-T3-jpn">
+                <rect key="frame" x="0.0" y="0.0" width="424" height="150.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rD9-jL-UvC">
+                        <rect key="frame" x="20" y="55" width="384" height="51"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Key that couild get very long too" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oFX-hJ-zwW">
+                                <rect key="frame" x="0.0" y="15.5" width="91" height="20.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="91" id="Hfk-jf-E2R"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="eIL-MJ-BDK">
+                                <rect key="frame" x="99" y="9.5" width="285" height="32"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Value that gets very big very quickluy" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="12" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="miA-4r-w9p" customClass="AutoCompleteTextField">
+                                        <rect key="frame" x="0.0" y="5.5" width="247" height="21"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="255" verticalCompressionResistancePriority="745" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mJu-kF-BlG">
+                                        <rect key="frame" x="253" y="0.0" width="32" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" priority="999" constant="32" id="2H5-Ml-3G5"/>
+                                            <constraint firstAttribute="width" constant="32" id="tRg-gW-xUf"/>
+                                        </constraints>
+                                        <state key="normal" image="copy"/>
+                                        <connections>
+                                            <action selector="onRightAccessoryButton:" destination="d4d-x7-3AI" eventType="touchUpInside" id="TTJ-OH-16c"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EXO-Hf-DTq" userLabel="Horizontal Line">
+                                <rect key="frame" x="99" y="41" width="247" height="1"/>
+                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="ouU-Wj-p0w"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="EXO-Hf-DTq" firstAttribute="leading" secondItem="miA-4r-w9p" secondAttribute="leading" id="1z9-jd-ncO"/>
+                            <constraint firstAttribute="height" priority="999" constant="40" id="36f-d5-L7R"/>
+                            <constraint firstItem="eIL-MJ-BDK" firstAttribute="leading" secondItem="oFX-hJ-zwW" secondAttribute="trailing" constant="8" id="5Js-D6-tiN"/>
+                            <constraint firstAttribute="trailing" secondItem="eIL-MJ-BDK" secondAttribute="trailing" id="Alv-5M-50w"/>
+                            <constraint firstItem="eIL-MJ-BDK" firstAttribute="centerY" secondItem="rD9-jL-UvC" secondAttribute="centerY" id="B8x-yQ-GUh"/>
+                            <constraint firstItem="EXO-Hf-DTq" firstAttribute="top" secondItem="miA-4r-w9p" secondAttribute="bottom" constant="5" id="SY3-ub-pXA"/>
+                            <constraint firstItem="oFX-hJ-zwW" firstAttribute="centerY" secondItem="rD9-jL-UvC" secondAttribute="centerY" id="thE-Za-V6y"/>
+                            <constraint firstItem="oFX-hJ-zwW" firstAttribute="leading" secondItem="rD9-jL-UvC" secondAttribute="leading" id="yJj-SW-i1e"/>
+                            <constraint firstItem="EXO-Hf-DTq" firstAttribute="trailing" secondItem="miA-4r-w9p" secondAttribute="trailing" id="zFM-EA-UhU"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottomMargin" secondItem="rD9-jL-UvC" secondAttribute="bottom" id="EKN-DK-g02"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="rD9-jL-UvC" secondAttribute="trailing" id="YoZ-Ke-8aS"/>
+                    <constraint firstItem="rD9-jL-UvC" firstAttribute="leading" secondItem="nSv-T3-jpn" secondAttribute="leadingMargin" id="ll6-SD-3hn"/>
+                    <constraint firstItem="rD9-jL-UvC" firstAttribute="top" secondItem="nSv-T3-jpn" secondAttribute="topMargin" id="nV1-43-DGc"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="horizontalLine" destination="EXO-Hf-DTq" id="Zhx-N5-YqT"/>
+                <outlet property="keyLabel" destination="oFX-hJ-zwW" id="OMB-qA-pjC"/>
+                <outlet property="rightAccessoryButton" destination="mJu-kF-BlG" id="kVn-KA-jbK"/>
+                <outlet property="valueText" destination="miA-4r-w9p" id="tLV-he-fcE"/>
+            </connections>
+            <point key="canvasLocation" x="44.927536231884062" y="63.28125"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="copy" width="30" height="30"/>
+    </resources>
+</document>

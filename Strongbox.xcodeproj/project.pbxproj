@@ -290,6 +290,14 @@
 		4D51EEFD21B94CC100623CA1 /* xml-keyfile.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D51EEFB21B94CC100623CA1 /* xml-keyfile.kdbx */; };
 		4D51EEFE21B94CC100623CA1 /* xml-keyfile.key in Resources */ = {isa = PBXBuildFile; fileRef = 4D51EEFC21B94CC100623CA1 /* xml-keyfile.key */; };
 		4D51EF0021B94E7200623CA1 /* DatabaseModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D51EEFF21B94E7200623CA1 /* DatabaseModelTests.m */; };
+		4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
+		4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
+		4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
+		4D556F1222B7FF6100E16027 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
+		4D556F2422B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */; };
+		4D556F2522B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */; };
+		4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D556F2B22B8328F00E16027 /* BrowseItemTotpCell.xib */; };
+		4D556F2F22B832EB00E16027 /* BrowseItemTotpCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F2E22B832EB00E16027 /* BrowseItemTotpCell.m */; };
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
 		4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4D56D90F21B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
@@ -960,6 +968,16 @@
 		4D51EEFB21B94CC100623CA1 /* xml-keyfile.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "xml-keyfile.kdbx"; sourceTree = "<group>"; };
 		4D51EEFC21B94CC100623CA1 /* xml-keyfile.key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "xml-keyfile.key"; sourceTree = "<group>"; };
 		4D51EEFF21B94E7200623CA1 /* DatabaseModelTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseModelTests.m; path = StrongboxTests/DatabaseModelTests.m; sourceTree = "<group>"; };
+		4D556F0B22B7F1B300E16027 /* FileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileManager.h; path = StrongBox/FileManager.h; sourceTree = "<group>"; };
+		4D556F0C22B7F1B300E16027 /* FileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FileManager.m; path = StrongBox/FileManager.m; sourceTree = "<group>"; };
+		4D556F0F22B7FF6100E16027 /* CacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CacheManager.h; path = StrongBox/CacheManager.h; sourceTree = "<group>"; };
+		4D556F1022B7FF6100E16027 /* CacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CacheManager.m; path = StrongBox/CacheManager.m; sourceTree = "<group>"; };
+		4D556F2222B817AA00E16027 /* LocalDatabaseIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LocalDatabaseIdentifier.h; path = StrongBox/LocalDatabaseIdentifier.h; sourceTree = "<group>"; };
+		4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LocalDatabaseIdentifier.m; path = StrongBox/LocalDatabaseIdentifier.m; sourceTree = "<group>"; };
+		4D556F2A22B82B8600E16027 /* BrowseViewType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseViewType.h; path = StrongBox/BrowseViewType.h; sourceTree = "<group>"; };
+		4D556F2B22B8328F00E16027 /* BrowseItemTotpCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = BrowseItemTotpCell.xib; path = StrongBox/BrowseItemTotpCell.xib; sourceTree = "<group>"; };
+		4D556F2D22B832EB00E16027 /* BrowseItemTotpCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseItemTotpCell.h; path = StrongBox/BrowseItemTotpCell.h; sourceTree = "<group>"; };
+		4D556F2E22B832EB00E16027 /* BrowseItemTotpCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BrowseItemTotpCell.m; path = StrongBox/BrowseItemTotpCell.m; sourceTree = "<group>"; };
 		4D55F0D61EE2BFF400C43B26 /* TextFieldAutoSuggest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextFieldAutoSuggest.h; path = StrongBox/TextFieldAutoSuggest.h; sourceTree = "<group>"; };
 		4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TextFieldAutoSuggest.m; path = StrongBox/TextFieldAutoSuggest.m; sourceTree = "<group>"; };
 		4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
@@ -1550,6 +1568,10 @@
 				4D82332922B01BE200A37BAC /* SortOrderTableViewController.h */,
 				4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */,
 				4D73231F22B13885003DB568 /* BrowseSortField.h */,
+				4D556F2A22B82B8600E16027 /* BrowseViewType.h */,
+				4D556F2B22B8328F00E16027 /* BrowseItemTotpCell.xib */,
+				4D556F2D22B832EB00E16027 /* BrowseItemTotpCell.h */,
+				4D556F2E22B832EB00E16027 /* BrowseItemTotpCell.m */,
 			);
 			name = Browse;
 			sourceTree = "<group>";
@@ -1999,6 +2021,75 @@
 			name = RMStore;
 			sourceTree = "<group>";
 		};
+		4D556F1322B8124400E16027 /* Local */ = {
+			isa = PBXGroup;
+			children = (
+				4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */,
+				4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */,
+				4D556F2222B817AA00E16027 /* LocalDatabaseIdentifier.h */,
+				4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */,
+			);
+			name = Local;
+			sourceTree = "<group>";
+		};
+		4D556F1422B8125400E16027 /* Google */ = {
+			isa = PBXGroup;
+			children = (
+				4D1757971C8361D200E6356F /* GoogleDriveManager.h */,
+				4D1757981C8361D200E6356F /* GoogleDriveManager.m */,
+				4D1757991C8361D200E6356F /* GoogleDriveStorageProvider.h */,
+				4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */,
+			);
+			name = Google;
+			sourceTree = "<group>";
+		};
+		4D556F1522B8126300E16027 /* OneDrive */ = {
+			isa = PBXGroup;
+			children = (
+				4D2F6C3E21807CD1007931E4 /* OneDriveStorageProvider.h */,
+				4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */,
+			);
+			name = OneDrive;
+			sourceTree = "<group>";
+		};
+		4D556F1622B8127200E16027 /* Dropbox */ = {
+			isa = PBXGroup;
+			children = (
+				4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */,
+				4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */,
+			);
+			name = Dropbox;
+			sourceTree = "<group>";
+		};
+		4D556F1722B8128500E16027 /* iCloud */ = {
+			isa = PBXGroup;
+			children = (
+				4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */,
+				4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */,
+				4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */,
+				4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */,
+			);
+			name = iCloud;
+			sourceTree = "<group>";
+		};
+		4D556F1822B812A300E16027 /* iOS Files */ = {
+			isa = PBXGroup;
+			children = (
+				4D56D90D21B803730030E13A /* FilesAppUrlBookmarkProvider.h */,
+				4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */,
+			);
+			name = "iOS Files";
+			sourceTree = "<group>";
+		};
+		4D556F1922B812B200E16027 /* Duress Dummy */ = {
+			isa = PBXGroup;
+			children = (
+				4D2BF3E921EF6B9000E39EBB /* DuressDummyStorageProvider.h */,
+				4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */,
+			);
+			name = "Duress Dummy";
+			sourceTree = "<group>";
+		};
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -2030,31 +2121,24 @@
 		4D62D6961C85F35E0051E13B /* StorageProviders */ = {
 			isa = PBXGroup;
 			children = (
+				4D556F0F22B7FF6100E16027 /* CacheManager.h */,
+				4D556F1022B7FF6100E16027 /* CacheManager.m */,
+				4D556F0B22B7F1B300E16027 /* FileManager.h */,
+				4D556F0C22B7F1B300E16027 /* FileManager.m */,
+				4D556F1922B812B200E16027 /* Duress Dummy */,
+				4D556F1822B812A300E16027 /* iOS Files */,
+				4D556F1722B8128500E16027 /* iCloud */,
+				4D556F1622B8127200E16027 /* Dropbox */,
+				4D556F1522B8126300E16027 /* OneDrive */,
+				4D556F1422B8125400E16027 /* Google */,
+				4D556F1322B8124400E16027 /* Local */,
 				4D0F121821C13F6100C4451D /* WebDAV */,
 				4D0F121721C13F5500C4451D /* SFTP */,
-				4D2F6C3E21807CD1007931E4 /* OneDriveStorageProvider.h */,
-				4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */,
 				4D18854A2170ABD7001AE6B0 /* SafeStorageProviderFactory.h */,
 				4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */,
-				4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */,
-				4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */,
-				4D1757971C8361D200E6356F /* GoogleDriveManager.h */,
-				4D1757981C8361D200E6356F /* GoogleDriveManager.m */,
-				4D1757991C8361D200E6356F /* GoogleDriveStorageProvider.h */,
-				4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */,
-				4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */,
-				4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */,
 				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
 				4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */,
 				4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */,
-				4DCF5FBD1F7299DD00011756 /* AppleICloudProvider.h */,
-				4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */,
-				4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */,
-				4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */,
-				4D56D90D21B803730030E13A /* FilesAppUrlBookmarkProvider.h */,
-				4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */,
-				4D2BF3E921EF6B9000E39EBB /* DuressDummyStorageProvider.h */,
-				4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */,
 			);
 			name = StorageProviders;
 			sourceTree = "<group>";
@@ -3085,6 +3169,7 @@
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
 				4D9AC55222A1390A00449F3F /* SelectKeyFile.storyboard in Resources */,
+				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4DE2689222A6602500A1D158 /* Preferences.storyboard in Resources */,
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
@@ -3396,6 +3481,7 @@
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlTreeSerializer.m in Sources */,
+				4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */,
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D2F6C2821807C53007931E4 /* KeePassXmlParserDelegate.m in Sources */,
@@ -3406,6 +3492,7 @@
 				4D5B1EAF2194B2D900ECAF0D /* KdbSerializationData.m in Sources */,
 				4D5B1EA72194AAAF00ECAF0D /* KdbEntry.m in Sources */,
 				4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
+				4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */,
 				4D4D6B57222EF3E80056514E /* RMStore.m in Sources */,
 				4D3E149521832C1500A41CA0 /* core.c in Sources */,
 				4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -3444,6 +3531,7 @@
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
 				4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
+				4D556F2422B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8322302BED00DCD8C7 /* socket_helper.m in Sources */,
 				4D0835CB228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */,
 				4D326E8522302BED00DCD8C7 /* NMSSHSession.m in Sources */,
@@ -3470,6 +3558,7 @@
 				4D3E149221832BEF00A41CA0 /* encoding.c in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
 				4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
+				4D556F2F22B832EB00E16027 /* BrowseItemTotpCell.m in Sources */,
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
 				4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
@@ -3752,9 +3841,11 @@
 				4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */,
 				4D0835C22284748200CA7405 /* SFTPProviderData.m in Sources */,
 				4D3E149621832C1500A41CA0 /* core.c in Sources */,
+				4D556F2522B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8A22302BED00DCD8C7 /* NMSSHConfig.m in Sources */,
 				4D3E148E21832B7400A41CA0 /* argon2.c in Sources */,
 				4D5F5B73218B350C00A0739A /* DatabaseAttachment.m in Sources */,
+				4D556F1222B7FF6100E16027 /* CacheManager.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
 				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,
@@ -3770,6 +3861,7 @@
 				4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */,
 				4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */,
 				4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */,
+				4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */,
 				4DE48A66216F558E00C9C991 /* SafesList.m in Sources */,
 				4DE0CB6B2232AF4300E109F9 /* GenericTextIntegerElementHandler.m in Sources */,
 				4DF972B621BFD81800F384C9 /* SFTPStorageProvider.m in Sources */,

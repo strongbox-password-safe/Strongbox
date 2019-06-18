@@ -10,8 +10,6 @@
 
 @interface IOsUtils : NSObject
 
-+ (NSURL *)applicationDocumentsDirectory;
-+ (NSURL *)applicationSupportDirectory;
 + (NSString*)nameFromDeviceName;
 
 @end

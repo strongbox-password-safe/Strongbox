@@ -12,13 +12,17 @@
 #import "Utils.h"
 #import "IOsUtils.h"
 #import "Settings.h"
-#import "LocalDeviceStorageProvider.h"
+#import "SafesList.h"
+#import "NSArray+Extensions.h"
+#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
+#import "FileManager.h"
 
-@interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DZNEmptyDataSetSource>
 
 @property NSArray<NSURL*>* keyFiles;
 @property NSArray<NSURL*>* otherFiles;
 @property UIDocumentPickerViewController* importDocPicker;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonOptions;
 
 @end
 
@@ -28,18 +32,37 @@
     [super viewDidLoad];
     
     self.clearsSelectionOnViewWillAppear = NO;
-    
     self.tableView.tableFooterView = [UIView new];
+    self.tableView.emptyDataSetSource = self;
     
+    self.title = self.manageMode ? @"Manage Key Files" : @"Select Key File";
+    self.buttonOptions.enabled = !self.manageMode;
+    self.buttonOptions.tintColor = self.manageMode ? UIColor.clearColor : nil;
+    
+    [self refresh];
+}
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+    NSString *text = @"No Key Files Found. Tap '+' to import one.";
+    
+    NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleBody],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor]};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+- (void)refresh {
+    [self loadKeyFiles];
     [self loadLocalFiles];
+    
+    [self.tableView reloadData];
 }
 
 - (void)loadLocalFiles {
-    NSMutableArray* files = [NSMutableArray array];
     NSMutableArray* otherFiles = [NSMutableArray array];
     
     NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *directoryURL =  [IOsUtils applicationDocumentsDirectory];
+    NSURL *directoryURL = FileManager.sharedInstance.documentsDirectory;
     
     NSArray *keys = [NSArray arrayWithObject:NSURLIsDirectoryKey];
     
@@ -58,19 +81,38 @@
         }
         else if (![isDirectory boolValue]) {
             if(Settings.sharedInstance.showAllFilesInLocalKeyFiles || ![self isUnlikelyKeyFile:url]) {
-                BOOL isKeyFile = [url.pathExtension caseInsensitiveCompare:@"key"] == NSOrderedSame;
-                if(isKeyFile) {
-                    [files addObject:url];
-                }
-                else {
-                    [otherFiles addObject:url];
-                }
+                [otherFiles addObject:url];
             }
         }
     }
 
-    self.keyFiles = [files copy];
     self.otherFiles = [otherFiles copy];
+}
+
+- (void)loadKeyFiles {
+    NSMutableArray* files = [NSMutableArray array];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *directoryURL =  FileManager.sharedInstance.keyFilesDirectory;
+    
+    NSDirectoryEnumerator *enumerator = [fm
+                                         enumeratorAtURL:directoryURL
+                                         includingPropertiesForKeys:@[NSURLIsDirectoryKey]
+                                         options:0
+                                         errorHandler:nil];
+    
+    for (NSURL *url in enumerator) {
+        NSError *error;
+        NSNumber *isDirectory = nil;
+        if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
+            // handle error
+            NSLog(@"%@", error);
+        }
+        else if (![isDirectory boolValue]) {
+            [files addObject:url];
+        }
+    }
+    
+    self.keyFiles = [files copy];
 }
 
 - (BOOL)isUnlikelyKeyFile:(NSURL*)url {
@@ -198,8 +240,8 @@
 }
 
 - (NSURL*)importToLocal:(NSURL*)url data:(NSData*)data error:(NSError**)error {
-    NSURL* destination = [[IOsUtils applicationDocumentsDirectory] URLByAppendingPathComponent:url.lastPathComponent];
-
+    NSURL* destination = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];
+    
     NSLog(@"Source: %@", url);
     NSLog(@"Destination: %@", destination);
     
@@ -213,6 +255,9 @@
         else {
             *error = err;
         }
+    }
+    else {
+        [Alerts info:self title:@"File Already Exists" message:@"A file with this name already exists in the Key Files directory."];
     }
     
     return nil;
@@ -229,10 +274,10 @@
         return nil;
     }
     else if (section == 1) {
-        return self.keyFiles.count == 0 ? nil : @"Key Files";
+        return self.keyFiles.count == 0 ? nil : @"Imported Key Files (Auto-Fill Enabled)";
     }
     else if (section == 2) {
-        return self.otherFiles.count == 0 ? nil : @"Other Files";
+        return self.otherFiles.count == 0 ? nil : @"Application Local Files";
     }
 
     return nil;
@@ -240,7 +285,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if(section == 0) {
-        return 1;
+        return self.manageMode ? 0 : 1;
     }
     else if(section == 1) {
         return self.keyFiles.count;
@@ -265,6 +310,8 @@
         {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
+        
+        cell.detailTextLabel.text = nil;
     }
     else if(indexPath.section == 1){
         NSURL* keyFile = self.keyFiles[indexPath.row];
@@ -276,6 +323,8 @@
         if([keyFile isEqual:self.selectedUrl]) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
+        
+        cell.detailTextLabel.text = self.manageMode ? [self getAssociatedDatabaseSubtitle:indexPath] : nil;
     }
     else if(indexPath.section == 2){
         NSURL* keyFile = self.otherFiles[indexPath.row];
@@ -287,6 +336,8 @@
         if([keyFile isEqual:self.selectedUrl]) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         }
+
+        cell.detailTextLabel.text = self.manageMode ? [self getAssociatedDatabaseSubtitle:indexPath] : nil;
     }
 
     return cell;
@@ -317,7 +368,36 @@
         [self removeFile:indexPath];
     }];
     
-    return @[removeAction];
+    UITableViewRowAction *importAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Import" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self importLocalFile:indexPath];
+    }];
+    importAction.backgroundColor = UIColor.blueColor;
+    
+    return indexPath.section == 2 ? @[removeAction, importAction] : @[removeAction];
+}
+
+- (void)importLocalFile:(NSIndexPath*)indexPath {
+    NSURL* url = self.otherFiles[indexPath.row];
+    NSURL *destination = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];
+    
+    NSLog(@"Importing Local Key File: [%@] => [%@]", url, destination);
+    
+    [Alerts twoOptionsWithCancel:self title:@"Remove After Import" message:@"Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing?" defaultButtonText:@"Yes, Remove Local Copy" secondButtonText:@"No, Keep Local Copy" action:^(int response) {
+        
+        NSError* error;
+        if(response == 1) {
+            if(![NSFileManager.defaultManager copyItemAtURL:url toURL:destination error:&error]) {
+                [Alerts error:self title:@"File could not be Imported" error:error];
+            }
+        }
+        else if (response == 0) {
+            if(![NSFileManager.defaultManager moveItemAtURL:url toURL:destination error:&error]) {
+                [Alerts error:self title:@"File could not be Imported" error:error];
+            }
+        }
+        
+        [self refresh];
+    }];
 }
 
 - (void)removeFile:(NSIndexPath * _Nonnull)indexPath {
@@ -335,11 +415,27 @@
     }
     
     if(![NSFileManager.defaultManager removeItemAtURL:url error:&error]) {
-        [Alerts info:self title:@"File Not Removed" message:@"The file could not be removed. Either it was not found or there was an issue deleting. Try using iTunes File Sharing to remove or check if present."];
+        [Alerts error:self title:@"File not removed" error:error];
     }
     
-    [self loadLocalFiles];
-    [self.tableView reloadData];
+    [self refresh];
+}
+
+- (NSString*)getAssociatedDatabaseSubtitle:(NSIndexPath*)indexPath {
+    NSArray<SafeMetaData*>* assoc = [self getAssociatedDatabase:indexPath.section == 1 ? self.keyFiles[indexPath.row] : self.otherFiles[indexPath.row]];
+    
+    if(assoc.count) {
+        return [NSString stringWithFormat:@"Used by %@", assoc.count > 1 ? @"multiple databases" : assoc.firstObject.nickName];
+    }
+    else {
+        return @"No Known Database Associations";
+    }
+}
+
+- (NSArray<SafeMetaData*>*)getAssociatedDatabase:(NSURL*)url {
+    return [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+        return [obj.keyFileUrl isEqual:url];
+    }];
 }
 
 @end

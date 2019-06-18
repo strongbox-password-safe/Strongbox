@@ -10,6 +10,7 @@
 #import "StorageProvider.h"
 #import "DuressAction.h"
 #import "AbstractDatabaseFormatAdaptor.h"
+#import "BrowseViewType.h"
 
 @interface SafeMetaData : NSObject
 
@@ -49,6 +50,7 @@
 
 @property NSURL* keyFileUrl;
 @property DatabaseFormat likelyFormat;
+@property BrowseViewType browseViewType;
 
 @end
 

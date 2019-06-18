@@ -16,6 +16,7 @@
 #import "OpenSafeSequenceHelper.h"
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "PickCredentialsTableViewController.h"
+#import "CacheManager.h"
 
 @interface SafesListTableViewController ()
 
@@ -136,7 +137,7 @@
     
     if([[self getInitialViewController] autoFillIsPossibleWithSafe:safe]) {
         if(![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider]) {
-            NSDate* mod = [LocalDeviceStorageProvider.sharedInstance getAutoFillCacheModificationDate:safe];
+            NSDate* mod = [CacheManager.sharedInstance getAutoFillCacheModificationDate:safe];
             
             NSDateFormatter *df = [[NSDateFormatter alloc] init];
             df.timeStyle = NSDateFormatterShortStyle;

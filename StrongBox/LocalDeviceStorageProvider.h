@@ -10,6 +10,8 @@
 #import "SafeStorageProvider.h"
 #import "SafeMetaData.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LocalDeviceStorageProvider : NSObject <SafeStorageProvider>
 
 + (instancetype)sharedInstance;
@@ -27,8 +29,8 @@
 - (void)    create:(NSString *)nickName
          extension:(NSString *)extension
               data:(NSData *)data
-      parentFolder:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
+      parentFolder:(NSObject * _Nullable)parentFolder
+    viewController:(UIViewController * _Nullable)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
 
 // Used during importation when we have a good idea of what the filename should be - try to maintain it if possible
@@ -40,52 +42,18 @@
             completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
 
 // Used during importation - we may just want to update the underlying local file (seems to be a common usage pattern)
-- (BOOL)writeWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data;
+- (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data;
 
-// Used by auto key file detection code in OpenSafeSequenceHelper
-//- (NSData*)readWithFilename:(NSString*)filename;
-- (NSData*)readWithCaseInsensitiveFilename:(NSString*)filename;
-- (BOOL)deleteWithCaseInsensitiveFilename:(NSString*)filename;
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
 
-- (void)deleteAllInboxItems;
+- (void)startMonitoringDocumentsDirectory;
 
-- (void)createOfflineCacheFile:(SafeMetaData *)safe
-                          data:(NSData *)data
-                     completion:(void (^)(BOOL success))completion;
+- (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData; // used by iCloud Migration
+- (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; // used by Import to see if we should update
 
-- (void)readOfflineCachedSafe:(SafeMetaData *)safeMetaData
-               viewController:(UIViewController *)viewController
-                   completion:(void (^)(NSData *, NSError *error))completion;
 
-- (void)updateOfflineCachedSafe:(SafeMetaData *)safeMetaData
-                           data:(NSData *)data
-                 viewController:(UIViewController *)viewController
-                     completion:(void (^)(BOOL success))completion;
-
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
-
-- (void)deleteOfflineCachedSafe:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
-
-- (NSDate *)getOfflineCacheFileModificationDate:(SafeMetaData *)safeMetadata;
-
-- (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData;
-
-- (void)startMonitoringDocumentsDirectory:(void (^)(void))completion;
-- (void)stopMonitoringDocumentsDirectory;
-- (NSArray<StorageBrowserItem *>*)scanForNewSafes;
-- (BOOL)fileExists:(SafeMetaData*)metaData;
-- (BOOL)fileNameExists:(NSString*)filename;
-
-// Auto Fill Cache
-
-- (void)createAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(BOOL success))completion;
-- (void)readAutoFillCache:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion;
-- (void)deleteAutoFillCache:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion;
-- (void)updateAutoFillCache:(SafeMetaData *)safeMetaData data:(NSData *)data viewController:(UIViewController *)viewController completion:(void (^)(BOOL success))completion;
-- (NSDate *)getAutoFillCacheModificationDate:(SafeMetaData *)safeMetadata;
-
-- (void)excludeDirectoriesFromBackup;
-
-- (void)deleteAllLocalAndAppGroupFiles;
+- (void)migrateLocalDatabasesToNewSystem;
 
 @end
+
+NS_ASSUME_NONNULL_END

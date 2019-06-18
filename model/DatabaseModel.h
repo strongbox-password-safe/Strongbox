@@ -54,6 +54,13 @@ extern NSInteger const kSearchScopeAll;
     includeKeePass1Backup:(BOOL)includeKeePass1Backup
         includeRecycleBin:(BOOL)includeRecycleBin;
 
+- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
+                    searchText:(NSString *)searchText
+                         scope:(NSInteger)scope
+                   dereference:(BOOL)dereference
+         includeKeePass1Backup:(BOOL)includeKeePass1Backup
+             includeRecycleBin:(BOOL)includeRecycleBin;
+
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;

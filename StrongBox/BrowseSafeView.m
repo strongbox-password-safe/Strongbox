@@ -26,10 +26,13 @@
 #import "MasterDetailViewController.h"
 #import "BrowsePreferencesTableViewController.h"
 #import "SortOrderTableViewController.h"
+#import "BrowseItemTotpCell.h"
+#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
+static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
-@interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating>
+@interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource>
 
 @property (strong, nonatomic) NSArray<Node*> *searchResults;
 @property (strong, nonatomic) NSArray<Node*> *items;
@@ -61,9 +64,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     if(!self.hasAlreadyAppeared && Settings.sharedInstance.immediateSearchOnBrowse && self.currentGroup == self.viewModel.database.rootGroup) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self.searchController.searchBar becomeFirstResponder];
+            if ([[Settings sharedInstance] isProOrFreeTrial]) {
+                [self.searchController.searchBar becomeFirstResponder];
+            }
         });
     }
+    
     self.hasAlreadyAppeared = YES;
     
     self.navigationController.toolbarHidden = NO;
@@ -107,8 +113,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
     self.navigationItem.rightBarButtonItems = rightBarButtons;
 
-//    self.navigationItem.leftBarButtonItem = self.editButtonItem;
-    
     [self setupSearchBar];
     
     [self refreshItems];
@@ -237,6 +241,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (void)setupTableview {
     [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
+    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemTotpCell bundle:nil] forCellReuseIdentifier:kBrowseItemTotpCell];
+
+    self.tableView.emptyDataSetSource = self;
     
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
                                 initWithTarget:self
@@ -439,12 +446,26 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    self.searchResults = [self.viewModel.database search:searchController.searchBar.text
-                                                   scope:searchController.searchBar.selectedScopeButtonIndex
+    if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
+        NSArray<Node*>* otps = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
+            return obj.otpToken != nil;
+        }];
+        
+        self.searchResults = [self.viewModel.database searchNodes:otps
+                                                       searchText:searchController.searchBar.text
+                                                            scope:searchController.searchBar.selectedScopeButtonIndex
+                                                      dereference:Settings.sharedInstance.searchDereferencedFields
+                                            includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
+                                                includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+    }
+    else {
+        self.searchResults = [self.viewModel.database search:searchController.searchBar.text
+                                                       scope:searchController.searchBar.selectedScopeButtonIndex
                                              dereference:Settings.sharedInstance.searchDereferencedFields
                                    includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
                                        includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
-
+    }
+    
     [self.tableView reloadData];
     [self startOtpRefreshTimerIfAppropriate];
 }
@@ -459,30 +480,46 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
-    BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
-
     NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
-    NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
 
-    if(node.isGroup) {
-        BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
+    if(self.searchController.isActive || self.viewModel.metadata.browseViewType != kBrowseViewTypeTotpList) {
+        BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
-        NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
+        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+
+        if(node.isGroup) {
+            BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
+
+            NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
+            
+            [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil];
+        }
+        else {
+            NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];
+            NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
+            flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+            
+            [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
+
+            [self setOtpCellProperties:cell node:node];
+        }
         
-        [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil];
+        return cell;
     }
     else {
-        NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];        
-        NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
-        flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+        BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
         
-        [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
+        NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];
 
-        [self setOtpCellProperties:cell node:node];
+        cell.labelTitle.text = title;
+        cell.labelUsername.text = subtitle;
+        cell.icon.image = icon;
+        
+        [self setOtpCellLabelProperties:cell.labelOtp node:node];
+
+        return cell;
     }
-    
-    return cell;
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
@@ -490,21 +527,25 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {
+    [self setOtpCellLabelProperties:cell.otpLabel node:node];
+}
+
+- (void)setOtpCellLabelProperties:(UILabel*)otpLabel node:(Node*)node {
     if(!Settings.sharedInstance.hideTotpInBrowse && node.otpToken) {
         uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
         
-        cell.otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
-        cell.otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
-        cell.otpLabel.alpha = 1;
+        otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+        otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+        otpLabel.alpha = 1;
         
         if(remainingSeconds < 16) {
             [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-                cell.otpLabel.alpha = 0.5;
+                otpLabel.alpha = 0.5;
             } completion:nil];
         }
     }
     else {
-        cell.otpLabel.text = @"";
+        otpLabel.text = @"";
     }
 }
 
@@ -607,7 +648,23 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (NSArray<Node*>*)getItems {
-    NSArray<Node*>* ret = self.currentGroup.children;
+    NSArray<Node*>* ret;
+    
+    switch (self.viewModel.metadata.browseViewType) {
+        case kBrowseViewTypeHierarchy:
+            ret = self.currentGroup.children;
+            break;
+        case kBrowseViewTypeList:
+            ret = self.currentGroup.allChildRecords;
+            break;
+        case kBrowseViewTypeTotpList:
+            ret = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
+                return obj.otpToken != nil;
+            }];
+            break;
+        default:
+            break;
+    }
     
     if(self.viewModel.database.format == kKeePass1 && !Settings.sharedInstance.showKeePass1BackupGroup) {
         Node* backupGroup = self.viewModel.database.keePass1BackupNode;
@@ -748,6 +805,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         UINavigationController* nav = segue.destinationViewController;
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)nav.topViewController;
         vc.format = self.viewModel.database.format;
+        vc.databaseMetaData = self.viewModel.metadata;
+        
         vc.onPreferencesChanged = ^{
             [self refreshItems];
         };
@@ -1033,6 +1092,25 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (IBAction)onViewPreferences:(id)sender {
     [self performSegueWithIdentifier:@"segueToViewSettings" sender:nil];
+}
+
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+    NSString *text = @"";
+    
+    if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
+        text = @"View As: TOTP List (No TOTP Entries)";
+    }
+    else if(self.searchController.isActive) {
+        text = @"No matching entries found";
+    }
+    else {
+        text = @"No Entries";
+    }
+    
+    NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleBody],
+                                 NSForegroundColorAttributeName: [UIColor lightGrayColor]};
+    
+    return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
 @end

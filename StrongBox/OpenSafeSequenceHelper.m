@@ -22,6 +22,9 @@
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
+#import "FileManager.h"
+#import "CacheManager.h"
+#import "LocalDeviceStorageProvider.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -241,13 +244,13 @@
     
     if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable)
     {
-        [[LocalDeviceStorageProvider sharedInstance] deleteOfflineCachedSafe:self.safe
+        [[CacheManager sharedInstance] deleteOfflineCachedSafe:self.safe
                                                                   completion:nil];
     }
     
     if (self.safe.autoFillCacheEnabled && self.safe.autoFillCacheAvailable)
     {
-        [[LocalDeviceStorageProvider sharedInstance] deleteAutoFillCache:self.safe completion:nil];
+        [[CacheManager sharedInstance] deleteAutoFillCache:self.safe completion:nil];
     }
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -332,14 +335,11 @@
 }
 
 - (NSURL*)getAutoDetectedKeyFileUrl {
-    // TODO: Will be wrong if/when move key files into shared App group
-    
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *directory = [IOsUtils applicationDocumentsDirectory];
-    NSError* error;
-    
+    NSURL *directory = FileManager.sharedInstance.documentsDirectory;
     NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:self.safe.fileName];
-    
+ 
+    NSError* error;
+    NSFileManager *fm = [NSFileManager defaultManager];
     NSArray<NSString*>* files = [fm contentsOfDirectoryAtPath:directory.path error:&error];
     
     if(!files) {
@@ -374,7 +374,7 @@
     scVc.initialFormat = self.safe.likelyFormat != kFormatUnknown ? self.safe.likelyFormat : heuristicFormat;
     
     if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
-        scVc.offlineCacheDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.safe];
+        scVc.offlineCacheDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:self.safe];
     }
     
     // Auto Detect Key File?
@@ -442,16 +442,15 @@
         id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
         
         if(self.openAutoFillCache) {
-            [[LocalDeviceStorageProvider sharedInstance] readAutoFillCache:self.safe viewController:self.viewController
-                                                                completion:^(NSData *data, NSError *error) {
+            [[CacheManager sharedInstance] readAutoFillCache:self.safe
+                                                  completion:^(NSData *data, NSError *error) {
                 [self onProviderReadDone:provider data:data error:error cacheMode:YES];
             }];
         }
         else if (self.manualOpenOfflineCache) {
             if(self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
-                [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:self.safe
-                                                                    viewController:self.viewController
-                                                                        completion:^(NSData *data, NSError *error)
+                [[CacheManager sharedInstance] readOfflineCachedSafe:self.safe
+                                                          completion:^(NSData *data, NSError *error)
                  {
                      if(data != nil) {
                          [self onProviderReadDone:nil data:data error:error cacheMode:YES];
@@ -775,9 +774,8 @@
           message:message
            action:^(BOOL response) {
                if (response) {
-                   [[LocalDeviceStorageProvider sharedInstance] readOfflineCachedSafe:self.safe
-                                                                       viewController:self.viewController
-                                                                           completion:^(NSData *data, NSError *error)
+                   [[CacheManager sharedInstance] readOfflineCachedSafe:self.safe
+                                                             completion:^(NSData *data, NSError *error)
                     {
                         if(data != nil) {
                             [self onProviderReadDone:nil
@@ -796,7 +794,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static NSString *getLastCachedDate(SafeMetaData *safe) {
-    NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
+    NSDate *modDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:safe];
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     df.timeStyle = NSDateFormatterShortStyle;
@@ -815,7 +813,7 @@ BOOL providerCanFallbackToOfflineCache(id<SafeStorageProvider> provider, SafeMet
     safe.offlineCacheEnabled && safe.offlineCacheAvailable;
     
     if(basic) {
-        NSDate *modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:safe];
+        NSDate *modDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:safe];
         
         return modDate != nil;
     }

@@ -98,8 +98,30 @@
                                             <segue destination="rF2-GZ-Oaf" kind="show" identifier="seguePrefsToNewEntryDefaults" id="AML-2j-abK"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="qU5-Rr-p6o" userLabel="Advanced">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="K2B-1c-PtU" userLabel="New Record Settings">
                                         <rect key="frame" x="0.0" y="187.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="K2B-1c-PtU" id="ZHy-Q3-xk5">
+                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Key File Management" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8yZ-ks-9kS" userLabel="New Record Settings">
+                                                    <rect key="frame" x="20" y="11" width="164" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="8yZ-ks-9kS" firstAttribute="leading" secondItem="ZHy-Q3-xk5" secondAttribute="leading" constant="20" id="0ch-wW-kHe"/>
+                                                <constraint firstItem="8yZ-ks-9kS" firstAttribute="top" secondItem="ZHy-Q3-xk5" secondAttribute="topMargin" id="Lck-Ld-tDC"/>
+                                                <constraint firstItem="8yZ-ks-9kS" firstAttribute="bottom" secondItem="ZHy-Q3-xk5" secondAttribute="bottomMargin" id="imn-zw-nmP"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8yZ-ks-9kS" secondAttribute="trailing" constant="20" symbolic="YES" id="rmA-ut-1cl"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="qU5-Rr-p6o" userLabel="Advanced">
+                                        <rect key="frame" x="0.0" y="231.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qU5-Rr-p6o" id="nHs-2B-VVq">
                                             <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
@@ -129,7 +151,7 @@
                                 <string key="footerTitle">Strongbox will make a best effort attempt to clear the clipboard after the designated delay (subject to iOS system background process constraints)</string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Lew-bC-n7e" userLabel="Enabled">
-                                        <rect key="frame" x="0.0" y="295" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="339" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Lew-bC-n7e" id="LeX-ba-WuA">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -159,7 +181,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="Z7a-IJ-QHN" userLabel="Delay">
-                                        <rect key="frame" x="0.0" y="339" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="383" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Z7a-IJ-QHN" id="7zp-x6-FpM">
                                             <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
@@ -194,7 +216,7 @@
                                 <string key="footerTitle">Strongbox can unlock your databases with a PIN code or using biometrics. This way you don't have to enter your full master password every time.</string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="ZFd-YQ-R8H">
-                                        <rect key="frame" x="0.0" y="490.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="534.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ZFd-YQ-R8H" id="E4M-0o-ciZ">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -224,7 +246,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="qfX-ca-cVj">
-                                        <rect key="frame" x="0.0" y="534.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="578.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qfX-ca-cVj" id="Q1R-5q-NVU">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -258,7 +280,7 @@
                             <tableViewSection headerTitle="Database Automatic Locking" footerTitle="Automatically lock your database (with an optional delay) when you switch away from Strongbox" id="5nu-31-G9a" userLabel="Database Lock">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="TvR-k1-awT" userLabel="Enabled">
-                                        <rect key="frame" x="0.0" y="686" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="730" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="TvR-k1-awT" id="juD-g0-zJQ">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -288,7 +310,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="qPX-XO-e45" userLabel="Delay">
-                                        <rect key="frame" x="0.0" y="730" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="774" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qPX-XO-e45" id="dla-nu-Q4o">
                                             <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
@@ -323,7 +345,7 @@
                                 <string key="footerTitle">Require a PIN code and/or Biometric authentication before opening Strongbox. If enabled, this will happen immediately on startup, and subsequently (after an optional delay) on switching away from Strongbox. </string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="YTf-4L-wex" userLabel="Method">
-                                        <rect key="frame" x="0.0" y="865.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="909.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="YTf-4L-wex" id="ESc-jL-gwX">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -350,7 +372,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="jUm-5p-TI2" userLabel="Delay">
-                                        <rect key="frame" x="0.0" y="909.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="953.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jUm-5p-TI2" id="A4c-lt-ywA">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -380,7 +402,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="QRs-Ch-ZTD" userLabel="Also Lock Preferences">
-                                        <rect key="frame" x="0.0" y="953.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="997.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="QRs-Ch-ZTD" id="DZM-Lw-3nY">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -414,7 +436,7 @@
                             <tableViewSection headerTitle="Delete All Data on App Unlock Failure" footerTitle="Deletes All Databases, Local Files, Caches, Key Files, Preferences and Keychain Entries after too many failed unlock attempts" id="dT5-0S-5Fy">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="yS6-Sb-w6F" userLabel="Enabled">
-                                        <rect key="frame" x="0.0" y="1121" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1165" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="yS6-Sb-w6F" id="s6i-C5-e97">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -444,7 +466,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="k8H-To-cIo">
-                                        <rect key="frame" x="0.0" y="1165" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1209" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="k8H-To-cIo" id="TaW-7y-tRq">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -478,7 +500,7 @@
                             <tableViewSection headerTitle="Cloud" footerTitle="Strongbox maintain sessions where possible if you use native cloud providers. You can manually clear these sessions here." id="jH9-W5-piz">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="dsK-Ta-v2m">
-                                        <rect key="frame" x="0.0" y="1316.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1360.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="dsK-Ta-v2m" id="M85-85-ZT4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -508,7 +530,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="w8s-IL-iDS">
-                                        <rect key="frame" x="0.0" y="1360.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1404.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="w8s-IL-iDS" id="Nxd-Pc-axc">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -546,7 +568,7 @@
                             <tableViewSection headerTitle="Help &amp; Feedback" id="Shc-Ok-sVd" userLabel="About">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="mTv-bI-glU">
-                                        <rect key="frame" x="0.0" y="1488.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1532.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mTv-bI-glU" id="ykf-m0-fBF">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -568,7 +590,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="i4t-V5-rFQ" userLabel="Twitter">
-                                        <rect key="frame" x="0.0" y="1532.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1576.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="i4t-V5-rFQ" id="hsf-kc-f0q">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -590,7 +612,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="cNQ-BR-bBI">
-                                        <rect key="frame" x="0.0" y="1576.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1620.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cNQ-BR-bBI" id="drV-iY-IgW">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -612,7 +634,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="Uv8-is-wFP" userLabel="Review Strongbox">
-                                        <rect key="frame" x="0.0" y="1620.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1664.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Uv8-is-wFP" id="nXf-vd-IEr">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -634,7 +656,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="TTD-nf-4Rr">
-                                        <rect key="frame" x="0.0" y="1664.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1708.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="TTD-nf-4Rr" id="URt-K3-q0E">
                                             <rect key="frame" x="0.0" y="0.0" width="388" height="43.5"/>
@@ -686,6 +708,7 @@
                         <outlet property="cellDatabaseAutoLockDelay" destination="qPX-XO-e45" id="lZB-I8-OwO"/>
                         <outlet property="cellDeleteDataAttempts" destination="k8H-To-cIo" id="FR1-vV-sFx"/>
                         <outlet property="cellEmailSupport" destination="cNQ-BR-bBI" id="LMc-qf-U8P"/>
+                        <outlet property="cellManageKeyFiles" destination="K2B-1c-PtU" id="P2l-bg-53x"/>
                         <outlet property="cellPasswordGeneration" destination="ewi-bU-m6C" id="BAg-VB-5hC"/>
                         <outlet property="cellReviewStrongbox" destination="Uv8-is-wFP" id="5tS-Gi-hlp"/>
                         <outlet property="clearClipboardEnabled" destination="ig0-eg-IBX" id="2lY-2M-3LD"/>
@@ -706,11 +729,20 @@
                         <outlet property="switchUseICloud" destination="qF5-6H-kgl" id="GFh-UC-E8z"/>
                         <outlet property="tweetStrongbox" destination="i4t-V5-rFQ" id="fA5-N8-wZX"/>
                         <segue destination="P8t-8V-TXo" kind="show" identifier="seguePrefToPasswordPrefs" id="Zvb-0b-q0w"/>
+                        <segue destination="mjX-zG-VQ1" kind="show" identifier="segueToManageKeyFiles" id="peX-qW-K9B"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dKR-j9-ea3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="257" y="3664"/>
+        </scene>
+        <!--SelectKeyFile-->
+        <scene sceneID="DlJ-Cw-dZw">
+            <objects>
+                <viewControllerPlaceholder storyboardName="SelectKeyFile" id="mjX-zG-VQ1" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="EsX-V9-vUS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="748" y="3564"/>
         </scene>
         <!--PasswordGenerationSettingsTableView-->
         <scene sceneID="bhw-PT-roB">

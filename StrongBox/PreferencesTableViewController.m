@@ -25,6 +25,8 @@
 #import "CloudSessionsTableViewController.h"
 #import "AboutViewController.h"
 #import "AdvancedPreferencesTableViewController.h"
+//#import "ManageKeyFilesViewController.h"
+#import "KeyFilesTableViewController.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -56,6 +58,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellReviewStrongbox;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordGeneration;
 @property (weak, nonatomic) IBOutlet UITableViewCell *tweetStrongbox;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellManageKeyFiles;
 
 @end
 
@@ -162,6 +165,9 @@
     }
     else if (cell == self.cellPasswordGeneration) {
         [self performSegueWithIdentifier:@"seguePrefToPasswordPrefs" sender:nil];
+    }
+    else if (cell == self.cellManageKeyFiles) {
+        [self performSegueWithIdentifier:@"segueToManageKeyFiles" sender:nil];
     }
 }
 
@@ -643,6 +649,10 @@
     else if ([segue.identifier isEqualToString:@"seguePrefsToAbout"]) {
         AboutViewController* vc = (AboutViewController*)segue.destinationViewController;
         vc.onDone = self.onDone;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToManageKeyFiles"]) {
+        KeyFilesTableViewController* vc = (KeyFilesTableViewController*)segue.destinationViewController;
+        vc.manageMode = YES;
     }
 }
 

@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "SafeStorageProvider.h"
-#import "LocalDeviceStorageProvider.h"
 #import "SafesList.h"
 #import "DatabaseModel.h"
 #import "AbstractDatabaseMetadata.h"

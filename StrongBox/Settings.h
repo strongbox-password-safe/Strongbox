@@ -13,10 +13,11 @@
 #import "AppLockMode.h"
 #import "BrowseItemSubtitleField.h"
 #import "BrowseSortField.h"
+#import "BrowseViewType.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString* const kAppGroupName = @"group.strongbox.mcguill";
+static NSString* const kAppGroupName = @"group.strongbox.mcguill"; // TODO: This could be an issue for custom builds - can we get from config?
 static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 
 @interface Settings : NSObject
@@ -145,6 +146,9 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BrowseSortField browseSortField;
 @property BOOL browseSortOrderDescending;
 @property BOOL browseSortFoldersSeparately;
+
+@property BOOL migratedLocalDatabasesToNewSystem;
+@property BOOL useSharedAppGroupLocalStorage; // TODO: Default this on in next release
 
 NS_ASSUME_NONNULL_END
 

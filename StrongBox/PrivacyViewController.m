@@ -11,8 +11,8 @@
 #import "Settings.h"
 #import "Alerts.h"
 #import "SafesList.h"
-#import "LocalDeviceStorageProvider.h"
 #import "AutoFillManager.h"
+#import "FileManager.h"
 
 @interface PrivacyViewController ()
 
@@ -190,7 +190,7 @@
     
     [SafesList.sharedInstance deleteAll]; // This also removes Key Chain Entries
     
-    [LocalDeviceStorageProvider.sharedInstance deleteAllLocalAndAppGroupFiles]; // Key Files, Caches, etc
+    [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; // Key Files, Caches, etc
 }
 
 @end

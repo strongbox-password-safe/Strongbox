@@ -12,6 +12,7 @@
 #import "PasswordGenerator.h"
 #import "Settings.h"
 #import "AutoFillManager.h"
+#import "CacheManager.h"
 
 @implementation Model {
     id <SafeStorageProvider> _storageProvider;
@@ -61,9 +62,11 @@
             [self->_storageProvider update:self.metadata
                                 data:updatedSafeData
                           completion:^(NSError *error) {
-                              [self updateOfflineCacheWithData:updatedSafeData];
-                              [self updateAutoFillCacheWithData:updatedSafeData];
-                              [self updateAutoFillQuickTypeDatabase];
+                              if(!error) {
+                                  [self updateOfflineCacheWithData:updatedSafeData]; // TODO: Not if there was an error
+                                  [self updateAutoFillCacheWithData:updatedSafeData];
+                                  [self updateAutoFillQuickTypeDatabase];
+                              }
                               handler(error);
                           }];
         }];
@@ -103,7 +106,7 @@
 }
 
 - (void)disableAndClearAutoFillCache {
-    [[LocalDeviceStorageProvider sharedInstance] deleteAutoFillCache:_metadata completion:^(NSError *error) {
+    [[CacheManager sharedInstance] deleteAutoFillCache:_metadata completion:^(NSError *error) {
           self.metadata.autoFillCacheEnabled = NO;
           self.metadata.autoFillCacheAvailable = NO;
         
@@ -144,78 +147,30 @@
     }
 }
 
-- (void)saveOfflineCacheFile:(NSData *)data
-                        safe:(SafeMetaData *)safe {
-    // Store this safe locally
-    // Do we already have a file?
-    //      Yes-> Overwrite
-    //      No-> Create New & Set location
+- (void)saveOfflineCacheFile:(NSData *)data safe:(SafeMetaData *)safe {
+    [[CacheManager sharedInstance] updateOfflineCachedSafe:safe data:data completion:^(BOOL success) {
+        if (!success) {
+            NSLog(@"Error updating Offline Cache file.");
+        }
 
-    if (safe.offlineCacheAvailable) {
-        [[LocalDeviceStorageProvider sharedInstance] updateOfflineCachedSafe:safe
-                                          data:data
-                                viewController:nil
-                                    completion:^(BOOL success) {
-                                        [self  onStoredOfflineCacheFile:safe
-                                                                success:success];
-                                    }];
-    }
-    else {
-        [[LocalDeviceStorageProvider sharedInstance] createOfflineCacheFile:safe data:data completion:^(BOOL success) {
-            [self onStoredOfflineCacheFile:safe success:success];
-        }];
-    }
+        safe.offlineCacheAvailable = success;
+        [[SafesList sharedInstance] update:safe];
+    }];
 }
 
-- (void)saveAutoFillCacheFile:(NSData *)data
-                         safe:(SafeMetaData *)safe {
-    if (safe.autoFillCacheAvailable) {
-        [[LocalDeviceStorageProvider sharedInstance] updateAutoFillCache:safe
-                                                                        data:data
-                                                              viewController:nil
-                                                                  completion:^(BOOL success) {
-          [self  onStoredAutoFillCacheFile:safe success:success];
+- (void)saveAutoFillCacheFile:(NSData *)data safe:(SafeMetaData *)safe {
+      [[CacheManager sharedInstance] updateAutoFillCache:safe data:data completion:^(BOOL success) {
+          if (!success) {
+              NSLog(@"Error updating Autofill Cache file.");
+          }
+
+          safe.autoFillCacheAvailable = success;
+          [[SafesList sharedInstance] update:safe];
       }];
-    }
-    else {
-        [[LocalDeviceStorageProvider sharedInstance] createAutoFillCache:safe data:data completion:^(BOOL success) {
-            [self onStoredAutoFillCacheFile:safe success:success];
-        }];
-    }
-}
-
-- (void)onStoredAutoFillCacheFile:(SafeMetaData *)safe success:(BOOL)success {
-    if (!success) {
-        NSLog(@"Error updating Autofill Cache file.");
-        
-        safe.autoFillCacheAvailable = NO;
-    }
-    else {
-        //NSLog(@"Offline Cache Now Available.");
-        
-        safe.autoFillCacheAvailable = YES;
-    }
-    
-    [[SafesList sharedInstance] update:safe];
-}
-
-- (void)onStoredOfflineCacheFile:(SafeMetaData *)safe success:(BOOL)success {
-    if (!success) {
-        NSLog(@"Error updating Offline Cache file.");
-
-        safe.offlineCacheAvailable = NO;
-    }
-    else {
-        //NSLog(@"Offline Cache Now Available.");
-
-        safe.offlineCacheAvailable = YES;
-    }
-
-    [[SafesList sharedInstance] update:safe];
 }
 
 - (void)disableAndClearOfflineCache {
-    [[LocalDeviceStorageProvider sharedInstance] deleteOfflineCachedSafe:_metadata
+    [[CacheManager sharedInstance] deleteOfflineCachedSafe:_metadata
                          completion:^(NSError *error) {
                              self->_metadata.offlineCacheEnabled = NO;
                              self->_metadata.offlineCacheAvailable = NO;

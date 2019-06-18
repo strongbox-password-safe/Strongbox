@@ -23,11 +23,6 @@
 
 @implementation BrowseItemCell
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    // Initialization code
-}
-
 - (void)setGroup:(NSString *)title
             icon:(UIImage*)icon
       childCount:(NSString*)childCount

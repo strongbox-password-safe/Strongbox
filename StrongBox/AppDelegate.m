@@ -21,6 +21,8 @@
 #import "NSArray+Extensions.h"
 #import "OfflineCacheNameDetector.h"
 #import "ProUpgradeIAPManager.h"
+#import "FileManager.h"
+#import "LocalDeviceStorageProvider.h"
 
 @interface AppDelegate ()
 
@@ -35,9 +37,11 @@
 
     [self initializeInstallSettingsAndLaunchCount];   
     
+    [self performMigrations];
+    
     // Do not backup local safes, caches or key files
 
-    [LocalDeviceStorageProvider.sharedInstance excludeDirectoriesFromBackup];
+    [FileManager.sharedInstance excludeDirectoriesFromBackup];
     
     [self cleanupInbox:launchOptions];
     
@@ -45,9 +49,19 @@
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
     
-//    NSLog(@"Documents Directory: [%@]", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
     
+    NSLog(@"Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
+    NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
+
     return YES;
+}
+
+- (void)performMigrations {
+    // 17-Jun-2019
+    if(!Settings.sharedInstance.migratedLocalDatabasesToNewSystem) {
+        [LocalDeviceStorageProvider.sharedInstance migrateLocalDatabasesToNewSystem];
+    }
 }
 
 - (void)cleanupInbox:(NSDictionary *)launchOptions {
@@ -55,7 +69,7 @@
         // Inbox should be empty whenever possible so that we can detect the
         // re-importation of a certain file and ask if user wants to create a
         // new copy or just update an old one...
-        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
+        [FileManager.sharedInstance deleteAllInboxItems];
     }
 }
 

@@ -20,6 +20,7 @@
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
+#import "CacheManager.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -61,11 +62,11 @@
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
 
 
-    NSDate* modDate = [[LocalDeviceStorageProvider sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
+    NSDate* modDate = [[CacheManager sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
     self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
     self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillCacheEnabled;
 
-    modDate = [[LocalDeviceStorageProvider sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
+    modDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
     self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
     
     self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];

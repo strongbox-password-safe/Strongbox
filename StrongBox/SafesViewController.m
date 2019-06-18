@@ -31,6 +31,9 @@
 #import "WelcomeViewController.h"
 #import "WelcomeCreateDoneViewController.h"
 #import "NSArray+Extensions.h"
+#import "FileManager.h"
+#import "CacheManager.h"
+#import "LocalDeviceStorageProvider.h"
 
 @interface SafesViewController () <UIDocumentPickerDelegate, DZNEmptyDataSetDelegate>
 
@@ -46,32 +49,6 @@
     
     if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
         self.tableView.contentOffset = CGPointZero;
-    }
-}
-
-- (void)syncLocalSafesWithFileSystem {
-    // Add any new
-    
-    NSArray<StorageBrowserItem*> *items = [LocalDeviceStorageProvider.sharedInstance scanForNewSafes];
-    
-    if(items.count) {
-        for(StorageBrowserItem* item in items) {
-            NSString* name = [SafesList sanitizeSafeNickName:[item.name stringByDeletingPathExtension]];
-            SafeMetaData *safe = [LocalDeviceStorageProvider.sharedInstance getSafeMetaData:name
-                                                                               providerData:item.providerData];
-            [[SafesList sharedInstance] add:safe];
-        }
-    }
-    
-    // Remove deleted
-    
-    NSArray<SafeMetaData*> *localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
-    
-    for (SafeMetaData* localSafe in localSafes) {
-        if(![LocalDeviceStorageProvider.sharedInstance fileExists:localSafe]) {
-            NSLog(@"Removing Safe [%@] because underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
-            [SafesList.sharedInstance remove:localSafe.uuid];
-        }
     }
 }
 
@@ -140,18 +117,7 @@
                                            selector:@selector(refresh)
                                                name:kDatabasesListChangedNotification
                                              object:nil];
-    
-    
-    [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory:^{
-        NSLog(@"File Change Detected! Scanning for New Safes");
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self syncLocalSafesWithFileSystem];
-        });
-    }];
-    
-    [self syncLocalSafesWithFileSystem];
-    
     [self internalRefresh];
     
     if([Settings.sharedInstance getLaunchCount] == 1) {
@@ -399,13 +365,17 @@
             }
         }];
     }
-         
-    if (safe.offlineCacheEnabled && safe.offlineCacheAvailable)
-    {
-        [[LocalDeviceStorageProvider sharedInstance] deleteOfflineCachedSafe:safe
-                                                                  completion:^(NSError *error) {
-                                                                      NSLog(@"Delete Offline Cache File. Error = %@", error);
-                                                                  }];
+    
+    if (safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
+        [[CacheManager sharedInstance] deleteOfflineCachedSafe:safe completion:^(NSError *error) {
+          NSLog(@"Delete Offline Cache File. Error = %@", error);
+      }];
+    }
+    
+    if(safe.autoFillCacheEnabled && safe.autoFillCacheAvailable) {
+        [CacheManager.sharedInstance deleteAutoFillCache:safe completion:^(NSError * _Nonnull error) {
+            NSLog(@"Delete Auto Fill Cache File. Error = %@", error);
+        }];
     }
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];

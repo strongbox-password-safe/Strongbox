@@ -28,7 +28,7 @@ static NSString* const kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
 static NSString* const kPasswordGenerationParameters = @"passwordGenerationSettings";
 static NSString* const kInstallDate = @"installDate";
 static NSString* const kDisallowBiometricId = @"disallowBiometricId";
-static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes"; // Dead
+//static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes"; // Dead
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
@@ -74,6 +74,7 @@ static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFi
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController";
 //static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword"; // DEAD
+static NSString* const kMigratedLocalDatabasesToNewSystem = @"migratedLocalDatabasesToNewSystem";
 
 static NSString* const kBrowseSortField = @"browseSortField";
 static NSString* const kBrowseSortOrderDescending = @"browseSortOrderDescending";
@@ -84,6 +85,14 @@ static NSString* const kAppLockPin = @"appLockPin2.0";
 static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 @implementation Settings
+
+- (BOOL)migratedLocalDatabasesToNewSystem {
+    return [self getBool:kMigratedLocalDatabasesToNewSystem];
+}
+
+- (void)setMigratedLocalDatabasesToNewSystem:(BOOL)migratedLocalDatabasesToNewSystem {
+    [self setBool:kMigratedLocalDatabasesToNewSystem value:migratedLocalDatabasesToNewSystem];
+}
 
 + (instancetype)sharedInstance {
     static Settings *sharedInstance = nil;
@@ -924,14 +933,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 - (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
     [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
 }
-
-//- (BOOL)interpretEmptyPasswordAsNoPassword {
-//    return [self getBool:kInterpretEmptyPasswordAsNoPassword fallback:NO];
-//}
-//
-//- (void)setInterpretEmptyPasswordAsNoPassword:(BOOL)interpretEmptyPasswordAsNoPassword {
-//    [self setBool:kInterpretEmptyPasswordAsNoPassword value:interpretEmptyPasswordAsNoPassword];
-//}
 
 - (BrowseSortField)browseSortField {
     BOOL oldDoNotSort = [[self getUserDefaults] boolForKey:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while

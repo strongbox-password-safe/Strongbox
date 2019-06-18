@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onDone)(BOOL success, NSURL* _Nullable url, NSData* _Nullable oneTimeData);
 @property (nullable) NSURL* selectedUrl;
+@property BOOL manageMode;
 
 @end
 

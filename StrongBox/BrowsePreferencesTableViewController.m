@@ -10,6 +10,7 @@
 #import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
+#import "SafesList.h"
 
 @interface BrowsePreferencesTableViewController ()
 
@@ -31,6 +32,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowRecycleBinInSearch;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDereference;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDerefenceDuringSearch;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAs;
+@property (weak, nonatomic) IBOutlet UILabel *labelViewAs;
 
 @end
 
@@ -68,9 +71,8 @@
 
     Settings.sharedInstance.hideTotpInBrowse = !self.switchShowTotpBrowseView.on;
     Settings.sharedInstance.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
-    
+
     [self bindGenericPreferencesChanged];
-    
     self.onPreferencesChanged();
 }
 
@@ -90,6 +92,8 @@
     
     self.switchShowTotpBrowseView.on = !Settings.sharedInstance.hideTotpInBrowse;
     self.switchShowRecycleBinInBrowse.on = !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
+
+    self.labelViewAs.text = [self getBrowseViewTypeName:self.databaseMetaData.browseViewType];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -99,6 +103,54 @@
     
     if (cell == self.cellBrowseItemSubtitle) {
         [self onChangeBrowseItemSubtitle];
+    }
+    else if (cell == self.cellViewAs) {
+        [self onChangeViewType];
+    }
+}
+
+- (void)onChangeViewType {
+    NSArray<NSNumber*>* options = @[@(kBrowseViewTypeHierarchy),
+                                    @(kBrowseViewTypeList),
+                                    @(kBrowseViewTypeTotpList)];
+    
+    NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return [self getBrowseViewTypeName:(BrowseViewType)obj.integerValue];
+    }];
+    
+    BrowseViewType current = self.databaseMetaData.browseViewType;
+    
+    NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.integerValue == current;
+    }];
+    
+    [self promptForString:optionStrings
+             currentIndex:currentIndex
+               completion:^(BOOL success, NSInteger selectedIdx) {
+                   if (success) {
+                       self.databaseMetaData.browseViewType = (BrowseViewType)options[selectedIdx].integerValue;
+                       [SafesList.sharedInstance update:self.databaseMetaData];
+                   }
+                   
+                   [self bindGenericPreferencesChanged];
+                   self.onPreferencesChanged();
+               }];
+}
+
+- (NSString*)getBrowseViewTypeName:(BrowseViewType)field {
+    switch (field) {
+        case kBrowseViewTypeHierarchy:
+            return @"Folder Hierarchy";
+            break;
+        case kBrowseViewTypeList:
+            return @"Flat List";
+            break;
+        case kBrowseViewTypeTotpList:
+            return @"TOTP List";
+            break;
+        default:
+            return @"None";
+            break;
     }
 }
 

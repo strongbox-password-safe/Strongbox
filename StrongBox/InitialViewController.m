@@ -30,6 +30,7 @@
 #import "StorageBrowserTableViewController.h"
 #import "PrivacyViewController.h"
 #import "CASGTableViewController.h"
+#import "FileManager.h"
 
 @interface InitialViewController ()
 
@@ -425,7 +426,7 @@
         // Inbox should be empty whenever possible so that we can detect the
         // re-importation of a certain file and ask if user wants to create a
         // new copy or just update an old one...
-        [LocalDeviceStorageProvider.sharedInstance deleteAllInboxItems];
+        [FileManager.sharedInstance deleteAllInboxItems];
 
         [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace];
     }];
@@ -447,13 +448,13 @@
 
 - (void)importKey:(NSData*)data url:(NSURL*)url  {
     NSString* filename = url.lastPathComponent;
-    NSString* path = [[IOsUtils applicationDocumentsDirectory].path stringByAppendingPathComponent:filename];
+    NSString* path = [FileManager.sharedInstance.keyFilesDirectory.path stringByAppendingPathComponent:filename];
     
     NSError *error;
     [data writeToFile:path options:kNilOptions error:&error];
     
     if(!error) {
-        [Alerts info:self title:@"Key File Copied" message:@"This key file has been copied to Strongbox's local documents directory"];
+        [Alerts info:self title:@"Key File Copied" message:@"This key file has been imported successfully."];
     }
     else {
         [Alerts error:self title:@"Problem Copying Key File" error:error];
@@ -491,7 +492,7 @@
 - (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
-        if([LocalDeviceStorageProvider.sharedInstance fileNameExists:filename] && Settings.sharedInstance.iCloudOn == NO) {
+        if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && Settings.sharedInstance.iCloudOn == NO) {
             [Alerts twoOptionsWithCancel:self
                                    title:@"Update Existing Database?"
                                  message:@"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?"
@@ -500,7 +501,7 @@
                                   action:^(int response) {
                             if(response == 0) {
                                 NSString *suggestedFilename = url.lastPathComponent;
-                                BOOL updated = [LocalDeviceStorageProvider.sharedInstance writeWithFilename:suggestedFilename overwrite:YES data:data];
+                                BOOL updated = [LocalDeviceStorageProvider.sharedInstance writeToDefaultStorageWithFilename:suggestedFilename overwrite:YES data:data];
                                 
                                 if(!updated) {
                                     [Alerts warn:self title:@"Error updating file." message:@"Could not update local file."];

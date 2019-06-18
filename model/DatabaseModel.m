@@ -561,12 +561,24 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
               dereference:(BOOL)dereference
     includeKeePass1Backup:(BOOL)includeKeePass1Backup
         includeRecycleBin:(BOOL)includeRecycleBin {
-    NSArray<NSString*>* terms = [self getSearchTerms:searchText];
-    
-    //NSLog(@"Search for nodes containing: [%@]", terms);
+    return [self searchNodes:self.allNodes
+                  searchText:searchText
+                       scope:scope
+                 dereference:dereference
+       includeKeePass1Backup:includeKeePass1Backup
+           includeRecycleBin:includeRecycleBin];
+}
 
-    NSMutableArray* results = [self.allNodes mutableCopy]; // Mutable for memory/perf reasons
-    
+- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
+                    searchText:(NSString *)searchText
+                         scope:(NSInteger)scope
+                   dereference:(BOOL)dereference
+         includeKeePass1Backup:(BOOL)includeKeePass1Backup
+             includeRecycleBin:(BOOL)includeRecycleBin {
+    NSMutableArray* results = [nodes mutableCopy]; // Mutable for memory/perf reasons
+
+    NSArray<NSString*>* terms = [self getSearchTerms:searchText];
+
     for (NSString* word in terms) {
         [self filterForWord:results
                  searchText:word
