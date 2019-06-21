@@ -20,8 +20,6 @@
 
 @end
 
-static UpgradeWindowController* currentInstance;
-
 @implementation UpgradeWindowController
 
 static UpgradeWindowController *sharedInstance = nil;
@@ -61,7 +59,8 @@ static UpgradeWindowController *sharedInstance = nil;
     [self.window makeKeyAndOrderFront:nil];
     [self.window center];
     [self.window setLevel:NSModalPanelWindowLevel]; //NSFloatingWindowLevel];
-
+    [self.window setHidesOnDeactivate:YES];
+    
     [self customizeButtonsBasedOnProduct];
     
     [[SKPaymentQueue defaultQueue] addTransactionObserver:self];

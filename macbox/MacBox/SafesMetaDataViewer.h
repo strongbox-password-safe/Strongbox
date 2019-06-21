@@ -8,8 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface SafesMetaDataViewer : NSWindowController<NSTableViewDelegate, NSTableViewDataSource>
+@interface SafesMetaDataViewer : NSWindowController
 
-@property (weak) IBOutlet NSTableView *tableView;
++ (void)show:(BOOL)debug;
 
 @end

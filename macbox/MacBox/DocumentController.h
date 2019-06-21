@@ -10,4 +10,6 @@
 
 @interface DocumentController : NSDocumentController
 
+- (void)originalOpenDocument:(id)sender;
+
 @end

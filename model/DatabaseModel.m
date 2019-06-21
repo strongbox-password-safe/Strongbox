@@ -14,16 +14,6 @@
 #import "Kdbx4Serialization.h"
 #import "KeePassCiphers.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-NSInteger const kSearchScopeTitle = 0;
-NSInteger const kSearchScopeUsername = 1;
-NSInteger const kSearchScopePassword = 2;
-NSInteger const kSearchScopeUrl = 3;
-NSInteger const kSearchScopeAll = 4;
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
 @interface DatabaseModel ()
 
 @property (nonatomic, strong) StrongboxDatabase* theSafe;
@@ -553,107 +543,6 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return mostOccurring;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Search...
-
-- (NSArray<Node*>*)search:(NSString *)searchText
-                    scope:(NSInteger)scope
-              dereference:(BOOL)dereference
-    includeKeePass1Backup:(BOOL)includeKeePass1Backup
-        includeRecycleBin:(BOOL)includeRecycleBin {
-    return [self searchNodes:self.allNodes
-                  searchText:searchText
-                       scope:scope
-                 dereference:dereference
-       includeKeePass1Backup:includeKeePass1Backup
-           includeRecycleBin:includeRecycleBin];
-}
-
-- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
-                    searchText:(NSString *)searchText
-                         scope:(NSInteger)scope
-                   dereference:(BOOL)dereference
-         includeKeePass1Backup:(BOOL)includeKeePass1Backup
-             includeRecycleBin:(BOOL)includeRecycleBin {
-    NSMutableArray* results = [nodes mutableCopy]; // Mutable for memory/perf reasons
-
-    NSArray<NSString*>* terms = [self getSearchTerms:searchText];
-
-    for (NSString* word in terms) {
-        [self filterForWord:results
-                 searchText:word
-                      scope:scope
-                dereference:dereference];
-    }
-    
-    [self filterExcludedSearchItems:results includeKeePass1Backup:includeKeePass1Backup includeRecycleBin:includeRecycleBin];
-    
-    return [self sortItemsForBrowse:results];
-}
-
-- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
-    NSArray* split = [searchText componentsSeparatedByString:@" "];
-    NSMutableSet<NSString*>* unique = [NSMutableSet setWithArray:split];
-    [unique removeObject:@""];
-    
-    // Split into words and sort by longest word first to eliminate most entries...
-    
-    return [unique.allObjects sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        return [@(((NSString*)obj2).length) compare:@(((NSString*)obj1).length)];
-    }];
-}
-
-- (void)filterForWord:(NSMutableArray<Node*>*)searchNodes
-           searchText:(NSString *)searchText
-                scope:(NSInteger)scope
-          dereference:(BOOL)dereference {
-    if (scope == kSearchScopeTitle) {
-        [self searchTitle:searchNodes searchText:searchText dereference:dereference];
-    }
-    else if (scope == kSearchScopeUsername) {
-        [self searchUsername:searchNodes searchText:searchText dereference:dereference];
-    }
-    else if (scope == kSearchScopePassword) {
-        [self searchPassword:searchNodes searchText:searchText dereference:dereference];
-    }
-    else if (scope == kSearchScopeUrl) {
-        [self searchUrl:searchNodes searchText:searchText dereference:dereference];
-    }
-    else {
-        [self searchAllFields:searchNodes searchText:searchText dereference:dereference];
-    }
-}
-
-- (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
-    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self isTitleMatches:searchText node:node dereference:dereference];
-    }];
-}
-
-- (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
-    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self isUsernameMatches:searchText node:node dereference:dereference];
-    }];
-}
-
-- (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
-    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self isPasswordMatches:searchText node:node dereference:dereference];
-    }];
-}
-
-- (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
-    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self isUrlMatches:searchText node:node dereference:dereference];
-    }];
-}
-
-- (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
-    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self isAllFieldsMatches:searchText node:node dereference:dereference];
-    }];
-}
-
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
     return [foo localizedCaseInsensitiveContainsString:searchText];
@@ -717,143 +606,16 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return NO;
 }
 
-- (void)filterExcludedSearchItems:(NSMutableArray<Node*>*)matches
-            includeKeePass1Backup:(BOOL)includeKeePass1Backup
-                includeRecycleBin:(BOOL)includeRecycleBin {
-    if(!includeKeePass1Backup) {
-        if (self.format == kKeePass1) {
-            Node* backupGroup = self.keePass1BackupNode;
-            if(backupGroup) {
-                [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
-                    return (obj != backupGroup && ![backupGroup contains:obj]);
-                }];
-            }
-        }
-    }
+- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
+    NSArray* split = [searchText componentsSeparatedByString:@" "];
+    NSMutableSet<NSString*>* unique = [NSMutableSet setWithArray:split];
+    [unique removeObject:@""];
     
-    Node* recycleBin = self.recycleBinNode;
-    if(!includeRecycleBin && recycleBin) {
-        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return obj != recycleBin && ![recycleBin contains:obj];
-        }];
-    }
-}
-
-- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items {
-    BrowseSortField field = Settings.sharedInstance.browseSortField;
-    BOOL descending = Settings.sharedInstance.browseSortOrderDescending;
-    BOOL foldersSeparately = Settings.sharedInstance.browseSortFoldersSeparately;
+    // Split into words and sort by longest word first to eliminate most entries...
     
-    if(field == kBrowseSortFieldEmail && self.format != kPasswordSafe) {
-        field = kBrowseSortFieldTitle;
-    }
-    else if(field == kBrowseSortFieldNone && self.format == kPasswordSafe) {
-        field = kBrowseSortFieldTitle;
-    }
-    
-    if(field != kBrowseSortFieldNone) {
-        return [items sortedArrayWithOptions:NSSortStable
-                             usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-                                 Node* n1 = (Node*)obj1;
-                                 Node* n2 = (Node*)obj2;
-                                 
-                                 return [self compareNodesForSort:n1 node2:n2 field:field descending:descending foldersSeparately:foldersSeparately];
-                             }];
-    }
-    else {
-        return items;
-    }
-}
-
-- (NSComparisonResult)compareNodesForSort:(Node*)node1
-                                    node2:(Node*)node2
-                                    field:(BrowseSortField)field
-                               descending:(BOOL)descending
-                        foldersSeparately:(BOOL)foldersSeparately {
-    if(foldersSeparately) {
-        if(node1.isGroup && !node2.isGroup) {
-            return NSOrderedAscending;
-        }
-        else if(!node1.isGroup && node2.isGroup) {
-            return NSOrderedDescending;
-        }
-    }
-    
-    // Groups - Do not compare fields other than title... default sort asc
-
-    if(node2.isGroup && node1.isGroup && field != kBrowseSortFieldTitle) {
-        return finderStringCompare(node1.title, node2.title);
-    }
-
-    Node* n1 = descending ? node2 : node1;
-    Node* n2 = descending ? node1 : node2;
-    
-    NSComparisonResult result = NSOrderedSame;
-    
-    if(field == kBrowseSortFieldTitle) {
-        result = finderStringCompare(n1.title, n2.title);
-    }
-    else if(field == kBrowseSortFieldUsername) {
-        result = finderStringCompare(n1.fields.username, n2.fields.username);
-    }
-    else if(field == kBrowseSortFieldPassword) {
-        result = finderStringCompare(n1.fields.password, n2.fields.password);
-    }
-    else if(field == kBrowseSortFieldUrl) {
-        result = finderStringCompare(n1.fields.url, n2.fields.url);
-    }
-    else if(field == kBrowseSortFieldEmail) {
-        result = finderStringCompare(n1.fields.email, n2.fields.email);
-    }
-    else if(field == kBrowseSortFieldNotes) {
-        result = finderStringCompare(n1.fields.notes, n2.fields.notes);
-    }
-    else if(field == kBrowseSortFieldCreated) {
-        result = [n1.fields.created compare:n2.fields.created];
-    }
-    else if(field == kBrowseSortFieldModified) {
-        result = [n1.fields.modified compare:n2.fields.modified];
-    }
-    
-    // Sort by title if tie-break
-    
-    if(result == NSOrderedSame && field != kBrowseSortFieldTitle) {
-        result = finderStringCompare(n1.title, n2.title);
-    }
-    
-    return result;
-}
-
-- (NSString*)getBrowseItemSubtitle:(Node*)node {
-    switch (Settings.sharedInstance.browseItemSubtitleField) {
-        case kBrowseItemSubtitleNoField:
-            return @"";
-            break;
-        case kBrowseItemSubtitleUsername:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
-            break;
-        case kBrowseItemSubtitlePassword:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
-            break;
-        case kBrowseItemSubtitleUrl:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
-            break;
-        case kBrowseItemSubtitleEmail:
-            return node.fields.email;
-            break;
-        case kBrowseItemSubtitleModified:
-            return friendlyDateString(node.fields.modified);
-            break;
-        case kBrowseItemSubtitleCreated:
-            return friendlyDateString(node.fields.created);
-            break;
-        case kBrowseItemSubtitleNotes:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
-            break;
-        default:
-            return @"";
-            break;
-    }
+    return [unique.allObjects sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return [@(((NSString*)obj2).length) compare:@(((NSString*)obj1).length)];
+    }];
 }
 
 @end

@@ -39,7 +39,9 @@
 
 @property Node* node;
 @property ViewModel* model;
-@property ViewController* parentViewController;
+
+@property dispatch_block_t onClosed;
+
 @property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property NSView* currentlyEditingUIControl;
@@ -67,6 +69,7 @@
 @property (weak) IBOutlet NSProgressIndicator *progressTotp;
 @property NSTimer* timerRefreshOtp;
 @property BOOL newEntry;
+@property BOOL historical;
 
 @property (weak) IBOutlet NSComboBox *comboGroup;
 @property NSArray<Node*>* groups;
@@ -75,6 +78,11 @@
 @property (weak) IBOutlet NSTextField *labelModified;
 
 @property dispatch_block_t passwordChangedNotifyTask;
+
+@property (weak) IBOutlet NSButton *buttonGenerate;
+@property (weak) IBOutlet NSButton *buttonSettings;
+@property (weak) IBOutlet NSButton *buttonAddAttachment;
+@property (weak) IBOutlet NSButton *buttonRemoveAttachment;
 
 @end
 
@@ -90,14 +98,16 @@ static NSImage* kDefaultAttachmentIcon;
 
 + (instancetype)showNode:(Node*)node
                    model:(ViewModel*)model
-    parentViewController:(ViewController*)parentViewController
-                newEntry:(BOOL)newEntry {
+                newEntry:(BOOL)newEntry
+              historical:(BOOL)historical
+                onClosed:(dispatch_block_t)onClosed {
     NodeDetailsWindowController *window = [[NodeDetailsWindowController alloc] initWithWindowNibName:@"NodeDetailsWindowController"];
     
     window.node = node;
     window.model = model;
     window.newEntry = newEntry;
-    window.parentViewController = parentViewController;
+    window.onClosed = onClosed;
+    window.historical = historical;
     
     [window showWindow:nil];
     
@@ -213,7 +223,7 @@ static NSImage* kDefaultAttachmentIcon;
     }
 
     [self stopObservingModelChanges];
-    [self.parentViewController onDetailsWindowClosed:self.node.uuid]; // Allows parent VC to remove reference to this
+    self.onClosed(); // Allows parent VC to remove reference to this
 }
 
 - (void)observeModelChanges {
@@ -236,13 +246,10 @@ static NSImage* kDefaultAttachmentIcon;
 - (void)windowDidLoad {
     [super windowDidLoad];
     
-    NSString* title =[self.model dereference:self.node.title node:self.node];
-    self.window.title = title;
-    
     [self.window makeKeyAndOrderFront:nil];
     [self.window center];
-    
     [self.window setLevel:Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSNormalWindowLevel : NSFloatingWindowLevel];
+    [self.window setHidesOnDeactivate:YES];
     
     [self setupUi];
     
@@ -255,6 +262,10 @@ static NSImage* kDefaultAttachmentIcon;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
     
     [self.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; // Take focus off Title so that edits require some effort...
+
+    NSString* title = [self.model dereference:self.node.title node:self.node];
+    NSString* aTitle = [NSString stringWithFormat:self.historical ? @"%@ (Historical Item)" : @"%@", title];
+    [self.window setTitle:aTitle];
 }
 
 - (void)setupUi {
@@ -353,13 +364,23 @@ static NSImage* kDefaultAttachmentIcon;
     self.textViewNotes.string = self.node.fields.notes;
     
     self.imageViewIcon.image = [self getIconForNode];
-    self.imageViewIcon.clickable = self.model.format != kPasswordSafe;
     self.imageViewIcon.onClick = ^{ [self onEditNodeIcon]; };
     self.imageViewIcon.showClickableBorder = YES;
     
     self.labelID.stringValue = self.model.format == kPasswordSafe ? self.node.uuid.UUIDString : keePassStringIdFromUuid(self.node.uuid);
     self.labelCreated.stringValue = friendlyDateString(self.node.fields.created);
     self.labelModified.stringValue = friendlyDateString(self.node.fields.modified);
+    
+    self.imageViewIcon.clickable = self.model.format != kPasswordSafe && !self.historical;
+    self.textFieldTitle.enabled = !self.historical;
+    self.textFieldUsername.enabled = !self.historical;
+    self.textFieldPassword.enabled = !self.historical;
+    self.textFieldEmail.enabled = !self.historical;
+    self.textFieldUrl.enabled = !self.historical;
+    self.textViewNotes.editable = !self.historical;
+    self.comboGroup.enabled = !self.historical;
+    self.buttonGenerate.enabled = !self.historical;
+    self.buttonSettings.enabled = !self.historical;
     
     [self validateTitleAndIndicateValidityInUI];
     
@@ -470,6 +491,9 @@ static NSImage* kDefaultAttachmentIcon;
     
     self.customFields = [fields copy];
     [self.tableViewCustomFields reloadData];
+    
+    self.buttonRemoveCustomField.enabled = !self.historical;
+    self.buttonAddCustomField.enabled = !self.historical;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
@@ -509,6 +533,9 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)onEditCustomField:(CustomField*)field {
+    if(self.historical) {
+        return;
+    }
     Alerts* alert = [[Alerts alloc] init];
     
     [alert inputKeyValue:@"Edit Custom Field" initKey:field.key initValue:field.value initProtected:field.protected placeHolder:NO completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
@@ -541,6 +568,10 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (IBAction)onDeleteCustomField:(id)sender {
+    if(self.historical) {
+        return;
+    }
+    
     NSInteger row = self.tableViewCustomFields.clickedRow;
     if(row == -1) {
         return;
@@ -558,6 +589,10 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (IBAction)onRemoveCustomField:(id)sender {
+    if(self.historical) {
+        return;
+    }
+    
     if(self.tableViewCustomFields.selectedRow != -1) {
         CustomField *field = self.customFields[self.tableViewCustomFields.selectedRow];
         
@@ -572,6 +607,10 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (IBAction)onAddCustomField:(id)sender {
+    if(self.historical) {
+        return;
+    }
+    
     Alerts* alert = [[Alerts alloc] init];
     
     [alert inputKeyValue:@"Add Custom Field" initKey:@"Key" initValue:@"Value" initProtected:NO placeHolder:YES completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
@@ -606,6 +645,10 @@ static NSImage* kDefaultAttachmentIcon;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     SEL theAction = [menuItem action];
+    
+    if(theAction == @selector(onAddCustomField:) || theAction == @selector(onRemoveCustomField:) || theAction == @selector(onEditCustomField:)) {
+        return !self.historical;
+    }
     
    if (theAction == @selector(onPreviewAttachment:)) {
         return [self.attachmentsView.selectionIndexes count] != 0;
@@ -739,6 +782,9 @@ NSString* trimField(NSTextField* textField) {
     self.attachmentsIconCache = nil;
     self.attachments = [self.node.fields.attachments copy];
     [self.attachmentsView reloadData];
+    
+    self.buttonAddAttachment.enabled = !self.historical;
+    self.buttonRemoveAttachment.enabled = !self.historical;
 }
 
 - (IBAction)onPreviewAttachment:(id)sender {
@@ -892,6 +938,10 @@ NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onRemoveAttachment:(id)sender {
+    if(self.historical) {
+        return;
+    }
+    
     NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
     if(idx == NSNotFound) {
         return;

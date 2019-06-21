@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -28,13 +28,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YC7-sM-Eov">
-                        <rect key="frame" x="20" y="57" width="677" height="276"/>
+                        <rect key="frame" x="20" y="61" width="677" height="272"/>
                         <clipView key="contentView" id="bDW-aA-7nq">
-                            <rect key="frame" x="1" y="0.0" width="675" height="275"/>
+                            <rect key="frame" x="1" y="0.0" width="675" height="271"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="xPS-Dt-etU" viewBased="YES" id="Qub-ji-CvX">
-                                    <rect key="frame" x="0.0" y="0.0" width="675" height="250"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="675" height="246"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -273,18 +273,19 @@
                 <constraints>
                     <constraint firstItem="YC7-sM-Eov" firstAttribute="top" secondItem="vNG-5k-wLX" secondAttribute="bottom" constant="20" id="1xn-eA-rAQ"/>
                     <constraint firstAttribute="bottom" secondItem="Sjt-Jq-nfN" secondAttribute="bottom" constant="20" id="7Bl-CG-tsL"/>
-                    <constraint firstItem="YC7-sM-Eov" firstAttribute="leading" secondItem="4da-F3-Owb" secondAttribute="leading" id="9kf-rY-MCT"/>
+                    <constraint firstItem="YC7-sM-Eov" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="DBq-WH-iIO"/>
+                    <constraint firstItem="EvQ-lT-2lu" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4da-F3-Owb" secondAttribute="trailing" constant="20" id="L6j-hZ-Uxp"/>
                     <constraint firstAttribute="trailing" secondItem="Sjt-Jq-nfN" secondAttribute="trailing" constant="20" id="MEs-Cp-aJe"/>
-                    <constraint firstItem="Sjt-Jq-nfN" firstAttribute="top" secondItem="YC7-sM-Eov" secondAttribute="bottom" constant="16" id="Pgn-Sw-7Vf"/>
+                    <constraint firstItem="4da-F3-Owb" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="Rrr-Sc-3hS"/>
+                    <constraint firstItem="4da-F3-Owb" firstAttribute="centerY" secondItem="EvQ-lT-2lu" secondAttribute="centerY" id="SS6-wD-prf"/>
                     <constraint firstItem="vNG-5k-wLX" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" id="Tv3-Qr-3ek"/>
+                    <constraint firstAttribute="trailing" secondItem="YC7-sM-Eov" secondAttribute="trailing" constant="20" id="U5g-vN-Co1"/>
+                    <constraint firstItem="Sjt-Jq-nfN" firstAttribute="top" secondItem="YC7-sM-Eov" secondAttribute="bottom" constant="20" id="Xgc-CZ-KeA"/>
                     <constraint firstItem="vNG-5k-wLX" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="gus-yg-DW5"/>
-                    <constraint firstItem="YC7-sM-Eov" firstAttribute="trailing" secondItem="Sjt-Jq-nfN" secondAttribute="trailing" id="kyG-WL-6vR"/>
                     <constraint firstItem="yc2-EZ-YvW" firstAttribute="baseline" secondItem="Sjt-Jq-nfN" secondAttribute="baseline" id="l0E-GZ-PgW"/>
                     <constraint firstItem="EvQ-lT-2lu" firstAttribute="baseline" secondItem="yc2-EZ-YvW" secondAttribute="baseline" id="q5X-md-ceJ"/>
                     <constraint firstItem="Sjt-Jq-nfN" firstAttribute="leading" secondItem="yc2-EZ-YvW" secondAttribute="trailing" constant="12" symbolic="YES" id="rVU-4J-URy"/>
-                    <constraint firstAttribute="trailing" secondItem="4da-F3-Owb" secondAttribute="trailing" constant="521" id="rm3-Lg-iXy"/>
                     <constraint firstItem="yc2-EZ-YvW" firstAttribute="leading" secondItem="EvQ-lT-2lu" secondAttribute="trailing" constant="12" symbolic="YES" id="sNO-o1-XAC"/>
-                    <constraint firstItem="4da-F3-Owb" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="352" id="wZZ-zb-RRc"/>
                 </constraints>
             </view>
             <connections>

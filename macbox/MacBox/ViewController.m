@@ -32,7 +32,7 @@
 #import "NodeDetailsWindowController.h"
 #import "MBProgressHUD.h"
 #import "CustomFieldTableCellView.h"
-
+#import "SearchScope.h"
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -135,15 +135,14 @@ static NSImage* kStrongBox256Image;
         [wc showWindow:nil];
     }
     else {
-        wc = [NodeDetailsWindowController showNode:item model:self.model parentViewController:self newEntry:newEntry];
+        wc = [NodeDetailsWindowController showNode:item model:self.model newEntry:newEntry historical:NO onClosed:^{
+            NSLog(@"Removing Details WindowController to List: [%@]", wc);
+            [self.detailsWindowControllers removeObjectForKey:item.uuid];
+        }];
+        
         NSLog(@"Adding Details WindowController to List: [%@]", wc);
         self.detailsWindowControllers[item.uuid] = wc;
     }
-}
-
-- (void)onDetailsWindowClosed:(id)wc {
-    NSLog(@"Removing Details WindowController to List: [%@]", wc);
-    [self.detailsWindowControllers removeObjectForKey:wc];
 }
 
 - (void)viewDidLoad {
@@ -431,12 +430,45 @@ static NSImage* kStrongBox256Image;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+- (SafeMetaData*)getDatabaseMetaData {
+    if(!self.model || !self.model.fileUrl) {
+        return nil;
+    }
+    
+    // TODO: Check Storage type when impl sftp or webdav
+    
+    return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
+    }];
+}
+
+- (void)addThisDatabaseToDatabases {
+    SafeMetaData *safe = [self getDatabaseMetaData];
+    
+    if(safe) {
+        NSLog(@"Database is already in Databases List... Not Adding");
+        return;
+    }
+    
+    NSURL* url = self.model.fileUrl;
+    
+    safe = [[SafeMetaData alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
+                                  storageProvider:kLocalDevice
+                                         fileName:url.lastPathComponent
+                                   fileIdentifier:url.absoluteString];
+    
+    [SafesList.sharedInstance add:safe];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (void)resetModel:(ViewModel *)model {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self stopObservingModelChanges];
         [self closeAllDetailsWindows];
         
         self.model = model;
+        [self addThisDatabaseToDatabases];
         
         [self bindToModel];
         [self setInitialFocus];
@@ -1069,16 +1101,6 @@ static NSImage* kStrongBox256Image;
     return item ? [item getSerializationId:self.model.format != kPasswordSafe] : nil;
 }
 
-- (SafeMetaData*)getDatabaseMetaData {
-    if(!self.model || !self.model.fileUrl) {
-        return nil;
-    }
-    
-    return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
-    }];
-}
-
 - (void)showProgressModal:(NSString*)operationDescription {
     [self hideProgressModal];
     
@@ -1152,6 +1174,7 @@ static NSImage* kStrongBox256Image;
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
             [Alerts info:@"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared." window:self.view.window];
+            
             if(metadata) {
                 [SafesList.sharedInstance remove:metadata.uuid];
             }
@@ -1220,14 +1243,29 @@ static NSImage* kStrongBox256Image;
           password:(NSString*)password
      keyFileDigest:(NSData*)keyFileDigest
  isBiometricUnlock:(BOOL)isBiometricUnlock {
+    SafeMetaData *safe = [self getDatabaseMetaData];
+
     if(success) {
-        [self maybePromptForBiometricEnrol:password
-                             keyFileDigest:keyFileDigest];
+        if(safe == nil) {
+            [self addThisDatabaseToDatabases];
+            
+            [self maybePromptForBiometricEnrol:password
+                                 keyFileDigest:keyFileDigest
+                                  safeMetaData:safe];
+        }
+        else {
+            [self maybePromptForBiometricEnrol:password
+                                 keyFileDigest:keyFileDigest
+                                  safeMetaData:safe];
+        }
     }
     else {
-        if(isBiometricUnlock) {
-            SafeMetaData *safe = [self getDatabaseMetaData];
-            [SafesList.sharedInstance remove:safe.uuid]; // FUTURE: Maybe we shouldn't remove but code relies on this to ask/prompt for Touch ID
+        if(isBiometricUnlock && safe != nil) {
+            safe.touchIdPassword = nil;
+            safe.touchIdKeyFileDigest = nil;
+            safe.hasPromptedForTouchIdEnrol = NO;
+            
+            [SafesList.sharedInstance update:safe];
         }
         
         [Alerts error:@"Could Not Unlock Database" error:error window:self.view.window];
@@ -1236,37 +1274,31 @@ static NSImage* kStrongBox256Image;
     self.isPromptingAboutUnderlyingFileChange = NO;// Reset in case we ended up here by auto reload
 }
 
-- (void)maybePromptForBiometricEnrol:(NSString*)password keyFileDigest:(NSData*)keyFileDigest {
-    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable && (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial)) {
-        //NSLog(@"Biometric ID is available on Device. Should we enrol?");
-        SafeMetaData* metaData = [self getDatabaseMetaData];
-        
-        if(!metaData) {
-            NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this database in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
-            
-            [Alerts yesNo:message
-                   window:self.view.window
-               completion:^(BOOL yesNo) {
-                   NSURL* url = self.model.fileUrl;
-                   SafeMetaData* safeMetaData = [[SafeMetaData alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
-                                                                       storageProvider:kLocalDevice
-                                                                              fileName:url.lastPathComponent
-                                                                        fileIdentifier:url.absoluteString];
+- (void)maybePromptForBiometricEnrol:(NSString*)password keyFileDigest:(NSData*)keyFileDigest safeMetaData:(SafeMetaData*)safeMetaData {
+    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable &&
+        (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) &&
+        !safeMetaData.hasPromptedForTouchIdEnrol) {
+        NSLog(@"Biometric ID is available on Device. Should we enrol?");
+
+        NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this database in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
+
+        [Alerts yesNo:message
+               window:self.view.window
+           completion:^(BOOL yesNo) {
+               if(yesNo) {
+                   safeMetaData.isTouchIdEnabled = YES;
+                   safeMetaData.touchIdPassword = password;
+                   safeMetaData.touchIdKeyFileDigest = keyFileDigest;
                    
-                   if(yesNo) {
-                       safeMetaData.isTouchIdEnabled = YES;
-                       safeMetaData.touchIdPassword = password;
-                       safeMetaData.touchIdKeyFileDigest = keyFileDigest;
-                       
-                       [self caveatAboutTouchId];
-                   }
-                   else {
-                       safeMetaData.isTouchIdEnabled = NO;
-                   }
-                   
-                   [SafesList.sharedInstance add:safeMetaData];
-               }];
-        }
+                   [self caveatAboutTouchId];
+               }
+               else {
+                   safeMetaData.isTouchIdEnabled = NO;
+               }
+           
+               safeMetaData.hasPromptedForTouchIdEnrol = YES;
+               [SafesList.sharedInstance update:safeMetaData];
+           }];
     }
 }
 
@@ -1873,10 +1905,11 @@ static NSImage* kStrongBox256Image;
     SafeMetaData* metaData = [self getDatabaseMetaData];
     
     if(metaData) {
-        [SafesList.sharedInstance remove:metaData.uuid];
-
+        metaData.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
         metaData.touchIdKeyFileDigest = nil;
         metaData.touchIdPassword = nil;
+        
+        [SafesList.sharedInstance update:metaData];
     }
 }
 

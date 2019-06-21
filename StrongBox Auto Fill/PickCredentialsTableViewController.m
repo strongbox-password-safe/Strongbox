@@ -17,6 +17,7 @@
 #import "regdom.h"
 #import "BrowseItemCell.h"
 #import "ItemDetailsViewController.h"
+#import "DatabaseSearchAndSorter.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -252,11 +253,13 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(NSInteger)scope {
-    return [self.model.database search:searchText
-                                 scope:scope
-                           dereference:Settings.sharedInstance.searchDereferencedFields
-                 includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
-                     includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database];
+    
+    return [searcher search:searchText
+                      scope:scope
+                dereference:Settings.sharedInstance.searchDereferencedFields
+      includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
+          includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -296,7 +299,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
     }
     else {
-        NSString* subtitle = [self.model.database getBrowseItemSubtitle:node];
+        DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database];
+        
+        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
         NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
         flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
         

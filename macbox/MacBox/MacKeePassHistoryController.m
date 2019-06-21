@@ -9,6 +9,7 @@
 #import "MacKeePassHistoryController.h"
 #import "MacNodeIconHelper.h"
 #import "Alerts.h"
+#import "NodeDetailsWindowController.h"
 
 @interface MacKeePassHistoryController () <NSTableViewDelegate, NSTableViewDataSource>
 
@@ -34,8 +35,25 @@
     self.showPasswordsCheckbox.state = NSOffState;
     self.tableViewHistory.dataSource = self;
     self.tableViewHistory.delegate = self;
+    self.tableViewHistory.doubleAction = @selector(onDoubleClick:);
     
     [self enableDisableButtons];
+}
+
+- (IBAction)onDoubleClick:(id)sender {
+    NSInteger row = self.tableViewHistory.clickedRow;
+    if(row == -1) {
+        return;
+    }
+    
+    Node* node = self.history[row];
+    [self openDetails:node];
+}
+
+- (void)openDetails:(Node*)node {
+    [NodeDetailsWindowController showNode:node model:self.model newEntry:NO historical:YES onClosed:^{
+        // TODO:?;
+    }];
 }
 
 - (IBAction)onShowPasswords:(id)sender {

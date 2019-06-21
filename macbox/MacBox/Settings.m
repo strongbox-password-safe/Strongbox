@@ -39,6 +39,7 @@ static NSString* const kAutoReloadAfterForeignChanges = @"autoReloadAfterForeign
 static NSString* const kDetectForeignChanges = @"detectForeignChanges";
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
+//static NSString* const kShowDatabasesListAtStartup = @"showDatabasesListAtStartup";
 
 static NSString* const kVisibleColumns = @"visibleColumns";
 NSString* const kTitleColumn = @"TitleColumn";
@@ -54,6 +55,14 @@ NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 @implementation Settings
+
+//- (BOOL)showDatabasesListAtStartup {
+//    return [self getBool:kShowDatabasesListAtStartup fallback:YES];
+//}
+
+//- (void)setShowDatabasesListAtStartup:(BOOL)showDatabasesListAtStartup {
+//    [self setBool:kShowDatabasesListAtStartup value:showDatabasesListAtStartup];
+//}
 
 + (instancetype)sharedInstance {
     static Settings *sharedInstance = nil;

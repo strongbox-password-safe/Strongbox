@@ -197,6 +197,7 @@
 		0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.release.xcconfig"; sourceTree = "<group>"; };
 		4D00B1F61F3DB03300D7560B /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Alerts.h; path = MacBox/Alerts.h; sourceTree = "<group>"; };
 		4D00B1F71F3DB03300D7560B /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Alerts.m; path = MacBox/Alerts.m; sourceTree = "<group>"; };
+		4D01BA2B22BD31F00044226F /* SearchScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchScope.h; path = ../model/SearchScope.h; sourceTree = "<group>"; };
 		4D0835A4228472D200CA7405 /* UiAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UiAttachment.h; path = ../StrongBox/UiAttachment.h; sourceTree = "<group>"; };
 		4D0835A5228472D200CA7405 /* UiAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UiAttachment.m; path = ../StrongBox/UiAttachment.m; sourceTree = "<group>"; };
 		4D0835A7228472FC00CA7405 /* KeyDerivationCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyDerivationCipher.h; path = ../model/KeyDerivationCipher.h; sourceTree = "<group>"; };
@@ -1024,6 +1025,7 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D01BA2B22BD31F00044226F /* SearchScope.h */,
 				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
 				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
 				4D0835A4228472D200CA7405 /* UiAttachment.h */,
@@ -1102,6 +1104,9 @@
 				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
 				4D92C8251F38A03500341A58 /* WindowController.h */,
 				4D92C8261F38A03500341A58 /* WindowController.m */,
+				4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */,
+				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
+				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
 				4DFC06D5226467AA00A4254A /* libs */,
 				4DF59F531F30DB7A00D68BFE /* MacBox */,
 				4D524D2B219B503F00C22CB4 /* View */,
@@ -1146,9 +1151,6 @@
 				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
 				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
 				4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */,
-				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
-				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
-				4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */,
 				4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */,
 				4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */,
 				4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */,

@@ -16,8 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)showNode:(Node*)node
                    model:(ViewModel*)model
-    parentViewController:(ViewController*)parentViewController
-                newEntry:(BOOL)newEntry;
+                newEntry:(BOOL)newEntry
+              historical:(BOOL)historical
+                onClosed:(dispatch_block_t)onClosed;
 
 @end
 

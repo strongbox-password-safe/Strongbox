@@ -77,6 +77,12 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Pm6-Y2-Zjt"/>
+                                        <menuItem title="Databases Manager..." keyEquivalent="d" id="cfB-Ro-c8W">
+                                            <connections>
+                                                <action selector="onViewDatabases:" target="Voe-Tx-rLC" id="7MJ-VN-GSI"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="k2j-IO-Bnz"/>
                                         <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                             <connections>
                                                 <action selector="openDocument:" target="Ady-hI-5gd" id="bVn-NM-KNZ"/>
@@ -177,10 +183,14 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="View" id="HyV-fh-RgO">
                                     <items>
-                                        <menuItem title="Show Database Summary" id="Hf1-zW-11E">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="Databases Manager" keyEquivalent="d" id="gIA-xp-Clh">
                                             <connections>
-                                                <action selector="onShowSafeSummary:" target="Ady-hI-5gd" id="rFY-1E-RCi"/>
+                                                <action selector="onViewDatabases:" target="Voe-Tx-rLC" id="U35-Ax-Ayu"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Debug Databases List" keyEquivalent="O" id="JHk-yt-TOz">
+                                            <connections>
+                                                <action selector="onViewDebugDatabasesList:" target="Voe-Tx-rLC" id="k6e-AL-CDc"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Toggle Quick View Panel" keyEquivalent="/" id="Nag-nL-cVF">
@@ -188,11 +198,10 @@
                                                 <action selector="onShowHideQuickView:" target="Ady-hI-5gd" id="OAf-pA-rZO"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="u02-kh-LCu"/>
-                                        <menuItem title="Show Databases Meta Data" id="gIA-xp-Clh">
+                                        <menuItem title="Show Database Summary" id="Hf1-zW-11E">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="onViewSafesMetaData:" target="Ady-hI-5gd" id="sVh-vd-kkP"/>
+                                                <action selector="onShowSafeSummary:" target="Ady-hI-5gd" id="rFY-1E-RCi"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -714,11 +723,11 @@ DQ
                                                                 <scrollView verticalHuggingPriority="251" verticalCompressionResistancePriority="749" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k9S-c9-cks">
                                                                     <rect key="frame" x="0.0" y="0.0" width="500" height="450"/>
                                                                     <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
-                                                                        <rect key="frame" x="1" y="0.0" width="498" height="434"/>
-                                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                        <rect key="frame" x="1" y="0.0" width="498" height="449"/>
+                                                                        <autoresizingMask key="autoresizingMask"/>
                                                                         <subviews>
                                                                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="Strongbox-OutlineView" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" headerView="WfS-hP-cVj" viewBased="YES" indentationPerLevel="14" autoresizesOutlineColumn="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="645" height="411"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="645" height="426"/>
                                                                                 <autoresizingMask key="autoresizingMask"/>
                                                                                 <size key="intercellSpacing" width="5" height="5"/>
                                                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -936,8 +945,8 @@ DQ
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="450" placeholder="YES" id="6k5-jc-JXF"/>
                                                                     </constraints>
-                                                                    <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="1Mq-39-woA">
-                                                                        <rect key="frame" x="1" y="434" width="498" height="15"/>
+                                                                    <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="1Mq-39-woA">
+                                                                        <rect key="frame" x="1" y="433" width="498" height="16"/>
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                     <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="pKo-nv-B4e">
@@ -1342,7 +1351,7 @@ DQ
                                                                                                 <rect key="frame" x="0.0" y="0.0" width="424" height="62"/>
                                                                                                 <clipView key="contentView" id="1lM-HR-oBn">
                                                                                                     <rect key="frame" x="1" y="0.0" width="422" height="61"/>
-                                                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                                    <autoresizingMask key="autoresizingMask"/>
                                                                                                     <subviews>
                                                                                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" headerView="q8h-Tq-A5j" viewBased="YES" id="wef-Ef-f0m">
                                                                                                             <rect key="frame" x="0.0" y="0.0" width="422" height="36"/>
@@ -1467,7 +1476,7 @@ DQ
                                                                                         <rect key="frame" x="0.0" y="0.0" width="424" height="157"/>
                                                                                         <subviews>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8vG-fA-yRR" userLabel="Notes Label">
-                                                                                                <rect key="frame" x="184" y="139" width="42" height="17"/>
+                                                                                                <rect key="frame" x="191" y="139" width="42" height="17"/>
                                                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Notes" id="zsQ-Yj-TPx">
                                                                                                     <font key="font" metaFont="systemSemibold" size="13"/>
                                                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1477,15 +1486,15 @@ DQ
                                                                                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nwU-ra-Y09">
                                                                                                 <rect key="frame" x="0.0" y="0.0" width="424" height="129"/>
                                                                                                 <clipView key="contentView" drawsBackground="NO" id="n6X-39-X3W">
-                                                                                                    <rect key="frame" x="1" y="1" width="407" height="127"/>
-                                                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                                    <rect key="frame" x="1" y="1" width="422" height="127"/>
+                                                                                                    <autoresizingMask key="autoresizingMask"/>
                                                                                                     <subviews>
                                                                                                         <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" linkDetection="YES" id="R2W-LK-2el">
-                                                                                                            <rect key="frame" x="0.0" y="0.0" width="407" height="127"/>
+                                                                                                            <rect key="frame" x="0.0" y="0.0" width="422" height="127"/>
                                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                                            <size key="minSize" width="407" height="127"/>
+                                                                                                            <size key="minSize" width="422" height="127"/>
                                                                                                             <size key="maxSize" width="595" height="10000000"/>
                                                                                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                             <connections>

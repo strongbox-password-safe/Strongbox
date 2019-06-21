@@ -30,7 +30,6 @@
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
-@property (strong, nonatomic) SafesMetaDataViewer *safesMetaDataViewer;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 @property NSTimer* clipboardChangeWatcher;
 @property NSInteger currentClipboardVersion;
@@ -55,7 +54,6 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self removeUnwantedMenuItems];
     [self removeCopyDiagnosticDumpItem];
-    
     [self removeShowSafesMetaDataItem];
     
     //BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
@@ -79,11 +77,9 @@
         [self removeUpgradeMenuItem];
     }
     
-    self.applicationHasFinishedLaunching = YES;
 
 //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
 //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
     
     // TODO: System Tray Icon
 //    NSImage* statusImage = [NSImage imageNamed:@"Strongbox-36x26-inverted-bw"];
@@ -93,6 +89,22 @@
 //    self.statusItem.highlightMode = YES;
 //    self.statusItem.enabled = YES;
 //    self.statusItem.menu = self.systemTraymenu;
+
+//    NSDocumentController *controller = [NSDocumentController sharedDocumentController];
+//    NSArray *documents = [controller recentDocumentURLs];
+    
+    // TODO: Might be nice to open last here - offer the option
+    
+//    NSLog(@"Recent Documents: [%@]", documents);
+//    NSLog(@"Open Documents: [%@]", controller.documents);
+
+//    if(Settings.sharedInstance.showDatabasesListAtStartup) {
+//        [self onViewDatabases:nil];
+//    }
+    
+    self.applicationHasFinishedLaunching = YES;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -240,7 +252,7 @@
 }
 
 - (void)removeShowSafesMetaDataItem {
-    [self removeMenuItem:@"View" action:@"onViewSafesMetaData:"];
+    [self removeMenuItem:@"View" action:@"onViewDebugDatabasesList:"];
 }
 
 - (void)removeCopyDiagnosticDumpItem {
@@ -286,16 +298,12 @@
     return YES;
 }
 
-- (IBAction)onViewSafesMetaData:(id)sender {
-    if(self.safesMetaDataViewer == nil) {
-        self.safesMetaDataViewer = [[SafesMetaDataViewer alloc] initWithWindowNibName:@"SafesMetaDataViewer"];
-        
-        NSWindow *window = [NSApplication sharedApplication].mainWindow;
-        
-        [window beginSheet:self.safesMetaDataViewer.window completionHandler:^(NSModalResponse returnCode) {
-            self.safesMetaDataViewer = nil;
-        }];
-    }
+- (IBAction)onViewDatabases:(id)sender {
+    [SafesMetaDataViewer show:NO]; // Debug: YES
+}
+
+- (IBAction)onViewDebugDatabasesList:(id)sender {
+    [SafesMetaDataViewer show:YES]; // Debug: YES
 }
 
 - (IBAction)onPreferences:(id)sender {

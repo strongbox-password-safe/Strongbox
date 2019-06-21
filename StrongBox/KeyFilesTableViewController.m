@@ -127,8 +127,10 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    self.onDone(NO, nil, nil);
-    [self.navigationController popViewControllerAnimated:YES];
+    if(!self.manageMode) {
+        self.onDone(NO, nil, nil);
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (IBAction)onAddKeyFile:(id)sender {
@@ -229,13 +231,23 @@
             return;
         }
         else {
-            self.onDone(YES, localUrl, nil);
-            [self.navigationController popViewControllerAnimated:YES];
+            if(!self.manageMode) {
+                self.onDone(YES, localUrl, nil);
+                [self.navigationController popViewControllerAnimated:YES];
+            }
+            else {
+                [self refresh];
+            }
         }
     }
     else {
-        self.onDone(YES, nil, data);
-        [self.navigationController popViewControllerAnimated:YES];
+        if(!self.manageMode) {
+            self.onDone(YES, nil, data);
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else {
+            [self refresh];
+        }
     }
 }
 
@@ -344,19 +356,24 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 0) {
-        self.onDone(YES, nil, nil);
+    if(!self.manageMode) {
+        if(indexPath.section == 0) {
+            self.onDone(YES, nil, nil);
+        }
+        else if(indexPath.section == 1) {
+            NSURL* url = self.keyFiles[indexPath.row];
+            self.onDone(YES, url, nil);
+        }
+        else if(indexPath.section == 2) {
+            NSURL* url = self.otherFiles[indexPath.row];
+            self.onDone(YES, url, nil);
+        }
+        
+        [self.navigationController popViewControllerAnimated:YES];
     }
-    else if(indexPath.section == 1) {
-        NSURL* url = self.keyFiles[indexPath.row];
-        self.onDone(YES, url, nil);
+    else {
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
-    else if(indexPath.section == 2) {
-        NSURL* url = self.otherFiles[indexPath.row];
-        self.onDone(YES, url, nil);
-    }
-    
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {

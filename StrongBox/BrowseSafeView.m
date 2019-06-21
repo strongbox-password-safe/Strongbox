@@ -28,6 +28,7 @@
 #import "SortOrderTableViewController.h"
 #import "BrowseItemTotpCell.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
+#import "DatabaseSearchAndSorter.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
@@ -446,24 +447,26 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+
     if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
         NSArray<Node*>* otps = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
             return obj.otpToken != nil;
         }];
         
-        self.searchResults = [self.viewModel.database searchNodes:otps
-                                                       searchText:searchController.searchBar.text
-                                                            scope:searchController.searchBar.selectedScopeButtonIndex
-                                                      dereference:Settings.sharedInstance.searchDereferencedFields
-                                            includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
-                                                includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+        self.searchResults = [searcher searchNodes:otps
+                                        searchText:searchController.searchBar.text
+                                             scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
+                                       dereference:Settings.sharedInstance.searchDereferencedFields
+                             includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
+                                 includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
     }
     else {
-        self.searchResults = [self.viewModel.database search:searchController.searchBar.text
-                                                       scope:searchController.searchBar.selectedScopeButtonIndex
-                                             dereference:Settings.sharedInstance.searchDereferencedFields
-                                   includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
-                                       includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+        self.searchResults = [searcher search:searchController.searchBar.text
+                                        scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
+                                  dereference:Settings.sharedInstance.searchDereferencedFields
+                        includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
+                            includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
     }
     
     [self.tableView reloadData];
@@ -483,6 +486,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
 
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+
     if(self.searchController.isActive || self.viewModel.metadata.browseViewType != kBrowseViewTypeTotpList) {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
@@ -496,7 +501,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil];
         }
         else {
-            NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];
+            NSString* subtitle = [searcher getBrowseItemSubtitle:node];
             NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
             flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
             
@@ -510,7 +515,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     else {
         BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
         
-        NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];
+        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
 
         cell.labelTitle.text = title;
         cell.labelUsername.text = subtitle;
@@ -689,7 +694,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         }
     }
     
-    return [self.viewModel.database sortItemsForBrowse:ret];
+    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+    return [searcher sortItemsForBrowse:ret];
 }
 
 - (void)refreshItems {

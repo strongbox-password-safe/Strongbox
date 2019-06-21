@@ -10,12 +10,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSInteger const kSearchScopeTitle;
-extern NSInteger const kSearchScopeUsername;
-extern NSInteger const kSearchScopePassword;
-extern NSInteger const kSearchScopeUrl;
-extern NSInteger const kSearchScopeAll;
-
 @interface DatabaseModel : NSObject
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
@@ -47,32 +41,6 @@ extern NSInteger const kSearchScopeAll;
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data;
-
-- (NSArray<Node*>*)search:(NSString *)searchText
-                    scope:(NSInteger)scope
-              dereference:(BOOL)dereference
-    includeKeePass1Backup:(BOOL)includeKeePass1Backup
-        includeRecycleBin:(BOOL)includeRecycleBin;
-
-- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
-                    searchText:(NSString *)searchText
-                         scope:(NSInteger)scope
-                   dereference:(BOOL)dereference
-         includeKeePass1Backup:(BOOL)includeKeePass1Backup
-             includeRecycleBin:(BOOL)includeRecycleBin;
-
-- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
-
-- (NSString *)getGroupPathDisplayString:(Node *)vm;
-- (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
-
-- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items;
-- (NSString*)getBrowseItemSubtitle:(Node*)node;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
@@ -109,6 +77,15 @@ extern NSInteger const kSearchScopeAll;
 
 @property (nullable, readonly) Node* keePass1BackupNode;
 
+- (NSString *)getGroupPathDisplayString:(Node *)vm;
+- (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
+
+- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
 @end
 

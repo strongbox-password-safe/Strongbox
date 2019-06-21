@@ -11,6 +11,8 @@
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "DatabaseModel.h"
+#import "Settings.h"
+#import "SafesMetaDataViewer.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
@@ -26,7 +28,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
     wizard.titleText = @"Please Enter the Master Credentials for this Database";
-    wizard.databaseFormat = kKeePass;
+    wizard.databaseFormat = kKeePass4;
     wizard.createSafeWizardMode = YES;
     
     NSModalResponse returnCode = [NSApp runModalForWindow:wizard.window];
@@ -60,6 +62,19 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             [document showWindows];
         }];
     }
+}
+
+- (void)openDocument:(id)sender {
+    if(self.documents.count == 0) {
+        [SafesMetaDataViewer show:NO];
+    }
+    else {
+        [self originalOpenDocument:sender];
+    }
+}
+
+- (void)originalOpenDocument:(id)sender {
+    return [super openDocument:sender];
 }
 
 @end

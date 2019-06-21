@@ -75,6 +75,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL concealEmptyProtectedFields;
 @property BOOL showCustomFieldsOnQuickViewPanel;
 
+//@property BOOL showDatabasesListAtStartup;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

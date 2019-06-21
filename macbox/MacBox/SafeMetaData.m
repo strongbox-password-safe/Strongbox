@@ -80,6 +80,7 @@ static NSString* kKeychainService = @"Strongbox";
     [encoder encodeObject:self.fileIdentifier forKey:@"fileIdentifier"];
     [encoder encodeInteger:self.storageProvider forKey:@"storageProvider"];
     [encoder encodeBool:self.isTouchIdEnabled forKey:@"isTouchIdEnabled"];
+    [encoder encodeBool:self.hasPromptedForTouchIdEnrol forKey:@"hasPromptedForTouchIdEnrol"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -90,6 +91,10 @@ static NSString* kKeychainService = @"Strongbox";
         self.fileIdentifier = [decoder decodeObjectForKey:@"fileIdentifier"];
         self.storageProvider = (int)[decoder decodeIntegerForKey:@"storageProvider"];
         self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
+        
+        if([decoder containsValueForKey:@"hasPromptedForTouchIdEnrol"]) {
+            self.hasPromptedForTouchIdEnrol = [decoder decodeBoolForKey:@"hasPromptedForTouchIdEnrol"];
+        }
     }
     
     return self;

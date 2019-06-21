@@ -24,6 +24,10 @@
 		4D004CEB21F4F7BE00E2B194 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
 		4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD021F4C26700E2B194 /* OTPAlgorithm.m */; };
 		4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
+		4D01BA2122BD24950044226F /* PinEntry.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D01BA2022BD24950044226F /* PinEntry.storyboard */; };
+		4D01BA2322BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D01BA2222BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard */; };
+		4D01BA2722BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */; };
+		4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */; };
 		4D036E462298243700AC892B /* SelectStringViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E442298243700AC892B /* SelectStringViewController.m */; };
 		4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D036E452298243700AC892B /* SelectStringViewController.xib */; };
 		4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E492298443100AC892B /* CloudSessionsTableViewController.m */; };
@@ -131,6 +135,9 @@
 		4D210F4E21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D210F4D21959A1D00B061B1 /* Kdb1DatabaseMetadata.m */; };
 		4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D210F4D21959A1D00B061B1 /* Kdb1DatabaseMetadata.m */; };
 		4D210F5121959F3300B061B1 /* Database-1.kdb in Resources */ = {isa = PBXBuildFile; fileRef = 4D210F5021959F3300B061B1 /* Database-1.kdb */; };
+		4D22AF0522BD949F00EB62FC /* CreateDatabaseOrSetCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D01BA2222BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard */; };
+		4D22AF0622BD94A500EB62FC /* PinEntry.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D01BA2022BD24950044226F /* PinEntry.storyboard */; };
+		4D22AF0722BD94B100EB62FC /* PasswordGenerationPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE2688F22A65CA100A1D158 /* PasswordGenerationPreferences.storyboard */; };
 		4D25673221E8B086006260B7 /* PinsConfigurationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25673121E8B086006260B7 /* PinsConfigurationController.m */; };
 		4D25674C21E8C65D006260B7 /* PinEntryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25674A21E8C65D006260B7 /* PinEntryController.m */; };
 		4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D25675021EBD094006260B7 /* LaunchScreen.storyboard */; };
@@ -228,8 +235,6 @@
 		4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */; };
 		4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
-		4D3DB9BA229ECBFB000D4742 /* PinEntry.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */; };
-		4D3DB9BB229ECBFB000D4742 /* PinEntry.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */; };
 		4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4D3E147C2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E147B2183049E00A41CA0 /* Kdbx4Serialization.m */; };
@@ -281,7 +286,6 @@
 		4D4767102179070A00C4358F /* GenericTextStringElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47670E2179070A00C4358F /* GenericTextStringElementHandler.m */; };
 		4D48C6ED22AD16F9002B502E /* ItemDetailsPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D48C6EC22AD16F9002B502E /* ItemDetailsPreferences.storyboard */; };
 		4D48C6F022AD186D002B502E /* ItemDetailsPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */; };
-		4D4ACAE322A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE222A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard */; };
 		4D4ACAE622A1275700D486B0 /* CASGTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4D4D6B57222EF3E80056514E /* RMStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D6AF6222EF3E80056514E /* RMStore.m */; };
@@ -501,7 +505,6 @@
 		4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C0217B376F00FE9DD9 /* Root.m */; };
 		4DC5B9C9217B47C500FE9DD9 /* GenericTextDateElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C8217B47C500FE9DD9 /* GenericTextDateElementHandler.m */; };
 		4DC5B9CA217B47C500FE9DD9 /* GenericTextDateElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C8217B47C500FE9DD9 /* GenericTextDateElementHandler.m */; };
-		4DC5C10622A51B5500E0F740 /* CreateDatabaseOrSetCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE222A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard */; };
 		4DC5C10722A51B7D00E0F740 /* CASGTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */; };
 		4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */; };
 		4DC66F3A229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */; };
@@ -675,6 +678,11 @@
 		4D004CE121F4F58300E2B194 /* Node+OtpToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Node+OtpToken.h"; path = "model/Node+OtpToken.h"; sourceTree = "<group>"; };
 		4D004CE221F4F58300E2B194 /* Node+OtpToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "Node+OtpToken.m"; path = "model/Node+OtpToken.m"; sourceTree = "<group>"; };
 		4D004CE521F4F67D00E2B194 /* OtpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OtpTests.m; path = StrongboxTests/OtpTests.m; sourceTree = "<group>"; };
+		4D01BA2022BD24950044226F /* PinEntry.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = PinEntry.storyboard; path = StrongBox/PinEntry.storyboard; sourceTree = "<group>"; };
+		4D01BA2222BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = CreateDatabaseOrSetCredentials.storyboard; path = StrongBox/CreateDatabaseOrSetCredentials.storyboard; sourceTree = "<group>"; };
+		4D01BA2522BD2A4F0044226F /* DatabaseSearchAndSorter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseSearchAndSorter.h; path = StrongBox/DatabaseSearchAndSorter.h; sourceTree = "<group>"; };
+		4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseSearchAndSorter.m; path = StrongBox/DatabaseSearchAndSorter.m; sourceTree = "<group>"; };
+		4D01BA2A22BD30160044226F /* SearchScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SearchScope.h; path = model/SearchScope.h; sourceTree = "<group>"; };
 		4D036E432298243700AC892B /* SelectStringViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectStringViewController.h; path = StrongBox/SelectStringViewController.h; sourceTree = "<group>"; };
 		4D036E442298243700AC892B /* SelectStringViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectStringViewController.m; path = StrongBox/SelectStringViewController.m; sourceTree = "<group>"; };
 		4D036E452298243700AC892B /* SelectStringViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SelectStringViewController.xib; path = StrongBox/SelectStringViewController.xib; sourceTree = "<group>"; };
@@ -896,7 +904,6 @@
 		4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PrivacyViewController.xib; path = StrongBox/PrivacyViewController.xib; sourceTree = "<group>"; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppleICloudOrLocalSafeFile.h; path = StrongBox/AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppleICloudOrLocalSafeFile.m; path = StrongBox/AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
-		4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PinEntry.storyboard; sourceTree = "<group>"; };
 		4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxSerializationCommon.m; path = model/keepass/KdbxSerializationCommon.m; sourceTree = SOURCE_ROOT; };
 		4D3E147A2183049E00A41CA0 /* Kdbx4Serialization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kdbx4Serialization.h; path = model/keepass/Kdbx4Serialization.h; sourceTree = SOURCE_ROOT; };
 		4D3E147B2183049E00A41CA0 /* Kdbx4Serialization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Kdbx4Serialization.m; path = model/keepass/Kdbx4Serialization.m; sourceTree = SOURCE_ROOT; };
@@ -952,10 +959,9 @@
 		4D47670A217905AB00C4358F /* Meta.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Meta.m; path = model/keepass/Meta.m; sourceTree = SOURCE_ROOT; };
 		4D47670D2179070A00C4358F /* GenericTextStringElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextStringElementHandler.h; path = model/keepass/GenericTextStringElementHandler.h; sourceTree = SOURCE_ROOT; };
 		4D47670E2179070A00C4358F /* GenericTextStringElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextStringElementHandler.m; path = model/keepass/GenericTextStringElementHandler.m; sourceTree = SOURCE_ROOT; };
-		4D48C6EC22AD16F9002B502E /* ItemDetailsPreferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ItemDetailsPreferences.storyboard; sourceTree = "<group>"; };
+		4D48C6EC22AD16F9002B502E /* ItemDetailsPreferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = ItemDetailsPreferences.storyboard; path = StrongBox/ItemDetailsPreferences.storyboard; sourceTree = "<group>"; };
 		4D48C6EE22AD186D002B502E /* ItemDetailsPreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ItemDetailsPreferencesViewController.h; path = StrongBox/ItemDetailsPreferencesViewController.h; sourceTree = "<group>"; };
 		4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ItemDetailsPreferencesViewController.m; path = StrongBox/ItemDetailsPreferencesViewController.m; sourceTree = "<group>"; };
-		4D4ACAE222A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CreateDatabaseOrSetCredentials.storyboard; sourceTree = "<group>"; };
 		4D4ACAE422A1275700D486B0 /* CASGTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CASGTableViewController.h; path = StrongBox/CASGTableViewController.h; sourceTree = "<group>"; };
 		4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CASGTableViewController.m; path = StrongBox/CASGTableViewController.m; sourceTree = "<group>"; };
 		4D4C49021EDEC0B900EB857D /* RecordView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecordView.h; path = StrongBox/RecordView.h; sourceTree = "<group>"; };
@@ -1026,7 +1032,7 @@
 		4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Kdb1Database.m; path = model/keepass/Kdb1Database.m; sourceTree = "<group>"; };
 		4D6FE2C62194469600EB9997 /* KdbDatabaseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbDatabaseTests.m; path = StrongboxTests/KdbDatabaseTests.m; sourceTree = "<group>"; };
 		4D6FE2C9219446B800EB9997 /* Database-twofish.kdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Database-twofish.kdb"; sourceTree = "<group>"; };
-		4D73231F22B13885003DB568 /* BrowseSortField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BrowseSortField.h; sourceTree = "<group>"; };
+		4D73231F22B13885003DB568 /* BrowseSortField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseSortField.h; path = model/BrowseSortField.h; sourceTree = "<group>"; };
 		4D74B927218C40B000FC369E /* V3Binary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = V3Binary.h; path = model/keepass/V3Binary.h; sourceTree = "<group>"; };
 		4D74B928218C40B000FC369E /* V3Binary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = V3Binary.m; path = model/keepass/V3Binary.m; sourceTree = "<group>"; };
 		4D74B92B218C438800FC369E /* V3BinariesList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = V3BinariesList.h; path = model/keepass/V3BinariesList.h; sourceTree = "<group>"; };
@@ -1063,7 +1069,7 @@
 		4D792A68222EF46A00250086 /* RMStoreTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMStoreTransaction.h; sourceTree = "<group>"; };
 		4D7C21D12180EAC200458A5B /* funky.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = funky.xml; sourceTree = "<group>"; };
 		4D7D2191229FD15800C1C925 /* BrowseItemSubtitleField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseItemSubtitleField.h; path = StrongBox/BrowseItemSubtitleField.h; sourceTree = "<group>"; };
-		4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SelectItem.storyboard; sourceTree = "<group>"; };
+		4D7D2192229FD9DE00C1C925 /* SelectItem.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = SelectItem.storyboard; path = StrongBox/SelectItem.storyboard; sourceTree = "<group>"; };
 		4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectItemTableViewController.h; path = StrongBox/SelectItemTableViewController.h; sourceTree = "<group>"; };
 		4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectItemTableViewController.m; path = StrongBox/SelectItemTableViewController.m; sourceTree = "<group>"; };
 		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
@@ -1255,8 +1261,8 @@
 		4D98344921777E3000731FFC /* password-two-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-two-entries-ladder.xml"; sourceTree = "<group>"; };
 		4D9A6B9C21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DiceWarePasswordGeneratorTests.m; path = StrongboxTests/DiceWarePasswordGeneratorTests.m; sourceTree = "<group>"; };
 		4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = SelectKeyFile.storyboard; path = StrongBox/SelectKeyFile.storyboard; sourceTree = "<group>"; };
-		4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StaticDataTableViewController.m; sourceTree = "<group>"; };
-		4D9AC55522A153F900449F3F /* StaticDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StaticDataTableViewController.h; sourceTree = "<group>"; };
+		4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StaticDataTableViewController.m; path = StrongBox/StaticDataTableViewController.m; sourceTree = "<group>"; };
+		4D9AC55522A153F900449F3F /* StaticDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StaticDataTableViewController.h; path = StrongBox/StaticDataTableViewController.h; sourceTree = "<group>"; };
 		4D9E08E421822F5C007BA1E7 /* AesCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesCipher.h; path = model/keepass/AesCipher.h; sourceTree = SOURCE_ROOT; };
 		4D9E08E521822F5C007BA1E7 /* AesCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesCipher.m; path = model/keepass/AesCipher.m; sourceTree = SOURCE_ROOT; };
 		4D9E08EE21824CBF007BA1E7 /* Kdbx4Database.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kdbx4Database.h; path = model/keepass/Kdbx4Database.h; sourceTree = SOURCE_ROOT; };
@@ -1319,9 +1325,9 @@
 		4DB1B7DB2188B5C900CF1663 /* KeePass4DatabaseMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePass4DatabaseMetadata.m; path = model/keepass/KeePass4DatabaseMetadata.m; sourceTree = "<group>"; };
 		4DB573FE2274913E001BB13C /* ItemMetadataEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItemMetadataEntry.h; sourceTree = "<group>"; };
 		4DB573FF2274913E001BB13C /* ItemMetadataEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ItemMetadataEntry.m; sourceTree = "<group>"; };
-		4DB7D51E229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdvancedPreferencesTableViewController.h; sourceTree = "<group>"; };
-		4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdvancedPreferencesTableViewController.m; sourceTree = "<group>"; };
-		4DBA027E22A3EDBE00BAC858 /* DatabaseOperations.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DatabaseOperations.storyboard; sourceTree = "<group>"; };
+		4DB7D51E229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AdvancedPreferencesTableViewController.h; path = StrongBox/AdvancedPreferencesTableViewController.h; sourceTree = "<group>"; };
+		4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AdvancedPreferencesTableViewController.m; path = StrongBox/AdvancedPreferencesTableViewController.m; sourceTree = "<group>"; };
+		4DBA027E22A3EDBE00BAC858 /* DatabaseOperations.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = DatabaseOperations.storyboard; path = StrongBox/DatabaseOperations.storyboard; sourceTree = "<group>"; };
 		4DBC7A482279DC1600CA534D /* CollapsibleTableViewHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CollapsibleTableViewHeader.h; path = StrongBox/CollapsibleTableViewHeader.h; sourceTree = "<group>"; };
 		4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CollapsibleTableViewHeader.m; path = StrongBox/CollapsibleTableViewHeader.m; sourceTree = "<group>"; };
 		4DBE5B311C8356C700C310BC /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1333,10 +1339,10 @@
 		4DC5B9C0217B376F00FE9DD9 /* Root.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Root.m; path = model/keepass/Root.m; sourceTree = SOURCE_ROOT; };
 		4DC5B9C7217B47C500FE9DD9 /* GenericTextDateElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextDateElementHandler.h; path = model/keepass/GenericTextDateElementHandler.h; sourceTree = SOURCE_ROOT; };
 		4DC5B9C8217B47C500FE9DD9 /* GenericTextDateElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextDateElementHandler.m; path = model/keepass/GenericTextDateElementHandler.m; sourceTree = SOURCE_ROOT; };
-		4DC66F37229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TPKeyboardAvoidingScrollView.h; sourceTree = "<group>"; };
-		4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TPKeyboardAvoidingScrollView.m; sourceTree = "<group>"; };
-		4DC66F3B229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+TPKeyboardAvoidingAdditions.h"; sourceTree = "<group>"; };
-		4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+TPKeyboardAvoidingAdditions.m"; sourceTree = "<group>"; };
+		4DC66F37229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TPKeyboardAvoidingScrollView.h; path = lib/TPKeyboardAvoidingScrollView/TPKeyboardAvoidingScrollView.h; sourceTree = "<group>"; };
+		4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TPKeyboardAvoidingScrollView.m; path = lib/TPKeyboardAvoidingScrollView/TPKeyboardAvoidingScrollView.m; sourceTree = "<group>"; };
+		4DC66F3B229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIScrollView+TPKeyboardAvoidingAdditions.h"; path = "lib/TPKeyboardAvoidingScrollView/UIScrollView+TPKeyboardAvoidingAdditions.h"; sourceTree = "<group>"; };
+		4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIScrollView+TPKeyboardAvoidingAdditions.m"; path = "lib/TPKeyboardAvoidingScrollView/UIScrollView+TPKeyboardAvoidingAdditions.m"; sourceTree = "<group>"; };
 		4DC74103221066E1009C32F0 /* UpgradeTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UpgradeTableViewController.h; path = StrongBox/UpgradeTableViewController.h; sourceTree = "<group>"; };
 		4DC74104221066E1009C32F0 /* UpgradeTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UpgradeTableViewController.m; path = StrongBox/UpgradeTableViewController.m; sourceTree = "<group>"; };
 		4DC8D9A521B6E444004F1812 /* KeyFileParsingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyFileParsingTests.m; path = StrongboxTests/KeyFileParsingTests.m; sourceTree = "<group>"; };
@@ -1374,13 +1380,13 @@
 		4DE0CB692232AF4300E109F9 /* GenericTextIntegerElementHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericTextIntegerElementHandler.m; path = model/keepass/GenericTextIntegerElementHandler.m; sourceTree = "<group>"; };
 		4DE229A01ED8A102000FDC3D /* DropboxV2StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DropboxV2StorageProvider.h; path = StrongBox/DropboxV2StorageProvider.h; sourceTree = "<group>"; };
 		4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DropboxV2StorageProvider.m; path = StrongBox/DropboxV2StorageProvider.m; sourceTree = "<group>"; };
-		4DE2688C22A659DE00A1D158 /* PasswordSafeHistory.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PasswordSafeHistory.storyboard; sourceTree = "<group>"; };
-		4DE2688F22A65CA100A1D158 /* PasswordGenerationPreferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PasswordGenerationPreferences.storyboard; sourceTree = "<group>"; };
+		4DE2688C22A659DE00A1D158 /* PasswordSafeHistory.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = PasswordSafeHistory.storyboard; path = StrongBox/PasswordSafeHistory.storyboard; sourceTree = "<group>"; };
+		4DE2688F22A65CA100A1D158 /* PasswordGenerationPreferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = PasswordGenerationPreferences.storyboard; path = StrongBox/PasswordGenerationPreferences.storyboard; sourceTree = "<group>"; };
 		4DE2689122A6602500A1D158 /* Preferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Preferences.storyboard; path = StrongBox/Preferences.storyboard; sourceTree = "<group>"; };
 		4DE2689422A6637500A1D158 /* KeePassHistory.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = KeePassHistory.storyboard; path = StrongBox/KeePassHistory.storyboard; sourceTree = "<group>"; };
-		4DE2689622A665A400A1D158 /* RecordView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = RecordView.storyboard; sourceTree = "<group>"; };
-		4DE2689822A668A100A1D158 /* ItemDetails.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ItemDetails.storyboard; sourceTree = "<group>"; };
-		4DE2689A22A669F400A1D158 /* MasterDetail.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MasterDetail.storyboard; sourceTree = "<group>"; };
+		4DE2689622A665A400A1D158 /* RecordView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = RecordView.storyboard; path = StrongBox/RecordView.storyboard; sourceTree = "<group>"; };
+		4DE2689822A668A100A1D158 /* ItemDetails.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = ItemDetails.storyboard; path = StrongBox/ItemDetails.storyboard; sourceTree = "<group>"; };
+		4DE2689A22A669F400A1D158 /* MasterDetail.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = MasterDetail.storyboard; path = StrongBox/MasterDetail.storyboard; sourceTree = "<group>"; };
 		4DE2689C22A66A6A00A1D158 /* Browse.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Browse.storyboard; path = StrongBox/Browse.storyboard; sourceTree = "<group>"; };
 		4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MasterDetailViewController.h; path = StrongBox/MasterDetailViewController.h; sourceTree = "<group>"; };
 		4DE2689F22A67A6200A1D158 /* MasterDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MasterDetailViewController.m; path = StrongBox/MasterDetailViewController.m; sourceTree = "<group>"; };
@@ -1405,8 +1411,8 @@
 		4DED20C22168AC9A00A5800A /* InitialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InitialViewController.m; path = StrongBox/InitialViewController.m; sourceTree = "<group>"; };
 		4DED20C42168B63200A5800A /* QuickLaunchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickLaunchViewController.h; path = StrongBox/QuickLaunchViewController.h; sourceTree = "<group>"; };
 		4DED20C52168B63200A5800A /* QuickLaunchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickLaunchViewController.m; path = StrongBox/QuickLaunchViewController.m; sourceTree = "<group>"; };
-		4DEDF7D922AA7F9800EFA5C9 /* ProExplanationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProExplanationViewController.h; sourceTree = "<group>"; };
-		4DEDF7DA22AA7F9800EFA5C9 /* ProExplanationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProExplanationViewController.m; sourceTree = "<group>"; };
+		4DEDF7D922AA7F9800EFA5C9 /* ProExplanationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProExplanationViewController.h; path = StrongBox/ProExplanationViewController.h; sourceTree = "<group>"; };
+		4DEDF7DA22AA7F9800EFA5C9 /* ProExplanationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProExplanationViewController.m; path = StrongBox/ProExplanationViewController.m; sourceTree = "<group>"; };
 		4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetector.h; path = StrongBox/OfflineDetector.h; sourceTree = "<group>"; };
 		4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OfflineDetector.m; path = StrongBox/OfflineDetector.m; sourceTree = "<group>"; };
 		4DF14F682250F69000B6AF25 /* QuickTypeRecordIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickTypeRecordIdentifier.h; path = "StrongBox Auto Fill/QuickTypeRecordIdentifier.h"; sourceTree = "<group>"; };
@@ -1681,7 +1687,7 @@
 		4D114096229D5EE200DEECF3 /* CASG */ = {
 			isa = PBXGroup;
 			children = (
-				4D4ACAE222A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard */,
+				4D01BA2222BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard */,
 				4D4ACAE422A1275700D486B0 /* CASGTableViewController.h */,
 				4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */,
 				4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */,
@@ -1734,9 +1740,9 @@
 		4D20E7A72299593E00ABFC89 /* PIN Code */ = {
 			isa = PBXGroup;
 			children = (
+				4D01BA2022BD24950044226F /* PinEntry.storyboard */,
 				4D25674921E8C65D006260B7 /* PinEntryController.h */,
 				4D25674A21E8C65D006260B7 /* PinEntryController.m */,
-				4D3DB9B9229ECBFB000D4742 /* PinEntry.storyboard */,
 			);
 			name = "PIN Code";
 			sourceTree = "<group>";
@@ -2212,6 +2218,9 @@
 				4D876B4221AC36F800805DED /* CustomField.m */,
 				4D004CE121F4F58300E2B194 /* Node+OtpToken.h */,
 				4D004CE221F4F58300E2B194 /* Node+OtpToken.m */,
+				4D01BA2522BD2A4F0044226F /* DatabaseSearchAndSorter.h */,
+				4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */,
+				4D01BA2A22BD30160044226F /* SearchScope.h */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -3156,7 +3165,6 @@
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */,
-				4D3DB9BA229ECBFB000D4742 /* PinEntry.storyboard in Resources */,
 				4D9597BB22A28FB7008DB224 /* SelectStorage.storyboard in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
@@ -3171,6 +3179,7 @@
 				4D9AC55222A1390A00449F3F /* SelectKeyFile.storyboard in Resources */,
 				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
+				4D01BA2122BD24950044226F /* PinEntry.storyboard in Resources */,
 				4DE2689222A6602500A1D158 /* Preferences.storyboard in Resources */,
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4DE2689522A6637500A1D158 /* KeePassHistory.storyboard in Resources */,
@@ -3180,7 +3189,6 @@
 				4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */,
 				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D12085122A79F6200139570 /* Welcome.storyboard in Resources */,
-				4D4ACAE322A1246C00D486B0 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4DAE98A62270B4E200A811C4 /* IconTableCell.xib in Resources */,
 				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D0835EF22847BD100CA7405 /* eff_short_wordlist_1.txt in Resources */,
@@ -3200,6 +3208,7 @@
 				4D0835ED22847BD100CA7405 /* diceware.wordlist.txt in Resources */,
 				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
 				4D48C6ED22AD16F9002B502E /* ItemDetailsPreferences.storyboard in Resources */,
+				4D01BA2322BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
 				4DAE98B42270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 			);
@@ -3212,6 +3221,7 @@
 				4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4D8EC42E22302649008EE004 /* LICENSE in Resources */,
 				4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
+				4D22AF0622BD94A500EB62FC /* PinEntry.storyboard in Resources */,
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
 				4D25675221EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,
@@ -3221,16 +3231,16 @@
 				4D9AC55322A13C4000449F3F /* SelectKeyFile.storyboard in Resources */,
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
+				4D22AF0522BD949F00EB62FC /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
-				4D3DB9BB229ECBFB000D4742 /* PinEntry.storyboard in Resources */,
 				4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
+				4D22AF0722BD94B100EB62FC /* PasswordGenerationPreferences.storyboard in Resources */,
 				4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4D9A6BAD21FF746500F003B2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
-				4DC5C10622A51B5500E0F740 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D0835CE228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */,
@@ -3657,6 +3667,7 @@
 				4D2F6C3421807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D2F6C1D21807C25007931E4 /* XMLWriter.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
+				4D01BA2722BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4DF97F2B21BF10EB0090A55E /* NSDateRFC1123.m in Sources */,
 				4D0835C12284748200CA7405 /* SFTPProviderData.m in Sources */,
 				4D9597B922A28825008DB224 /* SelectedStorageParameters.m in Sources */,
@@ -3711,6 +3722,7 @@
 				4D3E1485218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D2F6C2721807C53007931E4 /* XmlItem.m in Sources */,
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
+				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				4D33FA3922872008006C31B2 /* ItemDetailsViewController.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,

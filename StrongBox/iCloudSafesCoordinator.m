@@ -425,7 +425,9 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSMutableDictionary<NSString*, AppleICloudOrLocalSafeFile*>* ret = [NSMutableDictionary dictionary];
     
     for(AppleICloudOrLocalSafeFile *item in files) {
-        [ret setObject:item forKey:[item.fileUrl lastPathComponent]];
+        if(item.fileUrl && item.fileUrl.lastPathComponent) { // There was a crash here somehow... so protect against
+            [ret setObject:item forKey:item.fileUrl.lastPathComponent];
+        }
     }
     
     return ret;

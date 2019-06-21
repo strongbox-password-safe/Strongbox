@@ -14,6 +14,7 @@
 #import "Settings.h"
 #import "BrowseItemCell.h"
 #import "Utils.h"
+#import "DatabaseSearchAndSorter.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -74,8 +75,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
     
-    
-    NSString* subtitle = [self.viewModel.database getBrowseItemSubtitle:node];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+    NSString* subtitle = [searcher getBrowseItemSubtitle:node];
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
 

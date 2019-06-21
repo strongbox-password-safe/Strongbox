@@ -59,8 +59,6 @@
 
 @property (weak) IBOutlet NSTextField *textFieldSummaryTitle;
 
-- (void)onDetailsWindowClosed:(id)wc;
-
 // Used by Node Details too...
 
 void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window);
