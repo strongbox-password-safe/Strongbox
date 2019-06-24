@@ -7,7 +7,7 @@
 //
 
 #import "BrowsePreferencesTableViewController.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "SafesList.h"
@@ -35,6 +35,16 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAs;
 @property (weak, nonatomic) IBOutlet UILabel *labelViewAs;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSingleTapAction;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDoubleTapAction;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellTripleTapAction;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellLongPressAction;
+@property (weak, nonatomic) IBOutlet UILabel *labelSingleTapAction;
+@property (weak, nonatomic) IBOutlet UILabel *labelDoubleTapAction;
+@property (weak, nonatomic) IBOutlet UILabel *labelTripleTapAction;
+@property (weak, nonatomic) IBOutlet UILabel *labelLongPressAction;
+
+
 @end
 
 @implementation BrowsePreferencesTableViewController
@@ -42,7 +52,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self bindGenericPreferencesChanged];
+    [self bindPreferences];
     
     [self bindTableviewToFormat];
 }
@@ -60,40 +70,83 @@
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
     
-    Settings.sharedInstance.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
-    Settings.sharedInstance.showFlagsInBrowse = self.showFlagsInBrowse.on;
-    Settings.sharedInstance.immediateSearchOnBrowse = self.switchStartWithSearch.on;
+    self.databaseMetaData.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
+    self.databaseMetaData.showFlagsInBrowse = self.showFlagsInBrowse.on;
+    self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
     
-    Settings.sharedInstance.viewDereferencedFields = self.switchViewDereferenced.on;
-    Settings.sharedInstance.searchDereferencedFields = self.switchSearchDereferenced.on;
-    Settings.sharedInstance.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
-    Settings.sharedInstance.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
+    self.databaseMetaData.viewDereferencedFields = self.switchViewDereferenced.on;
+    self.databaseMetaData.searchDereferencedFields = self.switchSearchDereferenced.on;
+    self.databaseMetaData.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
+    self.databaseMetaData.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
 
-    Settings.sharedInstance.hideTotpInBrowse = !self.switchShowTotpBrowseView.on;
-    Settings.sharedInstance.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
-
-    [self bindGenericPreferencesChanged];
+    self.databaseMetaData.hideTotpInBrowse = !self.switchShowTotpBrowseView.on;
+    self.databaseMetaData.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
+    [SafesList.sharedInstance update:self.databaseMetaData];
+    
+    [self bindPreferences];
     self.onPreferencesChanged();
 }
 
-- (void)bindGenericPreferencesChanged {
-    self.showChildCountOnFolder.on = Settings.sharedInstance.showChildCountOnFolderInBrowse;
-    self.showFlagsInBrowse.on = Settings.sharedInstance.showFlagsInBrowse;
-    self.switchStartWithSearch.on = Settings.sharedInstance.immediateSearchOnBrowse;
+- (void)bindPreferences {
+    self.showChildCountOnFolder.on = self.databaseMetaData.showChildCountOnFolderInBrowse;
+    self.showFlagsInBrowse.on = self.databaseMetaData.showFlagsInBrowse;
+    self.switchStartWithSearch.on = self.databaseMetaData.immediateSearchOnBrowse;
     
-    self.switchViewDereferenced.on = Settings.sharedInstance.viewDereferencedFields;
-    self.switchSearchDereferenced.on = Settings.sharedInstance.searchDereferencedFields;
-    self.switchShowKeePass1BackupFolder.on = Settings.sharedInstance.showKeePass1BackupGroup;
-    self.switchShowRecycleBinInSearch.on = Settings.sharedInstance.showRecycleBinInSearchResults;
+    self.switchViewDereferenced.on = self.databaseMetaData.viewDereferencedFields;
+    self.switchSearchDereferenced.on = self.databaseMetaData.searchDereferencedFields;
+    self.switchShowKeePass1BackupFolder.on = self.databaseMetaData.showKeePass1BackupGroup;
+    self.switchShowRecycleBinInSearch.on = self.databaseMetaData.showRecycleBinInSearchResults;
     
-    BrowseItemSubtitleField current = Settings.sharedInstance.browseItemSubtitleField;
+    BrowseItemSubtitleField current = self.databaseMetaData.browseItemSubtitleField;
     BrowseItemSubtitleField effective = (current == kBrowseItemSubtitleEmail && self.format != kPasswordSafe) ? kBrowseItemSubtitleNoField : current;
     self.labelBrowseItemSubtitle.text = [self getBrowseItemSubtitleFieldName:effective];
     
-    self.switchShowTotpBrowseView.on = !Settings.sharedInstance.hideTotpInBrowse;
-    self.switchShowRecycleBinInBrowse.on = !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
+    self.switchShowTotpBrowseView.on = !self.databaseMetaData.hideTotpInBrowse;
+    self.switchShowRecycleBinInBrowse.on = !self.databaseMetaData.doNotShowRecycleBinInBrowse;
 
     self.labelViewAs.text = [self getBrowseViewTypeName:self.databaseMetaData.browseViewType];
+    
+    // Tap Actions
+    
+    self.labelSingleTapAction.text = [self getTapActionString:(self.databaseMetaData.tapAction)];
+    self.labelDoubleTapAction.text = [self getTapActionString:(self.databaseMetaData.doubleTapAction)];
+    self.labelTripleTapAction.text = [self getTapActionString:(self.databaseMetaData.tripleTapAction)];
+    self.labelLongPressAction.text = [self getTapActionString:(self.databaseMetaData.longPressTapAction)];
+}
+
+- (NSString*)getTapActionString:(BrowseTapAction)action {
+    switch (action) {
+        case kBrowseTapActionNone:
+            return @"No Action";
+            break;
+        case kBrowseTapActionOpenDetails:
+            return @"View Item Details";
+            break;
+        case kBrowseTapActionCopyTitle:
+            return @"Copy Title";
+            break;
+        case kBrowseTapActionCopyUsername:
+            return @"Copy Username";
+            break;
+        case kBrowseTapActionCopyPassword:
+            return @"Copy Password";
+            break;
+        case kBrowseTapActionCopyUrl:
+            return @"Copy URL";
+            break;
+        case kBrowseTapActionCopyEmail:
+            return @"Copy Email";
+            break;
+        case kBrowseTapActionCopyNotes:
+            return @"Copy Notes";
+            break;
+        case kBrowseTapActionCopyTotp:
+            return @"Copy TOTP";
+            break;
+        default:
+            return @"Unknown";
+            break;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -107,6 +160,83 @@
     else if (cell == self.cellViewAs) {
         [self onChangeViewType];
     }
+    else if (cell == self.cellSingleTapAction || cell == self.cellDoubleTapAction || cell == self.cellTripleTapAction || cell == self.cellLongPressAction) {
+        [self onChangeTapAction:cell];
+    }
+
+}
+
+- (void)onChangeTapAction:(UITableViewCell*)cell {
+    NSArray<NSNumber*>* options = self.format == kPasswordSafe ? @[@(kBrowseTapActionNone),
+                                    @(kBrowseTapActionOpenDetails),
+                                    @(kBrowseTapActionCopyTitle),
+                                    @(kBrowseTapActionCopyUsername),
+                                    @(kBrowseTapActionCopyPassword),
+                                    @(kBrowseTapActionCopyUrl),
+                                    @(kBrowseTapActionCopyEmail),
+                                    @(kBrowseTapActionCopyNotes),
+                                    @(kBrowseTapActionCopyTotp)]
+                                                    :
+                                    @[@(kBrowseTapActionNone),
+                                      @(kBrowseTapActionOpenDetails),
+                                      @(kBrowseTapActionCopyTitle),
+                                      @(kBrowseTapActionCopyUsername),
+                                      @(kBrowseTapActionCopyPassword),
+                                      @(kBrowseTapActionCopyUrl),
+                                      @(kBrowseTapActionCopyNotes),
+                                      @(kBrowseTapActionCopyTotp)];
+    
+    NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return [self getTapActionString:(BrowseTapAction)obj.integerValue];
+    }];
+    
+    BrowseTapAction current;
+    NSString* title;
+    if(cell == self.cellSingleTapAction) {
+        current = self.databaseMetaData.tapAction;
+        title = @"Single Tap Action";
+    }
+    else if(cell == self.cellDoubleTapAction) {
+        current = self.databaseMetaData.doubleTapAction;
+        title = @"Double Tap Action";
+    }
+    else if(cell == self.cellTripleTapAction) {
+        current = self.databaseMetaData.tripleTapAction;
+        title = @"Triple Tap Action";
+    }
+    else {
+        current = self.databaseMetaData.longPressTapAction;
+        title = @"Long Press Action";
+    }
+    
+    NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.integerValue == current;
+    }];
+    
+    [self promptForString:title
+                  options:optionStrings
+             currentIndex:currentIndex
+               completion:^(BOOL success, NSInteger selectedIdx) {
+                   if (success) {
+                       if(cell == self.cellSingleTapAction) {
+                           self.databaseMetaData.tapAction = (BrowseTapAction)options[selectedIdx].integerValue;
+                       }
+                       else if(cell == self.cellDoubleTapAction) {
+                           self.databaseMetaData.doubleTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
+                       }
+                       else if(cell == self.cellTripleTapAction) {
+                           self.databaseMetaData.tripleTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
+                       }
+                       else {
+                           self.databaseMetaData.longPressTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
+                       }
+                       
+                       [SafesList.sharedInstance update:self.databaseMetaData];
+                   }
+                   
+                   [self bindPreferences];
+                   self.onPreferencesChanged();
+               }];
 }
 
 - (void)onChangeViewType {
@@ -124,7 +254,8 @@
         return obj.integerValue == current;
     }];
     
-    [self promptForString:optionStrings
+    [self promptForString:@"View As"
+                  options:optionStrings
              currentIndex:currentIndex
                completion:^(BOOL success, NSInteger selectedIdx) {
                    if (success) {
@@ -132,7 +263,7 @@
                        [SafesList.sharedInstance update:self.databaseMetaData];
                    }
                    
-                   [self bindGenericPreferencesChanged];
+                   [self bindPreferences];
                    self.onPreferencesChanged();
                }];
 }
@@ -177,7 +308,7 @@
         return [self getBrowseItemSubtitleFieldName:(BrowseItemSubtitleField)obj.integerValue];
     }];
     
-    BrowseItemSubtitleField current = Settings.sharedInstance.browseItemSubtitleField;
+    BrowseItemSubtitleField current = self.databaseMetaData.browseItemSubtitleField;
     if(current == kBrowseItemSubtitleEmail && self.format != kPasswordSafe) {
         current = kBrowseItemSubtitleNoField;
     }
@@ -186,14 +317,15 @@
         return obj.integerValue == current;
     }];
     
-    [self promptForString:optionStrings
+    [self promptForString:@"Item Subtitle"
+                  options:optionStrings
              currentIndex:currentIndex
                completion:^(BOOL success, NSInteger selectedIdx) {
                    if (success) {
-                       Settings.sharedInstance.browseItemSubtitleField = (BrowseItemSubtitleField)options[selectedIdx].integerValue;
+                       self.databaseMetaData.browseItemSubtitleField = (BrowseItemSubtitleField)options[selectedIdx].integerValue;
                    }
                    
-                   [self bindGenericPreferencesChanged];
+                   [self bindPreferences];
                    self.onPreferencesChanged();
                }];
 }
@@ -229,7 +361,8 @@
     }
 }
 
-- (void)promptForString:(NSArray<NSString*>*)options
+- (void)promptForString:(NSString*)title
+                options:(NSArray<NSString*>*)options
            currentIndex:(NSInteger)currentIndex
              completion:(void(^)(BOOL success, NSInteger selectedIdx))completion {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
@@ -242,7 +375,7 @@
         [self.navigationController popViewControllerAnimated:YES];
         completion(success, selectedIndex);
     };
-    vc.title = @"Item Subtitle";
+    vc.title = title;
     
     [self.navigationController pushViewController:vc animated:YES];
 }

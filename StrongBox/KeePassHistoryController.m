@@ -72,16 +72,16 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 
-    NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+    NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
     
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
     NSString* subtitle = [searcher getBrowseItemSubtitle:node];
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
 
     NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
-    flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+    flags = self.viewModel.metadata.showFlagsInBrowse ? flags : @"";
     
     [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
     

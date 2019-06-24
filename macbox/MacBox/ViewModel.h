@@ -61,7 +61,7 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
 
-- (void)setTotp:(Node *)item otp:(NSString *)otp;
+- (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
 
 - (BOOL)addNewRecord:(Node *)parentGroup;

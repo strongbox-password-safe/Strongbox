@@ -498,6 +498,7 @@
 		4DB1B7DD2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7DB2188B5C900CF1663 /* KeePass4DatabaseMetadata.m */; };
 		4DB574002274913E001BB13C /* ItemMetadataEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB573FF2274913E001BB13C /* ItemMetadataEntry.m */; };
 		4DB7D520229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */; };
+		4DB93DE722C177DC0019F481 /* ExportOptionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB93DE622C177DC0019F481 /* ExportOptionsTableViewController.m */; };
 		4DBA027F22A3EDBE00BAC858 /* DatabaseOperations.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DBA027E22A3EDBE00BAC858 /* DatabaseOperations.storyboard */; };
 		4DBC7A4A2279DC1600CA534D /* CollapsibleTableViewHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */; };
 		4DC5B9BE217B31F100FE9DD9 /* CommonTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9BD217B31F100FE9DD9 /* CommonTesting.m */; };
@@ -1017,6 +1018,7 @@
 		4D5F5B95218B828500A0739A /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = iCloudSafesCoordinator.h; path = StrongBox/iCloudSafesCoordinator.h; sourceTree = "<group>"; };
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = iCloudSafesCoordinator.m; path = StrongBox/iCloudSafesCoordinator.m; sourceTree = "<group>"; };
+		4D63F97922BEB632002D1E26 /* BrowseTapAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BrowseTapAction.h; sourceTree = "<group>"; };
 		4D664DB22179C53B0023FF0C /* XmlTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = XmlTree.h; path = model/keepass/XmlTree.h; sourceTree = SOURCE_ROOT; };
 		4D664DB32179C53B0023FF0C /* XmlTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = XmlTree.m; path = model/keepass/XmlTree.m; sourceTree = SOURCE_ROOT; };
 		4D67B1DF2191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectDatabaseFormatTableViewController.h; path = StrongBox/SelectDatabaseFormatTableViewController.h; sourceTree = "<group>"; };
@@ -1327,6 +1329,8 @@
 		4DB573FF2274913E001BB13C /* ItemMetadataEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ItemMetadataEntry.m; sourceTree = "<group>"; };
 		4DB7D51E229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AdvancedPreferencesTableViewController.h; path = StrongBox/AdvancedPreferencesTableViewController.h; sourceTree = "<group>"; };
 		4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AdvancedPreferencesTableViewController.m; path = StrongBox/AdvancedPreferencesTableViewController.m; sourceTree = "<group>"; };
+		4DB93DE522C177DC0019F481 /* ExportOptionsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExportOptionsTableViewController.h; sourceTree = "<group>"; };
+		4DB93DE622C177DC0019F481 /* ExportOptionsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExportOptionsTableViewController.m; sourceTree = "<group>"; };
 		4DBA027E22A3EDBE00BAC858 /* DatabaseOperations.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = DatabaseOperations.storyboard; path = StrongBox/DatabaseOperations.storyboard; sourceTree = "<group>"; };
 		4DBC7A482279DC1600CA534D /* CollapsibleTableViewHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CollapsibleTableViewHeader.h; path = StrongBox/CollapsibleTableViewHeader.h; sourceTree = "<group>"; };
 		4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CollapsibleTableViewHeader.m; path = StrongBox/CollapsibleTableViewHeader.m; sourceTree = "<group>"; };
@@ -1578,6 +1582,7 @@
 				4D556F2B22B8328F00E16027 /* BrowseItemTotpCell.xib */,
 				4D556F2D22B832EB00E16027 /* BrowseItemTotpCell.h */,
 				4D556F2E22B832EB00E16027 /* BrowseItemTotpCell.m */,
+				4D63F97922BEB632002D1E26 /* BrowseTapAction.h */,
 			);
 			name = Browse;
 			sourceTree = "<group>";
@@ -2702,6 +2707,8 @@
 				4D6C51961F6407580035640E /* SafeDetailsView.h */,
 				4D6C51971F6407580035640E /* SafeDetailsView.m */,
 				4DBA027E22A3EDBE00BAC858 /* DatabaseOperations.storyboard */,
+				4DB93DE522C177DC0019F481 /* ExportOptionsTableViewController.h */,
+				4DB93DE622C177DC0019F481 /* ExportOptionsTableViewController.m */,
 			);
 			name = "Database Management";
 			sourceTree = "<group>";
@@ -3655,6 +3662,7 @@
 				4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4D4ACAE622A1275700D486B0 /* CASGTableViewController.m in Sources */,
+				4DB93DE722C177DC0019F481 /* ExportOptionsTableViewController.m in Sources */,
 				4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */,
 				4D876B4321AC36F800805DED /* CustomField.m in Sources */,
 				4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,

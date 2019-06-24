@@ -90,7 +90,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     // Filter KeePass1 Backup Group if so configured...
     
-    if(!Settings.sharedInstance.showKeePass1BackupGroup) {
+    if(!self.model.metadata.showKeePass1BackupGroup) {
         if (self.model.database.format == kKeePass1) {
             Node* backupGroup = self.model.database.keePass1BackupNode;
             
@@ -138,7 +138,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         self.timerRefreshOtp = nil;
     }
     
-    if(!Settings.sharedInstance.hideTotpInBrowse) {
+    if(!self.model.metadata.hideTotpInBrowse) {
         self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
         [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
     }
@@ -163,11 +163,11 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     NSString *searchString = searchController.searchBar.text;
     
-    [self filterContentForSearchText:searchString scope:searchController.searchBar.selectedScopeButtonIndex];
+    [self filterContentForSearchText:searchString scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex];
     [self.tableView reloadData];
 }
 
-- (void)filterContentForSearchText:(NSString *)searchText scope:(NSInteger)scope {
+- (void)filterContentForSearchText:(NSString *)searchText scope:(SearchScope)scope {
     if(!searchText.length) {
         self.searchResults = self.items;
         return;
@@ -252,14 +252,14 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     [self.searchController.searchBar setText:searchTerm];
 }
 
-- (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(NSInteger)scope {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database];
+- (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
     
     return [searcher search:searchText
                       scope:scope
-                dereference:Settings.sharedInstance.searchDereferencedFields
-      includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
-          includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+                dereference:self.model.metadata.searchDereferencedFields
+      includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
+          includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -287,23 +287,23 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     Node *node = [self getDataSource][indexPath.row];
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
     
-    NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+    NSString* title = self.model.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.model.database];
     NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
     
     if(node.isGroup) {
         BOOL italic = (self.model.database.recycleBinEnabled && node == self.model.database.recycleBinNode);
         
-        NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
+        NSString* childCount = self.model.metadata.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
         
         [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
     }
     else {
-        DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database];
+        DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
         
         NSString* subtitle = [searcher getBrowseItemSubtitle:node];
         NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
-        flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+        flags = self.model.metadata.showFlagsInBrowse ? flags : @"";
         
         [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
         

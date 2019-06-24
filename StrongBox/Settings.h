@@ -61,8 +61,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 - (NSString*)getFlagsStringForDiagnostics;
 - (NSString*)getBiometricIdName;
 
-@property (nonatomic) BOOL showPasswordByDefaultOnEditScreen;
-
 @property (nonatomic) BOOL neverShowForMacAppMessage;
 
 @property (nonatomic) BOOL iCloudOn;
@@ -87,68 +85,32 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
 @property (nonatomic) BOOL hasShownKeePassBetaWarning;
 
-@property (nonatomic) BOOL showKeePass1BackupGroup;
 @property (nonatomic) BOOL hideTips;
 
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
 
-@property BOOL hideTotp;
-@property BOOL hideTotpInBrowse;
 @property BOOL hideTotpInAutoFill;
 
-//@property BOOL uiDoNotSortKeePassNodesInBrowseView;
-
-@property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL doNotAutoDetectKeyFiles;
-
 @property (nullable) NSDate* lastEntitlementCheckAttempt;
 @property NSUInteger numberOfEntitlementCheckFails;
-
-@property BOOL doNotShowRecycleBinInBrowse;
-@property BOOL showRecycleBinInSearchResults;
 @property BOOL doNotCopyOtpCodeOnAutoFillSelect;
 
-@property BOOL viewDereferencedFields;
-@property BOOL searchDereferencedFields;
-
-@property BOOL showEmptyFieldsInDetailsView;
-
-@property NSArray<NSNumber*>* detailsViewCollapsedSections;
-@property BOOL easyReadFontForAll;
-
 @property BOOL instantPinUnlocking;
-@property BOOL showChildCountOnFolderInBrowse;
-@property BOOL showFlagsInBrowse;
-
 @property BOOL haveWarnedAboutAutoFillCrash;
-
 @property AppLockMode appLockMode;
 @property NSString* appLockPin;
 @property NSInteger appLockDelay;
 @property BOOL appLockAppliesToPreferences;
-
 @property NSInteger deleteDataAfterFailedUnlockCount;
 @property NSUInteger failedUnlockAttempts;
-
-@property BOOL immediateSearchOnBrowse;
-
-@property BrowseItemSubtitleField browseItemSubtitleField;
-
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL hideKeyFileOnUnlock;
-
 @property BOOL doNotUseNewSplitViewController;
-
 @property BOOL allowEmptyOrNoPasswordEntry;
-//@property BOOL interpretEmptyPasswordAsNoPassword;
-
-@property BrowseSortField browseSortField;
-@property BOOL browseSortOrderDescending;
-@property BOOL browseSortFoldersSeparately;
-
 @property BOOL migratedLocalDatabasesToNewSystem;
-@property BOOL useSharedAppGroupLocalStorage; // TODO: Default this on in next release
+@property BOOL useSharedAppGroupLocalStorage; // TODO: Default this on soon
 
 NS_ASSUME_NONNULL_END
 

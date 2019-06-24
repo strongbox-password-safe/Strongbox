@@ -63,7 +63,7 @@
                                 data:updatedSafeData
                           completion:^(NSError *error) {
                               if(!error) {
-                                  [self updateOfflineCacheWithData:updatedSafeData]; // TODO: Not if there was an error
+                                  [self updateOfflineCacheWithData:updatedSafeData];
                                   [self updateAutoFillCacheWithData:updatedSafeData];
                                   [self updateAutoFillQuickTypeDatabase];
                               }

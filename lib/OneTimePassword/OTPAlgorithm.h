@@ -29,6 +29,7 @@ typedef NS_ENUM(UInt8, OTPAlgorithm) {
     OTPAlgorithmSHA1,
     OTPAlgorithmSHA256,
     OTPAlgorithmSHA512,
+    OTPAlgorithmSteam,
 };
 
 extern OTPAlgorithm OTPAlgorithmUnknown;
@@ -39,6 +40,7 @@ extern OTPAlgorithm OTPAlgorithmUnknown;
 extern NSString *const kOTPAlgorithmSHA1;
 extern NSString *const kOTPAlgorithmSHA256;
 extern NSString *const kOTPAlgorithmSHA512;
+extern NSString *const kOTPAlgorithmSteam;
 
 @interface NSString (OTPAlgorithm)
 

@@ -344,7 +344,7 @@ static const int kMinNotesCellHeight = 160;
     self.userSelectedNewExistingCustomIconId = nil;
     self.userSelectedNewCustomIcon = nil;
     
-    self.hidePassword = !Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
+    self.hidePassword = !self.viewModel.metadata.showPasswordByDefaultOnEditScreen;
 
     if(!self.record) {
         self.record = [self createNewRecord];
@@ -367,7 +367,7 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (void)bindUiToKeePassDereferenceableFields:(BOOL)allowDereferencing {
-    if(Settings.sharedInstance.viewDereferencedFields && allowDereferencing) {
+    if(self.viewModel.metadata.viewDereferencedFields && allowDereferencing) {
         self.textFieldPassword.text = [self dereference:self.record.fields.password node:self.record];
         self.textFieldTitle.text = [self dereference:self.record.title node:self.record];
         self.textFieldUrl.text = [self dereference:self.record.fields.url node:self.record];
@@ -526,7 +526,7 @@ static const int kMinNotesCellHeight = 160;
         
     // Edit OTP
     
-    self.buttonSetOtp.hidden = Settings.sharedInstance.hideTotp || self.isEditing || self.readOnlyMode;
+    self.buttonSetOtp.hidden = self.viewModel.metadata.hideTotp || self.isEditing || self.readOnlyMode;
     self.buttonSetOtp.enabled = !self.isEditing && !self.readOnlyMode;
 
     // Password Generation Settings
@@ -708,6 +708,7 @@ static const int kMinNotesCellHeight = 160;
     if ([segue.identifier isEqual:@"segueToViewPreferences"]) {
         UINavigationController *nav = segue.destinationViewController;
         ItemDetailsPreferencesViewController* vc = (ItemDetailsPreferencesViewController*)nav.topViewController;
+        vc.database = self.viewModel.metadata;
         vc.onPreferencesChanged = ^{
             [self bindUiToRecord];
         };
@@ -1053,14 +1054,20 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (IBAction)onSetTotp:(id)sender {
-    [Alerts threeOptions:self title:@"How would you like to setup TOTP?" message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL" defaultButtonText:@"QR Code..." secondButtonText:@"Manually..." thirdButtonText:@"Cancel" action:^(int response) {
+    [Alerts threeOptionsWithCancel:self
+                             title:@"How would you like to setup TOTP?"
+                           message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL"
+                 defaultButtonText:@"QR Code..."
+                  secondButtonText:@"Manual (Standard/RFC 6238)..."
+                   thirdButtonText:@"Manual (Steam Token)..."
+                            action:^(int response) {
         if(response == 0){
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
                     Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
-                    BOOL success = [self.record setTotpWithString:string appendUrlToNotes:self.viewModel.database.format == kPasswordSafe];
+                    BOOL success = [self.record setTotpWithString:string appendUrlToNotes:self.viewModel.database.format == kPasswordSafe forceSteam:NO];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
                     }
@@ -1072,21 +1079,26 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             
             [self presentViewController:vc animated:YES completion:nil];
         }
-        else if(response == 1) {
-            [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Secret or OTPAuth URL" title:@"Please enter the secret or an OTPAuth URL" message:@"" completion:^(NSString *text, BOOL response) {
-                if(response) {
-                    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
-                    BOOL success = [self.record setTotpWithString:text appendUrlToNotes:self.viewModel.database.format == kPasswordSafe];
-                    if(!success) {
-                        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
-                    }
-                    else {
-                        [self saveAfterTotpSet:clonedOriginalNodeForHistory];
-                    }
-                }
-            }];
-        }
-    }];
+        else if(response == 1 || response == 2) {
+           [Alerts OkCancelWithTextField:self
+                    textFieldPlaceHolder:@"Secret or OTPAuth URL"
+                                   title:@"Please enter the secret or an OTPAuth URL" message:@""
+                              completion:^(NSString *text, BOOL success) {
+               if(success) {
+                   Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
+                   
+                   BOOL steam = response == 2;
+                   BOOL success = [self.record setTotpWithString:text
+                                                appendUrlToNotes:self.viewModel.database.format == kPasswordSafe forceSteam:steam];
+                   if(!success) {
+                       [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
+                   }
+                   else {
+                       [self saveAfterTotpSet:clonedOriginalNodeForHistory];
+                   }
+               }
+           }];
+        }}];
 }
 
 - (void)saveAfterTotpSet:(Node*)originalNodeForHistory {
@@ -1108,7 +1120,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)showHideOtpCode {
-    self.showOtp = !Settings.sharedInstance.hideTotp && self.record.otpToken != nil;
+    self.showOtp = !self.viewModel.metadata.hideTotp && self.record.otpToken != nil;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView beginUpdates];
@@ -1182,7 +1194,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
         // grab a FavIcon?
         
-        if(Settings.sharedInstance.isProOrFreeTrial && Settings.sharedInstance.tryDownloadFavIconForNewRecord &&
+        if(Settings.sharedInstance.isProOrFreeTrial && self.viewModel.metadata.tryDownloadFavIconForNewRecord &&
            (self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4)) {
             NSString* urlHint = trim(self.textFieldUrl.text);
             if(!urlHint.length) {

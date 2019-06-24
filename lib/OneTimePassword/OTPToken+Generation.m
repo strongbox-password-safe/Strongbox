@@ -85,6 +85,8 @@ CCHmacAlgorithm hashAlgorithmForAlgorithm(OTPAlgorithm algorithm)
             return kCCHmacAlgSHA256;
         case OTPAlgorithmSHA512:
             return kCCHmacAlgSHA512;
+        case OTPAlgorithmSteam:
+            return kCCHmacAlgSHA1;
     }
     return kCCHmacAlgSHA1;
 }
@@ -102,11 +104,56 @@ NSUInteger digestLengthForAlgorithm(CCHmacAlgorithm algorithm)
     return 0;
 }
 
-- (NSString *)generatePasswordForCounter:(uint64_t)counter
-{
-    // Ensure the counter value is big-endian
+- (NSString *)generatePasswordForCounter:(uint64_t)counter {
     counter = NSSwapHostLongLongToBig(counter);
+    
+    if(self.algorithm == OTPAlgorithmSteam) {
+        return [self generateSteamTotp:counter];
+    }
+    else {
+        return [self generateRFC6238Totp:counter];
+    }
+}
 
+- (NSString*)generateSteamTotp:(uint64_t)counter {
+//    NSLog(@"Generating Steam Totp");
+    
+    NSUInteger length = digestLengthForAlgorithm(kCCHmacAlgSHA1);
+    NSMutableData *hash = [NSMutableData dataWithLength:length];
+    CCHmac(kCCHmacAlgSHA1, self.secret.bytes, self.secret.length, &counter, sizeof(counter), hash.mutableBytes);
+    uint8_t *hmac = hash.mutableBytes;
+
+    int offset = (hmac[hash.length - 1] & 0xf);
+    
+    //NSLog(@"offset = %d, length = %lu", offset, (unsigned long)length);
+    
+    uint32_t a = ((hmac[offset] & 0x7f) << 24);
+    uint32_t b = ((hmac[offset + 1] & 0xff) << 16);
+    uint32_t c = ((hmac[offset + 2] & 0xff) << 8);
+    uint32_t d = (hmac[offset + 3] & 0xff);
+    
+    int binary = a | b | c | d;
+    
+    NSArray<NSString*>* alphabet = @[@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9",@"B",@"C",@"D",@"F",@"G",
+                                     @"H",@"J",@"K",@"M",@"N",@"P",@"Q",@"R",@"T",@"V",@"W",@"X",@"Y"];
+
+    uint32_t dp = pow(alphabet.count, self.digits);
+    uint64_t pw = binary % dp;
+    
+    NSMutableArray<NSString*>* resArray = [@[@"2",@"2",@"2",@"2",@"2"] mutableCopy];
+
+    int i=0;
+    while(pw > 0 && i < 5) {
+        resArray[i++] = alphabet[pw % alphabet.count];
+        pw /= alphabet.count;
+    }
+    
+    return [resArray componentsJoinedByString:@""];
+}
+
+- (NSString*)generateRFC6238Totp:(uint64_t)counter {
+//    NSLog(@"Generating RFC6238 Totp");
+    
     // Generate an HMAC value from the key and counter
     CCHmacAlgorithm algorithm = hashAlgorithmForAlgorithm(self.algorithm);
     NSMutableData *hash = [NSMutableData dataWithLength:digestLengthForAlgorithm(algorithm)];

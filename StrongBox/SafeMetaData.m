@@ -8,11 +8,59 @@
 
 #import "SafeMetaData.h"
 #import "JNKeychain.h"
+#import "Settings.h"
+
+static NSString* const kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
+static NSString* const kHideTotp = @"hideTotp";
+static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
+static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
+static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
+static NSString* const kTryDownloadFavIconForNewRecord = @"tryDownloadFavIconForNewRecord";
+static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
+static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
+static NSString* const kHideEmptyFieldsInDetailsView = @"hideEmptyFieldsInDetailsView";
+static NSString* const kCollapsedSections = @"collapsedSections";
+static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
+static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolderInBrowse";
+static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
+static NSString* const kImmediateSearchOnBrowse = @"immediateSearchOnBrowse";
+static NSString* const kBrowseItemSubtitleField = @"browseItemSubtitleField";
+static NSString* const kBrowseSortField = @"browseSortField";
+static NSString* const kBrowseSortOrderDescending = @"browseSortOrderDescending";
+static NSString* const kBrowseSortFoldersSeparately = @"browseSortFoldersSeparately";
+static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
+static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse"; // DEAD
+static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1BackupGroupInSearchResults";
+
+@interface SafeMetaData ()
+
+// Migrated to SafeMetaData - remove after a while (23-Jun-2019)
+
+@property (readonly) BrowseSortField old_browseSortField;
+@property (readonly) BOOL old_browseSortOrderDescending;
+@property (readonly) BOOL old_browseSortFoldersSeparately;
+@property (readonly) BrowseItemSubtitleField old_browseItemSubtitleField;
+@property (readonly) BOOL old_immediateSearchOnBrowse;
+@property (readonly) BOOL old_hideTotpInBrowse;
+@property (readonly) BOOL old_showKeePass1BackupGroup;
+@property (readonly) BOOL old_showChildCountOnFolderInBrowse;
+@property (readonly) BOOL old_showFlagsInBrowse;
+@property (readonly) BOOL old_doNotShowRecycleBinInBrowse;
+@property (readonly) BOOL old_showRecycleBinInSearchResults;
+@property (readonly) BOOL old_viewDereferencedFields;
+@property (readonly) BOOL old_searchDereferencedFields;
+@property (readonly) BOOL old_showEmptyFieldsInDetailsView;
+@property (readonly) NSArray<NSNumber*>* old_detailsViewCollapsedSections;
+@property (readonly) BOOL old_easyReadFontForAll;
+@property (readonly) BOOL old_hideTotp;
+@property (readonly) BOOL old_tryDownloadFavIconForNewRecord;
+@property (readonly) BOOL old_showPasswordByDefaultOnEditScreen;
+
+@end
 
 @implementation SafeMetaData
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.uuid = [[NSUUID UUID] UUIDString];
@@ -21,6 +69,35 @@
         self.autoFillCacheEnabled = YES;
         self.likelyFormat = kFormatUnknown;
         self.browseViewType = kBrowseViewTypeHierarchy;
+        
+        // Old original defaults for people used to this... Different defaults for newly created databases
+        
+        self.tapAction = kBrowseTapActionOpenDetails;
+        self.doubleTapAction = kBrowseTapActionCopyUsername;
+        self.tripleTapAction = kBrowseTapActionCopyTotp;
+        self.longPressTapAction = kBrowseTapActionCopyPassword;
+        
+        // Migration - Remove after a long while and use defaults instead... 23-Jun-2019
+        
+        self.browseSortField = self.old_browseSortField;
+        self.browseSortOrderDescending = self.old_browseSortOrderDescending;
+        self.browseSortFoldersSeparately = self.old_browseSortFoldersSeparately;
+        self.browseItemSubtitleField = self.old_browseItemSubtitleField;
+        self.immediateSearchOnBrowse = self.old_immediateSearchOnBrowse;
+        self.hideTotpInBrowse = self.old_hideTotpInBrowse;
+        self.showKeePass1BackupGroup = self.old_showKeePass1BackupGroup;
+        self.showChildCountOnFolderInBrowse = self.old_showChildCountOnFolderInBrowse;
+        self.showFlagsInBrowse = self.old_showFlagsInBrowse;
+        self.doNotShowRecycleBinInBrowse = self.old_doNotShowRecycleBinInBrowse;
+        self.showRecycleBinInSearchResults = self.old_showRecycleBinInSearchResults;
+        self.viewDereferencedFields = self.old_viewDereferencedFields;
+        self.searchDereferencedFields = self.old_searchDereferencedFields;
+        self.showEmptyFieldsInDetailsView = self.old_showEmptyFieldsInDetailsView;
+        self.detailsViewCollapsedSections = self.old_detailsViewCollapsedSections;
+        self.easyReadFontForAll = self.old_easyReadFontForAll;
+        self.hideTotp = self.old_hideTotp;
+        self.tryDownloadFavIconForNewRecord = self.old_tryDownloadFavIconForNewRecord;
+        self.showPasswordByDefaultOnEditScreen = self.old_showPasswordByDefaultOnEditScreen;
     }
     
     return self;
@@ -35,6 +112,13 @@
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
+
+        // Brand New Databases let's use these defaults;
+        
+        self.tapAction = kBrowseTapActionOpenDetails;
+        self.doubleTapAction = kBrowseTapActionCopyPassword;
+        self.tripleTapAction = kBrowseTapActionCopyTotp;
+        self.longPressTapAction = kBrowseTapActionCopyUsername;
     }
     
     return self;
@@ -71,6 +155,38 @@
     
     [encoder encodeInteger:self.likelyFormat forKey:@"likelyFormat"];
     [encoder encodeInteger:self.browseViewType forKey:@"browseViewType"];
+    
+    [encoder encodeInteger:self.tapAction forKey:@"tapAction"];
+    [encoder encodeInteger:self.doubleTapAction forKey:@"doubleTapAction"];
+    [encoder encodeInteger:self.tripleTapAction forKey:@"tripleTapAction"];
+    [encoder encodeInteger:self.longPressTapAction forKey:@"longPressTapAction"];
+    
+    // Migrate from Global Settings - 23-Jun-2019
+    
+    // Browse View
+
+    [encoder encodeInteger:self.browseSortField forKey:@"browseSortField"];
+    [encoder encodeBool:self.browseSortOrderDescending forKey:@"browseSortOrderDescending"];
+    [encoder encodeBool:self.browseSortFoldersSeparately forKey:@"browseSortFoldersSeparately"];
+    [encoder encodeInteger:self.browseItemSubtitleField forKey:@"browseItemSubtitleField"];
+    [encoder encodeBool:self.immediateSearchOnBrowse forKey:@"immediateSearchOnBrowse"];
+    [encoder encodeBool:self.hideTotpInBrowse forKey:@"hideTotpInBrowse"];
+    [encoder encodeBool:self.showKeePass1BackupGroup forKey:@"showKeePass1BackupGroup"];
+    [encoder encodeBool:self.showChildCountOnFolderInBrowse forKey:@"showChildCountOnFolderInBrowse"];
+    [encoder encodeBool:self.showFlagsInBrowse forKey:@"showFlagsInBrowse"];
+    [encoder encodeBool:self.doNotShowRecycleBinInBrowse forKey:@"doNotShowRecycleBinInBrowse"];
+    [encoder encodeBool:self.showRecycleBinInSearchResults forKey:@"showRecycleBinInSearchResults"];
+    [encoder encodeBool:self.viewDereferencedFields forKey:@"viewDereferencedFields"];
+    [encoder encodeBool:self.searchDereferencedFields forKey:@"searchDereferencedFields"];
+
+    // Details View
+    
+    [encoder encodeBool:self.showEmptyFieldsInDetailsView forKey:@"showEmptyFieldsInDetailsView"];
+    [encoder encodeObject:self.detailsViewCollapsedSections forKey:@"detailsViewCollapsedSections"];    
+    [encoder encodeBool:self.easyReadFontForAll forKey:@"easyReadFontForAll"];
+    [encoder encodeBool:self.hideTotp forKey:@"hideTotp"];
+    [encoder encodeBool:self.tryDownloadFavIconForNewRecord forKey:@"tryDownloadFavIconForNewRecord"];
+    [encoder encodeBool:self.showPasswordByDefaultOnEditScreen forKey:@"showPasswordByDefaultOnEditScreen"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -128,6 +244,79 @@
         
         if([decoder containsValueForKey:@"browseViewType"]) {
             self.browseViewType = (BrowseViewType)[decoder decodeIntegerForKey:@"browseViewType"];
+        }
+
+        if([decoder containsValueForKey:@"tapAction"]) {
+            self.tapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"tapAction"];
+        }
+        if([decoder containsValueForKey:@"doubleTapAction"]) {
+            self.doubleTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"doubleTapAction"];
+        }
+        if([decoder containsValueForKey:@"tripleTapAction"]) {
+            self.tripleTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"tripleTapAction"];
+        }
+        if([decoder containsValueForKey:@"longPressTapAction"]) {
+            self.longPressTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"longPressTapAction"];
+        }
+        
+        // Migrate from Global Settings - 23-Jun-2019
+        
+        if([decoder containsValueForKey:@"browseSortField"]) {
+            self.browseSortField = (BrowseSortField)[decoder decodeIntegerForKey:@"browseSortField"];
+        }
+        if([decoder containsValueForKey:@"browseSortOrderDescending"]) {
+            self.browseSortOrderDescending = [decoder decodeBoolForKey:@"browseSortOrderDescending"];
+        }
+        if([decoder containsValueForKey:@"browseSortFoldersSeparately"]) {
+            self.browseSortFoldersSeparately = [decoder decodeBoolForKey:@"browseSortFoldersSeparately"];
+        }
+        if([decoder containsValueForKey:@"browseItemSubtitleField"]) {
+            self.browseItemSubtitleField = (BrowseItemSubtitleField)[decoder decodeIntegerForKey:@"browseItemSubtitleField"];
+        }
+        if([decoder containsValueForKey:@"immediateSearchOnBrowse"]) {
+            self.immediateSearchOnBrowse = [decoder decodeBoolForKey:@"immediateSearchOnBrowse"];
+        }
+        if([decoder containsValueForKey:@"hideTotpInBrowse"]) {
+            self.hideTotpInBrowse = [decoder decodeBoolForKey:@"hideTotpInBrowse"];
+        }
+        if([decoder containsValueForKey:@"showKeePass1BackupGroup"]) {
+            self.showKeePass1BackupGroup = [decoder decodeBoolForKey:@"showKeePass1BackupGroup"];
+        }
+        if([decoder containsValueForKey:@"showChildCountOnFolderInBrowse"]) {
+            self.showChildCountOnFolderInBrowse = [decoder decodeBoolForKey:@"showChildCountOnFolderInBrowse"];
+        }
+        if([decoder containsValueForKey:@"showFlagsInBrowse"]) {
+            self.showFlagsInBrowse = [decoder decodeBoolForKey:@"showFlagsInBrowse"];
+        }
+        if([decoder containsValueForKey:@"doNotShowRecycleBinInBrowse"]) {
+            self.doNotShowRecycleBinInBrowse = [decoder decodeBoolForKey:@"doNotShowRecycleBinInBrowse"];
+        }
+        if([decoder containsValueForKey:@"showRecycleBinInSearchResults"]) {
+            self.showRecycleBinInSearchResults = [decoder decodeBoolForKey:@"showRecycleBinInSearchResults"];
+        }
+        if([decoder containsValueForKey:@"viewDereferencedFields"]) {
+            self.viewDereferencedFields = [decoder decodeBoolForKey:@"viewDereferencedFields"];
+        }
+        if([decoder containsValueForKey:@"searchDereferencedFields"]) {
+            self.searchDereferencedFields = [decoder decodeBoolForKey:@"searchDereferencedFields"];
+        }
+        if([decoder containsValueForKey:@"showEmptyFieldsInDetailsView"]) {
+            self.showEmptyFieldsInDetailsView = [decoder decodeBoolForKey:@"showEmptyFieldsInDetailsView"];
+        }
+        if([decoder containsValueForKey:@"detailsViewCollapsedSections"]) {
+            self.detailsViewCollapsedSections = [decoder decodeObjectForKey:@"detailsViewCollapsedSections"];
+        }
+        if([decoder containsValueForKey:@"easyReadFontForAll"]) {
+            self.easyReadFontForAll = [decoder decodeBoolForKey:@"easyReadFontForAll"];
+        }
+        if([decoder containsValueForKey:@"hideTotp"]) {
+            self.hideTotp = [decoder decodeBoolForKey:@"hideTotp"];
+        }
+        if([decoder containsValueForKey:@"tryDownloadFavIconForNewRecord"]) {
+            self.tryDownloadFavIconForNewRecord = [decoder decodeBoolForKey:@"tryDownloadFavIconForNewRecord"];
+        }
+        if([decoder containsValueForKey:@"showPasswordByDefaultOnEditScreen"]) {
+            self.showPasswordByDefaultOnEditScreen = [decoder decodeBoolForKey:@"showPasswordByDefaultOnEditScreen"];
         }
     }
     
@@ -203,6 +392,118 @@
     self.convenenienceKeyFileDigest = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;
+}
+
+///////////////////////////////////////////////////////////
+// Delete me after a while...
+
+- (NSUserDefaults*)getUserDefaults {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
+    return defaults;
+}
+
+- (NSInteger)getInteger:(NSString*)key {
+    return [self getInteger:key fallback:0];
+}
+
+- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
+    NSNumber* obj = [[self getUserDefaults] objectForKey:key];
+    return obj != nil ? obj.integerValue : fallback;
+}
+
+- (BOOL)getBool:(NSString*)key {
+    return [self getBool:key fallback:NO];
+}
+
+- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
+    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSNumber* obj = [userDefaults objectForKey:key];
+    
+    return obj != nil ? obj.boolValue : fallback;
+}
+
+//
+
+- (BrowseSortField)old_browseSortField {
+    BOOL oldDoNotSort = [self getBool:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while
+    return (BrowseSortField)[self getInteger:kBrowseSortField fallback:oldDoNotSort ? kBrowseSortFieldNone : kBrowseSortFieldTitle];
+}
+
+- (BOOL)old_browseSortOrderDescending {
+    return [self getBool:kBrowseSortOrderDescending fallback:NO];
+}
+
+- (BOOL)old_browseSortFoldersSeparately {
+    return [self getBool:kBrowseSortFoldersSeparately fallback:YES];
+}
+
+- (BOOL)old_immediateSearchOnBrowse {
+    return [self getBool:kImmediateSearchOnBrowse];
+}
+
+- (BrowseItemSubtitleField)old_browseItemSubtitleField {
+    BOOL showUsernameInBrowse = [self getBool:kShowUsernameInBrowse fallback:YES];
+
+    BrowseItemSubtitleField deflt = showUsernameInBrowse ? kBrowseItemSubtitleUsername : kBrowseItemSubtitleNoField;
+    return (BrowseItemSubtitleField)[self getInteger:kBrowseItemSubtitleField fallback:deflt];
+}
+
+-(BOOL)old_hideTotp {
+    return [self getBool:kHideTotp];
+}
+
+- (BOOL)old_showKeePass1BackupGroup {
+    return [self getBool:kShowKeePass1BackupGroupInSearchResults];
+}
+
+- (BOOL)old_showChildCountOnFolderInBrowse {
+    return [self getBool:kShowChildCountOnFolderInBrowse];
+}
+
+- (BOOL)old_showFlagsInBrowse {
+    return [self getBool:kShowFlagsInBrowse fallback:YES];
+}
+
+- (BOOL)old_doNotShowRecycleBinInBrowse {
+    return [self getBool:kDoNotShowRecycleBinInBrowse];
+}
+
+- (BOOL)old_showRecycleBinInSearchResults {
+    return [self getBool:kShowRecycleBinInSearchResults];
+}
+
+- (BOOL)old_viewDereferencedFields {
+    return [self getBool:kViewDereferencedFields];
+}
+
+- (BOOL)old_searchDereferencedFields {
+    return [self getBool:kSearchDereferencedFields];
+}
+
+-(BOOL)old_showEmptyFieldsInDetailsView {
+    return ![self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
+}
+
+- (NSArray<NSNumber *> *)old_detailsViewCollapsedSections {
+    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSArray* ret = [userDefaults arrayForKey:kCollapsedSections];    
+    return ret ? ret : @[@(0), @(0), @(0), @(0), @(1), @(1)]; // Default
+}
+
+- (BOOL)old_easyReadFontForAll {
+    return [self getBool:kEasyReadFontForAll];
+}
+
+-(BOOL)old_hideTotpInBrowse {
+    return [self getBool:kHideTotpInBrowse];
+}
+
+-(BOOL)old_tryDownloadFavIconForNewRecord {
+    return [self getBool:kTryDownloadFavIconForNewRecord fallback:YES];
+}
+
+- (BOOL)old_showPasswordByDefaultOnEditScreen {
+    return [self getBool:kShowPasswordByDefaultOnEditScreen];
 }
 
 @end

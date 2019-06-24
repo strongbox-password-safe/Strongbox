@@ -1057,7 +1057,9 @@ NSString* trimField(NSTextField* textField) {
     NSString* response = [[Alerts alloc] input:@"Please enter the secret or an OTPAuth URL" defaultValue:@"" allowEmpty:NO];
     
     if(response) {
-        [self.model setTotp:self.node otp:response];
+        [Alerts yesNo:@"Is this a Steam Token? (Say 'No' if you're unsure)" window:self.window completion:^(BOOL yesNo) {
+            [self.model setTotp:self.node otp:response steam:yesNo];
+        }];
     }
 }
 

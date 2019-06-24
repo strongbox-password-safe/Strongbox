@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) UIFont* easyReadFontForTotp;
 @property (readonly) UIFont* regularFont;
 @property (readonly) UIFont* italicFont;
-@property (readonly) UIFont* configuredValueFont;
 
 @end
 

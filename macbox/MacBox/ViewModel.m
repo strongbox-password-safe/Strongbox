@@ -675,11 +675,11 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     });
 }
 
-- (void)setTotp:(Node *)item otp:(NSString *)otp {
-    [self setTotp:item otp:otp modified:nil];
+- (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam {
+    [self setTotp:item otp:otp steam:steam modified:nil];
 }
 
-- (void)setTotp:(Node *)item otp:(NSString *)otp modified:(NSDate*)modified {
+- (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -688,7 +688,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [item.fields.keePassHistory addObject:cloneForHistory];
     
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
-    [item setTotpWithString:otp appendUrlToNotes:self.format == kPasswordSafe];
+    [item setTotpWithString:otp appendUrlToNotes:self.format == kPasswordSafe forceSteam:steam];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     
@@ -723,7 +723,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     [item clearTotp];
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] setTotp:item otp:oldOtpTokenUrl.absoluteString];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setTotp:item otp:oldOtpTokenUrl.absoluteString steam:oldOtpToken.algorithm == OTPAlgorithmSteam];
     
     if(!self.document.undoManager.isUndoing) {
         [self.document.undoManager setActionName:@"Clear TOTP"];

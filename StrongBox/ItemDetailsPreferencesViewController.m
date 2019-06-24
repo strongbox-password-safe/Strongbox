@@ -7,7 +7,8 @@
 //
 
 #import "ItemDetailsPreferencesViewController.h"
-#import "Settings.h"
+//#import "Settings.h"
+#import "SafesList.h"
 
 @interface ItemDetailsPreferencesViewController ()
 
@@ -34,22 +35,28 @@
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Item Details Preferences Changed: [%@]", sender);
     
-    Settings.sharedInstance.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
-    Settings.sharedInstance.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
-    Settings.sharedInstance.hideTotp = !self.switchShowTotp.on;
-    Settings.sharedInstance.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
-    Settings.sharedInstance.easyReadFontForAll = self.easyReadFontForAll.on;
+    self.database.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
+    self.database.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
+    self.database.hideTotp = !self.switchShowTotp.on;
+    self.database.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
+    self.database.easyReadFontForAll = self.easyReadFontForAll.on;
 
+    NSLog(@"easyReadFontForAll: %d", self.database.easyReadFontForAll);
+    
+    [SafesList.sharedInstance update:self.database];
+    
     [self bindPreferences];
     self.onPreferencesChanged();
 }
 
 - (void)bindPreferences {
-    self.switchAutoFavIcon.on = Settings.sharedInstance.tryDownloadFavIconForNewRecord;
-    self.switchShowPasswordOnDetails.on = Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
-    self.switchShowTotp.on = !Settings.sharedInstance.hideTotp;
-    self.switchShowEmptyFields.on = Settings.sharedInstance.showEmptyFieldsInDetailsView;
-    self.easyReadFontForAll.on = Settings.sharedInstance.easyReadFontForAll;
+    self.switchAutoFavIcon.on = self.database.tryDownloadFavIconForNewRecord;
+    self.switchShowPasswordOnDetails.on = self.database.showPasswordByDefaultOnEditScreen;
+    self.switchShowTotp.on = !self.database.hideTotp;
+    self.switchShowEmptyFields.on = self.database.showEmptyFieldsInDetailsView;
+    self.easyReadFontForAll.on = self.database.easyReadFontForAll;
+
+    NSLog(@"easyReadFontForAll: %d", self.database.easyReadFontForAll);
 }
 
 @end

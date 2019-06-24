@@ -16,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet UIView *horizontalLine;
 @property (weak, nonatomic) IBOutlet MBAutoGrowingTextView *textView;
 @property BOOL _isEditable;
+@property BOOL useEasyReadFont;
 
 @end
 
@@ -25,7 +26,7 @@
     [super awakeFromNib];
     self.textView.delegate = self;
     self.horizontalLine.backgroundColor = UIColor.blueColor;
-    self.textView.font = FontManager.sharedInstance.configuredValueFont;
+    self.textView.font = self.configuredValueFont;
     self.textView.adjustsFontForContentSizeCategory = YES;
     self.textView.userInteractionEnabled = YES; 
 
@@ -44,13 +45,16 @@
 - (void)prepareForReuse {
     [super prepareForReuse];
     self.textView.text = @"";
-    self.textView.font = FontManager.sharedInstance.configuredValueFont;
+    self.textView.font = self.configuredValueFont;
     self._isEditable = NO;
 }
 
-- (void)setNotes:(NSString *)notes editable:(BOOL)editable {
+- (void)setNotes:(NSString *)notes editable:(BOOL)editable useEasyReadFont:(BOOL)useEasyReadFont {
     self.textView.text = notes;
     self._isEditable = editable;
+    self.useEasyReadFont = useEasyReadFont;
+    self.textView.font = self.configuredValueFont;
+
     [self bindUiToSettings];
 }
 
@@ -69,6 +73,10 @@
     
     [self.textView layoutSubviews];
     [[NSNotificationCenter defaultCenter] postNotificationName:CellHeightsChangedNotification object:self];
+}
+
+- (UIFont*)configuredValueFont {
+    return self.useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;
 }
 
 @end

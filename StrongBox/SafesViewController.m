@@ -19,7 +19,6 @@
 #import "SafeStorageProviderFactory.h"
 #import "OpenSafeSequenceHelper.h"
 #import "SelectDatabaseFormatTableViewController.h"
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "AddNewSafeHelper.h"
 #import "StrongboxUIDocument.h"
 #import "SVProgressHUD.h"
@@ -35,10 +34,9 @@
 #import "CacheManager.h"
 #import "LocalDeviceStorageProvider.h"
 
-@interface SafesViewController () <UIDocumentPickerDelegate, DZNEmptyDataSetDelegate>
+@interface SafesViewController () <DZNEmptyDataSetDelegate>
 
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
-@property NSURL* temporaryExportUrl;
 
 @end
 
@@ -286,14 +284,8 @@
     }];
 
     renameAction.backgroundColor = [UIColor blueColor];
-    
-    UITableViewRowAction *exportAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Export" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self onExportSafe:indexPath];
-    }];
-    
-    exportAction.backgroundColor = [UIColor orangeColor]; // TODO: Move export into Details Screen... too many actions here
  
-    NSMutableArray* actions = [NSMutableArray arrayWithArray:@[removeAction, renameAction, exportAction]];
+    NSMutableArray* actions = [NSMutableArray arrayWithArray:@[removeAction, renameAction]];
     
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];    
     if(safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
@@ -706,61 +698,6 @@
 
 - (void)onNewExpressDatabase {
     [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:nil];
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    //NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    NSURL* url = [urls objectAtIndex:0];
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
-    
-    if(!data || error) {
-        [Alerts error:self title:@"Error Exporting" error:error];
-        NSLog(@"%@", error);
-        return;
-    }
-    
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
-    
-    [document saveToURL:url forSaveOperation:UIDocumentSaveForCreating | UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
-        if(!success) {
-            [Alerts warn:self title:@"Error Exporting" message:@""];
-        }
-        else {
-            [Alerts info:self title:@"Export Successful" message:@"Your Database was successfully exported."];
-        }
-    }];
-    
-    [document closeWithCompletionHandler:nil];
-}
-
-- (void)onExportSafe:(NSIndexPath*)indexPath {
-    SafeMetaData* safe = self.collection[indexPath.row];
-    
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
-    [provider read:safe viewController:self completion:^(NSData *data, NSError *error) {
-        if(!data || error) {
-            [Alerts error:self title:@"Error Reading Database" error:error];
-        }
-        else {
-            self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:safe.fileName];
-            
-            NSError* error;
-            [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
-            if(error) {
-                [Alerts error:self title:@"Error Writing Database" error:error];
-                NSLog(@"error: %@", error);
-                return;
-            }
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
-                vc.delegate = self;
-                
-                [self presentViewController:vc animated:YES completion:nil];
-            });
-        }
-    }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

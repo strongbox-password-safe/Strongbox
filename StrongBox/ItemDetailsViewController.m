@@ -171,7 +171,7 @@ static NSString* const kTotpCell = @"TotpCell";
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.tableFooterView = [UIView new];
 
-    self.passwordConcealedInUi = !Settings.sharedInstance.showPasswordByDefaultOnEditScreen;
+    self.passwordConcealedInUi = !self.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
     
     if(self.createNewItem) {
         self.item = [self createNewRecord];
@@ -378,7 +378,11 @@ static NSString* const kTotpCell = @"TotpCell";
         else if(indexPath.row == kRowTitle) {
             GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
             
-            [cell setKey:@"Title" value:[self maybeDereference:self.model.title] editing:self.editing selectAllOnEdit:self.createNewItem];
+            [cell setKey:@"Title" value:[self maybeDereference:self.model.title]
+                 editing:self.editing
+         selectAllOnEdit:self.createNewItem
+         useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+            
             cell.showUiValidationOnEmpty = YES;
             cell.onEdited = ^(NSString * _Nonnull text) {
                 self.model.title = trim(text);
@@ -389,6 +393,7 @@ static NSString* const kTotpCell = @"TotpCell";
         }
         else if(indexPath.row == kRowUsername) {
             GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
+            
             [cell setKey:@"Username"
                    value:[self maybeDereference:self.model.username]
                  editing:self.editing
@@ -397,7 +402,8 @@ static NSString* const kTotpCell = @"TotpCell";
                       return [obj hasPrefix:text];
                   }] sortedArrayUsingComparator:finderStringComparator];
                     return matches.firstObject;
-                }];
+                }
+         useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
             
             cell.onEdited = ^(NSString * _Nonnull text) {
                 self.model.username = trim(text);
@@ -427,7 +433,8 @@ static NSString* const kTotpCell = @"TotpCell";
                        value:[self maybeDereference:self.model.password]
               isConfidential:YES
                    concealed:self.passwordConcealedInUi
-                  isEditable:NO];
+                  isEditable:NO
+             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
                 
                 cell.accessoryType = UITableViewCellAccessoryNone;
                 cell.editingAccessoryType = UITableViewCellAccessoryNone;
@@ -491,13 +498,23 @@ static NSString* const kTotpCell = @"TotpCell";
                       return [obj hasPrefix:text];
                 }] sortedArrayUsingComparator:finderStringComparator];
                 return matches.firstObject;
-            }];
+            }
+             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
             
             cell.onEdited = ^(NSString * _Nonnull text) {
                 self.model.url = trim(text);
                 [self onModelEdited];
             };
-            cell.onRightAccessoryButton = ^{
+            
+            cell.onDoubleTap = ^{
+                if (isValidUrl(self.model.url)) {
+                    [self copyAndLaunchUrl];
+                }
+                else {
+                    [self copyToClipboard:[self dereference:self.model.url] message:@"URL Copied"];
+                }
+            };
+            cell.onTap = ^{
                 [self copyToClipboard:[self dereference:self.model.url] message:@"URL Copied"];
             };
             
@@ -510,7 +527,8 @@ static NSString* const kTotpCell = @"TotpCell";
                       return [obj hasPrefix:text];
                 }] sortedArrayUsingComparator:finderStringComparator];
                 return matches.firstObject;
-            }];
+            }
+             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
             
             cell.onEdited = ^(NSString * _Nonnull text) {
                 self.model.email = trim(text);
@@ -522,7 +540,9 @@ static NSString* const kTotpCell = @"TotpCell";
     else if (indexPath.section == kNotesSectionIdx) {
         NotesTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
         
-        [cell setNotes:[self maybeDereference:self.model.notes] editable:self.editing];
+        [cell setNotes:[self maybeDereference:self.model.notes]
+              editable:self.editing
+       useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
         cell.onNotesEdited = ^(NSString * _Nonnull notes) {
             self.model.notes = notes;
             [self onModelEdited];
@@ -549,7 +569,12 @@ static NSString* const kTotpCell = @"TotpCell";
             NSInteger idx = indexPath.row - (self.editing ? 1 : 0);
             CustomFieldViewModel* cf = self.model.customFields[idx];
             
-            [cell setKey:cf.key value:cf.value isConfidential:cf.protected concealed:(!self.editing && cf.concealedInUI) isEditable:self.editing];
+            [cell setKey:cf.key
+                   value:cf.value
+          isConfidential:cf.protected
+               concealed:(!self.editing && cf.concealedInUI)
+              isEditable:self.editing
+         useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
             
@@ -626,7 +651,10 @@ static NSString* const kTotpCell = @"TotpCell";
     else if (indexPath.section == kMetadataSectionIdx) {
         GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
-        [cell setKey:entry.key value:entry.value editing:NO];
+        [cell setKey:entry.key
+               value:entry.value
+             editing:NO
+     useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
         cell.selectionStyle = entry.copyable ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
         
         return cell;
@@ -658,7 +686,7 @@ static NSString* const kTotpCell = @"TotpCell";
         return @"Custom Fields";
     }
     else if (section == kNotesSectionIdx) {
-        return Settings.sharedInstance.hideTips ? @"Notes" : @"Notes - (Double Tap to Copy)";
+        return @"Notes";
     }
     else if (section == kAttachmentsSectionIdx) {
         return @"Attachments";
@@ -699,11 +727,11 @@ static NSString* const kTotpCell = @"TotpCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(!self.editing && Settings.sharedInstance.detailsViewCollapsedSections[indexPath.section].boolValue) {
+    if(!self.editing && self.databaseModel.metadata.detailsViewCollapsedSections[indexPath.section].boolValue) {
         return 0;
     }
 
-    BOOL shouldHideEmpty = !Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = !self.databaseModel.metadata.showEmptyFieldsInDetailsView && !self.editing;
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowIcon) {
@@ -728,7 +756,7 @@ static NSString* const kTotpCell = @"TotpCell";
         }
         else if(indexPath.row == kRowTotp) {
 #ifndef IS_APP_EXTENSION
-            if((!self.model.totp || Settings.sharedInstance.hideTotp) && !self.editing) {
+            if((!self.model.totp || self.databaseModel.metadata.hideTotp) && !self.editing) {
                 return 0;
             }
 #else
@@ -767,7 +795,7 @@ static NSString* const kTotpCell = @"TotpCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    BOOL shouldHideEmpty = !Settings.sharedInstance.showEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = !self.databaseModel.metadata.showEmptyFieldsInDetailsView && !self.editing;
     
     if(section == kSimpleFieldsSectionIdx) {
         return 0;
@@ -905,12 +933,7 @@ static NSString* const kTotpCell = @"TotpCell";
                 [self copyToClipboard:self.model.totp.password message:@"One Time Password Copied"];
             }
             else if (indexPath.row == kRowURL) {
-                if (isValidUrl(self.model.url)) {
-                    [self copyAndLaunchUrl];
-                }
-                else {
-                    [self copyToClipboard:[self dereference:self.model.url] message:@"URL Copied"];
-                }
+                // Handled by Tap/ Double Tap actions on Cell
             }
             else if (indexPath.row == kRowEmail) {
                 [self copyToClipboard:self.model.email message:@"Email Copied"];
@@ -1001,6 +1024,7 @@ static NSString* const kTotpCell = @"TotpCell";
     if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
         UINavigationController *nav = segue.destinationViewController;
         ItemDetailsPreferencesViewController* vc = (ItemDetailsPreferencesViewController*)nav.topViewController;
+        vc.database = self.databaseModel.metadata;
         vc.onPreferencesChanged = ^{
             [self performFullReload];
         };
@@ -1258,7 +1282,13 @@ static NSString* const kTotpCell = @"TotpCell";
 
 - (void)onSetTotp {
 #ifndef IS_APP_EXTENSION
-    [Alerts threeOptions:self title:@"How would you like to setup TOTP?" message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL" defaultButtonText:@"QR Code..." secondButtonText:@"Manually..." thirdButtonText:@"Cancel" action:^(int response) {
+    [Alerts threeOptionsWithCancel:self
+                             title:@"How would you like to setup TOTP?"
+                           message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL"
+                 defaultButtonText:@"QR Code..."
+                  secondButtonText:@"Manual (Standard/RFC 6238)..."
+                   thirdButtonText:@"Manual (Steam Token)..."
+                            action:^(int response) {
         if(response == 0){
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
             vc.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -1266,19 +1296,19 @@ static NSString* const kTotpCell = @"TotpCell";
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
-                    [self setTotpWithString:string];
+                    [self setTotpWithString:string steam:NO];
                 }
             };
             
             [self presentViewController:vc animated:YES completion:nil];
         }
-        else if(response == 1) {
+        else if(response == 1 || response == 2) {
             [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Secret or OTPAuth URL"
                                     title:@"Please enter the secret or an OTPAuth URL"
                                   message:@""
-                               completion:^(NSString *text, BOOL response) {
-                if(response) {
-                    [self setTotpWithString:text];
+                               completion:^(NSString *text, BOOL success) {
+                if(success) {
+                    [self setTotpWithString:text steam:(response == 2)];
                 }
             }];
         }
@@ -1286,8 +1316,8 @@ static NSString* const kTotpCell = @"TotpCell";
 #endif
 }
 
-- (void)setTotpWithString:(NSString*)string {
-    OTPToken* token = [Node getOtpTokenFromString:string];
+- (void)setTotpWithString:(NSString*)string steam:(BOOL)steam {
+    OTPToken* token = [Node getOtpTokenFromString:string forceSteam:steam];
     if(token) {
         self.model.totp = token;
         
@@ -1344,7 +1374,7 @@ static NSString* const kTotpCell = @"TotpCell";
 }
 
 - (NSString*)maybeDereference:(NSString*)text {
-    return !self.editing && Settings.sharedInstance.viewDereferencedFields ? [self.databaseModel.database dereference:text node:self.item] : text;
+    return !self.editing && self.databaseModel.metadata.viewDereferencedFields ? [self.databaseModel.database dereference:text node:self.item] : text;
 }
 
 - (NSString*)dereference:(NSString*)text {
@@ -1536,7 +1566,7 @@ static NSString* const kTotpCell = @"TotpCell";
         // grab a FavIcon?
 #ifndef IS_APP_EXTENSION
         if(Settings.sharedInstance.isProOrFreeTrial &&
-           Settings.sharedInstance.tryDownloadFavIconForNewRecord &&
+           self.databaseModel.metadata.tryDownloadFavIconForNewRecord &&
            (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) &&
            isValidUrl(self.model.url)) {
             self.sni = [[SetNodeIconUiHelper alloc] init];
@@ -1578,15 +1608,17 @@ static NSString* const kTotpCell = @"TotpCell";
         header = [[CollapsibleTableViewHeader alloc] initWithReuseIdentifier:@"header"];
     }
     
-    [header setCollapsed:Settings.sharedInstance.detailsViewCollapsedSections[section].boolValue];
+    [header setCollapsed:self.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue];
     
     __weak CollapsibleTableViewHeader* weakHeader = header;
     header.onToggleSection = ^() {
-        BOOL toggled = !Settings.sharedInstance.detailsViewCollapsedSections[section].boolValue;
+        BOOL toggled = !self.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue;
         
-        NSMutableArray* mutable = [Settings.sharedInstance.detailsViewCollapsedSections mutableCopy];
+        NSMutableArray* mutable = [self.databaseModel.metadata.detailsViewCollapsedSections mutableCopy];
         mutable[section] = @(toggled);
-        Settings.sharedInstance.detailsViewCollapsedSections = mutable;
+        self.databaseModel.metadata.detailsViewCollapsedSections = mutable;
+        
+        [SafesList.sharedInstance update:self.databaseModel.metadata];
         
         [weakHeader setCollapsed:toggled];
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];

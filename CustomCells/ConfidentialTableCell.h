@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ConfidentialTableCell : UITableViewCell
 
-- (void)setKey:(NSString *)key value:(NSString*)value isConfidential:(BOOL)isConfidential concealed:(BOOL)concealed isEditable:(BOOL)isEditable;
+- (void)setKey:(NSString *)key value:(NSString*)value isConfidential:(BOOL)isConfidential concealed:(BOOL)concealed isEditable:(BOOL)isEditable useEasyReadFont:(BOOL)useEasyReadFont;
 
 @property (nonatomic, copy, nullable) void (^onConcealedChanged)(BOOL concealed);
 

@@ -57,10 +57,4 @@ static NSString* const kEasyReadFontName = @"Menlo";
     [self buildFonts];
 }
 
-- (UIFont *)configuredValueFont {
-    BOOL useEasyReadFontInAllFields = Settings.sharedInstance.easyReadFontForAll;
-    
-    return useEasyReadFontInAllFields ? self.easyReadFont : self.regularFont;
-}
-
 @end

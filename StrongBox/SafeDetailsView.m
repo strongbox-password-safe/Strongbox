@@ -8,27 +8,19 @@
 
 #import "SafeDetailsView.h"
 #import "IOsUtils.h"
-#import <MessageUI/MessageUI.h>
 #import "Alerts.h"
-#import "CHCSVParser.h"
 #import "Settings.h"
 #import "ISMessages.h"
 #import "Utils.h"
-#import "Csv.h"
 #import "KeyFileParser.h"
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
 #import "CacheManager.h"
+#import "ExportOptionsTableViewController.h"
 
-@interface Delegate : NSObject <CHCSVParserDelegate>
-
-@property (readonly) NSArray *lines;
-
-@end
-
-@interface SafeDetailsView () <MFMailComposeViewControllerDelegate>
+@interface SafeDetailsView ()
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
@@ -94,7 +86,7 @@
     self.cellChangeMasterCredentials.imageView.image = [UIImage imageNamed:@"key"];
     self.cellPinCodes.imageView.image = [UIImage imageNamed:@"keypad"];
     self.cellExport.imageView.image = [UIImage imageNamed:@"upload"];
-
+    
     //
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
@@ -122,6 +114,10 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToPinsConfiguration"]) {
         PinsConfigurationController* vc = (PinsConfigurationController*)segue.destinationViewController;
+        vc.viewModel = self.viewModel;
+    }
+    else if([segue.identifier isEqualToString:@"segueToExportOptions"]) {
+        ExportOptionsTableViewController* vc = (ExportOptionsTableViewController*)segue.destinationViewController;
         vc.viewModel = self.viewModel;
     }
     else if([segue.identifier isEqualToString:@"segueToSetCredentials"]) {
@@ -336,6 +332,8 @@
     else if (cell == self.cellExport) {
         [self onExport];
     }
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -366,38 +364,7 @@
 }
 
 - (void)onExport {
-    [Alerts threeOptionsWithCancel:self title:@"How would you like to export your database?"
-                           message:@"You can export your encrypted database by email, or you can copy your database in plaintext format (CSV) to the clipboard."
-                 defaultButtonText:@"Export (Encrypted) by Email"
-                  secondButtonText:@"Export as CSV by Email"
-                   thirdButtonText:@"Copy CSV to Clipboard"
-                            action:^(int response) {
-                                if(response == 0) {
-                                    [self exportEncryptedSafeByEmail];
-                                }
-                                else if(response == 1){
-                                    NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
-                                    
-                                    NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
-                                    [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
-                                }
-                                else if(response == 2){
-                                    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database.rootGroup] encoding:NSUTF8StringEncoding];
-                                    
-                                    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                                    pasteboard.string = newStr;
-                                    
-                                    [ISMessages showCardAlertWithTitle:@"Database Copied to Clipboard"
-                                                               message:nil
-                                                              duration:3.f
-                                                           hideOnSwipe:YES
-                                                             hideOnTap:YES
-                                                             alertType:ISAlertTypeSuccess
-                                                         alertPosition:ISAlertPositionTop
-                                                               didHide:nil];
-                                }
-                            }];
-    
+    [self performSegueWithIdentifier:@"segueToExportOptions" sender:nil];
 }
 
 - (BOOL)canToggleTouchId {
@@ -407,49 +374,6 @@
 - (BOOL)canToggleOfflineCache {
     return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
 }
-
-- (void)exportEncryptedSafeByEmail {
-    [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
-        if(!safeData) {
-            [Alerts error:self title:@"Could not get database data" error:error];
-            return;
-        }
-      
-        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName,
-                                    ([self.viewModel.metadata.fileName hasSuffix:@".dat"] || [self.viewModel.metadata.fileName hasSuffix:@"psafe3"]) ? @"" : @".dat"];
-        
-        [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:safeData];
-    }];
-}
-
-- (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data {
-    if(![MFMailComposeViewController canSendMail]) {
-        [Alerts info:self
-               title:@"Email Not Available"
-             message:@"It looks like email is not setup on this device and so the database cannot be exported by email."];
-        
-        return;
-    }
-    
-    MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
-    
-    [picker setSubject:[NSString stringWithFormat:@"Strongbox Database: '%@'", self.viewModel.metadata.nickName]];
-    
-    [picker addAttachmentData:data mimeType:mimeType fileName:attachmentName];
-    
-    [picker setToRecipients:[NSArray array]];
-    [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox Database.", self.viewModel.metadata.nickName] isHTML:NO];
-    picker.mailComposeDelegate = self;
-    
-    [self presentViewController:picker animated:YES completion:^{ }];
-}
-
-- (void)mailComposeController:(MFMailComposeViewController *)controller
-          didFinishWithResult:(MFMailComposeResult)result
-                        error:(NSError *)error {
-    [self dismissViewControllerAnimated:YES completion:^{ }];
-}
-
 
 static NSString *getLastCachedDate(NSDate *modDate) {
     if(!modDate) { return @""; }

@@ -34,6 +34,7 @@ static NSString *const kQueryCounterKey = @"counter";
 static NSString *const kQueryDigitsKey = @"digits";
 static NSString *const kQueryPeriodKey = @"period";
 static NSString *const kQueryIssuerKey = @"issuer";
+static NSString *const kQueryEncoderKey = @"encoder";
 
 
 @implementation OTPToken (Serialization)
@@ -98,6 +99,13 @@ static NSString *const kQueryIssuerKey = @"issuer";
     }
     token.issuer = issuerString;
 
+    // KeePassXC Extension "encoder" - Pickup Steam
+    NSString *encoderString = query[kQueryEncoderKey];
+    if([encoderString isEqualToString:@"steam"]) {
+        token.algorithm = OTPAlgorithmSteam;
+        token.digits = 5;
+    }
+
     return token;
 }
 
@@ -112,23 +120,36 @@ static NSString *const kQueryIssuerKey = @"issuer";
         [query addObject:[NSURLQueryItem queryItemWithName:kQuerySecretKey value:[self.secret base32String]]];
     }
     
-    [query addObject:[NSURLQueryItem queryItemWithName:kQueryAlgorithmKey value:[NSString stringForAlgorithm:self.algorithm]]];
-    [query addObject:[NSURLQueryItem queryItemWithName:kQueryDigitsKey value:@(self.digits).stringValue]];
-
+    if(self.algorithm == OTPAlgorithmSteam) {
+        [query addObject:[NSURLQueryItem queryItemWithName:kQueryAlgorithmKey value:[NSString stringForAlgorithm:OTPAlgorithmSHA1]]];
+        
+        // KeePassXC Extension "encoder"
+        [query addObject:[NSURLQueryItem queryItemWithName:kQueryEncoderKey value:@"steam"]];
+        [query addObject:[NSURLQueryItem queryItemWithName:kQueryDigitsKey value:@(5).stringValue]];
+    }
+    else {
+        [query addObject:[NSURLQueryItem queryItemWithName:kQueryAlgorithmKey value:[NSString stringForAlgorithm:self.algorithm]]];
+        [query addObject:[NSURLQueryItem queryItemWithName:kQueryDigitsKey value:@(self.digits).stringValue]];
+    }
+    
     if (self.type == OTPTokenTypeTimer) {
         [query addObject:[NSURLQueryItem queryItemWithName:kQueryPeriodKey value:@(self.period).stringValue]];
-    } else if (self.type == OTPTokenTypeCounter) {
+    }
+    else if (self.type == OTPTokenTypeCounter) {
         [query addObject:[NSURLQueryItem queryItemWithName:kQueryCounterKey value:@(self.counter).stringValue]];
     }
 
-    if (self.issuer)
+    if (self.issuer) {
         [query addObject:[NSURLQueryItem queryItemWithName:kQueryIssuerKey value:self.issuer]];
-
+    }
+    
     NSURLComponents *urlComponents = [NSURLComponents new];
     urlComponents.scheme = kOTPAuthScheme;
     urlComponents.host = [NSString stringForTokenType:self.type];
-    if (self.name)
+    
+    if(self.name.length) {
         urlComponents.path = [@"/" stringByAppendingString:self.name];
+    }
     urlComponents.queryItems = query;
 
     //NSLog(@"URL: [%@]", urlComponents);

@@ -33,7 +33,7 @@ OTPAlgorithm OTPAlgorithmUnknown = UINT8_MAX;
 NSString *const kOTPAlgorithmSHA1 = @"SHA1";
 NSString *const kOTPAlgorithmSHA256 = @"SHA256";
 NSString *const kOTPAlgorithmSHA512 = @"SHA512";
-
+NSString *const kOTPAlgorithmSteam = @"Steam";
 
 @implementation NSString (OTPAlgorithm)
 
@@ -46,6 +46,8 @@ NSString *const kOTPAlgorithmSHA512 = @"SHA512";
             return kOTPAlgorithmSHA256;
         case OTPAlgorithmSHA512:
             return kOTPAlgorithmSHA512;
+        case OTPAlgorithmSteam:
+            return kOTPAlgorithmSteam;
     }
 }
 
@@ -57,6 +59,8 @@ NSString *const kOTPAlgorithmSHA512 = @"SHA512";
         return OTPAlgorithmSHA256;
     } else if ([self isEqualToString:kOTPAlgorithmSHA512]) {
         return OTPAlgorithmSHA512;
+    } else if ([self isEqualToString:kOTPAlgorithmSteam]) {
+        return OTPAlgorithmSteam;
     }
 
     return OTPAlgorithmUnknown;

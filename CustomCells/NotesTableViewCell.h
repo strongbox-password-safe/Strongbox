@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^onNotesEdited)(NSString* notes);
 @property (nonatomic, copy) void (^onNotesDoubleTap)(void);
 
-- (void)setNotes:(NSString*)notes editable:(BOOL)editable;
+- (void)setNotes:(NSString*)notes editable:(BOOL)editable useEasyReadFont:(BOOL)useEasyReadFont;
 
 @end
 

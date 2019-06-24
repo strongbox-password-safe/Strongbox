@@ -30,29 +30,18 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="eIL-MJ-BDK">
-                                <rect key="frame" x="99" y="9.5" width="285" height="32"/>
+                                <rect key="frame" x="99" y="15" width="285" height="21"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Value that gets very big very quickluy" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="12" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="miA-4r-w9p" customClass="AutoCompleteTextField">
-                                        <rect key="frame" x="0.0" y="5.5" width="247" height="21"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="285" height="21"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                     </textField>
-                                    <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="255" verticalCompressionResistancePriority="745" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mJu-kF-BlG">
-                                        <rect key="frame" x="253" y="0.0" width="32" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" priority="999" constant="32" id="2H5-Ml-3G5"/>
-                                            <constraint firstAttribute="width" constant="32" id="tRg-gW-xUf"/>
-                                        </constraints>
-                                        <state key="normal" image="copy"/>
-                                        <connections>
-                                            <action selector="onRightAccessoryButton:" destination="d4d-x7-3AI" eventType="touchUpInside" id="TTJ-OH-16c"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                             </stackView>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EXO-Hf-DTq" userLabel="Horizontal Line">
-                                <rect key="frame" x="99" y="41" width="247" height="1"/>
+                                <rect key="frame" x="99" y="41" width="285" height="1"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="ouU-Wj-p0w"/>
@@ -83,13 +72,9 @@
             <connections>
                 <outlet property="horizontalLine" destination="EXO-Hf-DTq" id="Zhx-N5-YqT"/>
                 <outlet property="keyLabel" destination="oFX-hJ-zwW" id="OMB-qA-pjC"/>
-                <outlet property="rightAccessoryButton" destination="mJu-kF-BlG" id="kVn-KA-jbK"/>
                 <outlet property="valueText" destination="miA-4r-w9p" id="tLV-he-fcE"/>
             </connections>
             <point key="canvasLocation" x="44.927536231884062" y="63.28125"/>
         </tableViewCell>
     </objects>
-    <resources>
-        <image name="copy" width="30" height="30"/>
-    </resources>
 </document>

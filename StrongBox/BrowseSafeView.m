@@ -9,7 +9,6 @@
 #import "BrowseSafeView.h"
 #import "PwSafeSerialization.h"
 #import "SelectDestinationGroupController.h"
-#import <MessageUI/MessageUI.h>
 #import "RecordView.h"
 #import "Alerts.h"
 #import <ISMessages/ISMessages.h>
@@ -33,7 +32,7 @@
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
-@interface BrowseSafeView () <MFMailComposeViewControllerDelegate, UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource>
+@interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource>
 
 @property (strong, nonatomic) NSArray<Node*> *searchResults;
 @property (strong, nonatomic) NSArray<Node*> *items;
@@ -60,23 +59,33 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 @implementation BrowseSafeView
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.navigationController.toolbarHidden = NO;
+    self.navigationController.toolbar.hidden = NO;
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:YES];
     
-    if(!self.hasAlreadyAppeared && Settings.sharedInstance.immediateSearchOnBrowse && self.currentGroup == self.viewModel.database.rootGroup) {
+    if(!self.hasAlreadyAppeared && self.viewModel.metadata.immediateSearchOnBrowse && self.currentGroup == self.viewModel.database.rootGroup) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if ([[Settings sharedInstance] isProOrFreeTrial]) {
                 [self.searchController.searchBar becomeFirstResponder];
             }
         });
     }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self addSearchBarToNav]; // Required to avoid weird UI artifact on subgroup segues
+        });
+    }
     
     self.hasAlreadyAppeared = YES;
     
-    self.navigationController.toolbarHidden = NO;
-    self.navigationController.toolbar.hidden = NO;
     [self refreshItems];
-    [self updateDetailsView:nil];
+    [self updateSplitViewDetailsView:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -108,13 +117,22 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     [self setupTips];
     
+    self.extendedLayoutIncludesOpaqueBars = YES;
+    self.definesPresentationContext = YES;
+
     [self setupNavBar];
+    [self setupSearchBar];
+    
+    if(self.currentGroup == self.viewModel.database.rootGroup) {
+        // Only do this for the root group - We should delay adding this because we get a weird
+        // UI Artifact / Delay on segues to subgroups if we add here :(
+        
+        [self addSearchBarToNav];
+    }
     
     NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
     self.navigationItem.rightBarButtonItems = rightBarButtons;
-
-    [self setupSearchBar];
     
     [self refreshItems];
     
@@ -129,28 +147,12 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         NSIndexPath *ip = [self.tableView indexPathForSelectedRow];
         if(ip) {
             Node* item = [self getDataSource][ip.row];
-            [self updateDetailsView:item];
+            [self updateSplitViewDetailsView:item];
         }
         else{
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateDetailsView:nil];
+                [self updateSplitViewDetailsView:nil];
             });
-        }
-    }
-}
-
-- (void)updateDetailsView:(Node*)item {
-    if(self.splitViewController) {
-        if(item) {
-            if(item.isGroup) {
-                [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
-            }
-            else{
-                [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:item];
-            }
-        }
-        else if(!self.splitViewController.isCollapsed) {
-            [self performSegueWithIdentifier:@"segueMasterDetailToEmptyDetail" sender:nil];
         }
     }
 }
@@ -185,16 +187,15 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)setupSearchBar {
-    self.extendedLayoutIncludesOpaqueBars = YES;
-    self.definesPresentationContext = YES;
-    
     self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
     self.searchController.searchResultsUpdater = self;
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
     self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
-    
+}
+
+- (void)addSearchBarToNav {
     if ([[Settings sharedInstance] isProOrFreeTrial]) {
         if (@available(iOS 11.0, *)) {
             self.navigationItem.searchController = self.searchController;
@@ -207,6 +208,11 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             [self.searchController.searchBar sizeToFit];
         }
     }
+    else {
+        if (@available(iOS 11.0, *)) {
+            self.navigationItem.searchController = nil;
+        }
+    }
     
     [self.searchController setActive:NO];
 }
@@ -217,26 +223,14 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
     
     if (!Settings.sharedInstance.hideTips && (!self.currentGroup || self.currentGroup.parent == nil)) {
-        if(arc4random_uniform(100) < 50) {
-            [ISMessages showCardAlertWithTitle:@"Fast Password Copy"
-                                       message:@"Tap and hold entry for fast password copy"
-                                      duration:2.5f
-                                   hideOnSwipe:YES
-                                     hideOnTap:YES
-                                     alertType:ISAlertTypeSuccess
-                                 alertPosition:ISAlertPositionBottom
-                                       didHide:nil];
-        }
-        else {
-            [ISMessages showCardAlertWithTitle:@"Fast Username Copy"
-                                       message:@"Double Tap for fast username copy"
-                                      duration:2.5f
-                                   hideOnSwipe:YES
-                                     hideOnTap:YES
-                                     alertType:ISAlertTypeSuccess
-                                 alertPosition:ISAlertPositionBottom
-                                       didHide:nil];
-        }
+        [ISMessages showCardAlertWithTitle:@"Fast Tap Actions"
+                                   message:@"You can long press, or double/triple tap to quickly copy fields... Give it a try!"
+                                  duration:2.5f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionBottom
+                                   didHide:nil];
     }
 }
 
@@ -276,7 +270,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.browseSortField == kBrowseSortFieldNone; 
+    return self.viewModel.database.format != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone;
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
@@ -447,7 +441,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
 
     if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
         NSArray<Node*>* otps = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
@@ -457,16 +451,16 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         self.searchResults = [searcher searchNodes:otps
                                         searchText:searchController.searchBar.text
                                              scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
-                                       dereference:Settings.sharedInstance.searchDereferencedFields
-                             includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
-                                 includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+                                       dereference:self.viewModel.metadata.searchDereferencedFields
+                             includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
+                                 includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults];
     }
     else {
         self.searchResults = [searcher search:searchController.searchBar.text
                                         scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
-                                  dereference:Settings.sharedInstance.searchDereferencedFields
-                        includeKeePass1Backup:Settings.sharedInstance.showKeePass1BackupGroup
-                            includeRecycleBin:Settings.sharedInstance.showRecycleBinInSearchResults];
+                                  dereference:self.viewModel.metadata.searchDereferencedFields
+                        includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
+                            includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults];
     }
     
     [self.tableView reloadData];
@@ -483,10 +477,10 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
-    NSString* title = Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
+    NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
 
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
 
     if(self.searchController.isActive || self.viewModel.metadata.browseViewType != kBrowseViewTypeTotpList) {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
@@ -496,14 +490,14 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
 
-            NSString* childCount = Settings.sharedInstance.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
+            NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
             
             [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil];
         }
         else {
             NSString* subtitle = [searcher getBrowseItemSubtitle:node];
             NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
-            flags = Settings.sharedInstance.showFlagsInBrowse ? flags : @"";
+            flags = self.viewModel.metadata.showFlagsInBrowse ? flags : @"";
             
             [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
 
@@ -536,7 +530,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)setOtpCellLabelProperties:(UILabel*)otpLabel node:(Node*)node {
-    if(!Settings.sharedInstance.hideTotpInBrowse && node.otpToken) {
+    if(!self.viewModel.metadata.hideTotpInBrowse && node.otpToken) {
         uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
         
         otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
@@ -587,7 +581,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 - (void)tapTimerFired:(NSTimer *)aTimer{
     if(self.tapCount == 1) {
-        [self tapOnCell:self.tappedIndexPath];
+        [self handleSingleTap:self.tappedIndexPath];
     }
     else if(self.tapCount == 2) {
         [self handleDoubleTap:self.tappedIndexPath];
@@ -596,40 +590,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     self.tapCount = 0;
     self.tappedIndexPath = nil;
     self.tapTimer = nil;
-}
-
-- (void)tapOnCell:(NSIndexPath *)indexPath  {
-    if (!self.editing) {
-        NSArray* arr = [self getDataSource];
-        
-        if(indexPath.row >= arr.count) {
-            return;
-        }
-        
-        Node *item = arr[indexPath.row];
-
-        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-
-        if(self.splitViewController) {
-            [self updateDetailsView:item];
-        }
-        else {
-            if (!item.isGroup) {
-                if (@available(iOS 11.0, *)) {
-                    [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
-                }
-                else {
-                    [self performSegueWithIdentifier:@"segueToRecord" sender:item];
-                }
-            }
-            else {
-                [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
-            }
-        }
-    }
-    else {
-        [self enableDisableToolbarButtons];
-    }
 }
 
 - (void)enableDisableToolbarButtons {
@@ -643,9 +603,9 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     self.buttonDelete.enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
     
     self.buttonSortItems.enabled = !self.isEditing ||
-        (!ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && Settings.sharedInstance.browseSortField == kBrowseSortFieldNone);
+        (!ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone);
     
-    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-32-descending" : @"sort-32"] : [UIImage imageNamed:Settings.sharedInstance.browseSortOrderDescending ? @"sort-descending" : @"sort-ascending"];
+    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-32-descending" : @"sort-32"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-descending" : @"sort-ascending"];
     
     [self.buttonSortItems setImage:sortImage];
         
@@ -671,7 +631,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             break;
     }
     
-    if(self.viewModel.database.format == kKeePass1 && !Settings.sharedInstance.showKeePass1BackupGroup) {
+    if(self.viewModel.database.format == kKeePass1 && !self.viewModel.metadata.showKeePass1BackupGroup) {
         Node* backupGroup = self.viewModel.database.keePass1BackupNode;
         
         if(backupGroup) {
@@ -685,7 +645,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     else if(self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4) {
         Node* recycleBin = self.viewModel.database.recycleBinNode;
         
-        if(Settings.sharedInstance.doNotShowRecycleBinInBrowse && recycleBin) {
+        if(self.viewModel.metadata.doNotShowRecycleBinInBrowse && recycleBin) {
             if([self.currentGroup contains:recycleBin]) {
                 ret = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
                     return obj != recycleBin;
@@ -694,7 +654,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         }
     }
     
-    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database];
+    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
     return [searcher sortItemsForBrowse:ret];
 }
 
@@ -731,7 +691,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         return obj.otpToken != nil;
     }];
     
-    if(!Settings.sharedInstance.hideTotpInBrowse && hasOtpToken) {
+    if(!self.viewModel.metadata.hideTotpInBrowse && hasOtpToken) {
         NSLog(@"Starting OTP Refresh Timer");
         
         self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
@@ -821,14 +781,14 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         UINavigationController* nav = segue.destinationViewController;
         SortOrderTableViewController* vc = (SortOrderTableViewController*)nav.topViewController;
         vc.format = self.viewModel.database.format;
-        vc.field = Settings.sharedInstance.browseSortField;
-        vc.descending = Settings.sharedInstance.browseSortOrderDescending;
-        vc.foldersSeparately = Settings.sharedInstance.browseSortFoldersSeparately;
+        vc.field = self.viewModel.metadata.browseSortField;
+        vc.descending = self.viewModel.metadata.browseSortOrderDescending;
+        vc.foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
         
         vc.onChangedOrder = ^(BrowseSortField field, BOOL descending, BOOL foldersSeparately) {
-            Settings.sharedInstance.browseSortField = field;
-            Settings.sharedInstance.browseSortOrderDescending = descending;
-            Settings.sharedInstance.browseSortFoldersSeparately = foldersSeparately;
+            self.viewModel.metadata.browseSortField = field;
+            self.viewModel.metadata.browseSortOrderDescending = descending;
+            self.viewModel.metadata.browseSortFoldersSeparately = foldersSeparately;
             [self refreshItems];
         };
     }
@@ -933,7 +893,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             
             [self refreshItems];
             
-            [self updateDetailsView:nil];
+            [self updateSplitViewDetailsView:nil];
             
             if (error) {
                 [Alerts error:self title:@"Error Saving" error:error];
@@ -985,58 +945,197 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     [self setEditing:false];
 }
 
-- (void)handleTripleTap:(NSIndexPath *)indexPath {
-    Node *item = [self getDataSource][indexPath.row];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (Node*)getTappedItem:(NSIndexPath*)indexPath {
+    NSArray* arr = [self getDataSource];
+    if(indexPath.row >= arr.count) { // This can happen in a race condition
+        return nil;
+    }
     
-    if (item.isGroup) {
-        NSLog(@"Item is group, cannot Fast Username Copy...");
-        
-        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
-        
+    return arr[indexPath.row];
+}
+
+- (void)handleSingleTap:(NSIndexPath *)indexPath  {
+    if (self.editing) {
+        [self enableDisableToolbarButtons]; // Buttons can be enabled disabled based on selection?
         return;
     }
- 
-    if(!item.otpToken) { // No TOTP - Treat this as a double tap
-        [self handleDoubleTap:indexPath];
+    
+    Node* item = [self getTappedItem:indexPath];
+    if(!item) {
+        return;
+    }
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    if(item.isGroup) {
+        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
     }
     else {
-        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-        
-        pasteboard.string = item.otpToken.password;
-        
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ TOTP Copied", [self dereference:item.title node:item]]
-                                   message:nil
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
-        
-        NSLog(@"Fast TOTP Copy on %@", item.title);
-        
-        if(!self.isEditing) {
-            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-        }
+        NSLog(@"Single Tap on %@", item.title);
+        [self performTapAction:item action:self.viewModel.metadata.tapAction];
     }
 }
 
 - (void)handleDoubleTap:(NSIndexPath *)indexPath {
-    Node *item = [self getDataSource][indexPath.row];
-    
-    if (item.isGroup) {
-        NSLog(@"Item is group, cannot Fast Username Copy...");
-        
-        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
-        
+    if(self.editing) {
         return;
     }
+
+    Node* item = [self getTappedItem:indexPath];
+    if(!item || item.isGroup) {
+        if(item) {
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
+        return;
+    }
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSLog(@"Double Tap on %@", item.title);
+
+    [self performTapAction:item action:self.viewModel.metadata.doubleTapAction];
+}
+
+- (void)handleTripleTap:(NSIndexPath *)indexPath {
+    if(self.editing) {
+        return;
+    }
+    Node* item = [self getTappedItem:indexPath];
+    if(!item || item.isGroup) {
+        if(item) {
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
+        return;
+    }
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSLog(@"Triple Tap on %@", item.title);
+
+    [self performTapAction:item action:self.viewModel.metadata.tripleTapAction];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
+    if(self.editing) {
+        return;
+    }
+    if (sender.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
+    Node* item = [self getTappedItem:indexPath];
+    if (!item || item.isGroup) {
+        if(item) {
+            [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
+        return;
+    }
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSLog(@"Long Press on %@", item.title);
     
+    [self performTapAction:item action:self.viewModel.metadata.longPressTapAction];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)performTapAction:(Node*)item action:(BrowseTapAction)action {
+    switch (action) {
+        case kBrowseTapActionNone:
+            // NOOP
+            break;
+        case kBrowseTapActionOpenDetails:
+            [self openEntryDetails:item];
+            break;
+        case kBrowseTapActionCopyTitle:
+            [self copyTitle:item];
+            break;
+        case kBrowseTapActionCopyUsername:
+            [self copyUsername:item];
+            break;
+        case kBrowseTapActionCopyPassword:
+            [self copyPassword:item];
+            break;
+        case kBrowseTapActionCopyUrl:
+            [self copyUrl:item];
+            break;
+        case kBrowseTapActionCopyEmail:
+            [self copyEmail:item];
+            break;
+        case kBrowseTapActionCopyNotes:
+            [self copyNotes:item];
+            break;
+        case kBrowseTapActionCopyTotp:
+            [self copyTotp:item];
+            break;
+       default:
+            break;
+    }
+}
+
+- (void)copyTitle:(Node*)item {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    pasteboard.string = [self dereference:item.title node:item];
+    
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Title Copied", [self dereference:item.title node:item]]
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
+}
+
+- (void)copyUrl:(Node*)item {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    pasteboard.string = [self dereference:item.fields.url node:item];
+    
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' URL Copied", [self dereference:item.title node:item]]
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
+}
+
+- (void)copyEmail:(Node*)item {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    pasteboard.string = [self dereference:item.fields.email node:item];
+    
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Email Copied", [self dereference:item.title node:item]]
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
+}
+
+- (void)copyNotes:(Node*)item {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    pasteboard.string = [self dereference:item.fields.notes node:item];
+    
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Notes Copied", [self dereference:item.title node:item]]
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
+}
+
+- (void)copyUsername:(Node*)item {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
     pasteboard.string = [self dereference:item.fields.username node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Username Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Username Copied", [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1046,41 +1145,40 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                                didHide:nil];
     
     NSLog(@"Fast Username Copy on %@", item.title);
-
-    if(!self.isEditing) {
-        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Long Press
+- (void)copyTotp:(Node*)item {
+    if(!item.otpToken) {
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@': No TOTP setup to Copy!", [self dereference:item.title node:item]]
+                                   message:nil
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeWarning
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
-    if (sender.state != UIGestureRecognizerStateBegan) {
         return;
     }
     
-    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
-    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    if (!indexPath || indexPath.row >= [self getDataSource].count) {
-        NSLog(@"Not on a cell");
-        return;
-    }
+    pasteboard.string = item.otpToken.password;
     
-    Node *item = [self getDataSource][indexPath.row];
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' TOTP Copied", [self dereference:item.title node:item]]
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
     
-    if (item.isGroup) {
-        NSLog(@"Item is group, cannot Fast PW Copy...");
-        return;
-    }
+    NSLog(@"Fast TOTP Copy on %@", item.title);
     
-    NSLog(@"Fast Password Copy on %@", item.title);
-    
-    [self copyPasswordOnLongPress:item withTapLocation:tapLocation];
 }
 
-- (void)copyPasswordOnLongPress:(Node *)item withTapLocation:(CGPoint)tapLocation {
+- (void)copyPassword:(Node *)item {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
     BOOL copyTotp = (item.fields.password.length == 0 && item.otpToken);
@@ -1095,6 +1193,37 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
 }
+
+- (void)openEntryDetails:(Node*)item {
+    if(item.isGroup) {
+        return;
+    }
+    
+    if(self.splitViewController) {
+        [self updateSplitViewDetailsView:item];
+    }
+    else {
+        if (@available(iOS 11.0, *)) {
+            [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToRecord" sender:item];
+        }
+    }
+}
+
+- (void)updateSplitViewDetailsView:(Node*)item {
+    if(self.splitViewController) {
+        if(item) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:item];
+        }
+        else if(!self.splitViewController.isCollapsed) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToEmptyDetail" sender:nil];
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction)onViewPreferences:(id)sender {
     [self performSegueWithIdentifier:@"segueToViewSettings" sender:nil];

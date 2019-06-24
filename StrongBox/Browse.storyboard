@@ -330,7 +330,7 @@
                             </connections>
                         </barButtonItem>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="&lt;Group Name&gt;" prompt="Fast-Copy: Long Press-Password, Double Tap-Username, Triple Tap-TOTP" largeTitleDisplayMode="never" id="5B9-6k-HF7">
+                    <navigationItem key="navigationItem" title="&lt;Group Name&gt;" prompt="Tip: Try long pressing, or double/triple tapping for quick actions" largeTitleDisplayMode="never" id="5B9-6k-HF7">
                         <barButtonItem key="leftBarButtonItem" title="Close" id="QGn-9Z-cSb">
                             <connections>
                                 <action selector="onClose:" destination="HOc-E3-CoK" id="ofa-Uf-2Su"/>
@@ -816,10 +816,134 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Tap Actions" footerTitle="Strongbox can perform different actions based on your taps" id="5Ed-gO-hgQ">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="Kgy-PH-CuO" userLabel="Single Tap">
+                                        <rect key="frame" x="0.0" y="571" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Kgy-PH-CuO" id="MQx-8F-Mx7">
+                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Single Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFj-ev-PsQ">
+                                                    <rect key="frame" x="20" y="11" width="79" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Open Item Details" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vt9-MG-2Il" userLabel="Browse View Type">
+                                                    <rect key="frame" x="239.5" y="11.5" width="136.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Vt9-MG-2Il" firstAttribute="centerY" secondItem="MQx-8F-Mx7" secondAttribute="centerY" id="0CP-Hi-cJ4"/>
+                                                <constraint firstItem="eFj-ev-PsQ" firstAttribute="leading" secondItem="MQx-8F-Mx7" secondAttribute="leading" constant="20" id="6Se-xM-8tt"/>
+                                                <constraint firstItem="Vt9-MG-2Il" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="eFj-ev-PsQ" secondAttribute="trailing" constant="8" symbolic="YES" id="7ez-08-vrY"/>
+                                                <constraint firstItem="eFj-ev-PsQ" firstAttribute="top" secondItem="MQx-8F-Mx7" secondAttribute="topMargin" id="Va3-d9-ViH"/>
+                                                <constraint firstAttribute="trailing" secondItem="Vt9-MG-2Il" secondAttribute="trailing" id="lfp-bE-EKR"/>
+                                                <constraint firstItem="eFj-ev-PsQ" firstAttribute="bottom" secondItem="MQx-8F-Mx7" secondAttribute="bottomMargin" id="w4g-PY-aJz"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="0ad-FM-L2V" userLabel="Double Tap">
+                                        <rect key="frame" x="0.0" y="615" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0ad-FM-L2V" id="Af5-7o-Qiz">
+                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Double Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5HW-17-RA2">
+                                                    <rect key="frame" x="20" y="11" width="86.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Copy Username" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Atk-hW-7JK" userLabel="Browse View Type">
+                                                    <rect key="frame" x="253" y="11.5" width="123" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="5HW-17-RA2" firstAttribute="leading" secondItem="Af5-7o-Qiz" secondAttribute="leading" constant="20" id="6XL-0F-vj6"/>
+                                                <constraint firstItem="5HW-17-RA2" firstAttribute="top" secondItem="Af5-7o-Qiz" secondAttribute="topMargin" id="EdM-XB-3wI"/>
+                                                <constraint firstAttribute="trailing" secondItem="Atk-hW-7JK" secondAttribute="trailing" id="UNc-qe-e36"/>
+                                                <constraint firstItem="5HW-17-RA2" firstAttribute="bottom" secondItem="Af5-7o-Qiz" secondAttribute="bottomMargin" id="buT-KO-NLO"/>
+                                                <constraint firstItem="Atk-hW-7JK" firstAttribute="centerY" secondItem="Af5-7o-Qiz" secondAttribute="centerY" id="eKX-Tq-rDd"/>
+                                                <constraint firstItem="Atk-hW-7JK" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="5HW-17-RA2" secondAttribute="trailing" constant="8" symbolic="YES" id="eL4-N2-j1d"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="Tyx-JQ-GAP" userLabel="Triple Tap">
+                                        <rect key="frame" x="0.0" y="659" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Tyx-JQ-GAP" id="KaQ-X8-7ea">
+                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Triple Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zPh-T1-OfL">
+                                                    <rect key="frame" x="20" y="11" width="74.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Copy TOTP" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Srz-kD-9f4" userLabel="Browse View Type">
+                                                    <rect key="frame" x="288.5" y="11.5" width="87.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Srz-kD-9f4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="zPh-T1-OfL" secondAttribute="trailing" constant="8" symbolic="YES" id="881-2S-XS3"/>
+                                                <constraint firstItem="zPh-T1-OfL" firstAttribute="bottom" secondItem="KaQ-X8-7ea" secondAttribute="bottomMargin" id="FA2-bh-dV5"/>
+                                                <constraint firstItem="Srz-kD-9f4" firstAttribute="centerY" secondItem="KaQ-X8-7ea" secondAttribute="centerY" id="aXb-Ie-dhy"/>
+                                                <constraint firstItem="zPh-T1-OfL" firstAttribute="leading" secondItem="KaQ-X8-7ea" secondAttribute="leading" constant="20" id="iml-9H-PZk"/>
+                                                <constraint firstAttribute="trailing" secondItem="Srz-kD-9f4" secondAttribute="trailing" id="qWR-fq-rit"/>
+                                                <constraint firstItem="zPh-T1-OfL" firstAttribute="top" secondItem="KaQ-X8-7ea" secondAttribute="topMargin" id="xj7-8Z-Y0a"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="idf-hL-TCt" userLabel="Long Press">
+                                        <rect key="frame" x="0.0" y="703" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="idf-hL-TCt" id="ZZh-ht-xiu">
+                                            <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Long Press" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gAT-pc-Dhv">
+                                                    <rect key="frame" x="20" y="11" width="85" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Copy Password" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8b5-7M-Fbk" userLabel="Browse View Type">
+                                                    <rect key="frame" x="258" y="11.5" width="118" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="8b5-7M-Fbk" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="gAT-pc-Dhv" secondAttribute="trailing" constant="8" symbolic="YES" id="8QM-G3-o9P"/>
+                                                <constraint firstAttribute="trailing" secondItem="8b5-7M-Fbk" secondAttribute="trailing" id="APx-rO-QYY"/>
+                                                <constraint firstItem="gAT-pc-Dhv" firstAttribute="bottom" secondItem="ZZh-ht-xiu" secondAttribute="bottomMargin" id="MAK-jS-zd1"/>
+                                                <constraint firstItem="gAT-pc-Dhv" firstAttribute="leading" secondItem="ZZh-ht-xiu" secondAttribute="leading" constant="20" id="OdT-ZW-06V"/>
+                                                <constraint firstItem="gAT-pc-Dhv" firstAttribute="top" secondItem="ZZh-ht-xiu" secondAttribute="topMargin" id="Vdl-pL-mdx"/>
+                                                <constraint firstItem="8b5-7M-Fbk" firstAttribute="centerY" secondItem="ZZh-ht-xiu" secondAttribute="centerY" id="fL9-HS-kbB"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="Field Dereferencing" id="rF2-Qb-rIF">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Pwa-P0-zyI" userLabel="View Dereferenced Fields">
-                                        <rect key="frame" x="0.0" y="563.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="815" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Pwa-P0-zyI" id="3qV-ed-tJO">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -849,7 +973,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="YHX-bF-TyV" userLabel="Dereference Fields for Search">
-                                        <rect key="frame" x="0.0" y="607.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="859" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="YHX-bF-TyV" id="kfX-Pd-gc1">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -900,11 +1024,19 @@
                         <outlet property="cellBrowseItemSubtitle" destination="bsk-lD-wkE" id="PBh-pT-Zus"/>
                         <outlet property="cellDerefenceDuringSearch" destination="YHX-bF-TyV" id="8gq-Rc-1aT"/>
                         <outlet property="cellDereference" destination="Pwa-P0-zyI" id="QZN-TY-ByF"/>
+                        <outlet property="cellDoubleTapAction" destination="0ad-FM-L2V" id="IzJ-OZ-5tN"/>
+                        <outlet property="cellLongPressAction" destination="idf-hL-TCt" id="QIg-yf-bNk"/>
                         <outlet property="cellShowBackupFolder" destination="2us-UW-5wB" id="DRk-Sf-z6C"/>
                         <outlet property="cellShowRecycleBin" destination="p1l-FU-I3N" id="b0Q-RT-okp"/>
                         <outlet property="cellShowRecycleBinInSearch" destination="wbr-ll-leJ" id="COo-z7-aZ9"/>
+                        <outlet property="cellSingleTapAction" destination="Kgy-PH-CuO" id="oY1-X0-ezw"/>
+                        <outlet property="cellTripleTapAction" destination="Tyx-JQ-GAP" id="Tnw-nN-HcB"/>
                         <outlet property="cellViewAs" destination="rFQ-3X-ErW" id="bMe-Jq-VM5"/>
                         <outlet property="labelBrowseItemSubtitle" destination="gg0-ep-FLv" id="3Vm-t2-dNS"/>
+                        <outlet property="labelDoubleTapAction" destination="Atk-hW-7JK" id="d0m-5r-eaB"/>
+                        <outlet property="labelLongPressAction" destination="8b5-7M-Fbk" id="syV-1i-bNm"/>
+                        <outlet property="labelSingleTapAction" destination="Vt9-MG-2Il" id="d9P-LI-vwx"/>
+                        <outlet property="labelTripleTapAction" destination="Srz-kD-9f4" id="Ajw-ko-LIt"/>
                         <outlet property="labelViewAs" destination="Yxs-mQ-Cm1" id="P9P-IJ-UN5"/>
                         <outlet property="showChildCountOnFolder" destination="R5T-wR-a2v" id="qkx-zK-a2p"/>
                         <outlet property="showFlagsInBrowse" destination="9La-H6-tpp" id="QrI-YP-cgr"/>

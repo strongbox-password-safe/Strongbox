@@ -2257,7 +2257,9 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     NSString* response = [[Alerts alloc] input:@"Please enter the secret or an OTPAuth URL" defaultValue:@"" allowEmpty:NO];
     
     if(response) {
-        [self.model setTotp:item otp:response];
+        [Alerts yesNo:@"Is this a Steam Token? (Say 'No' if you're unsure)" window:self.view.window completion:^(BOOL yesNo) {
+            [self.model setTotp:item otp:response steam:yesNo];
+        }];
     }
 }
 

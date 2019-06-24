@@ -11,6 +11,7 @@
 #import "OTPToken+Generation.h"
 #import "NSURL+QueryItems.h"
 #import <Base32/MF_Base32Additions.h>
+#import "OTPToken+Generation.h"
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 
@@ -28,12 +29,12 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     return _regex;
 }
 
--(OTPToken *)otpToken {
+- (OTPToken *)otpToken {
     return [Node getOtpTokenFromRecord:self.fields.password fields:self.fields.customFields notes:self.fields.notes];
 }
 
-- (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes {
-    OTPToken* token = [Node getOtpTokenFromString:string];
+- (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes forceSteam:(BOOL)forceSteam {
+    OTPToken* token = [Node getOtpTokenFromString:string forceSteam:forceSteam];
     
     if(token) {
         [self setTotp:token appendUrlToNotes:appendUrlToNotes];
@@ -43,12 +44,12 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     return NO;
 }
 
-+ (OTPToken*)getOtpTokenFromString:(NSString * _Nonnull)string {
++ (OTPToken*)getOtpTokenFromString:(NSString * _Nonnull)string forceSteam:(BOOL)forceSteam {
     OTPToken *token = nil;
     NSURL *url = [Node findOtpUrlInString:string];
 
     if(url) {
-        token = [OTPToken tokenWithURL:url];
+        token = [self getOtpTokenFromUrl:url];
     }
     else {
         NSData* secretData = [NSData secretWithString:string];
@@ -56,6 +57,11 @@ static NSString* const kOtpAuthScheme = @"otpauth";
             token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secretData name:@"<Unknown>" issuer:@"<Unknown>"];
             token = [token validate] ? token : nil;
         }
+    }
+    
+    if(forceSteam) {
+        token.algorithm = OTPAlgorithmSteam;
+        token.digits = 5;
     }
     
     return token;
@@ -68,12 +74,13 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     
     self.fields.customFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
     
-    if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-        NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+    if(token.algorithm == OTPAlgorithmSteam) {
+        NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
         self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
     }
     else {
-        self.fields.customFields[@"TOTP Settings"] = nil;
+        NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+        self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
     }
     
     // KeeOtp Plugin
@@ -122,21 +129,47 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     }
 }
 
++ (NSDictionary<NSString*, NSString*>*)getQueryParams:(NSString*)queryString {
+    NSURLComponents *components = [NSURLComponents new];
+    [components setQuery:queryString];
+    NSArray *queryItems = components.queryItems;
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:queryItems.count];
+    for (NSURLQueryItem *item in queryItems) {
+        params[item.name] = item.value;
+    }
+
+    return params;
+}
+
++ (OTPToken*)getOtpTokenFromUrl:(NSURL*)url {
+    if(url && url.scheme && [url.scheme isEqualToString:kOtpAuthScheme]) {
+        OTPToken* ret = [OTPToken tokenWithURL:url];
+        NSDictionary *params = [self getQueryParams:url.query];
+        if(params[@"encoder"] && [params[@"encoder"] isEqualToString:@"steam"]) {
+            NSLog(@"Steam Encoder on OTPAuth URL Found");
+            ret.algorithm = OTPAlgorithmSteam;
+            ret.digits = 5;
+        }
+        
+        return ret;
+    }
+    
+    return nil;
+}
+
 + (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary<NSString*, StringValue*>*)fields notes:(NSString*)notes {
     // KyPass - OTPAuth url in the Password field…
     
     NSURL *otpUrl = [NSURL URLWithString:password];
     
-    if(otpUrl && otpUrl.scheme && [otpUrl.scheme isEqualToString:kOtpAuthScheme]) {
-        OTPToken* ret = [OTPToken tokenWithURL:otpUrl];
-        if(ret) {
-            return ret;
-        }
+    OTPToken* ret = [self getOtpTokenFromUrl:otpUrl];
+    if(ret) {
+        return ret;
     }
     
     // KeePassXC
     // * []TOTP Seed=<seed>
-    // * []TOTP Settings=30;6 - time and digits - can be 30;S for “Steam”?
+    // * []TOTP Settings=30;6 - time and digits - can be 30;S for “Steam”
     
     StringValue* keePassXcOtpSecretEntry = fields[@"TOTP Seed"];
     
@@ -154,8 +187,14 @@ static NSString* const kOtpAuthScheme = @"otpauth";
                     if(params.count > 0) {
                         token.period = [params[0] integerValue];
                     }
-                    if(params.count > 1 && ![params[1] isEqualToString:@"S"]) { // S = Steam? Not sure how to gen... FUTURE
-                        token.digits = [params[1] integerValue];
+                    if(params.count > 1) {
+                        if(![params[1] isEqualToString:@"S"]) { // S = Steam
+                            token.digits = [params[1] integerValue];
+                        }
+                        else {
+                            token.digits = 5;
+                            token.algorithm = OTPAlgorithmSteam;
+                        }
                     }
                 }
             }
@@ -166,6 +205,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
             }
         }
     }
+    
     // KeeOtp Plugin
     // * otp="key=2GQFLXXUBJQELC&step=31"
     // * otp="key=2GQFLXXUBJQELC&size=8"
@@ -175,14 +215,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     if(keeOtpSecretEntry) {
         NSString* keeOtpSecret = keeOtpSecretEntry.value;
         if(keeOtpSecret) {
-            NSURLComponents *components = [NSURLComponents new];
-            [components setQuery:keeOtpSecret];
-            NSArray *queryItems = components.queryItems;
-            NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:queryItems.count];
-            for (NSURLQueryItem *item in queryItems) {
-                params[item.name] = item.value;
-            }
-            
+            NSDictionary *params = [self getQueryParams:keeOtpSecret];
             NSString* secret = params[@"key"];
             
             if(secret.length) {
@@ -214,11 +247,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 
     NSURL *url = [Node findOtpUrlInString:notes];
 
-    if(url) {
-        return [OTPToken tokenWithURL:url];
-    }
-    
-    return nil;
+    return [self getOtpTokenFromUrl:url];
 }
 
 + (NSURL*)findOtpUrlInString:(NSString*)notes {

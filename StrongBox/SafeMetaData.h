@@ -11,6 +11,9 @@
 #import "DuressAction.h"
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "BrowseViewType.h"
+#import "BrowseTapAction.h"
+#import "BrowseSortField.h"
+#import "BrowseItemSubtitleField.h"
 
 @interface SafeMetaData : NSObject
 
@@ -45,12 +48,43 @@
 @property (nonatomic) BOOL autoFillCacheEnabled;
 @property (nonatomic) BOOL autoFillCacheAvailable;
 
-@property (nonatomic) BOOL readOnly;
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
 @property NSURL* keyFileUrl;
 @property DatabaseFormat likelyFormat;
+
+@property (nonatomic) BOOL readOnly;
 @property BrowseViewType browseViewType;
+
+@property BrowseTapAction tapAction;
+@property BrowseTapAction doubleTapAction;
+@property BrowseTapAction tripleTapAction;
+@property BrowseTapAction longPressTapAction;
+
+// Migrate from Global Settings - 23-Jun-2019
+
+// Browse View
+@property BrowseSortField browseSortField;
+@property BOOL browseSortOrderDescending;
+@property BOOL browseSortFoldersSeparately;
+@property BrowseItemSubtitleField browseItemSubtitleField;
+@property BOOL immediateSearchOnBrowse;
+@property BOOL hideTotpInBrowse;
+@property BOOL showKeePass1BackupGroup;
+@property BOOL showChildCountOnFolderInBrowse;
+@property BOOL showFlagsInBrowse;
+@property BOOL doNotShowRecycleBinInBrowse;
+@property BOOL showRecycleBinInSearchResults;
+@property BOOL viewDereferencedFields;
+@property BOOL searchDereferencedFields;
+
+// Details View
+@property BOOL showEmptyFieldsInDetailsView;
+@property NSArray<NSNumber*>* detailsViewCollapsedSections;
+@property BOOL easyReadFontForAll;
+@property BOOL hideTotp;
+@property BOOL tryDownloadFavIconForNewRecord;
+@property BOOL showPasswordByDefaultOnEditScreen;
 
 @end
 

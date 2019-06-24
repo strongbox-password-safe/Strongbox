@@ -14,9 +14,9 @@
 @property (weak, nonatomic) IBOutlet UIView *horizontalLine;
 @property (weak, nonatomic) IBOutlet UILabel *keyLabel;
 @property (weak, nonatomic) IBOutlet AutoCompleteTextField *valueText;
-@property (weak, nonatomic) IBOutlet UIButton *rightAccessoryButton;
 
 @property BOOL selectAllOnEdit;
+@property BOOL useEasyReadFont;
 
 @end
 
@@ -34,8 +34,21 @@
     self.valueText.onEdited = ^(NSString * _Nonnull text) {
         [self onValueEdited];
     };
-    
+    self.valueText.font = self.configuredValueFont;
+
     self.selectAllOnEdit = NO;
+    
+    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
+    [doubleTap setNumberOfTapsRequired:2];
+    [doubleTap setNumberOfTouchesRequired:1];
+    [self addGestureRecognizer:doubleTap];
+
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
+    [singleTap setNumberOfTapsRequired:1];
+    [singleTap setNumberOfTouchesRequired:1];
+    [self addGestureRecognizer:singleTap];
+    
+    [singleTap requireGestureRecognizerToFail:doubleTap];
 }
 
 - (void)prepareForReuse {
@@ -48,7 +61,7 @@
     self.valueText.tag = 0;
     self.valueText.enabled = NO;
     self.valueText.placeholder = @"";
-    self.valueText.font = FontManager.sharedInstance.configuredValueFont;
+    self.valueText.font = self.configuredValueFont;
     
     self.horizontalLine.backgroundColor = UIColor.blueColor;
     
@@ -60,24 +73,24 @@
     self.editingAccessoryType = UITableViewCellAccessoryNone;
 }
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing {
-    [self setKey:key value:value editing:editing keyColor:nil];
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:editing keyColor:nil useEasyReadFont:useEasyReadFont];
 }
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:nil formatAsUrl:NO suggestionProvider:suggestionProvider];
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:nil formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
 }
 
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing keyColor:(UIColor *)keyColor {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:keyColor formatAsUrl:NO];
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing keyColor:(UIColor *)keyColor useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:keyColor formatAsUrl:NO useEasyReadFont:useEasyReadFont];
 }
 
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit {
-    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit keyColor:nil formatAsUrl:NO];
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit keyColor:nil formatAsUrl:NO useEasyReadFont:useEasyReadFont];
 }
 
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:nil formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider];
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:nil formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString*)key
@@ -85,8 +98,8 @@
        editing:(BOOL)editing
 selectAllOnEdit:(BOOL)selectAllOnEdit
       keyColor:(UIColor *)keyColor
-   formatAsUrl:(BOOL)formatAsUrl {
-    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit keyColor:keyColor formatAsUrl:formatAsUrl suggestionProvider:nil];
+   formatAsUrl:(BOOL)formatAsUrl useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit keyColor:keyColor formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString*)key
@@ -95,7 +108,7 @@ selectAllOnEdit:(BOOL)selectAllOnEdit
 selectAllOnEdit:(BOOL)selectAllOnEdit
       keyColor:(UIColor *)keyColor
    formatAsUrl:(BOOL)formatAsUrl
-suggestionProvider:(SuggestionProvider)suggestionProvider {
+suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
     self.keyLabel.text = key;
     self.keyLabel.textColor = keyColor == nil ? UIColor.darkGrayColor : keyColor;
 
@@ -104,12 +117,13 @@ suggestionProvider:(SuggestionProvider)suggestionProvider {
     self.valueText.suggestionProvider = suggestionProvider;
     
     self.valueText.textColor = formatAsUrl ? UIColor.blueColor : UIColor.darkTextColor;
-    self.rightAccessoryButton.hidden = !formatAsUrl || editing;
     
     self.selectAllOnEdit = selectAllOnEdit;
     
     self.horizontalLine.hidden = !editing;
     self.selectionStyle = editing ? UITableViewCellSelectionStyleNone : UITableViewCellSelectionStyleDefault;
+    self.useEasyReadFont = useEasyReadFont;
+    self.valueText.font = self.configuredValueFont;
 }
 
 - (BOOL)canBecomeFirstResponder {
@@ -142,10 +156,20 @@ suggestionProvider:(SuggestionProvider)suggestionProvider {
     }
 }
 
-- (IBAction)onRightAccessoryButton:(id)sender {
-    if(self.onRightAccessoryButton) {
-        self.onRightAccessoryButton();
+- (void)onTap:(id)sender {
+    if(self.onTap) {
+        self.onTap();
     }
+}
+
+- (void)onDoubleTap:(id)sender {
+    if(self.onDoubleTap) {
+        self.onDoubleTap();
+    }
+}
+
+- (UIFont*)configuredValueFont {
+    return self.useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;
 }
 
 @end

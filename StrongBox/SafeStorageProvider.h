@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler;
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
+- (SafeMetaData *_Nullable)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
 
 @end
 

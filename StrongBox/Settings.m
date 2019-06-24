@@ -17,8 +17,7 @@ static NSString* const kPromptedForReview = @"newPromptedForReview";
 static NSString* const kIsProKey = @"isPro";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGesture";
-static NSString* const kCopyPasswordOnLongPress = @"copyPasswordOnLongPress";
-static NSString* const kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
+
 static NSString* const kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
 static NSString* const kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 static NSString* const kiCloudOn = @"iCloudOn";
@@ -34,33 +33,19 @@ static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
 static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
 static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
-static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1BackupGroupInSearchResults";
 static NSString* const kHideTips = @"hideTips";
 static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
-static NSString* const kHideTotp = @"hideTotp";
-static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
+
 static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
-static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
-static NSString* const kTryDownloadFavIconForNewRecord = @"tryDownloadFavIconForNewRecord";
 static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles";
 static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
 static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
-static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
-static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
 static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
 //static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill"; // Dead
-static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
-static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
 static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene"; // DEAD
-static NSString* const kHideEmptyFieldsInDetailsView = @"hideEmptyFieldsInDetailsView";
-static NSString* const kCollapsedSections = @"collapsedSections";
-static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
-static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolderInBrowse";
-static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
-static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse"; // DEAD
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
@@ -68,17 +53,11 @@ static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferen
 //static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
 //static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock"; // DEAD
-static NSString* const kImmediateSearchOnBrowse = @"immediateSearchOnBrowse";
-static NSString* const kBrowseItemSubtitleField = @"browseItemSubtitleField";
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController";
 //static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword"; // DEAD
 static NSString* const kMigratedLocalDatabasesToNewSystem = @"migratedLocalDatabasesToNewSystem";
-
-static NSString* const kBrowseSortField = @"browseSortField";
-static NSString* const kBrowseSortOrderDescending = @"browseSortOrderDescending";
-static NSString* const kBrowseSortFoldersSeparately = @"browseSortFoldersSeparately";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -148,20 +127,6 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 - (void)setHasShownKeePassBetaWarning:(BOOL)hasShownKeePassBetaWarning {
     [[self getUserDefaults] setBool:hasShownKeePassBetaWarning forKey:kHasShownKeePassBetaWarning];
     [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)showPasswordByDefaultOnEditScreen {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    return [userDefaults boolForKey:kShowPasswordByDefaultOnEditScreen];
-}
-
-- (void)setShowPasswordByDefaultOnEditScreen:(BOOL)showPasswordByDefaultOnEditScreen {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setBool:showPasswordByDefaultOnEditScreen forKey:kShowPasswordByDefaultOnEditScreen];
-    
-    [userDefaults synchronize];
 }
 
 - (BOOL)isProOrFreeTrial
@@ -371,20 +336,6 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     [userDefaults synchronize];
 }
 
-- (BOOL)isCopyPasswordOnLongPress {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-
-    return [userDefaults boolForKey:kCopyPasswordOnLongPress];
-}
-
-- (void)setCopyPasswordOnLongPress:(BOOL)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setBool:value forKey:kCopyPasswordOnLongPress];
-    
-    [userDefaults synchronize];
-}
-
 - (void)setNeverShowForMacAppMessage:(BOOL)neverShowForMacAppMessage {
     [[self getUserDefaults] setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
     
@@ -447,8 +398,7 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 }
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d%d]",
-    self.showPasswordByDefaultOnEditScreen,
+    return [NSString stringWithFormat:@"[%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d]",
     self.isHavePromptedAboutFreeTrial,
     self.isProOrFreeTrial,
     self.isPro,
@@ -457,7 +407,6 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     self.getAutoLockTimeoutSeconds,
     (long)self.isUserHasBeenPromptedForReview,
     self.isHasPromptedForCopyPasswordGesture,
-    self.isCopyPasswordOnLongPress,
     self.neverShowForMacAppMessage,
     self.iCloudOn,
     self.iCloudWasOn,
@@ -592,15 +541,6 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)showKeePass1BackupGroup {
-    return [[self getUserDefaults] boolForKey:kShowKeePass1BackupGroupInSearchResults];
-}
-
-- (void)setShowKeePass1BackupGroup:(BOOL)showKeePass1BackupGroupInSearchResults {
-    [[self getUserDefaults] setBool:showKeePass1BackupGroupInSearchResults forKey:kShowKeePass1BackupGroupInSearchResults];
-    [[self getUserDefaults] synchronize];
-}
-
 - (BOOL)hideTips {
     return [[self getUserDefaults] boolForKey:kHideTips];
 }
@@ -640,39 +580,12 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [[self getUserDefaults] synchronize];
 }
 
--(BOOL)hideTotp {
-    return [[self getUserDefaults] boolForKey:kHideTotp];
-}
-
-- (void)setHideTotp:(BOOL)hideTotp {
-    [[self getUserDefaults] setBool:hideTotp forKey:kHideTotp];
-    [[self getUserDefaults] synchronize];
-}
-
--(BOOL)hideTotpInBrowse {
-    return [[self getUserDefaults] boolForKey:kHideTotpInBrowse];
-}
-
--(void)setHideTotpInBrowse:(BOOL)hideTotpInBrowse {
-    [[self getUserDefaults] setBool:hideTotpInBrowse forKey:kHideTotpInBrowse];
-    [[self getUserDefaults] synchronize];
-}
-
 - (BOOL)hideTotpInAutoFill {
     return [[self getUserDefaults] boolForKey:kHideTotpInAutoFill];
 }
 
 - (void)setHideTotpInAutoFill:(BOOL)hideTotpInAutoFill {
     [[self getUserDefaults] setBool:hideTotpInAutoFill forKey:kHideTotpInAutoFill];
-    [[self getUserDefaults] synchronize];
-}
-
--(BOOL)tryDownloadFavIconForNewRecord {
-    return [self getBool:kTryDownloadFavIconForNewRecord fallback:YES];
-}
-
-- (void)setTryDownloadFavIconForNewRecord:(BOOL)tryDownloadFavIconForNewRecord {
-    [[self getUserDefaults] setBool:tryDownloadFavIconForNewRecord forKey:kTryDownloadFavIconForNewRecord];
     [[self getUserDefaults] synchronize];
 }
 
@@ -713,24 +626,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)doNotShowRecycleBinInBrowse {
-    return [[self getUserDefaults] boolForKey:kDoNotShowRecycleBinInBrowse];
-}
-
-- (void)setDoNotShowRecycleBinInBrowse:(BOOL)doNotShowRecycleBinInBrowse {
-    [[self getUserDefaults] setBool:doNotShowRecycleBinInBrowse forKey:kDoNotShowRecycleBinInBrowse];
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)showRecycleBinInSearchResults {
-    return [[self getUserDefaults] boolForKey:kShowRecycleBinInSearchResults];
-}
-
-- (void)setShowRecycleBinInSearchResults:(BOOL)showRecycleBinInSearchResults {
-    [[self getUserDefaults] setBool:showRecycleBinInSearchResults forKey:kShowRecycleBinInSearchResults];
-    [[self getUserDefaults] synchronize];
-}
-
 - (BOOL)doNotCopyOtpCodeOnAutoFillSelect {
 
     return [[self getUserDefaults] boolForKey:kCopyOtpCodeOnAutoFillSelect];
@@ -741,52 +636,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)viewDereferencedFields {
-    return [[self getUserDefaults] boolForKey:kViewDereferencedFields];
-}
-
-- (void)setViewDereferencedFields:(BOOL)viewDereferencedFields {
-    [[self getUserDefaults] setBool:viewDereferencedFields forKey:kViewDereferencedFields];
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)searchDereferencedFields {
-    return [[self getUserDefaults] boolForKey:kSearchDereferencedFields];
-}
-
-- (void)setSearchDereferencedFields:(BOOL)searchDereferencedFields {
-    [[self getUserDefaults] setBool:searchDereferencedFields forKey:kSearchDereferencedFields];
-    [[self getUserDefaults] synchronize];
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
--(BOOL)showEmptyFieldsInDetailsView {
-    return ![self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
-}
-
-- (void)setShowEmptyFieldsInDetailsView:(BOOL)showEmptyFieldsInDetailsView {
-    [self setBool:kHideEmptyFieldsInDetailsView value:!showEmptyFieldsInDetailsView];
-}
-
-- (NSArray<NSNumber *> *)detailsViewCollapsedSections {
-    NSArray* ret = [[self getUserDefaults] arrayForKey:kCollapsedSections];
-    
-    return ret ? ret : @[@(0), @(0), @(0), @(0), @(1), @(1)]; // Default
-}
-
-- (void)setDetailsViewCollapsedSections:(NSArray<NSNumber *> *)detailsViewCollapsedSections {
-    [[self getUserDefaults] setObject:detailsViewCollapsedSections forKey:kCollapsedSections];
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)easyReadFontForAll {
-    return [self getBool:kEasyReadFontForAll];
-}
-
-- (void)setEasyReadFontForAll:(BOOL)easyReadFontForAll {
-    [self setBool:kEasyReadFontForAll value:easyReadFontForAll];
-}
 
 - (BOOL)instantPinUnlocking {
     return [self getBool:kInstantPinUnlocking fallback:YES];
@@ -794,30 +644,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setInstantPinUnlocking:(BOOL)instantPinUnlocking {
     [self setBool:kInstantPinUnlocking value:instantPinUnlocking];
-}
-
-- (BOOL)showChildCountOnFolderInBrowse {
-    return [self getBool:kShowChildCountOnFolderInBrowse];
-}
-
-- (void)setShowChildCountOnFolderInBrowse:(BOOL)showChildCountOnFolderInBrowse {
-    [self setBool:kShowChildCountOnFolderInBrowse value:showChildCountOnFolderInBrowse];
-}
-
-- (BOOL)showFlagsInBrowse {
-    return [self getBool:kShowFlagsInBrowse fallback:YES];
-}
-
-- (void)setShowFlagsInBrowse:(BOOL)showFlagsInBrowse {
-    [self setBool:kShowFlagsInBrowse value:showFlagsInBrowse];
-}
-
-- (BOOL)showUsernameInBrowse {
-    return [self getBool:kShowUsernameInBrowse fallback:YES];
-}
-
--(void)setShowUsernameInBrowse:(BOOL)showUsernameInBrowse {
-    [self setBool:kShowUsernameInBrowse value:showUsernameInBrowse];
 }
 
 - (BOOL)haveWarnedAboutAutoFillCrash {
@@ -884,24 +710,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
     [self setBool:kAppLockAppliesToPreferences value:appLockAppliesToPreferences];
 }
 
-- (BOOL)immediateSearchOnBrowse {
-    return [self getBool:kImmediateSearchOnBrowse];
-}
-
-- (void)setImmediateSearchOnBrowse:(BOOL)immediateSearchOnBrowse {
-    [self setBool:kImmediateSearchOnBrowse value:immediateSearchOnBrowse];
-    
-}
-
-- (BrowseItemSubtitleField)browseItemSubtitleField {
-    BrowseItemSubtitleField deflt = Settings.sharedInstance.showUsernameInBrowse ? kBrowseItemSubtitleUsername : kBrowseItemSubtitleNoField;
-    return (BrowseItemSubtitleField)[self getInteger:kBrowseItemSubtitleField fallback:deflt];
-}
-
-- (void)setBrowseItemSubtitleField:(BrowseItemSubtitleField)browseItemSubtitleField {
-    [self setInteger:kBrowseItemSubtitleField value:browseItemSubtitleField];
-}
-
 - (BOOL)showAllFilesInLocalKeyFiles {
     return [self getBool:kShowAllFilesInLocalKeyFiles];
 }
@@ -932,33 +740,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
     [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
-}
-
-- (BrowseSortField)browseSortField {
-    BOOL oldDoNotSort = [[self getUserDefaults] boolForKey:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while
-    
-    return (BrowseSortField)[self getInteger:kBrowseSortField fallback:oldDoNotSort ? kBrowseSortFieldNone : kBrowseSortFieldTitle];
-}
-
-- (void)setBrowseSortField:(BrowseSortField)browseSortField {
-    [self setInteger:kBrowseSortField value:browseSortField];
-}
-
-- (BOOL)browseSortOrderDescending {
-    return [self getBool:kBrowseSortOrderDescending fallback:NO];
-}
-
-- (void)setBrowseSortOrderDescending:(BOOL)browseSortOrderDescending {
-    [self setBool:kBrowseSortOrderDescending value:browseSortOrderDescending];
-}
-
-
-- (BOOL)browseSortFoldersSeparately {
-    return [self getBool:kBrowseSortFoldersSeparately fallback:YES];
-}
-
-- (void)setBrowseSortFoldersSeparately:(BOOL)browseSortFoldersSeparately {
-    [self setBool:kBrowseSortFoldersSeparately value:browseSortFoldersSeparately];
 }
 
 @end

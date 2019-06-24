@@ -10,13 +10,14 @@
 #import "DatabaseModel.h"
 #import "Node.h"
 #import "SearchScope.h"
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseSearchAndSorter : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithDatabase:(DatabaseModel*)database;
+- (instancetype)initWithDatabase:(DatabaseModel*)database metadata:(SafeMetaData*)metadata;
 
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope

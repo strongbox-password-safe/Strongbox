@@ -8,12 +8,37 @@
 
 #import <XCTest/XCTest.h>
 #import "Node+OtpToken.h"
+#import "OTPToken+Serialization.h"
 
 @interface OtpTests : XCTestCase
 
 @end
 
 @implementation OtpTests
+
+- (void)testSteamTotpKeePassXCSteamEncoderOTPAuthUrl {
+    OTPToken* token = [Node getOtpTokenFromRecord:@"otpauth://totp/Steam:mark@gmail.com?secret=63BEDWCQZKTQWPESARIERL5DTTQFCJTK&issuer=Steam&encoder=steam" fields:@{} notes:@""];
+    
+    XCTAssertNotNil(token);
+    
+    XCTAssertEqual(token.algorithm, OTPAlgorithmSteam);
+    XCTAssertEqual(token.digits, 5);
+    
+    NSLog(@"%@", token.url);
+}
+
+- (void)testSteamTotpKeePassXC {
+    NSDictionary *fields = @{ @"TOTP Seed" : [StringValue valueWithString:@"63BEDWCQZKTQWPESARIERL5DTTQFCJTK"], @"TOTP Settings" : [StringValue valueWithString:@"30;S"] };
+    
+    OTPToken* token = [Node getOtpTokenFromRecord:@"" fields:fields notes:@""];
+    
+    XCTAssertNotNil(token);
+    
+    XCTAssertEqual(token.algorithm, OTPAlgorithmSteam);
+    XCTAssertEqual(token.digits, 5);
+
+    NSLog(@"%@", token.url);
+}
 
 - (void)testPasswordOtpUrl {
     OTPToken* token = [Node getOtpTokenFromRecord:@"otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase" fields:@{} notes:@""];
@@ -71,7 +96,7 @@
 
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node setTotpWithString:@"otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase" appendUrlToNotes:YES];
+    BOOL ret = [node setTotpWithString:@"otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertTrue(ret);
     
@@ -89,7 +114,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node setTotpWithString:@"otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=8&period=31" appendUrlToNotes:YES];
+    BOOL ret = [node setTotpWithString:@"otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=8&period=31" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertTrue(ret);
     
@@ -107,7 +132,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node setTotpWithString:@"" appendUrlToNotes:YES];
+    BOOL ret = [node setTotpWithString:@"" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertFalse(ret);
     
@@ -125,7 +150,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node setTotpWithString:nil appendUrlToNotes:YES];
+    BOOL ret = [node setTotpWithString:nil appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertFalse(ret);
     
@@ -143,7 +168,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node setTotpWithString:@"Absolute Garbage GIGO" appendUrlToNotes:YES];
+    BOOL ret = [node setTotpWithString:@"Absolute Garbage GIGO" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertTrue(ret); //Seemd to be fine!
     
@@ -161,7 +186,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node setTotpWithString:@"2gqegflxxubjqelc" appendUrlToNotes:YES];
+    BOOL ret = [node setTotpWithString:@"2gqegflxxubjqelc" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertTrue(ret); //Seemd to be fine!
     

@@ -17,15 +17,17 @@
 @interface DatabaseSearchAndSorter ()
 
 @property DatabaseModel* database;
+@property SafeMetaData* metadata;
 
 @end
 
 @implementation DatabaseSearchAndSorter
 
-- (instancetype)initWithDatabase:(DatabaseModel*)database {
+- (instancetype)initWithDatabase:(DatabaseModel *)database metadata:(SafeMetaData *)metadata {
     self = [super init];
     if (self) {
         self.database = database;
+        self.metadata = metadata;
     }
     return self;
 }
@@ -161,9 +163,9 @@
 }
 
 - (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items {
-    BrowseSortField field = Settings.sharedInstance.browseSortField;
-    BOOL descending = Settings.sharedInstance.browseSortOrderDescending;
-    BOOL foldersSeparately = Settings.sharedInstance.browseSortFoldersSeparately;
+    BrowseSortField field = self.metadata.browseSortField;
+    BOOL descending = self.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.metadata.browseSortFoldersSeparately;
     
     if(field == kBrowseSortFieldEmail && self.database.format != kPasswordSafe) {
         field = kBrowseSortFieldTitle;
@@ -246,18 +248,18 @@
 }
 
 - (NSString*)getBrowseItemSubtitle:(Node*)node {
-    switch (Settings.sharedInstance.browseItemSubtitleField) {
+    switch (self.metadata.browseItemSubtitleField) {
         case kBrowseItemSubtitleNoField:
             return @"";
             break;
         case kBrowseItemSubtitleUsername:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
             break;
         case kBrowseItemSubtitlePassword:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
+            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
             break;
         case kBrowseItemSubtitleUrl:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
+            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
             break;
         case kBrowseItemSubtitleEmail:
             return node.fields.email;
@@ -269,7 +271,7 @@
             return friendlyDateString(node.fields.created);
             break;
         case kBrowseItemSubtitleNotes:
-            return Settings.sharedInstance.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
+            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
             break;
         default:
             return @"";

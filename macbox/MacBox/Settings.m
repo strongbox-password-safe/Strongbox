@@ -56,14 +56,6 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 @implementation Settings
 
-//- (BOOL)showDatabasesListAtStartup {
-//    return [self getBool:kShowDatabasesListAtStartup fallback:YES];
-//}
-
-//- (void)setShowDatabasesListAtStartup:(BOOL)showDatabasesListAtStartup {
-//    [self setBool:kShowDatabasesListAtStartup value:showDatabasesListAtStartup];
-//}
-
 + (instancetype)sharedInstance {
     static Settings *sharedInstance = nil;
     static dispatch_once_t onceToken;

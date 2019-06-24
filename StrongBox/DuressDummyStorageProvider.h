@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName filename:(NSString*)filename fileIdentifier:(NSString*)fileIdentifier;
+- (SafeMetaData *_Nullable)getSafeMetaData:(NSString *)nickName filename:(NSString*)filename fileIdentifier:(NSString*)fileIdentifier;
 
 @property (nonatomic, nonnull, readonly) DatabaseModel* database;
 

@@ -21,6 +21,7 @@
 @property BOOL _concealed;
 @property BOOL _isConfidential;
 @property BOOL _isEditable;
+@property BOOL useEasyReadFont;
 
 @end
 
@@ -48,12 +49,14 @@
     self.accessoryType = UITableViewCellAccessoryNone;
 }
 
-- (void)setKey:(NSString *)key value:(NSString*)value isConfidential:(BOOL)isConfidential concealed:(BOOL)concealed isEditable:(BOOL)isEditable {
+- (void)setKey:(NSString *)key value:(NSString*)value isConfidential:(BOOL)isConfidential concealed:(BOOL)concealed isEditable:(BOOL)isEditable useEasyReadFont:(BOOL)useEasyReadFont {
     self._key = key;
     self._value = value;
     self._isConfidential = isConfidential;
     self._concealed = concealed;
     self._isEditable = isEditable;
+    self.useEasyReadFont = useEasyReadFont;
+    self.valueLabel.font = self.configuredValueFont;
 
     [self bindUiToSettings];
 }
@@ -78,16 +81,20 @@
         [self.buttonRevealConceal setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
         self.valueLabel.text = @"*****************";
         self.valueLabel.textColor = [UIColor lightGrayColor];
-        self.valueLabel.font = FontManager.sharedInstance.configuredValueFont;
+        self.valueLabel.font = self.configuredValueFont;
     }
     else {
         [self.buttonRevealConceal setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateNormal];
         
         self.valueLabel.textColor = [UIColor darkTextColor];
-        self.valueLabel.font = self._isConfidential ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.configuredValueFont;
+        self.valueLabel.font = self._isConfidential ? FontManager.sharedInstance.easyReadFont : self.configuredValueFont;
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:CellHeightsChangedNotification object:self];
+}
+
+- (UIFont*)configuredValueFont {
+    return self.useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;
 }
 
 @end

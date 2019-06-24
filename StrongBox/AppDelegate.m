@@ -53,7 +53,7 @@
     
     NSLog(@"Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
     NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
-
+    
     return YES;
 }
 
