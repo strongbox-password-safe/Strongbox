@@ -265,7 +265,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SCB-rR-RcD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1273.913043478261" y="1411.6071428571429"/>
+            <point key="canvasLocation" x="-1284" y="1319"/>
         </scene>
         <!--Browse-->
         <scene sceneID="not-Ng-p9u">
@@ -312,7 +312,7 @@
                             </connections>
                         </barButtonItem>
                         <barButtonItem systemItem="flexibleSpace" id="P20-4X-Rdu"/>
-                        <barButtonItem title="Sort By" image="sort-ascending" id="3Mz-oA-Fxf">
+                        <barButtonItem title="Sort By" image="sort-asc" id="3Mz-oA-Fxf">
                             <connections>
                                 <action selector="onSortItems:" destination="HOc-E3-CoK" id="eC7-FQ-hXD"/>
                             </connections>
@@ -392,7 +392,7 @@
                 <viewControllerPlaceholder storyboardName="ItemDetails" id="xBb-lQ-IKW" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MOf-p9-EZ5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-620" y="1769"/>
+            <point key="canvasLocation" x="-543" y="1931"/>
         </scene>
         <!--ItemDetails-->
         <scene sceneID="Iu1-Da-dmc">
@@ -950,7 +950,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dereference Fields" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O9s-fM-wyE">
-                                                    <rect key="frame" x="20" y="11" width="144" height="22"/>
+                                                    <rect key="frame" x="20" y="8" width="144" height="27.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -980,7 +980,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dereference in Search" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Bw-5Z-xAK">
-                                                    <rect key="frame" x="20" y="11" width="170" height="22"/>
+                                                    <rect key="frame" x="20" y="8" width="170" height="27.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -1096,6 +1096,6 @@
         <image name="folder-plus" width="30" height="30"/>
         <image name="list" width="30" height="30"/>
         <image name="maintenance" width="30" height="30"/>
-        <image name="sort-ascending" width="30" height="30"/>
+        <image name="sort-asc" width="30" height="30"/>
     </resources>
 </document>

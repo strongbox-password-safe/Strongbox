@@ -82,13 +82,13 @@
 }
 
 - (void)updateAutoFillCacheWithData:(NSData *)data {
-    if (self.metadata.autoFillCacheEnabled) {
+    if (self.metadata.autoFillEnabled) {
         [self saveAutoFillCacheFile:data safe:self.metadata];
     }
 }
 
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler {
-    if (self.metadata.autoFillCacheEnabled) {
+    if (self.metadata.autoFillEnabled) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
         {
            NSError *error;
@@ -105,9 +105,9 @@
     }
 }
 
-- (void)disableAndClearAutoFillCache {
+- (void)disableAndClearAutoFill {
     [[CacheManager sharedInstance] deleteAutoFillCache:_metadata completion:^(NSError *error) {
-          self.metadata.autoFillCacheEnabled = NO;
+          self.metadata.autoFillEnabled = NO;
           self.metadata.autoFillCacheAvailable = NO;
         
           [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -116,9 +116,9 @@
       }];
 }
 
-- (void)enableAutoFillCache {
+- (void)enableAutoFill {
     _metadata.autoFillCacheAvailable = NO;
-    _metadata.autoFillCacheEnabled = YES;
+    _metadata.autoFillEnabled = YES;
     
     [[SafesList sharedInstance] update:self.metadata];
 }
@@ -249,7 +249,9 @@
 }
 
 - (void)updateAutoFillQuickTypeDatabase {
-    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
+    if(self.metadata.autoFillEnabled) {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
+    }
 }
 
 @end

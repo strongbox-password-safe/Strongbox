@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="EditDateCell" rowHeight="151" id="NTk-0m-jnT" customClass="EditDateCell">
+            <rect key="frame" x="0.0" y="0.0" width="424" height="151"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="NTk-0m-jnT" id="8vI-7Y-AGE">
+                <rect key="frame" x="0.0" y="0.0" width="424" height="150.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jmi-0l-fMf">
+                        <rect key="frame" x="20" y="55" width="384" height="51"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Key that couild get very long too" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999998807907104" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="flK-dj-f4U">
+                                <rect key="frame" x="0.0" y="15.5" width="91" height="20.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="91" id="qQ1-oC-pfL"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="JBk-YQ-oCK">
+                                <rect key="frame" x="99" y="15" width="285" height="21"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Value that gets very big very quickluy" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="12" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="jG6-Nc-huc">
+                                        <rect key="frame" x="0.0" y="0.0" width="285" height="21"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no"/>
+                                    </textField>
+                                </subviews>
+                            </stackView>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fcu-P6-KSC" userLabel="Horizontal Line">
+                                <rect key="frame" x="99" y="41" width="285" height="1"/>
+                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="IGN-yj-Ne0"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="flK-dj-f4U" firstAttribute="leading" secondItem="jmi-0l-fMf" secondAttribute="leading" id="4Mt-iY-gph"/>
+                            <constraint firstItem="JBk-YQ-oCK" firstAttribute="centerY" secondItem="jmi-0l-fMf" secondAttribute="centerY" id="BMi-Au-rhU"/>
+                            <constraint firstItem="JBk-YQ-oCK" firstAttribute="leading" secondItem="flK-dj-f4U" secondAttribute="trailing" constant="8" id="DKY-je-X8m"/>
+                            <constraint firstAttribute="height" priority="999" constant="40" id="GZu-qO-yAP"/>
+                            <constraint firstItem="fcu-P6-KSC" firstAttribute="top" secondItem="jG6-Nc-huc" secondAttribute="bottom" constant="5" id="Nj8-rj-nJJ"/>
+                            <constraint firstItem="flK-dj-f4U" firstAttribute="centerY" secondItem="jmi-0l-fMf" secondAttribute="centerY" id="PDe-ff-8f7"/>
+                            <constraint firstAttribute="trailing" secondItem="JBk-YQ-oCK" secondAttribute="trailing" id="d2L-25-OTX"/>
+                            <constraint firstItem="fcu-P6-KSC" firstAttribute="trailing" secondItem="jG6-Nc-huc" secondAttribute="trailing" id="jif-Ac-Aud"/>
+                            <constraint firstItem="fcu-P6-KSC" firstAttribute="leading" secondItem="jG6-Nc-huc" secondAttribute="leading" id="uAs-Vv-6cs"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="jmi-0l-fMf" firstAttribute="top" secondItem="8vI-7Y-AGE" secondAttribute="topMargin" id="6f0-pI-Uvf"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="jmi-0l-fMf" secondAttribute="bottom" id="QrH-BV-AWU"/>
+                    <constraint firstItem="jmi-0l-fMf" firstAttribute="leading" secondItem="8vI-7Y-AGE" secondAttribute="leadingMargin" id="Wmi-dE-Ob3"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="jmi-0l-fMf" secondAttribute="trailing" id="nV3-zo-K8b"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="keyLabel" destination="flK-dj-f4U" id="lr5-nk-Rgb"/>
+                <outlet property="valueTextField" destination="jG6-Nc-huc" id="JDa-UI-I7o"/>
+            </connections>
+            <point key="canvasLocation" x="44.927536231884062" y="63.28125"/>
+        </tableViewCell>
+    </objects>
+</document>

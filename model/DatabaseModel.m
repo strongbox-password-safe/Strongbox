@@ -80,6 +80,10 @@
 }
 
 + (DatabaseFormat)getLikelyDatabaseFormat:(NSData *)candidate {
+    if(candidate == nil) {
+        return kFormatUnknown;
+    }
+    
     NSError* error;
     if([PwSafeDatabase isAValidSafe:candidate error:&error]) {
         return kPasswordSafe;
@@ -98,6 +102,10 @@
 }
 
 + (NSString*)getLikelyFileExtension:(NSData *)candidate {
+    if(candidate == nil) {
+        return @"dat";
+    }
+    
     NSError* error;
     if([PwSafeDatabase isAValidSafe:candidate error:&error]) {
         return [PwSafeDatabase fileExtension];
@@ -166,6 +174,10 @@
                                           error:(NSError **)ppError {
 
     if(self = [super init]) {
+        if(safeData == nil) {
+            return nil;
+        }
+        
         if([PwSafeDatabase isAValidSafe:safeData error:ppError]) {
             self.adaptor = [[PwSafeDatabase alloc] init];
         }

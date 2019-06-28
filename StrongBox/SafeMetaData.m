@@ -66,7 +66,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.uuid = [[NSUUID UUID] UUIDString];
         self.failedPinAttempts = 0;
         self.offlineCacheEnabled = YES;
-        self.autoFillCacheEnabled = YES;
+        self.autoFillEnabled = YES;
         self.likelyFormat = kFormatUnknown;
         self.browseViewType = kBrowseViewTypeHierarchy;
         
@@ -142,7 +142,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     [encoder encodeBool:self.offlineCacheEnabled forKey:@"offlineCacheEnabled"];
     [encoder encodeBool:self.offlineCacheAvailable forKey:@"offlineCacheAvailable"];
     [encoder encodeBool:self.hasUnresolvedConflicts forKey:@"hasUnresolvedConflicts"];
-    [encoder encodeBool:self.autoFillCacheEnabled forKey:@"autoFillCacheEnabled"];
+    [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillCacheEnabled"];
     [encoder encodeBool:self.autoFillCacheAvailable forKey:@"autoFillCacheAvailable"];
     [encoder encodeBool:self.readOnly forKey:@"readOnly"];
     
@@ -205,10 +205,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.hasUnresolvedConflicts = [decoder decodeBoolForKey:@"hasUnresolvedConflicts"];
         
         if([decoder containsValueForKey:@"autoFillCacheEnabled"]) {
-            self.autoFillCacheEnabled = [decoder decodeBoolForKey:@"autoFillCacheEnabled"];
+            self.autoFillEnabled = [decoder decodeBoolForKey:@"autoFillCacheEnabled"];
         }
         else {
-            self.autoFillCacheEnabled = YES;
+            self.autoFillEnabled = YES;
         }
 
         if([decoder containsValueForKey:@"autoFillCacheAvailable"]) {

@@ -43,6 +43,9 @@
                   Identifier = "DavKitTests">
                </Test>
                <Test
+                  Identifier = "FavIconTests">
+               </Test>
+               <Test
                   Identifier = "SFTPTests">
                </Test>
             </SkippedTests>

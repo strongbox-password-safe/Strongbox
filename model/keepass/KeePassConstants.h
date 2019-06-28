@@ -16,6 +16,8 @@ static const uint32_t kInnerStreamChaCha20 = 3;
 
 static NSString* const kLastModificationTimeElementName = @"LastModificationTime";
 static NSString* const kCreationTimeElementName = @"CreationTime";
+static NSString* const kExpiryTimeElementName = @"ExpiryTime";
+static NSString* const kExpiresElementName = @"Expires";
 static NSString* const kLastAccessTimeElementName = @"LastAccessTime";
 static NSString* const kMetaElementName = @"Meta";
 static NSString* const kRootElementName = @"Root";

@@ -55,8 +55,8 @@
 
 
     NSDate* modDate = [[CacheManager sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
-    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillCacheEnabled ? getLastCachedDate(modDate) : @"";
-    self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillCacheEnabled;
+    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillEnabled ? getLastCachedDate(modDate) : @"";
+    self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillEnabled;
 
     modDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
     self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
@@ -242,14 +242,14 @@
 - (IBAction)onSwitchAllowAutoFillCache:(id)sender {
     if (!self.switchAllowAutoFillCache.on) {
         [Alerts yesNo:self
-                title:@"Disable AutoFill Cache?"
-              message:@"Disabling the AutoFill Cache will remove the AutoFill cache and you will not be able to use AutoFill in certain contexts. Are you sure you want to do this?"
+                title:@"Disable AutoFill?"
+              message:@"Are you sure you want to do this?"
                action:^(BOOL response) {
                    if (response) {
-                       [self.viewModel disableAndClearAutoFillCache];
+                       [self.viewModel disableAndClearAutoFill];
                        [self bindSettings];
                        
-                       [ISMessages showCardAlertWithTitle:@"AutoFill Cache Disabled"
+                       [ISMessages showCardAlertWithTitle:@"AutoFill Disabled"
                                                   message:nil
                                                  duration:3.f
                                               hideOnSwipe:YES
@@ -264,11 +264,14 @@
                }];
     }
     else {
-        [self.viewModel enableAutoFillCache];
+        [self.viewModel enableAutoFill];
+        
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database databaseUuid:self.viewModel.metadata.uuid];
+        
         [self.viewModel updateAutoFillCache:^{
             [self bindSettings];
             
-            [ISMessages                 showCardAlertWithTitle:@"AutoFill Cache Enabled"
+            [ISMessages                 showCardAlertWithTitle:@"AutoFill Enabled"
                                                        message:nil
                                                       duration:3.f
                                                    hideOnSwipe:YES
@@ -283,13 +286,13 @@
 - (IBAction)onSwitchAllowOfflineCache:(id)sender {
     if (!self.switchAllowOfflineCache.on) {
         [Alerts yesNo:self
-                title:@"Disable Offline Cache?"
-              message:@"Disabling Offline Cache for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?"
+                title:@"Disable Offline Access?"
+              message:@"Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?"
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearOfflineCache];
                        [self bindSettings];
-                       [ISMessages showCardAlertWithTitle:@"Offline Cache Disabled"
+                       [ISMessages showCardAlertWithTitle:@"Offline Disabled"
                                                   message:nil
                                                  duration:3.f
                                               hideOnSwipe:YES
@@ -308,7 +311,7 @@
         [self.viewModel updateOfflineCache:^{
             [self bindSettings];
             
-            [ISMessages                 showCardAlertWithTitle:@"Offline Cache Enabled"
+            [ISMessages                 showCardAlertWithTitle:@"Offline Enabled"
                                                        message:nil
                                                       duration:3.f
                                                    hideOnSwipe:YES

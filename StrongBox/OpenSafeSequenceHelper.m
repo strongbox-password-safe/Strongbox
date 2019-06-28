@@ -242,16 +242,8 @@
         [[AppleICloudProvider sharedInstance] delete:self.safe completion:nil];
     }
     
-    if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable)
-    {
-        [[CacheManager sharedInstance] deleteOfflineCachedSafe:self.safe
-                                                                  completion:nil];
-    }
-    
-    if (self.safe.autoFillCacheEnabled && self.safe.autoFillCacheAvailable)
-    {
-        [[CacheManager sharedInstance] deleteAutoFillCache:self.safe completion:nil];
-    }
+    [[CacheManager sharedInstance] deleteOfflineCachedSafe:self.safe completion:nil];
+    [[CacheManager sharedInstance] deleteAutoFillCache:self.safe completion:nil];
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     [[SafesList sharedInstance] remove:self.safe.uuid];
@@ -754,15 +746,15 @@
         if(self.safe.offlineCacheEnabled) {
             [viewModel updateOfflineCacheWithData:data];
         }
-        if(self.safe.autoFillCacheEnabled) {
+        
+        if(self.safe.autoFillEnabled) {
             [viewModel updateAutoFillCacheWithData:data];
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }
 
         NSLog(@"Setting likelyFormat to [%u]", openedSafe.format);
         self.safe.likelyFormat = openedSafe.format;
         [SafesList.sharedInstance update:self.safe];
-    
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
     }
     
     self.completion(viewModel, nil);

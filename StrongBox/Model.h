@@ -41,8 +41,8 @@
 
 - (void)updateAutoFillCacheWithData:(NSData *_Nonnull)data;
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler;
-- (void)disableAndClearAutoFillCache;
-- (void)enableAutoFillCache;
+- (void)disableAndClearAutoFill;
+- (void)enableAutoFill;
      
 // Operations
 

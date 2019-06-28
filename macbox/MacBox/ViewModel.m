@@ -688,7 +688,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [item.fields.keePassHistory addObject:cloneForHistory];
     
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
-    [item setTotpWithString:otp appendUrlToNotes:self.format == kPasswordSafe forceSteam:steam];
+    [item setTotpWithString:otp
+           appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
+                 forceSteam:steam];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     

@@ -31,6 +31,13 @@
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+//    NSLog(@"shouldChangeCharactersInRange: %lu-%lu-%lu", (unsigned long)range.location, (unsigned long)range.length, (unsigned long)textField.text.length);
+
+    if((range.location + range.length) != textField.text.length) { // Only perform autocompletion on end of string edits
+        NSLog(@"Not autocompleting as edit is inside string...");
+        return YES;
+    }
+    
     BOOL autoCompleted = [self autoCompleteText:string];
     
     if(autoCompleted) {

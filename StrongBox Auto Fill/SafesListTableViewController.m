@@ -169,11 +169,11 @@
         cell.textLabel.enabled = NO;
         cell.detailTextLabel.enabled = NO;
         
-        if(safe.autoFillCacheEnabled) {
+        if(safe.autoFillEnabled) {
             cell.detailTextLabel.text = @"[No Auto Fill Cache File Yet]";
         }
         else {
-            cell.detailTextLabel.text = @"[Auto Fill Cache Disabled]";
+            cell.detailTextLabel.text = @"[Auto Fill Disabled]";
         }
     }
     

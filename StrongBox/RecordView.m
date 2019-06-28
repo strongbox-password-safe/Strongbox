@@ -1067,7 +1067,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
                     Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
-                    BOOL success = [self.record setTotpWithString:string appendUrlToNotes:self.viewModel.database.format == kPasswordSafe forceSteam:NO];
+                    BOOL success = [self.record setTotpWithString:string
+                                                 appendUrlToNotes:self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1
+                                                       forceSteam:NO];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
                     }

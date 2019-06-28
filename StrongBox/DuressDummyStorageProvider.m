@@ -57,7 +57,7 @@
     SafeMetaData* meta = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:kDuressDummy fileName:filename fileIdentifier:fileIdentifier];
     
     meta.offlineCacheEnabled = NO;
-    meta.autoFillCacheEnabled = NO;
+    meta.autoFillEnabled = NO;
     
     return meta;
 }

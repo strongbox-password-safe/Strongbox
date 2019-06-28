@@ -18,7 +18,7 @@
 /// Checks whether a URL exists, and returns `URLResult.Success` as the result if it does.
 final class CheckURLExistsOperation: URLRequestOperation {
     override func prepareRequest() {
-        urlRequest.httpMethod = "HEAD"
+        urlRequest.httpMethod = "GET"
     }
 
     override func processResult(_ data: Data?, response: HTTPURLResponse, completion: @escaping (URLResult) -> Void) {

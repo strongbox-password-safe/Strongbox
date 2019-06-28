@@ -30,6 +30,8 @@
         self.lastAccessTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName context:context];
         self.lastModificationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName context:context];
         self.creationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName context:context];
+        self.expiryTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kExpiryTimeElementName context:context];
+        self.expires = [[GenericTextBooleanElementHandler alloc] initWithXmlElementName:kExpiresElementName context:context];
     }
     
     return self;
@@ -44,6 +46,12 @@
     }
     else if([xmlElementName isEqualToString:kLastAccessTimeElementName]) {
         return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName context:self.context];
+    }
+    else if([xmlElementName isEqualToString:kExpiryTimeElementName]) {
+        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kExpiryTimeElementName context:self.context];
+    }
+    else if([xmlElementName isEqualToString:kExpiresElementName]) {
+        return [[GenericTextBooleanElementHandler alloc] initWithXmlElementName:kExpiresElementName context:self.context];
     }
     
     return [super getChildHandler:xmlElementName];
@@ -62,6 +70,14 @@
         self.lastAccessTime = (GenericTextDateElementHandler*)completedObject;
         return YES;
     }
+    else if([withXmlElementName isEqualToString:kExpiryTimeElementName]) {
+        self.expiryTime = (GenericTextDateElementHandler*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kExpiresElementName]) {
+        self.expires = (GenericTextBooleanElementHandler*)completedObject;
+        return YES;
+    }
     
     return NO;
 }
@@ -75,14 +91,21 @@
     [ret.children addObject:[self.creationTime generateXmlTree]];
     [ret.children addObject:[self.lastAccessTime generateXmlTree]];
     
+    if(self.expiryTime.date) {
+        [ret.children addObject:[self.expiryTime generateXmlTree]];
+    }
+    if(self.expires.booleanValue) {
+        [ret.children addObject:[self.expires generateXmlTree]];
+    }
+    
     [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
     return ret;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"LastModificationTime = [%@], CreationTime = [%@], LastAccessTime = [%@]",
-            self.lastModificationTime, self.creationTime, self.lastAccessTime];
+    return [NSString stringWithFormat:@"LastModificationTime = [%@], CreationTime = [%@], LastAccessTime = [%@], expires=[%@], expiryTime=[%@]",
+            self.lastModificationTime, self.creationTime, self.lastAccessTime, self.expires, self.expiryTime];
 }
 
 

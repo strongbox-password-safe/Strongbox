@@ -28,7 +28,7 @@ final class DownloadImageOperation: URLRequestOperation {
 
         let (mimeType, _) = response.contentTypeAndEncoding()
         switch mimeType {
-        case "image/png", "image/jpg", "image/jpeg", "image/x-icon":
+        case "image/png", "image/jpg", "image/jpeg", "image/x-icon", "image/vnd.microsoft.icon":
             // UIImage(data:) is not thread-safe and needs to run on main queue :/
             DispatchQueue.main.async {
                 var result: URLResult

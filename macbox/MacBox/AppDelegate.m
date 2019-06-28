@@ -383,9 +383,19 @@
 - (void)startClipboardWatchingTask {
 //    NSLog(@"startClipboardWatchingTask...");
     self.currentClipboardVersion = -1;
-    self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f repeats:YES block:^(NSTimer * _Nonnull timer) {
-        [self checkClipboardForChangesAndNotify];
-    }];
+    
+    [NSTimer scheduledTimerWithTimeInterval:0.5f
+                                     target:self
+                                   selector:@selector(checkClipboardForChangesAndNotify)
+                                   userInfo:nil
+                                    repeats:YES];
+
+    // MMcG: Do not use the block version as it only works OSX-10.12+
+//    self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f
+//                                                                  repeats:YES
+//                                                                    block:^(NSTimer * _Nonnull timer) {
+//        [self checkClipboardForChangesAndNotify];
+//    }];
 }
 
 - (void)killClipboardWatchingTask {

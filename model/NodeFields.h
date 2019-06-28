@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDate *modified;
 @property (nonatomic, strong, nullable) NSDate *accessed;
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
+@property (nonatomic, strong, nullable) NSDate *expires;
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
 @property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, StringValue*> *customFields;
 

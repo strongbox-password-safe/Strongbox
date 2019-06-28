@@ -68,41 +68,41 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 }
 
 - (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes {
-    // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
-    
-    // KeePassXC Otp
-    
-    self.fields.customFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
-    
-    if(token.algorithm == OTPAlgorithmSteam) {
-        NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
-        self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
-    }
-    else {
-        NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
-        self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
-    }
-    
-    // KeeOtp Plugin
-    // * otp="key=2GQFLXXUBJQELC&step=31"
-    
-    NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
-    NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
-    
-    if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-        NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
-        NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
-        components.queryItems = @[key, step, size];
-    }
-    else {
-        components.queryItems = @[key];
-    }
-    self.fields.customFields[@"otp"] = [StringValue valueWithString:components.query protected:YES];
-
-    // Notes Field if it's a Password Safe database
+    // Notes Field if it's a Password Safe/KeePass1 database
     
     if(appendUrlToNotes) {
         self.fields.notes = [self.fields.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", [token url:YES]];
+    }
+    else {
+        // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
+        // KeePassXC Otp
+        
+        self.fields.customFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
+        
+        if(token.algorithm == OTPAlgorithmSteam) {
+            NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
+            self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
+        }
+        else {
+            NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+            self.fields.customFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
+        }
+        
+        // KeeOtp Plugin
+        // * otp="key=2GQFLXXUBJQELC&step=31"
+        
+        NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
+        NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
+        
+        if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
+            NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
+            NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
+            components.queryItems = @[key, step, size];
+        }
+        else {
+            components.queryItems = @[key];
+        }
+        self.fields.customFields[@"otp"] = [StringValue valueWithString:components.query protected:YES];
     }
 }
 
@@ -146,7 +146,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
         OTPToken* ret = [OTPToken tokenWithURL:url];
         NSDictionary *params = [self getQueryParams:url.query];
         if(params[@"encoder"] && [params[@"encoder"] isEqualToString:@"steam"]) {
-            NSLog(@"Steam Encoder on OTPAuth URL Found");
+//            NSLog(@"Steam Encoder on OTPAuth URL Found");
             ret.algorithm = OTPAlgorithmSteam;
             ret.digits = 5;
         }

@@ -260,6 +260,10 @@
 }
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
+    if(candidate == nil) {
+        return NO;
+    }
+    
     PasswordSafe3Header header = [PwSafeSerialization getHeader:candidate];
     
     if (header.tag[0] != 'P' ||

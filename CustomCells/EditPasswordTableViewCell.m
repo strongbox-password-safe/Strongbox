@@ -16,6 +16,8 @@
 @interface EditPasswordTableViewCell () <UITextViewDelegate>
 
 @property (weak, nonatomic) IBOutlet MBAutoGrowingTextView *valueTextView;
+@property (weak, nonatomic) IBOutlet UIButton *buttonGenerationSettings;
+@property BOOL internalShowGenerationSettings;
 
 @end
 
@@ -27,6 +29,23 @@
     self.valueTextView.delegate = self;
     self.valueTextView.font = FontManager.sharedInstance.easyReadFont;
     self.valueTextView.adjustsFontForContentSizeCategory = YES;
+
+    self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
+}
+
+- (BOOL)showGenerationSettings {
+    return self.internalShowGenerationSettings;
+}
+
+- (void)setShowGenerationSettings:(BOOL)showGenerationSettings {
+    self.internalShowGenerationSettings = showGenerationSettings;
+    self.buttonGenerationSettings.hidden = !self.internalShowGenerationSettings;
+}
+
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    
+    self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
 }
 
 - (IBAction)onGenerate:(id)sender {

@@ -173,7 +173,7 @@ public enum IconDownloadResult {
             icons.map { DownloadImageOperation(url: $0.url, session: urlSession) }
 
         executeURLOperations(operations) { results in
-            let downloadResults: [ImageType] = results.flatMap { result in
+            let downloadResults: [ImageType] = results.compactMap { result in
                 switch result {
                 case .imageDownloaded(_, let image):
                   return image;
@@ -202,6 +202,59 @@ public enum IconDownloadResult {
         }
     }
 
+    @objc public static func downloadPreferred(_ url: URL,
+                                          width: Int,
+                                          height: Int,
+                                          completion: @escaping (ImageType?) -> Void) {
+        scan(url) { icons, meta in
+            let iconMap = icons.reduce(into: [URL:DetectedIcon](), { current,icon in
+                current[icon.url] = icon
+            })
+            
+            let uniqueIcons = Array(iconMap.values);
+            dl(uniqueIcons) { downloaded in
+                let sortedIcons = iconsInPreferredOrder(uniqueIcons, width: width, height: height)
+                
+                for best in sortedIcons {
+                    let maybeBest = downloaded[best.url]
+                    if(maybeBest != nil) {
+                        DispatchQueue.main.async {
+                            completion(maybeBest!)
+                        }
+                        return
+                    }
+                }
+                
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    @objc public static func dl(_ icons: [DetectedIcon], completion: @escaping ([URL: ImageType]) -> Void) {
+        let urlSession = urlSessionProvider()
+        let operations: [DownloadImageOperation] =
+            icons.map { DownloadImageOperation(url: $0.url, session: urlSession) }
+        
+        var myDictionary =  [URL: ImageType]()
+        
+        executeURLOperations(operations) { results in
+            for result in results {
+                switch result {
+                case let .imageDownloaded(url, image):
+                    myDictionary[url] = image
+                default:
+                    continue;
+                }
+            }
+            
+            DispatchQueue.main.async {
+                completion(myDictionary)
+            }
+        }
+    }
+    
     /// Downloads the most preferred icon, by calling `scan(url:)` to discover available icons, and then choosing
     /// the most preferable available icon. If both `width` and `height` are supplied, the icon closest to the
     /// preferred size is chosen. Otherwise, the largest icon is chosen, if dimensions are known. If no icon
@@ -213,7 +266,7 @@ public enum IconDownloadResult {
     /// - parameter completion: A closure to call when the download task has produced results. The closure will
     ///                         be called on the main queue.
     /// - throws: An appropriate `IconError` if downloading was not successful.
-    @objc public static func downloadPreferred(_ url: URL,
+    @objc public static func downloadBest(_ url: URL,
                                          width: Int,
                                          height: Int,
                                          completion: @escaping (ImageType?) -> Void) {
@@ -226,14 +279,15 @@ public enum IconDownloadResult {
             }
 
             let urlSession = urlSessionProvider()
-
             let operations = [DownloadImageOperation(url: icon.url, session: urlSession)]
+
             executeURLOperations(operations) { results in
-                let downloadResults: [ImageType] = results.flatMap { result in
+                let downloadResults: [ImageType] = results.compactMap { result in
                     switch result {
                     case let .imageDownloaded(_, image):
                       return image;
                     case .failed(_):
+                        print("Failed to download from \(url) with result: \(result)", icon.url, result);
                       return nil;
                     default:
                       return nil;
@@ -295,8 +349,14 @@ public enum IconDownloadResult {
     /// - returns: The chosen icon, or `nil`, if `icons` is empty.
     static func chooseIcon(_ icons: [DetectedIcon], width: Int? = nil, height: Int? = nil) -> DetectedIcon? {
         guard icons.count > 0 else { return nil }
-      
-        let iconsInPreferredOrder = icons.sorted { left, right in
+
+        let sorted = iconsInPreferredOrder(icons, width:width, height:height)
+        
+        return sorted.first!
+    }
+        
+    static func iconsInPreferredOrder(_ icons: [DetectedIcon], width: Int? = nil, height: Int? = nil) -> [DetectedIcon] {
+        return icons.sorted { left, right in
             if width! > 0 || height! > 0 {
                 if left.area != nil && right.area != nil {
                     let preferredWidth = width, preferredHeight = height,
@@ -326,8 +386,6 @@ public enum IconDownloadResult {
             // Neither has dimensions, order by enum value
             return left.type.rawValue < right.type.rawValue
         }
-
-        return iconsInPreferredOrder.first!
     }
 
     fileprivate override init () {

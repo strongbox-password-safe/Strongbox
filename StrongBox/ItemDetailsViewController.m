@@ -34,6 +34,7 @@
 #import "PasswordGenerationSettingsTableView.h"
 #import "BrowseSafeView.h"
 #import "ItemDetailsPreferencesViewController.h"
+#import "EditDateCell.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -57,8 +58,9 @@ static NSInteger const kRowUsername = 2;
 static NSInteger const kRowPassword = 3;
 static NSInteger const kRowURL = 4;
 static NSInteger const kRowEmail = 5;
-static NSInteger const kRowTotp = 6;
-static NSInteger const kSimpleRowCount = 7;
+static NSInteger const kRowExpires = 6;
+static NSInteger const kRowTotp = 7;
+static NSInteger const kSimpleRowCount = 8;
 
 static NSString* const kConfidentialCellId = @"ConfidentialTableCell";
 static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
@@ -69,6 +71,7 @@ static NSString* const kEditAttachmentCellId = @"EditAttachmentCell";
 static NSString* const kViewAttachmentCellId = @"ViewAttachmentCell";
 static NSString* const kIconTableCell = @"IconTableCell";
 static NSString* const kTotpCell = @"TotpCell";
+static NSString* const kEditDateCell = @"EditDateCell";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -166,6 +169,7 @@ static NSString* const kTotpCell = @"TotpCell";
     [self.tableView registerNib:[UINib nibWithNibName:kGenericBasicCellId bundle:nil] forCellReuseIdentifier:kGenericBasicCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kViewAttachmentCellId bundle:nil] forCellReuseIdentifier:kViewAttachmentCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kTotpCell bundle:nil] forCellReuseIdentifier:kTotpCell];
+    [self.tableView registerNib:[UINib nibWithNibName:kEditDateCell bundle:nil] forCellReuseIdentifier:kEditDateCell];
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
@@ -421,9 +425,15 @@ static NSString* const kTotpCell = @"TotpCell";
                     self.model.password = trim(password);
                     [self onModelEdited];
                 };
+                
+#ifndef IS_APP_EXTENSION // TODO: Allow this after unifying storyboard?
                 cell.onPasswordSettings = ^(void) {
                     [self performSegueWithIdentifier:@"segueToPasswordGenerationSettings" sender:nil];
                 };
+                cell.showGenerationSettings = YES;
+#else
+                cell.showGenerationSettings = NO;
+#endif
                 return cell;
             }
             else {
@@ -535,6 +545,32 @@ static NSString* const kTotpCell = @"TotpCell";
                 [self onModelEdited];
             };
             return cell;
+        }
+        else if (indexPath.row == kRowExpires) {
+            if(self.isEditing) {
+                EditDateCell* cell = [tableView dequeueReusableCellWithIdentifier:kEditDateCell forIndexPath:indexPath];
+                cell.keyLabel.text = @"Expires";
+                [cell setDate:self.model.expires];
+                
+                cell.onDateChanged = ^(NSDate * _Nullable date) {
+                    NSLog(@"Setting Expiry Date to %@", friendlyDateString(date));
+                    self.model.expires = date;
+                    [self onModelEdited];
+                };
+                return cell;
+            }
+            else {
+                GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
+                NSDate* expires = self.model.expires;
+                NSString *str = expires ? friendlyDateString(expires) : @"Never";
+                
+                [cell setKey:@"Expires"
+                       value:str
+                     editing:NO
+             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+                
+                return cell;
+            }
         }
     }
     else if (indexPath.section == kNotesSectionIdx) {
@@ -763,6 +799,11 @@ static NSString* const kTotpCell = @"TotpCell";
             return 0;
 #endif
         }
+        else if(indexPath.row == kRowExpires) {
+            if(self.databaseModel.database.format == kPasswordSafe || (self.model.expires == nil && shouldHideEmpty)) {
+                return 0;
+            }
+        }
     }
     else if (indexPath.section == kNotesSectionIdx) {
         if(shouldHideEmpty && !self.model.notes.length) {
@@ -770,7 +811,8 @@ static NSString* const kTotpCell = @"TotpCell";
         }
     }
 #ifndef IS_APP_EXTENSION
-    else if(indexPath.section == kCustomFieldsSectionIdx && self.databaseModel.database.format == kPasswordSafe) {
+    else if(indexPath.section == kCustomFieldsSectionIdx &&
+            (self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1)) {
         return 0;
     }
     else if(indexPath.section == kAttachmentsSectionIdx && self.databaseModel.database.format == kPasswordSafe) {
@@ -805,7 +847,7 @@ static NSString* const kTotpCell = @"TotpCell";
     }
 #ifndef IS_APP_EXTENSION
     else if(section == kCustomFieldsSectionIdx) {
-        if(self.databaseModel.database.format == kPasswordSafe || (!self.editing && self.model.customFields.count == 0)) {
+        if(self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1 || (!self.editing && self.model.customFields.count == 0)) {
             return 0;
         }
     }
@@ -1062,8 +1104,7 @@ static NSString* const kTotpCell = @"TotpCell";
             }];
         };
     }
-    else if ([segue.identifier isEqual:@"toPasswordHistory"] && (self.item != nil))
-    {
+    else if ([segue.identifier isEqual:@"toPasswordHistory"] && (self.item != nil)) {
         PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.item.fields.passwordHistory;
         vc.readOnly = self.readOnly;
@@ -1426,6 +1467,7 @@ static NSString* const kTotpCell = @"TotpCell";
                                                                 url:item.fields.url
                                                               notes:item.fields.notes
                                                               email:item.fields.email
+                                                            expires:item.fields.expires
                                                                totp:item.otpToken
                                                                icon:iconModel
                                                        customFields:customFieldModels
@@ -1455,6 +1497,7 @@ static NSString* const kTotpCell = @"TotpCell";
     self.item.fields.url = self.model.url;
     self.item.fields.email = self.model.email;
     self.item.fields.notes = self.model.notes;
+    self.item.fields.expires = self.model.expires;
     
     // Custom Fields - Must be done before TOTP as otherwise it will be removed!
     
@@ -1469,7 +1512,7 @@ static NSString* const kTotpCell = @"TotpCell";
         [self.item clearTotp]; // Clears any custom fields and notes fields (Password Safe)
         
         if(self.model.totp != nil) {
-            [self.item setTotp:self.model.totp appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe];
+            [self.item setTotp:self.model.totp appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
         }
     }
     

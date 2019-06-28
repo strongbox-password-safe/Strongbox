@@ -26,6 +26,7 @@
                           url:(NSString *)url
                         notes:(NSString *)notes
                         email:(NSString *)email
+                      expires:(NSDate*)expires
                          totp:(OTPToken *)totp
                          icon:(SetIconModel*)icon
                  customFields:(NSArray<CustomFieldViewModel *> *)customFields
@@ -39,6 +40,7 @@
         self.totp = totp ? [OTPToken tokenWithURL:totp.url secret:totp.secret] : nil;
         self.url = url;
         self.email = email;
+        self.expires = expires;
         self.notes = notes;
         self.icon = icon;
         self.mutableCustomFields = customFields ? [[customFields sortedArrayUsingComparator:customFieldKeyComparator] mutableCopy] : [NSMutableArray array];
@@ -59,6 +61,7 @@
                                                                   url:self.url
                                                                 notes:self.notes
                                                                 email:self.email
+                                                              expires:self.expires
                                                                  totp:self.totp
                                                                  icon:self.icon
                                                          customFields:self.customFields
@@ -83,6 +86,12 @@
    
     if(!simpleEqual) {
         // NSLog(@"Model: Simply Different");
+        return YES;
+    }
+    
+    // Expiry
+    
+    if(!((self.expires == nil && other.expires == nil) || (self.expires && other.expires && [self.expires isEqual:other.expires]))) {
         return YES;
     }
     
@@ -226,6 +235,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                                                                 url:@"https://www.strongboxsafe.com"
                                                               notes:notes
                                                               email:@"markmc@gmail.com"
+                                                            expires:nil
                                                                totp:token
                                                                icon:[SetIconModel setIconModelWith:@(12) customUuid:nil customImage:nil]
                                                        customFields:@[ c1, c2, c3]

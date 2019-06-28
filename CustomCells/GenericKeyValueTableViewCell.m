@@ -157,13 +157,13 @@ suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)
 }
 
 - (void)onTap:(id)sender {
-    if(self.onTap) {
+    if(self.onTap && !self.isEditing) {
         self.onTap();
     }
 }
 
 - (void)onDoubleTap:(id)sender {
-    if(self.onDoubleTap) {
+    if(self.onDoubleTap && !self.isEditing) {
         self.onDoubleTap();
     }
 }

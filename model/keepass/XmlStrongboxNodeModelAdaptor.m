@@ -117,7 +117,9 @@
     ret.times.lastAccessTime.date = entry.fields.accessed;
     ret.times.lastModificationTime.date = entry.fields.modified;
     ret.times.creationTime.date = entry.fields.created;
-
+    ret.times.expiryTime.date = entry.fields.expires;
+    ret.times.expires.booleanValue = entry.fields.expires != nil;
+    
     // Strings
     
     for (NSString* key in entry.fields.customFields.allKeys) {
@@ -207,6 +209,7 @@
     fields.created = childEntry.times.creationTime.date;
     fields.accessed = childEntry.times.lastAccessTime.date;
     fields.modified = childEntry.times.lastModificationTime.date;
+    fields.expires = childEntry.times.expires.booleanValue ? childEntry.times.expiryTime.date : nil;
     
     for (Binary* binary in childEntry.binaries) {
         NSString* binaryRef = [binary.value.nonCustomisedXmlTree.node.xmlAttributes objectForKey:kBinaryValueAttributeRef];

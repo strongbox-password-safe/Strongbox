@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
                           url:(NSString*)url
                         notes:(NSString*)notes
                         email:(NSString*)email
+                      expires:(NSDate*)expires
                          totp:(OTPToken*_Nullable)totp
                          icon:(SetIconModel*)icon
                  customFields:(NSArray<CustomFieldViewModel*>*)customFields
@@ -50,6 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* url;
 @property NSString* notes;
 @property NSString* email;
+@property NSDate* expires;
+
 @property (nullable) OTPToken* totp;
 @property (readonly) NSArray<CustomFieldViewModel*> *customFields;
 @property (readonly) NSArray<UiAttachment*> *attachments;

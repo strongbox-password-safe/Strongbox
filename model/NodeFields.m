@@ -67,7 +67,7 @@
     ret.modified = self.modified;
     ret.accessed = self.accessed;
     ret.passwordModified = self.passwordModified;
-
+    ret.expires = self.expires;
     ret.attachments = [self cloneAttachments];
     ret.customFields = [self cloneCustomFields];
     

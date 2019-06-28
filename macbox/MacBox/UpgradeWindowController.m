@@ -18,6 +18,9 @@
 @property (nonatomic) NSInteger cancelDelay;
 @property (nonatomic) BOOL isPurchasing;
 
+@property NSInteger secondsRemaining;
+@property NSTimer *countdownTimer;
+
 @end
 
 @implementation UpgradeWindowController
@@ -181,24 +184,33 @@ static UpgradeWindowController *sharedInstance = nil;
     
     [self.buttonNoThanks setEnabled:NO];
     [self.buttonNoThanks setTitle:[NSString stringWithFormat:@"No Thanks (%ld)", (long)self.cancelDelay]];
-    
-    __block NSInteger secondsRemaining = self.cancelDelay;
-    NSTimer *y = [NSTimer scheduledTimerWithTimeInterval:1.0f repeats:YES block:^(NSTimer * _Nonnull timer) {
-        //NSLog(@"timer: %ld", (long)secondsRemaining);
-        
-        secondsRemaining--;
-        
-        if(secondsRemaining < 1) {
-            [self.buttonNoThanks setTitle:@"No Thanks"];
-            [self.buttonNoThanks setEnabled:YES];
-            [timer invalidate];
-        }
-        else {
-            [self.buttonNoThanks setTitle:[NSString stringWithFormat:@"No Thanks (%ld)", (long)secondsRemaining]];
-        }
-    }];
-    
-    [[NSRunLoop currentRunLoop] addTimer:y forMode:NSModalPanelRunLoopMode];
+
+    if(self.countdownTimer) {
+        [self.countdownTimer invalidate];
+    }
+    self.secondsRemaining = self.cancelDelay;
+    self.countdownTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f
+                                     target:self
+                                selector:@selector(updateNoThanksCountdown)
+                                   userInfo:nil
+                                    repeats:YES];
+
+    [[NSRunLoop currentRunLoop] addTimer:self.countdownTimer forMode:NSModalPanelRunLoopMode];
+}
+
+- (void)updateNoThanksCountdown {
+    NSLog(@"timer: %ld", (long)self.secondsRemaining);
+    self.secondsRemaining--;
+
+    if(self.secondsRemaining < 1) {
+        [self.buttonNoThanks setTitle:@"No Thanks"];
+        [self.buttonNoThanks setEnabled:YES];
+        [self.countdownTimer invalidate];
+        self.countdownTimer = nil;
+    }
+    else {
+        [self.buttonNoThanks setTitle:[NSString stringWithFormat:@"No Thanks (%ld)", (long)self.secondsRemaining]];
+    }
 }
 
 - (void)showProgressIndicator {

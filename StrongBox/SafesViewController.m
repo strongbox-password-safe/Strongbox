@@ -364,7 +364,7 @@
       }];
     }
     
-    if(safe.autoFillCacheEnabled && safe.autoFillCacheAvailable) {
+    if(safe.autoFillEnabled && safe.autoFillCacheAvailable) {
         [CacheManager.sharedInstance deleteAutoFillCache:safe completion:^(NSError * _Nonnull error) {
             NSLog(@"Delete Auto Fill Cache File. Error = %@", error);
         }];

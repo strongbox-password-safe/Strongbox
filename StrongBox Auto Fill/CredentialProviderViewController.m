@@ -165,13 +165,33 @@
 }
 
 - (void)showQuickLaunchView {
-    [self dismissViewControllerAnimated:NO completion:nil];
-    [self presentViewController:self.quickLaunch animated:NO completion:nil];
+    if(self.presentedViewController) {
+        [self dismissViewControllerAnimated:NO completion:nil];
+    }
+    
+    if(!self.quickLaunch) {
+        [Alerts warn:self title:@"Error" message:@"There was an error loading the Quick Launch View. Please mail support@strongboxsafe.com to inform the developer." completion:^{
+            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"There was an error loading the Quick Launch View" errorCode:-1]];
+        }];
+    }
+    else {
+        [self presentViewController:self.quickLaunch animated:NO completion:nil];
+    }
 }
 
 - (void)showSafesListView {
-    [self dismissViewControllerAnimated:NO completion:nil];
-    [self presentViewController:self.safesList animated:NO completion:nil];
+    if(self.presentedViewController) {
+        [self dismissViewControllerAnimated:NO completion:nil];
+    }
+    
+    if(!self.safesList) {
+        [Alerts warn:self title:@"Error" message:@"There was an error loading the Safes List View. Please mail support@strongboxsafe.com to inform the developer." completion:^{
+            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
+        }];
+    }
+    else {
+        [self presentViewController:self.safesList animated:NO completion:nil];
+    }
 }
 
 - (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider {
@@ -183,7 +203,7 @@
         return YES;
     }
     
-    return safeMetaData.autoFillCacheEnabled && safeMetaData.autoFillCacheAvailable;
+    return safeMetaData.autoFillEnabled && safeMetaData.autoFillCacheAvailable;
 }
 
 - (SafeMetaData*)getPrimarySafe {

@@ -25,6 +25,10 @@ BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion,
 }
 
 BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
+    if(candidate == nil) {
+        return NO;
+    }
+    
     if(candidate.length < SIZE_OF_KEEPASS_HEADER) {
         if(error) {
             *error = [Utils createNSError:@"candidate.length < SIZE_OF_KEEPASS_HEADER" errorCode:-1];

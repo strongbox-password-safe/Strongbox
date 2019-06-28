@@ -195,6 +195,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     ret.creation = record.fields.created;
     ret.modified = record.fields.modified;
     ret.accessed = record.fields.accessed;
+    ret.expired = record.fields.expires;
     
     if(record.fields.attachments.count) { 
         NodeFileAttachment *theAttachment = record.fields.attachments[0];
@@ -262,6 +263,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         
         Node* node = [[Node alloc] initAsGroup:group.name parent:parentNode allowDuplicateGroupTitles:YES uuid:nil];
         node.iconId = group.imageId;
+        
         node.linkedData = group;
         [parentNode addChild:node allowDuplicateGroupTitles:YES];
         
@@ -296,6 +298,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     fields.created = entry.creation;
     fields.accessed = entry.accessed;
     fields.modified = entry.modified;
+    fields.expires = entry.expired;
     
     if(entry.binaryFileName.length) {
         DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] init];

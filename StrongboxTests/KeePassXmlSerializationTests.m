@@ -10,6 +10,7 @@
 #import "KeePassDatabase.h"
 #import "XmlStrongboxNodeModelAdaptor.h"
 #import "KdbxSerialization.h"
+#import "Kdbx4Serialization.h"
 #import "CommonTesting.h"
 
 @interface KeePassXmlSerializationTests : XCTestCase
@@ -95,7 +96,7 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
+    Kdbx4SerializationData* data = [Kdbx4Serialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);

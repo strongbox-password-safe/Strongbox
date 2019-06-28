@@ -55,6 +55,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
+@property NSMutableDictionary* cellHeightsDictionary;
+
 @end
 
 @implementation BrowseSafeView
@@ -290,7 +292,18 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     return UITableViewAutomaticDimension;  // Required for iOS 9 and 10
 }
 
+
+
+// save height - TODO:
+//- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+//    [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:indexPath];
+//}
+
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    NSNumber *height = [self.cellHeightsDictionary objectForKey:indexPath];
+//    if (height) return height.doubleValue;
+//    return UITableViewAutomaticDimension;
+
     return 60.0f; // Required for iOS 9 and 10
 }
 
@@ -605,7 +618,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     self.buttonSortItems.enabled = !self.isEditing ||
         (!ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone);
     
-    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-32-descending" : @"sort-32"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-descending" : @"sort-ascending"];
+    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
     
     [self.buttonSortItems setImage:sortImage];
         
