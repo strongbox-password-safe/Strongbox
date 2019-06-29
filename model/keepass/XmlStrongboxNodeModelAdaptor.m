@@ -233,7 +233,7 @@
     
     for (NSString* key in childEntry.customStrings.allKeys) {
         StringValue* value = childEntry.customStrings[key];
-        [fields.customFields setObject:value forKey:key];
+        [fields setCustomField:key value:value];
     }
     
     Node* entryNode = [[Node alloc] initAsRecord:childEntry.title

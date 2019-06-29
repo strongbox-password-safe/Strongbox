@@ -561,6 +561,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
             }
             else {
                 GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
+                
                 NSDate* expires = self.model.expires;
                 NSString *str = expires ? friendlyDateString(expires) : @"Never";
                 
@@ -568,6 +569,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
                        value:str
                      editing:NO
              useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+                
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 
                 return cell;
             }
@@ -800,7 +803,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 #endif
         }
         else if(indexPath.row == kRowExpires) {
-            if(self.databaseModel.database.format == kPasswordSafe || (self.model.expires == nil && shouldHideEmpty)) {
+            if(self.model.expires == nil && shouldHideEmpty) {
                 return 0;
             }
         }
@@ -1358,7 +1361,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)setTotpWithString:(NSString*)string steam:(BOOL)steam {
-    OTPToken* token = [Node getOtpTokenFromString:string forceSteam:steam];
+    OTPToken* token = [NodeFields getOtpTokenFromString:string forceSteam:steam];
     if(token) {
         self.model.totp = token;
         
@@ -1468,7 +1471,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
                                                               notes:item.fields.notes
                                                               email:item.fields.email
                                                             expires:item.fields.expires
-                                                               totp:item.otpToken
+                                                               totp:item.fields.otpToken
                                                                icon:iconModel
                                                        customFields:customFieldModels
                                                         attachments:attachments
@@ -1501,18 +1504,20 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     // Custom Fields - Must be done before TOTP as otherwise it will be removed!
     
-    [self.item.fields.customFields removeAllObjects];
+    [self.item.fields removeAllCustomFields];
     for (CustomFieldViewModel *field in self.model.customFields) {
-        self.item.fields.customFields[field.key] = [StringValue valueWithString:field.value protected:field.protected];
+        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
+        [self.item.fields setCustomField:field.key value:value];
     }
 
     // TOTP
    
-    if([OTPToken areDifferent:self.item.otpToken b:self.model.totp]) {
-        [self.item clearTotp]; // Clears any custom fields and notes fields (Password Safe)
+    if([OTPToken areDifferent:self.item.fields.otpToken b:self.model.totp]) {
+        [self.item.fields clearTotp]; // Clears any custom fields and notes fields (Password Safe)
         
         if(self.model.totp != nil) {
-            [self.item setTotp:self.model.totp appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
+            [self.item.fields setTotp:self.model.totp
+                     appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
         }
     }
     

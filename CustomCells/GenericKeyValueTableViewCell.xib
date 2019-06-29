@@ -18,10 +18,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rD9-jL-UvC">
-                        <rect key="frame" x="20" y="55" width="384" height="51"/>
+                        <rect key="frame" x="20" y="11" width="384" height="129"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Key that couild get very long too" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oFX-hJ-zwW">
-                                <rect key="frame" x="0.0" y="15.5" width="91" height="20.5"/>
+                                <rect key="frame" x="0.0" y="54.5" width="91" height="20.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="91" id="Hfk-jf-E2R"/>
                                 </constraints>
@@ -30,7 +30,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="eIL-MJ-BDK">
-                                <rect key="frame" x="99" y="15" width="285" height="21"/>
+                                <rect key="frame" x="99" y="54" width="285" height="21"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Value that gets very big very quickluy" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="12" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="miA-4r-w9p" customClass="AutoCompleteTextField">
                                         <rect key="frame" x="0.0" y="0.0" width="285" height="21"/>
@@ -41,8 +41,8 @@
                                 </subviews>
                             </stackView>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EXO-Hf-DTq" userLabel="Horizontal Line">
-                                <rect key="frame" x="99" y="41" width="285" height="1"/>
-                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <rect key="frame" x="99" y="80" width="285" height="1"/>
+                                <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="ouU-Wj-p0w"/>
                                 </constraints>

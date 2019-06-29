@@ -633,6 +633,13 @@
 		4DF97F2B21BF10EB0090A55E /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F2621BF10EA0090A55E /* NSDateRFC1123.m */; };
 		4DF97F2C21BF10EB0090A55E /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F2921BF10EB0090A55E /* ISO8601DateFormatter.m */; };
 		4DF97F2E21BF116A0090A55E /* DavKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F2D21BF116A0090A55E /* DavKitTests.m */; };
+		4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
+		4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
+		4DFA67DE22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */; };
+		4DFA67DF22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */; };
+		4DFA67E222C80667000FC012 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E122C80667000FC012 /* PasswordMaker.m */; };
+		4DFA67E322C80667000FC012 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E122C80667000FC012 /* PasswordMaker.m */; };
+		4DFA67E522C80824000FC012 /* PasswordMakerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E422C80824000FC012 /* PasswordMakerTests.m */; };
 		4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */; };
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
@@ -1495,6 +1502,13 @@
 		4DF97F2921BF10EB0090A55E /* ISO8601DateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ISO8601DateFormatter.m; sourceTree = "<group>"; };
 		4DF97F2A21BF10EB0090A55E /* ISO8601DateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISO8601DateFormatter.h; sourceTree = "<group>"; };
 		4DF97F2D21BF116A0090A55E /* DavKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DavKitTests.m; path = StrongboxTests/DavKitTests.m; sourceTree = "<group>"; };
+		4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationViewController.h; path = StrongBox/PasswordGenerationViewController.h; sourceTree = "<group>"; };
+		4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationViewController.m; path = StrongBox/PasswordGenerationViewController.m; sourceTree = "<group>"; };
+		4DFA67DC22C7FF93000FC012 /* PasswordGenerationConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationConfig.h; path = StrongBox/PasswordGenerationConfig.h; sourceTree = "<group>"; };
+		4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = StrongBox/PasswordGenerationConfig.m; sourceTree = "<group>"; };
+		4DFA67E022C80667000FC012 /* PasswordMaker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = StrongBox/PasswordMaker.h; sourceTree = "<group>"; };
+		4DFA67E122C80667000FC012 /* PasswordMaker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = StrongBox/PasswordMaker.m; sourceTree = "<group>"; };
+		4DFA67E422C80824000FC012 /* PasswordMakerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordMakerTests.m; sourceTree = "<group>"; };
 		4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModelTests.m; path = StrongboxTests/PwSafeModelTests.m; sourceTree = "<group>"; };
 		4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BasicOrderedDictionary.h; path = model/BasicOrderedDictionary.h; sourceTree = SOURCE_ROOT; };
 		4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BasicOrderedDictionary.m; path = model/BasicOrderedDictionary.m; sourceTree = SOURCE_ROOT; };
@@ -1814,6 +1828,7 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4DFA67E422C80824000FC012 /* PasswordMakerTests.m */,
 				4D2259F222C67E56005547EA /* FavIconTests.m */,
 				4D98344621775F3800731FFC /* test-files */,
 				4D0835E22284794200CA7405 /* KeePassKeyFileTests.m */,
@@ -2902,6 +2917,12 @@
 				4D29E470206D434400AD537E /* PasswordGenerationSettingsTableView.h */,
 				4D29E471206D434400AD537E /* PasswordGenerationSettingsTableView.m */,
 				4DE2688F22A65CA100A1D158 /* PasswordGenerationPreferences.storyboard */,
+				4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */,
+				4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */,
+				4DFA67DC22C7FF93000FC012 /* PasswordGenerationConfig.h */,
+				4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */,
+				4DFA67E022C80667000FC012 /* PasswordMaker.h */,
+				4DFA67E122C80667000FC012 /* PasswordMaker.m */,
 			);
 			name = "Password Generation";
 			sourceTree = "<group>";
@@ -3491,6 +3512,7 @@
 				4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */,
 				4DD41FBA2182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m in Sources */,
 				4D19679F217F4E760057DF06 /* KeePassXmlStrongboxModelAdaptorTests.m in Sources */,
+				4DFA67E522C80824000FC012 /* PasswordMakerTests.m in Sources */,
 				4D004CE621F4F67D00E2B194 /* OtpTests.m in Sources */,
 				4D0835E42284799900CA7405 /* KeePassKeyFileTests.m in Sources */,
 				4DC5B9BE217B31F100FE9DD9 /* CommonTesting.m in Sources */,
@@ -3519,6 +3541,7 @@
 				4D1885672170E55F001AE6B0 /* OpenSafeSequenceHelper.m in Sources */,
 				4D27D74C21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
 				4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */,
+				4DFA67E222C80667000FC012 /* PasswordMaker.m in Sources */,
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
 				4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */,
 				4DC66F3D229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
@@ -3567,12 +3590,14 @@
 				4DA00AE1222180EE004C0C63 /* SetNodeIconUiHelper.m in Sources */,
 				4DF97F2C21BF10EB0090A55E /* ISO8601DateFormatter.m in Sources */,
 				4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */,
+				4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				4DAE98C42270B4E200A811C4 /* ItemDetailsModel.m in Sources */,
 				4DEDF7DB22AA7F9800EFA5C9 /* ProExplanationViewController.m in Sources */,
 				4D326E8D22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
+				4DFA67DE22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlTreeSerializer.m in Sources */,
 				4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */,
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
@@ -3809,6 +3834,7 @@
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
+				4DFA67E322C80667000FC012 /* PasswordMaker.m in Sources */,
 				4D33FA3922872008006C31B2 /* ItemDetailsViewController.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4D0835D2228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
@@ -3828,6 +3854,7 @@
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
 				4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */,
+				4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
 				4D4766F32178C82B00C4358F /* DecryptionParameters.m in Sources */,
@@ -3855,6 +3882,7 @@
 				4D2F6C3721807C7E007931E4 /* KeePassGroup.m in Sources */,
 				4D326E9022302BED00DCD8C7 /* NMSSHHostConfig.m in Sources */,
 				4DF972BA21BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */,
+				4DFA67DF22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */,
 				4D3E149321832BEF00A41CA0 /* encoding.c in Sources */,
 				4DF972CC21C01ABF00F384C9 /* DAVRequests.m in Sources */,
 				4D4766E12178C82B00C4358F /* SerializationData.m in Sources */,

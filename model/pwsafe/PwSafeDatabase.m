@@ -202,6 +202,7 @@
     fields.notes = record.notes;
     fields.passwordHistory = record.passwordHistory;
     fields.email = record.email;
+    fields.expires = record.expires;
     
     fields.accessed = record.accessed;
     fields.modified = record.modified;
@@ -393,6 +394,7 @@
     record.notes = recordNode.fields.notes;
     record.email = recordNode.fields.email;
     record.group = [[Group alloc] initWithPathComponents:[recordNode.parent getTitleHierarchy]];
+    record.expires = recordNode.fields.expires;
     
     if(!(recordNode.fields.passwordHistory.enabled == NO &&
          recordNode.fields.passwordHistory.entries.count == 0)) {

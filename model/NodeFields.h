@@ -10,6 +10,7 @@
 #import "PasswordHistory.h"
 #import "NodeFileAttachment.h"
 #import "StringValue.h"
+#import "OTPToken.h"
 
 @class Node;
 
@@ -36,8 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nullable) NSDate *expires;
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
-@property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, StringValue*> *customFields;
-
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
 
@@ -45,6 +44,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;
+
+// Custom Fields
+
+@property (nonatomic, strong, nonnull) NSDictionary<NSString*, StringValue*> *customFields;
+- (void)removeAllCustomFields;
+- (void)removeCustomField:(NSString*)key;
+- (void)setCustomField:(NSString*)key value:(StringValue*)value;
+
+///////////////////////////////////////////////
+// TOTP
+
+@property (nonatomic, readonly) OTPToken* otpToken;
+
++ (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; // Unit Testing
+
++ (OTPToken*_Nullable)getOtpTokenFromString:(NSString * _Nonnull)string forceSteam:(BOOL)forceSteam;
+
+- (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes forceSteam:(BOOL)forceSteam;
+
+- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes;
+
+- (void)clearTotp;
 
 @end
 

@@ -742,12 +742,12 @@
                 <viewControllerPlaceholder storyboardName="SelectKeyFile" id="mjX-zG-VQ1" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EsX-V9-vUS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="748" y="3564"/>
+            <point key="canvasLocation" x="1138" y="3535"/>
         </scene>
-        <!--PasswordGenerationSettingsTableView-->
+        <!--NewPasswordGenerationSettingsTableView-->
         <scene sceneID="bhw-PT-roB">
             <objects>
-                <viewControllerPlaceholder storyboardName="PasswordGenerationPreferences" referencedIdentifier="PasswordGenerationSettingsTableView" id="P8t-8V-TXo" sceneMemberID="viewController"/>
+                <viewControllerPlaceholder storyboardName="PasswordGenerationPreferences" referencedIdentifier="NewPasswordGenerationSettingsTableView" id="P8t-8V-TXo" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="00q-oL-fz2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1201" y="3664"/>

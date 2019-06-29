@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *keyLabel;
 
-- (void)setDate:(NSDate*)date;
+- (void)setDate:(NSDate*_Nullable)date;
 
 @property (nonatomic, copy, nullable) void (^onDateChanged)(NSDate*_Nullable date);
 

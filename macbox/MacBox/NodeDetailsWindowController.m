@@ -390,7 +390,7 @@ static NSImage* kDefaultAttachmentIcon;
 - (void)initializeTotp {
     [self bindUiToTotp];
     
-    if(!Settings.sharedInstance.doNotShowTotp && self.node.otpToken) {
+    if(!Settings.sharedInstance.doNotShowTotp && self.node.fields.otpToken) {
         if(self.timerRefreshOtp == nil) {
             self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshTotp:) userInfo:nil repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
@@ -410,16 +410,16 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)bindUiToTotp {
-    if(!Settings.sharedInstance.doNotShowTotp && self.node.otpToken) {
+    if(!Settings.sharedInstance.doNotShowTotp && self.node.fields.otpToken) {
         self.totpRow.hidden = NO;
         
-        uint64_t remainingSeconds = self.node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.node.otpToken.period);
+        uint64_t remainingSeconds = self.node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.node.fields.otpToken.period);
         
-        self.labelTotp.stringValue = self.node.otpToken.password;
+        self.labelTotp.stringValue = self.node.fields.otpToken.password;
         self.labelTotp.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : NSColor.controlTextColor;
         
         self.progressTotp.minValue = 0;
-        self.progressTotp.maxValue = self.node.otpToken.period;
+        self.progressTotp.maxValue = self.node.fields.otpToken.period;
         self.progressTotp.doubleValue = remainingSeconds;
     }
     else {
@@ -1043,8 +1043,8 @@ NSString* trimField(NSTextField* textField) {
 - (IBAction)onCopyTotp:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
 
-    if(self.node.otpToken) {
-        NSString *password = self.node.otpToken.password;
+    if(self.node.fields.otpToken) {
+        NSString *password = self.node.fields.otpToken.password;
         [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
     }
     

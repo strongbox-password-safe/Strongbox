@@ -55,7 +55,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
-@property NSMutableDictionary* cellHeightsDictionary;
+//@property NSMutableDictionary* cellHeightsDictionary;
 
 @end
 
@@ -105,10 +105,12 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         
         NSArray<Node*> *nodes = [self getDataSource];
         NSArray* visibleOtpRows = [visible filter:^BOOL(NSIndexPath * _Nonnull obj) {
-            return nodes[obj.row].otpToken != nil;
+            return nodes[obj.row].fields.otpToken != nil;
         }];
         
-        [self.tableView reloadRowsAtIndexPaths:visibleOtpRows withRowAnimation:UITableViewRowAnimationNone];
+        if(visibleOtpRows.count) {
+            [self.tableView reloadRowsAtIndexPaths:visibleOtpRows withRowAnimation:UITableViewRowAnimationNone];
+        }
     }
 }
 
@@ -254,11 +256,17 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsSelectionDuringEditing = YES;
     
-    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
-    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.estimatedRowHeight = self.cellHeight;
+    self.tableView.rowHeight = self.cellHeight;
     self.tableView.tableFooterView = [UIView new];
     
     self.clearsSelectionOnViewWillAppear = YES;
+}
+
+- (CGFloat)cellHeight {
+    // Super important for this to be pixel perfect - otherwise get very jumpy scrolling
+    return self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList ? 99.0 : 46.5;
+    //TODO: UITableViewAutomaticDimension;
 }
 
 - (IBAction)onClose:(id)sender {
@@ -296,15 +304,20 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 // save height - TODO:
 //- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+//    NSLog(@"Saving Height for IndexPath: %f - %ld", cell.frame.size.height, (long)indexPath.row);
 //    [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:indexPath];
 //}
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
 //    NSNumber *height = [self.cellHeightsDictionary objectForKey:indexPath];
-//    if (height) return height.doubleValue;
-//    return UITableViewAutomaticDimension;
-
-    return 60.0f; // Required for iOS 9 and 10
+//    if (height) {
+//        return height.doubleValue;
+//    }
+//    else {
+//        return 46.5; // TODO: 99.0 for TOTP List// UITableViewAutomaticDimension;
+//    }
+////    return 46.5f; // Required for iOS 9 and 10
+    return self.cellHeight;
 }
 
 - (IBAction)onSortItems:(id)sender {
@@ -458,7 +471,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
     if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
         NSArray<Node*>* otps = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-            return obj.otpToken != nil;
+            return obj.fields.otpToken != nil;
         }];
         
         self.searchResults = [searcher searchNodes:otps
@@ -543,10 +556,10 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)setOtpCellLabelProperties:(UILabel*)otpLabel node:(Node*)node {
-    if(!self.viewModel.metadata.hideTotpInBrowse && node.otpToken) {
-        uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
+    if(!self.viewModel.metadata.hideTotpInBrowse && node.fields.otpToken) {
+        uint64_t remainingSeconds = node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.fields.otpToken.period);
         
-        otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+        otpLabel.text = [NSString stringWithFormat:@"%@", node.fields.otpToken.password];
         otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
         otpLabel.alpha = 1;
         
@@ -637,7 +650,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             break;
         case kBrowseViewTypeTotpList:
             ret = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-                return obj.otpToken != nil;
+                return obj.fields.otpToken != nil;
             }];
             break;
         default:
@@ -701,7 +714,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
     
     BOOL hasOtpToken = [[self getDataSource] anyMatch:^BOOL(Node * _Nonnull obj) {
-        return obj.otpToken != nil;
+        return obj.fields.otpToken != nil;
     }];
     
     if(!self.viewModel.metadata.hideTotpInBrowse && hasOtpToken) {
@@ -1161,7 +1174,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)copyTotp:(Node*)item {
-    if(!item.otpToken) {
+    if(!item.fields.otpToken) {
         [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@': No TOTP setup to Copy!", [self dereference:item.title node:item]]
                                    message:nil
                                   duration:3.f
@@ -1176,7 +1189,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    pasteboard.string = item.otpToken.password;
+    pasteboard.string = item.fields.otpToken.password;
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' TOTP Copied", [self dereference:item.title node:item]]
                                message:nil
@@ -1194,8 +1207,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 - (void)copyPassword:(Node *)item {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    BOOL copyTotp = (item.fields.password.length == 0 && item.otpToken);
-    pasteboard.string = copyTotp ? item.otpToken.password : [self dereference:item.fields.password node:item];
+    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
+    pasteboard.string = copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ? @"'%@' OTP Code Copied" : @"'%@' Password Copied", [self dereference:item.title node:item]]
                                message:nil

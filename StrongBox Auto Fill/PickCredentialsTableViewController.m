@@ -314,10 +314,10 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {
-    if(!Settings.sharedInstance.hideTotpInAutoFill && node.otpToken) {
-        uint64_t remainingSeconds = node.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.otpToken.period);
+    if(!Settings.sharedInstance.hideTotpInAutoFill && node.fields.otpToken) {
+        uint64_t remainingSeconds = node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.fields.otpToken.period);
 
-        cell.otpLabel.text = [NSString stringWithFormat:@"%@", node.otpToken.password];
+        cell.otpLabel.text = [NSString stringWithFormat:@"%@", node.fields.otpToken.password];
         cell.otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
 
         cell.otpLabel.alpha = 1;
@@ -505,8 +505,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    BOOL copyTotp = (item.fields.password.length == 0 && item.otpToken);
-    pasteboard.string = copyTotp ? item.otpToken.password : [self dereference:item.fields.password node:item];
+    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
+    pasteboard.string = copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -552,8 +552,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }
     Node *item = arr[indexPath.row];
     if(item) {
-        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && item.otpToken) {
-            NSString* value = item.otpToken.password;
+        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && item.fields.otpToken) {
+            NSString* value = item.fields.otpToken.password;
             if (value.length) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = value;

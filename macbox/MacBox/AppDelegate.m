@@ -381,10 +381,10 @@
 }
 
 - (void)startClipboardWatchingTask {
-//    NSLog(@"startClipboardWatchingTask...");
+    NSLog(@"startClipboardWatchingTask...");
     self.currentClipboardVersion = -1;
     
-    [NSTimer scheduledTimerWithTimeInterval:0.5f
+    self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f
                                      target:self
                                    selector:@selector(checkClipboardForChangesAndNotify)
                                    userInfo:nil
@@ -399,7 +399,7 @@
 }
 
 - (void)killClipboardWatchingTask {
-//    NSLog(@"killClipboardWatchingTask...");
+    NSLog(@"killClipboardWatchingTask...");
     
     self.currentClipboardVersion = -1;
     

@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
                           url:(NSString*)url
                         notes:(NSString*)notes
                         email:(NSString*)email
-                      expires:(NSDate*)expires
+                      expires:(NSDate*_Nullable)expires
                          totp:(OTPToken*_Nullable)totp
                          icon:(SetIconModel*)icon
                  customFields:(NSArray<CustomFieldViewModel*>*)customFields

@@ -120,6 +120,16 @@
     }
 }
 
+- (NSDate *)expires {
+    return [self getDataAsDateForField:FIELD_TYPE_XTIME];
+}
+
+- (void)setExpires:(NSDate *)expires {
+    if (!((expires == nil && self.expires == nil) || [expires isEqual:self.expires])) {
+        [self setFieldWithDate:FIELD_TYPE_XTIME date:expires];
+    }
+}
+
 - (NSString *)username {
     return [self getPrettyStringForField:FIELD_TYPE_USER];
 }
@@ -201,11 +211,20 @@
     }
 }
 
-- (void)setFieldWithDate:(FieldType)type date:(NSDate *)date {
-    time_t timeT = (time_t)date.timeIntervalSince1970;
-    NSData *dataTime = [[NSData alloc] initWithBytes:&timeT length:4];
+- (void)clearField:(FieldType)type {
+    _fields[@(type)] = nil;
+}
 
-    [self setFieldWithData:type data:dataTime];
+- (void)setFieldWithDate:(FieldType)type date:(NSDate *)date {
+    if(date == nil) {
+        [self clearField:type]; // TODO: Test
+    }
+    else {
+        time_t timeT = (time_t)date.timeIntervalSince1970;
+        NSData *dataTime = [[NSData alloc] initWithBytes:&timeT length:4];
+
+        [self setFieldWithData:type data:dataTime];
+    }
 }
 
 - (void)setField:(FieldType)type string:(NSString *)string {

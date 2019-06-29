@@ -116,8 +116,8 @@
         
         // Copy TOTP code if configured to do so...
         
-        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && node.otpToken) {
-            NSString* value = node.otpToken.password;
+        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && node.fields.otpToken) {
+            NSString* value = node.fields.otpToken.password;
             if (value.length) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = value;

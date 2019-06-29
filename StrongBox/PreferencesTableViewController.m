@@ -27,6 +27,7 @@
 #import "AdvancedPreferencesTableViewController.h"
 //#import "ManageKeyFilesViewController.h"
 #import "KeyFilesTableViewController.h"
+#import "PasswordGenerationViewController.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -631,7 +632,11 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"seguePrefToPasswordPrefs"]) {
-        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)segue.destinationViewController;
+        //UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+//        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)nav.topViewController;
+//        vc.onDone = self.onDone;
+//
+        PasswordGenerationViewController* vc = (PasswordGenerationViewController*)segue.destinationViewController;
         vc.onDone = self.onDone;
     }
     else if ([segue.identifier isEqualToString:@"seguePrefsToNewEntryDefaults"]) {

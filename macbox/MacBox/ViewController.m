@@ -725,11 +725,11 @@ static NSImage* kStrongBox256Image;
         return cell;
     }
     else if([tableColumn.identifier isEqualToString:kTOTPColumn]) {
-        NSString* totp = it.otpToken ? it.otpToken.password : @"";
+        NSString* totp = it.fields.otpToken ? it.fields.otpToken.password : @"";
         //NSLog(@"TOTP: %@", totp);
         NSTableCellView* cell = [self getReadOnlyCell:totp];
 
-        if(it.otpToken) {
+        if(it.fields.otpToken) {
             uint64_t remainingSeconds = [self getTotpRemainingSeconds:item];
             
             cell.textField.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : NSColor.controlTextColor;
@@ -1574,12 +1574,12 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)copyTotp:(Node*)item {
-    if(!item || !item.otpToken) {
+    if(!item || !item.fields.otpToken) {
         return;
     }
     
     [[NSPasteboard generalPasteboard] clearContents];
-    NSString *password = item.otpToken.password;
+    NSString *password = item.fields.otpToken.password;
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 
     [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' TOTP Copied", item.title]];
@@ -1864,7 +1864,7 @@ static NSImage* kStrongBox256Image;
         return item && !item.isGroup && item.fields.password.length;
     }
     else if (theAction == @selector(onCopyTotp:)) {
-        return item && !item.isGroup && item.otpToken;
+        return item && !item.isGroup && item.fields.otpToken;
     }
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length; // TODO: Group can have notes
@@ -1883,7 +1883,7 @@ static NSImage* kStrongBox256Image;
         return item && !item.isGroup;
     }
     else if(theAction == @selector(onClearTotp:)) {
-        return item && !item.isGroup && item.otpToken;
+        return item && !item.isGroup && item.fields.otpToken;
     }
     else if (theAction == @selector(onViewItemHistory:)) {
         return
@@ -2204,7 +2204,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
             [self.outlineView beginUpdates];
             for(int i=0;i<rowRange.length;i++) {
                 Node* item = (Node*)[self.outlineView itemAtRow:rowRange.location + i];
-                if(item.otpToken) {
+                if(item.fields.otpToken) {
                     [self.outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:rowRange.location + i]
                                                 columnIndexes:[NSIndexSet indexSetWithIndex:totpColumnIndex]];
 
@@ -2223,19 +2223,19 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         return;
     }
     
-    if(!Settings.sharedInstance.doNotShowTotp && item.otpToken) {
+    if(!Settings.sharedInstance.doNotShowTotp && item.fields.otpToken) {
         self.totpRow.hidden = NO;
         
         //NSLog(@"Token: [%@] - Password: %@", item.otpToken, item.otpToken.password);
         
-        self.textFieldTotp.stringValue = item.otpToken.password;
+        self.textFieldTotp.stringValue = item.fields.otpToken.password;
         
         uint64_t remainingSeconds = [self getTotpRemainingSeconds:item];
         
         self.textFieldTotp.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : NSColor.controlTextColor;
 
         self.progressTotp.minValue = 0;
-        self.progressTotp.maxValue = item.otpToken.period;
+        self.progressTotp.maxValue = item.fields.otpToken.period;
         self.progressTotp.doubleValue = remainingSeconds;
     }
     else {
@@ -2245,7 +2245,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (uint64_t)getTotpRemainingSeconds:(Node*)item {
-    return item.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)item.otpToken.period);
+    return item.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)item.fields.otpToken.period);
 }
 - (IBAction)onSetTotp:(id)sender {
     Node *item = [self getCurrentSelectedItem];
@@ -2266,7 +2266,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 - (IBAction)onClearTotp:(id)sender {
     Node *item = [self getCurrentSelectedItem];
     
-    if(item == nil || item.isGroup || !item.otpToken) {
+    if(item == nil || item.isGroup || !item.fields.otpToken) {
         return;
     }
     

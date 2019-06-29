@@ -8,6 +8,10 @@
 
 #import "Node.h"
 #import "Utils.h"
+#import "OTPToken+Serialization.h"
+#import "OTPToken+Generation.h"
+#import "NSURL+QueryItems.h"
+#import <Base32/MF_Base32Additions.h>
 
 @interface Node ()
 
@@ -16,6 +20,36 @@
 @end
 
 @implementation Node
+
+NSComparator finderStyleNodeComparator = ^(id obj1, id obj2)
+{
+    Node* n1 = (Node*)obj1;
+    Node* n2 = (Node*)obj2;
+    
+    if(n1.isGroup && !n2.isGroup) {
+        return NSOrderedAscending;
+    }
+    else if(!n1.isGroup && n2.isGroup) {
+        return NSOrderedDescending;
+    }
+    
+    return finderStringCompare(n1.title, n2.title);
+};
+
+NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
+{
+    Node* n1 = (Node*)obj1;
+    Node* n2 = (Node*)obj2;
+    
+    if(n1.isGroup && !n2.isGroup) {
+        return NSOrderedAscending;
+    }
+    else if(!n1.isGroup && n2.isGroup) {
+        return NSOrderedDescending;
+    }
+    
+    return finderStringCompare(n2.title, n1.title);
+};
 
 + (instancetype)rootGroup {
     return [[Node alloc] initAsRoot:nil];
@@ -394,36 +428,5 @@
                 self.title, self.fields.username, self.fields.password, self.fields.url, (unsigned long)self.fields.attachments.count];
     }
 }
-
-NSComparator finderStyleNodeComparator = ^(id obj1, id obj2)
-{
-    Node* n1 = (Node*)obj1;
-    Node* n2 = (Node*)obj2;
-    
-    if(n1.isGroup && !n2.isGroup) {
-        return NSOrderedAscending;
-    }
-    else if(!n1.isGroup && n2.isGroup) {
-        return NSOrderedDescending;
-    }
-    
-    return finderStringCompare(n1.title, n2.title);
-};
-
-NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
-{
-    Node* n1 = (Node*)obj1;
-    Node* n2 = (Node*)obj2;
-    
-    if(n1.isGroup && !n2.isGroup) {
-        return NSOrderedAscending;
-    }
-    else if(!n1.isGroup && n2.isGroup) {
-        return NSOrderedDescending;
-    }
-
-    return finderStringCompare(n2.title, n1.title);
-};
-
 
 @end

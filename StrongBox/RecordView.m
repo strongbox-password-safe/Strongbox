@@ -936,10 +936,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.accessed = [[NSDate alloc] init];
     self.record.fields.modified = [[NSDate alloc] init];
     
-    [node.fields.customFields removeAllObjects];
+    [node.fields removeAllCustomFields];
     
     for (CustomField *field in items) {
-        node.fields.customFields[field.key] = [StringValue valueWithString:field.value protected:field.protected];
+        StringValue* value = [StringValue valueWithString:field.value protected:field.protected];
+        [node.fields setCustomField:field.key value:value];
     }
     
     [self sync:^(NSError *error) {
@@ -1021,12 +1022,12 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 - (IBAction)refreshOtpCode:(id)sender
 {
-    if(self.showOtp && self.record.otpToken) {
+    if(self.showOtp && self.record.fields.otpToken) {
         //NSLog(@"Token: [%@] - Password: %@", self.record.otpToken, self.record.otpToken.password);
 
-        uint64_t remainingSeconds = self.record.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.record.otpToken.period);
+        uint64_t remainingSeconds = self.record.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.record.fields.otpToken.period);
         
-        self.labelOtp.text = [NSString stringWithFormat:@"%@", self.record.otpToken.password];
+        self.labelOtp.text = [NSString stringWithFormat:@"%@", self.record.fields.otpToken.password];
         self.labelOtp.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
         self.otpProgress.tintColor = self.labelOtp.textColor;
         
@@ -1040,7 +1041,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             } completion:nil];
         }
         
-        self.otpProgress.progress = remainingSeconds / self.record.otpToken.period;
+        self.otpProgress.progress = remainingSeconds / self.record.fields.otpToken.period;
 
         self.labelOtp.hidden = NO;
         self.otpProgress.hidden = NO;
@@ -1067,9 +1068,9 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
                     Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
-                    BOOL success = [self.record setTotpWithString:string
-                                                 appendUrlToNotes:self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1
-                                                       forceSteam:NO];
+                    BOOL success = [self.record.fields setTotpWithString:string
+                                                        appendUrlToNotes:self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1
+                                                              forceSteam:NO];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
                     }
@@ -1090,8 +1091,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
                    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
                    
                    BOOL steam = response == 2;
-                   BOOL success = [self.record setTotpWithString:text
-                                                appendUrlToNotes:self.viewModel.database.format == kPasswordSafe forceSteam:steam];
+                   BOOL success = [self.record.fields setTotpWithString:text
+                                                       appendUrlToNotes:self.viewModel.database.format == kPasswordSafe forceSteam:steam];
                    if(!success) {
                        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
                    }
@@ -1122,7 +1123,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)showHideOtpCode {
-    self.showOtp = !self.viewModel.metadata.hideTotp && self.record.otpToken != nil;
+    self.showOtp = !self.viewModel.metadata.hideTotp && self.record.fields.otpToken != nil;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView beginUpdates];

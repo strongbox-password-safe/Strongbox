@@ -624,7 +624,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
     
-    [item.fields.customFields setObject:value forKey:key];
+    [item.fields setCustomField:key value:value];
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
 
     if(oldValue) {
@@ -661,7 +661,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
 
-    [item.fields.customFields removeObjectForKey:key];
+    [item.fields removeCustomField:key];
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
 
     [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
@@ -688,9 +688,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [item.fields.keePassHistory addObject:cloneForHistory];
     
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
-    [item setTotpWithString:otp
-           appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
-                 forceSteam:steam];
+    [item.fields setTotpWithString:otp
+                  appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
+                        forceSteam:steam];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     
@@ -712,7 +712,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    OTPToken* oldOtpToken = item.otpToken;
+    OTPToken* oldOtpToken = item.fields.otpToken;
     if(oldOtpToken == nil) { // NOP
         NSLog(@"Attempt to clear non existent OTP token");
         return;
@@ -723,7 +723,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [item.fields.keePassHistory addObject:cloneForHistory];
     
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
-    [item clearTotp];
+    [item.fields clearTotp];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setTotp:item otp:oldOtpTokenUrl.absoluteString steam:oldOtpToken.algorithm == OTPAlgorithmSteam];
     

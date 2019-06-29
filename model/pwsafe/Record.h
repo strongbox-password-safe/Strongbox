@@ -19,6 +19,8 @@
 @property (nonatomic, retain) NSString *email;
 @property (nonatomic, retain) NSString *url;
 @property (nonatomic, retain) NSString *notes;
+@property (nonatomic, retain) NSDate *expires;
+
 @property (nonatomic, retain) Group *group;
 @property (nonatomic, retain) NSDate *accessed;
 @property (nonatomic, retain) NSDate *modified;

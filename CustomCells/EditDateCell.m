@@ -11,7 +11,9 @@
 @interface EditDateCell ()
 
 @property UIDatePicker* datePicker;
-@property (weak, nonatomic) IBOutlet UITextField *valueTextField;
+@property UIDatePicker* timePicker;
+@property (weak, nonatomic) IBOutlet UITextField *dateTextField;
+@property (weak, nonatomic) IBOutlet UITextField *timeTextField;
 
 @end
 
@@ -21,54 +23,90 @@
     [super awakeFromNib];
 
     self.datePicker = [[UIDatePicker alloc] init];
-    self.datePicker.datePickerMode = UIDatePickerModeDateAndTime;
+    self.datePicker.datePickerMode = UIDatePickerModeDate;
     [self.datePicker addTarget:self action:@selector(onDateChanged:) forControlEvents:UIControlEventValueChanged];
-    self.valueTextField.inputView = self.datePicker;
-    self.valueTextField.placeholder = @"Never";
+
+    self.timePicker = [[UIDatePicker alloc] init];
+    self.timePicker.datePickerMode = UIDatePickerModeTime;
+    [self.timePicker addTarget:self action:@selector(onDateChanged:) forControlEvents:UIControlEventValueChanged];
+
+    self.dateTextField.inputView = self.datePicker;
+    self.dateTextField.placeholder = @"Date";
     
-    [self.valueTextField addTarget:self
-                            action:@selector(onTextFieldChanged:)
-                  forControlEvents:UIControlEventEditingChanged];
+    self.timeTextField.inputView = self.timePicker;
+    self.timeTextField.placeholder = @"Time";
+}
+
+- (IBAction)clearDate:(id)sender {
+    [self.dateTextField resignFirstResponder];
+    [self.timeTextField resignFirstResponder];
+    
+    [self setDate:nil];
+    
+    if(self.onDateChanged) {
+        self.onDateChanged(nil);
+    }
 }
 
 - (void)setDate:(NSDate *)date {
-    self.valueTextField.text = dateString(date);
+    self.dateTextField.text = dateString(date);
+    self.timeTextField.text = timeString(date);
+
+    if(date) {
+        self.datePicker.date = date;
+        self.timePicker.date = date;
+    }
 }
 
 - (void)onDateChanged:(id)sender {
-    [self setDate:self.datePicker.date];
-    self.valueTextField.textColor = nil;
+    UIDatePicker* picker = (UIDatePicker*)sender;
+    [self setDate:picker.date];
     
     if(self.onDateChanged) {
-        self.onDateChanged(self.datePicker.date);
+        self.onDateChanged(picker.date);
     }
 }
 
-- (void)onTextFieldChanged:(id)sender {
+//- (void)onTextFieldChanged:(id)sender {
+//    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+//
+//    df.timeStyle = kCFDateFormatterShortStyle;
+//    df.dateStyle = NSDateFormatterShortStyle;
+//
+//    df.locale = NSLocale.currentLocale;
+//
+//    NSDate* date = [df dateFromString:self.dateTextField.text];
+//
+//    self.dateTextField.textColor = date ? nil : UIColor.redColor;
+//
+//    if(date) {
+//        if(self.onDateChanged) {
+//            self.onDateChanged(date);
+//        }
+//    }
+//    else if(self.dateTextField.text.length == 0) {
+//        if(self.onDateChanged) {
+//            self.onDateChanged(nil);
+//        }
+//    }
+//    else {
+//        NSLog(@"Cannot parse, not changing...");
+//    }
+//}
+
+static NSString *timeString(NSDate *modDate) {
+    if(!modDate) {
+        return @"";
+    }
+    
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     
-    df.timeStyle = kCFDateFormatterShortStyle;
-    df.dateStyle = NSDateFormatterShortStyle;
+    df.timeStyle = NSDateFormatterShortStyle;
+    df.dateStyle = NSDateFormatterNoStyle;
     
     df.locale = NSLocale.currentLocale;
     
-    NSDate* date = [df dateFromString:self.valueTextField.text];
-    
-    self.valueTextField.textColor = date ? nil : UIColor.redColor;
-    
-    if(date) {
-        if(self.onDateChanged) {
-            self.onDateChanged(date);
-        }
-    }
-    else if(self.valueTextField.text.length == 0) {
-        if(self.onDateChanged) {
-            self.onDateChanged(nil);
-        }
-    }
-    else {
-        NSLog(@"Cannot parse, not changing...");
-    }
+    return [df stringFromDate:modDate];
 }
 
 static NSString *dateString(NSDate *modDate) {
@@ -78,7 +116,7 @@ static NSString *dateString(NSDate *modDate) {
     
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
 
-    df.timeStyle = kCFDateFormatterShortStyle;
+    df.timeStyle = NSDateFormatterNoStyle;
     df.dateStyle = NSDateFormatterShortStyle;
 
     df.locale = NSLocale.currentLocale;

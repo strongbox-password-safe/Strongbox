@@ -26,6 +26,7 @@
     [super awakeFromNib];
 
     self.horizontalLine.backgroundColor = UIColor.blueColor;
+    self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     self.keyLabel.font = FontManager.sharedInstance.regularFont;
     self.keyLabel.adjustsFontForContentSizeCategory = YES;
@@ -71,6 +72,7 @@
     
     self.accessoryType = UITableViewCellAccessoryNone;
     self.editingAccessoryType = UITableViewCellAccessoryNone;
+    self.selectionStyle = UITableViewCellSelectionStyleDefault;
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
@@ -124,6 +126,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)
     self.selectionStyle = editing ? UITableViewCellSelectionStyleNone : UITableViewCellSelectionStyleDefault;
     self.useEasyReadFont = useEasyReadFont;
     self.valueText.font = self.configuredValueFont;
+    self.selectionStyle = UITableViewCellSelectionStyleDefault;
 }
 
 - (BOOL)canBecomeFirstResponder {

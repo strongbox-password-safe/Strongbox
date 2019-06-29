@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSInteger currentlySelectedIndex;
 @property (nonatomic, copy) void (^onDone)(BOOL success, NSInteger selectedIndex);
 
+@property NSIndexSet *selectedIndices;
+@property (nonatomic, copy) void (^onMultipleDone)(BOOL success, NSIndexSet* selectedIndices);
+
 @end
 
 NS_ASSUME_NONNULL_END
