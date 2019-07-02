@@ -38,6 +38,18 @@
     XCTAssertNotNil(password);
 }
 
+- (void)testDiceware {
+    PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
+    config.wordCount = 4;
+    config.algorithm = kPasswordGenerationAlgorithmDiceware;
+    
+    NSString* password = [PasswordMaker.sharedInstance generateForConfig:config];
+    
+    NSLog(@"Generated: [%@]", password);
+    
+    XCTAssertNotNil(password);
+}
+
 //- (void)testEmojis {
 //    PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
 //    

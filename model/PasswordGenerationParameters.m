@@ -22,7 +22,7 @@
         self.maximumLength = 24;
         self.xkcdWordCount = 4;
         
-        self.wordSeparator = @"";
+        self.wordSeparator = @"-";
         self.xKcdWordList = kXcdGoogle;
         
         return self;

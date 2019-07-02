@@ -12,6 +12,24 @@
 		4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
 		4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
 		4D14A13A224D1A9400C71ABF /* NodeDetailsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D14A138224D1A9400C71ABF /* NodeDetailsWindowController.xib */; };
+		4D216F5222CBCCAC000954D0 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5122CBCCAC000954D0 /* PasswordGenerator.m */; };
+		4D216F5522CBCCDE000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
+		4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
+		4D216F6B22CBCE0D000954D0 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		4D216F6E22CBCE0D000954D0 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		4D216F7122CBCE0D000954D0 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		4D216F7322CBCE0D000954D0 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		4D216F7822CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		4D216F7922CBCE0D000954D0 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
 		4D22DA3E22609CBB00561AF7 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D22DA3D22609CBB00561AF7 /* MBProgressHUD.m */; };
 		4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF2216136D10054C8D0 /* formatV3.txt */; };
 		4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF3216136D10054C8D0 /* formatV4.txt */; };
@@ -57,7 +75,6 @@
 		4D524D06219B48D300C22CB4 /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */; };
 		4D524D07219B48D300C22CB4 /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D00219B48D300C22CB4 /* V3BinariesList.m */; };
 		4D524D0A219B490100C22CB4 /* NodeFileAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D08219B490100C22CB4 /* NodeFileAttachment.m */; };
-		4D524D13219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D524D12219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt */; };
 		4D524D23219B4B2A00C22CB4 /* thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D16219B4B2900C22CB4 /* thread.c */; };
 		4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D17219B4B2900C22CB4 /* argon2.c */; };
 		4D524D25219B4B2A00C22CB4 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D18219B4B2900C22CB4 /* core.c */; };
@@ -169,7 +186,6 @@
 		4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F12074FA6B00148741 /* DatabaseModel.m */; };
 		4DF348022074FA6C00148741 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F22074FA6B00148741 /* NodeFields.m */; };
 		4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F32074FA6C00148741 /* PasswordGenerationParameters.m */; };
-		4DF348042074FA6C00148741 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F92074FA6C00148741 /* PasswordGenerator.m */; };
 		4DF348052074FA6C00148741 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
 		4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF348072074FA6C00148741 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF348002074FA6C00148741 /* Node.m */; };
@@ -204,6 +220,27 @@
 		4D0835A82284732500CA7405 /* StrongboxDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = ../model/StrongboxDatabase.h; sourceTree = "<group>"; };
 		4D0835A92284732500CA7405 /* StrongboxDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxDatabase.m; path = ../model/StrongboxDatabase.m; sourceTree = "<group>"; };
 		4D14A138224D1A9400C71ABF /* NodeDetailsWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = NodeDetailsWindowController.xib; path = MacBox/NodeDetailsWindowController.xib; sourceTree = "<group>"; };
+		4D216F5022CBCCAC000954D0 /* PasswordGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerator.h; path = MacBox/PasswordGenerator.h; sourceTree = "<group>"; };
+		4D216F5122CBCCAC000954D0 /* PasswordGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerator.m; path = MacBox/PasswordGenerator.m; sourceTree = "<group>"; };
+		4D216F5322CBCCDE000954D0 /* PasswordMaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = ../model/PasswordMaker.h; sourceTree = "<group>"; };
+		4D216F5422CBCCDE000954D0 /* PasswordMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = ../model/PasswordMaker.m; sourceTree = "<group>"; };
+		4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = ../model/PasswordGenerationConfig.m; sourceTree = "<group>"; };
+		4D216F5722CBCD16000954D0 /* PasswordGenerationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationConfig.h; path = ../model/PasswordGenerationConfig.h; sourceTree = "<group>"; };
+		4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = securedrop.wordlist.utf8.txt; path = ../resources/wordlists/securedrop.wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "german-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/german-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = diceware.wordlist.utf8.txt; path = ../resources/wordlists/diceware.wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_large_wordlist.utf8.txt; path = ../resources/wordlists/eff_large_wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "swedish-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/swedish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "polish-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/polish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "french-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/french-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "catalan-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/catalan-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "dutch-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/dutch-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "../resources/wordlists/google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
+		4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "japanese-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/japanese-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_short_wordlist_1.utf8.txt; path = ../resources/wordlists/eff_short_wordlist_1.utf8.txt; sourceTree = "<group>"; };
+		4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_short_wordlist_2_0.utf8.txt; path = ../resources/wordlists/eff_short_wordlist_2_0.utf8.txt; sourceTree = "<group>"; };
+		4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "italian-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/italian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = beale.wordlist.utf8.txt; path = ../resources/wordlists/beale.wordlist.utf8.txt; sourceTree = "<group>"; };
 		4D22DA3C22609CBB00561AF7 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = MBProgressHUDMac/MBProgressHUD.h; sourceTree = "<group>"; };
 		4D22DA3D22609CBB00561AF7 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = MBProgressHUDMac/MBProgressHUD.m; sourceTree = "<group>"; };
 		4D23BBF2216136D10054C8D0 /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = formatV3.txt; path = ../model/pwsafe/formatV3.txt; sourceTree = "<group>"; };
@@ -304,7 +341,6 @@
 		4D524D09219B490100C22CB4 /* NodeFileAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFileAttachment.h; path = ../model/NodeFileAttachment.h; sourceTree = "<group>"; };
 		4D524D0B219B497B00C22CB4 /* KdbxSerializationCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbxSerializationCommon.h; path = ../model/keepass/KdbxSerializationCommon.h; sourceTree = "<group>"; };
 		4D524D0D219B4A0800C22CB4 /* tomcrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt.h; path = ../model/pwsafe/twofish/tomcrypt.h; sourceTree = "<group>"; };
-		4D524D12219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "../resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
 		4D524D15219B4B2900C22CB4 /* argon2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = argon2.h; path = ../lib/argon2/argon2.h; sourceTree = "<group>"; };
 		4D524D16219B4B2900C22CB4 /* thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = thread.c; path = ../lib/argon2/thread.c; sourceTree = "<group>"; };
 		4D524D17219B4B2900C22CB4 /* argon2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = argon2.c; path = ../lib/argon2/argon2.c; sourceTree = "<group>"; };
@@ -523,9 +559,7 @@
 		4DF347F42074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordSafe3PasswordGenerationParameters.h; path = ../model/PasswordSafe3PasswordGenerationParameters.h; sourceTree = "<group>"; };
 		4DF347F52074FA6C00148741 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../model/Utils.h; sourceTree = "<group>"; };
 		4DF347F62074FA6C00148741 /* PasswordGenerationParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationParameters.h; path = ../model/PasswordGenerationParameters.h; sourceTree = "<group>"; };
-		4DF347F72074FA6C00148741 /* PasswordGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerator.h; path = ../model/PasswordGenerator.h; sourceTree = "<group>"; };
 		4DF347F82074FA6C00148741 /* DatabaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModel.h; path = ../model/DatabaseModel.h; sourceTree = "<group>"; };
-		4DF347F92074FA6C00148741 /* PasswordGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerator.m; path = ../model/PasswordGenerator.m; sourceTree = "<group>"; };
 		4DF347FA2074FA6C00148741 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = ../model/NodeFields.h; sourceTree = "<group>"; };
 		4DF347FB2074FA6C00148741 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../model/Utils.m; sourceTree = "<group>"; };
 		4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordSafe3PasswordGenerationParameters.m; path = ../model/PasswordSafe3PasswordGenerationParameters.m; sourceTree = "<group>"; };
@@ -603,6 +637,44 @@
 				963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4D216F5922CBCD73000954D0 /* Password Generation */ = {
+			isa = PBXGroup;
+			children = (
+				4D216F5B22CBCDBF000954D0 /* Word Lists */,
+				4D216F5022CBCCAC000954D0 /* PasswordGenerator.h */,
+				4D216F5122CBCCAC000954D0 /* PasswordGenerator.m */,
+				4D216F5322CBCCDE000954D0 /* PasswordMaker.h */,
+				4D216F5422CBCCDE000954D0 /* PasswordMaker.m */,
+				4D216F5722CBCD16000954D0 /* PasswordGenerationConfig.h */,
+				4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */,
+				4DF347F62074FA6C00148741 /* PasswordGenerationParameters.h */,
+				4DF347F32074FA6C00148741 /* PasswordGenerationParameters.m */,
+			);
+			name = "Password Generation";
+			sourceTree = "<group>";
+		};
+		4D216F5B22CBCDBF000954D0 /* Word Lists */ = {
+			isa = PBXGroup;
+			children = (
+				4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */,
+				4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */,
+				4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */,
+				4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */,
+				4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */,
+				4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */,
+				4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */,
+				4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */,
+				4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */,
+				4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */,
+				4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */,
+				4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */,
+				4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */,
+				4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */,
+				4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */,
+			);
+			name = "Word Lists";
 			sourceTree = "<group>";
 		};
 		4D22DA3B22609CAB00561AF7 /* MBProgressHUD */ = {
@@ -1068,10 +1140,6 @@
 				4DF348002074FA6C00148741 /* Node.m */,
 				4DF347FA2074FA6C00148741 /* NodeFields.h */,
 				4DF347F22074FA6B00148741 /* NodeFields.m */,
-				4DF347F62074FA6C00148741 /* PasswordGenerationParameters.h */,
-				4DF347F32074FA6C00148741 /* PasswordGenerationParameters.m */,
-				4DF347F72074FA6C00148741 /* PasswordGenerator.h */,
-				4DF347F92074FA6C00148741 /* PasswordGenerator.m */,
 				4DF347F42074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.h */,
 				4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */,
 				4DF347FD2074FA6C00148741 /* StorageProvider.h */,
@@ -1107,6 +1175,7 @@
 				4D559F9D20750C2C009856E3 /* SafesMetaDataViewer.xib */,
 				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
 				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
+				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4DFC06D5226467AA00A4254A /* libs */,
 				4DF59F531F30DB7A00D68BFE /* MacBox */,
 				4D524D2B219B503F00C22CB4 /* View */,
@@ -1162,7 +1231,6 @@
 		4DF59F571F30DB7A00D68BFE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				4D524D12219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt */,
 				4DCA65B01F4B4A000078B962 /* Credits.rtf */,
 				4DF59F581F30DB7A00D68BFE /* main.m */,
 			);
@@ -1298,21 +1366,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */,
+				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4DF299802243CEAD0080F9DC /* CollectionViewHeader.xib in Resources */,
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
+				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
+				4D216F7822CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4DBCE223222414A100A2AFA2 /* SelectPredefinedIconController.xib in Resources */,
 				4D553B54219DD2CE00AA4BAB /* AttachmentItem.xib in Resources */,
 				4D14A13A224D1A9400C71ABF /* NodeDetailsWindowController.xib in Resources */,
+				4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DBCE22822241D6700A2AFA2 /* PredefinedKeePassIcon.xib in Resources */,
+				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
+				4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
+				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				4D9903C5223664D3002C10EE /* KeePassHistoryController.xib in Resources */,
-				4D524D13219B4AD500C22CB4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
+				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DEAEC2A1F3DDF61000CE3A6 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,
+				4D216F6B22CBCE0D000954D0 /* securedrop.wordlist.utf8.txt in Resources */,
 				4D9A5E46224D43B6006E6C65 /* CustomFieldTableCellView.xib in Resources */,
+				4D216F7922CBCE0D000954D0 /* beale.wordlist.utf8.txt in Resources */,
+				4D216F7322CBCE0D000954D0 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				4D216F7122CBCE0D000954D0 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
+				4D216F6E22CBCE0D000954D0 /* eff_large_wordlist.utf8.txt in Resources */,
 				4D559F9F20750C2C009856E3 /* SafesMetaDataViewer.xib in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
 			);
@@ -1379,6 +1461,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
+				4D216F5222CBCCAC000954D0 /* PasswordGenerator.m in Sources */,
 				4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */,
 				4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */,
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
@@ -1472,12 +1555,14 @@
 				4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */,
 				4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */,
 				4DBF494422232A3200F48182 /* DAVListingParser.m in Sources */,
+				4D216F5522CBCCDE000954D0 /* PasswordMaker.m in Sources */,
 				4D524CEF219B481200C22CB4 /* TwoFishCipher.m in Sources */,
 				4D553B49219DB2E400AA4BAB /* CustomPasswordTextField.m in Sources */,
 				4D524CD9219B47DB00C22CB4 /* KdfParameters.m in Sources */,
 				4D524D04219B48D300C22CB4 /* AttachmentsRationalizer.m in Sources */,
 				4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */,
 				4DA746522239678B002535F9 /* Node+OtpToken.m in Sources */,
+				4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,
@@ -1491,7 +1576,6 @@
 				4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */,
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
-				4DF348042074FA6C00148741 /* PasswordGenerator.m in Sources */,
 				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4DBF494022232A3200F48182 /* DAVRequest.m in Sources */,
 				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,

@@ -18,6 +18,8 @@
 @property BOOL _isEditable;
 @property BOOL useEasyReadFont;
 
+@property UITapGestureRecognizer *doubleTap;
+
 @end
 
 @implementation NotesTableViewCell
@@ -30,10 +32,21 @@
     self.textView.adjustsFontForContentSizeCategory = YES;
     self.textView.userInteractionEnabled = YES; 
 
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTextViewDoubleTap:)];
-    [doubleTap setNumberOfTapsRequired:2];
-    [doubleTap setNumberOfTouchesRequired:1];
-    [self.textView addGestureRecognizer:doubleTap];
+    self.doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTextViewDoubleTap:)];
+    [self.doubleTap setNumberOfTapsRequired:2];
+    [self.doubleTap setNumberOfTouchesRequired:1];
+    [self.textView addGestureRecognizer:self.doubleTap];
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    
+    if(editing) {
+        self.doubleTap.enabled = NO;
+    }
+    else {
+        self.doubleTap.enabled = YES;
+    }
 }
 
 - (void)onTextViewDoubleTap:(id)sender {

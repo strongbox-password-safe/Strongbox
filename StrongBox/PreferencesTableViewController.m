@@ -19,13 +19,10 @@
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "GoogleDriveManager.h"
 #import "OneDriveStorageProvider.h"
-
-#import "PasswordGenerationSettingsTableView.h"
 #import "AutoFillNewRecordSettingsController.h"
 #import "CloudSessionsTableViewController.h"
 #import "AboutViewController.h"
 #import "AdvancedPreferencesTableViewController.h"
-//#import "ManageKeyFilesViewController.h"
 #import "KeyFilesTableViewController.h"
 #import "PasswordGenerationViewController.h"
 
@@ -614,15 +611,11 @@
     }];
     
     NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
-    vc.currentlySelectedIndex = currentlySelectIndex;
-    vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
-        NSInteger selectedValue = -1;
-        if (success) {
-            selectedValue = options[selectedIndex].integerValue;
-        }
-        
+    vc.selected = [NSIndexSet indexSetWithIndex:currentlySelectIndex];
+    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
+        NSInteger selectedValue = options[selectedIndices.firstIndex].integerValue;
         [self.navigationController popViewControllerAnimated:YES];
-        completion(success, selectedValue);
+        completion(YES, selectedValue);
     };
     
     vc.title = title;

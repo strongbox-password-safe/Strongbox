@@ -14,6 +14,7 @@
 #import "BrowseItemSubtitleField.h"
 #import "BrowseSortField.h"
 #import "BrowseViewType.h"
+#import "PasswordGenerationConfig.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -67,9 +68,7 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property (nonatomic) BOOL iCloudWasOn;
 @property (nonatomic) BOOL iCloudPrompted;
 @property (nonatomic) BOOL iCloudAvailable;
-
-@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
-@property (nonatomic) BOOL safesMigratedToNewSystem; 
+@property (nonatomic) BOOL safesMigratedToNewSystem;
 
 @property (nonatomic) NSDate* installDate;
 @property (nonatomic, readonly) NSInteger daysInstalled;
@@ -111,6 +110,13 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL allowEmptyOrNoPasswordEntry;
 @property BOOL migratedLocalDatabasesToNewSystem;
 @property BOOL useSharedAppGroupLocalStorage; // TODO: Default this on soon
+
+// TODO: Remove after migration...
+
+@property BOOL migratedToNewPasswordGenerator;
+@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
+@property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
+
 
 NS_ASSUME_NONNULL_END
 

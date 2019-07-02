@@ -13,11 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SelectItemTableViewController : UITableViewController
 
 @property NSArray<NSString*>* items;
-@property NSInteger currentlySelectedIndex;
-@property (nonatomic, copy) void (^onDone)(BOOL success, NSInteger selectedIndex);
+@property NSIndexSet *selected;
 
-@property NSIndexSet *selectedIndices;
-@property (nonatomic, copy) void (^onMultipleDone)(BOOL success, NSIndexSet* selectedIndices);
+@property (nonatomic, copy) void (^onSelectionChanged)(NSIndexSet* selectedIndices);
+
+@property BOOL multipleSelectMode;
+@property BOOL multipleSelectDisallowEmpty;
 
 @end
 

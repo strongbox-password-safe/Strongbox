@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 - (NSString*)generateForConfig:(PasswordGenerationConfig*)config;
+- (NSString*)generateForConfigOrDefault:(PasswordGenerationConfig*)config;
 
 @end
 

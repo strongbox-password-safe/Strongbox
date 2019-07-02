@@ -7,7 +7,7 @@
 #import "Kdbx4Database.h"
 #import "Kdb1Database.h"
 #import "Settings.h"
-#import "PasswordGenerator.h"
+#import "PasswordMaker.h"
 #import "SprCompilation.h"
 #import "NSArray+Extensions.h"
 #import "NSMutableArray+Extensions.h"
@@ -215,9 +215,9 @@
 }
 
 void addSampleGroupAndRecordToGroup(Node* parent) {
-    PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
-    NSString* password = [PasswordGenerator generatePassword:params];
-    
+    PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+    NSString* password = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
+
     Node* sampleFolder = [[Node alloc] initAsGroup:@"Sample Folder" parent:parent allowDuplicateGroupTitles:YES uuid:nil];
     [parent addChild:sampleFolder allowDuplicateGroupTitles:NO];
     

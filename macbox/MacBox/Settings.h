@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "PasswordGenerationParameters.h"
+#import "PasswordGenerationConfig.h"
 #import "AutoFillNewRecordSettings.h"
 
 extern NSString* const kTitleColumn;
@@ -76,6 +77,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showCustomFieldsOnQuickViewPanel;
 
 //@property BOOL showDatabasesListAtStartup;
+
+@property PasswordGenerationConfig *passwordGenerationConfig;
 
 @end
 

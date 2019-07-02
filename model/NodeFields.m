@@ -165,7 +165,6 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 // TOTP
 
 - (OTPToken *)otpToken {
-    // TODO: Invalidate on any change!
     if(!self.hasCachedOtpToken) {
         self.cachedOtpToken = [NodeFields getOtpTokenFromRecord:self.password fields:self.customFields notes:self.notes];
         self.hasCachedOtpToken = YES;

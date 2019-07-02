@@ -62,6 +62,48 @@
     if(!Settings.sharedInstance.migratedLocalDatabasesToNewSystem) {
         [LocalDeviceStorageProvider.sharedInstance migrateLocalDatabasesToNewSystem];
     }
+    
+    // 2-Jul-2019
+    if(!Settings.sharedInstance.migratedToNewPasswordGenerator) {
+        [self migrateToNewPasswordGenerator];
+    }
+}
+
+- (void)migrateToNewPasswordGenerator {
+    NSLog(@"Migrating to new Password Generation System...");
+    
+    PasswordGenerationConfig* newConfig = Settings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationParameters* oldConfig = Settings.sharedInstance.passwordGenerationParameters;
+    
+    newConfig.algorithm = oldConfig.algorithm == kBasic ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
+
+    newConfig.basicLength = oldConfig.maximumLength;
+    
+    NSMutableArray<NSNumber*>* characterGroups = @[].mutableCopy;
+    if(oldConfig.useLower) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolLower)];
+    }
+    if(oldConfig.useUpper) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolUpper)];
+    }
+    if(oldConfig.useDigits) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolNumeric)];
+    }
+    if(oldConfig.useSymbols) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolSymbols)];
+    }
+    
+    newConfig.useCharacterGroups = characterGroups.copy;
+    newConfig.easyReadCharactersOnly = oldConfig.easyReadOnly;
+    newConfig.nonAmbiguousOnly = YES;
+    newConfig.pickFromEveryGroup = NO;
+    
+    newConfig.wordCount = oldConfig.xkcdWordCount;
+    newConfig.wordSeparator = oldConfig.wordSeparator;
+    newConfig.hackerify = NO;
+    
+    Settings.sharedInstance.passwordGenerationConfig = newConfig;
+    Settings.sharedInstance.migratedToNewPasswordGenerator = YES;
 }
 
 - (void)cleanupInbox:(NSDictionary *)launchOptions {

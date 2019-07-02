@@ -26,8 +26,9 @@
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
-#import "PasswordGenerationSettingsTableView.h"
 #import "ItemDetailsPreferencesViewController.h"
+#import "PasswordGenerationViewController.h"
+
 static const int kMinNotesCellHeight = 160;
 
 @interface RecordView () <UITextViewDelegate, UITextFieldDelegate>
@@ -784,7 +785,7 @@ static const int kMinNotesCellHeight = 160;
     }
     else if ([segue.identifier isEqualToString:@"segueToPwSettings"]) {
         UINavigationController *nav = segue.destinationViewController;
-        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)[nav topViewController];
+        PasswordGenerationViewController* vc = (PasswordGenerationViewController*)[nav topViewController];
         vc.onDone = ^{
             [self dismissViewControllerAnimated:YES completion:nil];
         };

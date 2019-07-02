@@ -24,7 +24,6 @@ static NSString* const kiCloudOn = @"iCloudOn";
 static NSString* const kiCloudWasOn = @"iCloudWasOn";
 static NSString* const kiCloudPrompted = @"iCloudPrompted";
 static NSString* const kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
-static NSString* const kPasswordGenerationParameters = @"passwordGenerationSettings";
 static NSString* const kInstallDate = @"installDate";
 static NSString* const kDisallowBiometricId = @"disallowBiometricId";
 //static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes"; // Dead
@@ -59,11 +58,68 @@ static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewC
 //static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword"; // DEAD
 static NSString* const kMigratedLocalDatabasesToNewSystem = @"migratedLocalDatabasesToNewSystem";
 
+static NSString* const kPasswordGenerationParameters = @"passwordGenerationSettings";
+static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
+static NSString* const kMigratedToNewPasswordGenerator = @"migratedToNewPasswordGenerator";
+
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
 static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 @implementation Settings
+
+- (BOOL)migratedToNewPasswordGenerator {
+    return [self getBool:kMigratedToNewPasswordGenerator];
+}
+
+- (void)setMigratedToNewPasswordGenerator:(BOOL)migratedToNewPasswordGenerator {
+    [self setBool:kMigratedToNewPasswordGenerator value:migratedToNewPasswordGenerator];
+}
+
+- (PasswordGenerationParameters *)passwordGenerationParameters {
+    NSUserDefaults *defaults = [self getUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
+    
+    if(encodedObject == nil) {
+        return [[PasswordGenerationParameters alloc] initWithDefaults];
+    }
+    
+    PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    
+    //NSError *error; // This fails because PGP doesn't conform to NSSecureCoding... something to do some day...
+    //PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchivedObjectOfClass:PasswordGenerationParameters.class fromData:encodedObject error:&error];
+    
+    return object;
+}
+
+-(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
+    NSUserDefaults *defaults = [self getUserDefaults];
+    [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
+    [defaults synchronize];
+}
+
+//
+
+- (PasswordGenerationConfig *)passwordGenerationConfig {
+    NSUserDefaults *defaults = [self getUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationConfig];
+    
+    if(encodedObject == nil) {
+        return [PasswordGenerationConfig defaults];
+    }
+    
+    PasswordGenerationConfig *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    
+    return object;
+}
+
+- (void)setPasswordGenerationConfig:(PasswordGenerationConfig *)passwordGenerationConfig {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationConfig];
+    NSUserDefaults *defaults = [self getUserDefaults];
+    [defaults setObject:encodedObject forKey:kPasswordGenerationConfig];
+    [defaults synchronize];
+}
 
 - (BOOL)migratedLocalDatabasesToNewSystem {
     return [self getBool:kMigratedLocalDatabasesToNewSystem];
@@ -374,28 +430,7 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
     [[self getUserDefaults] synchronize];
 }
 
-- (PasswordGenerationParameters *)passwordGenerationParameters {
-    NSUserDefaults *defaults = [self getUserDefaults];
-    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
-    
-    if(encodedObject == nil) {
-        return [[PasswordGenerationParameters alloc] initWithDefaults];
-    }
-    
-    PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
-
-    //NSError *error; // This fails because PGP doesn't conform to NSSecureCoding... something to do some day...
-    //PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchivedObjectOfClass:PasswordGenerationParameters.class fromData:encodedObject error:&error];
-
-    return object;
-}
-
--(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
-    NSUserDefaults *defaults = [self getUserDefaults];
-    [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
-    [defaults synchronize];
-}
+//
 
 - (NSString*)getFlagsStringForDiagnostics {
     return [NSString stringWithFormat:@"[%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d]",

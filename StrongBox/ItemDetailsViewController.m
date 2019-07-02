@@ -31,10 +31,10 @@
 #import "KeePassHistoryController.h"
 #import "PasswordHistoryViewController.h"
 #import "CollapsibleTableViewHeader.h"
-#import "PasswordGenerationSettingsTableView.h"
 #import "BrowseSafeView.h"
 #import "ItemDetailsPreferencesViewController.h"
 #import "EditDateCell.h"
+#import "PasswordGenerationViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -1132,7 +1132,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
     else if ([segue.identifier isEqualToString:@"segueToPasswordGenerationSettings"]) {
         UINavigationController *nav = segue.destinationViewController;
-        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)[nav topViewController];
+        PasswordGenerationViewController* vc = (PasswordGenerationViewController*)[nav topViewController];
         vc.onDone = ^{
             [self dismissViewControllerAnimated:YES completion:nil];
         };

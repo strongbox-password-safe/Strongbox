@@ -370,10 +370,10 @@
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
     vc.items = options;
-    vc.currentlySelectedIndex = currentIndex;
-    vc.onDone = ^(BOOL success, NSInteger selectedIndex) {
+    vc.selected = [NSIndexSet indexSetWithIndex:currentIndex];
+    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
         [self.navigationController popViewControllerAnimated:YES];
-        completion(success, selectedIndex);
+        completion(YES, selectedIndices.firstIndex);
     };
     vc.title = title;
     

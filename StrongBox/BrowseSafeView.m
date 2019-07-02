@@ -55,8 +55,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
-//@property NSMutableDictionary* cellHeightsDictionary;
-
 @end
 
 @implementation BrowseSafeView
@@ -217,8 +215,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             self.navigationItem.searchController = nil;
         }
     }
-    
-    [self.searchController setActive:NO];
 }
 
 - (void)setupTips {
@@ -300,23 +296,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     return UITableViewAutomaticDimension;  // Required for iOS 9 and 10
 }
 
-
-
-// save height - TODO:
-//- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-//    NSLog(@"Saving Height for IndexPath: %f - %ld", cell.frame.size.height, (long)indexPath.row);
-//    [self.cellHeightsDictionary setObject:@(cell.frame.size.height) forKey:indexPath];
-//}
-
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    NSNumber *height = [self.cellHeightsDictionary objectForKey:indexPath];
-//    if (height) {
-//        return height.doubleValue;
-//    }
-//    else {
-//        return 46.5; // TODO: 99.0 for TOTP List// UITableViewAutomaticDimension;
-//    }
-////    return 46.5f; // Required for iOS 9 and 10
     return self.cellHeight;
 }
 
@@ -681,6 +661,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
     
     DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
+    
     return [searcher sortItemsForBrowse:ret];
 }
 

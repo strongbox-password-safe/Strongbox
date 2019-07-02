@@ -7,8 +7,11 @@
 //
 
 #import "SelectItemTableViewController.h"
+#import <ISMessages/ISMessages.h>
 
 @interface SelectItemTableViewController ()
+
+@property NSMutableIndexSet *selectedIndices;
 
 @end
 
@@ -16,6 +19,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.selectedIndices = self.selected.mutableCopy;
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"selectGenericItemCellIdentifier"];
     
@@ -36,14 +41,44 @@
     
     cell.textLabel.text = self.items[indexPath.row];
     cell.imageView.image = nil;
-    cell.accessoryType = self.currentlySelectedIndex == indexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    cell.accessoryType = ([self.selectedIndices containsIndex:indexPath.row]) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.onDone) {
-        self.onDone(YES, indexPath.row);
+    // Toggle Select and reload row - if allowed
+    
+    if(self.multipleSelectMode) {
+        if(self.multipleSelectDisallowEmpty && self.selectedIndices.count == 1 && indexPath.row == self.selectedIndices.firstIndex) {
+            [self.tableView deselectRowAtIndexPath:indexPath animated:UITableViewRowAnimationAutomatic];
+            [ISMessages showCardAlertWithTitle:@"Select One"
+                                       message:@"You must select at least one item"
+                                      duration:0.5f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeWarning
+                                 alertPosition:ISAlertPositionTop
+                                       didHide:nil];
+            return;
+        }
+        
+        if([self.selectedIndices containsIndex:indexPath.row]) {
+            [self.selectedIndices removeIndex:indexPath.row];
+        }
+        else {
+            [self.selectedIndices addIndex:indexPath.row];
+        }
+    }
+    else {
+        [self.selectedIndices removeAllIndexes];
+        [self.selectedIndices addIndex:indexPath.row];
+    }
+    
+    [self.tableView reloadData];
+    
+    if(self.onSelectionChanged) {
+        self.onSelectionChanged(self.selectedIndices.copy);
     }
 }
 

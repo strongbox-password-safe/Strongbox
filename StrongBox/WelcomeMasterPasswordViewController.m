@@ -7,7 +7,7 @@
 //
 
 #import "WelcomeMasterPasswordViewController.h"
-#import "PasswordGenerator.h"
+#import "PasswordMaker.h"
 #import "WelcomeCreateDoneViewController.h"
 #import "AddNewSafeHelper.h"
 #import "Alerts.h"
@@ -66,14 +66,12 @@
     
     self.buttonCreate.layer.cornerRadius = 5.0f;
     
-    PasswordGenerationParameters* params = [[PasswordGenerationParameters alloc] initWithDefaults];
-    params.algorithm = kXkcd;
-    params.xkcdWordCount = 4;
-    params.wordSeparator = @"-";
+    PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
+    config.algorithm = kPasswordGenerationAlgorithmDiceware; // Default is EFF Large with 5 words
     
     [self addShowHideToTextField:self.textFieldPw tag:100 show:YES];
     
-    self.textFieldPw.text = [PasswordGenerator generatePassword:params];
+    self.textFieldPw.text = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
     
     [self.textFieldPw addTarget:self
                            action:@selector(validateUi)

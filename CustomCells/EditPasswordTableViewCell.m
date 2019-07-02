@@ -9,7 +9,7 @@
 #import "EditPasswordTableViewCell.h"
 #import "ItemDetailsViewController.h"
 #import "MBAutoGrowingTextView.h"
-#import "PasswordGenerator.h"
+#import "PasswordMaker.h"
 #import "FontManager.h"
 #import "Settings.h"
 
@@ -49,8 +49,8 @@
 }
 
 - (IBAction)onGenerate:(id)sender {
-    PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
-    [self setPassword:[PasswordGenerator generatePassword:params]];
+    PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+    [self setPassword:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
 }
 
 - (IBAction)onSettings:(id)sender {

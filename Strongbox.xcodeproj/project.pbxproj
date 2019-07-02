@@ -58,11 +58,6 @@
 		4D0835DC2284765D00CA7405 /* CustomFieldTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835DA2284765D00CA7405 /* CustomFieldTableCell.m */; };
 		4D0835E12284780400CA7405 /* PinEntryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25674A21E8C65D006260B7 /* PinEntryController.m */; };
 		4D0835E42284799900CA7405 /* KeePassKeyFileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835E22284794200CA7405 /* KeePassKeyFileTests.m */; };
-		4D0835EB22847BD100CA7405 /* beale.wordlist.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835E622847BD000CA7405 /* beale.wordlist.txt */; };
-		4D0835EC22847BD100CA7405 /* eff_large_wordlist.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835E722847BD000CA7405 /* eff_large_wordlist.txt */; };
-		4D0835ED22847BD100CA7405 /* diceware.wordlist.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835E822847BD000CA7405 /* diceware.wordlist.txt */; };
-		4D0835EE22847BD100CA7405 /* eff_short_wordlist_2_0.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835E922847BD000CA7405 /* eff_short_wordlist_2_0.txt */; };
-		4D0835EF22847BD100CA7405 /* eff_short_wordlist_1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835EA22847BD000CA7405 /* eff_short_wordlist_1.txt */; };
 		4D0AFD2222A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AFD2122A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m */; };
 		4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AFD2422A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m */; };
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
@@ -109,7 +104,6 @@
 		4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
 		4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D1885632170E260001AE6B0 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
-		4D1885652170E386001AE6B0 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46E206D350300AD537E /* PasswordGenerator.m */; };
 		4D1885672170E55F001AE6B0 /* OpenSafeSequenceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */; };
 		4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4D18F23322577FB100768E18 /* FieldReferenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18F23222577FB100768E18 /* FieldReferenceTests.m */; };
@@ -135,6 +129,10 @@
 		4D210F4E21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D210F4D21959A1D00B061B1 /* Kdb1DatabaseMetadata.m */; };
 		4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D210F4D21959A1D00B061B1 /* Kdb1DatabaseMetadata.m */; };
 		4D210F5121959F3300B061B1 /* Database-1.kdb in Resources */ = {isa = PBXBuildFile; fileRef = 4D210F5021959F3300B061B1 /* Database-1.kdb */; };
+		4D216F7E22CBCEC1000954D0 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7B22CBCEC1000954D0 /* PasswordGenerationConfig.m */; };
+		4D216F7F22CBCEC1000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7D22CBCEC1000954D0 /* PasswordMaker.m */; };
+		4D216F8022CBCED4000954D0 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7B22CBCEC1000954D0 /* PasswordGenerationConfig.m */; };
+		4D216F8122CBCED4000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7D22CBCEC1000954D0 /* PasswordMaker.m */; };
 		4D2259F322C67E56005547EA /* FavIconTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F222C67E56005547EA /* FavIconTests.m */; };
 		4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D2259F422C6C28A005547EA /* EditDateCell.xib */; };
 		4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D2259F422C6C28A005547EA /* EditDateCell.xib */; };
@@ -153,8 +151,6 @@
 		4D2962B3223173FC0082897D /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
 		4D2962B4223173FC0082897D /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
 		4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
-		4D29E46F206D350300AD537E /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46E206D350300AD537E /* PasswordGenerator.m */; };
-		4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E471206D434400AD537E /* PasswordGenerationSettingsTableView.m */; };
 		4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4D2BF3EC21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
@@ -227,6 +223,36 @@
 		4D3652142184A24700A56519 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3652122184A24700A56519 /* regdom.c */; };
 		4D3652152184A24700A56519 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3652122184A24700A56519 /* regdom.c */; };
 		4D3652172184A34600A56519 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3652162184A34600A56519 /* AppDelegate.m */; };
+		4D36B0B222C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A222C9473E003E9B68 /* eff_short_wordlist_2_0.utf8.txt */; };
+		4D36B0B322C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A222C9473E003E9B68 /* eff_short_wordlist_2_0.utf8.txt */; };
+		4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A322C9473F003E9B68 /* securedrop.wordlist.utf8.txt */; };
+		4D36B0B522C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A322C9473F003E9B68 /* securedrop.wordlist.utf8.txt */; };
+		4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A422C9473F003E9B68 /* dutch-diceware.wordlist.utf8.txt */; };
+		4D36B0B722C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A422C9473F003E9B68 /* dutch-diceware.wordlist.utf8.txt */; };
+		4D36B0B822C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A522C9473F003E9B68 /* eff_large_wordlist.utf8.txt */; };
+		4D36B0B922C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A522C9473F003E9B68 /* eff_large_wordlist.utf8.txt */; };
+		4D36B0BA22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */; };
+		4D36B0BB22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */; };
+		4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A822C9473F003E9B68 /* french-diceware.wordlist.utf8.txt */; };
+		4D36B0BF22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A822C9473F003E9B68 /* french-diceware.wordlist.utf8.txt */; };
+		4D36B0C022C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A922C9473F003E9B68 /* german-diceware.wordlist.utf8.txt */; };
+		4D36B0C122C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A922C9473F003E9B68 /* german-diceware.wordlist.utf8.txt */; };
+		4D36B0C222C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AA22C9473F003E9B68 /* swedish-diceware.wordlist.utf8.txt */; };
+		4D36B0C322C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AA22C9473F003E9B68 /* swedish-diceware.wordlist.utf8.txt */; };
+		4D36B0C422C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AB22C9473F003E9B68 /* google-10000-english-usa-no-swears-medium.txt */; };
+		4D36B0C522C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AB22C9473F003E9B68 /* google-10000-english-usa-no-swears-medium.txt */; };
+		4D36B0C622C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AC22C9473F003E9B68 /* eff_short_wordlist_1.utf8.txt */; };
+		4D36B0C722C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AC22C9473F003E9B68 /* eff_short_wordlist_1.utf8.txt */; };
+		4D36B0C822C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AD22C9473F003E9B68 /* catalan-diceware.wordlist.utf8.txt */; };
+		4D36B0C922C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AD22C9473F003E9B68 /* catalan-diceware.wordlist.utf8.txt */; };
+		4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AE22C9473F003E9B68 /* beale.wordlist.utf8.txt */; };
+		4D36B0CB22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AE22C9473F003E9B68 /* beale.wordlist.utf8.txt */; };
+		4D36B0CC22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AF22C9473F003E9B68 /* polish-diceware.wordlist.utf8.txt */; };
+		4D36B0CD22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AF22C9473F003E9B68 /* polish-diceware.wordlist.utf8.txt */; };
+		4D36B0CE22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0B022C94740003E9B68 /* italian-diceware.wordlist.utf8.txt */; };
+		4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0B022C94740003E9B68 /* italian-diceware.wordlist.utf8.txt */; };
+		4D36B0D022C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0B122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt */; };
+		4D36B0D122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0B122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt */; };
 		4D376E4722AC4B4000BDB93A /* BrowsePreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */; };
 		4D376F7A2242534D0031049E /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376F792242534D0031049E /* GenericTextBooleanElementHandler.m */; };
 		4D376F7B2242534D0031049E /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376F792242534D0031049E /* GenericTextBooleanElementHandler.m */; };
@@ -360,26 +386,6 @@
 		4D74B92A218C40B000FC369E /* V3Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D74B928218C40B000FC369E /* V3Binary.m */; };
 		4D74B92D218C438800FC369E /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D74B92C218C438800FC369E /* V3BinariesList.m */; };
 		4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D74B92C218C438800FC369E /* V3BinariesList.m */; };
-		4D75453322C42D64006DAB1D /* french-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452922C42D63006DAB1D /* french-diceware.wordlist */; };
-		4D75453422C42D64006DAB1D /* french-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452922C42D63006DAB1D /* french-diceware.wordlist */; };
-		4D75453522C42D64006DAB1D /* german-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452A22C42D64006DAB1D /* german-diceware.wordlist */; };
-		4D75453622C42D64006DAB1D /* german-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452A22C42D64006DAB1D /* german-diceware.wordlist */; };
-		4D75453722C42D64006DAB1D /* catalan-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452B22C42D64006DAB1D /* catalan-diceware.wordlist */; };
-		4D75453822C42D64006DAB1D /* catalan-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452B22C42D64006DAB1D /* catalan-diceware.wordlist */; };
-		4D75453922C42D64006DAB1D /* italian-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452C22C42D64006DAB1D /* italian-diceware.wordlist */; };
-		4D75453A22C42D64006DAB1D /* italian-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452C22C42D64006DAB1D /* italian-diceware.wordlist */; };
-		4D75453B22C42D64006DAB1D /* swedish-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452D22C42D64006DAB1D /* swedish-diceware.wordlist */; };
-		4D75453C22C42D64006DAB1D /* swedish-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452D22C42D64006DAB1D /* swedish-diceware.wordlist */; };
-		4D75453D22C42D64006DAB1D /* japanese-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452E22C42D64006DAB1D /* japanese-diceware.wordlist */; };
-		4D75453E22C42D64006DAB1D /* japanese-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452E22C42D64006DAB1D /* japanese-diceware.wordlist */; };
-		4D75453F22C42D64006DAB1D /* dutch-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452F22C42D64006DAB1D /* dutch-diceware.wordlist */; };
-		4D75454022C42D64006DAB1D /* dutch-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75452F22C42D64006DAB1D /* dutch-diceware.wordlist */; };
-		4D75454122C42D64006DAB1D /* english-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75453022C42D64006DAB1D /* english-diceware.wordlist */; };
-		4D75454222C42D64006DAB1D /* english-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75453022C42D64006DAB1D /* english-diceware.wordlist */; };
-		4D75454322C42D64006DAB1D /* securedrop.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75453122C42D64006DAB1D /* securedrop.wordlist */; };
-		4D75454422C42D64006DAB1D /* securedrop.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75453122C42D64006DAB1D /* securedrop.wordlist */; };
-		4D75454522C42D64006DAB1D /* polish-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75453222C42D64006DAB1D /* polish-diceware.wordlist */; };
-		4D75454622C42D64006DAB1D /* polish-diceware.wordlist in Resources */ = {isa = PBXBuildFile; fileRef = 4D75453222C42D64006DAB1D /* polish-diceware.wordlist */; };
 		4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D4E22204E0A00AEF439 /* IconCellView.xib */; };
 		4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D4E22204E0A00AEF439 /* IconCellView.xib */; };
 		4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5222204E4A00AEF439 /* IconViewCell.m */; };
@@ -423,7 +429,6 @@
 		4D8C14922074F5F900CE9CAE /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C148A2074F5F800CE9CAE /* Record.m */; };
 		4D8C14972074F63B00CE9CAE /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14982074F64A00CE9CAE /* crypt_argchk.c */; };
-		4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */; };
 		4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8EA82522316B4300B47035 /* KdbxHistory.m */; };
@@ -456,7 +461,6 @@
 		4D98344821775F5600731FFC /* password-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D98344721775F5600731FFC /* password-ladder.xml */; };
 		4D98344A21777E3000731FFC /* password-two-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D98344921777E3000731FFC /* password-two-entries-ladder.xml */; };
 		4D9A6B9D21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A6B9C21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m */; };
-		4D9A6BAD21FF746500F003B2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */; };
 		4D9AC55222A1390A00449F3F /* SelectKeyFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */; };
 		4D9AC55322A13C4000449F3F /* SelectKeyFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */; };
 		4D9AC55622A153FA00449F3F /* StaticDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */; };
@@ -635,10 +639,6 @@
 		4DF97F2E21BF116A0090A55E /* DavKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F2D21BF116A0090A55E /* DavKitTests.m */; };
 		4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
 		4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
-		4DFA67DE22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */; };
-		4DFA67DF22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */; };
-		4DFA67E222C80667000FC012 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E122C80667000FC012 /* PasswordMaker.m */; };
-		4DFA67E322C80667000FC012 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E122C80667000FC012 /* PasswordMaker.m */; };
 		4DFA67E522C80824000FC012 /* PasswordMakerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E422C80824000FC012 /* PasswordMakerTests.m */; };
 		4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */; };
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
@@ -752,11 +752,6 @@
 		4D0835DA2284765D00CA7405 /* CustomFieldTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomFieldTableCell.m; sourceTree = "<group>"; };
 		4D0835DB2284765D00CA7405 /* CustomFieldTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomFieldTableCell.h; sourceTree = "<group>"; };
 		4D0835E22284794200CA7405 /* KeePassKeyFileTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassKeyFileTests.m; path = StrongboxTests/KeePassKeyFileTests.m; sourceTree = "<group>"; };
-		4D0835E622847BD000CA7405 /* beale.wordlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = beale.wordlist.txt; path = resources/beale.wordlist.txt; sourceTree = "<group>"; };
-		4D0835E722847BD000CA7405 /* eff_large_wordlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_large_wordlist.txt; path = resources/eff_large_wordlist.txt; sourceTree = "<group>"; };
-		4D0835E822847BD000CA7405 /* diceware.wordlist.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = diceware.wordlist.txt; path = resources/diceware.wordlist.txt; sourceTree = "<group>"; };
-		4D0835E922847BD000CA7405 /* eff_short_wordlist_2_0.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_short_wordlist_2_0.txt; path = resources/eff_short_wordlist_2_0.txt; sourceTree = "<group>"; };
-		4D0835EA22847BD000CA7405 /* eff_short_wordlist_1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_short_wordlist_1.txt; path = resources/eff_short_wordlist_1.txt; sourceTree = "<group>"; };
 		4D0AFD2022A7E88100DDBC5A /* WelcomeMasterPasswordViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WelcomeMasterPasswordViewController.h; path = StrongBox/WelcomeMasterPasswordViewController.h; sourceTree = "<group>"; };
 		4D0AFD2122A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WelcomeMasterPasswordViewController.m; path = StrongBox/WelcomeMasterPasswordViewController.m; sourceTree = "<group>"; };
 		4D0AFD2322A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WelcomeCreateDoneViewController.h; path = StrongBox/WelcomeCreateDoneViewController.h; sourceTree = "<group>"; };
@@ -826,6 +821,10 @@
 		4D210F4C21959A1D00B061B1 /* Kdb1DatabaseMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kdb1DatabaseMetadata.h; path = model/keepass/Kdb1DatabaseMetadata.h; sourceTree = "<group>"; };
 		4D210F4D21959A1D00B061B1 /* Kdb1DatabaseMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Kdb1DatabaseMetadata.m; path = model/keepass/Kdb1DatabaseMetadata.m; sourceTree = "<group>"; };
 		4D210F5021959F3300B061B1 /* Database-1.kdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Database-1.kdb"; sourceTree = "<group>"; };
+		4D216F7A22CBCEC1000954D0 /* PasswordGenerationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationConfig.h; path = model/PasswordGenerationConfig.h; sourceTree = "<group>"; };
+		4D216F7B22CBCEC1000954D0 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = model/PasswordGenerationConfig.m; sourceTree = "<group>"; };
+		4D216F7C22CBCEC1000954D0 /* PasswordMaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = model/PasswordMaker.h; sourceTree = "<group>"; };
+		4D216F7D22CBCEC1000954D0 /* PasswordMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = model/PasswordMaker.m; sourceTree = "<group>"; };
 		4D2259F222C67E56005547EA /* FavIconTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconTests.m; path = StrongboxTests/FavIconTests.m; sourceTree = "<group>"; };
 		4D2259F422C6C28A005547EA /* EditDateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditDateCell.xib; sourceTree = "<group>"; };
 		4D2259F722C6C463005547EA /* EditDateCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditDateCell.h; sourceTree = "<group>"; };
@@ -845,10 +844,6 @@
 		4D2962B2223173FC0082897D /* History.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = History.m; path = model/keepass/History.m; sourceTree = "<group>"; };
 		4D29E46A206D328900AD537E /* PasswordGenerationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationParameters.h; path = model/PasswordGenerationParameters.h; sourceTree = SOURCE_ROOT; };
 		4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationParameters.m; path = model/PasswordGenerationParameters.m; sourceTree = SOURCE_ROOT; };
-		4D29E46D206D350300AD537E /* PasswordGenerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerator.h; path = model/PasswordGenerator.h; sourceTree = SOURCE_ROOT; };
-		4D29E46E206D350300AD537E /* PasswordGenerator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerator.m; path = model/PasswordGenerator.m; sourceTree = SOURCE_ROOT; };
-		4D29E470206D434400AD537E /* PasswordGenerationSettingsTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationSettingsTableView.h; path = StrongBox/PasswordGenerationSettingsTableView.h; sourceTree = "<group>"; };
-		4D29E471206D434400AD537E /* PasswordGenerationSettingsTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationSettingsTableView.m; path = StrongBox/PasswordGenerationSettingsTableView.m; sourceTree = "<group>"; };
 		4D2BF3E821EE3ECD00E39EBB /* PinEntryResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PinEntryResponse.h; sourceTree = "<group>"; };
 		4D2BF3E921EF6B9000E39EBB /* DuressDummyStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuressDummyStorageProvider.h; path = StrongBox/DuressDummyStorageProvider.h; sourceTree = "<group>"; };
 		4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuressDummyStorageProvider.m; path = StrongBox/DuressDummyStorageProvider.m; sourceTree = "<group>"; };
@@ -925,6 +920,21 @@
 		4D3652122184A24700A56519 /* regdom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = regdom.c; path = lib/psl/regdom.c; sourceTree = SOURCE_ROOT; };
 		4D3652132184A24700A56519 /* tld-canon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tld-canon.h"; path = "lib/psl/tld-canon.h"; sourceTree = SOURCE_ROOT; };
 		4D3652162184A34600A56519 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = StrongBox/AppDelegate.m; sourceTree = "<group>"; };
+		4D36B0A222C9473E003E9B68 /* eff_short_wordlist_2_0.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_short_wordlist_2_0.utf8.txt; path = resources/wordlists/eff_short_wordlist_2_0.utf8.txt; sourceTree = "<group>"; };
+		4D36B0A322C9473F003E9B68 /* securedrop.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = securedrop.wordlist.utf8.txt; path = resources/wordlists/securedrop.wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D36B0A422C9473F003E9B68 /* dutch-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "dutch-diceware.wordlist.utf8.txt"; path = "resources/wordlists/dutch-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0A522C9473F003E9B68 /* eff_large_wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_large_wordlist.utf8.txt; path = resources/wordlists/eff_large_wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = diceware.wordlist.utf8.txt; path = resources/wordlists/diceware.wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D36B0A822C9473F003E9B68 /* french-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "french-diceware.wordlist.utf8.txt"; path = "resources/wordlists/french-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0A922C9473F003E9B68 /* german-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "german-diceware.wordlist.utf8.txt"; path = "resources/wordlists/german-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0AA22C9473F003E9B68 /* swedish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "swedish-diceware.wordlist.utf8.txt"; path = "resources/wordlists/swedish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0AB22C9473F003E9B68 /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "resources/wordlists/google-10000-english-usa-no-swears-medium.txt"; sourceTree = "<group>"; };
+		4D36B0AC22C9473F003E9B68 /* eff_short_wordlist_1.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = eff_short_wordlist_1.utf8.txt; path = resources/wordlists/eff_short_wordlist_1.utf8.txt; sourceTree = "<group>"; };
+		4D36B0AD22C9473F003E9B68 /* catalan-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "catalan-diceware.wordlist.utf8.txt"; path = "resources/wordlists/catalan-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0AE22C9473F003E9B68 /* beale.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = beale.wordlist.utf8.txt; path = resources/wordlists/beale.wordlist.utf8.txt; sourceTree = "<group>"; };
+		4D36B0AF22C9473F003E9B68 /* polish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "polish-diceware.wordlist.utf8.txt"; path = "resources/wordlists/polish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0B022C94740003E9B68 /* italian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "italian-diceware.wordlist.utf8.txt"; path = "resources/wordlists/italian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		4D36B0B122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "japanese-diceware.wordlist.utf8.txt"; path = "resources/wordlists/japanese-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowsePreferencesTableViewController.h; path = StrongBox/BrowsePreferencesTableViewController.h; sourceTree = "<group>"; };
 		4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BrowsePreferencesTableViewController.m; path = StrongBox/BrowsePreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D376F782242534D0031049E /* GenericTextBooleanElementHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericTextBooleanElementHandler.h; path = model/keepass/GenericTextBooleanElementHandler.h; sourceTree = "<group>"; };
@@ -1075,16 +1085,6 @@
 		4D74B928218C40B000FC369E /* V3Binary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = V3Binary.m; path = model/keepass/V3Binary.m; sourceTree = "<group>"; };
 		4D74B92B218C438800FC369E /* V3BinariesList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = V3BinariesList.h; path = model/keepass/V3BinariesList.h; sourceTree = "<group>"; };
 		4D74B92C218C438800FC369E /* V3BinariesList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = V3BinariesList.m; path = model/keepass/V3BinariesList.m; sourceTree = "<group>"; };
-		4D75452922C42D63006DAB1D /* french-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "french-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75452A22C42D64006DAB1D /* german-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "german-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75452B22C42D64006DAB1D /* catalan-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "catalan-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75452C22C42D64006DAB1D /* italian-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "italian-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75452D22C42D64006DAB1D /* swedish-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "swedish-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75452E22C42D64006DAB1D /* japanese-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "japanese-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75452F22C42D64006DAB1D /* dutch-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "dutch-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75453022C42D64006DAB1D /* english-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "english-diceware.wordlist"; sourceTree = "<group>"; };
-		4D75453122C42D64006DAB1D /* securedrop.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = securedrop.wordlist; sourceTree = "<group>"; };
-		4D75453222C42D64006DAB1D /* polish-diceware.wordlist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "polish-diceware.wordlist"; sourceTree = "<group>"; };
 		4D766D4E22204E0A00AEF439 /* IconCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = IconCellView.xib; path = StrongBox/IconCellView.xib; sourceTree = "<group>"; };
 		4D766D5122204E4A00AEF439 /* IconViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IconViewCell.h; path = StrongBox/IconViewCell.h; sourceTree = "<group>"; };
 		4D766D5222204E4A00AEF439 /* IconViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconViewCell.m; path = StrongBox/IconViewCell.m; sourceTree = "<group>"; };
@@ -1152,7 +1152,6 @@
 		4D8C148B2074F5F800CE9CAE /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = model/pwsafe/Field.h; sourceTree = SOURCE_ROOT; };
 		4D8C14962074F63B00CE9CAE /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = model/pwsafe/twofish/twofish.c; sourceTree = SOURCE_ROOT; };
 		4D8C14982074F64A00CE9CAE /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = model/pwsafe/twofish/crypt_argchk.c; sourceTree = SOURCE_ROOT; };
-		4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "google-10000-english-usa-no-swears-medium.txt"; path = "resources/google-10000-english-usa-no-swears-medium.txt"; sourceTree = SOURCE_ROOT; };
 		4D8C72B722525E160016A5CC /* AutoFillManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillManager.h; path = StrongBox/AutoFillManager.h; sourceTree = "<group>"; };
 		4D8C72B822525E160016A5CC /* AutoFillManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillManager.m; path = StrongBox/AutoFillManager.m; sourceTree = "<group>"; };
 		4D8EA82522316B4300B47035 /* KdbxHistory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxHistory.m; path = StrongboxTests/KdbxHistory.m; sourceTree = "<group>"; };
@@ -1504,10 +1503,6 @@
 		4DF97F2D21BF116A0090A55E /* DavKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DavKitTests.m; path = StrongboxTests/DavKitTests.m; sourceTree = "<group>"; };
 		4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationViewController.h; path = StrongBox/PasswordGenerationViewController.h; sourceTree = "<group>"; };
 		4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationViewController.m; path = StrongBox/PasswordGenerationViewController.m; sourceTree = "<group>"; };
-		4DFA67DC22C7FF93000FC012 /* PasswordGenerationConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationConfig.h; path = StrongBox/PasswordGenerationConfig.h; sourceTree = "<group>"; };
-		4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = StrongBox/PasswordGenerationConfig.m; sourceTree = "<group>"; };
-		4DFA67E022C80667000FC012 /* PasswordMaker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = StrongBox/PasswordMaker.h; sourceTree = "<group>"; };
-		4DFA67E122C80667000FC012 /* PasswordMaker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = StrongBox/PasswordMaker.m; sourceTree = "<group>"; };
 		4DFA67E422C80824000FC012 /* PasswordMakerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordMakerTests.m; sourceTree = "<group>"; };
 		4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModelTests.m; path = StrongboxTests/PwSafeModelTests.m; sourceTree = "<group>"; };
 		4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BasicOrderedDictionary.h; path = model/BasicOrderedDictionary.h; sourceTree = SOURCE_ROOT; };
@@ -1700,22 +1695,21 @@
 		4D0835E522847BAF00CA7405 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
-				4D75452B22C42D64006DAB1D /* catalan-diceware.wordlist */,
-				4D75452F22C42D64006DAB1D /* dutch-diceware.wordlist */,
-				4D75453022C42D64006DAB1D /* english-diceware.wordlist */,
-				4D75452922C42D63006DAB1D /* french-diceware.wordlist */,
-				4D75452A22C42D64006DAB1D /* german-diceware.wordlist */,
-				4D75452C22C42D64006DAB1D /* italian-diceware.wordlist */,
-				4D75452E22C42D64006DAB1D /* japanese-diceware.wordlist */,
-				4D75453222C42D64006DAB1D /* polish-diceware.wordlist */,
-				4D75453122C42D64006DAB1D /* securedrop.wordlist */,
-				4D75452D22C42D64006DAB1D /* swedish-diceware.wordlist */,
-				4D0835E622847BD000CA7405 /* beale.wordlist.txt */,
-				4D0835E822847BD000CA7405 /* diceware.wordlist.txt */,
-				4D0835E722847BD000CA7405 /* eff_large_wordlist.txt */,
-				4D0835EA22847BD000CA7405 /* eff_short_wordlist_1.txt */,
-				4D0835E922847BD000CA7405 /* eff_short_wordlist_2_0.txt */,
-				4D8C149A2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt */,
+				4D36B0AE22C9473F003E9B68 /* beale.wordlist.utf8.txt */,
+				4D36B0AD22C9473F003E9B68 /* catalan-diceware.wordlist.utf8.txt */,
+				4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */,
+				4D36B0A422C9473F003E9B68 /* dutch-diceware.wordlist.utf8.txt */,
+				4D36B0A522C9473F003E9B68 /* eff_large_wordlist.utf8.txt */,
+				4D36B0AC22C9473F003E9B68 /* eff_short_wordlist_1.utf8.txt */,
+				4D36B0A222C9473E003E9B68 /* eff_short_wordlist_2_0.utf8.txt */,
+				4D36B0A822C9473F003E9B68 /* french-diceware.wordlist.utf8.txt */,
+				4D36B0A922C9473F003E9B68 /* german-diceware.wordlist.utf8.txt */,
+				4D36B0AB22C9473F003E9B68 /* google-10000-english-usa-no-swears-medium.txt */,
+				4D36B0B022C94740003E9B68 /* italian-diceware.wordlist.utf8.txt */,
+				4D36B0B122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt */,
+				4D36B0AF22C9473F003E9B68 /* polish-diceware.wordlist.utf8.txt */,
+				4D36B0A322C9473F003E9B68 /* securedrop.wordlist.utf8.txt */,
+				4D36B0AA22C9473F003E9B68 /* swedish-diceware.wordlist.utf8.txt */,
 			);
 			name = "Word Lists";
 			sourceTree = "<group>";
@@ -2818,7 +2812,6 @@
 		4DBE5B341C8356C700C310BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				4D0835E522847BAF00CA7405 /* Word Lists */,
 				4D2BF3F221EFA2EB00E39EBB /* AppLockMode.h */,
 				4D2BF3E821EE3ECD00E39EBB /* PinEntryResponse.h */,
 				4D25673321E8B45B006260B7 /* DuressAction.h */,
@@ -2837,8 +2830,6 @@
 				4D78AC2C1FB1E27700A68A92 /* Utils.m */,
 				4D29E46A206D328900AD537E /* PasswordGenerationParameters.h */,
 				4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */,
-				4D29E46D206D350300AD537E /* PasswordGenerator.h */,
-				4D29E46E206D350300AD537E /* PasswordGenerator.m */,
 				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
 				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
 				4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */,
@@ -2914,15 +2905,14 @@
 		4DE2688E22A65C8B00A1D158 /* Password Generation */ = {
 			isa = PBXGroup;
 			children = (
-				4D29E470206D434400AD537E /* PasswordGenerationSettingsTableView.h */,
-				4D29E471206D434400AD537E /* PasswordGenerationSettingsTableView.m */,
+				4D0835E522847BAF00CA7405 /* Word Lists */,
 				4DE2688F22A65CA100A1D158 /* PasswordGenerationPreferences.storyboard */,
 				4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */,
 				4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */,
-				4DFA67DC22C7FF93000FC012 /* PasswordGenerationConfig.h */,
-				4DFA67DD22C7FF93000FC012 /* PasswordGenerationConfig.m */,
-				4DFA67E022C80667000FC012 /* PasswordMaker.h */,
-				4DFA67E122C80667000FC012 /* PasswordMaker.m */,
+				4D216F7A22CBCEC1000954D0 /* PasswordGenerationConfig.h */,
+				4D216F7B22CBCEC1000954D0 /* PasswordGenerationConfig.m */,
+				4D216F7C22CBCEC1000954D0 /* PasswordMaker.h */,
+				4D216F7D22CBCEC1000954D0 /* PasswordMaker.m */,
 			);
 			name = "Password Generation";
 			sourceTree = "<group>";
@@ -3243,62 +3233,61 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D36B0B822C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */,
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
+				4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
+				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */,
 				4D9597BB22A28FB7008DB224 /* SelectStorage.storyboard in Resources */,
+				4D36B0D022C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
+				4D36B0C422C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
 				4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */,
 				4D0835CD228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */,
 				4DBA027F22A3EDBE00BAC858 /* DatabaseOperations.storyboard in Resources */,
-				4D0835EE22847BD100CA7405 /* eff_short_wordlist_2_0.txt in Resources */,
 				4DE2688D22A659DE00A1D158 /* PasswordSafeHistory.storyboard in Resources */,
+				4D36B0CE22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D36B0C222C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D766D6122204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
-				4D75453322C42D64006DAB1D /* french-diceware.wordlist in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
-				4D75453B22C42D64006DAB1D /* swedish-diceware.wordlist in Resources */,
+				4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				4D9AC55222A1390A00449F3F /* SelectKeyFile.storyboard in Resources */,
 				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4D01BA2122BD24950044226F /* PinEntry.storyboard in Resources */,
 				4DE2689222A6602500A1D158 /* Preferences.storyboard in Resources */,
+				4D36B0C622C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				4D36B0CC22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4DE2689522A6637500A1D158 /* KeePassHistory.storyboard in Resources */,
 				4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
-				4D0835EB22847BD100CA7405 /* beale.wordlist.txt in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */,
 				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
+				4D36B0C822C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D12085122A79F6200139570 /* Welcome.storyboard in Resources */,
 				4DAE98A62270B4E200A811C4 /* IconTableCell.xib in Resources */,
+				4D36B0B222C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				4D36B0BA22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
-				4D0835EF22847BD100CA7405 /* eff_short_wordlist_1.txt in Resources */,
-				4D0835EC22847BD100CA7405 /* eff_large_wordlist.txt in Resources */,
-				4D75453722C42D64006DAB1D /* catalan-diceware.wordlist in Resources */,
+				4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4DE2689B22A669F400A1D158 /* MasterDetail.storyboard in Resources */,
 				4DE2689D22A66A6A00A1D158 /* Browse.storyboard in Resources */,
 				4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */,
 				4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
-				4D75453F22C42D64006DAB1D /* dutch-diceware.wordlist in Resources */,
-				4D75454322C42D64006DAB1D /* securedrop.wordlist in Resources */,
-				4D75453D22C42D64006DAB1D /* japanese-diceware.wordlist in Resources */,
 				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D7D2193229FD9DE00C1C925 /* SelectItem.storyboard in Resources */,
-				4D75453922C42D64006DAB1D /* italian-diceware.wordlist in Resources */,
 				4D25675121EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4DE2689022A65CA100A1D158 /* PasswordGenerationPreferences.storyboard in Resources */,
-				4D8C149B2074F67100CE9CAE /* google-10000-english-usa-no-swears-medium.txt in Resources */,
-				4D75454522C42D64006DAB1D /* polish-diceware.wordlist in Resources */,
+				4D36B0C022C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 				4DE2689922A668A100A1D158 /* ItemDetails.storyboard in Resources */,
 				4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */,
-				4D0835ED22847BD100CA7405 /* diceware.wordlist.txt in Resources */,
 				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
-				4D75453522C42D64006DAB1D /* german-diceware.wordlist in Resources */,
-				4D75454122C42D64006DAB1D /* english-diceware.wordlist in Resources */,
 				4D48C6ED22AD16F9002B502E /* ItemDetailsPreferences.storyboard in Resources */,
 				4D01BA2322BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
@@ -3314,39 +3303,43 @@
 				4D8EC42E22302649008EE004 /* LICENSE in Resources */,
 				4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4D22AF0622BD94A500EB62FC /* PinEntry.storyboard in Resources */,
+				4D36B0C722C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				4D36B0CB22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
-				4D75453622C42D64006DAB1D /* german-diceware.wordlist in Resources */,
 				4D25675221EBD094006260B7 /* LaunchScreen.storyboard in Resources */,
 				4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,
 				4DAE98B72270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
-				4D75454422C42D64006DAB1D /* securedrop.wordlist in Resources */,
+				4D36B0C522C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
+				4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D36B0B522C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
 				4DAE98B92270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
+				4D36B0C122C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
-				4D75453822C42D64006DAB1D /* catalan-diceware.wordlist in Resources */,
+				4D36B0B922C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */,
 				4D9AC55322A13C4000449F3F /* SelectKeyFile.storyboard in Resources */,
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
 				4D22AF0522BD949F00EB62FC /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
-				4D75453A22C42D64006DAB1D /* italian-diceware.wordlist in Resources */,
-				4D75454622C42D64006DAB1D /* polish-diceware.wordlist in Resources */,
-				4D75453C22C42D64006DAB1D /* swedish-diceware.wordlist in Resources */,
-				4D75454022C42D64006DAB1D /* dutch-diceware.wordlist in Resources */,
-				4D75453422C42D64006DAB1D /* french-diceware.wordlist in Resources */,
+				4D36B0B722C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
 				4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */,
+				4D36B0B322C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				4D36B0D122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
 				4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
+				4D36B0C922C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D22AF0722BD94B100EB62FC /* PasswordGenerationPreferences.storyboard in Resources */,
-				4D75453E22C42D64006DAB1D /* japanese-diceware.wordlist in Resources */,
-				4D75454222C42D64006DAB1D /* english-diceware.wordlist in Resources */,
 				4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
-				4D9A6BAD21FF746500F003B2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
+				4D36B0C322C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D0835CE228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */,
+				4D36B0BF22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
+				4D36B0CD22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				4D36B0BB22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3540,8 +3533,6 @@
 			files = (
 				4D1885672170E55F001AE6B0 /* OpenSafeSequenceHelper.m in Sources */,
 				4D27D74C21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
-				4D29E472206D434400AD537E /* PasswordGenerationSettingsTableView.m in Sources */,
-				4DFA67E222C80667000FC012 /* PasswordMaker.m in Sources */,
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
 				4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */,
 				4DC66F3D229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
@@ -3550,7 +3541,6 @@
 				4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
-				4D29E46F206D350300AD537E /* PasswordGenerator.m in Sources */,
 				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
 				4DF97F2021BF101B0090A55E /* DAVRequest.m in Sources */,
 				4D25674C21E8C65D006260B7 /* PinEntryController.m in Sources */,
@@ -3594,10 +3584,10 @@
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				4DAE98C42270B4E200A811C4 /* ItemDetailsModel.m in Sources */,
 				4DEDF7DB22AA7F9800EFA5C9 /* ProExplanationViewController.m in Sources */,
+				4D216F7F22CBCEC1000954D0 /* PasswordMaker.m in Sources */,
 				4D326E8D22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
-				4DFA67DE22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlTreeSerializer.m in Sources */,
 				4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */,
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
@@ -3662,6 +3652,7 @@
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
 				4D766D5F22204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
 				4D3E1484218326BE00A41CA0 /* KdfParameters.m in Sources */,
+				4D216F7E22CBCEC1000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4D78AC301FB1E27700A68A92 /* NodeFields.m in Sources */,
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
 				4D376E4722AC4B4000BDB93A /* BrowsePreferencesTableViewController.m in Sources */,
@@ -3817,7 +3808,6 @@
 				4D33FA3A2287210C006C31B2 /* ItemDetailsModel.m in Sources */,
 				4D2F6C3921807C7E007931E4 /* String.m in Sources */,
 				4DF972C921C01ABF00F384C9 /* DAVListingParser.m in Sources */,
-				4D1885652170E386001AE6B0 /* PasswordGenerator.m in Sources */,
 				4D5F5B6F218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D1885632170E260001AE6B0 /* Model.m in Sources */,
 				4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */,
@@ -3834,7 +3824,6 @@
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
-				4DFA67E322C80667000FC012 /* PasswordMaker.m in Sources */,
 				4D33FA3922872008006C31B2 /* ItemDetailsViewController.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4D0835D2228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
@@ -3882,7 +3871,6 @@
 				4D2F6C3721807C7E007931E4 /* KeePassGroup.m in Sources */,
 				4D326E9022302BED00DCD8C7 /* NMSSHHostConfig.m in Sources */,
 				4DF972BA21BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */,
-				4DFA67DF22C7FF93000FC012 /* PasswordGenerationConfig.m in Sources */,
 				4D3E149321832BEF00A41CA0 /* encoding.c in Sources */,
 				4DF972CC21C01ABF00F384C9 /* DAVRequests.m in Sources */,
 				4D4766E12178C82B00C4358F /* SerializationData.m in Sources */,
@@ -3927,6 +3915,7 @@
 				4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */,
 				4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,
+				4D216F8122CBCED4000954D0 /* PasswordMaker.m in Sources */,
 				4D1884D021709DF3001AE6B0 /* Node.m in Sources */,
 				4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */,
 				4DAE98BF2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
@@ -3972,6 +3961,7 @@
 				4D3E148E21832B7400A41CA0 /* argon2.c in Sources */,
 				4D5F5B73218B350C00A0739A /* DatabaseAttachment.m in Sources */,
 				4D556F1222B7FF6100E16027 /* CacheManager.m in Sources */,
+				4D216F8022CBCED4000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
 				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,

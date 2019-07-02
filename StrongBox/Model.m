@@ -9,10 +9,10 @@
 #import "Model.h"
 #import "Utils.h"
 #import "SVProgressHUD.h"
-#import "PasswordGenerator.h"
 #import "Settings.h"
 #import "AutoFillManager.h"
 #import "CacheManager.h"
+#import "PasswordMaker.h"
 
 @implementation Model {
     id <SafeStorageProvider> _storageProvider;
@@ -244,8 +244,8 @@
 }
 
 - (NSString *)generatePassword {
-    PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
-    return [PasswordGenerator generatePassword:params];
+    PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+    return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 }
 
 - (void)updateAutoFillQuickTypeDatabase {

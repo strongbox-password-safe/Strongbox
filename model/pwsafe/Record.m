@@ -217,7 +217,7 @@
 
 - (void)setFieldWithDate:(FieldType)type date:(NSDate *)date {
     if(date == nil) {
-        [self clearField:type]; // TODO: Test
+        [self clearField:type];
     }
     else {
         time_t timeT = (time_t)date.timeIntervalSince1970;
