@@ -34,7 +34,6 @@ extern NSString* const kCustomFieldsColumn;
 @property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
 @property (nonatomic, strong) NSDate* endFreeTrialDate;
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
-@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 
 @property (nonatomic) BOOL alwaysShowPassword;
 @property (nonatomic) BOOL warnedAboutTouchId;
@@ -78,7 +77,12 @@ extern NSString* const kCustomFieldsColumn;
 
 //@property BOOL showDatabasesListAtStartup;
 
+
 @property PasswordGenerationConfig *passwordGenerationConfig;
+@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
+@property BOOL migratedToNewPasswordGenerator;
+
+@property BOOL autoOpenFirstDatabaseOnEmptyLaunch;
 
 @end
 

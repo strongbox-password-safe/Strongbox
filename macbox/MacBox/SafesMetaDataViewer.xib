@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="SafesMetaDataViewer">
             <connections>
                 <outlet property="buttonOpen" destination="MSn-gZ-6X1" id="yOS-Nq-pEC"/>
+                <outlet property="checkboxAutoOpenPrimary" destination="9gr-Ef-QvP" id="3By-9r-R2f"/>
                 <outlet property="tableView" destination="SmM-X3-Hfq" id="fIf-7b-cpz"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -18,14 +19,14 @@
         <window title="Databases" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="609" height="360"/>
+            <rect key="contentRect" x="196" y="240" width="609" height="387"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="609" height="360"/>
+                <rect key="frame" x="0.0" y="0.0" width="609" height="387"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MSn-gZ-6X1">
-                        <rect key="frame" x="461" y="13" width="134" height="32"/>
+                        <rect key="frame" x="461" y="47" width="134" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="122" id="OZf-4j-pAF"/>
                         </constraints>
@@ -41,13 +42,13 @@ DQ
                         </connections>
                     </button>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xpx-UG-Rzh">
-                        <rect key="frame" x="20" y="61" width="569" height="279"/>
+                        <rect key="frame" x="20" y="95" width="569" height="272"/>
                         <clipView key="contentView" id="KPl-fn-Wt0">
-                            <rect key="frame" x="1" y="0.0" width="567" height="278"/>
+                            <rect key="frame" x="1" y="0.0" width="567" height="271"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="FH4-sz-yxN" viewBased="YES" id="SmM-X3-Hfq">
-                                    <rect key="frame" x="0.0" y="0.0" width="567" height="255"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="567" height="248"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -373,7 +374,7 @@ DQ
                         </connections>
                     </scrollView>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cIa-aT-idW">
-                        <rect key="frame" x="14" y="13" width="134" height="32"/>
+                        <rect key="frame" x="14" y="47" width="134" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="122" id="KPr-Z3-ulJ"/>
                         </constraints>
@@ -386,7 +387,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ivt-SI-hdL">
-                        <rect key="frame" x="148" y="13" width="134" height="32"/>
+                        <rect key="frame" x="148" y="47" width="134" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="122" id="502-3F-Je9"/>
                         </constraints>
@@ -398,27 +399,39 @@ DQ
                             <action selector="onOpenFiles:" target="-2" id="KgX-3Q-wpZ"/>
                         </connections>
                     </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9gr-Ef-QvP">
+                        <rect key="frame" x="18" y="18" width="336" height="18"/>
+                        <buttonCell key="cell" type="check" title="Auto Open Primary Database on Application Launch" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="z9A-u0-szW">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="onChangeAutoOpen:" target="-2" id="OOf-J6-Ahs"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="9gr-Ef-QvP" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="6Py-CK-r0Z"/>
                     <constraint firstItem="MSn-gZ-6X1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivt-SI-hdL" secondAttribute="trailing" constant="20" id="8Cg-vi-kst"/>
+                    <constraint firstItem="cIa-aT-idW" firstAttribute="centerY" secondItem="ivt-SI-hdL" secondAttribute="centerY" id="B07-d6-r9f"/>
+                    <constraint firstItem="ivt-SI-hdL" firstAttribute="centerY" secondItem="MSn-gZ-6X1" secondAttribute="centerY" id="Ltk-Yh-fCC"/>
                     <constraint firstItem="ivt-SI-hdL" firstAttribute="top" secondItem="Xpx-UG-Rzh" secondAttribute="bottom" constant="20" id="MeW-st-8dk"/>
-                    <constraint firstAttribute="bottom" secondItem="MSn-gZ-6X1" secondAttribute="bottom" constant="20" symbolic="YES" id="PJm-Ll-aGn"/>
                     <constraint firstItem="cIa-aT-idW" firstAttribute="top" secondItem="Xpx-UG-Rzh" secondAttribute="bottom" constant="20" id="VHa-Ov-PTr"/>
                     <constraint firstItem="Xpx-UG-Rzh" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="WH7-PD-Lbc"/>
                     <constraint firstItem="ivt-SI-hdL" firstAttribute="leading" secondItem="cIa-aT-idW" secondAttribute="trailing" constant="12" id="a0v-Fa-Xu4"/>
                     <constraint firstItem="cIa-aT-idW" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="eej-WT-Rii"/>
-                    <constraint firstAttribute="bottom" secondItem="ivt-SI-hdL" secondAttribute="bottom" constant="20" id="fvm-NP-nmN"/>
                     <constraint firstItem="MSn-gZ-6X1" firstAttribute="top" secondItem="Xpx-UG-Rzh" secondAttribute="bottom" constant="20" symbolic="YES" id="hHj-dW-q9o"/>
                     <constraint firstAttribute="trailing" secondItem="Xpx-UG-Rzh" secondAttribute="trailing" constant="20" symbolic="YES" id="iPm-y1-w2I"/>
                     <constraint firstItem="Xpx-UG-Rzh" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" symbolic="YES" id="jec-5I-fk4"/>
                     <constraint firstItem="MSn-gZ-6X1" firstAttribute="trailing" secondItem="Xpx-UG-Rzh" secondAttribute="trailing" id="qH7-Na-7pJ"/>
-                    <constraint firstAttribute="bottom" secondItem="cIa-aT-idW" secondAttribute="bottom" constant="20" id="z05-tK-cRz"/>
+                    <constraint firstAttribute="bottom" secondItem="9gr-Ef-QvP" secondAttribute="bottom" constant="20" id="v9H-nP-jK5"/>
+                    <constraint firstItem="9gr-Ef-QvP" firstAttribute="top" secondItem="cIa-aT-idW" secondAttribute="bottom" constant="20" id="xTe-LY-aB4"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="165.5" y="116"/>
+            <point key="canvasLocation" x="169" y="117"/>
         </window>
         <menu id="e2f-yJ-sKQ">
             <items>
@@ -442,7 +455,7 @@ DQ
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="136" y="388"/>
+            <point key="canvasLocation" x="188" y="482"/>
         </menu>
     </objects>
 </document>

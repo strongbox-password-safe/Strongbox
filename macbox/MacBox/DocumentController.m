@@ -13,6 +13,8 @@
 #import "DatabaseModel.h"
 #import "Settings.h"
 #import "SafesMetaDataViewer.h"
+#import "SafesList.h"
+#import "Alerts.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
@@ -65,8 +67,13 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 }
 
 - (void)openDocument:(id)sender {
-    if(self.documents.count == 0) {
-        [SafesMetaDataViewer show:NO];
+    if(self.documents.count == 0) { // Empty Launch...
+        if(SafesList.sharedInstance.snapshot.count > 0 && Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
+            [self openDatabase:SafesList.sharedInstance.snapshot.firstObject];
+        }
+        else {
+            [SafesMetaDataViewer show:NO];
+        }
     }
     else {
         [self originalOpenDocument:sender];
@@ -75,6 +82,25 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 
 - (void)originalOpenDocument:(id)sender {
     return [super openDocument:sender];
+}
+
+- (void)openDatabase:(SafeMetaData*)database {
+    NSLog(@"Open: %@", database.nickName);
+    
+    if(database.storageProvider == kLocalDevice) {
+        NSURL* url = [NSURL URLWithString:database.fileIdentifier];
+        
+        [self openDocumentWithContentsOfURL:url
+                                    display:YES
+                          completionHandler:^(NSDocument * _Nullable document,
+                                              BOOL documentWasAlreadyOpen,
+                                              NSError * _Nullable error) {
+             NSLog(@"Done! = %@", error);
+             if(error) {
+                 [self presentError:error];
+             }
+         }];
+    }
 }
 
 @end

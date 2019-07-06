@@ -10,6 +10,7 @@
 #import "SafesList.h"
 #import "Alerts.h"
 #import "DocumentController.h"
+#import "Settings.h"
 
 static NSString* const kColumnIdUuid = @"uuid";
 static NSString* const kColumnIdNickName = @"nickName";
@@ -25,6 +26,7 @@ static NSString* const kColumnIdFileIdentifier = @"fileIdentifier";
 @property (nonatomic, strong) NSArray<SafeMetaData*>* safes;
 @property (weak) IBOutlet NSTableView *tableView;
 @property (weak) IBOutlet NSButton *buttonOpen;
+@property (weak) IBOutlet NSButton *checkboxAutoOpenPrimary;
 
 @property BOOL debug;
 
@@ -67,6 +69,7 @@ static SafesMetaDataViewer* sharedInstance;
     self.tableView.delegate = self;
     self.tableView.doubleAction = @selector(onDoubleClick:);
 
+    [self bindAutoOpenPrimary];
     [self showHideColumns];
     
     [self refresh];
@@ -76,6 +79,16 @@ static SafesMetaDataViewer* sharedInstance;
     if(self.safes.count) {
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     }
+}
+
+- (void)bindAutoOpenPrimary {
+    self.checkboxAutoOpenPrimary.state = Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch ? NSOnState : NSOffState;
+}
+
+- (IBAction)onChangeAutoOpen:(id)sender {
+    Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch = self.checkboxAutoOpenPrimary.state == NSOnState;
+    
+    [self bindAutoOpenPrimary];
 }
 
 - (void)showHideColumns {

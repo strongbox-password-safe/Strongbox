@@ -8,11 +8,13 @@
 
 #import "PreferencesWindowController.h"
 #import "Settings.h"
-#import "PasswordGenerator.h"
+#import "PasswordMaker.h"
 #import "Alerts.h"
 #import "AppDelegate.h"
+#import "Utils.h"
+#import "NSCheckboxTableCellView.h"
 
-@interface PreferencesWindowController ()
+@interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate>
 
 @property (weak) IBOutlet NSButton *switchAutoClearClipboard;
 @property (weak) IBOutlet NSSlider *sliderAutoClearClipboardTimeout;
@@ -35,6 +37,10 @@
 @property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
 @property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
+
+@property (weak) IBOutlet NSTableView *tableViewWordLists;
+
+@property NSArray<NSString*> *sortedWordListKeys;
 
 @end
 
@@ -67,6 +73,8 @@
 - (void)windowDidLoad {
     [super windowDidLoad];
 
+    [self setupPasswordGenerationUi];
+    
     [self bindPasswordUiToSettings];
     [self bindGeneralUiToSettings];
     [self bindAutoFillToSettings];
@@ -77,6 +85,28 @@
     [self.labelSamplePassword addGestureRecognizer:click];
     
     [self refreshSamplePassword];
+}
+
+- (void)setupPasswordGenerationUi {
+    NSDictionary* wordlists = PasswordGenerationConfig.wordLists;
+    
+    self.sortedWordListKeys = [wordlists.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NSString* v1 = wordlists[obj1];
+        NSString* v2 = wordlists[obj2];
+        return finderStringCompare(v1, v2);
+    }];
+    
+    [self.tableViewWordLists registerNib:[[NSNib alloc] initWithNibNamed:@"CheckboxCell" bundle:nil] forIdentifier:@"CheckboxCell"];
+    
+    self.tableViewWordLists.delegate = self;
+    self.tableViewWordLists.dataSource = self;
+    
+    self.textFieldWordSeparator.delegate = self;
+}
+
+- (void)controlTextDidChange:(NSNotification *)notification {
+    NSTextField *textField = [notification object];
+    [self onChangePasswordParameters:textField];
 }
 
 - (void)bindGeneralUiToSettings {
@@ -181,96 +211,164 @@
     self.radioAutolock60Min.state = alt == 3600 ? NSOnState : NSOffState;
 }
 
-- (void)bindPasswordUiToSettings {
-    PasswordGenerationParameters *params = Settings.sharedInstance.passwordGenerationParameters;
-    
-    self.radioBasic.state = params.algorithm == kBasic ? NSOnState : NSOffState;
-    self.radioXkcd.state = params.algorithm == kXkcd ? NSOnState : NSOffState;
-    self.checkboxUseLower.state = params.useLower ? NSOnState : NSOffState;
-    self.checkboxUseUpper.state = params.useUpper ? NSOnState : NSOffState;
-    self.checkboxUseDigits.state = params.useDigits ? NSOnState : NSOffState;
-    self.checkboxUseSymbols.state = params.useSymbols ? NSOnState : NSOffState;
-    self.checkboxUseEasy.state = params.easyReadOnly ? NSOnState : NSOffState;
-    
-    self.labelMinimumLength.stringValue =  [NSString stringWithFormat:@"%d", params.minimumLength];
-    self.labelMaximumLength.stringValue =  [NSString stringWithFormat:@"%d", params.maximumLength];
-    self.labelXkcdWordCount.stringValue =  [NSString stringWithFormat:@"%d", params.xkcdWordCount];
-    
-    self.stepperMinimumLength.integerValue = params.minimumLength;
-    self.stepperMaximumLength.integerValue = params.maximumLength;
-    self.stepperXkcdWordCount.integerValue = params.xkcdWordCount;
-    
-    self.checkboxUseLower.enabled = params.algorithm == kBasic;
-    self.checkboxUseUpper.enabled = params.algorithm == kBasic;
-    self.checkboxUseDigits.enabled = params.algorithm == kBasic;
-    self.checkboxUseSymbols.enabled = params.algorithm == kBasic;
-    self.checkboxUseEasy.enabled = params.algorithm == kBasic;
-    
-    self.labelMinimumLength.enabled = params.algorithm == kBasic;
-    self.labelMaximumLength.enabled = params.algorithm == kBasic;
-    self.labelXkcdWordCount.enabled = params.algorithm == kXkcd;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Password Generation
 
+- (void)bindPasswordUiToSettings {
+    PasswordGenerationConfig *params = Settings.sharedInstance.passwordGenerationConfig;
+
+    self.radioBasic.state = params.algorithm == kPasswordGenerationAlgorithmBasic ? NSOnState : NSOffState;
+    self.radioXkcd.state = params.algorithm == kPasswordGenerationAlgorithmDiceware ? NSOnState : NSOffState;
+
+    // Basic - Enabled
+    self.checkboxUseLower.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxUseUpper.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxUseDigits.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxUseSymbols.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxUseEasy.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxNonAmbiguous.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxPickFromEveryGroup.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.sliderPasswordLength.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.labelPasswordLength.textColor = params.algorithm == kBasic ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-    self.labelMinimum.textColor = params.algorithm == kBasic ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-    self.labelMaximum.textColor = params.algorithm == kBasic ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-    self.labelWordcount.textColor = params.algorithm == kXkcd ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
     
-    self.stepperMinimumLength.enabled = params.algorithm == kBasic;
-    self.stepperMaximumLength.enabled = params.algorithm == kBasic;
-    self.stepperXkcdWordCount.enabled = params.algorithm == kXkcd;
+    // Basic - Values
+    
+    self.checkboxUseLower.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolLower)] ? NSOnState : NSOffState;
+    self.checkboxUseUpper.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolUpper)] ? NSOnState : NSOffState;
+    self.checkboxUseDigits.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolNumeric)] ? NSOnState : NSOffState;
+    self.checkboxUseSymbols.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolSymbols)] ? NSOnState : NSOffState;
+    self.checkboxUseEasy.state = params.easyReadCharactersOnly ? NSOnState : NSOffState;
+
+    self.checkboxNonAmbiguous.state = params.nonAmbiguousOnly ? NSOnState : NSOffState;
+    self.checkboxPickFromEveryGroup.state = params.pickFromEveryGroup ? NSOnState : NSOffState;
+    self.sliderPasswordLength.integerValue = params.basicLength;
+    self.labelPasswordLength.stringValue = @(params.basicLength).stringValue;
+
+    // Diceware - Enabled
+    
+    self.labelXkcdWordCount.enabled = params.algorithm == kXkcd;
+    self.labelWordcount.textColor = params.algorithm == kXkcd ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
+    self.stepperXkcdWordCount.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
+    self.textFieldWordSeparator.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
+    self.popupCasing.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
+    self.popupHackerify.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
+    self.popupAddSalt.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
+    
+    // Diceware - Values
+    
+    [self.tableViewWordLists reloadData];
+    self.labelXkcdWordCount.stringValue = @(params.wordCount).stringValue;
+    self.stepperXkcdWordCount.integerValue = params.wordCount;
+    
+    self.textFieldWordSeparator.stringValue = params.wordSeparator ? params.wordSeparator : @"";
+    
+    [self.popupCasing selectItem:self.popupCasing.menu.itemArray[params.wordCasing]];
+    [self.popupHackerify selectItem:self.popupHackerify.menu.itemArray[params.hackerify]];
+    [self.popupAddSalt selectItem:self.popupAddSalt.menu.itemArray[params.saltConfig]];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+- (IBAction)onChangePasswordParameters:(id)sender {
+    PasswordGenerationConfig *params = Settings.sharedInstance.passwordGenerationConfig;
 
-- (IBAction)onChangePasswordParameters:(id)sender { 
-    PasswordGenerationParameters *params = Settings.sharedInstance.passwordGenerationParameters;
+    params.algorithm = self.radioBasic.state == NSOnState ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
+
+    // Lower
     
-    params.algorithm = self.radioBasic.state == NSOnState ? kBasic : kXkcd;
-    //self.radioXkcd.state == NSOnState;
-    params.useLower = self.checkboxUseLower.state == NSOnState;
-    params.useUpper = self.checkboxUseUpper.state == NSOnState;
-    params.useDigits = self.checkboxUseDigits.state == NSOnState;
-    params.useSymbols = self.checkboxUseSymbols.state == NSOnState;
-    params.easyReadOnly = self.checkboxUseEasy.state == NSOnState;
-    
-    params.minimumLength = (int)self.stepperMinimumLength.integerValue;
-    params.maximumLength = (int)self.stepperMaximumLength.integerValue;
-    params.xkcdWordCount = (int)self.stepperXkcdWordCount.integerValue;
-    
-    if(params.minimumLength > params.maximumLength) {
-        params.minimumLength = params.maximumLength;
+    NSMutableArray<NSNumber*> *newGroups = params.useCharacterGroups.mutableCopy;
+    if(self.checkboxUseLower.state == NSOnState) {
+        [newGroups addObject:@(kPasswordGenerationCharacterPoolLower)];
     }
-    
-    if(params.minimumLength <= 0) {
-        params.minimumLength = 1;
-    }
-    
-    if(params.maximumLength > 512){
-        params.maximumLength = 512;
-    }
-    
-    if(params.maximumLength < params.minimumLength) {
-        params.maximumLength = params.minimumLength;
+    else {
+        [newGroups removeObject:@(kPasswordGenerationCharacterPoolLower)];
     }
 
-    if(params.xkcdWordCount < 2){
-        params.xkcdWordCount = 2;
-    }
+    // Upper
     
-    if(params.xkcdWordCount > 50){
-        params.xkcdWordCount = 50;
+    if(self.checkboxUseUpper.state == NSOnState) {
+        [newGroups addObject:@(kPasswordGenerationCharacterPoolUpper)];
     }
-    
-    if(!params.useLower && !params.useUpper && !params.useDigits && !params.useSymbols) {
-        params.useLower = YES;
-        [Alerts info:@"You must use at least one of the character pools." informativeText:@"Invalid Settings" window:self.window completion:nil];
+    else {
+        [newGroups removeObject:@(kPasswordGenerationCharacterPoolUpper)];
     }
+
+    // Numeric
     
-    Settings.sharedInstance.passwordGenerationParameters = params;
+    if(self.checkboxUseDigits.state == NSOnState) {
+        [newGroups addObject:@(kPasswordGenerationCharacterPoolNumeric)];
+    }
+    else {
+        [newGroups removeObject:@(kPasswordGenerationCharacterPoolNumeric)];
+    }
+
+    // Symbols
+    
+    if(self.checkboxUseSymbols.state == NSOnState) {
+        [newGroups addObject:@(kPasswordGenerationCharacterPoolSymbols)];
+    }
+    else {
+        [newGroups removeObject:@(kPasswordGenerationCharacterPoolSymbols)];
+    }
+    params.useCharacterGroups = newGroups;
+
+    params.easyReadCharactersOnly = self.checkboxUseEasy.state == NSOnState;
+    params.nonAmbiguousOnly = self.checkboxNonAmbiguous.state == NSOnState;
+    params.pickFromEveryGroup = self.checkboxPickFromEveryGroup.state == NSOnState;
+    params.basicLength = self.sliderPasswordLength.integerValue;
+
+    // Diceware
+    
+    params.wordCount = (int)self.stepperXkcdWordCount.integerValue;
+    params.wordSeparator = self.textFieldWordSeparator.stringValue;
+    
+    params.wordCasing = [self.popupCasing.menu.itemArray indexOfObject:self.popupCasing.selectedItem];
+    params.hackerify = [self.popupHackerify.menu.itemArray indexOfObject:self.popupHackerify.selectedItem];
+    params.saltConfig = [self.popupAddSalt.menu.itemArray indexOfObject:self.popupAddSalt.selectedItem];
+
+    // Save
+    
+    Settings.sharedInstance.passwordGenerationConfig = params;
     
     [self bindPasswordUiToSettings];
     [self refreshSamplePassword];
 }
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    return self.sortedWordListKeys.count;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    NSCheckboxTableCellView *result = [tableView makeViewWithIdentifier:@"CheckboxCell" owner:self];
+    
+    PasswordGenerationConfig *params = Settings.sharedInstance.passwordGenerationConfig;
+    NSString* wordListKey = self.sortedWordListKeys[row];
+    
+    result.checkbox.state = [params.wordLists containsObject:wordListKey];
+    [result.checkbox setTitle:PasswordGenerationConfig.wordLists[wordListKey]];
+    
+    result.onClicked = ^(BOOL checked) {
+        NSLog(@"%@ - %d", wordListKey, checked);
+        NSMutableArray *set = [Settings.sharedInstance.passwordGenerationConfig.wordLists mutableCopy];
+        if(checked) {
+            [set addObject:wordListKey];
+        }
+        else {
+            [set removeObject:wordListKey];
+        }
+        
+        PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+        config.wordLists = set;
+        [Settings.sharedInstance setPasswordGenerationConfig:config];
+        
+        [self bindPasswordUiToSettings];
+        [self refreshSamplePassword];
+    };
+    
+    result.checkbox.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
+    
+    return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction)onAutolockChange:(id)sender {
     if(self.radioAutolockNever.state == NSOnState) {
@@ -408,7 +506,8 @@
 }
 
 -(void)refreshSamplePassword {
-    self.labelSamplePassword.stringValue = [PasswordGenerator generatePassword:Settings.sharedInstance.passwordGenerationParameters];
+    NSString* sample = [PasswordMaker.sharedInstance generateForConfig:Settings.sharedInstance.passwordGenerationConfig];
+    self.labelSamplePassword.stringValue = sample ? sample : @"<Could not Generate>";
 }
 
 - (int)autoFillModeToSegmentIndex:(AutoFillMode)mode {

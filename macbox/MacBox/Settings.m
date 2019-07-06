@@ -41,6 +41,11 @@ static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFie
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 //static NSString* const kShowDatabasesListAtStartup = @"showDatabasesListAtStartup";
 
+static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
+static NSString* const kMigratedToNewPasswordGenerator = @"migratedToNewPasswordGenerator";
+
+static NSString* const kAutoOpenFirstDatabaseOnEmptyLaunch = @"autoOpenFirstDatabaseOnEmptyLaunch";
+
 static NSString* const kVisibleColumns = @"visibleColumns";
 NSString* const kTitleColumn = @"TitleColumn";
 NSString* const kUsernameColumn = @"UsernameColumn";
@@ -55,6 +60,46 @@ NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 @implementation Settings
+
+- (BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
+    return [self getBool:kAutoOpenFirstDatabaseOnEmptyLaunch];
+}
+
+- (void)setAutoOpenFirstDatabaseOnEmptyLaunch:(BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
+    [self setBool:kAutoOpenFirstDatabaseOnEmptyLaunch value:autoOpenFirstDatabaseOnEmptyLaunch];
+}
+
+- (BOOL)migratedToNewPasswordGenerator {
+    return [self getBool:kMigratedToNewPasswordGenerator];
+}
+
+- (void)setMigratedToNewPasswordGenerator:(BOOL)migratedToNewPasswordGenerator {
+    [self setBool:kMigratedToNewPasswordGenerator value:migratedToNewPasswordGenerator];
+}
+
+- (PasswordGenerationConfig *)passwordGenerationConfig {
+    NSUserDefaults *defaults = [self getUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationConfig];
+    
+    if(encodedObject == nil) {
+        return [PasswordGenerationConfig defaults];
+    }
+    
+    PasswordGenerationConfig *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    
+    return object;
+}
+
+- (void)setPasswordGenerationConfig:(PasswordGenerationConfig *)passwordGenerationConfig {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationConfig];
+    NSUserDefaults *defaults = [self getUserDefaults];
+    [defaults setObject:encodedObject forKey:kPasswordGenerationConfig];
+    [defaults synchronize];
+}
+
+- (NSUserDefaults*)getUserDefaults {
+    return [NSUserDefaults standardUserDefaults];
+}
 
 + (instancetype)sharedInstance {
     static Settings *sharedInstance = nil;

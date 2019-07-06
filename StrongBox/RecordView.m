@@ -989,18 +989,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.accessed = [[NSDate alloc] init];
     self.record.fields.modified = [[NSDate alloc] init];
     
-    [self.record setTitle:historicalNode.title allowDuplicateGroupTitles:NO];
-    self.record.iconId = historicalNode.iconId;
-    self.record.customIconUuid = historicalNode.customIconUuid;
-    
-    self.record.fields.username = historicalNode.fields.username;
-    self.record.fields.url = historicalNode.fields.url;
-    self.record.fields.password = historicalNode.fields.password;
-    self.record.fields.notes = historicalNode.fields.notes;
-    self.record.fields.passwordModified = historicalNode.fields.passwordModified;
-    
-    self.record.fields.attachments = [historicalNode.fields cloneAttachments];
-    self.record.fields.customFields = [historicalNode.fields cloneCustomFields];
+    [self.record restoreFromHistoricalNode:historicalNode];
     
     // Sync
     

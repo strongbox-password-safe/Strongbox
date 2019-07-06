@@ -52,6 +52,8 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    [self performMigrations];
+    
     [self removeUnwantedMenuItems];
     [self removeCopyDiagnosticDumpItem];
     [self removeShowSafesMetaDataItem];
@@ -93,6 +95,9 @@
 //    NSDocumentController *controller = [NSDocumentController sharedDocumentController];
 //    NSArray *documents = [controller recentDocumentURLs];
     
+    
+    
+    
     // TODO: Might be nice to open last here - offer the option
     
 //    NSLog(@"Recent Documents: [%@]", documents);
@@ -105,6 +110,51 @@
     self.applicationHasFinishedLaunching = YES;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+}
+
+- (void)performMigrations {
+    // 2-Jul-2019
+    
+    if(!Settings.sharedInstance.migratedToNewPasswordGenerator) {
+        [self migrateToNewPasswordGenerator];
+    }
+}
+
+- (void)migrateToNewPasswordGenerator {
+    NSLog(@"Migrating to new Password Generation System...");
+    
+    PasswordGenerationConfig* newConfig = Settings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationParameters* oldConfig = Settings.sharedInstance.passwordGenerationParameters;
+    
+    newConfig.algorithm = oldConfig.algorithm == kBasic ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
+    
+    newConfig.basicLength = oldConfig.maximumLength;
+    
+    NSMutableArray<NSNumber*>* characterGroups = @[].mutableCopy;
+    if(oldConfig.useLower) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolLower)];
+    }
+    if(oldConfig.useUpper) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolUpper)];
+    }
+    if(oldConfig.useDigits) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolNumeric)];
+    }
+    if(oldConfig.useSymbols) {
+        [characterGroups addObject:@(kPasswordGenerationCharacterPoolSymbols)];
+    }
+    
+    newConfig.useCharacterGroups = characterGroups.copy;
+    newConfig.easyReadCharactersOnly = oldConfig.easyReadOnly;
+    newConfig.nonAmbiguousOnly = YES;
+    newConfig.pickFromEveryGroup = NO;
+    
+    newConfig.wordCount = oldConfig.xkcdWordCount;
+    newConfig.wordSeparator = oldConfig.wordSeparator;
+    newConfig.hackerify = NO;
+    
+    Settings.sharedInstance.passwordGenerationConfig = newConfig;
+    Settings.sharedInstance.migratedToNewPasswordGenerator = YES;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

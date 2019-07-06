@@ -22,18 +22,21 @@
 @property (weak) IBOutlet NSButton *checkboxUseDigits;
 @property (weak) IBOutlet NSButton *checkboxUseSymbols;
 @property (weak) IBOutlet NSButton *checkboxUseEasy;
-@property (weak) IBOutlet NSTextField *labelMinimumLength;
-@property (weak) IBOutlet NSTextField *labelMaximumLength;
+@property (weak) IBOutlet NSButton *checkboxNonAmbiguous;
+@property (weak) IBOutlet NSButton *checkboxPickFromEveryGroup;
+@property (weak) IBOutlet NSSlider *sliderPasswordLength;
+@property (weak) IBOutlet NSTextField *labelPasswordLength;
+
 @property (weak) IBOutlet NSTextField *labelXkcdWordCount;
-@property (weak) IBOutlet NSStepper *stepperMinimumLength;
-@property (weak) IBOutlet NSStepper *stepperMaximumLength;
 @property (weak) IBOutlet NSStepper *stepperXkcdWordCount;
+@property (weak) IBOutlet NSTextField *textFieldWordSeparator;
+@property (weak) IBOutlet NSPopUpButton *popupCasing;
+@property (weak) IBOutlet NSPopUpButton *popupHackerify;
+@property (weak) IBOutlet NSPopUpButton *popupAddSalt;
+
 @property (weak) IBOutlet NSTextField *labelSamplePassword;
 @property (weak) IBOutlet NSTabView *tabView;
 
-@property (weak) IBOutlet NSTextField *labelPasswordLength;
-@property (weak) IBOutlet NSTextField *labelMinimum;
-@property (weak) IBOutlet NSTextField *labelMaximum;
 @property (weak) IBOutlet NSTextField *labelWordcount;
 
 @property (weak) IBOutlet NSButton *checkboxAutoSave;

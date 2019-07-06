@@ -163,7 +163,7 @@
     self.cellAlgorithm.detailTextLabel.text = self.config.algorithm == kPasswordGenerationAlgorithmBasic ? @"Basic" : @"Diceware (XKCD)";
     
     NSArray<NSString*> *characterGroups = [self.config.useCharacterGroups map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [self characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
+        return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
     }];
     NSString* useGroups = [characterGroups componentsJoinedByString:@", "];
     self.cellUseCharacterGroups.detailTextLabel.text = [NSString stringWithFormat:@"Using: %@", useGroups];
@@ -190,11 +190,11 @@
     
     self.cellWordSeparator.detailTextLabel.text = self.config.wordSeparator;
     
-    self.cellCasing.detailTextLabel.text = [self getCasingStringForCasing:self.config.wordCasing];
+    self.cellCasing.detailTextLabel.text = [PasswordGenerationConfig getCasingStringForCasing:self.config.wordCasing];
     
-    self.cellHackerify.detailTextLabel.text = [self getHackerifyLevel:self.config.hackerify];
+    self.cellHackerify.detailTextLabel.text = [PasswordGenerationConfig getHackerifyLevel:self.config.hackerify];
     
-    self.cellAddSalt.detailTextLabel.text = [self getSaltLevel:self.config.saltConfig];
+    self.cellAddSalt.detailTextLabel.text = [PasswordGenerationConfig getSaltLevel:self.config.saltConfig];
     
     [self bindBasicLengthSlider];
     [self bindWordCountSlider];
@@ -307,7 +307,7 @@
                                 @(kPasswordGenerationSaltConfigSuffix)];
     
     NSArray<NSString*>* options = [opt map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [self getSaltLevel:obj.integerValue];
+        return [PasswordGenerationConfig getSaltLevel:obj.integerValue];
     }];
     
     NSUInteger index = [opt indexOfObject:@(self.config.saltConfig)];
@@ -331,7 +331,7 @@
                                 @(kPasswordGenerationHackerifyLevelProAll)];
     
     NSArray<NSString*>* options = [opt map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [self getHackerifyLevel:obj.integerValue];
+        return [PasswordGenerationConfig getHackerifyLevel:obj.integerValue];
     }];
     
     NSUInteger index = [opt indexOfObject:@(self.config.hackerify)];
@@ -355,7 +355,7 @@
                                @(kPasswordGenerationWordCasingRandom)];
     
     NSArray<NSString*>* options = [opt map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [self getCasingStringForCasing:obj.integerValue];
+        return [PasswordGenerationConfig getCasingStringForCasing:obj.integerValue];
     }];
     
     NSUInteger index = [opt indexOfObject:@(self.config.wordCasing)];
@@ -412,7 +412,7 @@
                                       @(kPasswordGenerationCharacterPoolSymbols)];
     
     NSArray<NSString*> *poolsStrings = [pools map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [self characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
+        return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
     }];
     
     NSMutableIndexSet *selected = [NSMutableIndexSet indexSet];
@@ -508,86 +508,6 @@
     
     vc.title = title;
     [self.navigationController pushViewController:vc animated:YES];
-}
-
-- (NSString*)getCasingStringForCasing:(PasswordGenerationWordCasing)casing {
-    switch (casing) {
-        case kPasswordGenerationWordCasingNoChange:
-            return @"Do Not Change";
-            break;
-        case kPasswordGenerationWordCasingLower:
-            return @"Lowercase";
-            break;
-        case kPasswordGenerationWordCasingUpper:
-            return @"Uppercase";
-            break;
-        case kPasswordGenerationWordCasingTitle:
-            return @"Title Case";
-            break;
-        case kPasswordGenerationWordCasingRandom:
-            return @"Random";
-            break;
-        default:
-            return @"Unknown";
-            break;
-    }
-}
-
-- (NSString*)characterPoolToPoolString:(PasswordGenerationCharacterPool)pool {
-    switch (pool) {
-        case kPasswordGenerationCharacterPoolLower:
-            return @"Lowercase";
-            break;
-        case kPasswordGenerationCharacterPoolUpper:
-            return @"Uppercase";
-            break;
-        case kPasswordGenerationCharacterPoolNumeric:
-            return @"Numeric";
-            break;
-        case kPasswordGenerationCharacterPoolSymbols:
-            return @"Symbols";
-            break;
-        default:
-            return @"Unknown";
-            break;
-    }
-}
-
-- (NSString*)getHackerifyLevel:(PasswordGenerationHackerifyLevel)level {
-    switch (level) {
-        case kPasswordGenerationHackerifyLevelNone:
-            return @"None";
-            break;
-        case kPasswordGenerationHackerifyLevelBasicSome:
-            return @"Basic (Some Words)";
-            break;
-        case kPasswordGenerationHackerifyLevelBasicAll:
-            return @"Basic (All Words)";
-            break;
-        case kPasswordGenerationHackerifyLevelProSome:
-            return @"Pro (Some Words)";
-            break;
-        case kPasswordGenerationHackerifyLevelProAll:
-            return @"Pro (All Words)";
-            break;
-    }
-}
-
-- (NSString*)getSaltLevel:(PasswordGenerationSaltConfig)salt {
-    switch (salt) {
-        case kPasswordGenerationSaltConfigNone:
-            return @"None";
-            break;
-        case kPasswordGenerationSaltConfigPrefix:
-            return @"Prefix";
-            break;
-        case kPasswordGenerationSaltConfigSprinkle:
-            return @"Sprinkle";
-            break;
-        case kPasswordGenerationSaltConfigSuffix:
-            return @"Suffix";
-            break;
-    }
 }
 
 @end

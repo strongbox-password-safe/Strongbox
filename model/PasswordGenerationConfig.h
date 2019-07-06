@@ -52,6 +52,11 @@ typedef NS_ENUM (NSInteger, PasswordGenerationSaltConfig) {
 + (instancetype)defaults;
 + (NSDictionary<NSString*, NSString*>*)wordLists;
 
++ (NSString*)getCasingStringForCasing:(PasswordGenerationWordCasing)casing;
++ (NSString*)characterPoolToPoolString:(PasswordGenerationCharacterPool)pool;
++ (NSString*)getHackerifyLevel:(PasswordGenerationHackerifyLevel)level;
++ (NSString*)getSaltLevel:(PasswordGenerationSaltConfig)salt;
+
 @property PasswordGenerationAlgo algorithm;
 
 @property NSInteger basicLength;

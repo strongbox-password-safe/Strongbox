@@ -133,7 +133,7 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
         NSLog(@"All Words Cache Miss! Boo");
         self.allWordsCacheKey = currentWordListsCacheKey;
         
-        
+
         NSArray<NSString*>* all = [config.wordLists flatMap:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
             return [self getWordsForList:obj];
         }];
@@ -187,6 +187,7 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
                                       @(kPasswordGenerationCharacterPoolUpper),
                                       @(kPasswordGenerationCharacterPoolSymbols),
                                       @(kPasswordGenerationCharacterPoolNumeric)];
+    
     saltConfig.easyReadCharactersOnly = YES;
     saltConfig.nonAmbiguousOnly = YES;
     

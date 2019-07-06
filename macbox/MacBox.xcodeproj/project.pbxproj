@@ -12,7 +12,6 @@
 		4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
 		4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
 		4D14A13A224D1A9400C71ABF /* NodeDetailsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D14A138224D1A9400C71ABF /* NodeDetailsWindowController.xib */; };
-		4D216F5222CBCCAC000954D0 /* PasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5122CBCCAC000954D0 /* PasswordGenerator.m */; };
 		4D216F5522CBCCDE000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
 		4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
 		4D216F6B22CBCE0D000954D0 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
@@ -94,6 +93,7 @@
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
+		4D75D08A22CFED3000D704BF /* CheckboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D75D08922CFED3000D704BF /* CheckboxCell.xib */; };
 		4D7E39D52266420600EC940E /* InstalledWebBrowserHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39D42266420600EC940E /* InstalledWebBrowserHelper.m */; };
 		4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87F8AB22304A04006A6320 /* NSData+GZIP.m */; };
 		4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */; };
@@ -163,6 +163,7 @@
 		4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
+		4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
 		4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
 		4DDA015D2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */; };
 		4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
@@ -220,8 +221,6 @@
 		4D0835A82284732500CA7405 /* StrongboxDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = ../model/StrongboxDatabase.h; sourceTree = "<group>"; };
 		4D0835A92284732500CA7405 /* StrongboxDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxDatabase.m; path = ../model/StrongboxDatabase.m; sourceTree = "<group>"; };
 		4D14A138224D1A9400C71ABF /* NodeDetailsWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = NodeDetailsWindowController.xib; path = MacBox/NodeDetailsWindowController.xib; sourceTree = "<group>"; };
-		4D216F5022CBCCAC000954D0 /* PasswordGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerator.h; path = MacBox/PasswordGenerator.h; sourceTree = "<group>"; };
-		4D216F5122CBCCAC000954D0 /* PasswordGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerator.m; path = MacBox/PasswordGenerator.m; sourceTree = "<group>"; };
 		4D216F5322CBCCDE000954D0 /* PasswordMaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = ../model/PasswordMaker.h; sourceTree = "<group>"; };
 		4D216F5422CBCCDE000954D0 /* PasswordMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = ../model/PasswordMaker.m; sourceTree = "<group>"; };
 		4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = ../model/PasswordGenerationConfig.m; sourceTree = "<group>"; };
@@ -376,6 +375,7 @@
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UpgradeWindowController.xib; path = MacBox/UpgradeWindowController.xib; sourceTree = "<group>"; };
+		4D75D08922CFED3000D704BF /* CheckboxCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CheckboxCell.xib; path = MacBox/CheckboxCell.xib; sourceTree = "<group>"; };
 		4D7E39D32266420600EC940E /* InstalledWebBrowserHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InstalledWebBrowserHelper.h; sourceTree = "<group>"; };
 		4D7E39D42266420600EC940E /* InstalledWebBrowserHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InstalledWebBrowserHelper.m; sourceTree = "<group>"; };
 		4D87F8AB22304A04006A6320 /* NSData+GZIP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+GZIP.m"; path = "../lib/GZIP/NSData+GZIP.m"; sourceTree = "<group>"; };
@@ -516,6 +516,8 @@
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DocumentController.h; path = MacBox/DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DocumentController.m; path = MacBox/DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = MacBox/Credits.rtf; sourceTree = "<group>"; };
+		4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSCheckboxTableCellView.h; path = MacBox/NSCheckboxTableCellView.h; sourceTree = "<group>"; };
+		4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSCheckboxTableCellView.m; path = MacBox/NSCheckboxTableCellView.m; sourceTree = "<group>"; };
 		4DDA01582242A1B300C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "../StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
 		4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "../StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
 		4DDA015B2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextBooleanElementHandler.h; path = ../model/keepass/GenericTextBooleanElementHandler.h; sourceTree = "<group>"; };
@@ -643,8 +645,6 @@
 			isa = PBXGroup;
 			children = (
 				4D216F5B22CBCDBF000954D0 /* Word Lists */,
-				4D216F5022CBCCAC000954D0 /* PasswordGenerator.h */,
-				4D216F5122CBCCAC000954D0 /* PasswordGenerator.m */,
 				4D216F5322CBCCDE000954D0 /* PasswordMaker.h */,
 				4D216F5422CBCCDE000954D0 /* PasswordMaker.m */,
 				4D216F5722CBCD16000954D0 /* PasswordGenerationConfig.h */,
@@ -1153,6 +1153,9 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D75D08922CFED3000D704BF /* CheckboxCell.xib */,
+				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
+				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
 				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
@@ -1366,6 +1369,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D58A45D207368B10061E046 /* PreferencesWindowController.xib in Resources */,
+				4D75D08A22CFED3000D704BF /* CheckboxCell.xib in Resources */,
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4DF299802243CEAD0080F9DC /* CollectionViewHeader.xib in Resources */,
 				4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */,
@@ -1461,7 +1465,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
-				4D216F5222CBCCAC000954D0 /* PasswordGenerator.m in Sources */,
 				4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */,
 				4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */,
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
@@ -1514,6 +1517,7 @@
 				4D524D0A219B490100C22CB4 /* NodeFileAttachment.m in Sources */,
 				4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */,
 				4D29664121ADAC0B009B7936 /* CustomField.m in Sources */,
+				4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */,
 				4D524CEB219B481200C22CB4 /* KeePassCiphers.m in Sources */,
 				4D524CAE219B474200C22CB4 /* CHCSVParser.m in Sources */,
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,

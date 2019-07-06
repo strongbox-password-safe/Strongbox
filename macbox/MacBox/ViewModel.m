@@ -10,7 +10,7 @@
 #import "ViewModel.h"
 #import "Csv.h"
 #import "DatabaseModel.h"
-#import "PasswordGenerator.h"
+#import "PasswordMaker.h"
 #import "Settings.h"
 #import "Node+OtpToken.h"
 #import "OTPToken+Serialization.h"
@@ -487,19 +487,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.accessed = [[NSDate alloc] init];
     item.fields.modified = [[NSDate alloc] init];
     
-    // TODO: This should be a function on Node - copyFromNode(Node* node) or something - also find it iOS app...
-    
-    [item setTitle:historicalItem.title allowDuplicateGroupTitles:YES];
-    item.iconId = historicalItem.iconId;
-    item.customIconUuid = historicalItem.customIconUuid;
-    
-    item.fields.username = historicalItem.fields.username;
-    item.fields.url = historicalItem.fields.url;
-    item.fields.password = historicalItem.fields.password;
-    item.fields.notes = historicalItem.fields.notes;
-    item.fields.passwordModified = historicalItem.fields.passwordModified;
-    item.fields.attachments = [historicalItem.fields cloneAttachments];
-    item.fields.customFields = [historicalItem.fields cloneCustomFields];
+    [item restoreFromHistoricalNode:historicalItem];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] restoreHistoryItem:item
                                                                       historicalItem:originalNode
@@ -982,8 +970,7 @@ NSString* getSmartFillNotes() {
 }
 
 - (NSString*)generatePassword {
-    PasswordGenerationParameters *params = [[Settings sharedInstance] passwordGenerationParameters];
-    return [PasswordGenerator generatePassword:params];
+    return [PasswordMaker.sharedInstance generateForConfigOrDefault:Settings.sharedInstance.passwordGenerationConfig];
 }
 
 - (NSSet<NSString*> *)emailSet {

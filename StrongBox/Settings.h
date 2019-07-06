@@ -117,7 +117,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 
-
 NS_ASSUME_NONNULL_END
 
 @end

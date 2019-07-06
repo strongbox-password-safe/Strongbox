@@ -373,6 +373,21 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     return match != nil;
 }
 
+- (void)restoreFromHistoricalNode:(Node *)historicalItem {
+    [self setTitle:historicalItem.title allowDuplicateGroupTitles:YES];
+    self.iconId = historicalItem.iconId;
+    self.customIconUuid = historicalItem.customIconUuid;
+    self.fields.username = historicalItem.fields.username;
+    self.fields.url = historicalItem.fields.url;
+    self.fields.password = historicalItem.fields.password;
+    self.fields.email = historicalItem.fields.email;
+    self.fields.notes = historicalItem.fields.notes;
+    self.fields.passwordModified = historicalItem.fields.passwordModified;
+    self.fields.attachments = [historicalItem.fields cloneAttachments];
+    self.fields.customFields = [historicalItem.fields cloneCustomFields];
+    self.fields.expires = historicalItem.fields.expires;
+}
+
 - (NSString*)recursiveTreeDescription:(uint32_t)indentLevel {
     NSMutableString *ret = [NSMutableString string];
     

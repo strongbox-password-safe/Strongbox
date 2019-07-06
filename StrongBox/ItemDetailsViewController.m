@@ -1175,19 +1175,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
     self.item.fields.accessed = [[NSDate alloc] init];
     self.item.fields.modified = [[NSDate alloc] init];
     
-    [self.item setTitle:historicalNode.title allowDuplicateGroupTitles:YES];
-    self.item.iconId = historicalNode.iconId;
-    self.item.customIconUuid = historicalNode.customIconUuid;
+    [self.item restoreFromHistoricalNode:historicalNode];
     
-    self.item.fields.username = historicalNode.fields.username;
-    self.item.fields.url = historicalNode.fields.url;
-    self.item.fields.password = historicalNode.fields.password;
-    self.item.fields.notes = historicalNode.fields.notes;
-    self.item.fields.passwordModified = historicalNode.fields.passwordModified;
-    
-    self.item.fields.attachments = [historicalNode.fields cloneAttachments];
-    self.item.fields.customFields = [historicalNode.fields cloneCustomFields];
-
     [self performFullReload];
     
     // Sync

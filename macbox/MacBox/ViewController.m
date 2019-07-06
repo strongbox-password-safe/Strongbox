@@ -1867,7 +1867,7 @@ static NSImage* kStrongBox256Image;
         return item && !item.isGroup && item.fields.otpToken;
     }
     else if (theAction == @selector(onCopyNotes:)) {
-        return item && !item.isGroup && self.textViewNotes.textStorage.string.length; // TODO: Group can have notes
+        return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
     else if (theAction == @selector(onClearTouchId:)) {
         SafeMetaData* metaData = [self getDatabaseMetaData];

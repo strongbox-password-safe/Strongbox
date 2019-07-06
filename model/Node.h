@@ -79,6 +79,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (Node*_Nullable)findFirstChild:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate;
 - (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate;
 
+- (void)restoreFromHistoricalNode:(Node*)historicalItem;
+
 ///////////////////////////////////////////////
 // For use by any Safe Format Provider
 //

@@ -8,6 +8,13 @@
 
 #import "PasswordGenerationConfig.h"
 
+@interface PasswordGenerationConfig ()
+
+@property NSSet<NSNumber*>* characterPools;
+@property NSSet<NSString*>* dicewareLists;
+
+@end
+
 @implementation PasswordGenerationConfig
 
 static NSString* const kWordListSecureDrop = @"securedrop.wordlist.utf8";
@@ -37,10 +44,10 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
                           kWordListEffLarge : @"EFF Large",
                           kWordListBeale : @"Beale",
                           kWordListCatalan : @"Catalan",
-                          kWordListDiceware : @"Diceware (Original)",
+                          kWordListDiceware : @"Diceware (Arnold G. Reinhold's Original)",
                           kWordListDutch : @"Dutch",
                           kWordListEffShort1 : @"EFF Short (v1.0)",
-                          kWordListEffShort2 : @"EFF Short (v2.0)",
+                          kWordListEffShort2 : @"EFF Short (v2.0 - More memorable, unique prefix)",
                           kWordListFrench : @"French",
                           kWordListGerman : @"German",
                           kWordListGoogleUsNoSwears : @"Google (U.S. English, No Swears)",
@@ -59,10 +66,10 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
     ret.algorithm = kPasswordGenerationAlgorithmBasic;
     
     ret.basicLength = 16;
-    ret.useCharacterGroups = @[@(kPasswordGenerationCharacterPoolLower),
-                               @(kPasswordGenerationCharacterPoolUpper),
-                               @(kPasswordGenerationCharacterPoolNumeric),
-                               @(kPasswordGenerationCharacterPoolSymbols)];
+    ret.useCharacterGroups = [NSSet setWithArray:@[@(kPasswordGenerationCharacterPoolLower),
+                                                  @(kPasswordGenerationCharacterPoolUpper),
+                                                  @(kPasswordGenerationCharacterPoolNumeric),
+                                                  @(kPasswordGenerationCharacterPoolSymbols)]].mutableCopy;
     
     ret.easyReadCharactersOnly = YES;
     ret.nonAmbiguousOnly = YES;
@@ -79,6 +86,17 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
 
 + (NSDictionary<NSString*, NSString*>*)wordLists {
     return wordLists.copy;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.dicewareLists = [NSSet set];
+        self.characterPools = [NSSet set];
+    }
+    
+    return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
@@ -120,6 +138,102 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
     }
     
     return self;
+}
+
++ (NSString*)getCasingStringForCasing:(PasswordGenerationWordCasing)casing {
+    switch (casing) {
+        case kPasswordGenerationWordCasingNoChange:
+            return @"Do Not Change";
+            break;
+        case kPasswordGenerationWordCasingLower:
+            return @"Lowercase";
+            break;
+        case kPasswordGenerationWordCasingUpper:
+            return @"Uppercase";
+            break;
+        case kPasswordGenerationWordCasingTitle:
+            return @"Title Case";
+            break;
+        case kPasswordGenerationWordCasingRandom:
+            return @"Random";
+            break;
+        default:
+            return @"Unknown";
+            break;
+    }
+}
+
++ (NSString*)characterPoolToPoolString:(PasswordGenerationCharacterPool)pool {
+    switch (pool) {
+        case kPasswordGenerationCharacterPoolLower:
+            return @"Lowercase";
+            break;
+        case kPasswordGenerationCharacterPoolUpper:
+            return @"Uppercase";
+            break;
+        case kPasswordGenerationCharacterPoolNumeric:
+            return @"Numeric";
+            break;
+        case kPasswordGenerationCharacterPoolSymbols:
+            return @"Symbols";
+            break;
+        default:
+            return @"Unknown";
+            break;
+    }
+}
+
++ (NSString*)getHackerifyLevel:(PasswordGenerationHackerifyLevel)level {
+    switch (level) {
+        case kPasswordGenerationHackerifyLevelNone:
+            return @"None";
+            break;
+        case kPasswordGenerationHackerifyLevelBasicSome:
+            return @"Basic (Some Words)";
+            break;
+        case kPasswordGenerationHackerifyLevelBasicAll:
+            return @"Basic (All Words)";
+            break;
+        case kPasswordGenerationHackerifyLevelProSome:
+            return @"Pro (Some Words)";
+            break;
+        case kPasswordGenerationHackerifyLevelProAll:
+            return @"Pro (All Words)";
+            break;
+    }
+}
+
++ (NSString*)getSaltLevel:(PasswordGenerationSaltConfig)salt {
+    switch (salt) {
+        case kPasswordGenerationSaltConfigNone:
+            return @"None";
+            break;
+        case kPasswordGenerationSaltConfigPrefix:
+            return @"Prefix";
+            break;
+        case kPasswordGenerationSaltConfigSprinkle:
+            return @"Sprinkle";
+            break;
+        case kPasswordGenerationSaltConfigSuffix:
+            return @"Suffix";
+            break;
+    }
+}
+
+- (NSArray<NSString *> *)wordLists {
+    return self.dicewareLists.allObjects;
+}
+
+- (void)setWordLists:(NSArray<NSString *> *)wordLists {
+    self.dicewareLists = [NSSet setWithArray:wordLists];
+}
+
+- (NSArray<NSNumber *> *)useCharacterGroups {
+    return self.characterPools.allObjects;
+}
+
+- (void)setUseCharacterGroups:(NSArray<NSNumber *> *)useCharacterGroups {
+    self.characterPools = [NSSet setWithArray:useCharacterGroups];
 }
 
 @end
