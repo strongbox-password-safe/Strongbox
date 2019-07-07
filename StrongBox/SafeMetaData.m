@@ -398,8 +398,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 // Delete me after a while...
 
 - (NSUserDefaults*)getUserDefaults {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
-    return defaults;
+    return [Settings.sharedInstance getUserDefaults];
 }
 
 - (NSInteger)getInteger:(NSString*)key {

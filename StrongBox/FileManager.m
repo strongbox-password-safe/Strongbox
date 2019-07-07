@@ -56,7 +56,12 @@
 }
 
 - (NSURL *)keyFilesDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:kAppGroupName];
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
+    if(!url) {
+        NSLog(@"Could not get container URL for App Group: [%@]", Settings.sharedInstance.appGroupName);
+        return nil;
+    }
+    
     NSURL* ret = [url URLByAppendingPathComponent:@"key-files"];
     
     [self createIfNecessary:ret];
@@ -65,7 +70,11 @@
 }
 
 - (NSURL *)sharedAppGroupDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:kAppGroupName];
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
+    if(!url) {
+        NSLog(@"Could not get container URL for App Group: [%@]", Settings.sharedInstance.appGroupName);
+        return nil;
+    }
     
     [self createIfNecessary:url];
     

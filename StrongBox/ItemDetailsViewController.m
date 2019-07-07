@@ -908,7 +908,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return NO;
     }
 
-    return YES;
+    return self.editing; // TODO: This used to be YES but seems to lead to terrible behaviour with TOTP - Revisit after TOTP Cell Improvements
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {

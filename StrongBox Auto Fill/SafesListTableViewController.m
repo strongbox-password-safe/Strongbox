@@ -89,7 +89,7 @@
 }
 
 - (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
-    return [UIImage imageNamed:@"Strongbox-180x180-greyed"];
+    return [UIImage imageNamed:@"AppIcon-2019-bw-180"];
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView

@@ -2,11 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "Strongbox-256x256.png",
+      "filename" : "Icon-256.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "Icon-512.png",
       "scale" : "2x"
     },
     {

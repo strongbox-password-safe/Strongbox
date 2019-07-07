@@ -637,26 +637,25 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             break;
     }
     
+    // Filter KeePass 1 Backup Group
+    
     if(self.viewModel.database.format == kKeePass1 && !self.viewModel.metadata.showKeePass1BackupGroup) {
         Node* backupGroup = self.viewModel.database.keePass1BackupNode;
         
         if(backupGroup) {
-            if([self.currentGroup contains:backupGroup]) {
-                ret = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
+                ret = [ret filter:^BOOL(Node * _Nonnull obj) {
                     return obj != backupGroup;
                 }];
-            }
         }
     }
+    // Filter KeePass 2 Recycle Bin?
     else if(self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4) {
         Node* recycleBin = self.viewModel.database.recycleBinNode;
         
         if(self.viewModel.metadata.doNotShowRecycleBinInBrowse && recycleBin) {
-            if([self.currentGroup contains:recycleBin]) {
-                ret = [self.currentGroup.children filter:^BOOL(Node * _Nonnull obj) {
-                    return obj != recycleBin;
-                }];
-            }
+            ret = [ret filter:^BOOL(Node * _Nonnull obj) {
+                return obj != recycleBin;
+            }];
         }
     }
     

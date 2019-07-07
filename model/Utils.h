@@ -39,6 +39,7 @@ NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
 NSString* friendlyFileSizeString(long long byteCount);
 NSString *friendlyDateString(NSDate *modDate);
 NSString *friendlyDateStringVeryShort(NSDate *modDate);
+NSString *iso8601DateString(NSDate *modDate);
 
 NSString* xmlCleanupAndTrim(NSString* foo);
 

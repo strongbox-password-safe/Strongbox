@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonUnlock;
 @property NSDate* startTime;
 @property (weak, nonatomic) IBOutlet UILabel *labelUnlockAttemptsRemaining;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
 
 @end
 
@@ -26,6 +27,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self setupImageView];
     
     self.startTime = [[NSDate alloc] init];
     
@@ -43,6 +46,13 @@
     }
     
     [self updateUnlockAttemptsRemainingLabel];
+}
+
+- (void)setupImageView {
+    self.imageViewLogo.userInteractionEnabled = YES;
+    UITapGestureRecognizer *tapGesture1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onUnlock:)];
+    tapGesture1.numberOfTapsRequired = 1;
+    [self.imageViewLogo addGestureRecognizer:tapGesture1];
 }
 
 - (void)updateUnlockAttemptsRemainingLabel {

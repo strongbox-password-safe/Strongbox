@@ -12,6 +12,7 @@
 #import "Utils.h"
 #import "SVProgressHUD/SVProgressHUD.h"
 #import "UiAttachment.h"
+#import "UIImage+FixOrientation.h"
 
 const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 
@@ -48,6 +49,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     
     NSArray<NSString*>* buttonTitles =
     @[  @"Photos",
+        @"Camera",
         @"Files"];
     
     int index = 1;
@@ -73,28 +75,30 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 }
 
 - (void)onAddAttachmentLocationResponse:(int)response {
-    if(response == 2) {
+    if(response == 3) {
         UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
         vc.delegate = self;
         vc.modalPresentationStyle = UIModalPresentationFormSheet;
         
         [self.parentViewController presentViewController:vc animated:YES completion:nil];
     }
-    else if(response == 1) {
+    else if(response == 2 || response == 1) {
         UIImagePickerController *vc = [[UIImagePickerController alloc] init];
         vc.delegate = self;
         vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
         vc.modalPresentationStyle = UIModalPresentationFormSheet;
         
-        BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
+        UIImagePickerControllerSourceType source = response == 1 ? UIImagePickerControllerSourceTypePhotoLibrary : UIImagePickerControllerSourceTypeCamera;
+        
+        BOOL available = [UIImagePickerController isSourceTypeAvailable:source];
         
         if(!available) {
-            [Alerts info:self.parentViewController title:@"Source Unavailable" message:@"Could not access photos source."];
+            [Alerts info:self.parentViewController title:@"Source Unavailable" message:response == 2 ? @"Strongbox could not access the camera. Does it have permission?" : @"Strongbox could not access photos. Does it have permission?"];
             return;
         }
         
         vc.mediaTypes = @[(NSString*)kUTTypeMovie, (NSString*)kUTTypeImage];
-        vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        vc.sourceType = source;
         
         [self.parentViewController presentViewController:vc animated:YES completion:nil];
     }
@@ -125,11 +129,14 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     
     NSURL *url;
     NSData* data;
-    
+    NSString *suggestedFilename = @"image.png";
+
     if(isImage) {
         if (@available(iOS 11.0, *)) {
             url =  [info objectForKey:UIImagePickerControllerImageURL];
-        } else {
+        }
+        
+        if(!url) {
             UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
             
             if(!image) {
@@ -137,21 +144,21 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
                 return;
             }
             
-            data = UIImagePNGRepresentation(image);
+            UIImage* fixed = [image fixOrientation];
+            
+            data = UIImagePNGRepresentation(fixed);
+            suggestedFilename = [NSString stringWithFormat:@"%@.png", iso8601DateString(NSDate.date)];
         }
     }
     else {
         url =  [info objectForKey:UIImagePickerControllerMediaURL];
     }
     
-    NSString *suggestedFilename;
-    
     NSError* error;
     if(url) {
         data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
         suggestedFilename = [url.absoluteString.lastPathComponent stringByRemovingPercentEncoding];
     }
-    suggestedFilename = suggestedFilename.length ? suggestedFilename : @"attachment";
     
     if(!data) {
         NSLog(@"Error: %@", error);

@@ -66,10 +66,10 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
     ret.algorithm = kPasswordGenerationAlgorithmBasic;
     
     ret.basicLength = 16;
-    ret.useCharacterGroups = [NSSet setWithArray:@[@(kPasswordGenerationCharacterPoolLower),
-                                                  @(kPasswordGenerationCharacterPoolUpper),
-                                                  @(kPasswordGenerationCharacterPoolNumeric),
-                                                  @(kPasswordGenerationCharacterPoolSymbols)]].mutableCopy;
+    ret.useCharacterGroups = @[@(kPasswordGenerationCharacterPoolLower),
+                               @(kPasswordGenerationCharacterPoolUpper),
+                               @(kPasswordGenerationCharacterPoolNumeric),
+                               @(kPasswordGenerationCharacterPoolSymbols)];
     
     ret.easyReadCharactersOnly = YES;
     ret.nonAmbiguousOnly = YES;

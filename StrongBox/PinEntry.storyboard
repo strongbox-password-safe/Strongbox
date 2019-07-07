@@ -20,7 +20,7 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="24" translatesAutoresizingMaskIntoConstraints="NO" id="OVN-Dw-JST">
                                 <rect key="frame" x="20" y="127" width="374" height="642.5"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="255" verticalCompressionResistancePriority="744" image="Strongbox-1024x1024-new" translatesAutoresizingMaskIntoConstraints="NO" id="U3e-Ch-M2Y" userLabel="Logo">
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="255" verticalCompressionResistancePriority="744" image="AppIcon-2019-1024" translatesAutoresizingMaskIntoConstraints="NO" id="U3e-Ch-M2Y" userLabel="Logo">
                                         <rect key="frame" x="123" y="0.0" width="128" height="128"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="128" id="3Vc-J7-Jpg"/>
@@ -312,6 +312,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Strongbox-1024x1024-new" width="512" height="512"/>
+        <image name="AppIcon-2019-1024" width="512" height="512"/>
     </resources>
 </document>

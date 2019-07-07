@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* url;
 @property NSString* notes;
 @property NSString* email;
-@property NSDate* expires;
+@property (nullable) NSDate* expires;
 
 @property (nullable) OTPToken* totp;
 @property (readonly) NSArray<CustomFieldViewModel*> *customFields;

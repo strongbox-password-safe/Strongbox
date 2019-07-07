@@ -97,7 +97,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                                               NSError * _Nullable error) {
              NSLog(@"Done! = %@", error);
              if(error) {
-                 [self presentError:error];
+                 [SafesMetaDataViewer show:NO];
              }
          }];
     }

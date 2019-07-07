@@ -124,6 +124,18 @@ NSString *friendlyDateStringVeryShort(NSDate *modDate) {
     return [df stringFromDate:modDate];
 }
 
+NSString *iso8601DateString(NSDate *modDate) {
+    if(!modDate) { return @""; }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    [dateFormatter setLocale:enUSPOSIXLocale];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZZ"];
+
+    return [dateFormatter stringFromDate:modDate];
+}
+
+
 NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     // 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C => 46C9B1FFBD4ABC4BBB260C6190BAD20C
     

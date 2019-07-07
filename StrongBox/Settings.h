@@ -18,12 +18,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString* const kAppGroupName = @"group.strongbox.mcguill"; // TODO: This could be an issue for custom builds - can we get from config?
-static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
+extern NSString* const kProStatusChangedNotificationKey;
 
 @interface Settings : NSObject
 
 + (Settings *)sharedInstance;
+
 - (NSUserDefaults*)getUserDefaults;
 
 - (void)requestBiometricId:(NSString*)reason
@@ -34,8 +34,6 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
              fallbackTitle:(NSString*_Nullable)fallbackTitle
      allowDevicePinInstead:(BOOL)allowDevicePinInstead
                 completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
-
-@property BOOL suppressPrivacyScreen;
 
 + (BOOL)isBiometricIdAvailable;
 
@@ -116,6 +114,9 @@ static NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNoti
 @property BOOL migratedToNewPasswordGenerator;
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
+
+@property (readonly) NSString* appGroupName;
+@property BOOL suppressPrivacyScreen;
 
 NS_ASSUME_NONNULL_END
 

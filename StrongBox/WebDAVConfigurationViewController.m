@@ -7,6 +7,7 @@
 //
 
 #import "WebDAVConfigurationViewController.h"
+#import "Utils.h"
 
 @interface WebDAVConfigurationViewController ()
 
@@ -30,15 +31,17 @@
 - (IBAction)onConnect:(id)sender {
     self.configuration = [[WebDAVSessionConfiguration alloc] init];
 
-    NSString* host = [self.textFieldRootUrl.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    NSString* hostStr = trim(self.textFieldRootUrl.text);
 
     // Trim trailing Slash as library doesn't like it...
     
-    if([host hasSuffix:@"/"]) {
-        host = [host substringToIndex:host.length - 1];
+    if([hostStr hasSuffix:@"/"]) {
+        hostStr = [hostStr substringToIndex:hostStr.length - 1];
     }
-    
-    self.configuration.host = [NSURL URLWithString:host];
+
+    NSURL *urlHost = [NSURL URLWithString:[hostStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+
+    self.configuration.host = urlHost;
     self.configuration.username = self.textFieldUsername.text;
     self.configuration.password = self.textFieldPassword.text;
     self.configuration.allowUntrustedCertificate = self.switchAllowUntrusted.on;
@@ -55,8 +58,8 @@
 }
 
 - (void)validateConnect {
-    NSString* host = [self.textFieldRootUrl.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    NSURL *urlHost = [NSURL URLWithString:host];
+    NSString* host = trim(self.textFieldRootUrl.text);
+    NSURL *urlHost = [NSURL URLWithString:[host stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     
     if(!(urlHost && urlHost.scheme && urlHost.host)) {
         self.labelValidation.text = @"🛑 URL Invalid";

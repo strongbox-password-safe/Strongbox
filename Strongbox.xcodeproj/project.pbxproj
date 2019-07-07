@@ -370,6 +370,8 @@
 		4D5F5B94218B6C9D00A0739A /* NodeFileAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */; };
 		4D5F5B96218B828600A0739A /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D5F5B95218B828500A0739A /* QuickLook.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
+		4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
 		4D664DB42179C53B0023FF0C /* XmlTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D664DB32179C53B0023FF0C /* XmlTree.m */; };
 		4D664DB52179C7DF0023FF0C /* XmlTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D664DB32179C53B0023FF0C /* XmlTree.m */; };
 		4D67B1E12191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E02191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.m */; };
@@ -460,7 +462,6 @@
 		4D983445217749F700731FFC /* KeePassXmlStrongboxNodeModelAdaptorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D983444217749F700731FFC /* KeePassXmlStrongboxNodeModelAdaptorTests.m */; };
 		4D98344821775F5600731FFC /* password-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D98344721775F5600731FFC /* password-ladder.xml */; };
 		4D98344A21777E3000731FFC /* password-two-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D98344921777E3000731FFC /* password-two-entries-ladder.xml */; };
-		4D9A6B9D21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A6B9C21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m */; };
 		4D9AC55222A1390A00449F3F /* SelectKeyFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */; };
 		4D9AC55322A13C4000449F3F /* SelectKeyFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */; };
 		4D9AC55622A153FA00449F3F /* StaticDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */; };
@@ -1065,6 +1066,8 @@
 		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = iCloudSafesCoordinator.h; path = StrongBox/iCloudSafesCoordinator.h; sourceTree = "<group>"; };
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = iCloudSafesCoordinator.m; path = StrongBox/iCloudSafesCoordinator.m; sourceTree = "<group>"; };
 		4D63F97922BEB632002D1E26 /* BrowseTapAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BrowseTapAction.h; sourceTree = "<group>"; };
+		4D646A1E22D2A42C00C5D2FE /* UIImage+FixOrientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIImage+FixOrientation.h"; path = "StrongBox/UIImage+FixOrientation.h"; sourceTree = "<group>"; };
+		4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UIImage+FixOrientation.m"; path = "StrongBox/UIImage+FixOrientation.m"; sourceTree = "<group>"; };
 		4D664DB22179C53B0023FF0C /* XmlTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = XmlTree.h; path = model/keepass/XmlTree.h; sourceTree = SOURCE_ROOT; };
 		4D664DB32179C53B0023FF0C /* XmlTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = XmlTree.m; path = model/keepass/XmlTree.m; sourceTree = SOURCE_ROOT; };
 		4D67B1DF2191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectDatabaseFormatTableViewController.h; path = StrongBox/SelectDatabaseFormatTableViewController.h; sourceTree = "<group>"; };
@@ -1306,7 +1309,6 @@
 		4D983444217749F700731FFC /* KeePassXmlStrongboxNodeModelAdaptorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlStrongboxNodeModelAdaptorTests.m; path = StrongboxTests/KeePassXmlStrongboxNodeModelAdaptorTests.m; sourceTree = "<group>"; };
 		4D98344721775F5600731FFC /* password-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-ladder.xml"; sourceTree = "<group>"; };
 		4D98344921777E3000731FFC /* password-two-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-two-entries-ladder.xml"; sourceTree = "<group>"; };
-		4D9A6B9C21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DiceWarePasswordGeneratorTests.m; path = StrongboxTests/DiceWarePasswordGeneratorTests.m; sourceTree = "<group>"; };
 		4D9AC55122A1390A00449F3F /* SelectKeyFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = SelectKeyFile.storyboard; path = StrongBox/SelectKeyFile.storyboard; sourceTree = "<group>"; };
 		4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StaticDataTableViewController.m; path = StrongBox/StaticDataTableViewController.m; sourceTree = "<group>"; };
 		4D9AC55522A153F900449F3F /* StaticDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StaticDataTableViewController.h; path = StrongBox/StaticDataTableViewController.h; sourceTree = "<group>"; };
@@ -1829,7 +1831,6 @@
 				4D18F23222577FB100768E18 /* FieldReferenceTests.m */,
 				4D376F8322425A6C0031049E /* XmlTests.m */,
 				4D8EA82522316B4300B47035 /* KdbxHistory.m */,
-				4D9A6B9C21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m */,
 				4D004CE521F4F67D00E2B194 /* OtpTests.m */,
 				4DF972B121BFD78700F384C9 /* SFTPTests.m */,
 				4DF97F2D21BF116A0090A55E /* DavKitTests.m */,
@@ -2285,6 +2286,8 @@
 				4D01BA2522BD2A4F0044226F /* DatabaseSearchAndSorter.h */,
 				4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */,
 				4D01BA2A22BD30160044226F /* SearchScope.h */,
+				4D646A1E22D2A42C00C5D2FE /* UIImage+FixOrientation.h */,
+				4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -3499,7 +3502,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D9A6B9D21FF721F00F003B2 /* DiceWarePasswordGeneratorTests.m in Sources */,
 				4D983445217749F700731FFC /* KeePassXmlStrongboxNodeModelAdaptorTests.m in Sources */,
 				4D2259F322C67E56005547EA /* FavIconTests.m in Sources */,
 				4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */,
@@ -3542,6 +3544,7 @@
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
 				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
+				4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				4DF97F2021BF101B0090A55E /* DAVRequest.m in Sources */,
 				4D25674C21E8C65D006260B7 /* PinEntryController.m in Sources */,
 				4D3E148D21832B7400A41CA0 /* argon2.c in Sources */,
@@ -3950,6 +3953,7 @@
 				4D9E08F121824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D3E14A72183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
 				4D1884C721709CBF001AE6B0 /* GoogleDriveStorageProvider.m in Sources */,
+				4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				4D2259FA22C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0835B62284742000CA7405 /* FontManager.m in Sources */,
 				4D33FA3E2287214D006C31B2 /* SetNodeIconUiHelper.m in Sources */,
@@ -4192,7 +4196,7 @@
 			baseConfigurationReference = A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -4280,7 +4284,7 @@
 			baseConfigurationReference = AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

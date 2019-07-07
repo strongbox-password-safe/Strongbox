@@ -66,7 +66,26 @@ static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
 static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
+NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
+static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
+
+static NSString* cachedAppGroupName;
+
 @implementation Settings
+
++ (void)initialize {
+    if(self == [Settings class]) {
+        // NSString* appGroupPP = [Settings getAppGroupFromProvisioningProfile];
+        // cachedAppGroupName = appGroupPP ? appGroupPP : kDefaultAppGroupName;
+        //NSLog(@"App Group Name: [%@] (Auto Detected : [%@])", cachedAppGroupName, appGroupPP);
+
+        cachedAppGroupName = kDefaultAppGroupName;
+    }
+}
+
+- (NSString *)appGroupName {
+    return cachedAppGroupName;
+}
 
 - (BOOL)migratedToNewPasswordGenerator {
     return [self getBool:kMigratedToNewPasswordGenerator];
@@ -141,7 +160,11 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 }
 
 - (NSUserDefaults*)getUserDefaults {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kAppGroupName];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+    
+    if(defaults == nil) {
+        NSLog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", self.appGroupName);
+    }
     
     return defaults;
 }
@@ -775,6 +798,112 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 
 - (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
     [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
+}
+
+// Initial Implementation of Provision Profile Extraction (To try automatically determine app group id initially)
+
++ (NSString*)getAppGroupFromProvisioningProfile {
+    NSString* profilePath = [NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"];
+    
+    if (profilePath == nil) {
+        NSLog(@"INFO: getAppGroupFromProvisioningProfile - Could not find embedded.mobileprovision file");
+        return nil;
+    }
+    
+    NSData* plistData = [NSData dataWithContentsOfFile:profilePath];
+    if(!plistData) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - dataWithContentsOfFile nil");
+        return nil;
+    }
+    
+    NSString* plistDataString = [NSString stringWithFormat:@"%@", plistData];
+    if(plistDataString == nil) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - plistData - stringWithFormat nil");
+        return nil;
+    }
+    
+    NSString* plistString = [self extractPlist:plistDataString];
+    if(!plistString) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - extractPlist nil");
+        return nil;
+    }
+    
+    NSError* error;
+    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"<key>com.apple.security.application-groups</key>.*?<array>.*?<string>(.*?)</string>.*?</array>" options:NSRegularExpressionCaseInsensitive | NSRegularExpressionDotMatchesLineSeparators
+                                                                             error:&error];
+    
+    if(error || regex == nil) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - regularExpressionWithPattern %@", error);
+        return nil;
+    }
+    
+    NSTextCheckingResult* res = [regex firstMatchInString:plistString options:kNilOptions range:NSMakeRange(0, plistString.length)];
+    
+    if(res && [res numberOfRanges] > 1) {
+        NSRange rng = [res rangeAtIndex:1];
+        NSString* appGroup = [plistString substringWithRange:rng];
+        return appGroup;
+    }
+    else {
+        NSLog(@"INFO: getAppGroupFromProvisioningProfile - App Group Not Found - [%@]", res);
+        return nil;
+    }
+}
+
++ (NSString*)extractPlist:(NSString*)str {
+    // Remove brackets at beginning and end
+    if(!str || str.length < 10) { // Some kind of sensible minimum
+        return nil;
+    }
+    
+    str = [str substringWithRange:NSMakeRange(1, str.length-2)];
+    str = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    // convert hex to ascii
+    
+    NSString* profileText = [self hexStringtoAscii:str];
+    return profileText;
+}
+
++ (NSString*)hexStringtoAscii:(NSString*)hexString {
+    NSString* pattern = @"(0x)?([0-9a-f]{2})";
+    NSError* error;
+    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:&error];
+    
+    if(error) {
+        NSLog(@"hexStringToAscii Error: %@", error);
+        return nil;
+    }
+    
+    NSArray<NSTextCheckingResult*>* matches = [regex matchesInString:hexString options:kNilOptions range:NSMakeRange(0, hexString.length)];
+    if(!matches) {
+        NSLog(@"hexStringToAscii Error: Matches nil");
+        return nil;
+    }
+    
+    NSArray<NSNumber*> *characters = [matches map:^id _Nonnull(NSTextCheckingResult * _Nonnull obj, NSUInteger idx) {
+        if(obj.numberOfRanges > 1) {
+            NSRange range = [obj rangeAtIndex:2];
+            NSString *sub = [hexString substringWithRange:range];
+            //NSLog(@"Match: %@", sub);
+            
+            NSScanner *scanner = [NSScanner scannerWithString:sub];
+            uint32_t u32;
+            [scanner scanHexInt:&u32];
+            return @(u32);
+        }
+        else {
+            NSLog(@"Do not know how to decode.");
+            return @(32); // Space ASCII
+        }
+    }];
+    
+    NSMutableString* foo = [NSMutableString string];
+    for (NSNumber* ch in characters) {
+        [foo appendFormat:@"%c", ch.unsignedCharValue];
+    }
+    
+    return foo.copy;
 }
 
 @end

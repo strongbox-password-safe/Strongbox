@@ -79,37 +79,27 @@
         [self removeUpgradeMenuItem];
     }
     
+    NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
+    statusImage.size = NSMakeSize(18.0, 18.0);
+    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
+    self.statusItem.image = statusImage;
+    self.statusItem.highlightMode = YES;
+    self.statusItem.enabled = YES;
+    self.statusItem.menu = self.systemTraymenu;
+    self.statusItem.toolTip = @"Strongbox";
+    
+    //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
+    //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
 
-//    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
-//    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
-    
-    // TODO: System Tray Icon
-//    NSImage* statusImage = [NSImage imageNamed:@"Strongbox-36x26-inverted-bw"];
-//    statusImage.size = NSMakeSize(18.0, 18.0);
-//    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-//    self.statusItem.image = statusImage;
-//    self.statusItem.highlightMode = YES;
-//    self.statusItem.enabled = YES;
-//    self.statusItem.menu = self.systemTraymenu;
-
-//    NSDocumentController *controller = [NSDocumentController sharedDocumentController];
-//    NSArray *documents = [controller recentDocumentURLs];
-    
-    
-    
-    
-    // TODO: Might be nice to open last here - offer the option
-    
-//    NSLog(@"Recent Documents: [%@]", documents);
-//    NSLog(@"Open Documents: [%@]", controller.documents);
-
-//    if(Settings.sharedInstance.showDatabasesListAtStartup) {
-//        [self onViewDatabases:nil];
-//    }
-    
     self.applicationHasFinishedLaunching = YES;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onSystemTrayShow:(id)sender {
+    [NSApp arrangeInFront:sender];
+    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:sender];
+    [NSApp activateIgnoringOtherApps:YES];
 }
 
 - (void)performMigrations {
