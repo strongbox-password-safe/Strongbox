@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "OTPToken.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setGroup:(NSString *)title icon:(UIImage*)icon childCount:(NSString*)childCount italic:(BOOL)italic groupLocation:(NSString*)groupLocation;
 - (void)setGroup:(NSString *)title icon:(UIImage*)icon childCount:(NSString*)childCount italic:(BOOL)italic groupLocation:(NSString*)groupLocation tintColor:(UIColor* _Nullable )tintColor;
 
-- (void)setRecord:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon groupLocation:(NSString*)groupLocation flags:(NSString*)flags;
+- (void)setRecord:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon groupLocation:(NSString*)groupLocation flags:(NSString*)flags otpToken:(OTPToken*)otpToken;
 
 @end
 

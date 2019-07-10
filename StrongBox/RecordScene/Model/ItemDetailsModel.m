@@ -9,7 +9,7 @@
 #import "ItemDetailsModel.h"
 #import "Utils.h"
 #import "OTPToken+Serialization.h"
-#import "OTPToken+Generation.h"
+//#import "OTPToken+Generation.h"
 
 @interface ItemDetailsModel()
 

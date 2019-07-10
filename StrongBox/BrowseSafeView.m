@@ -17,8 +17,6 @@
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 #import "NodeIconHelper.h"
-#import "Node+OTPToken.h"
-#import "OTPToken+Generation.h"
 #import "SetNodeIconUiHelper.h"
 #import "ItemDetailsViewController.h"
 #import "BrowseItemCell.h"
@@ -28,6 +26,7 @@
 #import "BrowseItemTotpCell.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "DatabaseSearchAndSorter.h"
+#import "OTPToken+Generation.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
@@ -44,7 +43,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
 
-@property NSTimer* timerRefreshOtp;
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 
 @property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
@@ -55,9 +53,23 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
+@property NSTimer* timerRefreshOtp;
+
 @end
 
 @implementation BrowseSafeView
+
+- (void)dealloc {
+    [self killOtpTimer];
+}
+
+-(void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if(self.isMovingFromParentViewController) { // Kill
+        [self killOtpTimer];
+    }
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -88,30 +100,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     [self updateSplitViewDetailsView:nil];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    if(self.timerRefreshOtp) {
-        [self.timerRefreshOtp invalidate];
-        self.timerRefreshOtp = nil;
-    }
-}
-
-- (IBAction)updateOtpCodes:(id)sender {
-    if(![self.tableView isEditing]) { // DO not update during edit, cancels left swipe menu and edit selections!
-        NSArray<NSIndexPath*>* visible = [self.tableView indexPathsForVisibleRows];
-        
-        NSArray<Node*> *nodes = [self getDataSource];
-        NSArray* visibleOtpRows = [visible filter:^BOOL(NSIndexPath * _Nonnull obj) {
-            return nodes[obj.row].fields.otpToken != nil;
-        }];
-        
-        if(visibleOtpRows.count) {
-            [self.tableView reloadRowsAtIndexPaths:visibleOtpRows withRowAnimation:UITableViewRowAnimationNone];
-        }
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -130,6 +118,9 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         // UI Artifact / Delay on segues to subgroups if we add here :(
         
         [self addSearchBarToNav];
+        
+         // This coordinates all TOTP UI updates for this database
+        [self startOtpRefresh];
     }
     
     NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
@@ -260,9 +251,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (CGFloat)cellHeight {
-    // Super important for this to be pixel perfect - otherwise get very jumpy scrolling
     return self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList ? 99.0 : 46.5;
-    //TODO: UITableViewAutomaticDimension;
 }
 
 - (IBAction)onClose:(id)sender {
@@ -449,28 +438,13 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
 
-    if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
-        NSArray<Node*>* otps = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-            return obj.fields.otpToken != nil;
-        }];
-        
-        self.searchResults = [searcher searchNodes:otps
-                                        searchText:searchController.searchBar.text
-                                             scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
-                                       dereference:self.viewModel.metadata.searchDereferencedFields
-                             includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                                 includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults];
-    }
-    else {
-        self.searchResults = [searcher search:searchController.searchBar.text
-                                        scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
-                                  dereference:self.viewModel.metadata.searchDereferencedFields
-                        includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                            includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults];
-    }
+    self.searchResults = [searcher search:searchController.searchBar.text
+                                    scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
+                              dereference:self.viewModel.metadata.searchDereferencedFields
+                    includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
+                        includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults];
     
     [self.tableView reloadData];
-    [self startOtpRefreshTimerIfAppropriate];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -488,7 +462,15 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
 
-    if(self.searchController.isActive || self.viewModel.metadata.browseViewType != kBrowseViewTypeTotpList) {
+    if(!self.searchController.isActive && self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
+        BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
+        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
+        
+        [cell setItem:title subtitle:subtitle icon:icon otpToken:node.fields.otpToken];
+        
+        return cell;
+    }
+    else {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
         NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
@@ -505,53 +487,20 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
             flags = self.viewModel.metadata.showFlagsInBrowse ? flags : @"";
             
-            [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
-
-            [self setOtpCellProperties:cell node:node];
+            [cell setRecord:title
+                   subtitle:subtitle
+                       icon:icon
+              groupLocation:groupLocation
+                      flags:flags
+                   otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
         }
         
-        return cell;
-    }
-    else {
-        BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
-        
-        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
-
-        cell.labelTitle.text = title;
-        cell.labelUsername.text = subtitle;
-        cell.icon.image = icon;
-        
-        [self setOtpCellLabelProperties:cell.labelOtp node:node];
-
         return cell;
     }
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
     return [self.viewModel.database dereference:text node:node];
-}
-
-- (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {
-    [self setOtpCellLabelProperties:cell.otpLabel node:node];
-}
-
-- (void)setOtpCellLabelProperties:(UILabel*)otpLabel node:(Node*)node {
-    if(!self.viewModel.metadata.hideTotpInBrowse && node.fields.otpToken) {
-        uint64_t remainingSeconds = node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.fields.otpToken.period);
-        
-        otpLabel.text = [NSString stringWithFormat:@"%@", node.fields.otpToken.password];
-        otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
-        otpLabel.alpha = 1;
-        
-        if(remainingSeconds < 16) {
-            [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-                otpLabel.alpha = 0.5;
-            } completion:nil];
-        }
-    }
-    else {
-        otpLabel.text = @"";
-    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -681,28 +630,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                                    [self getDataSource].count > 0);
     
     [self enableDisableToolbarButtons];
-    
-    // Any OTPs we should start a refresh timer if so...
-    
-    [self startOtpRefreshTimerIfAppropriate];
-}
-
-- (void)startOtpRefreshTimerIfAppropriate {
-    if(self.timerRefreshOtp) {
-        [self.timerRefreshOtp invalidate];
-        self.timerRefreshOtp = nil;
-    }
-    
-    BOOL hasOtpToken = [[self getDataSource] anyMatch:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.otpToken != nil;
-    }];
-    
-    if(!self.viewModel.metadata.hideTotpInBrowse && hasOtpToken) {
-        NSLog(@"Starting OTP Refresh Timer");
-        
-        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
-    }
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
@@ -1252,6 +1179,27 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                                  NSForegroundColorAttributeName: [UIColor lightGrayColor]};
     
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
+}
+
+//
+
+- (void)killOtpTimer {
+    if(self.timerRefreshOtp) {
+        NSLog(@"Kill Central OTP Timer");
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+}
+
+- (void)startOtpRefresh {
+    NSLog(@"Start Central OTP Timer");
+    
+    self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:[BrowseSafeView class] selector:@selector(updateOtpCodes) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+}
+
++ (void)updateOtpCodes { // Keep Static to avoid retain cycle
+    [NSNotificationCenter.defaultCenter postNotificationName:kCentralUpdateOtpUiNotification object:nil];
 }
 
 @end

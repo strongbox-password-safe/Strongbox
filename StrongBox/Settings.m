@@ -67,6 +67,8 @@ static NSString* const kAppLockPin = @"appLockPin2.0";
 static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
+NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 
 static NSString* cachedAppGroupName;

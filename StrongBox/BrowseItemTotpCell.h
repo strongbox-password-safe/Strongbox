@@ -7,15 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "OTPToken.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowseItemTotpCell : UITableViewCell
 
-@property (weak, nonatomic) IBOutlet UILabel *labelOtp;
-@property (weak, nonatomic) IBOutlet UILabel *labelTitle;
-@property (weak, nonatomic) IBOutlet UILabel *labelUsername;
-@property (weak, nonatomic) IBOutlet UIImageView *icon;
+- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon otpToken:(OTPToken*)otpToken;
 
 @end
 

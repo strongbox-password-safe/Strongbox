@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "OTPToken.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TotpCell : UITableViewCell
 
-@property (weak, nonatomic) IBOutlet UILabel *labelTotp;
-@property (weak, nonatomic) IBOutlet UIProgressView *progressView;
+- (void)setItem:(OTPToken*)otpToken;
 
 @end
 

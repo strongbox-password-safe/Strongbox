@@ -19,7 +19,6 @@
 #import "NSArray+Extensions.h"
 #import "UiAttachment.h"
 #import "CustomFieldsViewController.h"
-#import "Node+OtpToken.h"
 #import "OTPToken+Generation.h"
 #import "QRCodeScannerViewController.h"
 #import "NodeIconHelper.h"

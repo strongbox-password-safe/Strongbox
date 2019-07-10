@@ -14,8 +14,6 @@
 		4D004CDD21F4C26700E2B194 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD021F4C26700E2B194 /* OTPAlgorithm.m */; };
 		4D004CDF21F4C26700E2B194 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD321F4C26700E2B194 /* OTPToken+Generation.m */; };
 		4D004CE021F4C26700E2B194 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD621F4C26700E2B194 /* OTPToken.m */; };
-		4D004CE321F4F58300E2B194 /* Node+OtpToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CE221F4F58300E2B194 /* Node+OtpToken.m */; };
-		4D004CE421F4F58300E2B194 /* Node+OtpToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CE221F4F58300E2B194 /* Node+OtpToken.m */; };
 		4D004CE621F4F67D00E2B194 /* OtpTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CE521F4F67D00E2B194 /* OtpTests.m */; };
 		4D004CE721F4F7B300E2B194 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD621F4C26700E2B194 /* OTPToken.m */; };
 		4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD321F4C26700E2B194 /* OTPToken+Generation.m */; };
@@ -709,8 +707,6 @@
 		4D004CD621F4C26700E2B194 /* OTPToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OTPToken.m; path = lib/OneTimePassword/OTPToken.m; sourceTree = "<group>"; };
 		4D004CD721F4C26700E2B194 /* OTPToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OTPToken.h; path = lib/OneTimePassword/OTPToken.h; sourceTree = "<group>"; };
 		4D004CD821F4C26700E2B194 /* OneTimePassword.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OneTimePassword.h; path = lib/OneTimePassword/OneTimePassword.h; sourceTree = "<group>"; };
-		4D004CE121F4F58300E2B194 /* Node+OtpToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Node+OtpToken.h"; path = "model/Node+OtpToken.h"; sourceTree = "<group>"; };
-		4D004CE221F4F58300E2B194 /* Node+OtpToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "Node+OtpToken.m"; path = "model/Node+OtpToken.m"; sourceTree = "<group>"; };
 		4D004CE521F4F67D00E2B194 /* OtpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OtpTests.m; path = StrongboxTests/OtpTests.m; sourceTree = "<group>"; };
 		4D01BA2022BD24950044226F /* PinEntry.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = PinEntry.storyboard; path = StrongBox/PinEntry.storyboard; sourceTree = "<group>"; };
 		4D01BA2222BD24E30044226F /* CreateDatabaseOrSetCredentials.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = CreateDatabaseOrSetCredentials.storyboard; path = StrongBox/CreateDatabaseOrSetCredentials.storyboard; sourceTree = "<group>"; };
@@ -2281,8 +2277,6 @@
 				4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */,
 				4D876B4121AC36F800805DED /* CustomField.h */,
 				4D876B4221AC36F800805DED /* CustomField.m */,
-				4D004CE121F4F58300E2B194 /* Node+OtpToken.h */,
-				4D004CE221F4F58300E2B194 /* Node+OtpToken.m */,
 				4D01BA2522BD2A4F0044226F /* DatabaseSearchAndSorter.h */,
 				4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */,
 				4D01BA2A22BD30160044226F /* SearchScope.h */,
@@ -3676,7 +3670,6 @@
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */,
-				4D004CE321F4F58300E2B194 /* Node+OtpToken.m in Sources */,
 				4D06943922083E5200FB826C /* ProUpgradeIAPManager.m in Sources */,
 				4DF97F1E21BF101B0090A55E /* DAVResponseItem.m in Sources */,
 				4D47670F2179070A00C4358F /* GenericTextStringElementHandler.m in Sources */,
@@ -3862,7 +3855,6 @@
 				4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */,
 				4D4554AF2285C0BB0015C236 /* BrowseItemCell.m in Sources */,
 				4DF972CD21C01ABF00F384C9 /* DAVResponseItem.m in Sources */,
-				4D004CE421F4F58300E2B194 /* Node+OtpToken.m in Sources */,
 				4DAEA41E217CBB1300AC128E /* GenericTextUuidElementHandler.m in Sources */,
 				4D3E149F21832CC700A41CA0 /* blake2b.c in Sources */,
 				4DA12F03219837830000CEBB /* CustomIconList.m in Sources */,

@@ -16,7 +16,6 @@
 #import "Alerts.h"
 #import "mach/mach.h"
 #import "QuickTypeRecordIdentifier.h"
-#import "Node+OTPToken.h"
 #import "OTPToken+Generation.h"
 #import "Utils.h"
 #import "GoogleDriveManager.h"

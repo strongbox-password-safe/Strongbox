@@ -22,9 +22,8 @@
 #import "NodeIconHelper.h"
 #import "IconTableCell.h"
 #import "TotpCell.h"
-#import "OTPToken+Generation.h"
+//#import "OTPToken+Generation.h"
 #import "Alerts.h"
-#import "Node+OtpToken.h"
 #import "Settings.h"
 #import "NSDictionary+Extensions.h"
 #import "OTPToken+Serialization.h"
@@ -35,6 +34,7 @@
 #import "ItemDetailsPreferencesViewController.h"
 #import "EditDateCell.h"
 #import "PasswordGenerationViewController.h"
+#import "OTPToken+Generation.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -80,7 +80,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
 @property ItemDetailsModel* model;
 @property ItemDetailsModel* preEditModelClone;
 @property BOOL passwordConcealedInUi;
-@property NSTimer* timerRefreshOtp;
 @property UIBarButtonItem* cancelOrDiscardBarButton;
 @property UIView* coverView;
 
@@ -128,10 +127,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
     
-    if(self.model.totp) {
-        [self rescheduleTimer];
-    }
-    
     [UIView setAnimationsEnabled:YES];
     
     if(self.splitViewController) {
@@ -143,8 +138,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
     [super viewWillDisappear:animated];
     
     [NSNotificationCenter.defaultCenter removeObserver:self name:CellHeightsChangedNotification object:nil];
-    
-    [self killTotpUpdateTimer];
 }
 
 - (void)viewDidLoad {
@@ -322,8 +315,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    [self killTotpUpdateTimer];
-    
     [super setEditing:editing animated:animated];
     
     [self.tableView performBatchUpdates:^{
@@ -347,7 +338,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         
         [self bindNavBar];
-        [self rescheduleTimer];
     }];
 }
 
@@ -469,30 +459,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
             else {
                 TotpCell* cell = [tableView dequeueReusableCellWithIdentifier:kTotpCell forIndexPath:indexPath];
                 
-                if(self.model.totp) {
-                    uint64_t remainingSeconds = [self getRemainingTotpSeconds];
-                    UIColor *color = (remainingSeconds <= 5) ? [UIColor redColor] : (remainingSeconds <= 10) ? [UIColor orangeColor] : [UIColor blueColor];
-                    
-                    cell.labelTotp.text = [NSString stringWithFormat:@"%@", self.model.totp.password];
-                    cell.labelTotp.textColor = color;
-                    cell.progressView.tintColor = color;
-                    
-                    if(cell.progressView.layer)
-                        [cell.progressView.layer removeAllAnimations];
-                    
-                    cell.progressView.progress = remainingSeconds / self.model.totp.period;
-                    [UIView animateWithDuration:0.0 animations:^{
-                        [cell.progressView layoutIfNeeded];
-                    } completion:^(BOOL finished) {
-                        cell.progressView.progress = 0;
-                        [UIView animateWithDuration:remainingSeconds delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-                            [cell.progressView layoutIfNeeded];
-                        } completion:nil];
-                    }];
-                }
-                else {
-                    cell.labelTotp.text = @"No TOTP Setup";
-                }
+                [cell setItem:self.model.totp];
                 
                 return cell;
             }
@@ -908,7 +875,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return NO;
     }
 
-    return self.editing; // TODO: This used to be YES but seems to lead to terrible behaviour with TOTP - Revisit after TOTP Cell Improvements
+    return self.editing;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1159,11 +1126,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)performFullReload {
-    [self killTotpUpdateTimer];
     self.model = [self modelFromItem:self.item]; // Reload Model to update metadata Modified field...
     [self.tableView reloadData];
     [self bindNavBar];
-    [self rescheduleTimer];
 }
 
 - (void)onRestoreFromHistoryNode:(Node*)historicalNode {
@@ -1251,64 +1216,16 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(uint64_t)getRemainingTotpSeconds {
-    return self.model.totp.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.model.totp.period);
-}
-
-- (void)rescheduleTimer {
-    if(!self.model.totp) {
-        [self killTotpUpdateTimer];
-        return;
-    }
-    
-    uint64_t remaining = [self getRemainingTotpSeconds];
-    
-    if(remaining > 10) {
-        NSLog(@"Setting TOTP Timer for 10 Seconds from Expiry with %llu seconds remaining", remaining);
-
-        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:remaining - 9 repeats:NO block:^(NSTimer * _Nonnull timer) {
-            [self updateTotpRowAndRescheduleTimer];
-        }];
-    }
-    else if (remaining > 5) {
-        NSLog(@"Setting TOTP Timer for 5 Seconds from Expiry with %llu seconds remaining", remaining);
-
-        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:remaining - 4 repeats:NO block:^(NSTimer * _Nonnull timer) {
-            [self updateTotpRowAndRescheduleTimer];
-        }];
-    }
-    else {
-        NSLog(@"Starting TOTP Timer with %llu seconds remaining", remaining);
-        
-        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:remaining repeats:NO block:^(NSTimer * _Nonnull timer) {
-            [self updateTotpRowAndRescheduleTimer];
-        }];
-    }
-    
-
-    [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
-}
-
-- (void)updateTotpRowAndRescheduleTimer {
+- (void)updateTotpRow {
     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTotp inSection:kSimpleFieldsSectionIdx]]
                           withRowAnimation:UITableViewRowAnimationAutomatic];
-    
-    [self killTotpUpdateTimer];
-
-    [self rescheduleTimer];
 }
 
-- (void)killTotpUpdateTimer {
-    if(self.timerRefreshOtp) {
-        [self.timerRefreshOtp invalidate];
-        self.timerRefreshOtp = nil;
-    }
-}
 
 - (void)onClearTotp {
     self.model.totp = nil;
-    
-    [self updateTotpRowAndRescheduleTimer];
+
+    [self updateTotpRow];
     
     [self onModelEdited];
 }
@@ -1354,7 +1271,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     if(token) {
         self.model.totp = token;
         
-        [self updateTotpRowAndRescheduleTimer];
+        [self updateTotpRow];
         
         [self onModelEdited];
     }
@@ -1553,8 +1470,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)onSaveChangesDone:(NSError*)error {
     [self enableUi];
     
-    [self killTotpUpdateTimer];
-
     if (error != nil) { // TODO: This may not be correct for Split View
         [Alerts error:self title:@"Problem Saving" error:error completion:^{
             [self.navigationController popToRootViewControllerAnimated:YES];
@@ -1569,7 +1484,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
         [self prepareTableViewForEditing];
     } completion:^(BOOL finished) {
         [self bindNavBar];
-        [self rescheduleTimer];
 
         if(self.onChanged) {
             self.onChanged();

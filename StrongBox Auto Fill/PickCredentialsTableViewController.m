@@ -10,14 +10,14 @@
 #import "NodeIconHelper.h"
 #import "Settings.h"
 #import "NSArray+Extensions.h"
-#import "Node+OTPToken.h"
-#import "OTPToken+Generation.h"
+//#import "OTPToken+Generation.h"
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"
 #import "BrowseItemCell.h"
 #import "ItemDetailsViewController.h"
 #import "DatabaseSearchAndSorter.h"
+#import "OTPToken+Generation.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -304,33 +304,16 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         NSString* subtitle = [searcher getBrowseItemSubtitle:node];
         NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
         flags = self.model.metadata.showFlagsInBrowse ? flags : @"";
-        
-        [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
-        
-        [self setOtpCellProperties:cell node:node];
+       
+        [cell setRecord:title
+               subtitle:subtitle
+                   icon:icon
+          groupLocation:groupLocation
+                  flags:flags
+               otpToken:Settings.sharedInstance.hideTotpInAutoFill ? nil : node.fields.otpToken];
     }
     
     return cell;
-}
-
-- (void)setOtpCellProperties:(BrowseItemCell*)cell node:(Node*)node {
-    if(!Settings.sharedInstance.hideTotpInAutoFill && node.fields.otpToken) {
-        uint64_t remainingSeconds = node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)node.fields.otpToken.period);
-
-        cell.otpLabel.text = [NSString stringWithFormat:@"%@", node.fields.otpToken.password];
-        cell.otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
-
-        cell.otpLabel.alpha = 1;
-
-        if(remainingSeconds < 16) {
-            [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-                cell.otpLabel.alpha = 0.5;
-            } completion:nil];
-        }
-    }
-    else {
-        cell.otpLabel.text = @"";
-    }
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {

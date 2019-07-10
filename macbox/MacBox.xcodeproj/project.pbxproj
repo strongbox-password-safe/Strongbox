@@ -136,7 +136,6 @@
 		4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
 		4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
-		4DA746522239678B002535F9 /* Node+OtpToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA746502239678B002535F9 /* Node+OtpToken.m */; };
 		4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
 		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
 		4DBCE223222414A100A2AFA2 /* SelectPredefinedIconController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DBCE221222414A100A2AFA2 /* SelectPredefinedIconController.xib */; };
@@ -461,8 +460,6 @@
 		4D9E09A021825161007BA1E7 /* Salsa20Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Salsa20Stream.h; path = ../model/keepass/Salsa20Stream.h; sourceTree = "<group>"; };
 		4D9E09A121825161007BA1E7 /* Salsa20Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Salsa20Stream.m; path = ../model/keepass/Salsa20Stream.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		4DA746502239678B002535F9 /* Node+OtpToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Node+OtpToken.m"; path = "../model/Node+OtpToken.m"; sourceTree = "<group>"; };
-		4DA746512239678B002535F9 /* Node+OtpToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Node+OtpToken.h"; path = "../model/Node+OtpToken.h"; sourceTree = "<group>"; };
 		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
 		4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableImageView.m; path = MacBox/ClickableImageView.m; sourceTree = "<group>"; };
 		4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectPredefinedIconController.h; path = MacBox/SelectPredefinedIconController.h; sourceTree = "<group>"; };
@@ -1106,8 +1103,6 @@
 				4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */,
 				4DBFD382225CFE2F00290488 /* SprCompilation.h */,
 				4DBFD383225CFE2F00290488 /* SprCompilation.m */,
-				4DA746512239678B002535F9 /* Node+OtpToken.h */,
-				4DA746502239678B002535F9 /* Node+OtpToken.m */,
 				4DC8D9BA21B6F391004F1812 /* KeyFileParser.h */,
 				4DC8D9B921B6F391004F1812 /* KeyFileParser.m */,
 				4D29663F21ADAC0B009B7936 /* CustomField.h */,
@@ -1565,7 +1560,6 @@
 				4D524CD9219B47DB00C22CB4 /* KdfParameters.m in Sources */,
 				4D524D04219B48D300C22CB4 /* AttachmentsRationalizer.m in Sources */,
 				4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */,
-				4DA746522239678B002535F9 /* Node+OtpToken.m in Sources */,
 				4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,

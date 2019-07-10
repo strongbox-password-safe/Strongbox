@@ -19,6 +19,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kProStatusChangedNotificationKey;
+extern NSString* const kCentralUpdateOtpUiNotification;
 
 @interface Settings : NSObject
 

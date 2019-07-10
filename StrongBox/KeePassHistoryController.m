@@ -83,9 +83,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
     flags = self.viewModel.metadata.showFlagsInBrowse ? flags : @"";
     
-    [cell setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags];
-    
-    cell.otpLabel.text = @"";
+    [cell setRecord:title
+           subtitle:subtitle
+               icon:icon
+      groupLocation:groupLocation
+              flags:flags
+           otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
     
     return cell;
 }
