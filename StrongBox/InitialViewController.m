@@ -559,53 +559,71 @@
 }
 
 - (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {
-    id<SafeStorageProvider> provider;
-    
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
     DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
     
     if(Settings.sharedInstance.iCloudOn) {
-        provider = AppleICloudProvider.sharedInstance;
-
-        [provider create:nickName
-               extension:extension
-                    data:data
-            parentFolder:nil
-          viewController:self
-              completion:^(SafeMetaData *metadata, NSError *error)
-         {
-             dispatch_async(dispatch_get_main_queue(), ^(void)
-                            {
-                                if (error == nil) {
-                                    metadata.likelyFormat = format;
-                                    [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                                }
-                                else {
-                                    [Alerts error:self title:@"Error Importing Database" error:error];
-                                }
-                            });
-         }];
+        [Alerts twoOptionsWithCancel:self
+                               title:@"Copy to iCloud or Local?"
+                             message:@"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?"
+                   defaultButtonText:@"Copy to Local Device Only"
+                    secondButtonText:@"Copy to iCloud"
+                              action:^(int response) {
+                                  if(response == 0) {
+                                      [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data];
+                                  }
+                                  else if(response == 1) {
+                                      [self importToICloud:url format:format nickName:nickName extension:extension data:data];
+                                  }
+                    }];
     }
     else {
-        // Try to keep the filename the same... but don't overwrite any existing, will have asked previously above if the user wanted to
-        
-        NSString *suggestedFilename = url.lastPathComponent;
-        [LocalDeviceStorageProvider.sharedInstance create:nickName
-                                                extension:extension
-                                                     data:data
-                                        suggestedFilename:suggestedFilename
-                                               completion:^(SafeMetaData *metadata, NSError *error) {
-                                                   dispatch_async(dispatch_get_main_queue(), ^(void) {
-                if (error == nil) {
-                    metadata.likelyFormat = format;
-                    [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                }
-                else {
-                    [Alerts error:self title:@"Error Importing Database" error:error];
-                }
-            });
-        }];
+        [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data];
     }
+}
+    
+- (void)importToICloud:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data {
+    NSString *suggestedFilename = url.lastPathComponent;
+
+    [AppleICloudProvider.sharedInstance create:nickName
+           extension:extension
+                data:data
+   suggestedFilename:suggestedFilename
+        parentFolder:nil
+      viewController:self
+          completion:^(SafeMetaData *metadata, NSError *error)
+     {
+         dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if (error == nil) {
+                metadata.likelyFormat = format;
+                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+            }
+            else {
+                [Alerts error:self title:@"Error Importing Database" error:error];
+            }
+        });
+     }];
+}
+
+- (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data {
+    // Try to keep the filename the same... but don't overwrite any existing, will have asked previously above if the user wanted to
+    
+    NSString *suggestedFilename = url.lastPathComponent;
+    [LocalDeviceStorageProvider.sharedInstance create:nickName
+                                            extension:extension
+                                                 data:data
+                                    suggestedFilename:suggestedFilename
+                                           completion:^(SafeMetaData *metadata, NSError *error) {
+                                               dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if (error == nil) {
+                metadata.likelyFormat = format;
+                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+            }
+            else {
+                [Alerts error:self title:@"Error Importing Database" error:error];
+            }
+        });
+    }];
 }
 
 - (void)addExternalFileReferenceSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url {

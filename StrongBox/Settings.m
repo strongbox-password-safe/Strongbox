@@ -34,6 +34,8 @@ static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunch
 static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
 static NSString* const kHideTips = @"hideTips";
 static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
+
+static const NSInteger kDefaultClearClipboardTimeout = 90;
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
 
@@ -620,24 +622,19 @@ static NSString* cachedAppGroupName;
 }
 
 - (BOOL)clearClipboardEnabled {
-    return [[self getUserDefaults] boolForKey:kClearClipboardEnabled];
+    return [self getBool:kClearClipboardEnabled fallback:YES];
 }
 
 - (void)setClearClipboardEnabled:(BOOL)clearClipboardEnabled {
-    [[self getUserDefaults] setBool:clearClipboardEnabled forKey:kClearClipboardEnabled];
-    [[self getUserDefaults] synchronize];
+    [self setBool:kClearClipboardEnabled value:clearClipboardEnabled];
 }
 
-static const NSInteger kDefaultClearClipboardTimeout = 60;
 - (NSInteger)clearClipboardAfterSeconds {
-    NSInteger ret =  [[self getUserDefaults] integerForKey:kClearClipboardAfterSeconds];
-
-    return ret == 0 ? kDefaultClearClipboardTimeout : ret;
+    return [self getInteger:kClearClipboardAfterSeconds fallback:kDefaultClearClipboardTimeout];
 }
 
 -(void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
-    [[self getUserDefaults] setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
-    [[self getUserDefaults] synchronize];
+    return [self setInteger:kClearClipboardAfterSeconds value:clearClipboardAfterSeconds];
 }
 
 - (BOOL)hideTotpInAutoFill {

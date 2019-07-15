@@ -608,9 +608,30 @@
 }
 
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName data:(NSData *)data {
+    if(Settings.sharedInstance.iCloudOn) {
+        [Alerts twoOptionsWithCancel:self
+                               title:@"Copy to iCloud or Local?"
+                             message:@"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?"
+                   defaultButtonText:@"Copy to Local Device Only"
+                    secondButtonText:@"Copy to iCloud"
+                              action:^(int response) {
+                                  if(response == 0) {
+                                      [self addManualDownloadUrl:NO data:data nickName:nickName];
+                                  }
+                                  else if(response == 1) {
+                                      [self addManualDownloadUrl:YES data:data nickName:nickName];
+                                  }
+                              }];
+    }
+    else {
+        [self addManualDownloadUrl:NO data:data nickName:nickName];
+    }
+}
+
+- (void)addManualDownloadUrl:(BOOL)iCloud data:(NSData*)data nickName:(NSString *)nickName {
     id<SafeStorageProvider> provider;
 
-    if(Settings.sharedInstance.iCloudOn) {
+    if(iCloud) {
         provider = AppleICloudProvider.sharedInstance;
     }
     else {

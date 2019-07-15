@@ -361,7 +361,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         }
     }
 
-    ItemDetailsViewController* vc = segue.destinationViewController;
+    //UINavigationController* nav = segue.destinationViewController;
+    ItemDetailsViewController* vc = (ItemDetailsViewController*)segue.destinationViewController;
     
     vc.createNewItem = YES;
     vc.item = nil;

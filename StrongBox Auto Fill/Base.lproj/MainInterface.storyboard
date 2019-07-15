@@ -174,12 +174,12 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="buttonAddCredential" destination="CiF-V3-i2n" id="sV6-SO-sJ7"/>
-                        <segue destination="3GQ-ZN-KLB" kind="show" identifier="segueToAddNew" id="EcB-OV-Wwf"/>
+                        <segue destination="3GQ-ZN-KLB" kind="show" identifier="segueToAddNew" id="Zc4-1I-3vA"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AMO-jP-4q3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3055" y="-16"/>
+            <point key="canvasLocation" x="3426" y="-18"/>
         </scene>
         <!--Quick Launch-->
         <scene sceneID="HFQ-UK-RJR">
@@ -344,11 +344,11 @@
                             <outlet property="delegate" destination="3GQ-ZN-KLB" id="eWo-90-v9G"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Acme Inc." prompt="Tip: Tap Field to Copy" id="80O-7a-Hk7"/>
+                    <navigationItem key="navigationItem" title="Acme Inc." id="MKB-qq-Qjo"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aCH-tO-DzH" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4156" y="-17"/>
+            <point key="canvasLocation" x="4503" y="-9"/>
         </scene>
     </scenes>
     <resources>

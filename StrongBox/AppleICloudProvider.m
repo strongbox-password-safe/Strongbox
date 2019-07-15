@@ -66,7 +66,35 @@
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
-    NSURL * fileURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:nickName extension:extension]];
+    [self create:nickName
+       extension:extension
+            data:data
+suggestedFilename:nil
+    parentFolder:parentFolder
+  viewController:viewController
+      completion:completion];
+}
+
+- (void)    create:(NSString *)nickName
+         extension:(NSString *)extension
+              data:(NSData *)data
+ suggestedFilename:(NSString*)suggestedFilename
+      parentFolder:(NSObject *)parentFolder
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+    NSURL * fileURL = nil;
+    
+    if(suggestedFilename) {
+        NSString* filename = [[suggestedFilename lastPathComponent] stringByDeletingPathExtension];
+        NSString* extension = [suggestedFilename pathExtension];
+        
+        NSString* uniqueFilename = [self getUniqueICloudFilename:filename extension:extension];
+        fileURL = [self getFullICloudURLWithFileName:uniqueFilename];
+    }
+    
+    if(!fileURL) {
+        fileURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:nickName extension:extension]];
+    }
     
     NSLog(@"Want to create file at %@", fileURL);
     

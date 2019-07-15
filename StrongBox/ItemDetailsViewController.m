@@ -143,7 +143,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
+    NSMutableArray* rightBarButtons = self.navigationItem.rightBarButtonItems ?  self.navigationItem.rightBarButtonItems.mutableCopy : @[].mutableCopy;
+    
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
     
     self.navigationItem.rightBarButtonItems = rightBarButtons;

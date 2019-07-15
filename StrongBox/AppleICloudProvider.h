@@ -14,6 +14,14 @@
 
 + (instancetype)sharedInstance;
 
+- (void)    create:(NSString *)nickName
+         extension:(NSString *)extension
+              data:(NSData *)data
+ suggestedFilename:(NSString*)suggestedFilename
+      parentFolder:(NSObject *)parentFolder
+    viewController:(UIViewController *)viewController
+        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
+
 @property (strong, nonatomic, readonly) NSString *displayName;
 @property (strong, nonatomic, readonly) NSString *icon;
 @property (nonatomic, readonly) StorageProvider storageId;

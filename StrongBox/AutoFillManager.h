@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid;
 - (void)clearAutoFillQuickTypeDatabase;
 
+@property (readonly) BOOL isAutoFillAvailableButDisabled;
+
+
 @end
 
 NS_ASSUME_NONNULL_END

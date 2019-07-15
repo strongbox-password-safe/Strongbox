@@ -749,7 +749,14 @@
         
         if(self.safe.autoFillEnabled) {
             [viewModel updateAutoFillCacheWithData:data];
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
+            
+//            if(!Settings.sharedInstance.hasPromptedUserToEnableAutoFill &&
+//               AutoFillManager.sharedInstance.isAutoFillAvailableButDisabled) {
+//                // TODO: Prompt user to enable
+//            }
+//            else {
+                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
+//            }
         }
 
         NSLog(@"Setting likelyFormat to [%u]", openedSafe.format);
