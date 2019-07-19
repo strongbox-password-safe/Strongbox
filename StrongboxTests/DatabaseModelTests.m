@@ -28,7 +28,7 @@
     XCTAssert(data);
     
     NSError *error;
-    DatabaseModel* model = [[DatabaseModel alloc] initExistingWithDataAndPassword:data password:nil keyFileDigest:digest error:&error];
+    DatabaseModel* model = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:digest] error:&error];
     XCTAssert(model);
     
     NSLog(@"%@", model);

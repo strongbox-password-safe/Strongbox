@@ -91,5 +91,8 @@ static const uint32_t kDefaultSeedLength = 32;
                                                         kParameterRounds : voRound }];
 }
 
+- (NSData *)transformSeed {
+    return self.seed;
+}
 
 @end

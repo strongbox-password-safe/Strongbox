@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* name;
 @property (nullable) NSString* password;
 @property (nullable) NSURL* keyFileUrl;
+@property (nullable) NSString* yubiKeySecret;
 @property (nullable) NSData* oneTimeKeyFileData;
 @property DatabaseFormat format;
 @property BOOL readOnly;

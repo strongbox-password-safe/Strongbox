@@ -35,7 +35,8 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
 
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
+    CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
+    SerializationData* data = [KdbxSerialization deserialize:safeData compositeKeyFactors:cpf ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
@@ -56,7 +57,8 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
+    CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
+    SerializationData* data = [KdbxSerialization deserialize:safeData compositeKeyFactors:cpf ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
@@ -96,7 +98,8 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    Kdbx4SerializationData* data = [Kdbx4Serialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
+    CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
+    Kdbx4SerializationData* data = [Kdbx4Serialization deserialize:safeData compositeKey:cpf ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);
@@ -119,7 +122,8 @@
     NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
-    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" keyFileDigest:nil ppError:&error];
+    CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
+    SerializationData* data = [KdbxSerialization deserialize:safeData compositeKeyFactors:cpf ppError:&error];
     
     if(!data) {
         NSLog(@"%@", error);

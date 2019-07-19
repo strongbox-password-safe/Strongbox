@@ -181,8 +181,8 @@
                         self.viewModel.metadata.duressPin = pin;
                     } else {
                         self.viewModel.metadata.conveniencePin = pin;
-                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
-                        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
+                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
+                        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
                         self.viewModel.metadata.isEnrolledForConvenience = YES;
                     }
                     

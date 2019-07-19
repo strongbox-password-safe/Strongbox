@@ -27,7 +27,7 @@
     
     NSError *error;
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:@"a" keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"a" keyFileDigest:keyFileDigest] error:&error];
     
     XCTAssert(db);
     
@@ -43,7 +43,7 @@
     
     NSError *error;
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:@"a" keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"a" keyFileDigest:keyFileDigest] error:&error];
     
     XCTAssert(db);
 
@@ -59,7 +59,7 @@
     
     NSError *error;
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] error:&error];
     
     XCTAssert(db);
     
@@ -75,7 +75,7 @@
     
     NSError *error;
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(db);
     
@@ -91,7 +91,7 @@
     
     NSError *error;
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(db);
     NSLog(@"%@", db);
@@ -106,7 +106,7 @@
     
     NSError *error;
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:@"" keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"" keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(db);
     NSLog(@"%@", db);
@@ -121,12 +121,12 @@
     
     NSError *error;
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(db);
     NSData* saved = [adaptor save:db error:&error];
     XCTAssert(saved);
-    StrongboxDatabase *reopened = [adaptor open:saved password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *reopened = [adaptor open:saved compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(reopened);
     NSLog(@"%@", reopened);
@@ -141,12 +141,12 @@
     
     NSError *error;
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:data password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *db = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(db);
     NSData* saved = [adaptor save:db error:&error];
     XCTAssert(saved);
-    StrongboxDatabase *reopened = [adaptor open:saved password:nil keyFileDigest:keyFileDigest error:&error];
+    StrongboxDatabase *reopened = [adaptor open:saved compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest]  error:&error];
     
     XCTAssert(reopened);
     NSLog(@"%@", reopened);

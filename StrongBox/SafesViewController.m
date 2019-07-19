@@ -257,9 +257,8 @@
                                          manualOpenOfflineCache:offline
                                                      completion:^(Model * _Nullable model, NSError * _Nullable error) {
             if(model) {
-                // TODO: Open this to all devices not jsut iPads soon...
                 if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
-                    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && !Settings.sharedInstance.doNotUseNewSplitViewController) {
+                    if(!Settings.sharedInstance.doNotUseNewSplitViewController) {
                         [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
                     }
                     else {
@@ -460,7 +459,26 @@
         vc.onDone = ^(BOOL addExisting, SafeMetaData * _Nonnull databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(addExisting) {
-                    [self onAddExistingSafe];
+                    // Here we can check if the user enabled iCloud and we've found an existing database and ask if they
+                    // want to continue adding the database...
+            
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            if([SafesList.sharedInstance getSafesOfProvider:kiCloud].count) {
+                                [Alerts twoOptionsWithCancel:self
+                                                       title:@"Found iCloud Database"
+                                                     message:@"It looks like you already have an iCloud database, would you like to use this one, or would you like to continue adding another?"
+                                           defaultButtonText:@"Use this iCloud database"
+                                            secondButtonText:@"I'd like to add another database"
+                                                      action:^(int response) {
+                                                          if(response == 1) {
+                                                              [self onAddExistingSafe];
+                                                          }
+                                                      }];
+                            }
+                            else {
+                                [self onAddExistingSafe];
+                            }
+                    });
                 }
                 else if(databaseToOpen) {
                     [self openDatabase:databaseToOpen offline:NO];

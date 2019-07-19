@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseOldNonSplitView;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowYubikeySecretWorkaround;
 
 @end
 
@@ -57,6 +58,7 @@
     Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     Settings.sharedInstance.doNotUseNewSplitViewController = self.switchUseOldNonSplitView.on;
+    Settings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
     
     [self bindPreferences];
 }
@@ -69,6 +71,7 @@
     self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchUseOldNonSplitView.on = Settings.sharedInstance.doNotUseNewSplitViewController;
+    self.switchShowYubikeySecretWorkaround.on = Settings.sharedInstance.showYubikeySecretWorkaroundField;
 }
 
 @end

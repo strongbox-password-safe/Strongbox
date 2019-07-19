@@ -75,6 +75,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 
 static NSString* cachedAppGroupName;
 
+static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
+
 @implementation Settings
 
 + (void)initialize {
@@ -89,6 +91,14 @@ static NSString* cachedAppGroupName;
 
 - (NSString *)appGroupName {
     return cachedAppGroupName;
+}
+
+- (BOOL)showYubikeySecretWorkaroundField {
+    return [self getBool:kShowYubikeySecretWorkaroundField];
+}
+
+- (void)setShowYubikeySecretWorkaroundField:(BOOL)showYubikeySecretWorkaroundField {
+    [self setBool:kShowYubikeySecretWorkaroundField value:showYubikeySecretWorkaroundField];
 }
 
 - (BOOL)migratedToNewPasswordGenerator {

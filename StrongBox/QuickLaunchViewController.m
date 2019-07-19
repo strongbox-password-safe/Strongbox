@@ -172,9 +172,8 @@
                                      manualOpenOfflineCache:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
         if(model) {
-            // TODO: Open this to all devices not jsut iPads soon...
             if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
-                if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && !Settings.sharedInstance.doNotUseNewSplitViewController) {
+                if(!Settings.sharedInstance.doNotUseNewSplitViewController) { // TODO: Eventually remove this preference
                     [self performSegueWithIdentifier:@"segueToMasterDetailFromQuick" sender:model];
                 }
                 else {

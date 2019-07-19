@@ -10,6 +10,7 @@
 #import "Cipher.h"
 #import "RootXmlDomainObject.h"
 #import "XmlProcessingContext.h"
+#import "CompositeKeyFactors.h"
 
 typedef struct _KeepassHeader {
     uint8_t signature1[4];
@@ -46,7 +47,6 @@ KeepassFileHeader getNewFileHeader(NSString* version);
 void dumpHeaderEntries(NSDictionary *headerEntries);
 NSObject*__nullable getHeaderEntryObject(uint8_t identifier, NSData* data);
 
-NSData *getCompositeKey(NSString*__nullable password, NSData*__nullable keyFileDigest);
 NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
 NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);

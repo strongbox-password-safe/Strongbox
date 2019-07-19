@@ -29,7 +29,7 @@
         NSString* password = [CommonTesting.testKdbx4FilesAndPasswords objectForKey:file];
         
         //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:blob password:password error:&error];
-        StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:blob password:password error:&error];
+        StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
         
         XCTAssertNotNil(db);
         
@@ -43,7 +43,7 @@
     
     NSError* error;
     //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData password:@"a" error:&error];
+    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     NSLog(@"%@", db);
     
     XCTAssertNotNil(db);
@@ -54,7 +54,7 @@
     
     NSError* error;
     //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData password:@"a" error:&error];
+    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     NSLog(@"%@", db);
     
     XCTAssertNotNil(db);
@@ -62,7 +62,7 @@
 
 - (void)testEmptyDbGetAsDataAndReOpenSafeIsTheSame {
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    StrongboxDatabase* db = [adaptor create:@"password"];
+    StrongboxDatabase* db = [adaptor create:[CompositeKeyFactors password:@"password"]];
     
     NSLog(@"%@", db);
     
@@ -82,7 +82,7 @@
     XCTAssertNil(error);
     XCTAssertNotNil(data);
     
-    StrongboxDatabase *b = [adaptor open:data password:@"password" error:&error];
+    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
     
     if(error) {
         NSLog(@"%@", error);
@@ -101,7 +101,7 @@
 - (void)testSmallNewDbWithPasswordGetAsDataAndReOpenSafeIsTheSame {
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
 
-    StrongboxDatabase* db = [adaptor create:@"password"];
+    StrongboxDatabase* db = [adaptor create:[CompositeKeyFactors password:@"password"]];
 
     KeePass4DatabaseMetadata* metadata = db.metadata;
     XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
@@ -135,7 +135,7 @@
     XCTAssertNotNil(data);
     
     // Kdbx4Database *b = [[Kdbx4Database alloc] initExistingWithDataAndPassword:data password:@"password" error:&error];
-    StrongboxDatabase* b = [adaptor open:data password:@"password" error:&error];
+    StrongboxDatabase* b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
     if(error) {
         NSLog(@"%@", error);
     }
@@ -187,7 +187,7 @@
     
     NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
     XCTAssertNotNil(db);
     
@@ -205,7 +205,7 @@
     
     NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error]; //:blob password:@"a" error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error]; //:blob password:@"a" error:&error];
     
     XCTAssertNotNil(db);
     
@@ -215,7 +215,7 @@
 
     XCTAssert(data);
     
-    StrongboxDatabase *db2 = [adaptor open:data password:@"a" error:&error];
+    StrongboxDatabase *db2 = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
 
     NSLog(@"AFTER: %@", db2);
 
@@ -231,7 +231,7 @@
     
     NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
     XCTAssertNotNil(db);
     
@@ -253,14 +253,14 @@
     
     NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    StrongboxDatabase *b = [adaptor open:blob password:@"a" error:&error];
+    StrongboxDatabase *b = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
     XCTAssertNotNil(b);
     
     NSLog(@"BEFORE: %@", b);
     
     NSData* recData = [adaptor save:b error:&error]; // [b getAsData:&error];
-    StrongboxDatabase *db = [adaptor open:recData password:@"a" error:&error];
+    StrongboxDatabase *db = [adaptor open:recData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
     Node* testNode = db.rootGroup.childGroups[0].childRecords[0];
     XCTAssert(testNode);
@@ -278,7 +278,7 @@
     
     NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:@"a" error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
     XCTAssertNotNil(db);
     

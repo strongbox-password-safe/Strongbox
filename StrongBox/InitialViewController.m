@@ -295,17 +295,15 @@
 
 - (void)onICloudAvailable {
     if (!Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
-        [Settings sharedInstance].iCloudPrompted = YES;
-
         BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
         BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
         
-        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { // Empty Databases - Assume user wants iCloud on
-            Settings.sharedInstance.iCloudOn = YES; // Empty
+        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { // Empty Databases - Possibly first time user - onboarding will ask
+            //Settings.sharedInstance.iCloudOn = YES; // Empty
             [self onICloudAvailableContinuation];
             return;
         }
-        else if(self.presentedViewController == nil) {
+        else if (self.presentedViewController == nil) {
             NSString *message = existingLocalDeviceSafes ?
             (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
              @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
@@ -319,6 +317,7 @@
                   if(response) {
                       Settings.sharedInstance.iCloudOn = YES;
                   }
+                  [Settings sharedInstance].iCloudPrompted = YES;
                   [self onICloudAvailableContinuation];
               }];
         }

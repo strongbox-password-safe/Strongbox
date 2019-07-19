@@ -350,6 +350,9 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
 }
 
 + (NSData *)dataFromHexString:(NSString*)string {
+    // Remove any and all spaces
+    string = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
     const char *chars = [string UTF8String];
     NSUInteger i = 0, len = string.length;
     
@@ -375,6 +378,12 @@ NSData* sha256(NSData *data) {
     NSData *out = [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
     
     return out;
+}
+
+NSData* hmacSha1(NSData* data, NSData* key) {
+    unsigned char cHMAC[CC_SHA1_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA1, key.bytes, key.length, data.bytes, data.length, cHMAC);
+    return [[NSData alloc] initWithBytes:cHMAC length:CC_SHA1_DIGEST_LENGTH];
 }
 
 uint32_t getRandomUint32() {

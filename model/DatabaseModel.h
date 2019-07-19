@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseModel : NSObject
 
++ (NSData *_Nullable)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error;
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
 + (BOOL)isAutoFillLikelyToCrash:(NSData*)data;
@@ -21,16 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
-- (instancetype)initNewWithPassword:(nullable NSString *)password keyFileDigest:(nullable NSData*)keyFileDigest format:(DatabaseFormat)format;
+- (instancetype)initNew:(CompositeKeyFactors*)compositeKeyFactors format:(DatabaseFormat)format;
 
-- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data
-                                                  password:(NSString *_Nonnull)password
-                                                     error:(NSError *_Nonnull*_Nonnull)ppError;
-
-- (instancetype _Nullable )initExistingWithDataAndPassword:(NSData *_Nonnull)data
-                                                  password:(NSString *__nullable)password
-                                             keyFileDigest:(NSData* __nullable)keyFileDigest
-                                                     error:(NSError *_Nonnull*_Nonnull)ppError;
+- (instancetype _Nullable )initExisting:(NSData *_Nonnull)data
+                    compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+                                  error:(NSError *_Nonnull*_Nonnull)ppError;
 
 - (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
 
@@ -53,8 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *activeGroups;
 
-@property (nonatomic, retain, nullable) NSString *masterPassword;
-@property (nonatomic, retain, nullable) NSData *keyFileDigest;
+@property (nonatomic, nonnull, readonly) CompositeKeyFactors* compositeKeyFactors;
+
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, readonly, nonnull) NSString* fileExtension;
 

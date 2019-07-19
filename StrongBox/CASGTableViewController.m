@@ -34,6 +34,9 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowEmpty;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellYubiKeySecret;
+@property (weak, nonatomic) IBOutlet UITextField *textFieldYubikeySecret;
+
 @property (nullable) NSString* selectedName;
 @property (nullable) NSString* selectedPassword;
 @property (nullable) NSURL* selectedKeyFileUrl;
@@ -209,15 +212,16 @@
     creds.format = self.selectedFormat;
     creds.readOnly = self.switchReadOnly.on;
     creds.offlineCache = self.switchOpenOffline.on;
+    creds.yubiKeySecret = self.textFieldYubikeySecret.text;
     
     self.onDone(YES, creds);
 }
 
 - (void)bindTableView {
     BOOL showAllowEmpty = (self.selectedFormat == kKeePass1 && [self keyFileIsSet]) ||
-    self.selectedFormat == kKeePass4 ||
-    self.selectedFormat == kKeePass ||
-    self.selectedFormat == kFormatUnknown;
+                                                                self.selectedFormat == kKeePass4 ||
+                                                                self.selectedFormat == kKeePass ||
+                                                                self.selectedFormat == kFormatUnknown;
 
     if(self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
         [self cell:self.cellKeyFile setHidden:YES];
@@ -227,6 +231,7 @@
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
+        [self cell:self.cellYubiKeySecret setHidden:YES];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
@@ -235,6 +240,7 @@
         [self cell:self.cellFormat setHidden:self.mode == kCASGModeCreateExpress];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
+        [self cell:self.cellYubiKeySecret setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
     }
@@ -244,17 +250,21 @@
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
+        [self cell:self.cellYubiKeySecret setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
     }
     else if(self.mode == kCASGModeGetCredentials) {
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
-        
         [self cell:self.cellDatabaseName setHidden:YES];
         [self cell:self.cellFormat setHidden:YES];
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         
+        [self cell:self.cellYubiKeySecret setHidden:!Settings.sharedInstance.showYubikeySecretWorkaroundField ||
+                                                     self.initialFormat == kPasswordSafe ||
+                                                     self.initialFormat == kKeePass1];
+
         if(self.offlineCacheDate) {
             self.labelOfflineCache.text = [NSString stringWithFormat:@"Open Offline Cache (%@)",friendlyDateStringVeryShort(self.offlineCacheDate)];
         }

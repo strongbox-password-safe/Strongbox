@@ -294,13 +294,13 @@
                         </connections>
                     </tableView>
                     <toolbarItems>
-                        <barButtonItem image="maintenance" id="YZa-t7-Q9A">
+                        <barButtonItem title="Database Management" image="maintenance" id="YZa-t7-Q9A">
                             <connections>
                                 <segue destination="tH9-ae-xkY" kind="presentation" identifier="segueToSafeSettings" id="Vt6-Gg-48O"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem systemItem="flexibleSpace" id="nT5-Nw-Gyx"/>
-                        <barButtonItem title="Move" image="folder-move" id="xfT-gV-3qh">
+                        <barButtonItem title="Move Items" image="folder-move" id="xfT-gV-3qh">
                             <connections>
                                 <action selector="onMove:" destination="HOc-E3-CoK" id="hqL-zD-Mb6"/>
                             </connections>

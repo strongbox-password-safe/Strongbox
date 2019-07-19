@@ -143,24 +143,24 @@
 - (void)setCredentials:(NSString*)password keyFileUrl:(NSURL*)keyFileUrl oneTimeKeyFileData:(NSData*)oneTimeKeyFileData {
     if(keyFileUrl != nil || oneTimeKeyFileData != nil) {
         NSError* error;
-        self.viewModel.database.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
+        self.viewModel.database.compositeKeyFactors.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
         
-        if(self.viewModel.database.keyFileDigest == nil) {
+        if(self.viewModel.database.compositeKeyFactors.keyFileDigest == nil) {
             [Alerts error:self title:@"Could not change credentials" error:error];
             return;
         }
     }
     else {
-        self.viewModel.database.keyFileDigest = nil;
+        self.viewModel.database.compositeKeyFactors.keyFileDigest = nil;
     }
 
-    self.viewModel.database.masterPassword = password;
+    self.viewModel.database.compositeKeyFactors.password = password;
     
     [self.viewModel update:^(NSError *error) {
         if (error == nil) {
             if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-                self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
-                self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
+                self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
+                self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
                 
                 NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
             }
@@ -222,8 +222,8 @@
     else {
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForConvenience = YES;
-        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.masterPassword;
-        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.keyFileDigest;
+        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
+        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindSettings];

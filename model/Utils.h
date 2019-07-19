@@ -75,6 +75,7 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width);
 + (NSData *)dataFromHexString:(NSString*)string;
 
 NSData* sha256(NSData *data);
+NSData* hmacSha1(NSData *data, NSData* key);
 NSData*_Nullable getRandomData(uint32_t length);
 uint32_t getRandomUint32(void);
 

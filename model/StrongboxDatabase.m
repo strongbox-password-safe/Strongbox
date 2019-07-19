@@ -23,39 +23,43 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 @implementation StrongboxDatabase
 
 - (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata
-                  masterPassword:(NSString *)masterPassword
-                   keyFileDigest:(NSData*)keyFileDigest {
-    return [self initWithRootGroup:[Node rootGroup] metadata:metadata masterPassword:masterPassword keyFileDigest:nil];
+             compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
+    return [self initWithRootGroup:[Node rootGroup]
+                          metadata:metadata
+               compositeKeyFactors:compositeKeyFactors];
 }
 
-- (instancetype)initWithRootGroup:(Node *)rootGroup
+- (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(NSString *)masterPassword
-                    keyFileDigest:(NSData*)keyFileDigest {
-    return [self initWithRootGroup:rootGroup metadata:metadata masterPassword:masterPassword keyFileDigest:keyFileDigest attachments:[NSArray array]];
+              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
+    return [self initWithRootGroup:rootGroup
+                          metadata:metadata
+               compositeKeyFactors:compositeKeyFactors
+                       attachments:[NSArray array]];
 }
 
-- (instancetype)initWithRootGroup:(Node *)rootGroup
+- (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(NSString *)masterPassword
-                    keyFileDigest:(NSData*)keyFileDigest
-                      attachments:(NSArray<DatabaseAttachment *> *)attachments {
-    return [self initWithRootGroup:rootGroup metadata:metadata masterPassword:masterPassword keyFileDigest:keyFileDigest attachments:attachments customIcons:[NSDictionary dictionary]];
+              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+                      attachments:(NSArray<DatabaseAttachment*>*)attachments {
+    return [self initWithRootGroup:rootGroup
+                          metadata:metadata
+               compositeKeyFactors:compositeKeyFactors
+                       attachments:attachments
+                       customIcons:[NSDictionary dictionary]];
 }
 
-- (instancetype)initWithRootGroup:(Node *)rootGroup
+- (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(NSString *)masterPassword
-                    keyFileDigest:(NSData*)keyFileDigest
-                      attachments:(NSArray<DatabaseAttachment *> *)attachments
-                      customIcons:(NSDictionary<NSUUID *,NSData *> *)customIcons {
+              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+                      attachments:(NSArray<DatabaseAttachment*>*)attachments
+                      customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons {
     self = [super init];
     
     if (self) {
         _rootGroup = rootGroup;
         _metadata = metadata;
-        _masterPassword = masterPassword;
-        _keyFileDigest = keyFileDigest;
+        _compositeKeyFactors = compositeKeyFactors;
         _mutableAttachments = [[AttachmentsRationalizer rationalizeAttachments:attachments root:rootGroup] mutableCopy];
         
         self.mutableCustomIcons = [customIcons mutableCopy];
@@ -405,7 +409,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 //
 
 -(NSString *)description {
-    return [NSString stringWithFormat:@"masterPassword = %@, metadata=%@, rootGroup = %@", self.masterPassword, self.metadata, self.rootGroup];
+    return [NSString stringWithFormat:@"masterPassword = %@, metadata=%@, rootGroup = %@",
+            self.compositeKeyFactors.password, self.metadata, self.rootGroup];
 }
 
 @end

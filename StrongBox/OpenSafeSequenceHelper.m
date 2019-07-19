@@ -47,6 +47,7 @@
 @property NSString* masterPassword;
 @property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
+@property NSString* yubikeySecret;
 
 @end
 
@@ -384,7 +385,12 @@
     scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(success) {
-                [self onGotManualCredentials:creds.password keyFileUrl:creds.keyFileUrl oneTimeKeyFileData:creds.oneTimeKeyFileData readOnly:creds.readOnly openOffline:creds.offlineCache];
+                [self onGotManualCredentials:creds.password
+                                  keyFileUrl:creds.keyFileUrl
+                          oneTimeKeyFileData:creds.oneTimeKeyFileData
+                                    readOnly:creds.readOnly
+                                 openOffline:creds.offlineCache
+                               yubikeySecret:creds.yubiKeySecret];
             }
             else {
                 self.completion(nil, nil);
@@ -399,7 +405,8 @@
                     keyFileUrl:(NSURL*)keyFileUrl
             oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                       readOnly:(BOOL)readOnly
-                   openOffline:(BOOL)openOffline {
+                   openOffline:(BOOL)openOffline
+                 yubikeySecret:(NSString*)yubikeySecret {
     if(keyFileUrl || oneTimeKeyFileData) {
         NSError *error;
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
@@ -412,6 +419,11 @@
             return;
         }
     }
+
+    self.yubikeySecret = yubikeySecret;
+    if(yubikeySecret.length) {
+        readOnly = YES;
+    }
     
     // Change in Read-Only or Key File Setting? Save
     
@@ -420,6 +432,7 @@
         self.safe.keyFileUrl = keyFileUrl;
         [SafesList.sharedInstance update:self.safe];
     }
+    
     
     self.manualOpenOfflineCache = openOffline;
     self.masterPassword = password;
@@ -502,9 +515,34 @@
     });
 }
 
+- (NSData*)getYubikeyResponse:(NSData*)database error:(NSError**)error {
+    NSData* challenge = [DatabaseModel getYubikeyChallenge:database error:error];
+    
+    if(!challenge || !self.yubikeySecret.length) {
+        return nil;
+    }
+    
+    //NSLog(@"Got Yubikey Challenge: [%@]", challenge);
+    
+    NSData* yubikeySecretData = [Utils dataFromHexString:self.yubikeySecret];
+    NSData* challengeResponse = hmacSha1(challenge, yubikeySecretData);
+    
+    return challengeResponse;
+}
+
 - (void)openSafeWithData:(NSData *)data
                 provider:(id)provider
                cacheMode:(BOOL)cacheMode {
+    NSError* error;
+    if(![DatabaseModel isAValidSafe:data error:&error]) {
+        [self openSafeWithDataDone:error
+                        openedSafe:nil
+                         cacheMode:cacheMode
+                          provider:provider
+                              data:data];
+        return;
+    }
+    
     [SVProgressHUD showWithStatus:@"Decrypting..."];
 
     DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
@@ -512,24 +550,37 @@
         self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
     }
 
+    // Yubikey?
+    
+    NSData* yubikeyResponse = self.yubikeySecret.length ? [self getYubikeyResponse:data error:&error] : nil;
+    if(error) {
+        NSLog(@"Yubikey secret provided but error getting challenge or response.");
+        [self openSafeWithDataDone:error
+                        openedSafe:nil
+                         cacheMode:cacheMode
+                          provider:provider
+                              data:data];
+        return;
+    }
+    
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSError *error;
         DatabaseModel *openedSafe = nil;
 
-        if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) && self.masterPassword.length == 0 && self.keyFileDigest) {
+        CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword keyFileDigest:self.keyFileDigest yubiKeyResponse:yubikeyResponse];
+
+        if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) &&
+           self.masterPassword.length == 0 && (self.keyFileDigest || yubikeyResponse)) {
             // KeePass 2 allows empty and nil/none... we need to try both to figure out what the user meant.
             // We will try empty first which is what will have come from the View Controller and then nil.
             
-            openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
-                                                                       password:self.masterPassword // Will be @""
-                                                                  keyFileDigest:self.keyFileDigest
-                                                                          error:&error];
+            // self.masterPassword // Will be @""
+        
+            openedSafe = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
             
             if(openedSafe == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
-                openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
-                                                                           password:nil
-                                                                      keyFileDigest:self.keyFileDigest
-                                                                              error:&error];
+                cpf = [CompositeKeyFactors password:nil keyFileDigest:self.keyFileDigest yubiKeyResponse:yubikeyResponse];
+                openedSafe = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
                 
                 if(openedSafe) {
                     self.masterPassword = nil;
@@ -537,10 +588,7 @@
             }
         }
         else {
-            openedSafe = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
-                                                                       password:self.masterPassword
-                                                                  keyFileDigest:self.keyFileDigest
-                                                                          error:&error];
+            openedSafe = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^(void){
@@ -594,15 +642,25 @@
         self.completion(nil, error);
     }
     else {
-        if (!self.canConvenienceEnrol || cacheMode || self.safe.isEnrolledForConvenience || ![[Settings sharedInstance] isProOrFreeTrial] || self.safe.hasBeenPromptedForConvenience) {
+        // SAFETY: Guarantee no writes with old yubikey response in some kind of unthinkable scenario when we have opened
+        // using the Yubikey secret workaround
+        
+        openedSafe.compositeKeyFactors.yubiKeyResponse = nil; // TODO: Eventually allow this when we allow writeable yubikey dbs
+        
+        if (!self.canConvenienceEnrol ||
+            cacheMode ||
+            self.safe.isEnrolledForConvenience ||
+            ![[Settings sharedInstance] isProOrFreeTrial] ||
+            self.safe.hasBeenPromptedForConvenience ||
+            self.yubikeySecret.length) { // Do not allow convenience enrol if yubikey secret is being used as we're not storing it at the moment
             // Can't or shouldn't Convenience Enrol...
             [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
         }
         else {
             BOOL biometricPossible = Settings.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
             BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
-
-            if(!biometricPossible && !pinPossible) {
+            
+            if (!biometricPossible && !pinPossible) {
                 // Can enrol but no methods possible
                 [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
             }
@@ -651,8 +709,8 @@
                                                             handler:^(UIAlertAction *a) {
                                                                 self.safe.isTouchIdEnabled = YES;
                                                                 self.safe.isEnrolledForConvenience = YES;
-                                                                self.safe.convenienceMasterPassword = openedSafe.masterPassword;
-                                                                self.safe.convenenienceKeyFileDigest = openedSafe.keyFileDigest;
+                                                                self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
+                                                                self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
                                                                 self.safe.hasBeenPromptedForConvenience = YES;
                                                                 
                                                                 [SafesList.sharedInstance update:self.safe];
@@ -706,8 +764,8 @@
                 if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
                     self.safe.conveniencePin = pin;
                     self.safe.isEnrolledForConvenience = YES;
-                    self.safe.convenienceMasterPassword = openedSafe.masterPassword;
-                    self.safe.convenenienceKeyFileDigest = openedSafe.keyFileDigest;
+                    self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
+                    self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
                     self.safe.hasBeenPromptedForConvenience = YES;
                     
                     [SafesList.sharedInstance update:self.safe];
@@ -749,14 +807,7 @@
         
         if(self.safe.autoFillEnabled) {
             [viewModel updateAutoFillCacheWithData:data];
-            
-//            if(!Settings.sharedInstance.hasPromptedUserToEnableAutoFill &&
-//               AutoFillManager.sharedInstance.isAutoFillAvailableButDisabled) {
-//                // TODO: Prompt user to enable
-//            }
-//            else {
-                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
-//            }
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }
 
         NSLog(@"Setting likelyFormat to [%u]", openedSafe.format);

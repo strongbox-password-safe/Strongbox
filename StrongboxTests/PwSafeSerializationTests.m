@@ -23,7 +23,7 @@
     NSError *error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
 
-    StrongboxDatabase *db = [adaptor open:safeData password:@"a" error:&error];
+    StrongboxDatabase *db = [adaptor open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
 
     if(!db) {
         NSLog(@"ERROR: %@", error);
@@ -42,7 +42,7 @@
     
     NSError *error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:safeData password:@"M1cr0s0ft" error:&error];
+    StrongboxDatabase *db = [adaptor open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"M1cr0s0ft"] error:&error];
     
     if(!db) {
         NSLog(@"ERROR: %@", error);

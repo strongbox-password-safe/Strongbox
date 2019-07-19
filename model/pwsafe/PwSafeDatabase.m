@@ -27,23 +27,15 @@
     return [PwSafeSerialization isAValidSafe:candidate error:error];
 }
 
--(StrongboxDatabase *)create:(NSString *)password {
-    return [self create:password keyFileDigest:nil];
-}
-
--(StrongboxDatabase *)create:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] masterPassword:password keyFileDigest:nil];
+- (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] compositeKeyFactors:compositeKeyFactors];
     
     [self defaultLastUpdateFieldsToNow:(PwSafeMetadata*)ret.metadata];
     
     return ret;
 }
 
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError **)error {
-    return [self open:data password:password keyFileDigest:nil error:error];
-}
-
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest error:(NSError **)error {
+- (StrongboxDatabase *)open:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)error {
     if (![PwSafeDatabase isAValidSafe:data error:error]) {
         NSLog(@"Not a valid safe!");
         
@@ -56,7 +48,7 @@
 
     NSMutableArray<Field*> *headerFields;
     NSArray<Record*> *records = [self decryptSafe:data
-                                         password:password
+                                         password:compositeKeyFactors.password
                                           headers:&headerFields
                                             error:error];
 
@@ -80,14 +72,14 @@
 
     [self syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
     
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password keyFileDigest:nil];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:compositeKeyFactors];
     ret.adaptorTag = headerFields;
 
     return ret;
 }
 
 - (NSData *)save:(StrongboxDatabase *)database error:(NSError **)error {
-    if(!database.masterPassword) {
+    if(!database.compositeKeyFactors.password) {
         if(error) {
             *error = [Utils createNSError:@"Master Password not set." errorCode:-3];
         }
@@ -104,7 +96,7 @@
     
     NSData *K, *L;
     PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)metadata.keyStretchIterations
-                                                      masterPassword:database.masterPassword
+                                                      masterPassword:database.compositeKeyFactors.password
                                                                    K:&K
                                                                    L:&L];
     
@@ -148,6 +140,11 @@
     
     return ret;
 }
+
++ (NSData *_Nullable)getYubikeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
+    return nil;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deserialization

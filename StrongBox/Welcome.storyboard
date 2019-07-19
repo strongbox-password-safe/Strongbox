@@ -130,11 +130,132 @@
                         <outlet property="labelMessage1" destination="NwP-5P-0Bq" id="27l-wn-NYF"/>
                         <outlet property="labelMessage2" destination="oK0-Zj-23i" id="sgi-di-cZZ"/>
                         <segue destination="JIT-YM-MTv" kind="show" identifier="segueToCreate" id="xDs-2z-Iqv"/>
+                        <segue destination="eS1-EV-xF2" kind="show" identifier="segueToICloudPrompt" id="hkm-MT-sHA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SJO-B6-LkR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="815" y="-282"/>
+            <point key="canvasLocation" x="555" y="98"/>
+        </scene>
+        <!--Use iCloud?-->
+        <scene sceneID="TAe-je-7XW">
+            <objects>
+                <viewController title="Use iCloud?" extendedLayoutIncludesOpaqueBars="YES" modalPresentationStyle="formSheet" hidesBottomBarWhenPushed="YES" id="eS1-EV-xF2" customClass="WelcomeUseICloudViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="9FA-sm-TNl">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eA3-ey-Ilg">
+                                <rect key="frame" x="20" y="202.33333333333337" width="374" height="402"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Use iCloud?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jZz-Dg-Hqg" userLabel="Heading">
+                                        <rect key="frame" x="0.0" y="0.0" width="374" height="43"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="36"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="iCloud is available on this device, would you like to enable it for Strongbox?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dBe-kT-Zyp" userLabel="Message">
+                                        <rect key="frame" x="0.0" y="51" width="374" height="42.333333333333343"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="748" text="You can use iCloud to make your databases available across all your devices seamlessly." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IR2-ja-Yf3" userLabel="Message">
+                                        <rect key="frame" x="0.0" y="123.33333333333333" width="374" height="42.333333333333329"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WTP-2R-oTB">
+                                        <rect key="frame" x="62" y="195.66666666666666" width="250" height="55"/>
+                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="55" id="3OI-in-dw6"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="ugs-cP-cBv"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <state key="normal" title="Use iCloud">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onUseICloud:" destination="eS1-EV-xF2" eventType="touchUpInside" id="cSB-Eh-Vcu"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="747" text="or" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="puR-8j-GRT" userLabel="Message">
+                                        <rect key="frame" x="179" y="262.66666666666663" width="16" height="20.333333333333314"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dbL-uP-DgX">
+                                        <rect key="frame" x="62" y="295" width="250" height="55"/>
+                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="55" id="YAY-Vb-Xnc"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="oTy-if-ncy"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <state key="normal" title="Do Not Use iCloud">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onDoNotUseICloud:" destination="eS1-EV-xF2" eventType="touchUpInside" id="UWK-9A-uL1"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RUg-zZ-USW">
+                                        <rect key="frame" x="158.66666666666666" y="370" width="57" height="32"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                        <state key="normal" title="Dismiss">
+                                            <color key="titleColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onDismiss:" destination="eS1-EV-xF2" eventType="touchUpInside" id="lSb-AC-rf1"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="jZz-Dg-Hqg" firstAttribute="leading" secondItem="eA3-ey-Ilg" secondAttribute="leading" id="8YU-Y9-YNM"/>
+                                    <constraint firstItem="RUg-zZ-USW" firstAttribute="top" secondItem="dbL-uP-DgX" secondAttribute="bottom" constant="20" id="BHZ-cC-3Km"/>
+                                    <constraint firstItem="dBe-kT-Zyp" firstAttribute="leading" secondItem="eA3-ey-Ilg" secondAttribute="leading" id="Gyt-Je-mNV"/>
+                                    <constraint firstItem="dbL-uP-DgX" firstAttribute="top" secondItem="puR-8j-GRT" secondAttribute="bottom" constant="12" id="Lrg-fW-a8u"/>
+                                    <constraint firstItem="puR-8j-GRT" firstAttribute="centerX" secondItem="eA3-ey-Ilg" secondAttribute="centerX" id="Lyh-5z-ouk"/>
+                                    <constraint firstItem="dbL-uP-DgX" firstAttribute="centerX" secondItem="eA3-ey-Ilg" secondAttribute="centerX" id="Q4C-vp-NYi"/>
+                                    <constraint firstItem="RUg-zZ-USW" firstAttribute="centerX" secondItem="eA3-ey-Ilg" secondAttribute="centerX" id="RPb-BQ-4cf"/>
+                                    <constraint firstItem="WTP-2R-oTB" firstAttribute="top" secondItem="IR2-ja-Yf3" secondAttribute="bottom" constant="30" id="VFP-YL-53l"/>
+                                    <constraint firstAttribute="trailing" secondItem="jZz-Dg-Hqg" secondAttribute="trailing" id="X4S-28-Ekk"/>
+                                    <constraint firstAttribute="trailing" secondItem="dBe-kT-Zyp" secondAttribute="trailing" id="at8-RE-Kvc"/>
+                                    <constraint firstItem="WTP-2R-oTB" firstAttribute="centerX" secondItem="eA3-ey-Ilg" secondAttribute="centerX" id="bpr-uU-TdB"/>
+                                    <constraint firstAttribute="trailing" secondItem="IR2-ja-Yf3" secondAttribute="trailing" id="cL5-e0-Mm6"/>
+                                    <constraint firstItem="puR-8j-GRT" firstAttribute="top" secondItem="WTP-2R-oTB" secondAttribute="bottom" constant="12" id="cwO-J9-MRi"/>
+                                    <constraint firstAttribute="trailing" secondItem="dBe-kT-Zyp" secondAttribute="trailing" id="ekV-3m-6gi"/>
+                                    <constraint firstItem="jZz-Dg-Hqg" firstAttribute="top" secondItem="eA3-ey-Ilg" secondAttribute="top" id="fgg-gq-hb1"/>
+                                    <constraint firstAttribute="bottom" secondItem="RUg-zZ-USW" secondAttribute="bottom" id="gNp-YH-rKR"/>
+                                    <constraint firstItem="dBe-kT-Zyp" firstAttribute="top" secondItem="jZz-Dg-Hqg" secondAttribute="bottom" constant="8" id="h7G-lM-kfX"/>
+                                    <constraint firstItem="dBe-kT-Zyp" firstAttribute="leading" secondItem="eA3-ey-Ilg" secondAttribute="leading" id="jDX-I1-F58"/>
+                                    <constraint firstItem="IR2-ja-Yf3" firstAttribute="leading" secondItem="eA3-ey-Ilg" secondAttribute="leading" id="l5t-vQ-vfK"/>
+                                    <constraint firstItem="IR2-ja-Yf3" firstAttribute="top" secondItem="dBe-kT-Zyp" secondAttribute="bottom" constant="30" id="ztS-nS-zqD"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="eA3-ey-Ilg" firstAttribute="leading" secondItem="Fnc-4e-bvg" secondAttribute="leading" constant="20" id="H1G-kN-orj"/>
+                            <constraint firstItem="Fnc-4e-bvg" firstAttribute="trailing" secondItem="eA3-ey-Ilg" secondAttribute="trailing" constant="20" id="M06-Pe-Be1"/>
+                            <constraint firstItem="eA3-ey-Ilg" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Fnc-4e-bvg" secondAttribute="top" id="Vmg-17-cTj"/>
+                            <constraint firstItem="Fnc-4e-bvg" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="eA3-ey-Ilg" secondAttribute="bottom" id="kNo-x4-K3C"/>
+                            <constraint firstItem="eA3-ey-Ilg" firstAttribute="centerY" secondItem="9FA-sm-TNl" secondAttribute="centerY" multiplier="0.9" id="rj2-s8-8cq"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Fnc-4e-bvg"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="Tc2-GU-4xQ"/>
+                    <connections>
+                        <segue destination="JIT-YM-MTv" kind="show" identifier="segueToDatabaseName" id="E5F-62-0vl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="V0L-R9-Xrc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1499" y="-250"/>
         </scene>
         <!--Create Database-->
         <scene sceneID="tJD-h8-uSf">
@@ -253,7 +374,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="e4V-uK-TCm" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="VTJ-UJ-0Xl" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2108" y="97.536945812807886"/>
+            <point key="canvasLocation" x="2384" y="98"/>
         </scene>
         <!--Set Master Password-->
         <scene sceneID="0mO-3w-JPM">
@@ -369,7 +490,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zbe-P8-xt2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2970" y="98"/>
+            <point key="canvasLocation" x="3432" y="98"/>
         </scene>
         <!--Welcome Create Done View Controller-->
         <scene sceneID="org-11-4dx">
@@ -483,7 +604,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sB3-Sv-4Zc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3783" y="98"/>
+            <point key="canvasLocation" x="3403" y="98"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Tlt-Za-Zi8">
@@ -496,12 +617,15 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="n1n-7g-yga" kind="relationship" relationship="rootViewController" id="wOP-8A-sFj"/>
+                        <segue destination="n1n-7g-yga" kind="relationship" relationship="rootViewController" id="dLC-ja-0bC"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AGO-nd-0gm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-174" y="-271"/>
+            <point key="canvasLocation" x="-435" y="98"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="E5F-62-0vl"/>
+    </inferredMetricsTieBreakers>
 </document>

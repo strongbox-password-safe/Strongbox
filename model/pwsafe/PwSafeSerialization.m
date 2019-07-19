@@ -260,7 +260,7 @@
 }
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    if(candidate == nil) {
+    if(candidate == nil || candidate.length < SIZE_OF_PASSWORD_SAFE_3_HEADER) {
         return NO;
     }
     

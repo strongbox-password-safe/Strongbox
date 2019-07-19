@@ -9,6 +9,8 @@
 #import "WelcomeViewController.h"
 #import "WelcomeCreateDatabaseViewController.h"
 #import "SafesList.h"
+#import "Settings.h"
+#import "WelcomeUseICloudViewController.h"
 
 @interface WelcomeViewController ()
 
@@ -81,12 +83,22 @@
 }
 
 - (IBAction)onCreate:(id)sender {
-    [self performSegueWithIdentifier:@"segueToCreate" sender:nil];
+    if(Settings.sharedInstance.iCloudAvailable && !Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+        [self performSegueWithIdentifier:@"segueToICloudPrompt" sender:@(NO)];
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToCreate" sender:nil];
+    }
 }
 
 - (IBAction)onAdd:(id)sender {
-    NSInteger count = SafesList.sharedInstance.snapshot.count;
-    self.onDone(count == 0, nil);
+    if(Settings.sharedInstance.iCloudAvailable && !Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+        [self performSegueWithIdentifier:@"segueToICloudPrompt" sender:@(YES)];
+    }
+    else {
+        NSInteger count = SafesList.sharedInstance.snapshot.count;
+        self.onDone(count == 0, nil);
+    }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -95,6 +107,13 @@
         
         vc.onDone = self.onDone;
     }
+    else if([segue.identifier isEqualToString:@"segueToICloudPrompt"]) {
+        WelcomeUseICloudViewController* vc = (WelcomeUseICloudViewController*)segue.destinationViewController;
+        
+        vc.addExisting = ((NSNumber*)sender).boolValue;
+        vc.onDone = self.onDone;
+    }
+    
 }
 
 @end

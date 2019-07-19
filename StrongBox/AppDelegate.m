@@ -51,9 +51,9 @@
     
     [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
     
-    NSLog(@"Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
-    NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
-    
+    //    NSLog(@"Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
+    //    NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
+
     return YES;
 }
 

@@ -226,33 +226,6 @@ NSString* headerEntryIdentifierString(HeaderEntryIdentifier identifier) {
     }
 }
 
-NSData *getCompositeKey(NSString* password, NSData* keyFileDigest) {
-    NSData *hashedPassword = password != nil ? sha256([password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
-    NSData *hashedKeyFileData = keyFileDigest;
-    
-    // Concatenate together in one big sha256...
-    
-    NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
-    CC_SHA256_CTX context;
-    CC_SHA256_Init(&context);
-    
-    if(hashedPassword) {
-        CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
-    }
-    
-    if(hashedKeyFileData) {
-        CC_SHA256_Update(&context, hashedKeyFileData.bytes, (CC_LONG)hashedKeyFileData.length);
-    }
-    
-    CC_SHA256_Final(compositeKey.mutableBytes, &context);
-    
-    if(kLogVerbose) {
-        NSLog(@"COMPOSITE KEY: %@", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
-    }
-    
-    return compositeKey;
-}
-
 NSData *getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     //    1. create an AES cipher, taking Transform Seed as its key/seed,
@@ -310,6 +283,7 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey) {
     CC_SHA256_Init(&context);
     CC_SHA256_Update(&context, masterSeed.bytes, (CC_LONG)masterSeed.length);
     CC_SHA256_Update(&context, transformKey.bytes, (CC_LONG)transformKey.length);
+    
     CC_SHA256_Final(masterKey.mutableBytes, &context);
     
     if(kLogVerbose) {

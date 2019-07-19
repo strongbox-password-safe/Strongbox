@@ -83,7 +83,7 @@
     }
     else {
         self.labelTotp.text = @"No TOTP Setup";
-        self.labelTotp.textColor = nil; // TODO: Right?
+        self.labelTotp.textColor = nil;
     }
 }
 

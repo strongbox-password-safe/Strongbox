@@ -44,20 +44,6 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
-- (BOOL)isAutoFillAvailableButDisabled {
-    return NO;
-    // TODO:
-    
-    //    if (@available(iOS 12.0, *)) {
-//        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
-//               return !state.enabled;;
-//        }];
-//    }
-//    else {
-//        return NO;
-//    }
-}
-
 - (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid {
     if (@available(iOS 12.0, *)) {
         NSLog(@"Updating Quick Type AutoFill Database...");
@@ -94,9 +80,6 @@ static NSString* const kMailToScheme = @"mailto";
             }
             else {
                 NSLog(@"AutoFill Credential Store Disabled...");
-                
-//                if (self)
-//                [Alerts ]
             }
         }];
     }

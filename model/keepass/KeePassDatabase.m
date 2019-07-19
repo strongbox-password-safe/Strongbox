@@ -13,11 +13,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@interface KeePassDatabase ()
-
-@end
-
 @implementation KeePassDatabase
+
++ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error {
+    return [KdbxSerialization getYubikeyChallenge:candidate error:error];
+}
 
 + (NSString *)fileExtension {
     return @"kdbx";
@@ -35,11 +35,7 @@
     return [KdbxSerialization isAValidSafe:candidate error:error];
 }
 
-- (StrongboxDatabase *)create:(NSString *)password {
-    return [self create:password keyFileDigest:nil];
-}
-
--(StrongboxDatabase *)create:(NSString *)password keyFileDigest:(nullable NSData *)keyFileDigest {
+- (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
     Node* rootGroup = [[Node alloc] initAsRoot:nil];
     
     // Keepass has it's own root group to work off of, and doesn't allow entries at the actual root.
@@ -50,19 +46,15 @@
     
     KeePassDatabaseMetadata* metadata = [[KeePassDatabaseMetadata alloc] init];
     
-    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password keyFileDigest:keyFileDigest];
+    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:compositeKeyFactors];
     
     return ret;
 }
 
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError **)error {
-    return [self open:data password:password keyFileDigest:nil error:error];
-}
-
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest error:(NSError **)error {
+- (StrongboxDatabase *)open:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)error {
     // 1. First get XML out of the encrypted binary...
     
-    SerializationData *serializationData = [KdbxSerialization deserialize:data password:password keyFileDigest:keyFileDigest ppError:error];
+    SerializationData *serializationData = [KdbxSerialization deserialize:data compositeKeyFactors:compositeKeyFactors ppError:error];
     
     if(serializationData == nil) {
         NSLog(@"Error getting Decrypting KDBX binary: [%@]", *error);
@@ -167,8 +159,7 @@
     
     StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
                                                                  metadata:metadata
-                                                           masterPassword:password
-                                                            keyFileDigest:keyFileDigest
+                                                      compositeKeyFactors:compositeKeyFactors
                                                               attachments:attachments
                                                               customIcons:customIcons];
     ret.adaptorTag = adaptorTag;
@@ -177,7 +168,7 @@
 }
 
 - (NSData *)save:(StrongboxDatabase *)database error:(NSError **)error {
-    if(!database.masterPassword && !database.keyFileDigest) {
+    if(!database.compositeKeyFactors.password && !database.compositeKeyFactors.keyFileDigest) {
         if(error) {
             *error = [Utils createNSError:@"Master Password not set." errorCode:-3];
         }
@@ -244,7 +235,7 @@
     
     // Set Header Hash
     
-    NSString *headerHash = [kdbxSerializer stage1Serialize:database.masterPassword keyFileDigest:database.keyFileDigest error:error];
+    NSString *headerHash = [kdbxSerializer stage1Serialize:database.compositeKeyFactors error:error];
     if(!headerHash) {
         NSLog(@"Could not serialize Document to KDBX. Stage 1");
         

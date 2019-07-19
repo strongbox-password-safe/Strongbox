@@ -91,10 +91,18 @@ viewController:(UIViewController *)viewController
         return;
     }
 
+//    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
+//    if (!securitySucceeded) {
+//        NSLog(@"Could not access secure scoped resource!");
+//        return;
+//    }
+    
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     
     [document openWithCompletionHandler:^(BOOL success) {
         completion(success ? document.data : nil, nil);
+        
+//        [url stopAccessingSecurityScopedResource];
     }];
 }
 
@@ -134,7 +142,6 @@ viewController:(UIViewController *)viewController
     return nil;
 }
 
-
 - (NSData*)bookMarkFromMetadata:(SafeMetaData*)metadata {
     NSData* data = [metadata.fileIdentifier dataUsingEncoding:NSUTF8StringEncoding];
     
@@ -156,9 +163,6 @@ viewController:(UIViewController *)viewController
     NSError *error;
     BOOL bookmarkIsStale; // https://stackoverflow.com/questions/23954662/what-is-the-correct-way-to-handle-stale-nsurl-bookmarks
     NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI;
-#ifdef NSURLBookmarkResolutionWithSecurityScope
-    options |= NSURLBookmarkResolutionWithSecurityScope;
-#endif
     
     NSURL *url = [NSURL URLByResolvingBookmarkData:bookmarkData
                                            options:options

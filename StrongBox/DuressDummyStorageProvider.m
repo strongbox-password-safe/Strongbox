@@ -87,13 +87,14 @@
     NSData* data = [self getData];
     NSError *error;
     
-    DatabaseModel* model = [[DatabaseModel alloc] initExistingWithDataAndPassword:data password:@"1234" error:&error];
+    CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
+    DatabaseModel* model = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
     
     if(!model || error != nil) {
         // For some reason we can't open the duress database... reset it - probably because someone changed the password
         [self setData:nil];
         data = [self getData];
-        model = [[DatabaseModel alloc] initExistingWithDataAndPassword:data password:@"1234" error:&error];
+        model = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
     }
     
     return model;
@@ -105,7 +106,8 @@
     NSData* data = [defaults objectForKey:@"dd-safe"];
     
     if(!data) {
-        DatabaseModel* model = [[DatabaseModel alloc] initNewWithPassword:@"1234" keyFileDigest:nil format:kKeePass];
+        CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
+        DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass];
         NSError* error;
         data = [model getAsData:&error];
         [self setData:data];

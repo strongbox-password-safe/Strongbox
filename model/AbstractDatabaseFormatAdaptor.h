@@ -11,6 +11,7 @@
 #import "AbstractDatabaseMetadata.h"
 #import "DatabaseAttachment.h"
 #import "StrongboxDatabase.h"
+#import "CompositeKeyFactors.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,12 +27,13 @@ typedef enum {
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString *)fileExtension;
++ (NSData *_Nullable)getYubikeyChallenge:(NSData *)candidate error:(NSError**)error;
 
-- (StrongboxDatabase*)create:(nullable NSString *)password;
-- (StrongboxDatabase*)create:(nullable NSString *)password keyFileDigest:(nullable NSData*)keyFileDigest;
-- (nullable StrongboxDatabase*)open:(NSData*)data password:(NSString *)password error:(NSError **)error;
-- (nullable StrongboxDatabase*)open:(NSData*)data password:(nullable NSString *)password keyFileDigest:(nullable NSData *)keyFileDigest error:(NSError **)error;
+- (StrongboxDatabase*)create:(CompositeKeyFactors*)compositeKeyFactors;
+- (nullable StrongboxDatabase*)open:(NSData*)data compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors error:(NSError **)error;
+
 - (nullable NSData*)save:(StrongboxDatabase*)database error:(NSError**)error;
+
 
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, readonly) NSString* fileExtension;

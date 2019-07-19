@@ -1705,8 +1705,38 @@ limitations under the License.</string>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="9my-LM-9pS" userLabel="Auto Detect Key Files">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="fw3-gc-cgu" userLabel="Yubikey Secret">
                                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fw3-gc-cgu" id="ydJ-lJ-NYu">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Show Yubikey Secret Workaround Field" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iX3-kB-Et9">
+                                                    <rect key="frame" x="20" y="11" width="299" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wGm-bI-fp3">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="obn-i0-b7p"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="iX3-kB-Et9" firstAttribute="top" secondItem="ydJ-lJ-NYu" secondAttribute="topMargin" id="57d-Fz-8Bq"/>
+                                                <constraint firstItem="iX3-kB-Et9" firstAttribute="leading" secondItem="ydJ-lJ-NYu" secondAttribute="leading" constant="20" id="FrG-DE-Oi6"/>
+                                                <constraint firstItem="wGm-bI-fp3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iX3-kB-Et9" secondAttribute="trailing" constant="8" symbolic="YES" id="gd9-Dz-NA9"/>
+                                                <constraint firstItem="iX3-kB-Et9" firstAttribute="bottom" secondItem="ydJ-lJ-NYu" secondAttribute="bottomMargin" id="iUV-iO-cVd"/>
+                                                <constraint firstItem="wGm-bI-fp3" firstAttribute="trailing" secondItem="ydJ-lJ-NYu" secondAttribute="trailing" constant="-20" id="tQu-ch-4T3"/>
+                                                <constraint firstItem="iX3-kB-Et9" firstAttribute="centerY" secondItem="wGm-bI-fp3" secondAttribute="centerY" id="vj9-Jz-p9G"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="9my-LM-9pS" userLabel="Auto Detect Key Files">
+                                        <rect key="frame" x="0.0" y="88" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9my-LM-9pS" id="9lM-zF-bT7">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -1736,7 +1766,7 @@ limitations under the License.</string>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CcK-rW-IeV" userLabel="Copy TOTP on Auto Fill Select">
-                                        <rect key="frame" x="0.0" y="88" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="132" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CcK-rW-IeV" id="1PM-Sz-iTD">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -1766,7 +1796,7 @@ limitations under the License.</string>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="vPN-Jo-2Sg" userLabel="Hide TOTP in Auto Fill">
-                                        <rect key="frame" x="0.0" y="132" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="176" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vPN-Jo-2Sg" id="Awr-hG-MZ2">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -1796,7 +1826,7 @@ limitations under the License.</string>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CYR-kY-sof" userLabel="Hide Key File Name on Unlock Screen">
-                                        <rect key="frame" x="0.0" y="176" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="220" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYR-kY-sof" id="BzG-ai-wwd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -1826,7 +1856,7 @@ limitations under the License.</string>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="jqp-w9-9EG" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="220" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="264" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jqp-w9-9EG" id="jTK-py-WHd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -1856,7 +1886,7 @@ limitations under the License.</string>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="UFp-oF-Ury" userLabel="Emergency: Use Old Non Split View">
-                                        <rect key="frame" x="0.0" y="264" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="308" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="UFp-oF-Ury" id="IEl-jC-Z7B">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -1911,6 +1941,7 @@ limitations under the License.</string>
                         <outlet property="switchHideKeyFileName" destination="G1j-ld-CDQ" id="Ca0-EJ-krQ"/>
                         <outlet property="switchHideTotpAutoFill" destination="i8s-W8-7ca" id="BOF-lX-HII"/>
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
+                        <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>
                         <outlet property="switchUseOldNonSplitView" destination="gGr-OV-EMW" id="998-eZ-ZkT"/>
                     </connections>
                 </tableViewController>

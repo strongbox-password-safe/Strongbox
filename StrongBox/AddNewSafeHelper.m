@@ -105,7 +105,8 @@ static DatabaseModel* getNewDatabase(NSString* password, NSURL* keyFileUrl, NSDa
         return nil;
     }
     
-    return [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:keyFileDigest format:format];
+    CompositeKeyFactors* ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
+    return [[DatabaseModel alloc] initNew:ckf format:format];
 }
 
 NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {

@@ -54,12 +54,22 @@ static const BOOL kLogVerbose = NO;
 
 @implementation Kdbx4Serialization
 
-+ (NSData *)serialize:(Kdbx4SerializationData *)serializationData
-             password:(NSString *)password
-        keyFileDigest:(NSData*)keyFileDigest
-              ppError:(NSError **)ppError {
++ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError * _Nullable __autoreleasing *)error {
+    CryptoParameters* cp = [Kdbx4Serialization getCryptoParams:candidate];
+    
+    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(cp.kdfParameters, error);
+    
+    if(!kdf) {
+        NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", cp.kdfParameters);
+        return nil;
+    }
+    
+    return kdf.transformSeed;
+}
+
++ (NSData *)serialize:(Kdbx4SerializationData *)serializationData compositeKey:(CompositeKeyFactors *)compositeKey ppError:(NSError * _Nullable __autoreleasing *)ppError {
     if(kLogVerbose) {
-        NSLog(@"Serializing with [%@] and password [%@]", serializationData, password);
+        NSLog(@"Serializing with [%@] and password [%@]", serializationData, compositeKey);
     }
     
     // 1. File Header
@@ -82,7 +92,7 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    Keys *keys = getKeys(password, keyFileDigest, serializationData.kdfParameters, masterSeed, ppError);
+    Keys *keys = getKeys(compositeKey, serializationData.kdfParameters, masterSeed, ppError);
     
     //NSLog(@"SERIALIZE KEYS: [%@]", keys);
     
@@ -165,7 +175,7 @@ static const BOOL kLogVerbose = NO;
     return [[CryptoParameters alloc] initFromHeaders:headerEntries];
 }
 
-+ (Kdbx4SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest ppError:(NSError**)ppError {
++ (Kdbx4SerializationData *)deserialize:(NSData *)safeData compositeKey:(CompositeKeyFactors *)compositeKey ppError:(NSError * _Nullable __autoreleasing *)ppError  {
     size_t endOfHeadersOffset;
     NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);
     
@@ -185,7 +195,7 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    Keys *keys = getKeys(password, keyFileDigest, cryptoParams.kdfParameters, cryptoParams.masterSeed, ppError);
+    Keys *keys = getKeys(compositeKey, cryptoParams.kdfParameters, cryptoParams.masterSeed, ppError);
     //NSLog(@"DESERIALIZE KEYS: [%@]", keys);
 
     if (!keys) {
@@ -470,16 +480,17 @@ static NSData* decryptBlocks(HmacBlockHeader *blockHeader, Keys *keys, CryptoPar
     return [cipher decrypt:dec iv:cryptoParams.iv key:keys.masterKey];
 }
 
-static Keys* getKeys(NSString* password, NSData* keyFileDigest, KdfParameters *kdfParameters, NSData* masterSeed, NSError** error) {
-    Keys *ret = [[Keys alloc] init];
+static Keys* getKeys(CompositeKeyFactors *compositeKey, KdfParameters *kdfParameters, NSData* masterSeed, NSError** error) {
     id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, error);
-    
+
     if(!kdf) {
         NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", kdfParameters);
         return nil;
     }
-    
-    ret.compositeKey = getCompositeKey(password, keyFileDigest);
+
+    Keys *ret = [[Keys alloc] init];
+
+    ret.compositeKey = getCompositeKey(compositeKey);
     ret.transformKey = [kdf deriveKey:ret.compositeKey];
     ret.masterKey = getMasterKey(masterSeed, ret.transformKey);
 
@@ -682,6 +693,38 @@ static NSDictionary<NSNumber *,NSObject *>* getHeaderEntries(uint8_t * const buf
     }
     
     return YES;
+}
+
+static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
+    NSData *hashedPassword = compositeKeyFactors.password != nil ? sha256([compositeKeyFactors.password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
+    
+    // Concatenate together in one big sha256...
+    
+    NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
+    CC_SHA256_CTX context;
+    CC_SHA256_Init(&context);
+    
+    if(hashedPassword) {
+        CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
+    }
+    
+    if(compositeKeyFactors.keyFileDigest) {
+        CC_SHA256_Update(&context, compositeKeyFactors.keyFileDigest.bytes, (CC_LONG)compositeKeyFactors.keyFileDigest.length);
+    }
+    
+    if(compositeKeyFactors.yubiKeyResponse) {
+        //NSLog(@"YUBI: Adding YubiKey Challenge Response to Composite Key");
+        NSData *hashed = sha256(compositeKeyFactors.yubiKeyResponse);
+        CC_SHA256_Update(&context, hashed.bytes, (CC_LONG)hashed.length);
+    }
+    
+    CC_SHA256_Final(compositeKey.mutableBytes, &context);
+    
+    if(kLogVerbose) {
+        NSLog(@"COMPOSITE KEY: %@", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
+    }
+    
+    return compositeKey;
 }
 
 @end

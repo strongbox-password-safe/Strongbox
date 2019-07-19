@@ -15,9 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol KeyDerivationCipher <NSObject>
 
 - (instancetype)initWithParametersDictionary:(KdfParameters*)parameters;
+
 - (NSData*)deriveKey:(NSData*)data;
 
 @property (readonly, nonatomic) KdfParameters* kdfParameters;
+@property (readonly, nonatomic) NSData* transformSeed; // Used in conjunction with Yubikey as the challenge
 
 @end
 

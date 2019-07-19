@@ -179,4 +179,8 @@ static const BOOL kLogVerbose = NO;
     return [[KdfParameters alloc] initWithParameters:dict];
 }
 
+- (NSData *)transformSeed {
+    return self.salt;
+}
+
 @end

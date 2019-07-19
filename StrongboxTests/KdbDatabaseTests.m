@@ -33,7 +33,7 @@
         }
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-        StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
+        StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
         
         XCTAssertNotNil(db);
         
@@ -50,7 +50,7 @@
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-1"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
     
     XCTAssertNotNil(db);
     
@@ -65,7 +65,7 @@
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-twofish"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
     
     XCTAssertNotNil(db);
     
@@ -80,7 +80,7 @@
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-1"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob password:password error:&error];
+    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
     
     XCTAssertNotNil(db);
     
@@ -89,7 +89,7 @@
     //db.masterPassword = @"ladder";
     NSData* rec = [adaptor save:db error:&error];
 
-    StrongboxDatabase *b = [adaptor open:rec password:db.masterPassword error:&error];
+    StrongboxDatabase *b = [adaptor open:rec compositeKeyFactors:[CompositeKeyFactors password:db.compositeKeyFactors.password] error:&error];
     NSLog(@"AFTER: %@", b);
     
     XCTAssertNotNil(b);

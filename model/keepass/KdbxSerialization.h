@@ -8,18 +8,22 @@
 
 #import <Foundation/Foundation.h>
 #import "SerializationData.h"
+#import "CompositeKeyFactors.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KdbxSerialization : NSObject
 
++ (NSData *_Nullable)getYubikeyChallenge:(NSData *)candidate error:(NSError * _Nullable __autoreleasing *)error;
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 
-+ (nullable SerializationData*)deserialize:(NSData*)safeData password:(nullable NSString*)password keyFileDigest:(nullable NSData *)keyFileDigest ppError:(NSError**)ppError;
++ (nullable SerializationData*)deserialize:(NSData*)safeData
+                       compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+                                   ppError:(NSError**)ppError;
 
 - (instancetype)init:(SerializationData*)serializationData;
 
-- (nullable NSString*)stage1Serialize:(NSString*__nullable)password keyFileDigest:(NSData*__nullable)keyFileDigest error:(NSError**)error;
+- (nullable NSString*)stage1Serialize:(CompositeKeyFactors*)compositeKeyFactors error:(NSError**)error;
 - (nullable NSData*)stage2Serialize:xml error:(NSError**)error;
 
 @end

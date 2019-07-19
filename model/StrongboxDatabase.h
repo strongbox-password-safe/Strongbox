@@ -10,6 +10,7 @@
 #import "AbstractDatabaseMetadata.h"
 #import "DatabaseAttachment.h"
 #import "UiAttachment.h"
+#import "CompositeKeyFactors.h"
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
@@ -24,24 +25,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata
-                  masterPassword:(nullable NSString*)masterPassword
-                   keyFileDigest:(nullable NSData*)keyFileDigest;
+             compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(nullable NSString*)masterPassword
-                    keyFileDigest:(nullable NSData*)keyFileDigest;
+              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(nullable NSString*)masterPassword
-                    keyFileDigest:(nullable NSData*)keyFileDigest
+              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
                          metadata:(id<AbstractDatabaseMetadata>)metadata
-                   masterPassword:(nullable NSString*)masterPassword
-                    keyFileDigest:(nullable NSData*)keyFileDigest
+              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments
                       customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons NS_DESIGNATED_INITIALIZER;
 
@@ -52,8 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, readonly) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly) NSDictionary<NSUUID*, NSData*>* customIcons;
-@property (nonatomic, retain, nullable) NSString *masterPassword;
-@property (nonatomic, retain, nullable) NSData *keyFileDigest;
+
+@property (nonatomic, readonly, nonnull) CompositeKeyFactors *compositeKeyFactors;
 
 @property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
 @property (nullable, readonly) NSUUID* recycleBinNodeUuid;   // NOT read-only because we made to set on demand

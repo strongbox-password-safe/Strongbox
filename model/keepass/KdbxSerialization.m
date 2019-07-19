@@ -54,6 +54,23 @@ static BOOL kLogVerbose = NO;
 
 @implementation KdbxSerialization
 
++ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError * _Nullable __autoreleasing *)error {
+    size_t offset;
+    NSDictionary *headerEntries = getHeaderEntries3((uint8_t*)candidate.bytes, candidate.length, &offset);
+    if(!headerEntries) {
+        NSLog(@"Error getting header entries. Possibly missing header entry.");
+        
+        if (error != nil) {
+            *error = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-3];
+        }
+        return nil;
+    }
+    
+    DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
+    
+    return decryptionParameters.masterSeed;
+}
+
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
     return keePass2SignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber, error);
 }
@@ -68,7 +85,7 @@ static BOOL kLogVerbose = NO;
     return self;
 }
 
-- (NSString*)stage1Serialize:(NSString*)password keyFileDigest:(NSData*)keyFileDigest error:(NSError**)error {
+- (NSString *)stage1Serialize:(CompositeKeyFactors *)compositeKeyFactors error:(NSError * _Nullable __autoreleasing *)error {
     // 1. File Header
     
     KeepassFileHeader header = getNewFileHeader(self.serializationData.fileVersion);
@@ -76,11 +93,11 @@ static BOOL kLogVerbose = NO;
     
     // 2. Generate Encryption Parameters To Be Serialized in the Headers
     
-    NSData* compositeKey = getCompositeKey(password, keyFileDigest);
+    NSData* compositeKey = getCompositeKey(compositeKeyFactors);
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
     NSData* transformKey = getAesTransformKey(compositeKey, transformSeed, self.serializationData.transformRounds);
     NSData* masterSeed = getRandomData(kMasterSeedLength);
-    self.masterKey = getMasterKey(masterSeed, transformKey);
+    self.masterKey = getMaster(masterSeed, transformKey, compositeKeyFactors.yubiKeyResponse);
     
     id<Cipher> cipher = getCipher(self.serializationData.cipherId);
     if(!cipher) {
@@ -163,7 +180,9 @@ static BOOL kLogVerbose = NO;
     return ret;
 }
 
-+ (SerializationData*)deserialize:(NSData*)safeData password:(NSString*)password keyFileDigest:(NSData *)keyFileDigest ppError:(NSError **)ppError {
++ (SerializationData *)deserialize:(NSData *)safeData
+               compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                           ppError:(NSError * _Nullable __autoreleasing *)ppError {
     size_t offset;
     NSDictionary *headerEntries = getHeaderEntries3((uint8_t*)safeData.bytes, safeData.length, &offset);
     if(!headerEntries) {
@@ -176,10 +195,13 @@ static BOOL kLogVerbose = NO;
     }
     
     DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
+    if(kLogVerbose) {
+        NSLog(@"DecryptionParameters: [%@]", decryptionParameters);
+    }
     
-    NSData* compositeKey = getCompositeKey(password, keyFileDigest);
+    NSData* compositeKey = getCompositeKey(compositeKeyFactors);
     NSData* transformKey = getAesTransformKey(compositeKey, decryptionParameters.transformSeed, decryptionParameters.transformRounds);
-    NSData* masterKey = getMasterKey(decryptionParameters.masterSeed, transformKey);
+    NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, compositeKeyFactors.yubiKeyResponse);
     
     // Hash Header for corruption check
     
@@ -514,6 +536,65 @@ static NSData* deblockify(uint8_t* blockified) {
     }
     
     return [deblockified copy];
+}
+
+// MMcG: Because of the funky KDBX 3.1 YubiKey Challenge Response Design :(
+
+static NSData *getMaster(NSData* masterSeed, NSData *transformKey, NSData* yubiResponse) {
+    NSMutableData *masterKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
+    CC_SHA256_CTX context;
+    CC_SHA256_Init(&context);
+    CC_SHA256_Update(&context, masterSeed.bytes, (CC_LONG)masterSeed.length);
+    
+    if(yubiResponse) {
+        NSData* hashed = sha256(yubiResponse);
+        CC_SHA256_Update(&context, hashed.bytes, (CC_LONG)hashed.length);
+    }
+    
+    CC_SHA256_Update(&context, transformKey.bytes, (CC_LONG)transformKey.length);
+    
+    
+    CC_SHA256_Final(masterKey.mutableBytes, &context);
+    
+    if(kLogVerbose) {
+        NSLog(@"MASTER KEY: %@", [masterKey base64EncodedStringWithOptions:kNilOptions]);
+    }
+    
+    return [masterKey copy];
+}
+
+static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
+    NSData *hashedPassword = compositeKeyFactors.password != nil ? sha256([compositeKeyFactors.password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
+    
+    // Concatenate together in one big sha256...
+    
+    NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
+    CC_SHA256_CTX context;
+    CC_SHA256_Init(&context);
+    
+    if(hashedPassword) {
+        CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
+    }
+    
+    if(compositeKeyFactors.keyFileDigest) {
+        CC_SHA256_Update(&context, compositeKeyFactors.keyFileDigest.bytes, (CC_LONG)compositeKeyFactors.keyFileDigest.length);
+    }
+
+    // Not done here as in KDBX4.0 - Handled in get Master :(
+    
+//    if(compositeKeyFactors.yubiKeyResponse) {
+//        NSLog(@"YUBI: Adding YubiKey Challenge Response to Composite Key");
+//        NSData *hashed = sha256(compositeKeyFactors.yubiKeyResponse);
+//        CC_SHA256_Update(&context, hashed.bytes, (CC_LONG)hashed.length);
+//    }
+    
+    CC_SHA256_Final(compositeKey.mutableBytes, &context);
+    
+    if(kLogVerbose) {
+        NSLog(@"COMPOSITE KEY: %@", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
+    }
+    
+    return compositeKey;
 }
 
 @end

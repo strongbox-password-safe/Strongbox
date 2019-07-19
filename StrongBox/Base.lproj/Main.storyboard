@@ -14,7 +14,7 @@
         <scene sceneID="JvJ-3L-1tN">
             <objects>
                 <tableViewController storyboardIdentifier="SafesListViewController" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="9DM-GO-ZGc" customClass="SafesViewController" sceneMemberID="viewController">
-                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" bounces="NO" bouncesZoom="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" id="mMS-W8-mn0">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" bouncesZoom="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" id="mMS-W8-mn0">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -77,7 +77,7 @@
                                     <action selector="onToggleEdit:" destination="9DM-GO-ZGc" id="tWT-4w-N2j"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="rocket" id="Nmk-hC-aIH">
+                            <barButtonItem title="Switch to Quick Launch Mode" image="rocket" id="Nmk-hC-aIH">
                                 <color key="tintColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="onSwitchToQuickLaunchView:" destination="9DM-GO-ZGc" id="S0C-AR-sFq"/>
@@ -90,14 +90,14 @@
                                     <action selector="onAddSafe:" destination="9DM-GO-ZGc" id="SnI-aF-HIp"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem image="services" id="1nK-Pq-30i">
+                            <barButtonItem title="Preferences" image="services" id="1nK-Pq-30i">
                                 <connections>
                                     <action selector="onPreferences:" destination="9DM-GO-ZGc" id="abc-7w-oKY"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="barButtonQuickLaunchView" destination="Nmk-hC-aIH" id="yBX-dB-JwD"/>
                         <outlet property="buttonAddSafe" destination="zN1-I2-XSj" id="SD8-XN-MaW"/>
@@ -865,15 +865,16 @@ Cg
         <!--Databases Navigation Controller-->
         <scene sceneID="1kV-wb-Lxz">
             <objects>
-                <navigationController wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" id="waq-lN-OIc" userLabel="Databases Navigation Controller" sceneMemberID="viewController">
+                <navigationController wantsFullScreenLayout="YES" extendedLayoutIncludesOpaqueBars="YES" definesPresentationContext="YES" toolbarHidden="NO" id="waq-lN-OIc" userLabel="Databases Navigation Controller" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Databases" id="qEb-5H-93x"/>
                     <toolbarItems/>
-                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="vgj-1e-XZg">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
-                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="ZOq-uY-37z">
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" id="ZOq-uY-37z">
+                        <rect key="frame" x="0.0" y="769" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
                     <connections>
@@ -1009,7 +1010,7 @@ Cg
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8pJ-19-apM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3296" y="2185"/>
+            <point key="canvasLocation" x="-3277" y="2220"/>
         </scene>
         <!--Initial View Controller-->
         <scene sceneID="A2h-Qc-mpt">
@@ -1190,8 +1191,8 @@ Cheers,
         <image name="warning-32" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="pfC-It-asC"/>
+        <segue reference="okm-JQ-5uE"/>
         <segue reference="tck-ij-KjR"/>
-        <segue reference="FxO-1A-UIC"/>
+        <segue reference="AoX-b8-d4D"/>
     </inferredMetricsTieBreakers>
 </document>

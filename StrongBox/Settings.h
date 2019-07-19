@@ -26,7 +26,7 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 + (Settings *)sharedInstance;
 
-- (NSUserDefaults*)getUserDefaults;
+- (NSUserDefaults*_Nullable)getUserDefaults;
 
 - (void)requestBiometricId:(NSString*)reason
      allowDevicePinInstead:(BOOL)allowDevicePinInstead
@@ -119,6 +119,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property (readonly) NSString* appGroupName;
 @property BOOL suppressPrivacyScreen;
+
+@property BOOL showYubikeySecretWorkaroundField;
 
 NS_ASSUME_NONNULL_END
 

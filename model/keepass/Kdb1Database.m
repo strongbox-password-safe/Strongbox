@@ -42,28 +42,27 @@ static const BOOL kLogVerbose = NO;
     [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
 }
 
-- (nonnull StrongboxDatabase *)create:(nullable NSString *)password {
-    return [self create:password keyFileDigest:nil];
-}
-
-- (StrongboxDatabase *)create:(NSString *)password keyFileDigest:(NSData *)keyFileDigest {
+- (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
     Node* rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:NO];
     
     [self addKeePassDefaultRootGroup:rootGroup];
     
     Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
     
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata masterPassword:password keyFileDigest:keyFileDigest];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
+                                                                 metadata:metadata
+                                                      compositeKeyFactors:compositeKeyFactors];
     
     return ret;
 }
 
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password error:(NSError **)error {
-    return [self open:data password:password keyFileDigest:nil error:error];
-}
-
-- (StrongboxDatabase *)open:(NSData *)data password:(NSString *)password keyFileDigest:(NSData *)keyFileDigest error:(NSError **)error {
-    KdbSerializationData *serializationData = [KdbSerialization deserialize:data password:password keyFileDigest:keyFileDigest ppError:error];
+- (StrongboxDatabase *)open:(NSData *)data
+        compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      error:(NSError * _Nullable __autoreleasing *)error {
+    KdbSerializationData *serializationData = [KdbSerialization deserialize:data
+                                                                   password:compositeKeyFactors.password
+                                                              keyFileDigest:compositeKeyFactors.keyFileDigest
+                                                                    ppError:error];
     
     if(serializationData == nil) {
         NSLog(@"Error getting Decrypting KDB binary: [%@]", *error);
@@ -92,8 +91,7 @@ static const BOOL kLogVerbose = NO;
 
     StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
                                                                  metadata:metadata
-                                                           masterPassword:password
-                                                            keyFileDigest:keyFileDigest
+                                                      compositeKeyFactors:compositeKeyFactors
                                                               attachments:attachments];
     ret.adaptorTag = serializationData.metaEntries;
     
@@ -101,7 +99,7 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (NSData *)save:(StrongboxDatabase *)database error:(NSError**)error {
-    if(!database.masterPassword.length && !database.keyFileDigest) { // KeePass 1 does not allow empty Password 
+    if(!database.compositeKeyFactors.password.length && !database.compositeKeyFactors.keyFileDigest) { // KeePass 1 does not allow empty Password
         if(error) {
             *error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
         }
@@ -133,8 +131,16 @@ static const BOOL kLogVerbose = NO;
         [serializationData.metaEntries addObjectsFromArray:metaEntries];
     }
     
-    return [KdbSerialization serialize:serializationData password:database.masterPassword keyFileDigest:database.keyFileDigest ppError:error];
+    return [KdbSerialization serialize:serializationData
+                              password:database.compositeKeyFactors.password
+                         keyFileDigest:database.compositeKeyFactors.keyFileDigest
+                               ppError:error];
 }
+
++ (NSData *_Nullable)getYubikeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
+    return nil;
+}
+
 
 -(void)nodeModelToGroupsAndEntries:(int)level
                              group:(Node*)group

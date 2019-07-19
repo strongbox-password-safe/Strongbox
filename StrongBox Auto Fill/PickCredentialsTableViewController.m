@@ -10,7 +10,6 @@
 #import "NodeIconHelper.h"
 #import "Settings.h"
 #import "NSArray+Extensions.h"
-//#import "OTPToken+Generation.h"
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"

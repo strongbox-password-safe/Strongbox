@@ -41,6 +41,10 @@ https://keepass.info/
 
 Kudos to Dominik Reichl and all the KeePass team for their incredible technical skill, for coming up with a great format, and their seminal KeePass app. 
 
+Hats off to the KeePassXC team for their fantastic cross platform apps. 
+
+https://keepassxc.org/
+
 I use many different libraries in the app here are just a few:
 
 - Dropbox-iOS-SDK

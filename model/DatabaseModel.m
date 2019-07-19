@@ -23,6 +23,28 @@
 
 @implementation DatabaseModel
 
++ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error  {
+    if(candidate == nil) {
+        return nil;
+    }
+    
+    NSError* validityError;
+    if([PwSafeDatabase isAValidSafe:candidate error:&validityError]) {
+        return nil; // NOT Supported
+    }
+    else if ([KeePassDatabase isAValidSafe:candidate error:&validityError]) {
+        return [KeePassDatabase getYubikeyChallenge:candidate error:error];
+    }
+    else if([Kdbx4Database isAValidSafe:candidate error:&validityError]) {
+        return [Kdbx4Database getYubikeyChallenge:candidate error:error];
+    }
+    else if([Kdb1Database isAValidSafe:candidate error:&validityError]) {
+        return nil;  // NOT Supported
+    }
+    
+    return nil;
+}
+
 + (BOOL)    isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
     if(candidate == nil) {
         if(error) {
@@ -44,7 +66,7 @@
           [Kdbx4Database isAValidSafe:candidate error:&k2] ||
           [Kdb1Database isAValidSafe:candidate error:&k3];
 
-    if(error) {
+    if(!ret && error) {
         NSString* errorSummary = @"Could not recognise this a valid Database:\n";
         
         errorSummary = [errorSummary stringByAppendingFormat:@"- Password Safe: %@\n", pw.localizedDescription];
@@ -141,10 +163,10 @@
     return nil;
 }
 
-- (instancetype)initNewWithPassword:(NSString *)password keyFileDigest:(NSData*)keyFileDigest format:(DatabaseFormat)format {
+- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors format:(DatabaseFormat)format {
     if(self = [super init]) {
         self.adaptor = [DatabaseModel getAdaptor:format];
-        self.theSafe = [self.adaptor create:password keyFileDigest:keyFileDigest];
+        self.theSafe = [self.adaptor create:compositeKeyFactors];
         
         if (self.theSafe == nil) {
             return nil;
@@ -162,39 +184,29 @@
     return self;
 }
 
-- (instancetype)initExistingWithDataAndPassword:(NSData *)safeData
-                                       password:(NSString *)password
-                                          error:(NSError **)ppError {
-    return [self initExistingWithDataAndPassword:safeData password:password keyFileDigest:nil error:ppError];
-}
-
-- (instancetype)initExistingWithDataAndPassword:(NSData *)safeData
-                                       password:(NSString *)password
-                                  keyFileDigest:(NSData*)keyFileDigest
-                                          error:(NSError **)ppError {
-
+- (instancetype)initExisting:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)ppError {
     if(self = [super init]) {
-        if(safeData == nil) {
+        if(data == nil) {
             return nil;
         }
         
-        if([PwSafeDatabase isAValidSafe:safeData error:ppError]) {
+        if([PwSafeDatabase isAValidSafe:data error:ppError]) {
             self.adaptor = [[PwSafeDatabase alloc] init];
         }
-        else if([KeePassDatabase isAValidSafe:safeData error:ppError]) {
+        else if([KeePassDatabase isAValidSafe:data error:ppError]) {
             self.adaptor = [[KeePassDatabase alloc] init];
         }
-        else if([Kdbx4Database isAValidSafe:safeData error:ppError]) {
+        else if([Kdbx4Database isAValidSafe:data error:ppError]) {
             self.adaptor = [[Kdbx4Database alloc] init];
         }
-        else if([Kdb1Database isAValidSafe:safeData error:ppError]) {
+        else if([Kdb1Database isAValidSafe:data error:ppError]) {
             self.adaptor = [[Kdb1Database alloc] init];
         }
         else {
             return nil;
         }
 
-        self.theSafe = [self.adaptor open:safeData password:password keyFileDigest:keyFileDigest error:ppError];
+        self.theSafe = [self.adaptor open:data compositeKeyFactors:compositeKeyFactors error:ppError];
         
         if (self.theSafe == nil) {
             return nil;
@@ -337,22 +349,6 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
 - (NSDictionary<NSUUID *,NSData *> *)customIcons {
     return self.theSafe.customIcons;
-}
-
--(NSString*)masterPassword {
-    return self.theSafe.masterPassword;
-}
-
--(void)setMasterPassword:(NSString *)masterPassword {
-    self.theSafe.masterPassword = masterPassword;
-}
-
-- (NSData *)keyFileDigest {
-    return self.theSafe.keyFileDigest;
-}
-
-- (void)setKeyFileDigest:(NSData *)keyFileDigest {
-    self.theSafe.keyFileDigest = keyFileDigest;
 }
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment {
@@ -628,6 +624,10 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return [unique.allObjects sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         return [@(((NSString*)obj2).length) compare:@(((NSString*)obj1).length)];
     }];
+}
+
+- (CompositeKeyFactors *)compositeKeyFactors {
+    return self.theSafe.compositeKeyFactors;
 }
 
 @end

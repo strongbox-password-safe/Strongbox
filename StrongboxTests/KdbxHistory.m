@@ -24,7 +24,7 @@
     
     NSError* error;
     //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData password:@"a" error:&error];
+    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     NSLog(@"%@", db);
     
     XCTAssertNotNil(db);
