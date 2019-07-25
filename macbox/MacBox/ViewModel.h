@@ -35,9 +35,8 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (void)lock:(NSString*_Nullable)selectedItem;
-- (void)reloadAndUnlock:(NSString*_Nullable)password
- keyFileDigest:(NSData*_Nullable)keyFileDigest
-    completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
+- (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors
+             completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
@@ -96,9 +95,7 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 
-@property (nonatomic, readonly) NSString* masterPassword;
-@property (nonatomic, readonly) NSData* masterKeyFileDigest;
-- (void)setMasterCredentials:(NSString *)masterPassword masterKeyFileDigest:(NSData *)masterKeyFileDigest;
+@property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
 
 @property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
 @property (readonly) Node* recycleBinNode;
@@ -124,7 +121,9 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 @property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
 @property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
 
-@property NSString* selectedItem;
+@property (nullable) NSString* selectedItem;
+
+- (NSString *)getHtmlPrintString:(NSString*)databaseName;
 
 @end
 

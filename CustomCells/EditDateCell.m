@@ -32,9 +32,11 @@
 
     self.dateTextField.inputView = self.datePicker;
     self.dateTextField.placeholder = @"Date";
+    self.dateTextField.accessibilityLabel = @"Date Text Field";
     
     self.timeTextField.inputView = self.timePicker;
     self.timeTextField.placeholder = @"Time";
+    self.timeTextField.accessibilityLabel = @"Time Text Field";
 }
 
 - (IBAction)clearDate:(id)sender {

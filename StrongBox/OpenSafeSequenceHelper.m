@@ -48,6 +48,7 @@
 @property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
 @property NSString* yubikeySecret;
+@property BOOL biometricPreCleared; // Quick Launch has just authorized the user via Bio - No need to ask again
 
 @end
 
@@ -57,7 +58,23 @@
                                    safe:(SafeMetaData*)safe
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
-                manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                             completion:(CompletionBlock)completion {
+    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
+                                                       safe:safe
+                                        canConvenienceEnrol:canConvenienceEnrol
+                                             isAutoFillOpen:isAutoFillOpen
+                                     manualOpenOfflineCache:manualOpenOfflineCache
+                                biometricAuthenticationDone:NO
+                                                 completion:completion];
+}
+
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                                   safe:(SafeMetaData*)safe
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion {
     [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
                                                        safe:safe
@@ -65,6 +82,7 @@
                                         canConvenienceEnrol:canConvenienceEnrol
                                              isAutoFillOpen:isAutoFillOpen
                                      manualOpenOfflineCache:manualOpenOfflineCache
+                                biometricAuthenticationDone:biometricAuthenticationDone
                                                  completion:completion];
 }
 
@@ -74,6 +92,7 @@
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                  manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                                                        safe:safe
@@ -81,6 +100,7 @@
                                                                         canConvenienceEnrol:canConvenienceEnrol
                                                                              isAutoFillOpen:isAutoFillOpen
                                                                      manualOpenOfflineCache:manualOpenOfflineCache
+                                                                        biometricPreCleared:biometricAuthenticationDone
                                                                                  completion:completion];
     
     [helper beginSequence];
@@ -92,6 +112,7 @@
                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                         isAutoFillOpen:(BOOL)isAutoFillOpen
                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                   biometricPreCleared:(BOOL)biometricPreCleared
                             completion:(CompletionBlock)completion {
     self = [super init];
     if (self) {
@@ -103,6 +124,7 @@
         self.completion = completion;
         self.isAutoFillOpen = isAutoFillOpen;
         self.manualOpenOfflineCache = manualOpenOfflineCache;
+        self.biometricPreCleared = biometricPreCleared;
     }
     
     return self;
@@ -152,6 +174,8 @@
                     self.isConvenienceUnlock = YES;
                     self.masterPassword = self.safe.convenienceMasterPassword;
                     self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
+                    self.yubikeySecret = self.safe.convenenienceYubikeySecret;
+                    
                     self.safe.failedPinAttempts = 0;
                     
                     [SafesList.sharedInstance update:self.safe];
@@ -178,6 +202,7 @@
                         self.safe.isEnrolledForConvenience = NO;
                         self.safe.convenienceMasterPassword = nil;
                         self.safe.convenenienceKeyFileDigest = nil;
+                        self.safe.convenenienceYubikeySecret = nil;
                         
                         [SafesList.sharedInstance update:self.safe];
 
@@ -254,12 +279,19 @@
 
 - (void)showBiometricAuthentication {
     NSLog(@"REQUEST-BIOMETRIC: Open Safe");
-    [Settings.sharedInstance requestBiometricId:@"Identify to Login"
-                                  fallbackTitle:@"Enter Database Master Password..."
-                          allowDevicePinInstead:NO 
-                                     completion:^(BOOL success, NSError * _Nullable error) {
-        [self onBiometricAuthenticationDone:success error:error];
-    }];
+    
+    if(self.biometricPreCleared && Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths) {
+        NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
+        [self onBiometricAuthenticationDone:YES error:nil];
+    }
+    else {
+        [Settings.sharedInstance requestBiometricId:@"Identify to Login"
+                                      fallbackTitle:@"Enter Database Master Password..."
+                              allowDevicePinInstead:NO
+                                         completion:^(BOOL success, NSError * _Nullable error) {
+            [self onBiometricAuthenticationDone:success error:error];
+        }];
+    }
 }
 
 - (void)onBiometricAuthenticationDone:(BOOL)success
@@ -277,7 +309,7 @@
         else {
             self.masterPassword = self.safe.convenienceMasterPassword;
             self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
-
+            self.yubikeySecret = self.safe.convenenienceYubikeySecret;
             [self openSafe];
         }
     }
@@ -619,6 +651,7 @@
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
                 self.safe.convenenienceKeyFileDigest = nil;
+                self.safe.convenenienceYubikeySecret = nil;
                 self.safe.conveniencePin = nil;
                 self.safe.isTouchIdEnabled = NO;
                 self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
@@ -651,8 +684,7 @@
             cacheMode ||
             self.safe.isEnrolledForConvenience ||
             ![[Settings sharedInstance] isProOrFreeTrial] ||
-            self.safe.hasBeenPromptedForConvenience ||
-            self.yubikeySecret.length) { // Do not allow convenience enrol if yubikey secret is being used as we're not storing it at the moment
+            self.safe.hasBeenPromptedForConvenience) {
             // Can't or shouldn't Convenience Enrol...
             [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
         }
@@ -711,6 +743,9 @@
                                                                 self.safe.isEnrolledForConvenience = YES;
                                                                 self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
                                                                 self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
+                                                                
+                                                                self.safe.convenenienceYubikeySecret = self.yubikeySecret;
+                                                                
                                                                 self.safe.hasBeenPromptedForConvenience = YES;
                                                                 
                                                                 [SafesList.sharedInstance update:self.safe];
@@ -737,6 +772,8 @@
                                                          
                                                          self.safe.convenienceMasterPassword = nil;
                                                          self.safe.convenenienceKeyFileDigest = nil;
+                                                         self.safe.convenenienceYubikeySecret = nil;
+                                                         
                                                          self.safe.isEnrolledForConvenience = NO;
                                                          self.safe.hasBeenPromptedForConvenience = YES;
                                                          
@@ -764,8 +801,11 @@
                 if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
                     self.safe.conveniencePin = pin;
                     self.safe.isEnrolledForConvenience = YES;
+                    
                     self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
                     self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
+                    self.safe.convenenienceYubikeySecret = self.yubikeySecret;
+                    
                     self.safe.hasBeenPromptedForConvenience = YES;
                     
                     [SafesList.sharedInstance update:self.safe];
@@ -798,7 +838,9 @@
                                                   metaData:self.safe
                                            storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
                                                  cacheMode:cacheMode
-                                                isReadOnly:NO]; 
+                                                isReadOnly:self.yubikeySecret.length];
+    
+    viewModel.openedWithYubiKeySecret = self.yubikeySecret;
     
     if (!cacheMode) {
         if(self.safe.offlineCacheEnabled) {
@@ -858,7 +900,7 @@ static NSString *getLastCachedDate(SafeMetaData *safe) {
 
 BOOL providerCanFallbackToOfflineCache(id<SafeStorageProvider> provider, SafeMetaData* safe) {
     BOOL basic =    provider &&
-                    provider.cloudBased &&
+                    provider.allowOfflineCache &&
     !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
     safe.offlineCacheEnabled && safe.offlineCacheAvailable;
     

@@ -31,7 +31,7 @@
 - (instancetype)init {
     if (self = [super init]) {
         _storageId = kiCloud;
-        _cloudBased = YES;
+        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;

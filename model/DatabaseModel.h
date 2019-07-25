@@ -83,6 +83,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
+- (NSString*)getHtmlPrintString:(NSString*)databaseName;
+
 @end
 
 #endif // ifndef _DatabaseModel_h

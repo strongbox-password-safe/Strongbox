@@ -21,6 +21,7 @@
 #import "GoogleDriveManager.h"
 #import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
+#import "LocalDeviceStorageProvider.h"
 
 @interface CredentialProviderViewController ()
 
@@ -66,7 +67,8 @@
                                                   openAutoFillCache:YES
                                                 canConvenienceEnrol:NO
                                                      isAutoFillOpen:YES
-                                             manualOpenOfflineCache:NO 
+                                             manualOpenOfflineCache:NO
+                                        biometricAuthenticationDone:NO
                                                          completion:^(Model * _Nullable model, NSError * _Nullable error) {
                                                              NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
                 if(model) {
@@ -197,12 +199,36 @@
     return storageProvider == kiCloud || storageProvider == kWebDAV || storageProvider == kSFTP;
 }
 
-- (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
+- (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
+    if(!safeMetaData.autoFillEnabled) {
+        return NO;
+    }
+    
     if([self isLiveAutoFillProvider:safeMetaData.storageProvider]) {
         return YES;
     }
     
-    return safeMetaData.autoFillEnabled && safeMetaData.autoFillCacheAvailable;
+    if(safeMetaData.storageProvider == kLocalDevice) {
+        return [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safeMetaData];
+    }
+    
+    return NO;
+}
+
+- (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
+    if(!safeMetaData.autoFillEnabled) {
+        return NO;
+    }
+    
+    if([self isLiveAutoFillProvider:safeMetaData.storageProvider]) {
+        return YES;
+    }
+    
+    if(safeMetaData.storageProvider == kLocalDevice && [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safeMetaData]) {
+        return YES;
+    }
+    
+    return safeMetaData.autoFillCacheAvailable;
 }
 
 - (SafeMetaData*)getPrimarySafe {

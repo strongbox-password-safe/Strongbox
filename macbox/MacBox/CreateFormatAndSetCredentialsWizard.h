@@ -12,8 +12,8 @@
 
 @interface CreateFormatAndSetCredentialsWizard : NSWindowController
 
-@property (nonatomic, readonly) NSString* confirmedPassword;
-@property (nonatomic, readonly) NSData* confirmedKeyFileDigest;
+@property (nonatomic, readonly) CompositeKeyFactors* confirmedCompositeKeyFactors;
+
 @property (nonatomic) NSString* titleText;
 @property DatabaseFormat databaseFormat;
 

@@ -113,10 +113,12 @@ selectAllOnEdit:(BOOL)selectAllOnEdit
 suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
     self.keyLabel.text = key;
     self.keyLabel.textColor = keyColor == nil ? UIColor.darkGrayColor : keyColor;
-
+    self.keyLabel.accessibilityLabel = key;
+    
     self.valueText.text = value;
     self.valueText.enabled = editing;
     self.valueText.suggestionProvider = suggestionProvider;
+    self.valueText.accessibilityLabel = [key stringByAppendingString:@" Text Field"];
     
     self.valueText.textColor = formatAsUrl ? UIColor.blueColor : UIColor.darkTextColor;
     

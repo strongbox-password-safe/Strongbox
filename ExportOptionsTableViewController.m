@@ -26,6 +26,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmail;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailCsv;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCopy;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellHtml;
 
 @property NSURL* temporaryExportUrl;
 
@@ -48,6 +49,7 @@
     self.cellEmail.imageView.image = [UIImage imageNamed:@"attach"];
     self.cellEmailCsv.imageView.image = [UIImage imageNamed:@"message"];
     self.cellCopy.imageView.image = [UIImage imageNamed:@"copy"];
+    self.cellHtml.imageView.image = [UIImage imageNamed:@"document"];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -65,6 +67,9 @@
     }
     else if(cell == self.cellCopy) {
         [self copyCsv];
+    }
+    else if(cell == self.cellHtml) {
+        [self exportHtmlByEmail];
     }
 }
 
@@ -88,6 +93,14 @@
     NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
     NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
     [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
+}
+
+- (void)exportHtmlByEmail {
+    NSString *html = [self.viewModel.database getHtmlPrintString:self.viewModel.metadata.nickName];
+    
+    NSString* attachmentName = [NSString stringWithFormat:@"%@.html", self.viewModel.metadata.nickName];
+    
+    [self composeEmail:attachmentName mimeType:@"text/html" data:[html dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (void)exportEncryptedSafeByEmail {

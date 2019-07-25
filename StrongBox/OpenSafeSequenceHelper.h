@@ -20,17 +20,26 @@ typedef void(^CompletionBlock)(Model*_Nullable model, NSError*_Nullable error);
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
-                    canConvenienceEnrol:(BOOL)canBiometricEnrol
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                  manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
                              completion:(CompletionBlock)completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
-                      openAutoFillCache:(BOOL)openAutoFillCache
-                    canConvenienceEnrol:(BOOL)canBiometricEnrol
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                  manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                             completion:(CompletionBlock)completion;
+
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                                   safe:(SafeMetaData*)safe
+                      openAutoFillCache:(BOOL)openAutoFillCache
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion;
 
 @end

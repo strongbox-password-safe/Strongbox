@@ -20,6 +20,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseOldNonSplitView;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowYubikeySecretWorkaround;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAppLockBioForQuickLaunch;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDefaultToSharedStorage;
 
 @end
 
@@ -59,6 +61,8 @@
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     Settings.sharedInstance.doNotUseNewSplitViewController = self.switchUseOldNonSplitView.on;
     Settings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
+    Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths = self.switchAppLockBioForQuickLaunch.on;
+    Settings.sharedInstance.useLocalSharedStorage = self.switchDefaultToSharedStorage.on;
     
     [self bindPreferences];
 }
@@ -72,6 +76,8 @@
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchUseOldNonSplitView.on = Settings.sharedInstance.doNotUseNewSplitViewController;
     self.switchShowYubikeySecretWorkaround.on = Settings.sharedInstance.showYubikeySecretWorkaroundField;
+    self.switchAppLockBioForQuickLaunch.on = Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths;
+    self.switchDefaultToSharedStorage.on = Settings.sharedInstance.useLocalSharedStorage;
 }
 
 @end

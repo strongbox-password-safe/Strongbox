@@ -26,7 +26,7 @@
         _displayName = @"";
         _icon = @"product32";
         _storageId = kDuressDummy;
-        _cloudBased = NO;
+        _allowOfflineCache = NO;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;

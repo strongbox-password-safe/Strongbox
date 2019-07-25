@@ -56,8 +56,8 @@
 
     __weak InitialViewController* weakSelf = self;
     self.privacyAndLockVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
-    self.privacyAndLockVc.onUnlockDone = ^{
-        [weakSelf hidePrivacyScreen];
+    self.privacyAndLockVc.onUnlockDone = ^(BOOL userJustCompletedBiometricAuthentication) {
+        [weakSelf hidePrivacyScreen:userJustCompletedBiometricAuthentication];
     };
     
     self.privacyAndLockVc.startupLockMode = startupLockMode;
@@ -74,7 +74,7 @@
     [visible presentViewController:self.privacyAndLockVc animated:NO completion:nil];
 }
 
-- (void)hidePrivacyScreen {
+- (void)hidePrivacyScreen:(BOOL)userJustCompletedBiometricAuthentication {
     if (self.privacyAndLockVc) {
         if ([self shouldLockSafes]) {
             UINavigationController* nav = [self selectedViewController];
@@ -82,12 +82,12 @@
 
             // This dismisses all modals including the privacy screen which is what we want
             [self dismissViewControllerAnimated:NO completion:^{
-                [self onPrivacyScreenDismissed];
+                [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
             }];
         }
         else {
             [self.privacyAndLockVc.presentingViewController dismissViewControllerAnimated:NO completion:^{
-                [self onPrivacyScreenDismissed];
+                [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
             }];
         }
         
@@ -95,14 +95,14 @@
     }
 }
 
-- (void)onPrivacyScreenDismissed {
+- (void)onPrivacyScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
     self.privacyAndLockVc = nil;
 
 //    NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
     
     if(!self.enqueuedImportUrl) {
         if([self isInQuickLaunchViewMode]) {
-            [self openQuickLaunchPrimarySafe];
+            [self openQuickLaunchPrimarySafe:userJustCompletedBiometricAuthentication];
         }
 
         [self checkICloudAvailability];
@@ -140,13 +140,13 @@
     }
 }
 
-- (void)openQuickLaunchPrimarySafe {
+- (void)openQuickLaunchPrimarySafe:(BOOL)userJustCompletedBiometricAuthentication {
     UINavigationController* nav = [self selectedViewController];
     QuickLaunchViewController* quickLaunch = (QuickLaunchViewController*)nav.viewControllers[0];
     NSLog(@"Found Quick Launch = %@", quickLaunch);
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [quickLaunch openPrimarySafe];
+        [quickLaunch openPrimarySafe:userJustCompletedBiometricAuthentication];
     });
 }
 
@@ -212,7 +212,7 @@
             }
             else {
                 if([self isInQuickLaunchViewMode]) {
-                    [self openQuickLaunchPrimarySafe];
+                    [self openQuickLaunchPrimarySafe:NO];
                 }
                 else {
                     [self checkICloudAvailability];

@@ -10,21 +10,21 @@
             <connections>
                 <outlet property="checkboxAlternatingGrid" destination="3Fh-ze-Xpd" id="uBi-9m-cnS"/>
                 <outlet property="checkboxAlwaysShowPassword" destination="AIq-rw-YUd" id="Quw-Cn-9aM"/>
-                <outlet property="checkboxAutoSave" destination="xpq-u1-zFL" id="buZ-MR-GjR"/>
+                <outlet property="checkboxAutoSave" destination="lGm-nA-viI" id="yrd-8L-SRL"/>
                 <outlet property="checkboxConcealEmptyProtected" destination="jiS-41-Ng9" id="Yyl-gE-nJh"/>
                 <outlet property="checkboxDereferenceOutlineView" destination="lHQ-UK-RWK" id="DY1-9B-IY9"/>
                 <outlet property="checkboxDereferenceQuickView" destination="jsN-b5-K5E" id="bYV-7P-dv0"/>
                 <outlet property="checkboxDereferenceSearch" destination="Zd4-sH-oaR" id="fyo-vn-FXS"/>
-                <outlet property="checkboxDetectForeignChanges" destination="0cp-bC-cZx" id="jtO-AA-VTP"/>
+                <outlet property="checkboxDetectForeignChanges" destination="hWF-oW-tXl" id="db8-0D-2VC"/>
                 <outlet property="checkboxFloatDetailsWindowsOnTop" destination="DdM-YZ-jh7" id="KkF-Q6-46b"/>
                 <outlet property="checkboxHorizontalGridLines" destination="QKg-8i-dPw" id="fcc-2R-gHx"/>
                 <outlet property="checkboxKeePassNoSort" destination="ost-Ny-EQH" id="RL1-de-d2K"/>
                 <outlet property="checkboxNonAmbiguous" destination="yFg-qg-zhJ" id="tbu-4V-Gtq"/>
                 <outlet property="checkboxOtherFieldsAreEditable" destination="5aJ-TP-GHM" id="hPE-0N-sDl"/>
                 <outlet property="checkboxPickFromEveryGroup" destination="EXF-t2-lIO" id="wMh-bS-Ot8"/>
-                <outlet property="checkboxReloadForeignChanges" destination="CSY-pP-QHq" id="K6S-M9-RmW"/>
+                <outlet property="checkboxReloadForeignChanges" destination="EvG-61-L1Q" id="ZCR-Zi-3tE"/>
                 <outlet property="checkboxShowAutoCompleteSuggestions" destination="Xfc-2q-RkA" id="AWn-9Q-jiU"/>
-                <outlet property="checkboxShowPopupNotifications" destination="pIQ-pf-3Qi" id="6lO-QU-YWg"/>
+                <outlet property="checkboxShowPopupNotifications" destination="d48-A0-G7M" id="Luq-tJ-8fK"/>
                 <outlet property="checkboxShowRecycleBinInBrowse" destination="fde-AD-Q1O" id="YmE-rS-kE5"/>
                 <outlet property="checkboxShowRecycleBinInSearch" destination="sbr-vi-pTL" id="qm8-eO-7i0"/>
                 <outlet property="checkboxShowTotpCodes" destination="D4c-Tm-kfj" id="OmC-PG-FGK"/>
@@ -35,7 +35,6 @@
                 <outlet property="checkboxUseSymbols" destination="sEr-GH-iRP" id="fnS-XM-gN8"/>
                 <outlet property="checkboxUseUpper" destination="TvQ-8P-YxV" id="Rf8-pR-6JA"/>
                 <outlet property="checkboxVerticalGridLines" destination="qxv-P5-NVf" id="b1Q-pv-0yJ"/>
-                <outlet property="labelClearClipboardTimeout" destination="xTR-Xf-Wmp" id="R47-eH-T1w"/>
                 <outlet property="labelCustomEmail" destination="G0U-od-kog" id="YUO-ft-SaI"/>
                 <outlet property="labelCustomNotes" destination="URz-hD-ZhY" id="jGe-ZP-OdJ"/>
                 <outlet property="labelCustomPassword" destination="91j-8i-95M" id="Q32-rK-83S"/>
@@ -49,13 +48,6 @@
                 <outlet property="popupAddSalt" destination="Kdn-ov-Ky9" id="tJO-Qi-VLr"/>
                 <outlet property="popupCasing" destination="jBp-mZ-tir" id="sSt-in-bns"/>
                 <outlet property="popupHackerify" destination="Dq7-By-xbj" id="GGq-Tz-cTv"/>
-                <outlet property="radioAutolock10Min" destination="BxS-GU-YG2" id="byY-pr-qLB"/>
-                <outlet property="radioAutolock1Min" destination="GzR-XF-DPr" id="Y6g-ew-Xh6"/>
-                <outlet property="radioAutolock2Min" destination="pi0-90-KFq" id="GzC-gp-8uK"/>
-                <outlet property="radioAutolock30Min" destination="zNs-lo-naW" id="cTh-DJ-lIO"/>
-                <outlet property="radioAutolock5Min" destination="XE2-yF-uCO" id="lvx-sh-T89"/>
-                <outlet property="radioAutolock60Min" destination="hxQ-Wn-I9B" id="nlF-vf-ksw"/>
-                <outlet property="radioAutolockNever" destination="KSu-vw-pYi" id="oFn-6Q-SXr"/>
                 <outlet property="radioBasic" destination="J7H-II-Qa5" id="7tJ-z5-i9g"/>
                 <outlet property="radioXkcd" destination="NQT-T4-Biz" id="YK1-7p-k3S"/>
                 <outlet property="segmentEmail" destination="aoG-xQ-5ff" id="2yj-Pb-iXM"/>
@@ -65,12 +57,18 @@
                 <outlet property="segmentUrl" destination="h8h-CX-SRm" id="ViS-PH-U2O"/>
                 <outlet property="segmentUsername" destination="wWT-2d-mc5" id="NM2-OB-4T4"/>
                 <outlet property="showCustomFieldsInQuickView" destination="oKT-ke-irF" id="iuj-Vl-9tx"/>
-                <outlet property="sliderAutoClearClipboardTimeout" destination="vda-bU-6SH" id="l3O-bq-dyw"/>
                 <outlet property="sliderPasswordLength" destination="9KZ-9l-cam" id="z6O-ZX-3oV"/>
+                <outlet property="stepperClearClipboard" destination="XkJ-k9-VXm" id="UTi-ro-0tp"/>
+                <outlet property="stepperLockDatabase" destination="M1Y-fH-3um" id="igb-Px-rU5"/>
                 <outlet property="stepperXkcdWordCount" destination="Sh6-f5-1Jt" id="dZE-nk-E6l"/>
-                <outlet property="switchAutoClearClipboard" destination="aIY-V4-XHm" id="Pe7-FX-zo3"/>
+                <outlet property="switchAutoClearClipboard" destination="QEg-TP-0kC" id="cLk-zW-bWh"/>
+                <outlet property="switchAutoLockAfter" destination="MZP-ha-yar" id="Zsd-8H-2bC"/>
+                <outlet property="switchAutoPromptTouchID" destination="Ia9-41-2Rl" id="Bqs-Xq-Grz"/>
+                <outlet property="switchShowInMenuBar" destination="0Wy-pB-zM8" id="1Uc-q9-feZ"/>
                 <outlet property="tabView" destination="pKR-KL-ngR" id="HNX-Yy-AwH"/>
                 <outlet property="tableViewWordLists" destination="jxP-ba-wA1" id="qsO-V7-Bos"/>
+                <outlet property="textFieldClearClipboard" destination="wsV-1v-9l4" id="eGl-qX-xR0"/>
+                <outlet property="textFieldLockDatabase" destination="1QM-ew-ATR" id="WW4-JF-HFr"/>
                 <outlet property="textFieldWordSeparator" destination="aEu-bB-uqR" id="3YQ-vR-hQW"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -82,21 +80,21 @@
             <rect key="contentRect" x="196" y="240" width="488" height="802"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="488" height="769"/>
+                <rect key="frame" x="0.0" y="0.0" width="488" height="412"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="465" height="729"/>
+                        <rect key="frame" x="13" y="26" width="465" height="372"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
-                            <tabViewItem label="General" identifier="" id="d1S-ha-z7I">
-                                <view key="view" id="0i4-gP-tCE">
-                                    <rect key="frame" x="10" y="33" width="445" height="683"/>
+                            <tabViewItem label="General" identifier="" id="yNg-sv-E7G">
+                                <view key="view" id="elx-gC-YoE">
+                                    <rect key="frame" x="10" y="33" width="445" height="326"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xfc-2q-RkA">
-                                            <rect key="frame" x="15" y="647" width="284" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Show AutoComplete Suggestions for Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yeU-d7-EAN">
+                                            <rect key="frame" x="15" y="188" width="198" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Use Auto Complete on Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yeU-d7-EAN">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -104,9 +102,191 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="Ig3-Kc-Ptl"/>
                                             </connections>
                                         </button>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pxT-nk-uUw">
+                                            <rect key="frame" x="286" y="155" width="56" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="1oQ-mP-YWU">
+                                                <font key="font" usesAppearanceFont="YES"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d48-A0-G7M">
+                                            <rect key="frame" x="15" y="222" width="243" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Display Popup Notifications for Edits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="CdL-C9-1bi">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="AlS-lG-689"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Wy-pB-zM8">
+                                            <rect key="frame" x="15" y="290" width="180" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Show in System Menu Bar" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Gyg-6A-be3">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="SDq-sz-Biy"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wsV-1v-9l4">
+                                            <rect key="frame" x="216" y="152" width="43" height="22"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="43" id="7cT-Z8-M0h"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="60" drawsBackground="YES" id="7yu-Zp-WLO">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="t74-5E-775"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="onClearClipboardTextFieldEdited:" target="-2" id="1UU-HX-Jcu"/>
+                                            </connections>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QEg-TP-0kC">
+                                            <rect key="frame" x="15" y="154" width="185" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Auto Clear Clipboard After:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rl3-rd-Ws6">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onAutoClearClipboard:" target="-2" id="kk4-6k-RRg"/>
+                                            </connections>
+                                        </button>
+                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XkJ-k9-VXm">
+                                            <rect key="frame" x="264" y="150" width="19" height="27"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="15" maxValue="1200" doubleValue="60" id="dVG-hS-h7r"/>
+                                            <connections>
+                                                <action selector="onStepperClearClipboard:" target="-2" id="0Zl-NP-05u"/>
+                                            </connections>
+                                        </stepper>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a59-6L-N1P">
+                                            <rect key="frame" x="286" y="121" width="56" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="OGE-ad-bBB">
+                                                <font key="font" usesAppearanceFont="YES"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1QM-ew-ATR">
+                                            <rect key="frame" x="216" y="118" width="43" height="22"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="43" id="Af3-jU-4XG"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="60" drawsBackground="YES" id="GkR-xY-LgF">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="NGb-U7-Vnn"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="onTextFieldAutoLockEdited:" target="-2" id="TAa-tH-vco"/>
+                                            </connections>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MZP-ha-yar">
+                                            <rect key="frame" x="15" y="120" width="181" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Auto Lock Database After:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uxM-9Q-feq">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onAutolockChange:" target="-2" id="Rgc-MH-zo1"/>
+                                            </connections>
+                                        </button>
+                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="M1Y-fH-3um">
+                                            <rect key="frame" x="264" y="116" width="19" height="27"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="1200" doubleValue="60" id="X6T-6m-hcs"/>
+                                            <connections>
+                                                <action selector="onStepperAutoLockDatabase:" target="-2" id="xQB-Ze-5v6"/>
+                                            </connections>
+                                        </stepper>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lGm-nA-viI">
+                                            <rect key="frame" x="15" y="86" width="114" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Use Auto Save " bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="aJ8-Bc-3q6">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="4C1-Vk-R2y"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hWF-oW-tXl">
+                                            <rect key="frame" x="15" y="52" width="224" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Monitor for External File Changes" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Cd5-R3-hg8">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="RxJ-QV-bDO"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EvG-61-L1Q">
+                                            <rect key="frame" x="15" y="18" width="351" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Auto Reload on External File Changes (When Possible)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="0sC-XX-GhI">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="c7t-qt-TxO"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ia9-41-2Rl">
+                                            <rect key="frame" x="15" y="256" width="311" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Automatically Prompt for Touch ID Open (BETA)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1BJ-eP-XiH">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="nPT-Pt-tFy"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="d48-A0-G7M" firstAttribute="top" secondItem="Ia9-41-2Rl" secondAttribute="bottom" constant="20" id="0uo-6Z-CXR"/>
+                                        <constraint firstItem="a59-6L-N1P" firstAttribute="leading" secondItem="M1Y-fH-3um" secondAttribute="trailing" constant="8" id="1jN-KE-DGk"/>
+                                        <constraint firstItem="wsV-1v-9l4" firstAttribute="leading" secondItem="QEg-TP-0kC" secondAttribute="trailing" constant="18" id="2Dp-NE-iSp"/>
+                                        <constraint firstItem="XkJ-k9-VXm" firstAttribute="leading" secondItem="wsV-1v-9l4" secondAttribute="trailing" constant="8" id="2tX-2a-BRc"/>
+                                        <constraint firstItem="1QM-ew-ATR" firstAttribute="centerY" secondItem="M1Y-fH-3um" secondAttribute="centerY" id="A9x-0i-WoW"/>
+                                        <constraint firstItem="QEg-TP-0kC" firstAttribute="firstBaseline" secondItem="wsV-1v-9l4" secondAttribute="firstBaseline" id="Hhf-aB-qs2"/>
+                                        <constraint firstItem="d48-A0-G7M" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="Jkx-Lq-GhJ"/>
+                                        <constraint firstItem="0Wy-pB-zM8" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="MVF-TB-gfa"/>
+                                        <constraint firstItem="hWF-oW-tXl" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="NT5-6l-Bpj"/>
+                                        <constraint firstItem="wsV-1v-9l4" firstAttribute="centerY" secondItem="XkJ-k9-VXm" secondAttribute="centerY" id="NpS-k8-Sf4"/>
+                                        <constraint firstItem="0Wy-pB-zM8" firstAttribute="top" secondItem="elx-gC-YoE" secondAttribute="top" constant="20" id="Pyd-6h-ZUa"/>
+                                        <constraint firstItem="MZP-ha-yar" firstAttribute="firstBaseline" secondItem="1QM-ew-ATR" secondAttribute="firstBaseline" id="RU0-hg-aay"/>
+                                        <constraint firstItem="MZP-ha-yar" firstAttribute="top" secondItem="QEg-TP-0kC" secondAttribute="bottom" constant="20" id="Scb-Zg-spy"/>
+                                        <constraint firstItem="M1Y-fH-3um" firstAttribute="centerY" secondItem="a59-6L-N1P" secondAttribute="centerY" id="Y7w-bD-sQn"/>
+                                        <constraint firstItem="lGm-nA-viI" firstAttribute="top" secondItem="MZP-ha-yar" secondAttribute="bottom" constant="20" id="ZJi-VH-XYt"/>
+                                        <constraint firstItem="EvG-61-L1Q" firstAttribute="top" secondItem="hWF-oW-tXl" secondAttribute="bottom" constant="20" id="ZLc-kd-aED"/>
+                                        <constraint firstItem="QEg-TP-0kC" firstAttribute="top" secondItem="Xfc-2q-RkA" secondAttribute="bottom" constant="20" id="Ze5-2u-TkO"/>
+                                        <constraint firstItem="EvG-61-L1Q" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="aLg-Ox-gam"/>
+                                        <constraint firstItem="lGm-nA-viI" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="c92-GN-r4w"/>
+                                        <constraint firstItem="Xfc-2q-RkA" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="g3E-7u-MNG"/>
+                                        <constraint firstItem="hWF-oW-tXl" firstAttribute="top" secondItem="lGm-nA-viI" secondAttribute="bottom" constant="20" id="gqQ-ve-xYf"/>
+                                        <constraint firstItem="Ia9-41-2Rl" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="grb-lS-hwX"/>
+                                        <constraint firstItem="QEg-TP-0kC" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="gug-me-u9w"/>
+                                        <constraint firstItem="1QM-ew-ATR" firstAttribute="leading" secondItem="MZP-ha-yar" secondAttribute="trailing" constant="22" id="hgp-M7-K5M"/>
+                                        <constraint firstItem="pxT-nk-uUw" firstAttribute="leading" secondItem="XkJ-k9-VXm" secondAttribute="trailing" constant="8" id="iJL-va-Z7m"/>
+                                        <constraint firstItem="XkJ-k9-VXm" firstAttribute="centerY" secondItem="pxT-nk-uUw" secondAttribute="centerY" id="jkA-R2-4Ci"/>
+                                        <constraint firstAttribute="bottom" secondItem="EvG-61-L1Q" secondAttribute="bottom" constant="20" id="jph-LB-k2S"/>
+                                        <constraint firstItem="Ia9-41-2Rl" firstAttribute="top" secondItem="0Wy-pB-zM8" secondAttribute="bottom" constant="20" id="kFc-Ob-4Yb"/>
+                                        <constraint firstItem="Xfc-2q-RkA" firstAttribute="leading" secondItem="d48-A0-G7M" secondAttribute="leading" id="sSv-DN-GfG"/>
+                                        <constraint firstItem="MZP-ha-yar" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="17" id="wQC-QV-fJP"/>
+                                        <constraint firstItem="M1Y-fH-3um" firstAttribute="leading" secondItem="1QM-ew-ATR" secondAttribute="trailing" constant="8" id="wXH-9k-o93"/>
+                                        <constraint firstItem="Xfc-2q-RkA" firstAttribute="top" secondItem="d48-A0-G7M" secondAttribute="bottom" constant="20" id="wfA-sp-pwM"/>
+                                    </constraints>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="View" identifier="" id="d1S-ha-z7I">
+                                <view key="view" id="0i4-gP-tCE">
+                                    <rect key="frame" x="10" y="33" width="445" height="564"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AIq-rw-YUd">
-                                            <rect key="frame" x="15" y="309" width="358" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Reveal Password Immediately in Details and Quick View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="WDq-o0-s5T">
+                                            <rect key="frame" x="15" y="154" width="201" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Reveal Password Immediately" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="WDq-o0-s5T">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -115,7 +295,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FfB-of-qge">
-                                            <rect key="frame" x="15" y="569" width="209" height="18"/>
+                                            <rect key="frame" x="15" y="460" width="209" height="18"/>
                                             <buttonCell key="cell" type="check" title="Title is Editable in Outline View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="F1L-We-jkz">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -125,7 +305,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5aJ-TP-GHM">
-                                            <rect key="frame" x="15" y="543" width="265" height="18"/>
+                                            <rect key="frame" x="15" y="426" width="265" height="18"/>
                                             <buttonCell key="cell" type="check" title="Other Fields are Editable in Outline View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="b3R-cq-lpF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -135,7 +315,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ost-Ny-EQH">
-                                            <rect key="frame" x="15" y="413" width="297" height="18"/>
+                                            <rect key="frame" x="15" y="290" width="297" height="18"/>
                                             <buttonCell key="cell" type="check" title="KeePass: Do Not Sort - Use Custom Ordering" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LyM-2c-0d1">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -144,50 +324,9 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="IZr-lo-USE"/>
                                             </connections>
                                         </button>
-                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="sdt-B3-RKP">
-                                            <rect key="frame" x="17" y="192" width="411" height="5"/>
-                                        </box>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xpq-u1-zFL">
-                                            <rect key="frame" x="15" y="166" width="114" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Use Auto Save " bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="t9E-dh-uAI">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onGeneralSettingsChange:" target="-2" id="wfI-IY-1Ss"/>
-                                            </connections>
-                                        </button>
-                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="EmU-GF-nL1" userLabel="Last Horizontal Line">
-                                            <rect key="frame" x="17" y="101" width="411" height="5"/>
-                                        </box>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aIY-V4-XHm">
-                                            <rect key="frame" x="15" y="75" width="246" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Auto Clear Clipboard on Exit or After:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jJ5-fK-nHH">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutoClearClipboard:" target="-2" id="oJI-bU-vwR"/>
-                                            </connections>
-                                        </button>
-                                        <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vda-bU-6SH">
-                                            <rect key="frame" x="15" y="41" width="415" height="24"/>
-                                            <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="15" maxValue="300" doubleValue="90" tickMarkPosition="above" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="soT-JT-SbG"/>
-                                            <connections>
-                                                <action selector="onAutoClearClipboardSlider:" target="-2" id="hcy-tQ-r12"/>
-                                            </connections>
-                                        </slider>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xTR-Xf-Wmp">
-                                            <rect key="frame" x="184" y="20" width="77" height="17"/>
-                                            <textFieldCell key="cell" lineBreakMode="clipping" title="60 Seconds" id="CuY-ae-aLX">
-                                                <font key="font" usesAppearanceFont="YES"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D4c-Tm-kfj">
-                                            <rect key="frame" x="15" y="335" width="292" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Show TOTP Codes in Details and Quick View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JRW-Zu-b78">
+                                            <rect key="frame" x="15" y="188" width="135" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Show TOTP Codes" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JRW-Zu-b78">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -196,7 +335,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Fh-ze-Xpd">
-                                            <rect key="frame" x="15" y="517" width="191" height="18"/>
+                                            <rect key="frame" x="15" y="392" width="191" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Alternating Grid Rows" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yUR-zy-Zuh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -206,7 +345,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QKg-8i-dPw">
-                                            <rect key="frame" x="15" y="491" width="186" height="18"/>
+                                            <rect key="frame" x="15" y="358" width="186" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Horizontal Grid Lines" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dGB-m5-a2Q">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -215,19 +354,9 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="AL8-Bz-Is1"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DdM-YZ-jh7">
-                                            <rect key="frame" x="15" y="439" width="203" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Float Details Windows On Top" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="arR-Au-qRQ">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onGeneralSettingsChange:" target="-2" id="hRO-pb-Wcb"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fde-AD-Q1O">
-                                            <rect key="frame" x="15" y="387" width="256" height="18"/>
-                                            <buttonCell key="cell" type="check" title="KeePass: Show 'Recycle Bin' in Browse" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Jpd-Vh-Gb2">
+                                            <rect key="frame" x="15" y="256" width="194" height="18"/>
+                                            <buttonCell key="cell" type="check" title="KeePass: Show 'Recycle Bin'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Jpd-Vh-Gb2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -236,8 +365,8 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sbr-vi-pTL">
-                                            <rect key="frame" x="15" y="361" width="339" height="18"/>
-                                            <buttonCell key="cell" type="check" title="KeePass: Show 'Recycle Bin' items in Search Results" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="xNZ-Zk-Nb1">
+                                            <rect key="frame" x="15" y="222" width="291" height="18"/>
+                                            <buttonCell key="cell" type="check" title="KeePass: Show 'Recycle Bin' items in Search" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="xNZ-Zk-Nb1">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -245,18 +374,8 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="VgP-6z-oD6"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pIQ-pf-3Qi">
-                                            <rect key="frame" x="15" y="283" width="178" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Show Popup Notifications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Lc8-RW-yah">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onGeneralSettingsChange:" target="-2" id="sJI-l3-Q1j"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lHQ-UK-RWK">
-                                            <rect key="frame" x="15" y="231" width="324" height="18"/>
+                                            <rect key="frame" x="15" y="86" width="324" height="18"/>
                                             <buttonCell key="cell" type="check" title="Dereference Items in Outline View (Possibly Slow)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wZm-fx-dml">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -266,7 +385,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zd4-sH-oaR">
-                                            <rect key="frame" x="15" y="205" width="318" height="18"/>
+                                            <rect key="frame" x="15" y="52" width="318" height="18"/>
                                             <buttonCell key="cell" type="check" title="Dereference Items during Search (Possibly Slow)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Q4C-wJ-6XA">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -275,18 +394,8 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="ehc-9f-op4"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0cp-bC-cZx">
-                                            <rect key="frame" x="15" y="140" width="224" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Monitor for External File Changes" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uUp-A4-M5e">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onGeneralSettingsChange:" target="-2" id="5hB-0j-Mii"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qxv-P5-NVf">
-                                            <rect key="frame" x="15" y="465" width="170" height="18"/>
+                                            <rect key="frame" x="15" y="324" width="170" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Vertical Grid Lines" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fHB-gf-XSD">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -296,7 +405,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jsN-b5-K5E">
-                                            <rect key="frame" x="15" y="257" width="219" height="18"/>
+                                            <rect key="frame" x="15" y="120" width="219" height="18"/>
                                             <buttonCell key="cell" type="check" title="Dereference Items in Quick View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="CaQ-T7-oFx">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -305,18 +414,8 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="d1T-O0-UTr"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CSY-pP-QHq">
-                                            <rect key="frame" x="15" y="114" width="351" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Auto Reload on External File Changes (When Possible)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="9FY-oN-MIs">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onGeneralSettingsChange:" target="-2" id="obb-t7-y3g"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jiS-41-Ng9">
-                                            <rect key="frame" x="15" y="621" width="216" height="18"/>
+                                            <rect key="frame" x="15" y="528" width="216" height="18"/>
                                             <buttonCell key="cell" type="check" title="Conceal Empty Protected Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7Ab-yA-ZGL">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -326,7 +425,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oKT-ke-irF">
-                                            <rect key="frame" x="15" y="595" width="235" height="18"/>
+                                            <rect key="frame" x="15" y="494" width="235" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Custom Fields on Quick View" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XxN-X4-xIT">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -335,64 +434,51 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="CbX-xI-5gb"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DdM-YZ-jh7">
+                                            <rect key="frame" x="15" y="18" width="203" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Float Details Windows On Top" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="arR-Au-qRQ">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="hRO-pb-Wcb"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="Xfc-2q-RkA" firstAttribute="top" secondItem="0i4-gP-tCE" secondAttribute="top" constant="20" id="07k-Kr-0Am"/>
-                                        <constraint firstItem="sdt-B3-RKP" firstAttribute="top" secondItem="Zd4-sH-oaR" secondAttribute="bottom" constant="12" id="0QP-Li-FjN"/>
-                                        <constraint firstItem="qxv-P5-NVf" firstAttribute="top" secondItem="QKg-8i-dPw" secondAttribute="bottom" constant="12" id="178-uf-5tZ"/>
+                                        <constraint firstItem="qxv-P5-NVf" firstAttribute="top" secondItem="QKg-8i-dPw" secondAttribute="bottom" constant="20" id="178-uf-5tZ"/>
                                         <constraint firstItem="oKT-ke-irF" firstAttribute="leading" secondItem="jiS-41-Ng9" secondAttribute="leading" id="1o4-tD-GEx"/>
-                                        <constraint firstItem="0cp-bC-cZx" firstAttribute="leading" secondItem="xpq-u1-zFL" secondAttribute="leading" id="1ug-No-A9E"/>
-                                        <constraint firstItem="3Fh-ze-Xpd" firstAttribute="top" secondItem="5aJ-TP-GHM" secondAttribute="bottom" constant="12" id="2at-u3-9np"/>
-                                        <constraint firstItem="vda-bU-6SH" firstAttribute="leading" secondItem="0i4-gP-tCE" secondAttribute="leading" constant="17" id="3LW-oC-vyB"/>
+                                        <constraint firstItem="3Fh-ze-Xpd" firstAttribute="top" secondItem="5aJ-TP-GHM" secondAttribute="bottom" constant="20" id="2at-u3-9np"/>
                                         <constraint firstItem="qxv-P5-NVf" firstAttribute="leading" secondItem="QKg-8i-dPw" secondAttribute="leading" id="4Ut-96-og9"/>
-                                        <constraint firstItem="5aJ-TP-GHM" firstAttribute="top" secondItem="FfB-of-qge" secondAttribute="bottom" constant="12" id="5um-OX-ryH"/>
-                                        <constraint firstItem="aIY-V4-XHm" firstAttribute="top" secondItem="EmU-GF-nL1" secondAttribute="bottom" constant="12" id="6Me-ai-dOy"/>
-                                        <constraint firstItem="EmU-GF-nL1" firstAttribute="leading" secondItem="0i4-gP-tCE" secondAttribute="leading" constant="17" id="7tk-Nl-5wa"/>
+                                        <constraint firstItem="DdM-YZ-jh7" firstAttribute="leading" secondItem="Zd4-sH-oaR" secondAttribute="leading" id="5W2-fC-zv8"/>
+                                        <constraint firstItem="5aJ-TP-GHM" firstAttribute="top" secondItem="FfB-of-qge" secondAttribute="bottom" constant="20" id="5um-OX-ryH"/>
                                         <constraint firstItem="lHQ-UK-RWK" firstAttribute="leading" secondItem="jsN-b5-K5E" secondAttribute="leading" id="820-YB-B8u"/>
-                                        <constraint firstItem="xpq-u1-zFL" firstAttribute="top" secondItem="sdt-B3-RKP" secondAttribute="bottom" constant="12" id="8Lf-lM-c7F"/>
-                                        <constraint firstItem="xTR-Xf-Wmp" firstAttribute="top" secondItem="vda-bU-6SH" secondAttribute="bottom" constant="6" id="8Ui-fV-bNp"/>
-                                        <constraint firstItem="pIQ-pf-3Qi" firstAttribute="top" secondItem="AIq-rw-YUd" secondAttribute="bottom" constant="12" id="9GE-Qt-Tez"/>
-                                        <constraint firstItem="oKT-ke-irF" firstAttribute="top" secondItem="jiS-41-Ng9" secondAttribute="bottom" constant="12" id="9zT-Vo-cUB"/>
-                                        <constraint firstItem="jsN-b5-K5E" firstAttribute="leading" secondItem="pIQ-pf-3Qi" secondAttribute="leading" id="AgF-oV-qJn"/>
-                                        <constraint firstItem="fde-AD-Q1O" firstAttribute="top" secondItem="ost-Ny-EQH" secondAttribute="bottom" constant="12" id="Ccn-Hi-2wz"/>
+                                        <constraint firstItem="DdM-YZ-jh7" firstAttribute="top" secondItem="Zd4-sH-oaR" secondAttribute="bottom" constant="20" id="9Wy-zW-mK5"/>
+                                        <constraint firstItem="oKT-ke-irF" firstAttribute="top" secondItem="jiS-41-Ng9" secondAttribute="bottom" constant="20" id="9zT-Vo-cUB"/>
+                                        <constraint firstItem="fde-AD-Q1O" firstAttribute="top" secondItem="ost-Ny-EQH" secondAttribute="bottom" constant="20" id="Ccn-Hi-2wz"/>
                                         <constraint firstItem="D4c-Tm-kfj" firstAttribute="leading" secondItem="sbr-vi-pTL" secondAttribute="leading" id="DCu-rY-nhh"/>
-                                        <constraint firstItem="jsN-b5-K5E" firstAttribute="top" secondItem="pIQ-pf-3Qi" secondAttribute="bottom" constant="12" id="DXU-tb-nl4"/>
-                                        <constraint firstItem="DdM-YZ-jh7" firstAttribute="leading" secondItem="qxv-P5-NVf" secondAttribute="leading" id="JBO-qM-kUH"/>
+                                        <constraint firstItem="jsN-b5-K5E" firstAttribute="leading" secondItem="AIq-rw-YUd" secondAttribute="leading" id="FSI-Gv-cGM"/>
                                         <constraint firstItem="sbr-vi-pTL" firstAttribute="leading" secondItem="fde-AD-Q1O" secondAttribute="leading" id="LFy-QF-NUF"/>
-                                        <constraint firstItem="jiS-41-Ng9" firstAttribute="top" secondItem="Xfc-2q-RkA" secondAttribute="bottom" constant="12" id="N6W-IX-9FY"/>
-                                        <constraint firstItem="Zd4-sH-oaR" firstAttribute="top" secondItem="lHQ-UK-RWK" secondAttribute="bottom" constant="12" id="NgI-rY-Ac0"/>
-                                        <constraint firstAttribute="trailing" secondItem="vda-bU-6SH" secondAttribute="trailing" constant="17" id="R77-EI-DJa"/>
-                                        <constraint firstItem="D4c-Tm-kfj" firstAttribute="top" secondItem="sbr-vi-pTL" secondAttribute="bottom" constant="12" id="UAI-xU-ahF"/>
+                                        <constraint firstItem="jsN-b5-K5E" firstAttribute="top" secondItem="AIq-rw-YUd" secondAttribute="bottom" constant="20" id="LUX-J8-3ow"/>
+                                        <constraint firstItem="Zd4-sH-oaR" firstAttribute="top" secondItem="lHQ-UK-RWK" secondAttribute="bottom" constant="20" id="NgI-rY-Ac0"/>
+                                        <constraint firstItem="D4c-Tm-kfj" firstAttribute="top" secondItem="sbr-vi-pTL" secondAttribute="bottom" constant="20" id="UAI-xU-ahF"/>
                                         <constraint firstItem="AIq-rw-YUd" firstAttribute="leading" secondItem="D4c-Tm-kfj" secondAttribute="leading" id="W59-gG-zGj"/>
                                         <constraint firstItem="3Fh-ze-Xpd" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="WzD-N6-f4F"/>
-                                        <constraint firstItem="sbr-vi-pTL" firstAttribute="top" secondItem="fde-AD-Q1O" secondAttribute="bottom" constant="12" id="X6f-c5-AKd"/>
-                                        <constraint firstItem="pIQ-pf-3Qi" firstAttribute="leading" secondItem="AIq-rw-YUd" secondAttribute="leading" id="XIc-g1-oge"/>
-                                        <constraint firstAttribute="trailing" secondItem="EmU-GF-nL1" secondAttribute="trailing" constant="17" id="XYt-yS-cJU"/>
-                                        <constraint firstItem="QKg-8i-dPw" firstAttribute="top" secondItem="3Fh-ze-Xpd" secondAttribute="bottom" constant="12" id="YAm-aC-alU"/>
+                                        <constraint firstItem="sbr-vi-pTL" firstAttribute="top" secondItem="fde-AD-Q1O" secondAttribute="bottom" constant="20" id="X6f-c5-AKd"/>
+                                        <constraint firstItem="QKg-8i-dPw" firstAttribute="top" secondItem="3Fh-ze-Xpd" secondAttribute="bottom" constant="20" id="YAm-aC-alU"/>
                                         <constraint firstItem="ost-Ny-EQH" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="YLc-BD-3dm"/>
-                                        <constraint firstItem="DdM-YZ-jh7" firstAttribute="top" secondItem="qxv-P5-NVf" secondAttribute="bottom" constant="12" id="YPL-ks-Lre"/>
-                                        <constraint firstItem="CSY-pP-QHq" firstAttribute="leading" secondItem="0cp-bC-cZx" secondAttribute="leading" id="ZLq-Bf-v6w"/>
                                         <constraint firstItem="Zd4-sH-oaR" firstAttribute="leading" secondItem="lHQ-UK-RWK" secondAttribute="leading" id="aSm-Ov-FHs"/>
-                                        <constraint firstItem="FfB-of-qge" firstAttribute="top" secondItem="oKT-ke-irF" secondAttribute="bottom" constant="12" id="bdP-VN-TfX"/>
-                                        <constraint firstItem="xpq-u1-zFL" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="eJK-9e-Qli"/>
-                                        <constraint firstAttribute="bottom" secondItem="xTR-Xf-Wmp" secondAttribute="bottom" constant="20" id="etq-FI-XWt"/>
+                                        <constraint firstItem="ost-Ny-EQH" firstAttribute="top" secondItem="qxv-P5-NVf" secondAttribute="bottom" constant="20" id="bMJ-68-ccl"/>
+                                        <constraint firstItem="FfB-of-qge" firstAttribute="top" secondItem="oKT-ke-irF" secondAttribute="bottom" constant="20" id="bdP-VN-TfX"/>
+                                        <constraint firstItem="FfB-of-qge" firstAttribute="leading" secondItem="oKT-ke-irF" secondAttribute="leading" id="fzc-WI-qjN"/>
                                         <constraint firstItem="QKg-8i-dPw" firstAttribute="leading" secondItem="3Fh-ze-Xpd" secondAttribute="leading" id="g4A-kb-SNT"/>
-                                        <constraint firstItem="EmU-GF-nL1" firstAttribute="top" secondItem="CSY-pP-QHq" secondAttribute="bottom" constant="12" id="gjn-a0-a84"/>
-                                        <constraint firstItem="ost-Ny-EQH" firstAttribute="top" secondItem="DdM-YZ-jh7" secondAttribute="bottom" constant="12" id="i8U-ba-t0n"/>
-                                        <constraint firstItem="vda-bU-6SH" firstAttribute="top" secondItem="aIY-V4-XHm" secondAttribute="bottom" constant="12" id="iKT-Xf-5iY"/>
-                                        <constraint firstAttribute="trailing" secondItem="sdt-B3-RKP" secondAttribute="trailing" constant="17" id="jLE-Ue-0V6"/>
+                                        <constraint firstItem="jiS-41-Ng9" firstAttribute="leading" secondItem="0i4-gP-tCE" secondAttribute="leading" constant="17" id="kAi-7m-CiP"/>
                                         <constraint firstItem="fde-AD-Q1O" firstAttribute="leading" secondItem="ost-Ny-EQH" secondAttribute="leading" id="kSd-nr-MSR"/>
-                                        <constraint firstItem="FfB-of-qge" firstAttribute="leading" secondItem="Xfc-2q-RkA" secondAttribute="leading" id="kb9-MY-gQ4"/>
-                                        <constraint firstItem="Xfc-2q-RkA" firstAttribute="leading" secondItem="0i4-gP-tCE" secondAttribute="leading" constant="17" id="ki3-48-0Pj"/>
-                                        <constraint firstItem="aIY-V4-XHm" firstAttribute="leading" secondItem="EmU-GF-nL1" secondAttribute="leading" id="llL-hJ-IRL"/>
-                                        <constraint firstItem="xTR-Xf-Wmp" firstAttribute="centerX" secondItem="0i4-gP-tCE" secondAttribute="centerX" id="lpi-vJ-Puw"/>
-                                        <constraint firstItem="CSY-pP-QHq" firstAttribute="top" secondItem="0cp-bC-cZx" secondAttribute="bottom" constant="12" id="nqJ-zB-bkY"/>
-                                        <constraint firstItem="sdt-B3-RKP" firstAttribute="leading" secondItem="0i4-gP-tCE" secondAttribute="leading" constant="17" id="qiv-nR-7FP"/>
+                                        <constraint firstItem="jiS-41-Ng9" firstAttribute="top" secondItem="0i4-gP-tCE" secondAttribute="top" constant="20" id="lU3-0t-a00"/>
+                                        <constraint firstAttribute="bottom" secondItem="DdM-YZ-jh7" secondAttribute="bottom" constant="20" id="mSh-aJ-1Bn"/>
                                         <constraint firstItem="5aJ-TP-GHM" firstAttribute="leading" secondItem="FfB-of-qge" secondAttribute="leading" id="r6Z-9h-1bI"/>
-                                        <constraint firstItem="AIq-rw-YUd" firstAttribute="top" secondItem="D4c-Tm-kfj" secondAttribute="bottom" constant="12" id="uvC-Fv-AJi"/>
-                                        <constraint firstItem="jiS-41-Ng9" firstAttribute="leading" secondItem="Xfc-2q-RkA" secondAttribute="leading" id="vJd-sa-aXe"/>
-                                        <constraint firstItem="0cp-bC-cZx" firstAttribute="top" secondItem="xpq-u1-zFL" secondAttribute="bottom" constant="12" id="wT2-dE-bDE"/>
-                                        <constraint firstItem="lHQ-UK-RWK" firstAttribute="top" secondItem="jsN-b5-K5E" secondAttribute="bottom" constant="12" id="ytj-iY-wLG"/>
+                                        <constraint firstItem="AIq-rw-YUd" firstAttribute="top" secondItem="D4c-Tm-kfj" secondAttribute="bottom" constant="20" id="uvC-Fv-AJi"/>
+                                        <constraint firstItem="lHQ-UK-RWK" firstAttribute="top" secondItem="jsN-b5-K5E" secondAttribute="bottom" constant="20" id="ytj-iY-wLG"/>
                                     </constraints>
                                 </view>
                             </tabViewItem>
@@ -505,9 +591,6 @@
                                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="vsT-oH-XRx">
                                             <rect key="frame" x="17" y="631" width="411" height="5"/>
                                         </box>
-                                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Aju-is-w2Y">
-                                            <rect key="frame" x="17" y="18" width="411" height="5"/>
-                                        </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZSa-r1-ZwL">
                                             <rect key="frame" x="361" y="377" width="52" height="21"/>
                                             <constraints>
@@ -565,7 +648,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EiR-Du-pZ3">
-                                            <rect key="frame" x="43" y="125" width="50" height="17"/>
+                                            <rect key="frame" x="43" y="104" width="50" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Casing:" id="aDE-1C-0wm">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -573,7 +656,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iZ0-fA-BeQ">
-                                            <rect key="frame" x="43" y="84" width="66" height="17"/>
+                                            <rect key="frame" x="43" y="63" width="66" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Hackerify:" id="H0y-HC-izD">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -581,7 +664,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aEu-bB-uqR">
-                                            <rect key="frame" x="148" y="164" width="280" height="22"/>
+                                            <rect key="frame" x="148" y="143" width="280" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="wju-iH-CAK">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -589,7 +672,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WXr-Uc-r1z">
-                                            <rect key="frame" x="43" y="167" width="103" height="17"/>
+                                            <rect key="frame" x="43" y="146" width="103" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Word Separator:" id="CEj-hL-zeZ">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -597,7 +680,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bsi-3L-YcA">
-                                            <rect key="frame" x="43" y="43" width="59" height="17"/>
+                                            <rect key="frame" x="43" y="22" width="59" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Add Salt:" id="0cr-Nk-wlR">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -605,13 +688,13 @@
                                             </textFieldCell>
                                         </textField>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kfk-XF-5ds">
-                                            <rect key="frame" x="45" y="194" width="383" height="152"/>
+                                            <rect key="frame" x="45" y="173" width="383" height="173"/>
                                             <clipView key="contentView" id="fgm-VP-bkg">
-                                                <rect key="frame" x="1" y="1" width="381" height="150"/>
+                                                <rect key="frame" x="1" y="1" width="381" height="171"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowSizeStyle="automatic" viewBased="YES" id="jxP-ba-wA1">
-                                                        <rect key="frame" x="0.0" y="0.0" width="381" height="150"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="381" height="171"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -668,7 +751,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jBp-mZ-tir">
-                                            <rect key="frame" x="146" y="120" width="285" height="25"/>
+                                            <rect key="frame" x="146" y="99" width="285" height="25"/>
                                             <popUpButtonCell key="cell" type="push" title="Do Not Change" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="TdW-8Y-fTN" id="8gN-5o-KGp">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="menu"/>
@@ -687,7 +770,7 @@
                                             </connections>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dq7-By-xbj">
-                                            <rect key="frame" x="146" y="79" width="285" height="25"/>
+                                            <rect key="frame" x="146" y="58" width="285" height="25"/>
                                             <popUpButtonCell key="cell" type="push" title="No" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="sGb-F9-jKX" id="pch-1N-ldN">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="menu"/>
@@ -706,7 +789,7 @@
                                             </connections>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kdn-ov-Ky9">
-                                            <rect key="frame" x="146" y="38" width="285" height="25"/>
+                                            <rect key="frame" x="146" y="17" width="285" height="25"/>
                                             <popUpButtonCell key="cell" type="push" title="No" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1GA-KH-YXz" id="XeS-3a-EcQ">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="menu"/>
@@ -736,7 +819,6 @@
                                         <constraint firstItem="sEr-GH-iRP" firstAttribute="leading" secondItem="2DG-Am-EOz" secondAttribute="leading" id="C3m-Fu-K2w"/>
                                         <constraint firstItem="Sh6-f5-1Jt" firstAttribute="top" secondItem="oZm-W6-pFf" secondAttribute="bottom" constant="8" symbolic="YES" id="Ei1-Em-w1d"/>
                                         <constraint firstAttribute="trailing" secondItem="Dq7-By-xbj" secondAttribute="trailing" constant="17" id="Ewz-qr-rPG"/>
-                                        <constraint firstItem="NQT-T4-Biz" firstAttribute="leading" secondItem="Aju-is-w2Y" secondAttribute="leading" id="Ez6-Gv-myf"/>
                                         <constraint firstItem="aEu-bB-uqR" firstAttribute="top" secondItem="Kfk-XF-5ds" secondAttribute="bottom" constant="8" id="GUH-w0-hDH"/>
                                         <constraint firstItem="yFg-qg-zhJ" firstAttribute="leading" secondItem="2DG-Am-EOz" secondAttribute="leading" id="HQ0-US-W2e"/>
                                         <constraint firstItem="EiR-Du-pZ3" firstAttribute="centerY" secondItem="jBp-mZ-tir" secondAttribute="centerY" id="HRr-9Q-s27"/>
@@ -747,7 +829,6 @@
                                         <constraint firstItem="Dq7-By-xbj" firstAttribute="top" secondItem="jBp-mZ-tir" secondAttribute="bottom" constant="20" id="JXj-3T-zhx"/>
                                         <constraint firstItem="P9l-t1-FvO" firstAttribute="leading" secondItem="vsT-oH-XRx" secondAttribute="leading" id="Jye-6l-eFa"/>
                                         <constraint firstItem="aEu-bB-uqR" firstAttribute="leading" secondItem="WXr-Uc-r1z" secondAttribute="trailing" constant="4" id="Kq1-ul-EMY"/>
-                                        <constraint firstAttribute="bottom" secondItem="Aju-is-w2Y" secondAttribute="bottom" constant="20" id="L7l-cE-tBm"/>
                                         <constraint firstItem="nP6-Q0-au2" firstAttribute="top" secondItem="TvQ-8P-YxV" secondAttribute="bottom" constant="8" id="N32-b5-5tv"/>
                                         <constraint firstItem="Dq7-By-xbj" firstAttribute="leading" secondItem="jBp-mZ-tir" secondAttribute="leading" id="QTh-i2-eaE"/>
                                         <constraint firstItem="1IP-Sw-QEI" firstAttribute="centerY" secondItem="ZSa-r1-ZwL" secondAttribute="centerY" id="QVd-8z-9PI"/>
@@ -782,14 +863,13 @@
                                         <constraint firstItem="TvQ-8P-YxV" firstAttribute="leading" secondItem="nP6-Q0-au2" secondAttribute="leading" id="l9G-ls-saU"/>
                                         <constraint firstItem="EiR-Du-pZ3" firstAttribute="leading" secondItem="WXr-Uc-r1z" secondAttribute="leading" id="mB6-90-eUC"/>
                                         <constraint firstItem="bsi-3L-YcA" firstAttribute="centerY" secondItem="Kdn-ov-Ky9" secondAttribute="centerY" id="mOm-07-iZs"/>
-                                        <constraint firstItem="oZm-W6-pFf" firstAttribute="trailing" secondItem="Aju-is-w2Y" secondAttribute="trailing" id="mlC-DJ-dUH"/>
                                         <constraint firstAttribute="trailing" secondItem="aEu-bB-uqR" secondAttribute="trailing" constant="17" id="oNA-LJ-Omd"/>
                                         <constraint firstItem="NQT-T4-Biz" firstAttribute="baseline" secondItem="1IP-Sw-QEI" secondAttribute="baseline" id="ogV-rb-LBs"/>
-                                        <constraint firstItem="Aju-is-w2Y" firstAttribute="top" secondItem="Kdn-ov-Ky9" secondAttribute="bottom" constant="20" id="qej-Jw-KBE"/>
                                         <constraint firstItem="WXr-Uc-r1z" firstAttribute="leading" secondItem="Vwb-bK-uLD" secondAttribute="leading" id="qfi-9Y-Lu5"/>
                                         <constraint firstItem="PGt-9T-Nnu" firstAttribute="leading" secondItem="4ag-1n-rL7" secondAttribute="leading" constant="45" id="qpy-Nt-TsD"/>
                                         <constraint firstItem="Vwb-bK-uLD" firstAttribute="leading" secondItem="PGt-9T-Nnu" secondAttribute="leading" id="s5h-RQ-qPH"/>
                                         <constraint firstAttribute="trailing" secondItem="Kfk-XF-5ds" secondAttribute="trailing" constant="17" id="t9A-r3-QMq"/>
+                                        <constraint firstAttribute="bottom" secondItem="Kdn-ov-Ky9" secondAttribute="bottom" constant="20" id="tdd-aW-opY"/>
                                         <constraint firstItem="iZ0-fA-BeQ" firstAttribute="centerY" secondItem="Dq7-By-xbj" secondAttribute="centerY" id="vyq-va-Y3I"/>
                                         <constraint firstItem="vsT-oH-XRx" firstAttribute="leading" secondItem="J7H-II-Qa5" secondAttribute="leading" id="xAr-XI-ivh"/>
                                         <constraint firstItem="EXF-t2-lIO" firstAttribute="leading" secondItem="yFg-qg-zhJ" secondAttribute="leading" id="xmR-3N-gog"/>
@@ -799,13 +879,13 @@
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Auto Fill" identifier="" id="I9V-VC-Eni" userLabel="Record Autofill">
+                            <tabViewItem label="New Entry Defaults" identifier="" id="I9V-VC-Eni" userLabel="Record Autofill">
                                 <view key="view" id="Ley-eP-xRM">
-                                    <rect key="frame" x="10" y="33" width="422" height="394"/>
+                                    <rect key="frame" x="10" y="33" width="445" height="394"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <segmentedControl verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="IJU-Td-FRW" userLabel="TitleSegment">
-                                            <rect key="frame" x="90" y="353" width="314" height="24"/>
+                                            <rect key="frame" x="90" y="353" width="337" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="Rn9-SM-hyH">
                                                 <font key="font" metaFont="system"/>
                                                 <segments>
@@ -827,7 +907,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wWT-2d-mc5" userLabel="UsernameSegment">
-                                            <rect key="frame" x="90" y="291" width="314" height="24"/>
+                                            <rect key="frame" x="90" y="291" width="337" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="C0b-2x-jus">
                                                 <font key="font" metaFont="system"/>
                                                 <segments>
@@ -849,7 +929,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ygs-Wj-0ju" userLabel="PasswordSegment">
-                                            <rect key="frame" x="90" y="229" width="314" height="24"/>
+                                            <rect key="frame" x="90" y="229" width="337" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="eSB-Yn-gxe">
                                                 <font key="font" metaFont="system"/>
                                                 <segments>
@@ -871,7 +951,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aoG-xQ-5ff" userLabel="EmailSegment">
-                                            <rect key="frame" x="90" y="167" width="314" height="24"/>
+                                            <rect key="frame" x="90" y="167" width="337" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="mGr-7Q-I8c">
                                                 <font key="font" metaFont="system"/>
                                                 <segments>
@@ -893,7 +973,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h8h-CX-SRm" userLabel="UrlSegment">
-                                            <rect key="frame" x="90" y="105" width="314" height="24"/>
+                                            <rect key="frame" x="90" y="105" width="337" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="tVL-lg-pMl">
                                                 <font key="font" metaFont="system"/>
                                                 <segments>
@@ -915,7 +995,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MIX-wa-Bho" userLabel="NotesSegment">
-                                            <rect key="frame" x="90" y="43" width="314" height="24"/>
+                                            <rect key="frame" x="90" y="43" width="337" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="gZ5-SU-Jkg">
                                                 <font key="font" metaFont="system"/>
                                                 <segments>
@@ -937,7 +1017,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QWT-HQ-jpd" userLabel="CustomTitle">
-                                            <rect key="frame" x="367" y="330" width="37" height="17"/>
+                                            <rect key="frame" x="390" y="330" width="37" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="vXF-Ex-fAx">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -945,7 +1025,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ynx-zg-Pdx" userLabel="CustomUsername">
-                                            <rect key="frame" x="367" y="268" width="37" height="17"/>
+                                            <rect key="frame" x="390" y="268" width="37" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="JVP-Ku-8dQ">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -953,7 +1033,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G0U-od-kog" userLabel="CustomEmail">
-                                            <rect key="frame" x="367" y="144" width="37" height="17"/>
+                                            <rect key="frame" x="390" y="144" width="37" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="4t6-z0-Fcm">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -961,7 +1041,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="URz-hD-ZhY" userLabel="CustomNotes">
-                                            <rect key="frame" x="367" y="20" width="37" height="17"/>
+                                            <rect key="frame" x="390" y="20" width="37" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="Wd7-9M-1Es">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -969,7 +1049,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aXa-II-We8" userLabel="CustomUrl">
-                                            <rect key="frame" x="367" y="82" width="37" height="17"/>
+                                            <rect key="frame" x="390" y="82" width="37" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="wuf-Hn-OvO">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -977,7 +1057,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="91j-8i-95M" userLabel="CustomPassword">
-                                            <rect key="frame" x="367" y="206" width="37" height="17"/>
+                                            <rect key="frame" x="390" y="206" width="37" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="HXH-iE-msc">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1033,115 +1113,6 @@
                                     </constraints>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Auto Lock" identifier="" id="4gu-Gs-WEq">
-                                <view key="view" id="lv8-FU-7Ni">
-                                    <rect key="frame" x="10" y="33" width="445" height="223"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2FW-DH-BVp">
-                                            <rect key="frame" x="15" y="186" width="138" height="17"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Autolock on Inactivity:" id="JEa-XH-qS2">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KSu-vw-pYi">
-                                            <rect key="frame" x="28" y="161" width="58" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="Never" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="HPP-Na-VPN">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="8gs-5I-M0W"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GzR-XF-DPr">
-                                            <rect key="frame" x="28" y="137" width="107" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="After 1 Minute" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="lnv-Yi-dTM">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="V6S-JA-Af6"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pi0-90-KFq">
-                                            <rect key="frame" x="28" y="113" width="115" height="18"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="112" id="fOL-M8-PHe"/>
-                                            </constraints>
-                                            <buttonCell key="cell" type="radio" title="After 2 Minutes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="pfG-82-FiI">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="Pci-eh-H4X"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XE2-yF-uCO">
-                                            <rect key="frame" x="28" y="91" width="115" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="After 5 Minutes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="BgN-aI-W7M">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="ddd-57-43o"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BxS-GU-YG2">
-                                            <rect key="frame" x="28" y="67" width="122" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="After 10 Minutes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="sGk-lf-DEk">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="wbz-OF-Ntb"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hxQ-Wn-I9B">
-                                            <rect key="frame" x="28" y="19" width="95" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="After 1 Hour" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="xxq-a5-Mon">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="eLg-b8-VWN"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zNs-lo-naW">
-                                            <rect key="frame" x="28" y="43" width="124" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="After 30 Minutes" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8an-6m-AyW">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="onAutolockChange:" target="-2" id="mfs-SE-fg9"/>
-                                            </connections>
-                                        </button>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="zNs-lo-naW" firstAttribute="top" secondItem="BxS-GU-YG2" secondAttribute="bottom" constant="8" id="Cz1-sr-Qqq"/>
-                                        <constraint firstItem="GzR-XF-DPr" firstAttribute="top" secondItem="KSu-vw-pYi" secondAttribute="bottom" constant="8" id="H5z-QW-t9u"/>
-                                        <constraint firstAttribute="bottom" secondItem="hxQ-Wn-I9B" secondAttribute="bottom" constant="20" id="KZ0-q1-8lS"/>
-                                        <constraint firstItem="2FW-DH-BVp" firstAttribute="top" secondItem="lv8-FU-7Ni" secondAttribute="top" constant="20" id="NpB-ZO-uw6"/>
-                                        <constraint firstItem="hxQ-Wn-I9B" firstAttribute="top" secondItem="zNs-lo-naW" secondAttribute="bottom" constant="8" id="UAP-5n-CBU"/>
-                                        <constraint firstItem="2FW-DH-BVp" firstAttribute="leading" secondItem="lv8-FU-7Ni" secondAttribute="leading" constant="17" id="UB3-9n-6Lu"/>
-                                        <constraint firstItem="zNs-lo-naW" firstAttribute="leading" secondItem="BxS-GU-YG2" secondAttribute="leading" id="bDV-ac-XEg"/>
-                                        <constraint firstItem="pi0-90-KFq" firstAttribute="leading" secondItem="XE2-yF-uCO" secondAttribute="leading" id="ca7-0l-tqb"/>
-                                        <constraint firstItem="pi0-90-KFq" firstAttribute="top" secondItem="GzR-XF-DPr" secondAttribute="bottom" constant="8" id="ePJ-Xc-bCQ"/>
-                                        <constraint firstItem="KSu-vw-pYi" firstAttribute="leading" secondItem="lv8-FU-7Ni" secondAttribute="leading" constant="29" id="hOy-VE-tww"/>
-                                        <constraint firstItem="KSu-vw-pYi" firstAttribute="top" secondItem="2FW-DH-BVp" secondAttribute="bottom" constant="8" symbolic="YES" id="iTu-Vl-h7r"/>
-                                        <constraint firstItem="hxQ-Wn-I9B" firstAttribute="leading" secondItem="zNs-lo-naW" secondAttribute="leading" id="ka8-hv-aU6"/>
-                                        <constraint firstItem="BxS-GU-YG2" firstAttribute="leading" secondItem="XE2-yF-uCO" secondAttribute="leading" id="krs-JQ-wAb"/>
-                                        <constraint firstItem="KSu-vw-pYi" firstAttribute="leading" secondItem="GzR-XF-DPr" secondAttribute="leading" id="okO-D9-VjZ"/>
-                                        <constraint firstItem="GzR-XF-DPr" firstAttribute="leading" secondItem="pi0-90-KFq" secondAttribute="leading" id="rLx-yC-AiA"/>
-                                        <constraint firstItem="XE2-yF-uCO" firstAttribute="top" secondItem="pi0-90-KFq" secondAttribute="bottom" constant="6" symbolic="YES" id="rpV-OO-2Mi"/>
-                                        <constraint firstItem="pi0-90-KFq" firstAttribute="centerX" secondItem="XE2-yF-uCO" secondAttribute="centerX" id="rse-GH-VhA"/>
-                                        <constraint firstItem="BxS-GU-YG2" firstAttribute="top" secondItem="XE2-yF-uCO" secondAttribute="bottom" constant="8" id="tRq-C5-dRT"/>
-                                    </constraints>
-                                </view>
-                            </tabViewItem>
                         </tabViewItems>
                     </tabView>
                 </subviews>
@@ -1155,7 +1126,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="-906" y="123"/>
+            <point key="canvasLocation" x="-1114" y="8"/>
         </window>
     </objects>
 </document>

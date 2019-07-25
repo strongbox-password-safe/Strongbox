@@ -374,7 +374,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (BOOL)canCreateNewCredential {
-    return [self.rootViewController isLiveAutoFillProvider:self.model.metadata.storageProvider] && !self.model.isReadOnly;
+    return [self.rootViewController liveAutoFillIsPossibleWithSafe:self.model.metadata] && !self.model.isReadOnly;
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {

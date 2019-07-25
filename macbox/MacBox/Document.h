@@ -8,15 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AbstractDatabaseFormatAdaptor.h"
+#import "CompositeKeyFactors.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Document : NSDocument
 
-- (instancetype)initWithCredentials:(DatabaseFormat)format password:(nullable NSString*)password keyFileDigest:(nullable NSData*)keyFileDigest;
+- (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
-- (void)revertWithUnlock:(NSString*_Nullable)password
-           keyFileDigest:(NSData*_Nullable)keyFileDigest
+- (void)revertWithUnlock:(CompositeKeyFactors*)compositeKeyFactors
             selectedItem:(NSString*_Nullable)selectedItem
               completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
 

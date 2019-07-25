@@ -17,6 +17,7 @@
 #import "SafesMetaDataViewer.h"
 #import "BiometricIdHelper.h"
 //#import "DAVKit.h"
+#import "ViewController.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -58,8 +59,6 @@
     [self removeCopyDiagnosticDumpItem];
     [self removeShowSafesMetaDataItem];
     
-    //BiometricIdHelper.sharedInstance.dummyMode = YES; // DEBUG
-    
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
@@ -79,14 +78,7 @@
         [self removeUpgradeMenuItem];
     }
     
-    NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
-    statusImage.size = NSMakeSize(18.0, 18.0);
-    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-    self.statusItem.image = statusImage;
-    self.statusItem.highlightMode = YES;
-    self.statusItem.enabled = YES;
-    self.statusItem.menu = self.systemTraymenu;
-    self.statusItem.toolTip = @"Strongbox";
+    [self showHideSystemStatusBarIcon];
     
     //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
     //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
@@ -94,6 +86,27 @@
     self.applicationHasFinishedLaunching = YES;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+}
+
+- (void)showHideSystemStatusBarIcon {
+    if(Settings.sharedInstance.showSystemTrayIcon) {
+        if(!self.statusItem) {
+            NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
+            statusImage.size = NSMakeSize(18.0, 18.0);
+            self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+            self.statusItem.image = statusImage;
+            self.statusItem.highlightMode = YES;
+            self.statusItem.enabled = YES;
+            self.statusItem.menu = self.systemTraymenu;
+            self.statusItem.toolTip = @"Strongbox";
+        }
+    }
+    else {
+        if(self.statusItem) {
+            [NSStatusBar.systemStatusBar removeStatusItem:self.statusItem];
+            self.statusItem = nil;
+        }
+    }
 }
 
 - (IBAction)onSystemTrayShow:(id)sender {
@@ -158,6 +171,29 @@
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
     }
+
+    ViewController* viewController = [self getActiveViewController];
+    if(viewController) {
+        [viewController autoPromptForTouchIdIfDesired];
+    }
+}
+
+- (ViewController*)getActiveViewController {
+    if(NSApplication.sharedApplication.keyWindow) {
+        NSWindow *window = NSApplication.sharedApplication.keyWindow;
+        NSDocument* doc = [NSDocumentController.sharedDocumentController documentForWindow:window];
+        
+        if(doc && doc.windowControllers.count) {
+            NSWindowController* windowController = [doc.windowControllers firstObject];
+            NSViewController* vc = windowController.contentViewController;
+            
+            if(vc && [vc isKindOfClass:ViewController.class]) {
+                return (ViewController*)vc;
+            }
+        }
+    }
+    
+    return nil;
 }
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
@@ -166,7 +202,6 @@
     if(timeout != 0) {
         self.autoLockWorkBlock = dispatch_block_create(0, ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kAutoLockTime object:nil];
-            
             self.autoLockWorkBlock = nil;
         });
         
@@ -176,14 +211,14 @@
 
 - (void)initializeFreeTrialAndShowWelcomeMessage {
     NSCalendar *cal = [NSCalendar currentCalendar];
-    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:2 toDate:[NSDate date] options:0];
+    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:3 toDate:[NSDate date] options:0];
     
     [Settings sharedInstance].endFreeTrialDate = date;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [Alerts info:@"Welcome to Strongbox"
      informativeText:@"Hi and welcome to Strongbox!\n\n"
-         @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of Strongbox for the next couple of months. "
+         @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of Strongbox for the next three months. "
          @"After that point, you will be transitioned to the regular version of Strongbox.\n\n"
          @"You can always find out more at any time by tapping 'Upgrade to Pro' in the Strongbox menu item.\n\n"
          @"Thanks!\n-Mark"
@@ -399,11 +434,11 @@
     NSLog(@"Preferences Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
 
     [self initializeClipboardWatchingTask];
+    [self showHideSystemStatusBarIcon];
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)notification {
 //    NSLog(@"applicationWillBecomeActive");
-
     [self initializeClipboardWatchingTask];
 }
 

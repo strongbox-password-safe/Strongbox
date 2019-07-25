@@ -39,7 +39,7 @@
         _displayName = @"Local Device";
         _icon = @"iphone_x";
         _storageId = kLocalDevice;
-        _cloudBased = NO;
+        _allowOfflineCache = NO;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = YES;
@@ -83,7 +83,7 @@
     
     LocalDatabaseIdentifier *identifier = [[LocalDatabaseIdentifier alloc] init];
     identifier.filename = suggestedFilename;
-    identifier.sharedStorage = Settings.sharedInstance.useSharedAppGroupLocalStorage;
+    identifier.sharedStorage = Settings.sharedInstance.useLocalSharedStorage;
     
     SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:identifier];
     metadata.offlineCacheEnabled = NO;
@@ -240,15 +240,18 @@
     [self syncLocalSafesWithFileSystem];
 }
 
-//- (void)stopMonitoringDocumentsDirectory {
-//    dispatch_source_cancel(_source);
-//}
+- (void)stopMonitoringDocumentsDirectory {
+    dispatch_source_cancel(_source);
+}
 
 - (NSArray<StorageBrowserItem *>*)scanForNewDatabases {
     NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
     NSMutableSet *existing = [NSMutableSet set];
     for (SafeMetaData* safe in localSafes) {
-        [existing addObject:safe.fileName];
+        LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:safe];
+        if(!identifier.sharedStorage) {
+            [existing addObject:identifier.filename];
+        }
     }
     
     NSError* error;
@@ -369,7 +372,7 @@
 }
 
 - (NSURL*)getDefaultStorageFileUrl:(NSString*)filename {
-    NSURL* folder = [self getDirectory:Settings.sharedInstance.useSharedAppGroupLocalStorage];
+    NSURL* folder = [self getDirectory:Settings.sharedInstance.useLocalSharedStorage];
     return [folder URLByAppendingPathComponent:filename];
 }
 
@@ -396,6 +399,54 @@
     }
     
     Settings.sharedInstance.migratedLocalDatabasesToNewSystem = YES;
+}
+
+- (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata {
+    LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:metadata];
+    return identifier.sharedStorage;
+}
+
+- (BOOL)toggleSharedStorage:(SafeMetaData*)metadata error:(NSError**)error {
+    LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:metadata];
+
+    NSURL* src = [self getFileUrl:identifier.sharedStorage filename:identifier.filename];
+    NSURL* dest = [self getFileUrl:!identifier.sharedStorage filename:identifier.filename];
+
+    int i=0;
+    NSString* extension = [identifier.filename pathExtension];
+    NSString* baseFileName = [identifier.filename stringByDeletingPathExtension];
+    
+    // Avoid Race Conditions
+    
+    [self stopMonitoringDocumentsDirectory];
+    
+    while ([[NSFileManager defaultManager] fileExistsAtPath:dest.path]) {
+        identifier.filename = [[baseFileName stringByAppendingFormat:@"-%d", i] stringByAppendingPathExtension:extension];
+        
+        dest = [self getFileUrl:!identifier.sharedStorage filename:identifier.filename];
+        
+        NSLog(@"File exists at destination... Trying: [%@]", dest);
+    }
+    
+    if(![NSFileManager.defaultManager moveItemAtURL:src toURL:dest error:error]) {
+        NSLog(@"Error moving local file: [%@]", *error);
+        [self startMonitoringDocumentsDirectory];
+        return NO;
+    }
+    else {
+        NSLog(@"OK - Moved local file: [%@] -> [%@]", src, dest);
+    }
+    
+    identifier.sharedStorage = !identifier.sharedStorage;
+    
+    metadata.fileIdentifier = [identifier toJson];
+    metadata.fileName = identifier.filename;
+    
+    [SafesList.sharedInstance update:metadata];
+    
+    [self startMonitoringDocumentsDirectory];
+    
+    return YES;
 }
 
 @end

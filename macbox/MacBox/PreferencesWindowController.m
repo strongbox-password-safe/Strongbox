@@ -16,9 +16,6 @@
 
 @interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate>
 
-@property (weak) IBOutlet NSButton *switchAutoClearClipboard;
-@property (weak) IBOutlet NSSlider *sliderAutoClearClipboardTimeout;
-@property (weak) IBOutlet NSTextField *labelClearClipboardTimeout;
 @property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInBrowse;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInSearch;
@@ -27,20 +24,73 @@
 @property (weak) IBOutlet NSButton *checkboxHorizontalGridLines;
 @property (weak) IBOutlet NSButton *checkboxVerticalGridLines;
 @property (weak) IBOutlet NSButton *checkboxShowAutoCompleteSuggestions;
-@property (weak) IBOutlet NSButton *checkboxShowPopupNotifications;
+
 @property (weak) IBOutlet NSButton *checkboxTitleIsEditable;
 @property (weak) IBOutlet NSButton *checkboxOtherFieldsAreEditable;
 @property (weak) IBOutlet NSButton *checkboxDereferenceQuickView;
 @property (weak) IBOutlet NSButton *checkboxDereferenceOutlineView;
 @property (weak) IBOutlet NSButton *checkboxDereferenceSearch;
-@property (weak) IBOutlet NSButton *checkboxDetectForeignChanges;
-@property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
 @property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
-
 @property (weak) IBOutlet NSTableView *tableViewWordLists;
 
+@property (weak) IBOutlet NSButton *radioBasic;
+@property (weak) IBOutlet NSButton *radioXkcd;
+@property (weak) IBOutlet NSButton *checkboxUseLower;
+@property (weak) IBOutlet NSButton *checkboxUseUpper;
+@property (weak) IBOutlet NSButton *checkboxUseDigits;
+@property (weak) IBOutlet NSButton *checkboxUseSymbols;
+@property (weak) IBOutlet NSButton *checkboxUseEasy;
+@property (weak) IBOutlet NSButton *checkboxNonAmbiguous;
+@property (weak) IBOutlet NSButton *checkboxPickFromEveryGroup;
+@property (weak) IBOutlet NSSlider *sliderPasswordLength;
+@property (weak) IBOutlet NSTextField *labelPasswordLength;
+
+@property (weak) IBOutlet NSTextField *labelXkcdWordCount;
+@property (weak) IBOutlet NSStepper *stepperXkcdWordCount;
+@property (weak) IBOutlet NSTextField *textFieldWordSeparator;
+@property (weak) IBOutlet NSPopUpButton *popupCasing;
+@property (weak) IBOutlet NSPopUpButton *popupHackerify;
+@property (weak) IBOutlet NSPopUpButton *popupAddSalt;
+
+@property (weak) IBOutlet NSTextField *labelSamplePassword;
+@property (weak) IBOutlet NSTabView *tabView;
+
+@property (weak) IBOutlet NSTextField *labelWordcount;
+
+@property (weak) IBOutlet NSButton *checkboxAlwaysShowPassword;
+@property (weak) IBOutlet NSButton *checkboxKeePassNoSort;
+
+@property (weak) IBOutlet NSSegmentedControl *segmentTitle;
+@property (weak) IBOutlet NSTextField *labelCustomTitle;
+@property (weak) IBOutlet NSSegmentedControl *segmentUsername;
+@property (weak) IBOutlet NSTextField *labelCustomUsername;
+@property (weak) IBOutlet NSSegmentedControl *segmentEmail;
+@property (weak) IBOutlet NSTextField *labelCustomEmail;
+@property (weak) IBOutlet NSSegmentedControl *segmentPassword;
+@property (weak) IBOutlet NSTextField *labelCustomPassword;
+@property (weak) IBOutlet NSSegmentedControl *segmentUrl;
+@property (weak) IBOutlet NSTextField *labelCustomUrl;
+@property (weak) IBOutlet NSSegmentedControl *segmentNotes;
+@property (weak) IBOutlet NSTextField *labelCustomNotes;
+
 @property NSArray<NSString*> *sortedWordListKeys;
+
+@property (weak) IBOutlet NSButton *checkboxShowPopupNotifications;
+@property (weak) IBOutlet NSButton *checkboxDetectForeignChanges;
+@property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
+@property (weak) IBOutlet NSButton *checkboxAutoSave;
+
+@property (weak) IBOutlet NSButton *switchAutoClearClipboard;
+@property (weak) IBOutlet NSTextField *textFieldClearClipboard;
+@property (weak) IBOutlet NSStepper *stepperClearClipboard;
+
+@property (weak) IBOutlet NSButton *switchAutoLockAfter;
+@property (weak) IBOutlet NSTextField *textFieldLockDatabase;
+@property (weak) IBOutlet NSStepper *stepperLockDatabase;
+
+@property (weak) IBOutlet NSButton *switchShowInMenuBar;
+@property (weak) IBOutlet NSButton *switchAutoPromptTouchID;
 
 @end
 
@@ -131,6 +181,10 @@
     self.checkboxReloadForeignChanges.state = Settings.sharedInstance.autoReloadAfterForeignChanges ? NSOnState : NSOffState;
     self.checkboxConcealEmptyProtected.state = Settings.sharedInstance.concealEmptyProtectedFields ? NSOnState : NSOffState;
     self.showCustomFieldsInQuickView.state = Settings.sharedInstance.showCustomFieldsOnQuickViewPanel ? NSOnState : NSOffState;
+    
+    self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
+    
+    self.switchAutoPromptTouchID.state = Settings.sharedInstance.autoPromptForTouchIdOnActivate ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -155,6 +209,11 @@
     Settings.sharedInstance.autoReloadAfterForeignChanges = Settings.sharedInstance.detectForeignChanges && (self.checkboxReloadForeignChanges.state == NSOnState);
     Settings.sharedInstance.concealEmptyProtectedFields = self.checkboxConcealEmptyProtected.state == NSOnState;
     Settings.sharedInstance.showCustomFieldsOnQuickViewPanel = self.showCustomFieldsInQuickView.state == NSOnState;
+    
+    Settings.sharedInstance.showSystemTrayIcon =
+        self.switchShowInMenuBar.state == NSOnState;
+    
+    Settings.sharedInstance.autoPromptForTouchIdOnActivate = self.switchAutoPromptTouchID.state == NSOnState;
     
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
@@ -197,18 +256,6 @@
     index = [self autoFillModeToSegmentIndex:settings.notesAutoFillMode];
     self.segmentNotes.selectedSegment = index;
     self.labelCustomNotes.stringValue = settings.notesAutoFillMode == kCustom ? settings.notesCustomAutoFill : @"";
-}
-
--(void) bindAutoLockToSettings {
-    NSInteger alt = Settings.sharedInstance.autoLockTimeoutSeconds;
-    
-    self.radioAutolockNever.state = alt == 0 ? NSOnState : NSOffState;
-    self.radioAutolock1Min.state = alt == 60 ? NSOnState : NSOffState;
-    self.radioAutolock2Min.state = alt == 120 ? NSOnState : NSOffState;
-    self.radioAutolock5Min.state = alt == 300 ? NSOnState : NSOffState;
-    self.radioAutolock10Min.state = alt == 600 ? NSOnState : NSOffState;
-    self.radioAutolock30Min.state = alt == 1800 ? NSOnState : NSOffState;
-    self.radioAutolock60Min.state = alt == 3600 ? NSOnState : NSOffState;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -370,33 +417,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction)onAutolockChange:(id)sender {
-    if(self.radioAutolockNever.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 0;
-    }
-    else if (self.radioAutolock1Min.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 60;
-    }
-    else if (self.radioAutolock2Min.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 120;
-    }
-    else if (self.radioAutolock5Min.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 300;
-    }
-    else if (self.radioAutolock10Min.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 600;
-    }
-    else if (self.radioAutolock30Min.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 1800;
-    }
-    else if (self.radioAutolock60Min.state == NSOnState) {
-        Settings.sharedInstance.autoLockTimeoutSeconds = 3600;
-    }
-    
-    [self bindAutoLockToSettings];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
-}
-
 - (IBAction)onTitleSegment:(id)sender {
     AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
 
@@ -533,28 +553,84 @@
     }
 }
 
-- (void)bindAutoClearClipboard {
-    self.switchAutoClearClipboard.state = Settings.sharedInstance.clearClipboardEnabled ? NSOnState : NSOffState;
-    self.sliderAutoClearClipboardTimeout.integerValue = Settings.sharedInstance.clearClipboardAfterSeconds;
-    self.labelClearClipboardTimeout.stringValue = [NSString stringWithFormat:@"%ld Seconds", Settings.sharedInstance.clearClipboardAfterSeconds];
+// Auto Lock DB
 
-    self.sliderAutoClearClipboardTimeout.enabled = Settings.sharedInstance.clearClipboardEnabled;
+-(void) bindAutoLockToSettings {
+    NSInteger alt = Settings.sharedInstance.autoLockTimeoutSeconds;
+    
+    self.switchAutoLockAfter.state = alt != 0 ? NSOnState : NSOffState;
+    self.textFieldLockDatabase.enabled = alt != 0;
+    self.stepperLockDatabase.enabled = alt != 0;
+    self.stepperLockDatabase.integerValue = alt;
+    self.textFieldLockDatabase.stringValue =  self.stepperLockDatabase.stringValue;
 }
 
-- (IBAction)onAutoClearClipboard:(id)sender {
-    NSLog(@"onAutoClearClipboard: [%d]", self.switchAutoClearClipboard.state == NSOnState);
+- (IBAction)onAutolockChange:(id)sender {
+    NSLog(@"onAutolockChange: [%d]", self.switchAutoLockAfter.state == NSOnState);
     
-    Settings.sharedInstance.clearClipboardEnabled = self.switchAutoClearClipboard.state == NSOnState;
+    Settings.sharedInstance.autoLockTimeoutSeconds = self.switchAutoLockAfter.state == NSOnState ? 120 : 0;
+    
+    [self bindAutoLockToSettings];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onStepperAutoLockDatabase:(id)sender {
+    Settings.sharedInstance.autoLockTimeoutSeconds =     self.stepperLockDatabase.integerValue;
+    
+    [self bindAutoLockToSettings];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onTextFieldAutoLockEdited:(id)sender {
+    self.stepperLockDatabase.integerValue = self.textFieldLockDatabase.integerValue;
+    
+    Settings.sharedInstance.autoLockTimeoutSeconds =     self.stepperLockDatabase.integerValue;
+    
+    [self bindAutoLockToSettings];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+// Auto Clear Clipboard
+
+- (void)bindAutoClearClipboard {
+    self.switchAutoClearClipboard.state = Settings.sharedInstance.clearClipboardEnabled ? NSOnState : NSOffState;
+
+    self.textFieldClearClipboard.enabled = Settings.sharedInstance.clearClipboardEnabled;
+
+    self.stepperClearClipboard.enabled = Settings.sharedInstance.clearClipboardEnabled;
+
+    self.stepperClearClipboard.integerValue = Settings.sharedInstance.clearClipboardAfterSeconds;
+    
+    self.textFieldClearClipboard.stringValue =  self.stepperClearClipboard.stringValue;
+}
+
+- (IBAction)onStepperClearClipboard:(id)sender {
+    Settings.sharedInstance.clearClipboardAfterSeconds =     self.stepperClearClipboard.integerValue;
     
     [self bindAutoClearClipboard];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
-- (IBAction)onAutoClearClipboardSlider:(id)sender {
-    NSLog(@"onAutoClearClipboardSlider: [%d]", self.sliderAutoClearClipboardTimeout.intValue);
+- (IBAction)onClearClipboardTextFieldEdited:(id)sender {
+    self.stepperClearClipboard.integerValue = self.textFieldClearClipboard.integerValue;
     
-    Settings.sharedInstance.clearClipboardAfterSeconds = self.sliderAutoClearClipboardTimeout.integerValue;
+    // Use the stepper to validate...
+    
+    Settings.sharedInstance.clearClipboardAfterSeconds =     self.stepperClearClipboard.integerValue;
+    
+    [self bindAutoClearClipboard];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onAutoClearClipboard:(id)sender {
+    NSLog(@"onAutoClearClipboard: [%d]", self.switchAutoClearClipboard.state == NSOnState);
+    
+    Settings.sharedInstance.clearClipboardEnabled = self.switchAutoClearClipboard.state == NSOnState;
     
     [self bindAutoClearClipboard];
     

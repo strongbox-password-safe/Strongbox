@@ -29,7 +29,7 @@
         _displayName = @"Google Drive";
         _icon = @"product32";
         _storageId = kGoogleDrive;
-        _cloudBased = YES;
+        _allowOfflineCache = YES;
         _providesIcons = YES;
         _browsableNew = YES;
         _browsableExisting = YES;

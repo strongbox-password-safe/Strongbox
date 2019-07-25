@@ -1222,7 +1222,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
                           withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
-
 - (void)onClearTotp {
     self.model.totp = nil;
 

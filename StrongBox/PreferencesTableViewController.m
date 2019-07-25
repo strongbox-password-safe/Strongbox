@@ -249,6 +249,7 @@
                     safe.isTouchIdEnabled = NO;
                     safe.convenienceMasterPassword = nil;
                     safe.convenenienceKeyFileDigest = nil;
+                    safe.convenenienceYubikeySecret = nil;
                     safe.conveniencePin = nil;
                     safe.duressPin = nil;
                     safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
@@ -287,6 +288,7 @@
                     safe.isEnrolledForConvenience = NO;
                     safe.convenienceMasterPassword = nil;
                     safe.convenenienceKeyFileDigest = nil;
+                    safe.convenenienceYubikeySecret = nil;
                     safe.conveniencePin = nil;
                     safe.isTouchIdEnabled = NO;
                     safe.duressPin = nil;

@@ -52,7 +52,8 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     if (modalCode == NSModalResponseOK) {
         NSURL *URL = [panel URL];
 
-        Document *document = [[Document alloc] initWithCredentials:wizard.databaseFormat password:wizard.confirmedPassword keyFileDigest:wizard.confirmedKeyFileDigest];
+        Document *document = [[Document alloc] initWithCredentials:wizard.databaseFormat
+                                               compositeKeyFactors:wizard.confirmedCompositeKeyFactors];
 
         [document saveToURL:URL ofType:kStrongboxPasswordDatabaseDocumentType forSaveOperation:NSSaveOperation completionHandler:^(NSError * _Nullable errorOrNil) {
             if(errorOrNil) {

@@ -412,8 +412,7 @@ static NSString* RMASN1ReadIA5SString(const uint8_t **pp, long omax)
     return self;
 }
 
-- (BOOL)isActiveAutoRenewableSubscriptionForDate:(NSDate*)date
-{
+- (BOOL)isActiveAutoRenewableSubscriptionForDate:(NSDate*)date {
     NSAssert(self.subscriptionExpirationDate != nil, @"The product %@ is not an auto-renewable subscription.", self.productIdentifier);
     
     if (self.cancellationDate) {

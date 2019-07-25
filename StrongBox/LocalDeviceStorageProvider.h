@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, readonly) NSString *displayName;
 @property (strong, nonatomic, readonly) NSString *icon;
 @property (nonatomic, readonly) StorageProvider storageId;
-@property (nonatomic, readonly) BOOL cloudBased;
+@property (nonatomic, readonly) BOOL allowOfflineCache;
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
@@ -53,6 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)migrateLocalDatabasesToNewSystem;
+
+- (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata;
+- (BOOL)toggleSharedStorage:(SafeMetaData*)metadata error:(NSError**)error;
 
 @end
 

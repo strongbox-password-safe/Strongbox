@@ -76,6 +76,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 static NSString* cachedAppGroupName;
 
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
+static NSString* const kCoalesceAppLockAndQuickLaunchBiometricAuths = @"coalesceAppLockAndQuickLaunchBiometricAuths";
+static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
 
 @implementation Settings
 
@@ -91,6 +93,24 @@ static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWo
 
 - (NSString *)appGroupName {
     return cachedAppGroupName;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)useLocalSharedStorage {
+    return [self getBool:kUseLocalSharedStorage fallback:YES];
+}
+
+- (void)setUseLocalSharedStorage:(BOOL)useLocalSharedStorage {
+    [self setBool:kUseLocalSharedStorage value:useLocalSharedStorage];
+}
+
+- (BOOL)coalesceAppLockAndQuickLaunchBiometricAuths {
+    return [self getBool:kCoalesceAppLockAndQuickLaunchBiometricAuths fallback:NO]; // TODO: Might be nice to default on if works out
+}
+
+- (void)setCoalesceAppLockAndQuickLaunchBiometricAuths:(BOOL)coalesceAppLockAndQuickLaunchBiometricAuths {
+    [self setBool:kCoalesceAppLockAndQuickLaunchBiometricAuths value:coalesceAppLockAndQuickLaunchBiometricAuths];
 }
 
 - (BOOL)showYubikeySecretWorkaroundField {

@@ -109,7 +109,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL doNotUseNewSplitViewController;
 @property BOOL allowEmptyOrNoPasswordEntry;
 @property BOOL migratedLocalDatabasesToNewSystem;
-@property BOOL useSharedAppGroupLocalStorage; // TODO: Default this on soon
 
 // TODO: Remove after migration...
 
@@ -121,6 +120,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL suppressPrivacyScreen;
 
 @property BOOL showYubikeySecretWorkaroundField;
+@property BOOL coalesceAppLockAndQuickLaunchBiometricAuths;
+@property BOOL useLocalSharedStorage;
 
 NS_ASSUME_NONNULL_END
 

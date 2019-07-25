@@ -54,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childGroups;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childRecords;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildRecords;
+@property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildGroups;
 
 - (NSString*)getSerializationId:(BOOL)groupCanUseUuid;
 

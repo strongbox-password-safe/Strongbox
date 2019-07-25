@@ -63,8 +63,7 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    _confirmedPassword = nil;
-    _confirmedKeyFileDigest = nil;
+    _confirmedCompositeKeyFactors = nil;
     
     if(self.createSafeWizardMode) {
         [NSApp stopModalWithCode:NSModalResponseCancel];
@@ -76,13 +75,12 @@
 }
 
 - (IBAction)onOk:(id)sender {
+    CompositeKeyFactors* ret = [CompositeKeyFactors password:nil];
+
     if(self.checkboxUseAPassword.state == NSOnState) {
         if([self.textFieldNew.stringValue isEqualToString:self.textFieldConfirm.stringValue]) {
-            _confirmedPassword = self.textFieldNew.stringValue;
+            ret.password = self.textFieldNew.stringValue;
         }
-    }
-    else {
-        _confirmedPassword = nil;
     }
 
     if(self.checkboxUseAKeyFile.state == NSOnState) {
@@ -92,15 +90,14 @@
         if(!data) {
             NSLog(@"Could not read file at %@. Error: %@", self.keyFilePath, error);
             [Alerts error:@"Could not open key file." error:error window:self.window];
-            _confirmedPassword = nil;
+            _confirmedCompositeKeyFactors = nil;
             return;
         }
 
-        _confirmedKeyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong for XML KDB Only
+        ret.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong for XML KDB Only
     }
-    else {
-        _confirmedKeyFileDigest = nil;
-    }
+
+    _confirmedCompositeKeyFactors = ret;
 
     if(self.createSafeWizardMode) {
         [NSApp stopModalWithCode:NSModalResponseOK];

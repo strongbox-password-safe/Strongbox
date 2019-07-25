@@ -136,7 +136,7 @@
     cell.detailTextLabel.enabled = YES;
     
     if([[self getInitialViewController] autoFillIsPossibleWithSafe:safe]) {
-        if(![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider]) {
+        if(![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe]) {
             NSDate* mod = [CacheManager.sharedInstance getAutoFillCacheModificationDate:safe];
             
             NSDateFormatter *df = [[NSDateFormatter alloc] init];
@@ -187,14 +187,15 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SafeMetaData* safe = [self.safes objectAtIndex:indexPath.row];
 
-    BOOL useAutoFillCache = ![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider];
+    BOOL useAutoFillCache = ![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
     
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
                                           openAutoFillCache:useAutoFillCache
                                         canConvenienceEnrol:NO
                                              isAutoFillOpen:YES
-                                     manualOpenOfflineCache:NO 
+                                     manualOpenOfflineCache:NO
+                                biometricAuthenticationDone:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
                                                           if(model) {
                                                               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];

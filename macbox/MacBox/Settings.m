@@ -8,15 +8,28 @@
 
 #import "Settings.h"
 
-#define kRevealDetailsImmediately @"revealDetailsImmediately"
-#define kFullVersion @"fullVersion"
-#define kEndFreeTrialDate @"endFreeTrialDate"
-#define kAutoLockTimeout @"autoLockTimeout"
-#define kPasswordGenerationParameters @"passwordGenerationParameters"
-#define kWarnedAboutTouchId @"warnedAboutTouchId"
-#define kAlwaysShowPassword @"alwaysShowPassword"
-#define kUiDoNotSortKeePassNodesInBrowseView @"uiDoNotSortKeePassNodesInBrowseView"
+static NSString* const kVisibleColumns = @"visibleColumns";
 
+NSString* const kTitleColumn = @"TitleColumn";
+NSString* const kUsernameColumn = @"UsernameColumn";
+NSString* const kPasswordColumn = @"PasswordColumn";
+NSString* const kTOTPColumn = @"TOTPColumn";
+NSString* const kURLColumn = @"URLColumn";
+NSString* const kEmailColumn = @"EmailColumn";
+NSString* const kNotesColumn = @"NotesColumn";
+NSString* const kAttachmentsColumn = @"AttachmentsColumn";
+NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
+
+static const NSInteger kDefaultClearClipboardTimeout = 60;
+
+static NSString* const kRevealDetailsImmediately = @"revealDetailsImmediately";
+static NSString* const kFullVersion = @"fullVersion";
+static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
+static NSString* const kAutoLockTimeout = @"autoLockTimeout";
+static NSString* const kPasswordGenerationParameters = @"passwordGenerationParameters";
+static NSString* const kWarnedAboutTouchId = @"warnedAboutTouchId";
+static NSString* const kAlwaysShowPassword = @"alwaysShowPassword";
+static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kAutoSave = @"autoSave";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
@@ -40,26 +53,29 @@ static NSString* const kDetectForeignChanges = @"detectForeignChanges";
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 //static NSString* const kShowDatabasesListAtStartup = @"showDatabasesListAtStartup";
-
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
 static NSString* const kMigratedToNewPasswordGenerator = @"migratedToNewPasswordGenerator";
-
 static NSString* const kAutoOpenFirstDatabaseOnEmptyLaunch = @"autoOpenFirstDatabaseOnEmptyLaunch";
-
-static NSString* const kVisibleColumns = @"visibleColumns";
-NSString* const kTitleColumn = @"TitleColumn";
-NSString* const kUsernameColumn = @"UsernameColumn";
-NSString* const kPasswordColumn = @"PasswordColumn";
-NSString* const kTOTPColumn = @"TOTPColumn";
-NSString* const kURLColumn = @"URLColumn";
-NSString* const kEmailColumn = @"EmailColumn";
-NSString* const kNotesColumn = @"NotesColumn";
-NSString* const kAttachmentsColumn = @"AttachmentsColumn";
-NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
-
-static const NSInteger kDefaultClearClipboardTimeout = 60;
+static NSString* const kAutoPromptForTouchIdOnActivate = @"autoPromptForTouchIdOnActivate";
+static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
 
 @implementation Settings
+
+- (BOOL)showSystemTrayIcon {
+    return [self getBool:kShowSystemTrayIcon fallback:YES];
+}
+
+- (void)setShowSystemTrayIcon:(BOOL)showSystemTrayIcon {
+    [self setBool:kShowSystemTrayIcon value:showSystemTrayIcon];
+}
+
+- (BOOL)autoPromptForTouchIdOnActivate {
+    return [self getBool:kAutoPromptForTouchIdOnActivate fallback:NO]; // TODO: If this works well, default on
+}
+
+- (void)setAutoPromptForTouchIdOnActivate:(BOOL)autoPromptForTouchIdOnActivate {
+    [self setBool:kAutoPromptForTouchIdOnActivate value:autoPromptForTouchIdOnActivate];
+}
 
 - (BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
     return [self getBool:kAutoOpenFirstDatabaseOnEmptyLaunch];

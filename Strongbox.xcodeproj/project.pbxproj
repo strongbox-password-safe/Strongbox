@@ -565,6 +565,7 @@
 		4DD696A7218F13C80082DC08 /* AttachmentsRationalizerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD696A6218F13C80082DC08 /* AttachmentsRationalizerTests.m */; };
 		4DD696A8218F38EC0082DC08 /* AttachmentsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD696A4218F0B170082DC08 /* AttachmentsRationalizer.m */; };
 		4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
+		4DD85C8122E8FB2700700192 /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
 		4DDA015322425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DDA015222425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml */; };
 		4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
 		4DDA01572242621400C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
@@ -1427,6 +1428,8 @@
 		4DD696A6218F13C80082DC08 /* AttachmentsRationalizerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentsRationalizerTests.m; path = StrongboxTests/AttachmentsRationalizerTests.m; sourceTree = "<group>"; };
 		4DD7B7EB2173A0F900B4FD98 /* PickCredentialsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PickCredentialsTableViewController.h; path = "StrongBox Auto Fill/PickCredentialsTableViewController.h"; sourceTree = SOURCE_ROOT; };
 		4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PickCredentialsTableViewController.m; path = "StrongBox Auto Fill/PickCredentialsTableViewController.m"; sourceTree = SOURCE_ROOT; };
+		4DD85C7F22E8FB2700700192 /* AttachmentsPoolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AttachmentsPoolViewController.h; path = StrongBox/AttachmentsPoolViewController.h; sourceTree = "<group>"; };
+		4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentsPoolViewController.m; path = StrongBox/AttachmentsPoolViewController.m; sourceTree = "<group>"; };
 		4DDA015222425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "corrupt-recycly-bin-values.xml"; sourceTree = "<group>"; };
 		4DDA01542242621400C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
 		4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
@@ -2782,6 +2785,8 @@
 				4DBA027E22A3EDBE00BAC858 /* DatabaseOperations.storyboard */,
 				4DB93DE522C177DC0019F481 /* ExportOptionsTableViewController.h */,
 				4DB93DE622C177DC0019F481 /* ExportOptionsTableViewController.m */,
+				4DD85C7F22E8FB2700700192 /* AttachmentsPoolViewController.h */,
+				4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */,
 			);
 			name = "Database Management";
 			sourceTree = "<group>";
@@ -3637,6 +3642,7 @@
 				4D12085422A7A67300139570 /* WelcomeViewController.m in Sources */,
 				4D67B1E42191FD0400B0D29A /* XmlProcessingContext.m in Sources */,
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
+				4DD85C8122E8FB2700700192 /* AttachmentsPoolViewController.m in Sources */,
 				4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
 				4DBC7A4A2279DC1600CA534D /* CollapsibleTableViewHeader.m in Sources */,

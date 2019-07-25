@@ -28,7 +28,7 @@
         _displayName = @"Dropbox";
         _icon = @"dropbox-blue-32x32-nologo";
         _storageId = kDropbox;
-        _cloudBased = YES;
+        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
@@ -82,7 +82,6 @@
         completion:(void (^)(NSData *data, NSError *error))completion {
     NSString *path = [NSString pathWithComponents:
                       @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
-
     [self performTaskWithAuthorizationIfNecessary:viewController
                                              task:^(BOOL userCancelled, NSError *error) {
                                                  if (error) {
@@ -103,7 +102,9 @@
 }
 
 - (void)readFileWithPath:(NSString *)path completion:(void (^)(NSData *data, NSError *error))completion {
-    [SVProgressHUD show];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:@"Reading..."];
+    });
 
     DBUserClient *client = DBClientsManager.authorizedClient;
     [[[client.filesRoutes downloadData:path]

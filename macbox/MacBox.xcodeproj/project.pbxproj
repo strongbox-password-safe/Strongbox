@@ -169,6 +169,7 @@
 		4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */; };
 		4DE0CB6E2232C0D400E109F9 /* GenericTextIntegerElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */; };
 		4DE0CB712232C0F200E109F9 /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB702232C0F200E109F9 /* History.m */; };
+		4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */; };
 		4DEA5897224BFA7300013808 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5895224BFA7200013808 /* StringValue.m */; };
 		4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5896224BFA7200013808 /* AesKdfCipher.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */; };
@@ -526,6 +527,8 @@
 		4DE0CB6D2232C0D400E109F9 /* GenericTextIntegerElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextIntegerElementHandler.h; path = ../model/keepass/GenericTextIntegerElementHandler.h; sourceTree = "<group>"; };
 		4DE0CB6F2232C0F200E109F9 /* History.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = History.h; path = ../model/keepass/History.h; sourceTree = "<group>"; };
 		4DE0CB702232C0F200E109F9 /* History.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = History.m; path = ../model/keepass/History.m; sourceTree = "<group>"; };
+		4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompositeKeyFactors.m; path = ../StrongBox/CompositeKeyFactors.m; sourceTree = "<group>"; };
+		4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CompositeKeyFactors.h; path = ../StrongBox/CompositeKeyFactors.h; sourceTree = "<group>"; };
 		4DEA5893224BFA7200013808 /* StringValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringValue.h; path = ../model/keepass/StringValue.h; sourceTree = "<group>"; };
 		4DEA5894224BFA7200013808 /* AesKdfCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AesKdfCipher.h; path = ../model/keepass/AesKdfCipher.h; sourceTree = "<group>"; };
 		4DEA5895224BFA7200013808 /* StringValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StringValue.m; path = ../model/keepass/StringValue.m; sourceTree = "<group>"; };
@@ -1094,6 +1097,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
+				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
 				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
 				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
@@ -1561,6 +1566,7 @@
 				4D524D04219B48D300C22CB4 /* AttachmentsRationalizer.m in Sources */,
 				4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */,
 				4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */,
+				4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,

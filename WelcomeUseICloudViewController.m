@@ -17,6 +17,26 @@
 
 @implementation WelcomeUseICloudViewController
 
+- (BOOL)shouldAutorotate {
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        return YES; /* Device is iPad */
+    }
+    else {
+        return NO;
+    }
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        return UIInterfaceOrientationMaskAll; /* Device is iPad */
+    }
+    else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+}
+
 - (IBAction)onUseICloud:(id)sender {
     [self enableICloudAndContinue:YES];
 }

@@ -34,6 +34,7 @@
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong) NSString* convenienceMasterPassword;
 @property (nonatomic, strong) NSData* convenenienceKeyFileDigest;
+@property (nonatomic, strong) NSString* convenenienceYubikeySecret;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 

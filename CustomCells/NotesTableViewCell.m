@@ -31,7 +31,8 @@
     self.textView.font = self.configuredValueFont;
     self.textView.adjustsFontForContentSizeCategory = YES;
     self.textView.userInteractionEnabled = YES; 
-
+    self.textView.accessibilityLabel = @"Notes Text View";
+    
     self.doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTextViewDoubleTap:)];
     [self.doubleTap setNumberOfTapsRequired:2];
     [self.doubleTap setNumberOfTouchesRequired:1];

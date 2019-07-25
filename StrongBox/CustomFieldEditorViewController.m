@@ -63,6 +63,10 @@ const static NSSet<NSString*> *keePassReservedNames;
     self.keyTextField.text = self.customField.key;
     self.textView.text = self.customField.value;
     self.switchProtected.on = self.customField.protected;
+
+    self.keyTextField.accessibilityLabel = @"Custom Field Name";
+    self.textView.accessibilityLabel = @"Custom Field Value";
+    self.switchProtected.accessibilityLabel = @"Custom Field Protected";
     
     [self.keyTextField becomeFirstResponder];
     

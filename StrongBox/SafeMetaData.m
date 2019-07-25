@@ -355,6 +355,22 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     }
 }
 
+- (NSString *)convenenienceYubikeySecret {
+    NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
+    return [JNKeychain loadValueForKey:key];
+}
+
+- (void)setConvenenienceYubikeySecret:(NSString *)convenenienceYubikeySecret {
+    NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
+    
+    if(convenenienceYubikeySecret) {
+        [JNKeychain saveValue:convenenienceYubikeySecret forKey:key];
+    }
+    else {
+        [JNKeychain deleteValueForKey:key];
+    }
+}
+
 - (NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
     return [JNKeychain loadValueForKey:key];
@@ -390,6 +406,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
     self.convenenienceKeyFileDigest = nil;
+    self.convenenienceYubikeySecret = nil;
+    
     self.duressPin = nil;
     self.conveniencePin = nil;
 }
@@ -424,7 +442,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 //
 
 - (BrowseSortField)old_browseSortField {
-    BOOL oldDoNotSort = [self getBool:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while
+    BOOL oldDoNotSort = [self getBool:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while - 24-Jul-2019
     return (BrowseSortField)[self getInteger:kBrowseSortField fallback:oldDoNotSort ? kBrowseSortFieldNone : kBrowseSortFieldTitle];
 }
 

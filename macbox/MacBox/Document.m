@@ -27,8 +27,7 @@
 @property WindowController* windowController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *masterPasswordWindowController;
 
-@property NSString* passwordForRevertWithUnlock;
-@property NSData* keyFileDigestForRevertWithUnlock;
+@property CompositeKeyFactors* ckfForRevertWithUnlock;
 @property NSString *selectedItemForUnlock;
 
 @end
@@ -47,9 +46,9 @@
     return YES;
 }
 
-- (instancetype)initWithCredentials:(DatabaseFormat)format password:(NSString*)password keyFileDigest:(NSData*)keyFileDigest {
+- (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
     if (self = [super init]) {
-        DatabaseModel *db = [[DatabaseModel alloc] initNewWithPassword:password keyFileDigest:keyFileDigest format:format];
+        DatabaseModel *db = [[DatabaseModel alloc] initNew:compositeKeyFactors format:format];
         self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:nil];
     }
     
@@ -78,8 +77,8 @@
         // Update Touch Id Password
         
 //        NSLog(@"Updating Touch ID Password in case is has changed");
-        safe.touchIdPassword = self.model.masterPassword;
-        safe.touchIdKeyFileDigest = self.model.masterKeyFileDigest;
+        safe.touchIdPassword = self.model.compositeKeyFactors.password;
+        safe.touchIdKeyFileDigest = self.model.compositeKeyFactors.keyFileDigest;
     }
     
     if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
@@ -121,19 +120,15 @@
         return NO;
     }
 
-    if(self.passwordForRevertWithUnlock || self.keyFileDigestForRevertWithUnlock) {
-        DatabaseModel* db = [[DatabaseModel alloc] initExistingWithDataAndPassword:data
-                                                      password:self.passwordForRevertWithUnlock
-                                                 keyFileDigest:self.keyFileDigestForRevertWithUnlock
-                                                         error:&error];
+    if(self.ckfForRevertWithUnlock) {
+        DatabaseModel* db = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:self.ckfForRevertWithUnlock error:&error];
         
         if(!db) {
             if(outError != nil) {
                 *outError = error;
             }
             
-            self.passwordForRevertWithUnlock = nil;
-            self.keyFileDigestForRevertWithUnlock = nil;
+            self.ckfForRevertWithUnlock = nil;
             self.selectedItemForUnlock = nil;
             
             if(self.model && !self.model.locked) {
@@ -149,8 +144,7 @@
         self.model = [[ViewModel alloc] initLocked:self];
     }
 
-    self.passwordForRevertWithUnlock = nil;
-    self.keyFileDigestForRevertWithUnlock = nil;
+    self.ckfForRevertWithUnlock = nil;
     self.selectedItemForUnlock = nil;
     
     [self setWindowModel:self.model];
@@ -216,12 +210,10 @@
     return NO;
 }
 
-- (void)revertWithUnlock:(NSString*)password
-           keyFileDigest:(NSData*)keyFileDigest
-            selectedItem:(NSString*)selectedItem
-              completion:(void(^)(BOOL success, NSError*_Nullable error))completion {
-    self.passwordForRevertWithUnlock = password;
-    self.keyFileDigestForRevertWithUnlock = keyFileDigest;
+- (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
+            selectedItem:(NSString *)selectedItem
+              completion:(void (^)(BOOL, NSError * _Nullable))completion {
+    self.ckfForRevertWithUnlock = compositeKeyFactors;
     self.selectedItemForUnlock = selectedItem;
     
     NSError* error;
@@ -230,6 +222,7 @@
     // So we try to do all the things it would do...
     
     //    BOOL success = [self revertToContentsOfURL:self.fileURL ofType:self.fileType error:&error];
+    
     [self.undoManager removeAllActions]; // Clear undo stack
     NSFileWrapper* wrapper = [[NSFileWrapper alloc] initWithURL:self.fileURL options:NSFileWrapperReadingImmediate error:&error];
     BOOL success = [self readFromFileWrapper:wrapper ofType:self.fileType error:&error];
@@ -237,8 +230,7 @@
         self.fileModificationDate = wrapper.fileAttributes.fileModificationDate;
     }
     
-    self.passwordForRevertWithUnlock = nil;
-    self.keyFileDigestForRevertWithUnlock = nil;
+    self.ckfForRevertWithUnlock = nil;
     self.selectedItemForUnlock = nil;
 
     if(completion) {

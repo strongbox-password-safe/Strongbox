@@ -38,7 +38,7 @@
         _displayName = @"WebDAV";
         _icon = @"webdav-32x32";
         _storageId = kWebDAV;
-        _cloudBased = YES;
+        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;

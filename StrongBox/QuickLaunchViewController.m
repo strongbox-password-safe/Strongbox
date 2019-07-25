@@ -146,10 +146,14 @@
 }
 
 - (IBAction)onOpenPrimarySafe:(id)sender {
-    [self openPrimarySafe];
+    [self openPrimarySafe:NO];
 }
 
 - (void)openPrimarySafe {
+    [self openPrimarySafe:NO];
+}
+
+- (void)openPrimarySafe:(BOOL)userJustCompletedBiometricAuthentication {
     // Only do this if we are top of the nav stack
     
     if(self.navigationController.topViewController != self) {
@@ -170,6 +174,7 @@
                                         canConvenienceEnrol:YES
                                              isAutoFillOpen:NO
                                      manualOpenOfflineCache:NO
+                                biometricAuthenticationDone:userJustCompletedBiometricAuthentication
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
         if(model) {
             if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported

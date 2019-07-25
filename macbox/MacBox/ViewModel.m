@@ -12,7 +12,6 @@
 #import "DatabaseModel.h"
 #import "PasswordMaker.h"
 #import "Settings.h"
-#import "Node+OtpToken.h"
 #import "OTPToken+Serialization.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
@@ -71,11 +70,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     self.selectedItem = selectedItem;
 }
 
-- (void)reloadAndUnlock:(NSString*)password
- keyFileDigest:(NSData*)keyFileDigest
-    completion:(void (^)(BOOL success, NSError* error))completion {
-    [self.document revertWithUnlock:password
-                      keyFileDigest:keyFileDigest
+- (void)reloadAndUnlock:(CompositeKeyFactors *)compositeKeyFactors
+             completion:(void (^)(BOOL, NSError * _Nullable))completion {
+    [self.document revertWithUnlock:compositeKeyFactors
                        selectedItem:self.selectedItem
                          completion:completion]; // Full Reload from Disk to get latest version
 }
@@ -116,7 +113,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 
 - (BOOL)masterCredentialsSet {
     if(!self.locked) {
-        return !(self.passwordDatabase.masterPassword == nil && self.passwordDatabase.keyFileDigest == nil);
+        return !(self.passwordDatabase.compositeKeyFactors.password == nil &&
+                 self.passwordDatabase.compositeKeyFactors.keyFileDigest == nil &&
+                 self.passwordDatabase.compositeKeyFactors.yubiKeyResponse == nil);
     }
     
     return NO;
@@ -147,27 +146,23 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(NSString*)masterPassword {
-    return self.locked ? nil : self.passwordDatabase.masterPassword;
+-(CompositeKeyFactors *)compositeKeyFactors {
+    return self.locked ? nil : self.passwordDatabase.compositeKeyFactors;
 }
 
--(NSData *)masterKeyFileDigest {
-    return self.locked ? nil : self.passwordDatabase.keyFileDigest;
-}
-
-- (void)setMasterCredentials:(NSString *)masterPassword masterKeyFileDigest:(NSData *)masterKeyFileDigest {
+- (void)setCompositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    NSString* original = self.passwordDatabase.masterPassword;
-    NSData* originalKey = self.passwordDatabase.keyFileDigest;
+    CompositeKeyFactors* original = [CompositeKeyFactors password:self.passwordDatabase.compositeKeyFactors.password
+                                                    keyFileDigest:self.passwordDatabase.compositeKeyFactors.keyFileDigest];
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] setMasterCredentials:original masterKeyFileDigest:originalKey];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setCompositeKeyFactors:original];
     [self.document.undoManager setActionName:@"Change Master Credentials"];
     
-    [self.passwordDatabase setMasterPassword:masterPassword];
-    [self.passwordDatabase setKeyFileDigest:masterKeyFileDigest];
+    self.passwordDatabase.compositeKeyFactors.password = compositeKeyFactors.password;
+    self.passwordDatabase.compositeKeyFactors.keyFileDigest = compositeKeyFactors.keyFileDigest;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1027,6 +1022,10 @@ NSString* getSmartFillNotes() {
 
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
     return [self.passwordDatabase getSearchTerms:searchText];
+}
+
+- (NSString *)getHtmlPrintString:(NSString*)databaseName {
+    return [self.passwordDatabase getHtmlPrintString:databaseName];
 }
 
 @end

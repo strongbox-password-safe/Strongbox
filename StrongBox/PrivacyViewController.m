@@ -92,7 +92,7 @@
 - (void)beginUnlockSequence {
     if (Settings.sharedInstance.appLockMode == kNoLock || ![self shouldLock]) {
         Settings.sharedInstance.failedUnlockAttempts = 0;
-        self.onUnlockDone();
+        self.onUnlockDone(NO);
         return;
     }
 
@@ -100,11 +100,11 @@
         [self requestBiometric];
     }
     else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
-        [self requestPin];
+        [self requestPin:NO];
     }
     else {
         Settings.sharedInstance.failedUnlockAttempts = 0;
-        self.onUnlockDone();
+        self.onUnlockDone(NO);
     }
 }
 
@@ -116,11 +116,11 @@
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
-                    [self requestPin];
+                    [self requestPin:YES];
                 }
                 else {
                     Settings.sharedInstance.failedUnlockAttempts = 0;
-                    self.onUnlockDone();
+                    self.onUnlockDone(YES);
                 }
             });
         }
@@ -129,7 +129,7 @@
         }}];
 }
 
-- (void)requestPin {
+- (void)requestPin:(BOOL)afterSuccessfulBiometricAuthentication {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
@@ -147,7 +147,7 @@
         if(response == kOk) {
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
                 Settings.sharedInstance.failedUnlockAttempts = 0;
-                self.onUnlockDone();
+                self.onUnlockDone(afterSuccessfulBiometricAuthentication);
                 
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];

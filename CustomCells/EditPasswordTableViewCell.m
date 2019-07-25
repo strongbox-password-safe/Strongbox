@@ -29,7 +29,8 @@
     self.valueTextView.delegate = self;
     self.valueTextView.font = FontManager.sharedInstance.easyReadFont;
     self.valueTextView.adjustsFontForContentSizeCategory = YES;
-
+    self.valueTextView.accessibilityLabel = @"Password Text Field";
+    
     self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
 }
 

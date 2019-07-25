@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
+#import "StaticDataTableViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SafeDetailsView : UITableViewController
+@interface SafeDetailsView : StaticDataTableViewController
 
 @property (nonatomic) Model *viewModel;
 

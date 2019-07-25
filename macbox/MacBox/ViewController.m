@@ -27,12 +27,12 @@
 #import "KeePassPredefinedIcons.h"
 #import "MacKeePassHistoryController.h"
 #import "MacNodeIconHelper.h"
-#import "Node+OtpToken.h"
 #import "OTPToken+Generation.h"
 #import "NodeDetailsWindowController.h"
 #import "MBProgressHUD.h"
 #import "CustomFieldTableCellView.h"
 #import "SearchScope.h"
+#import <WebKit/WebKit.h>
 
 #define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
 
@@ -472,7 +472,24 @@ static NSImage* kStrongBox256Image;
         
         [self bindToModel];
         [self setInitialFocus];
+        
+        [self autoPromptForTouchIdIfDesired];
     });
+}
+
+- (void)autoPromptForTouchIdIfDesired {
+    if(self.model && self.model.locked) {
+        if([self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) { 
+            NSLog(@"autoPromptForTouchIdIfDesired: GOOD Prompting...");
+            [self onUnlockWithTouchId:nil];
+        }
+        else {
+            NSLog(@"autoPromptForTouchIdIfDesired: Biometric not available or Auto Prompt configured Off...");
+        }
+    }
+    else {
+        NSLog(@"autoPromptForTouchIdIfDesired: Model not in LOCKED state, ignoring");
+    }
 }
 
 - (void)bindToModel {
@@ -486,13 +503,15 @@ static NSImage* kStrongBox256Image;
         
         if(![self biometricOpenIsAvailableForSafe]) {
             self.buttonUnlockWithTouchId.hidden = YES;
-            [self.buttonUnlockWithTouchId setKeyEquivalent:@""];
-            [self.buttonUnlockWithPassword setKeyEquivalent:@"\r"];
+            
+            //[self.buttonUnlockWithPassword setKeyEquivalent:@""];
+            //[self.buttonUnlockWithPassword setKeyEquivalent:@"\r"];
         }
         else {
             self.buttonUnlockWithTouchId.hidden = NO;
+
+            //[self.buttonUnlockWithTouchId setKeyEquivalent:@""];
             [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
-            [self.buttonUnlockWithPassword setKeyEquivalent:@""];
         }
     }
     else {
@@ -1140,13 +1159,16 @@ static NSImage* kStrongBox256Image;
             }
             
             NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong KDB Xml
-            [self reloadAndUnlock:password keyFileDigest:keyFileDigest isBiometricOpen:NO];
+            
+            CompositeKeyFactors* ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
+            [self reloadAndUnlock:ckf isBiometricOpen:NO];
         }
     }];
 }
 
 - (IBAction)onEnterMasterPassword:(id)sender {
-    [self reloadAndUnlock:self.textFieldMasterPassword.stringValue keyFileDigest:nil isBiometricOpen:NO];
+    CompositeKeyFactors* ckf = [CompositeKeyFactors password:self.textFieldMasterPassword.stringValue];
+    [self reloadAndUnlock:ckf isBiometricOpen:NO];
 }
 
 - (IBAction)onUnlockWithTouchId:(id)sender {
@@ -1157,7 +1179,9 @@ static NSImage* kStrongBox256Image;
             [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if(success) {
-                        [self reloadAndUnlock:metadata.touchIdPassword keyFileDigest:metadata.touchIdKeyFileDigest isBiometricOpen:YES];
+                        CompositeKeyFactors* ckf = [CompositeKeyFactors password:metadata.touchIdPassword keyFileDigest:metadata.touchIdKeyFileDigest];
+
+                        [self reloadAndUnlock:ckf isBiometricOpen:YES];
                     }
                     else {
                         NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
@@ -1199,7 +1223,8 @@ static NSImage* kStrongBox256Image;
                         [self showPopupToastNotification:@"Reloading after external changes..."];
                         
                         self.model.selectedItem = [self selectedItemSerializationId];
-                        [self reloadAndUnlock:self.model.masterPassword keyFileDigest:self.model.masterKeyFileDigest isBiometricOpen:NO];
+                        
+                        [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
                     }
                 }];
                 return;
@@ -1208,7 +1233,7 @@ static NSImage* kStrongBox256Image;
                 [self showPopupToastNotification:@"Reloading after external changes..."];
 
                 self.model.selectedItem = [self selectedItemSerializationId];
-                [self reloadAndUnlock:self.model.masterPassword keyFileDigest:self.model.masterKeyFileDigest isBiometricOpen:NO];
+                [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
                 return;
             }
         }
@@ -1222,17 +1247,17 @@ static NSImage* kStrongBox256Image;
     self.isPromptingAboutUnderlyingFileChange = NO;
 }
 
-- (void)reloadAndUnlock:(NSString*)password keyFileDigest:(NSData*)keyFileDigest isBiometricOpen:(BOOL)isBiometricOpen {
+- (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen {
     if(self.model) {
         [self showProgressModal:@"Unlocking..."];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.model reloadAndUnlock:password keyFileDigest:keyFileDigest completion:^(BOOL success, NSError * _Nullable error) {
+            [self.model reloadAndUnlock:compositeKeyFactors completion:^(BOOL success, NSError * _Nullable error) {
                 [self hideProgressModal];
                 if(success) {
                     self.textFieldMasterPassword.stringValue = @"";
                 }
-                [self onUnlocked:success error:error password:password keyFileDigest:keyFileDigest isBiometricUnlock:isBiometricOpen];
+                [self onUnlocked:success error:error compositeKeyFactors:compositeKeyFactors isBiometricUnlock:isBiometricOpen];
             }];
         });
     }
@@ -1240,8 +1265,7 @@ static NSImage* kStrongBox256Image;
 
 - (void)onUnlocked:(BOOL)success
              error:(NSError*)error
-          password:(NSString*)password
-     keyFileDigest:(NSData*)keyFileDigest
+compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
  isBiometricUnlock:(BOOL)isBiometricUnlock {
     SafeMetaData *safe = [self getDatabaseMetaData];
 
@@ -1249,13 +1273,11 @@ static NSImage* kStrongBox256Image;
         if(safe == nil) {
             [self addThisDatabaseToDatabases];
             
-            [self maybePromptForBiometricEnrol:password
-                                 keyFileDigest:keyFileDigest
+            [self maybePromptForBiometricEnrol:compositeKeyFactors
                                   safeMetaData:safe];
         }
         else {
-            [self maybePromptForBiometricEnrol:password
-                                 keyFileDigest:keyFileDigest
+            [self maybePromptForBiometricEnrol:compositeKeyFactors
                                   safeMetaData:safe];
         }
     }
@@ -1274,7 +1296,7 @@ static NSImage* kStrongBox256Image;
     self.isPromptingAboutUnderlyingFileChange = NO;// Reset in case we ended up here by auto reload
 }
 
-- (void)maybePromptForBiometricEnrol:(NSString*)password keyFileDigest:(NSData*)keyFileDigest safeMetaData:(SafeMetaData*)safeMetaData {
+- (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors safeMetaData:(SafeMetaData*)safeMetaData {
     if ( BiometricIdHelper.sharedInstance.biometricIdAvailable &&
         (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) &&
         !safeMetaData.hasPromptedForTouchIdEnrol) {
@@ -1287,8 +1309,8 @@ static NSImage* kStrongBox256Image;
            completion:^(BOOL yesNo) {
                if(yesNo) {
                    safeMetaData.isTouchIdEnabled = YES;
-                   safeMetaData.touchIdPassword = password;
-                   safeMetaData.touchIdKeyFileDigest = keyFileDigest;
+                   safeMetaData.touchIdPassword = compositeKeyFactors.password;
+                   safeMetaData.touchIdKeyFileDigest = compositeKeyFactors.keyFileDigest;
                    
                    [self caveatAboutTouchId];
                }
@@ -1383,7 +1405,7 @@ static NSImage* kStrongBox256Image;
             
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
-                    [self.model setMasterCredentials:self.changeMasterPassword.confirmedPassword masterKeyFileDigest:self.changeMasterPassword.confirmedKeyFileDigest];
+                    [self.model setCompositeKeyFactors:self.changeMasterPassword.confirmedCompositeKeyFactors];
                 }
                 
                 if(completion) {
@@ -1897,6 +1919,9 @@ static NSImage* kStrongBox256Image;
         menuItem.state = [self isColumnVisible:menuItem.identifier];
         return [self isColumnAvailableForModel:menuItem.identifier];
     }
+    else if(theAction == @selector(onPrintDatabase:)) {
+        return self.model && !self.model.locked;
+    }
     
     return YES;
 }
@@ -2310,77 +2335,30 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     [self.outlineView expandItem:nil expandChildren:YES];
 }
 
+- (IBAction)onPrintDatabase:(id)sender {
+    NSString* databaseName = [NSString stringWithFormat:@"%@ Emergency Sheet", [self getDatabaseMetaData].nickName];
+    NSString* htmlString = [self.model getHtmlPrintString:databaseName];
+
+    //    NSError* error;
+    //    NSString* path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"print.html"];
+    //    NSLog(@"Path: %@", path);
+    //    if (![htmlString writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
+    //        NSLog(@"EEEEEEEEEEEEEEEK - %@", error);
+    //    }
+
+    // Print not supported:
+    // WKWebView *webView = [[WKWebView alloc] init];
+    // [webView loadHTMLString:htmlString baseURL:nil];
+    
+    WebView *webView = [[WebView alloc] init];
+    [webView.mainFrame loadHTMLString:htmlString baseURL:nil];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:webView.mainFrame.frameView.documentView
+                                                                   printInfo:NSPrintInfo.sharedPrintInfo];
+                                  
+        [printOp runOperation];
+    });
+}
+
 @end
-
-
-// FUTURE: Attempt to fix funky tab ordering! Very difficult
-
-//- (void)controlTextDidEndEditing:(NSNotification *)notification {
-////    NSLog(@"controlTextDidEndEditing - XXX");
-//
-//    NSDictionary *userInfo = [notification userInfo];
-//
-//    int textMovement = [[userInfo valueForKey:@"NSTextMovement"] intValue];
-//
-//    //[self.outlineView controlTextDidEndEditing:notification];
-//
-//    NSInteger editedColumn = [self.outlineView columnForView:notification.object];
-//    NSInteger editedRow = [self.outlineView rowForView:notification.object];
-//
-//    NSInteger lastCol = self.outlineView.numberOfColumns; // [[self.outlineView tableColumns] count] - 1;
-//    NSInteger lastRow = self.outlineView.numberOfRows; // [[self.outlineView tableColumns] count] - 1;
-//
-//    if (textMovement == NSTabTextMovement)
-//    {
-//        if (editedColumn != lastCol - 1 )
-//        {
-//            [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:editedRow] byExtendingSelection:NO];
-//            [self.outlineView editColumn: editedColumn+1 row: editedRow withEvent: nil select: YES];
-//        }
-//        else
-//        {
-//            if (editedRow !=lastRow-1)
-//            {
-//                [self.outlineView editColumn:0 row:editedRow + 1 withEvent:nil select:YES];
-//            }
-//            else
-//            {
-//                [self.outlineView editColumn:0 row:0 withEvent:nil select:YES]; // Go to the first cell
-//            }
-//        }
-//    }
-//    else if (textMovement == NSReturnTextMovement)
-//    {
-//        if(editedRow !=lastRow-1)
-//        {
-//            [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:editedRow+1] byExtendingSelection:NO];
-//            [self.outlineView editColumn: editedColumn row: editedRow+1 withEvent: nil select: YES];
-//        }
-//        else
-//        {
-//            if (editedColumn !=lastCol - 1)
-//            {
-//                [self.outlineView editColumn:editedColumn+1 row:0 withEvent:nil select:YES];
-//            }
-//            else
-//            {
-//                [self.outlineView editColumn:0 row:0 withEvent:nil select:YES]; //Go to the first cell
-//            }
-//        }
-//    }
-//
-//
-//
-//
-//
-//    //    if ( (editedColumn == lastColumn)
-////        && (textMovement == NSTextMovementTab)
-////        && editedRow < ([self.outlineView numberOfRows] - 1)
-////        )
-////    {
-////        // the tab key was hit while in the last column,
-////        // so go to the left most cell in the next row
-////        [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:(editedRow+1)] byExtendingSelection:NO];
-////        [self.outlineView editColumn: 0 row: (editedRow + 1)  withEvent: nil select: YES];
-////    }
-//

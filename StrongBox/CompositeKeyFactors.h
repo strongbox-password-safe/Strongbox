@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic) NSString* password;
 @property (nullable, nonatomic) NSData* keyFileDigest;
-@property (nullable, nonatomic) NSData* yubiKeyResponse;
+@property (nullable, nonatomic) NSData* yubiKeyResponse; // Actually used to unlock / decrypt
 
 @end
 

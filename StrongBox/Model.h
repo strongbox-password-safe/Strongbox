@@ -20,6 +20,8 @@
 @property (nonatomic, readonly) BOOL isUsingOfflineCache;
 @property (nonatomic, readonly) BOOL isReadOnly;
 
+@property (nullable, nonatomic) NSString* openedWithYubiKeySecret; // Used for Convenience Setting if this database was opened with a Yubikey workaround
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;

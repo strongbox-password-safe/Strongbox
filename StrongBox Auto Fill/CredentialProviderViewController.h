@@ -17,7 +17,7 @@ API_AVAILABLE(ios(12.0))
 - (void)showSafesListView;
 - (SafeMetaData*)getPrimarySafe;
 
-- (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider;
+- (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers;

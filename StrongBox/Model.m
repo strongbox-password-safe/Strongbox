@@ -40,7 +40,7 @@
 }
 
 - (BOOL)isCloudBasedStorage {
-    return _storageProvider.cloudBased;
+    return _storageProvider.allowOfflineCache;
 }
 
 - (BOOL)isUsingOfflineCache {

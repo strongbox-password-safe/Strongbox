@@ -84,6 +84,9 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL autoOpenFirstDatabaseOnEmptyLaunch;
 
+@property BOOL autoPromptForTouchIdOnActivate;
+@property BOOL showSystemTrayIcon;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

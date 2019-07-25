@@ -63,5 +63,7 @@
 
 void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window);
 
+- (void)autoPromptForTouchIdIfDesired;
+
 @end
 

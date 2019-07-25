@@ -27,7 +27,7 @@
         _displayName = @"Files App URL Bookmark";
         _icon = @"lock"; 
         _storageId = kFilesAppUrlBookmark;
-        _cloudBased = NO;
+        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;
@@ -36,6 +36,7 @@
     
     return self;
 }
+
 - (void)create:(NSString *)nickName extension:(NSString *)extension data:(NSData *)data parentFolder:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(SafeMetaData *, NSError *))completion {
     // NOTIMPL:
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
@@ -91,18 +92,18 @@ viewController:(UIViewController *)viewController
         return;
     }
 
-//    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
-//    if (!securitySucceeded) {
-//        NSLog(@"Could not access secure scoped resource!");
-//        return;
-//    }
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
+    if (!securitySucceeded) {
+        NSLog(@"Could not access secure scoped resource!");
+        return;
+    }
     
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     
     [document openWithCompletionHandler:^(BOOL success) {
         completion(success ? document.data : nil, nil);
         
-//        [url stopAccessingSecurityScopedResource];
+        [url stopAccessingSecurityScopedResource];
     }];
 }
 

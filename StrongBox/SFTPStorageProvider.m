@@ -39,7 +39,7 @@
         _displayName = @"SFTP";
         _icon = @"sftp-32x32"; 
         _storageId = kSFTP;
-        _cloudBased = YES;
+        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;

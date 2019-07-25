@@ -296,7 +296,46 @@
         [actions addObject:openOffline];
     }
     
+    if(safe.storageProvider == kLocalDevice) {
+        BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
+        NSString* actionTitle = shared ? @"Show in 'Files'" : @"Make Auto Fill-able";
+        
+        UITableViewRowAction *toggleStorage = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:actionTitle handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+            NSString* message = shared ? @"Showing this database in 'Files' will make the database available for access via 'Files' and iTunes File Sharing. However the database will no longer be fully accessible in Auto Fill contexts. This is due to iOS system design.\n\nNB: You can always reverse this action" :
+            
+            @"Making this database Auto Fill-able will allow the database to be fully accessible in Auto Fill contexts (not just a read-only cache). However it will no longer be visible to iTunes File Sharing or via the Files app. This is due to iOS system design.\n\nNB: You can always reverse this action";
+            
+            [Alerts okCancel:self
+                       title:@"Change Local Device Storage Mode"
+                     message:message
+                      action:^(BOOL response) {
+                if (response) {
+                    [self toggleLocalSharedStorage:indexPath];
+                }
+            }];
+        }];
+        toggleStorage.backgroundColor = [UIColor darkGrayColor];
+        
+        [actions addObject:toggleStorage];
+    }
+    
     return actions;
+}
+
+- (void)toggleLocalSharedStorage:(NSIndexPath*)indexPath {
+    SafeMetaData* metadata = [self.collection objectAtIndex:indexPath.row];
+
+    NSError* error;
+    if (![LocalDeviceStorageProvider.sharedInstance toggleSharedStorage:metadata error:&error]) {
+        [Alerts error:self title:@"Could not change storage location" error:error];
+    }
+    else {
+        BOOL previouslyShared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:metadata];
+
+        NSString* message = !previouslyShared ? @"This database has been made visible in 'Files'" :
+            @"This database has been made fully Auto Fill-able";
+        [Alerts info:self title:@"Local Storage Mode Changed" message:message];
+    }
 }
 
 - (void)openOffline:(NSIndexPath*)indexPath {

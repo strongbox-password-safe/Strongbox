@@ -122,14 +122,15 @@
         return;
     }
 
-    BOOL useAutoFillCache = ![[self getInitialViewController] isLiveAutoFillProvider:safe.storageProvider];
+    BOOL useAutoFillCache = ![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
 
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
                                           openAutoFillCache:useAutoFillCache
                                         canConvenienceEnrol:NO
                                              isAutoFillOpen:YES
-                                     manualOpenOfflineCache:NO 
+                                     manualOpenOfflineCache:NO
+                                biometricAuthenticationDone:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
                                                      if(model) {
                                                          [self performSegueWithIdentifier:@"toPickCredentialsFromQuickLaunch" sender:model];

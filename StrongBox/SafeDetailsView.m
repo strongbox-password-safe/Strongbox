@@ -19,6 +19,7 @@
 #import "AddNewSafeHelper.h"
 #import "CacheManager.h"
 #import "ExportOptionsTableViewController.h"
+#import "AttachmentsPoolViewController.h"
 
 @interface SafeDetailsView ()
 
@@ -33,6 +34,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeMasterCredentials;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
 
 @end
 
@@ -69,6 +72,16 @@
     self.switchReadOnly.on = self.viewModel.metadata.readOnly;
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setupTableView];
+}
+
+- (void)setupTableView {
+    [self cell:self.cellViewAttachments setHidden:self.viewModel.database.attachments.count == 0];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
@@ -86,7 +99,8 @@
     self.cellChangeMasterCredentials.imageView.image = [UIImage imageNamed:@"key"];
     self.cellPinCodes.imageView.image = [UIImage imageNamed:@"keypad"];
     self.cellExport.imageView.image = [UIImage imageNamed:@"upload"];
-    
+    self.cellPrint.imageView.image = [UIImage imageNamed:@"print"];
+    self.cellViewAttachments.imageView.image = [UIImage imageNamed:@"picture"];
     //
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
@@ -138,6 +152,10 @@
             }];
         };
     }
+    else if ([segue.identifier isEqualToString:@"segueToAttachmentsPool"]) {
+        AttachmentsPoolViewController* vc = (AttachmentsPoolViewController*)segue.destinationViewController;
+        vc.viewModel = self.viewModel;
+    }
 }
 
 - (void)setCredentials:(NSString*)password keyFileUrl:(NSURL*)keyFileUrl oneTimeKeyFileData:(NSData*)oneTimeKeyFileData {
@@ -161,6 +179,7 @@
             if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
                 self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
                 self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
+                self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
                 
                 NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
             }
@@ -202,6 +221,7 @@
                            self.viewModel.metadata.isEnrolledForConvenience = NO;
                            self.viewModel.metadata.convenienceMasterPassword = nil;
                            self.viewModel.metadata.convenenienceKeyFileDigest = nil;
+                           self.viewModel.metadata.convenenienceYubikeySecret = nil;
                        }
                        
                        [[SafesList sharedInstance] update:self.viewModel.metadata];
@@ -224,6 +244,7 @@
         self.viewModel.metadata.isEnrolledForConvenience = YES;
         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
         self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
+        self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindSettings];
@@ -335,8 +356,18 @@
     else if (cell == self.cellExport) {
         [self onExport];
     }
+    else if (cell == self.cellPrint) {
+        [self onPrint];
+    }
+    else if (cell == self.cellViewAttachments) {
+        [self viewAttachments];
+    }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)viewAttachments {
+    [self performSegueWithIdentifier:@"segueToAttachmentsPool" sender:nil];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -368,6 +399,16 @@
 
 - (void)onExport {
     [self performSegueWithIdentifier:@"segueToExportOptions" sender:nil];
+}
+
+- (void)onPrint {
+    NSString* htmlString = [self.viewModel.database getHtmlPrintString:self.viewModel.metadata.nickName];
+    
+    UIMarkupTextPrintFormatter *formatter = [[UIMarkupTextPrintFormatter alloc] initWithMarkupText:htmlString];
+    
+    UIPrintInteractionController.sharedPrintController.printFormatter = formatter;
+    
+    [UIPrintInteractionController.sharedPrintController presentAnimated:YES completionHandler:nil];
 }
 
 - (BOOL)canToggleTouchId {

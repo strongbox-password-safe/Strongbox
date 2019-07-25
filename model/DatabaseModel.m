@@ -13,6 +13,7 @@
 #import "NSMutableArray+Extensions.h"
 #import "Kdbx4Serialization.h"
 #import "KeePassCiphers.h"
+#import "KissXML.h"
 
 @interface DatabaseModel ()
 
@@ -343,7 +344,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return self.theSafe.metadata;
 }
 
--(NSArray *)attachments {
+-(NSArray<DatabaseAttachment *> *)attachments {
     return self.theSafe.attachments;
 }
 
@@ -628,6 +629,113 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
 - (CompositeKeyFactors *)compositeKeyFactors {
     return self.theSafe.compositeKeyFactors;
+}
+
+- (NSString*)getHtmlPrintString:(NSString*)databaseName {
+    // MMcG: This isn't great - in future use a css resource file and find a better way to build this... functional for now.
+    NSString* stylesheet = @"<head><style type=\"text/css\"> \
+    body { width: 800px; } \
+    .database-title { font-size: 36pt; text-align: center; } \
+    .group-title { font-size: 20pt; margin-top:20px; margin-bottom: 5px; text-align: center; font-weight: bold; } \
+    .entry-table {  border-collapse: collapse; margin-bottom: 10px; width: 800px; border: 1px solid black; } \
+    .entry-title { font-weight: bold; font-size: 16pt; padding: 5px; } \
+    table td, table th { border: 1px solid black; } \
+    .entry-field-label { width: 100px; padding: 2px; } \
+    .entry-field-value { font-family: Menlo; padding: 2px; max-width: 700px; word-wrap: break-word; } \
+    </style></head>";
+    
+    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h6>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], iso8601DateString(NSDate.date)];
+    
+    NSArray<Node*>* sortedGroups = [self.rootGroup.allChildGroups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NSString* path1 = [self getGroupPathDisplayString:obj1];
+        NSString* path2 = [self getGroupPathDisplayString:obj2];
+        return finderStringCompare(path1, path2);
+    }];
+    
+    NSMutableArray* allGroups = sortedGroups.mutableCopy;
+    [allGroups addObject:self.rootGroup];
+    
+    for(Node* group in allGroups) {
+        [ret appendFormat:@"    <div class=\"group-title\">%@</div>\n", [self htmlStringFromString:[self getGroupPathDisplayString:group]]];
+        
+        NSMutableArray* nodeStrings = @[].mutableCopy;
+        
+        NSArray* sorted = [group.childRecords sortedArrayUsingComparator:finderStyleNodeComparator];
+        
+        for(Node* entry in sorted) {
+            NSString* nodeString = [self getHtmlStringForNode:entry];
+            [nodeStrings addObject:nodeString];
+        }
+        
+        NSString* groupString = [nodeStrings componentsJoinedByString:@"\n    "];
+        
+        [ret appendString:groupString];
+        [ret appendString:@"    </tr>\n"];
+    }
+    
+    [ret appendString:@"</body>\n</html>"];
+    return ret.copy;
+}
+
+- (NSString*)getHtmlStringForNode:(Node*)entry {
+    NSMutableString* str = [NSMutableString string];
+    
+    [str appendFormat:@"        <table class=\"entry-table\"><tr class=\"entry-title\"><td colspan=\"100\">%@</td></tr>\n", entry.title];
+    
+    if(entry.fields.username.length) {
+        [str appendString:[self getHtmlEntryFieldRow:@"Username" value:entry.fields.username]];
+        [str appendString:@"\n"];
+    }
+    
+    [str appendString:[self getHtmlEntryFieldRow:@"Password" value:entry.fields.password]];
+    [str appendString:@"\n"];
+
+    if(entry.fields.url.length) {
+        [str appendString:[self getHtmlEntryFieldRow:@"URL" value:entry.fields.url]];
+        [str appendString:@"\n"];
+    }
+    
+    if (self.format == kPasswordSafe && entry.fields.email.length) {
+        [str appendString:[self getHtmlEntryFieldRow:@"Email" value:entry.fields.email]];
+        [str appendString:@"\n"];
+    }
+    
+    if (entry.fields.notes.length) {
+        [str appendString:[self getHtmlEntryFieldRow:@"Notes" value:entry.fields.notes]];
+        [str appendString:@"\n"];
+    }
+    
+    // Expiry
+    
+    if(entry.fields.expires) {
+        [str appendString:[self getHtmlEntryFieldRow:@"Expires" value:iso8601DateString(entry.fields.expires)]];
+        [str appendString:@"\n"];
+    }
+
+    // Custom Fields
+    
+    if(entry.fields.customFields.count) {
+        for (NSString* key in entry.fields.customFields.allKeys) {
+            StringValue* v = entry.fields.customFields[key];
+            [str appendString:[self getHtmlEntryFieldRow:key value:v.value]];
+            [str appendString:@"\n"];
+        }
+    }
+    
+    [str appendString:@"</table>\n"];
+    
+    return str.copy;
+}
+
+- (NSString*)getHtmlEntryFieldRow:(NSString*)label value:(NSString*)value {
+    return [NSString stringWithFormat:@"        <tr class=\"entry-field-row\"><td class=\"entry-field-label\">%@</td><td class = \"entry-field-value\">%@</td></tr>", label, [self htmlStringFromString:value]];
+}
+
+- (NSString*)htmlStringFromString:(NSString*)str {
+    NSXMLNode *textNode = [NSXMLNode textWithStringValue:str];
+    NSString *escapedString = textNode.XMLString;
+    
+    return [[escapedString stringByReplacingOccurrencesOfString:@"\r\n" withString:@"<br>"] stringByReplacingOccurrencesOfString:@"\n" withString:@"<br>"];
 }
 
 @end

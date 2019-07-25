@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 
-- (void)openPrimarySafe;
+- (void)openPrimarySafe:(BOOL)userJustCompletedBiometricAuthentication;
 
 @end
 

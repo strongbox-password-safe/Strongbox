@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PrivacyViewController : UIViewController
 
-@property (nonatomic, copy) void (^onUnlockDone)(void);
+@property (nonatomic, copy) void (^onUnlockDone)(BOOL userJustCompletedBiometricAuthentication);
 @property BOOL startupLockMode;
 
 - (void)onAppBecameActive;

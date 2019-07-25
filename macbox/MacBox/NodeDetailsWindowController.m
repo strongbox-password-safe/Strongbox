@@ -22,7 +22,6 @@
 #import "MBProgressHUD.h"
 #import "SelectPredefinedIconController.h"
 #import "AttachmentItem.h"
-#import "Node+OtpToken.h"
 #import "OTPToken+Generation.h"
 
 @interface NodeDetailsWindowController () < NSTableViewDataSource,

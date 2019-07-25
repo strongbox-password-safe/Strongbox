@@ -152,6 +152,12 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     }] : [NSArray array];
 }
 
+- (NSArray<Node *> *)allChildGroups {
+    return self.isGroup ? [self filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return node.isGroup;
+    }] : @[];
+}
+
 - (NSArray<Node *> *)allChildRecords {
     return self.isGroup ? [self filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
