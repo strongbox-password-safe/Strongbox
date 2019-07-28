@@ -878,7 +878,6 @@
 
 - (void)requestBiometricBeforeOpeningPreferences {
     [Settings.sharedInstance requestBiometricId:@"Identify to Open Preferences"
-                          allowDevicePinInstead:NO 
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{

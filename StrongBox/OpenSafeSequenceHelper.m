@@ -278,7 +278,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)showBiometricAuthentication {
-    NSLog(@"REQUEST-BIOMETRIC: Open Safe");
+    //NSLog(@"REQUEST-BIOMETRIC: Open Safe");
     
     if(self.biometricPreCleared && Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths) {
         NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
@@ -286,8 +286,7 @@
     }
     else {
         [Settings.sharedInstance requestBiometricId:@"Identify to Login"
-                                      fallbackTitle:@"Enter Database Master Password..."
-                              allowDevicePinInstead:NO
+                                      fallbackTitle:@"Unlock Manually..."
                                          completion:^(BOOL success, NSError * _Nullable error) {
             [self onBiometricAuthenticationDone:success error:error];
         }];

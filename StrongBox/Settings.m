@@ -517,7 +517,8 @@ static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
     [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
     
     if (error) {
-        //NSLog(@"Error with biometrics authentication");
+        NSLog(@"isBiometricIdAvailable: NO -> ");
+        [Settings logBiometricError:error];
         return NO;
     }
     
@@ -525,33 +526,67 @@ static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
 }
 
 - (void)requestBiometricId:(NSString*)reason
-     allowDevicePinInstead:(BOOL)allowDevicePinInstead
                 completion:(void(^)(BOOL success, NSError * __nullable error))completion {
-    [self requestBiometricId:reason fallbackTitle:nil allowDevicePinInstead:allowDevicePinInstead completion:completion];
+    [self requestBiometricId:reason fallbackTitle:nil completion:completion];
 }
 
 - (void)requestBiometricId:(NSString*)reason
-             fallbackTitle:(NSString*)fallbackTitle
-     allowDevicePinInstead:(BOOL)allowDevicePinInstead
+             fallbackTitle:(NSString*)fallbackTitle // Setting this means you handle the case of error == LAErrorUserFallback
                 completion:(void(^)(BOOL success, NSError * __nullable error))completion {
     LAContext *localAuthContext = [[LAContext alloc] init];
     if(fallbackTitle) {
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
-    else {
-        localAuthContext.localizedFallbackTitle = @"";
-    }
     
-    NSLog(@"REQUEST-BIOMETRIC: %d", self.suppressPrivacyScreen);
+    //NSLog(@"REQUEST-BIOMETRIC: %d", self.suppressPrivacyScreen);
     
     self.suppressPrivacyScreen = YES;
-    [localAuthContext evaluatePolicy:allowDevicePinInstead ? LAPolicyDeviceOwnerAuthentication : LAPolicyDeviceOwnerAuthenticationWithBiometrics
+    
+    // MMcG: NB
+    //
+    // LAPolicyDeviceOwnerAuthentication -> This allows user to enter Device Passcode - which is normally what we want
+    // LAPolicyDeviceOwnerAuthenticationWithBiometrics -> Does not auto fall back to device passcode but allows for custom fallback mechanism
+    
+    [localAuthContext evaluatePolicy:fallbackTitle ? LAPolicyDeviceOwnerAuthenticationWithBiometrics : LAPolicyDeviceOwnerAuthentication
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
-                                    completion(success, error);
-                                    NSLog(@"REQUEST-BIOMETRIC DONE: %d", success);
-                                    self.suppressPrivacyScreen = NO;
+                                   if(!success) {
+                                       NSLog(@"requestBiometricId: NO -> ");
+                                       [Settings logBiometricError:error];
+                                   }
+                                   else {
+                                       NSLog(@"REQUEST-BIOMETRIC DONE SUCCESS");
+                                   }
+                                   completion(success, error);
+                                   
+                                   self.suppressPrivacyScreen = NO;
                                }];
+}
+
++ (void)logBiometricError:(NSError*)error {
+    if (error.code == LAErrorAuthenticationFailed) {
+        NSLog(@"BIOMETRIC: Auth Failed");
+    }
+    else if (error.code == LAErrorUserFallback) {
+        NSLog(@"BIOMETRIC: User Choose Fallback");
+    }
+    else if (error.code == LAErrorUserCancel) {
+        NSLog(@"BIOMETRIC: User Cancelled");
+    }
+    else if (@available(iOS 11.0, *)) {
+        if (error.code == LAErrorBiometryNotAvailable) {
+            NSLog(@"BIOMETRIC: LAErrorBiometryNotAvailable");
+        }
+        else if (error.code == LAErrorSystemCancel) {
+            NSLog(@"BIOMETRIC: LAErrorSystemCancel");
+        }
+        else if (error.code == LAErrorBiometryNotEnrolled) {
+            NSLog(@"BIOMETRIC: LAErrorBiometryNotEnrolled");
+        }
+        else if (error.code == LAErrorBiometryLockout) {
+            NSLog(@"BIOMETRIC: LAErrorBiometryLockout");
+        }
+    }
 }
 
 - (NSString*)getBiometricIdName {
@@ -660,7 +695,14 @@ static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
 }
 
 - (NSInteger)clearClipboardAfterSeconds {
-    return [self getInteger:kClearClipboardAfterSeconds fallback:kDefaultClearClipboardTimeout];
+    NSInteger ret = [self getInteger:kClearClipboardAfterSeconds fallback:kDefaultClearClipboardTimeout];
+
+    if(ret <= 0) { // This seems to have occurred somehow on some devices :(
+        [self setClearClipboardAfterSeconds:kDefaultClearClipboardTimeout];
+        return kDefaultClearClipboardTimeout;
+    }
+    
+    return ret;
 }
 
 -(void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {

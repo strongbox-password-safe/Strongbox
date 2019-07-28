@@ -13,6 +13,7 @@
 #import "SafesList.h"
 #import "AutoFillManager.h"
 #import "FileManager.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 
 @interface PrivacyViewController ()
 
@@ -96,8 +97,13 @@
         return;
     }
 
-    if((Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) && Settings.isBiometricIdAvailable) {
-        [self requestBiometric];
+    if(Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) {
+        if(Settings.isBiometricIdAvailable) {
+            [self requestBiometric];
+        }
+        else {
+            [Alerts info:self title:@"Biometrics Unavailable" message:@"This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application."];
+        }
     }
     else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
         [self requestPin:NO];
@@ -109,9 +115,8 @@
 }
 
 - (void)requestBiometric {
-    NSLog(@"REQUEST-BIOMETRIC: Privacy Screen");
+    //NSLog(@"REQUEST-BIOMETRIC: Privacy Screen");
     [Settings.sharedInstance requestBiometricId:@"Identify to Open Strongbox"
-                          allowDevicePinInstead:NO
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -125,7 +130,12 @@
             });
         }
         else {
-            [self incrementFailedUnlockCount];
+            if (error.code == LAErrorUserCancel) {
+                NSLog(@"User Cancelled - Not Incrementing Fail Count...");
+            }
+            else {
+                [self incrementFailedUnlockCount];
+            }
         }}];
 }
 
@@ -184,15 +194,17 @@
 }
 
 - (void)incrementFailedUnlockCount {
-    Settings.sharedInstance.failedUnlockAttempts = Settings.sharedInstance.failedUnlockAttempts + 1;
-    NSLog(@"Failed Unlocks: %lu", (unsigned long)Settings.sharedInstance.failedUnlockAttempts);
-    [self updateUnlockAttemptsRemainingLabel];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        Settings.sharedInstance.failedUnlockAttempts = Settings.sharedInstance.failedUnlockAttempts + 1;
+        NSLog(@"Failed Unlocks: %lu", (unsigned long)Settings.sharedInstance.failedUnlockAttempts);
+        [self updateUnlockAttemptsRemainingLabel];
 
-    if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
-        if(Settings.sharedInstance.failedUnlockAttempts >= Settings.sharedInstance.deleteDataAfterFailedUnlockCount) {
-            [self deleteAllData];
+        if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
+            if(Settings.sharedInstance.failedUnlockAttempts >= Settings.sharedInstance.deleteDataAfterFailedUnlockCount) {
+                [self deleteAllData];
+            }
         }
-    }
+    });
 }
 
 - (void)deleteAllData {

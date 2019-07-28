@@ -29,12 +29,10 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 - (NSUserDefaults*_Nullable)getUserDefaults;
 
 - (void)requestBiometricId:(NSString*)reason
-     allowDevicePinInstead:(BOOL)allowDevicePinInstead
                 completion:(void(^)(BOOL success, NSError * __nullable error))completion;
 
-- (void)requestBiometricId:(NSString  *)reason
+- (void)requestBiometricId:(NSString *)reason
              fallbackTitle:(NSString*_Nullable)fallbackTitle
-     allowDevicePinInstead:(BOOL)allowDevicePinInstead
                 completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
 
 + (BOOL)isBiometricIdAvailable;

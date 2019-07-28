@@ -189,8 +189,14 @@
     [self showConfiguredInitialView];
 }
 
-- (BOOL)isInQuickLaunchViewMode { 
-    return self.selectedIndex == 1;
+- (BOOL)isInQuickLaunchViewMode {
+    UINavigationController* quickLaunchNav = self.viewControllers[1];
+    
+    NSLog(@"isInQuickLaunchViewMode: vis [%@] => root [%@]", quickLaunchNav.visibleViewController, quickLaunchNav.viewControllers.firstObject);
+    
+    BOOL quickLaunchVisible = quickLaunchNav.visibleViewController == quickLaunchNav.viewControllers.firstObject;
+    
+    return self.selectedIndex == 1 && quickLaunchVisible;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
