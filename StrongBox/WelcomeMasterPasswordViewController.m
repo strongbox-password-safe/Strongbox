@@ -11,6 +11,7 @@
 #import "WelcomeCreateDoneViewController.h"
 #import "AddNewSafeHelper.h"
 #import "Alerts.h"
+#import "SafesList.h"
 
 @interface WelcomeMasterPasswordViewController () <UITextFieldDelegate>
 
@@ -99,6 +100,7 @@
                                             }
                                             else {
                                                 self.database = metadata;
+                                                [SafesList.sharedInstance addWithDuplicateCheck:self.database];
                                                 [self performSegueWithIdentifier:@"segueToDone" sender:nil];
                                             }
                                         }];

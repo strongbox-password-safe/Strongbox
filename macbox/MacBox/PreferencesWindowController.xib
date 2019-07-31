@@ -80,11 +80,11 @@
             <rect key="contentRect" x="196" y="240" width="488" height="802"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="488" height="412"/>
+                <rect key="frame" x="0.0" y="0.0" width="488" height="779"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="465" height="372"/>
+                        <rect key="frame" x="13" y="26" width="465" height="739"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="yNg-sv-E7G">
@@ -484,12 +484,12 @@
                             </tabViewItem>
                             <tabViewItem label="Password Generation" identifier="" id="WW6-Pn-Ixw">
                                 <view key="view" id="4ag-1n-rL7">
-                                    <rect key="frame" x="10" y="33" width="445" height="716"/>
+                                    <rect key="frame" x="10" y="33" width="445" height="693"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NQT-T4-Biz">
-                                            <rect key="frame" x="16" y="378" width="242" height="18"/>
-                                            <buttonCell key="cell" type="radio" title="Use XKCD Algorithm" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="E9h-Ru-ZSh">
+                                            <rect key="frame" x="16" y="355" width="242" height="18"/>
+                                            <buttonCell key="cell" type="radio" title="Use Diceware (XKCD) Algorithm" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="E9h-Ru-ZSh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -498,7 +498,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J7H-II-Qa5">
-                                            <rect key="frame" x="16" y="608" width="145" height="18"/>
+                                            <rect key="frame" x="16" y="585" width="145" height="18"/>
                                             <buttonCell key="cell" type="radio" title="Use Basic Algorithm" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Yfa-yq-zNC">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -508,7 +508,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2DG-Am-EOz">
-                                            <rect key="frame" x="182" y="521" width="205" height="18"/>
+                                            <rect key="frame" x="182" y="498" width="205" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use easy read characters only" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="l2X-s0-1mS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -518,7 +518,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yFg-qg-zhJ">
-                                            <rect key="frame" x="182" y="499" width="214" height="18"/>
+                                            <rect key="frame" x="182" y="476" width="214" height="18"/>
                                             <buttonCell key="cell" type="check" title="Non ambiguous characters only" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="gVi-YQ-iZC">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -528,7 +528,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TvQ-8P-YxV">
-                                            <rect key="frame" x="182" y="587" width="114" height="18"/>
+                                            <rect key="frame" x="182" y="564" width="114" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Uppercase" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="p5m-6K-WQZ">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -538,7 +538,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nP6-Q0-au2">
-                                            <rect key="frame" x="182" y="565" width="84" height="18"/>
+                                            <rect key="frame" x="182" y="542" width="84" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Digits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kel-O1-056">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -548,7 +548,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kF8-9A-1QK">
-                                            <rect key="frame" x="182" y="609" width="114" height="18"/>
+                                            <rect key="frame" x="182" y="586" width="114" height="18"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="110" id="17f-kX-L9c"/>
                                             </constraints>
@@ -561,7 +561,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sEr-GH-iRP">
-                                            <rect key="frame" x="182" y="543" width="102" height="18"/>
+                                            <rect key="frame" x="182" y="520" width="102" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Symbols" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="smi-BA-LgH">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -571,7 +571,7 @@
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1IP-Sw-QEI">
-                                            <rect key="frame" x="281" y="379" width="77" height="17"/>
+                                            <rect key="frame" x="281" y="356" width="77" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Word Count" id="8sh-Rm-atE">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -579,20 +579,20 @@
                                             </textFieldCell>
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sh6-f5-1Jt">
-                                            <rect key="frame" x="412" y="374" width="19" height="27"/>
+                                            <rect key="frame" x="412" y="351" width="19" height="27"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="16" doubleValue="4" id="Jau-LJ-Pfz"/>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="Cag-5g-5e0"/>
                                             </connections>
                                         </stepper>
                                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="oZm-W6-pFf">
-                                            <rect key="frame" x="17" y="405" width="411" height="5"/>
+                                            <rect key="frame" x="17" y="382" width="411" height="5"/>
                                         </box>
                                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="vsT-oH-XRx">
-                                            <rect key="frame" x="17" y="631" width="411" height="5"/>
+                                            <rect key="frame" x="17" y="608" width="411" height="5"/>
                                         </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZSa-r1-ZwL">
-                                            <rect key="frame" x="361" y="377" width="52" height="21"/>
+                                            <rect key="frame" x="361" y="354" width="52" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="52" id="hwg-Ut-ux4"/>
                                             </constraints>
@@ -603,7 +603,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="P9l-t1-FvO">
-                                            <rect key="frame" x="15" y="638" width="415" height="58"/>
+                                            <rect key="frame" x="15" y="615" width="415" height="58"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="58" id="FOq-sT-K0p"/>
                                             </constraints>
@@ -615,7 +615,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EXF-t2-lIO">
-                                            <rect key="frame" x="182" y="477" width="224" height="18"/>
+                                            <rect key="frame" x="182" y="454" width="224" height="18"/>
                                             <buttonCell key="cell" type="check" title="Pick characters from every group" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RjO-D4-8If">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -625,14 +625,14 @@
                                             </connections>
                                         </button>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9KZ-9l-cam">
-                                            <rect key="frame" x="43" y="418" width="387" height="24"/>
+                                            <rect key="frame" x="43" y="395" width="387" height="24"/>
                                             <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="6" maxValue="64" doubleValue="14.631578947368421" tickMarkPosition="above" numberOfTickMarks="40" sliderType="linear" id="MyT-Rg-HxQ"/>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="TTG-cg-iGZ"/>
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1g7-rx-VnH">
-                                            <rect key="frame" x="411" y="450" width="19" height="17"/>
+                                            <rect key="frame" x="411" y="427" width="19" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="16" id="Qhb-4F-GjZ">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -640,7 +640,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PGt-9T-Nnu">
-                                            <rect key="frame" x="43" y="450" width="112" height="17"/>
+                                            <rect key="frame" x="43" y="427" width="112" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Password Length:" id="tNY-6D-USH">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -688,13 +688,13 @@
                                             </textFieldCell>
                                         </textField>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kfk-XF-5ds">
-                                            <rect key="frame" x="45" y="173" width="383" height="173"/>
+                                            <rect key="frame" x="45" y="173" width="383" height="150"/>
                                             <clipView key="contentView" id="fgm-VP-bkg">
-                                                <rect key="frame" x="1" y="1" width="381" height="171"/>
+                                                <rect key="frame" x="1" y="1" width="381" height="148"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowSizeStyle="automatic" viewBased="YES" id="jxP-ba-wA1">
-                                                        <rect key="frame" x="0.0" y="0.0" width="381" height="171"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="381" height="148"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -733,6 +733,9 @@
                                                     </tableView>
                                                 </subviews>
                                             </clipView>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="150" id="ecI-Sp-Y4r"/>
+                                            </constraints>
                                             <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="xDg-gW-kIg">
                                                 <rect key="frame" x="1" y="138" width="381" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
@@ -743,7 +746,7 @@
                                             </scroller>
                                         </scrollView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vwb-bK-uLD">
-                                            <rect key="frame" x="43" y="354" width="69" height="17"/>
+                                            <rect key="frame" x="43" y="331" width="69" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Word Lists" id="C39-Ei-N25">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>

@@ -26,7 +26,6 @@
 #import "IOsUtils.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "StrongboxUIDocument.h"
-#import "QuickLaunchViewController.h"
 #import "StorageBrowserTableViewController.h"
 #import "PrivacyViewController.h"
 #import "CASGTableViewController.h"
@@ -101,8 +100,8 @@
 //    NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
     
     if(!self.enqueuedImportUrl) {
-        if([self isInQuickLaunchViewMode]) {
-            [self openQuickLaunchPrimarySafe:userJustCompletedBiometricAuthentication];
+        if([self shouldQuickLaunch]) {
+            [self openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
         }
 
         [self checkICloudAvailability];
@@ -140,13 +139,12 @@
     }
 }
 
-- (void)openQuickLaunchPrimarySafe:(BOOL)userJustCompletedBiometricAuthentication {
+- (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
     UINavigationController* nav = [self selectedViewController];
-    QuickLaunchViewController* quickLaunch = (QuickLaunchViewController*)nav.viewControllers[0];
-    NSLog(@"Found Quick Launch = %@", quickLaunch);
+    SafesViewController* safesController = (SafesViewController*)nav.viewControllers[0];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [quickLaunch openPrimarySafe:userJustCompletedBiometricAuthentication];
+        [safesController openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
     });
 }
 
@@ -165,38 +163,17 @@
     return NO;
 }
 
-- (void)showQuickLaunchView {
-    self.selectedIndex = 1;
-}
-
-- (void)showSafesListView {
-    self.selectedIndex = 0;
-}
-
-- (void)showConfiguredInitialView {
-    if(Settings.sharedInstance.useQuickLaunchAsRootView) {
-        [self showQuickLaunchView];
-    }
-    else {
-        [self showSafesListView];
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tabBar.hidden = YES;
-    
-    [self showConfiguredInitialView];
 }
 
-- (BOOL)isInQuickLaunchViewMode {
-    UINavigationController* quickLaunchNav = self.viewControllers[1];
-    
-    NSLog(@"isInQuickLaunchViewMode: vis [%@] => root [%@]", quickLaunchNav.visibleViewController, quickLaunchNav.viewControllers.firstObject);
+- (BOOL)shouldQuickLaunch {
+    UINavigationController* quickLaunchNav = self.viewControllers[0];
     
     BOOL quickLaunchVisible = quickLaunchNav.visibleViewController == quickLaunchNav.viewControllers.firstObject;
     
-    return self.selectedIndex == 1 && quickLaunchVisible;
+    return quickLaunchVisible;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -217,8 +194,8 @@
                 [self processEnqueuedImport];
             }
             else {
-                if([self isInQuickLaunchViewMode]) {
-                    [self openQuickLaunchPrimarySafe:NO];
+                if([self shouldQuickLaunch]) {
+                    [self openQuickLaunchDatabase:NO];
                 }
                 else {
                     [self checkICloudAvailability];
@@ -660,14 +637,6 @@
     metadata.likelyFormat = format;
     
     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-}
-
-- (SafeMetaData*)getPrimarySafe {
-    SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstObject];
-    
-    //NSLog(@"Primary Safe: [%@]", safe);
-    
-    return safe.hasUnresolvedConflicts ? nil : safe;
 }
 
 - (void)segueToNagScreenIfAppropriate {

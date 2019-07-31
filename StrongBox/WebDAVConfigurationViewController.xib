@@ -135,6 +135,7 @@
                                 </label>
                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="aDW-Ay-EYK">
                                     <rect key="frame" x="306" y="246" width="51" height="31"/>
+                                    <accessibility key="accessibilityConfiguration" label="Allow Untrusted Certificate"/>
                                 </switch>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Allow Untrusted Certificate" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GnF-Py-IGa">
                                     <rect key="frame" x="91" y="251" width="207" height="21"/>

@@ -321,6 +321,8 @@ viewController:(UIViewController *)viewController
             [SVProgressHUD showWithStatus:@"Authenticating..."];
         });
         
+        NSLog(@"Supported Authentication Methods by Server: [%@]", session.supportedAuthenticationMethods);
+        
         if(sessionConfiguration.authenticationMode == kPrivateKey) {
             [session authenticateByInMemoryPublicKey:sessionConfiguration.publicKey
                                           privateKey:sessionConfiguration.privateKey

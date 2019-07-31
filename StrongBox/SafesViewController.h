@@ -15,11 +15,12 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonToggleEdit;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonQuickLaunchView;
 
 - (IBAction)onAddSafe:(id)sender;
 - (IBAction)onUpgrade:(id)sender;
 
 - (IBAction)onToggleEdit:(id)sender;
+
+- (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication;
 
 @end

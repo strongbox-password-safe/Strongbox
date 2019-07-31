@@ -22,14 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace;
 - (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace;
 
-- (void)showQuickLaunchView;
-- (void)showSafesListView;
-
 - (void)appResignActive;
 - (void)appBecameActive;
 
-- (BOOL)isInQuickLaunchViewMode;
-- (nullable SafeMetaData* )getPrimarySafe;
 - (void)checkICloudAvailability;
 
 @end

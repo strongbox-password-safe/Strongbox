@@ -91,6 +91,7 @@
                                 </textField>
                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eQL-vF-B3E">
                                     <rect key="frame" x="124" y="247.33333333333331" width="51" height="31"/>
+                                    <accessibility key="accessibilityConfiguration" label="Use a Private Key"/>
                                     <connections>
                                         <action selector="onUsePrivateKey:" destination="-1" eventType="valueChanged" id="lu6-Dn-eOd"/>
                                     </connections>

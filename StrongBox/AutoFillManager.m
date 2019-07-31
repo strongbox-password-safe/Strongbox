@@ -44,7 +44,7 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid {
+- (void)    updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid {
     if (@available(iOS 12.0, *)) {
         NSLog(@"Updating Quick Type AutoFill Database...");
         

@@ -664,7 +664,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (IBAction)onPasswordSettings:(id)sender {
-    [PreferencesWindowController.sharedInstance showOnTab:1];
+    [PreferencesWindowController.sharedInstance showOnTab:2];
 }
 
 - (IBAction)onGenerate:(id)sender {

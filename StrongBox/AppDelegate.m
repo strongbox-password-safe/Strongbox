@@ -71,6 +71,25 @@
     if(!Settings.sharedInstance.migratedToNewPasswordGenerator) {
         [self migrateToNewPasswordGenerator];
     }
+    
+    // 29-Jul-2019
+    
+    if(!Settings.sharedInstance.migratedToNewQuickLaunchSystem) {
+        [self migrateToNewQuickLaunchSystem];
+    }
+}
+
+- (void)migrateToNewQuickLaunchSystem {
+    NSLog(@"Migrating to new migrateToNewQuickLaunchSystem...");
+    
+    if(Settings.sharedInstance.useQuickLaunchAsRootView && SafesList.sharedInstance.snapshot.count) {
+        SafeMetaData* first = SafesList.sharedInstance.snapshot.firstObject;
+        NSString* quickLaunchUuid = first.uuid;
+        Settings.sharedInstance.quickLaunchUuid = quickLaunchUuid;
+        NSLog(@"Setting [%@] to configured quick launch database", first.nickName);
+    }
+    
+    Settings.sharedInstance.migratedToNewQuickLaunchSystem = YES;
 }
 
 - (void)migrateToNewPasswordGenerator {

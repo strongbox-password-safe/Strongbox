@@ -30,6 +30,8 @@
 @property (nonatomic, strong) NSString *fileIdentifier;
 @property (nonatomic) StorageProvider storageProvider;
 
+@property BOOL hasBeenPromptedForQuickLaunch;
+
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong) NSString* convenienceMasterPassword;

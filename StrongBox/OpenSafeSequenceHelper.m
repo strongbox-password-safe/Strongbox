@@ -48,7 +48,7 @@
 @property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
 @property NSString* yubikeySecret;
-@property BOOL biometricPreCleared; // Quick Launch has just authorized the user via Bio - No need to ask again
+@property BOOL biometricPreCleared; // App Lock has just authorized the user via Bio - No need to ask again
 
 @end
 
@@ -339,6 +339,9 @@
                         [self promptForManualCredentials];
                     }];
             });
+        }
+        else {
+            self.completion(nil, nil);
         }
     }
 }
@@ -685,7 +688,24 @@
             ![[Settings sharedInstance] isProOrFreeTrial] ||
             self.safe.hasBeenPromptedForConvenience) {
             // Can't or shouldn't Convenience Enrol...
-            [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+            
+            if(Settings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
+                [Alerts yesNo:self.viewController
+                        title:@"Set Quick Launch?"
+                      message:NSLocalizedString(@"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click.", @"Ask use if they would like to use database for quick launch")
+                       action:^(BOOL response) {
+                    if(response) {
+                        Settings.sharedInstance.quickLaunchUuid = self.safe.uuid;
+                    }
+                    
+                    self.safe.hasBeenPromptedForQuickLaunch = YES;
+                    [SafesList.sharedInstance update:self.safe];
+                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+                }];
+            }
+            else {
+                [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+            }
         }
         else {
             BOOL biometricPossible = Settings.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;

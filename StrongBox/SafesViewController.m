@@ -12,7 +12,7 @@
 #import "Alerts.h"
 #import "Settings.h"
 #import "SelectStorageProviderController.h"
-#import "SafeItemTableCell.h"
+#import "DatabaseCell.h"
 #import "VersionConflictController.h"
 #import "InitialViewController.h"
 #import "AppleICloudProvider.h"
@@ -33,6 +33,8 @@
 #import "FileManager.h"
 #import "CacheManager.h"
 #import "LocalDeviceStorageProvider.h"
+#import "Utils.h"
+#import "DatabasesViewPreferencesController.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate>
 
@@ -79,33 +81,19 @@
 - (void)internalRefresh {
     self.collection = SafesList.sharedInstance.snapshot;
     
-    [self.tableView reloadData];
-    
+    self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+
     self.buttonToggleEdit.enabled = (self.collection.count > 0);
-    [self.buttonToggleEdit setTintColor:(self.collection.count > 0) ? nil : [UIColor clearColor]];
     
-    if([[self getInitialViewController] getPrimarySafe]) {
-        [self.barButtonQuickLaunchView setEnabled:YES];
-        [self.barButtonQuickLaunchView setTintColor:nil];
-    }
-    else {
-        [self.barButtonQuickLaunchView setEnabled:NO];
-        [self.barButtonQuickLaunchView setTintColor: [UIColor clearColor]];
-    }
+    [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.collection = [NSArray array];
-    
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
-    
-    self.tableView.tableFooterView = [UIView new];
-    
-    self.tableView.rowHeight = 55.0f;
-    
+
+    [self setupTableview];
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onProStatusChanged:)
                                                name:kProStatusChangedNotificationKey
@@ -121,6 +109,14 @@
     if([Settings.sharedInstance getLaunchCount] == 1) {
         [self startOnboarding];
     }
+}
+
+- (void)setupTableview {
+    [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    self.tableView.tableFooterView = [UIView new];
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
@@ -209,20 +205,82 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SafeItemTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
-    
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    
-    cell.textLabel.text = safe.nickName;
-    cell.detailTextLabel.text = safe.fileName;
-    
-    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:safe.storageProvider];
+    DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
 
-    NSString *icon = provider.icon;
-    cell.imageView.image = [UIImage imageNamed:icon];
-    cell.imageViewWarningIndicator.hidden = !safe.hasUnresolvedConflicts;
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    [self populateDatabaseCell:cell database:safe];
     
     return cell;
+}
+
+- (UIImage*)getStatusImage:(SafeMetaData*)database {
+    if(database.hasUnresolvedConflicts) {
+        return [UIImage imageNamed:@"error"];
+    }
+    else if([Settings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+        return [UIImage imageNamed:@"rocket"];
+    }
+    else if(database.readOnly) {
+        return [UIImage imageNamed:@"glasses"];
+    }
+
+    return nil;
+}
+
+- (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database {
+    UIImage* statusImage = Settings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
+    
+    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellTopSubtitle];
+    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle1];
+    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle2];
+    
+    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
+    UIImage* databaseIcon = Settings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:provider.icon] : nil;
+    
+    [cell set:database.nickName
+  topSubtitle:topSubtitle
+    subtitle1:subtitle1
+    subtitle2:subtitle2
+ providerIcon:databaseIcon
+  statusImage:statusImage
+     disabled:NO];
+}
+
+- (NSString*)getDatabaseCellSubtitleField:(SafeMetaData*)database field:(DatabaseCellSubtitleField)field {
+    switch (field) {
+        case kDatabaseCellSubtitleFieldNone:
+            return nil;
+            break;
+        case kDatabaseCellSubtitleFieldFileName:
+            return database.fileName;
+            break;
+        case kDatabaseCellSubtitleFieldLastCachedDate:
+            return [self getOfflineCacheModDateString:database];
+            break;
+        case kDatabaseCellSubtitleFieldStorage:
+            return [self getStorageString:database];
+            break;
+        default:
+            return @"<Unknown Field>";
+            break;
+    }
+}
+
+- (NSString*)getStorageString:(SafeMetaData*)database {
+    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
+    
+    NSString* providerString = provider.displayName;
+    BOOL localDeviceOption = database.storageProvider == kLocalDevice;
+    if(localDeviceOption) {
+        providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ? @"Local" : @"Local (Documents)";
+    }
+    return providerString;
+}
+
+- (NSString*)getOfflineCacheModDateString:(SafeMetaData*)database {
+    NSDate* modDate = database.offlineCacheEnabled ? [CacheManager.sharedInstance getOfflineCacheFileModificationDate:database] : nil;
+    return modDate ? [NSString stringWithFormat:@"Cached: %@", friendlyDateStringVeryShort(modDate)] : @"";
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -240,12 +298,14 @@
 - (void)openSafeAtIndexPath:(NSIndexPath*)indexPath offline:(BOOL)offline {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    [self openDatabase:safe offline:offline];
+    [self openDatabase:safe offline:offline userJustCompletedBiometricAuthentication:NO];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)openDatabase:(SafeMetaData*)safe offline:(BOOL)offline {
+- (void)openDatabase:(SafeMetaData*)safe
+             offline:(BOOL)offline
+userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
     if(safe.hasUnresolvedConflicts) {
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
@@ -255,6 +315,7 @@
                                             canConvenienceEnrol:YES
                                                  isAutoFillOpen:NO
                                          manualOpenOfflineCache:offline
+                                    biometricAuthenticationDone:userJustCompletedBiometricAuthentication
                                                      completion:^(Model * _Nullable model, NSError * _Nullable error) {
             if(model) {
                 if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
@@ -269,57 +330,124 @@
                     [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
                 }
             }
+                                                         
+             [self refresh]; // Duress PIN may have caused a removal
          }];
     }
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
+                                                                            title:@"Remove..."
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeSafe:indexPath];
     }];
 
-    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Rename" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self renameSafe:indexPath];
+    UITableViewRowAction *offlineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                            title:@"Open Offline"
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self openOffline:indexPath];
     }];
+    offlineAction.backgroundColor = [UIColor darkGrayColor];
 
-    renameAction.backgroundColor = [UIColor blueColor];
- 
-    NSMutableArray* actions = [NSMutableArray arrayWithArray:@[removeAction, renameAction]];
+    // Other Options
     
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];    
-    if(safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
-        UITableViewRowAction *openOffline = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Open Offline" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-            [self openOffline:indexPath];
-        }];
-        openOffline.backgroundColor = [UIColor darkGrayColor];
+    UITableViewRowAction *moreActions = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"More..." handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self showDatabaseMoreActions:indexPath];
+    }];
+    moreActions.backgroundColor = [UIColor blueColor];
 
-        [actions addObject:openOffline];
-    }
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    BOOL offlineOption = safe.offlineCacheEnabled && safe.offlineCacheAvailable;
+
+    return offlineOption ? @[removeAction, offlineAction, moreActions] : @[removeAction, moreActions];
+}
+
+- (void)showDatabaseMoreActions:(NSIndexPath*)indexPath {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Database Actions"
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+
+    // Rename Action...
     
-    if(safe.storageProvider == kLocalDevice) {
+    UIAlertAction *renameAction = [UIAlertAction actionWithTitle:@"Rename Database..."
+                                                           style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction *a) {
+                                                             [self renameSafe:indexPath];
+                                                         } ];
+    [alertController addAction:renameAction];
+    
+    // Quick Launch Option
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    BOOL isAlreadyQuickLaunch = [Settings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
+    UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ? @"Unset as Quick Launch DB..." : @"Set as Quick Launch DB..."
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+                                                              [self toggleQuickLaunch:safe];
+                                                          } ];
+    [alertController addAction:quickLaunchAction];
+    
+    // Local Device options
+    
+    BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
+    if(localDeviceOption) {
         BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
-        NSString* actionTitle = shared ? @"Show in 'Files'" : @"Make Auto Fill-able";
-        
-        UITableViewRowAction *toggleStorage = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:actionTitle handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-            NSString* message = shared ? @"Showing this database in 'Files' will make the database available for access via 'Files' and iTunes File Sharing. However the database will no longer be fully accessible in Auto Fill contexts. This is due to iOS system design.\n\nNB: You can always reverse this action" :
-            
-            @"Making this database Auto Fill-able will allow the database to be fully accessible in Auto Fill contexts (not just a read-only cache). However it will no longer be visible to iTunes File Sharing or via the Files app. This is due to iOS system design.\n\nNB: You can always reverse this action";
-            
-            [Alerts okCancel:self
-                       title:@"Change Local Device Storage Mode"
-                     message:message
-                      action:^(BOOL response) {
-                if (response) {
-                    [self toggleLocalSharedStorage:indexPath];
-                }
-            }];
-        }];
-        toggleStorage.backgroundColor = [UIColor darkGrayColor];
-        
-        [actions addObject:toggleStorage];
+        NSString* localDeviceActionTitle = shared ? @"Show in 'Files'..." : @"Make Auto Fill-able...";
+
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:localDeviceActionTitle
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) {
+                                                                 [self promptAboutToggleLocalStorage:indexPath shared:shared];
+                                                             }];
+        [alertController addAction:secondAction];
     }
     
-    return actions;
+    // Cancel
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil];
+    
+    [alertController addAction:cancelAction];
+    
+//    alertController.popoverPresentationController.sourceView = self.view;
+//    alertController.popoverPresentationController.sourceRect = sender;
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)toggleQuickLaunch:(SafeMetaData*)database {
+    if([Settings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+        Settings.sharedInstance.quickLaunchUuid = nil;
+        [self refresh];
+    }
+    else {
+        [Alerts yesNo:self
+                title:@"About Quick Launch"
+              message:@"Setting this database as your Quick Launch database means you will be automatically prompted to unlock this database as soon as you launch or re-activate Strongbox. This can save you one precious tap!\n\nSet as Quick Launch Database?"
+               action:^(BOOL response) {
+            if (response) {
+                Settings.sharedInstance.quickLaunchUuid = database.uuid;
+                [self refresh];
+            }
+        }];
+    }
+}
+
+- (void)promptAboutToggleLocalStorage:(NSIndexPath*)indexPath shared:(BOOL)shared {
+    NSString* message = shared ? @"Showing this database in 'Files' will make the database available for access via 'Files' and iTunes File Sharing. However the database will no longer be fully accessible in Auto Fill contexts. This is due to iOS system design.\n\nNB: You can always reverse this action" :
+    
+    @"Making this database Auto Fill-able will allow the database to be fully accessible in Auto Fill contexts (not just a read-only cache). However it will no longer be visible to iTunes File Sharing or via the Files app. This is due to iOS system design.\n\nNB: You can always reverse this action";
+    
+    [Alerts okCancel:self
+               title:@"Change Local Device Storage Mode"
+             message:message
+              action:^(BOOL response) {
+                  if (response) {
+                      [self toggleLocalSharedStorage:indexPath];
+                  }
+              }];
 }
 
 - (void)toggleLocalSharedStorage:(NSIndexPath*)indexPath {
@@ -520,7 +648,7 @@
                     });
                 }
                 else if(databaseToOpen) {
-                    [self openDatabase:databaseToOpen offline:NO];
+                    [self openDatabase:databaseToOpen offline:NO userJustCompletedBiometricAuthentication:NO];
                 }
             }];
         };
@@ -536,9 +664,20 @@
         wcdvc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(databaseToOpen) {
-                     [self openDatabase:databaseToOpen offline:NO];
+                     [self openDatabase:databaseToOpen offline:NO userJustCompletedBiometricAuthentication:NO];
                 }
             }];
+        };
+    }
+    else if([segue.identifier isEqualToString:@"segueToDatabasesViewPreferences"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        DatabasesViewPreferencesController* vc = (DatabasesViewPreferencesController*)nav.topViewController;
+        
+        vc.onPreferencesChanged = ^{
+            [self internalRefresh];
+            
+            [self.tableView beginUpdates];
+            [self.tableView endUpdates];
         };
     }
 }
@@ -854,14 +993,6 @@
     return ivc;
 }
 
-- (IBAction)onSwitchToQuickLaunchView:(id)sender {
-    Settings.sharedInstance.useQuickLaunchAsRootView = YES;
-    
-    InitialViewController * ivc = [self getInitialViewController];
-    
-    [ivc showQuickLaunchView];
-}
-
 - (IBAction)onPreferences:(id)sender {
     if (!Settings.sharedInstance.appLockAppliesToPreferences || Settings.sharedInstance.appLockMode == kNoLock) {
         [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
@@ -923,6 +1054,33 @@
     };
     
     [self presentViewController:pinEntryVc animated:YES completion:nil];
+}
+
+// Quick Launch
+
+- (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
+    // Only do this if we are top of the nav stack
+    
+    if(self.navigationController.topViewController != self) {
+        NSLog(@"Not opening Quick Launch database as not at top of the Nav Stack");
+        return;
+    }
+    
+    if(!Settings.sharedInstance.quickLaunchUuid) {
+        NSLog(@"Not opening Quick Launch database as not configured");
+        return;
+    }
+    
+    SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        return [obj.uuid isEqualToString:Settings.sharedInstance.quickLaunchUuid];
+    }];
+    
+    if(!safe) {
+        NSLog(@"Not opening Quick Launch database as configured database not found");
+        return;
+    }
+    
+    [self openDatabase:safe offline:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
 }
 
 @end

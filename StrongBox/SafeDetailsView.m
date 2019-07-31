@@ -420,16 +420,7 @@
 }
 
 static NSString *getLastCachedDate(NSDate *modDate) {
-    if(!modDate) { return @""; }
-    
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.timeStyle = NSDateFormatterShortStyle;
-    df.dateStyle = NSDateFormatterShortStyle;
-    df.doesRelativeDateFormatting = YES;
-    df.locale = NSLocale.currentLocale;
-    
-    NSString *modDateStr = [df stringFromDate:modDate];
-    return [NSString stringWithFormat:@"(Cached %@)", modDateStr];
+    return modDate ? [NSString stringWithFormat:@"(Cached %@)", friendlyDateStringVeryShort(modDate)] : @"";
 }
 
 

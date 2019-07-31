@@ -28,7 +28,9 @@ static NSString* const kInstallDate = @"installDate";
 static NSString* const kDisallowBiometricId = @"disallowBiometricId";
 //static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes"; // Dead
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
-static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView";
+
+static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView"; // TODO: Retire / Remove - Dead
+
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
 static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
 static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
@@ -78,6 +80,15 @@ static NSString* cachedAppGroupName;
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
 static NSString* const kCoalesceAppLockAndQuickLaunchBiometricAuths = @"coalesceAppLockAndQuickLaunchBiometricAuths";
 static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
+static NSString* const kQuickLaunchUuid = @"quickLaunchUuid";
+static NSString* const kMigratedToNewQuickLaunchSystem = @"migratedToNewQuickLaunchSystem";
+
+static NSString* const kShowDatabaseIcon = @"showDatabaseIcon";
+static NSString* const kShowDatabaseStatusIcon = @"showDatabaseStatusIcon";
+static NSString* const kDatabaseCellTopSubtitle = @"databaseCellTopSubtitle";
+static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
+static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
+static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 @implementation Settings
 
@@ -96,6 +107,72 @@ static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)showDatabasesSeparator {
+    return [self getBool:kShowDatabasesSeparator];
+}
+
+- (void)setShowDatabasesSeparator:(BOOL)showDatabasesSeparator {
+    [self setBool:kShowDatabasesSeparator value:showDatabasesSeparator];
+}
+
+- (BOOL)showDatabaseIcon {
+    return [self getBool:kShowDatabaseIcon fallback:YES];
+}
+
+- (void)setShowDatabaseIcon:(BOOL)showDatabaseIcon {
+    [self setBool:kShowDatabaseIcon value:showDatabaseIcon];
+}
+
+- (BOOL)showDatabaseStatusIcon {
+    return [self getBool:kShowDatabaseStatusIcon fallback:YES];
+}
+
+- (void)setShowDatabaseStatusIcon:(BOOL)showDatabaseStatusIcon {
+    [self setBool:kShowDatabaseStatusIcon value:showDatabaseStatusIcon];
+}
+
+- (DatabaseCellSubtitleField)databaseCellTopSubtitle {
+    return[self getInteger:kDatabaseCellTopSubtitle fallback:kDatabaseCellSubtitleFieldNone];
+}
+
+- (void)setDatabaseCellTopSubtitle:(DatabaseCellSubtitleField)databaseCellTopSubtitle {
+    [self setInteger:kDatabaseCellTopSubtitle value:databaseCellTopSubtitle];
+}
+
+- (DatabaseCellSubtitleField)databaseCellSubtitle1 {
+    return[self getInteger:kDatabaseCellSubtitle1 fallback:kDatabaseCellSubtitleFieldStorage];
+}
+
+- (void)setDatabaseCellSubtitle1:(DatabaseCellSubtitleField)databaseCellSubtitle1 {
+    [self setInteger:kDatabaseCellSubtitle1 value:databaseCellSubtitle1];
+}
+
+- (DatabaseCellSubtitleField)databaseCellSubtitle2 {
+    return[self getInteger:kDatabaseCellSubtitle2 fallback:kDatabaseCellSubtitleFieldNone];
+}
+
+- (void)setDatabaseCellSubtitle2:(DatabaseCellSubtitleField)databaseCellSubtitle2 {
+    [self setInteger:kDatabaseCellSubtitle2 value:databaseCellSubtitle2];
+}
+
+//
+
+- (BOOL)migratedToNewQuickLaunchSystem {
+    return [self getBool:kMigratedToNewQuickLaunchSystem];
+}
+
+- (void)setMigratedToNewQuickLaunchSystem:(BOOL)migratedToNewQuickLaunchSystem {
+    [self setBool:kMigratedToNewQuickLaunchSystem value:migratedToNewQuickLaunchSystem];
+}
+
+- (NSString *)quickLaunchUuid {
+    return [self getString:kQuickLaunchUuid];
+}
+
+- (void)setQuickLaunchUuid:(NSString *)quickLaunchUuid {
+    [self setString:kQuickLaunchUuid value:quickLaunchUuid];
+}
 
 - (BOOL)useLocalSharedStorage {
     return [self getBool:kUseLocalSharedStorage fallback:YES];
@@ -203,6 +280,22 @@ static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
     return defaults;
 }
 
+- (NSString*)getString:(NSString*)key {
+    return [self getString:key fallback:nil];
+}
+
+- (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
+    NSString* obj = [[self getUserDefaults] objectForKey:key];
+    return obj != nil ? obj : fallback;
+}
+
+- (void)setString:(NSString*)key value:(NSString*)value {
+    [[self getUserDefaults] setObject:value forKey:key];
+    [[self getUserDefaults] synchronize];
+}
+
+//
+
 - (BOOL)getBool:(NSString*)key {
     return [self getBool:key fallback:NO];
 }
@@ -216,6 +309,8 @@ static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
     [[self getUserDefaults] setBool:value forKey:key];
     [[self getUserDefaults] synchronize];
 }
+
+//
 
 - (NSInteger)getInteger:(NSString*)key {
     return [[self getUserDefaults] integerForKey:key];

@@ -38,7 +38,7 @@
     NSURL* url = [self getOfflineCachePath:safeMetadata];
     
     if(![[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
-        NSLog(@"Offline cache file does NOT exist!");
+        //        NSLog(@"Offline cache file does NOT exist!");
         return nil;
     }
     

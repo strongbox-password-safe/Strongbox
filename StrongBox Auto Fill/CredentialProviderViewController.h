@@ -13,10 +13,6 @@
 API_AVAILABLE(ios(12.0))
 @interface CredentialProviderViewController : ASCredentialProviderViewController
 
-- (void)showQuickLaunchView;
-- (void)showSafesListView;
-- (SafeMetaData*)getPrimarySafe;
-
 - (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 

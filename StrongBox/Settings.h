@@ -15,6 +15,7 @@
 #import "BrowseSortField.h"
 #import "BrowseViewType.h"
 #import "PasswordGenerationConfig.h"
+#import "DatabaseCellSubtitleField.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -77,7 +78,7 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property (nonatomic) BOOL disallowAllPinCodeOpens;
 @property (nonatomic) BOOL disallowAllBiometricId;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
-@property (nonatomic) BOOL useQuickLaunchAsRootView;
+@property (nonatomic) BOOL useQuickLaunchAsRootView; // DEAD
 @property (nonatomic) BOOL showKeePassCreateSafeOptions;
 @property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
 @property (nonatomic) BOOL hasShownKeePassBetaWarning;
@@ -120,6 +121,16 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL showYubikeySecretWorkaroundField;
 @property BOOL coalesceAppLockAndQuickLaunchBiometricAuths;
 @property BOOL useLocalSharedStorage;
+
+@property (nullable) NSString* quickLaunchUuid;
+@property BOOL migratedToNewQuickLaunchSystem;
+
+@property BOOL showDatabaseIcon;
+@property BOOL showDatabasesSeparator;
+@property BOOL showDatabaseStatusIcon;
+@property DatabaseCellSubtitleField databaseCellTopSubtitle;
+@property DatabaseCellSubtitleField databaseCellSubtitle1;
+@property DatabaseCellSubtitleField databaseCellSubtitle2;
 
 NS_ASSUME_NONNULL_END
 

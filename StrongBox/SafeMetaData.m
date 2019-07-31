@@ -187,6 +187,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     [encoder encodeBool:self.hideTotp forKey:@"hideTotp"];
     [encoder encodeBool:self.tryDownloadFavIconForNewRecord forKey:@"tryDownloadFavIconForNewRecord"];
     [encoder encodeBool:self.showPasswordByDefaultOnEditScreen forKey:@"showPasswordByDefaultOnEditScreen"];
+    
+    //
+    
+    [encoder encodeBool:self.hasBeenPromptedForQuickLaunch forKey:@"hasBeenPromptedForQuickLaunch"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -317,6 +321,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         }
         if([decoder containsValueForKey:@"showPasswordByDefaultOnEditScreen"]) {
             self.showPasswordByDefaultOnEditScreen = [decoder decodeBoolForKey:@"showPasswordByDefaultOnEditScreen"];
+        }
+        
+        if([decoder containsValueForKey:@"hasBeenPromptedForQuickLaunch"]) {
+            self.hasBeenPromptedForQuickLaunch = [decoder decodeBoolForKey:@"hasBeenPromptedForQuickLaunch"];
         }
     }
     

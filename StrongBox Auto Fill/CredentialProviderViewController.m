@@ -10,7 +10,6 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "SafesListTableViewController.h"
-#import "QuickViewController.h"
 #import "Settings.h"
 #import "iCloudSafesCoordinator.h"
 #import "Alerts.h"
@@ -25,7 +24,6 @@
 
 @interface CredentialProviderViewController ()
 
-@property (nonatomic, strong) UINavigationController* quickLaunch;
 @property (nonatomic, strong) UINavigationController* safesList;
 @property (nonatomic, strong) NSArray<ASCredentialServiceIdentifier *> * serviceIdentifiers;
 
@@ -47,7 +45,9 @@
 
 -(void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"provideCredentialWithoutUserInteractionForIdentity: [%@]", credentialIdentity);
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserInteractionRequired userInfo:nil]];
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
+                                                                      code:ASExtensionErrorCodeUserInteractionRequired
+                                                                  userInfo:nil]];
 }
 
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
@@ -146,37 +146,14 @@
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
     
     self.safesList = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
-    self.quickLaunch = [mainStoryboard instantiateViewControllerWithIdentifier:@"QuickLaunchNavigationController"];
-    
     ((SafesListTableViewController*)(self.safesList.topViewController)).rootViewController = self;
-    ((QuickViewController*)(self.quickLaunch.topViewController)).rootViewController = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     if(!self.quickTypeMode) {
-        if(Settings.sharedInstance.useQuickLaunchAsRootView) {
-            [self showQuickLaunchView];
-        }
-        else {
-            [self showSafesListView];
-        }
-    }
-}
-
-- (void)showQuickLaunchView {
-    if(self.presentedViewController) {
-        [self dismissViewControllerAnimated:NO completion:nil];
-    }
-    
-    if(!self.quickLaunch) {
-        [Alerts warn:self title:@"Error" message:@"There was an error loading the Quick Launch View. Please mail support@strongboxsafe.com to inform the developer." completion:^{
-            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"There was an error loading the Quick Launch View" errorCode:-1]];
-        }];
-    }
-    else {
-        [self presentViewController:self.quickLaunch animated:NO completion:nil];
+        [self showSafesListView];
     }
 }
 
@@ -231,10 +208,6 @@
     return safeMetaData.autoFillCacheAvailable;
 }
 
-- (SafeMetaData*)getPrimarySafe {
-    return [SafesList.sharedInstance.snapshot firstObject];
-}
-
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers {
     return self.serviceIdentifiers;
 }
@@ -254,7 +227,14 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
     if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
         Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
         
-        [Alerts info:vc title:@"Welcome to Strongbox Auto Fill" message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:\n\n- Dropbox\n- OneDrive\n- Google Drive\n- Local Device\n\nIn these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy the Auto Fill extension!\n-Mark"];
+        [Alerts info:vc title:@"Welcome to Strongbox Auto Fill"
+             message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:" \
+         "\n\n- Dropbox"\
+         "\n- OneDrive"\
+         "\n- Google Drive"\
+         "\n- 'Files' based databases"\
+         "\n- Non Auto-Fill Enabled Local Databases\n\n"\
+         "In these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy Auto Fill!\n-Mark"];
     }
 }
 

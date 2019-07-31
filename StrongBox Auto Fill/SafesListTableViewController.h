@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SafesListTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonShowQuickView;
 @property (nonatomic) CredentialProviderViewController *rootViewController;
 
 @end
