@@ -133,9 +133,7 @@ suggestedFilename:nil
     }];
 }
 
-- (void)      read:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(NSData *data, NSError *error))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
     
@@ -170,9 +168,7 @@ suggestedFilename:nil
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData
-          data:(NSData *)data
-    completion:(void (^)(NSError *error))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileUrl];
     

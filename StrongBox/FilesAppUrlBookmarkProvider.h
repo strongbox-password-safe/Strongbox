@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData;
 
+- (BOOL)autoFillBookMarkIsSet:(SafeMetaData*)metadata;
+- (SafeMetaData*)setAutoFillBookmark:(NSData*)bookmark metadata:(SafeMetaData*)metadata;
+
 @end
 
 NS_ASSUME_NONNULL_END

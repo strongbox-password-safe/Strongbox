@@ -24,7 +24,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = @"Files App URL Bookmark";
+        _displayName = @"iOS Files";
         _icon = @"lock"; 
         _storageId = kFilesAppUrlBookmark;
         _allowOfflineCache = YES;
@@ -49,18 +49,7 @@
 }
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData {
-    NSString *base64 = [((NSData*)providerData)base64EncodedStringWithOptions:kNilOptions];
-    NSDictionary* dp = [NSDictionary dictionaryWithObjectsAndKeys:base64, @"bookMark", nil];
-    
-    NSError* error;
-    NSData* data = [NSJSONSerialization dataWithJSONObject:dp options:0 error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-        return nil;
-    }
-    
-    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSString* json = [self getJsonFileIdentifier:(NSData*)providerData autoFillBookmark:nil];
     
     return [[SafeMetaData alloc] initWithNickName:nickName
                                   storageProvider:self.storageId
@@ -80,14 +69,14 @@ viewController:(UIViewController *)viewController
     // NOTIMPL
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     //NSLog(@"READ! %@", safeMetaData);
     
     NSError *error;
-    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData ppError:&error];
+    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:isAutoFill ppError:&error];
     
     if(error || !url) {
-        NSLog(@"%@", error);
+        NSLog(@"Error or nil URL in Files App Provider: %@", error);
         completion(nil, error);
         return;
     }
@@ -112,12 +101,12 @@ viewController:(UIViewController *)viewController
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(NSError *))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSError *error;
-    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData ppError:&error];
+    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:isAutoFill ppError:&error];
     
     if(error || !url) {
-        NSLog(@"%@", error);
+        NSLog(@"Error or nil URL in Files App provider: [%@]", error);
         completion(error);
     }
     
@@ -143,7 +132,28 @@ viewController:(UIViewController *)viewController
     return nil;
 }
 
-- (NSData*)bookMarkFromMetadata:(SafeMetaData*)metadata {
+//
+
+- (NSString*)getJsonFileIdentifier:(NSData*)bookmark autoFillBookmark:(NSData*)autoFillBookmark {
+    NSString *base64 = [bookmark base64EncodedStringWithOptions:kNilOptions];
+    NSString *base64AutoFill = [autoFillBookmark base64EncodedStringWithOptions:kNilOptions];
+    
+    NSDictionary* dp = autoFillBookmark ? @{ @"bookMark" : base64, @"autoFillBookMark" : base64AutoFill } : @{  @"bookMark" : base64 };
+    
+    NSError* error;
+    NSData* data = [NSJSONSerialization dataWithJSONObject:dp options:0 error:&error];
+    
+    if(error) {
+        NSLog(@"%@", error);
+        return nil;
+    }
+    
+    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    return json;
+}
+
+- (NSData*)bookMarkFromMetadata:(SafeMetaData*)metadata isAutoFill:(BOOL)isAutoFill {
     NSData* data = [metadata.fileIdentifier dataUsingEncoding:NSUTF8StringEncoding];
     
     NSError *error;
@@ -153,13 +163,17 @@ viewController:(UIViewController *)viewController
         return nil;
     }
     
-    NSString* b64 = [dictionary objectForKey:@"bookMark"];
+    NSString* b64 = isAutoFill ? dictionary[@"autoFillBookMark"] : dictionary[@"bookMark"];
     
-    return [[NSData alloc] initWithBase64EncodedString:b64 options:kNilOptions];
+    return b64 ? [[NSData alloc] initWithBase64EncodedString:b64 options:kNilOptions] : nil;
 }
 
-- (NSURL*)filesAppUrlFromMetaData:(SafeMetaData*)safeMetaData ppError:(NSError**)ppError {
-    NSData* bookmarkData = [self bookMarkFromMetadata:safeMetaData];
+- (NSURL*)filesAppUrlFromMetaData:(SafeMetaData*)safeMetaData isAutoFill:(BOOL)isAutoFill ppError:(NSError**)ppError {
+    NSData* bookmarkData = [self bookMarkFromMetadata:safeMetaData isAutoFill:isAutoFill];
+    if(!bookmarkData) {
+        NSLog(@"Bookmark not found in metadata... possibly autofill initial read?");
+        return nil;
+    }
     
     NSError *error;
     BOOL bookmarkIsStale; // https://stackoverflow.com/questions/23954662/what-is-the-correct-way-to-handle-stale-nsurl-bookmarks
@@ -181,6 +195,21 @@ viewController:(UIViewController *)viewController
     }
     
     return url;
+}
+
+- (BOOL)autoFillBookMarkIsSet:(SafeMetaData*)metadata {
+    NSError* error;
+    return [self filesAppUrlFromMetaData:metadata isAutoFill:YES ppError:&error] != nil;
+}
+
+- (SafeMetaData*)setAutoFillBookmark:(NSData *)bookmark metadata:(SafeMetaData *)metadata {
+    NSData* originalBookmark = [self bookMarkFromMetadata:metadata isAutoFill:NO];
+    
+    NSString* fileIdentifier = [self getJsonFileIdentifier:originalBookmark autoFillBookmark:bookmark];
+    
+    metadata.fileIdentifier = fileIdentifier;
+    
+    return metadata;
 }
 
 @end

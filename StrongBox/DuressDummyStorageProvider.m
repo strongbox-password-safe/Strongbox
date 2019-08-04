@@ -70,7 +70,10 @@
     // NOTIMPL
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completion {
+- (void)read:(SafeMetaData *)safeMetaData
+viewController:(UIViewController *)viewController
+  isAutoFill:(BOOL)isAutoFill
+  completion:(void (^)(NSData * _Nonnull, NSError * _Nonnull))completion {
     return [self readWithProviderData:nil viewController:viewController completion:completion];
 }
 
@@ -78,7 +81,7 @@
     completionHandler([self getData], nil);
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(NSError *))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     [self setData:data];
     completion(nil);
 }

@@ -21,6 +21,9 @@
 #import "DatabaseCell.h"
 #import "Utils.h"
 #import "LocalDeviceStorageProvider.h"
+#import "FilesAppUrlBookmarkProvider.h"
+#import "Alerts.h"
+#import "StrongboxUIDocument.h"
 
 @interface SafesListTableViewController ()
 
@@ -40,7 +43,8 @@
     self.tableView.emptyDataSetDelegate = self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
-
+    self.tableView.tableFooterView = [UIView new];
+    
     [SVProgressHUD setViewForExtension:self.view];
     
     if(Settings.sharedInstance.quickLaunchUuid) {
@@ -199,7 +203,6 @@
      disabled:disabled];
 }
 
-
 - (NSString*)getDatabaseCellSubtitleField:(SafeMetaData*)database field:(DatabaseCellSubtitleField)field {
     switch (field) {
         case kDatabaseCellSubtitleFieldNone:
@@ -231,7 +234,6 @@
         if(database.storageProvider == kLocalDevice) {
             providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ? @"Local" : @"Local (Documents)";
         }
-        
     }
     
     return providerString;
@@ -245,6 +247,8 @@
     SafeMetaData* safe = [self.safes objectAtIndex:indexPath.row];
     
     [self openDatabase:safe];
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)openDatabase:(SafeMetaData*)safe {

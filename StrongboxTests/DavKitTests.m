@@ -70,7 +70,7 @@ static WebDAVStorageProvider* getSession() {
         parentFolder:nil
       viewController:nil
           completion:^(SafeMetaData *metadata, NSError *error) {
-        [provider update:metadata data:[@"Another test...." dataUsingEncoding:NSUTF8StringEncoding] completion:^(NSError *error) {
+        [provider update:metadata data:[@"Another test...." dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
             NSLog(@"Update: %@", error);
             self.done = YES;
         }];
@@ -92,7 +92,7 @@ static WebDAVStorageProvider* getSession() {
               XCTAssertNotNil(metadata);
               
               if(metadata) {
-                  [provider read:metadata viewController:nil completion:^(NSData *data, NSError *error) {
+                  [provider read:metadata viewController:nil isAutoFill:NO completion:^(NSData *data, NSError *error) {
                       NSLog(@"Read: %@ - Error: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], error);
                       self.done = YES;
                   }];

@@ -25,12 +25,15 @@
 #import "FileManager.h"
 #import "CacheManager.h"
 #import "LocalDeviceStorageProvider.h"
+#import "FilesAppUrlBookmarkProvider.h"
+#import "StrongboxUIDocument.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
 #endif
 
-@interface OpenSafeSequenceHelper ()
+@interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate>
 
 @property (nonatomic, strong) NSString* biometricIdName;
 @property (nonnull) UIViewController* viewController;
@@ -49,6 +52,8 @@
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
 @property NSString* yubikeySecret;
 @property BOOL biometricPreCleared; // App Lock has just authorized the user via Bio - No need to ask again
+
+@property UIDocumentPickerViewController *documentPicker;
 
 @end
 
@@ -103,7 +108,7 @@
                                                                         biometricPreCleared:biometricAuthenticationDone
                                                                                  completion:completion];
     
-    [helper beginSequence];
+    [helper beginSequenceWithAutoFillFilesCheck];
 }
 
 - (instancetype)initWithViewController:(UIViewController*)viewController
@@ -130,7 +135,30 @@
     return self;
 }
 
-- (void)beginSequence {
+- (void)beginSequenceWithAutoFillFilesCheck {
+    if(self.isAutoFillOpen && self.safe.storageProvider == kFilesAppUrlBookmark) {
+        // Special case - We can support the Files app provider in Auto Fill but we need to ask the
+        // user to actively re-select the database via UIDocumentPicjer :(
+        //
+        // Sucks but it's only a one time deal so do it...
+        
+        FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
+        
+        if(![fp autoFillBookMarkIsSet:self.safe]) {
+            [Alerts info:self.viewController
+                   title:@"Database File Select Required"
+                 message:@"For technical reasons, you need to re-select your database file to enable Auto Fill. You will only need to do this once.\n\nThanks!\n-Mark"
+              completion:^{
+                  [self promptForAutofillBookmarkSelect];
+              }];
+            return;
+        }
+    }
+    
+    [self beginSeq];
+}
+
+- (void)beginSeq {
     if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
         BOOL biometricAllowed = !Settings.sharedInstance.disallowAllBiometricId;
@@ -509,7 +537,10 @@
             [self openWithOfflineCacheFile:message];
         }
         else {
-            [provider read:self.safe viewController:self.viewController completion:^(NSData *data, NSError *error) {
+            [provider read:self.safe
+            viewController:self.viewController
+                isAutoFill:self.isAutoFillOpen
+                completion:^(NSData *data, NSError *error) {
                 [self onProviderReadDone:provider data:data error:error cacheMode:NO];
              }];
         }
@@ -681,45 +712,46 @@
         // using the Yubikey secret workaround
         
         openedSafe.compositeKeyFactors.yubiKeyResponse = nil; // TODO: Eventually allow this when we allow writeable yubikey dbs
+
+        BOOL biometricPossible = Settings.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
+        BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
+
+        BOOL conveniencePossible = self.canConvenienceEnrol && !cacheMode && [Settings.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);
+        BOOL convenienceNotYetPrompted = !self.safe.hasBeenPromptedForConvenience;
         
-        if (!self.canConvenienceEnrol ||
-            cacheMode ||
-            self.safe.isEnrolledForConvenience ||
-            ![[Settings sharedInstance] isProOrFreeTrial] ||
-            self.safe.hasBeenPromptedForConvenience) {
-            // Can't or shouldn't Convenience Enrol...
-            
-            if(Settings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
-                [Alerts yesNo:self.viewController
-                        title:@"Set Quick Launch?"
-                      message:NSLocalizedString(@"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click.", @"Ask use if they would like to use database for quick launch")
-                       action:^(BOOL response) {
-                    if(response) {
-                        Settings.sharedInstance.quickLaunchUuid = self.safe.uuid;
-                    }
-                    
-                    self.safe.hasBeenPromptedForQuickLaunch = YES;
-                    [SafesList.sharedInstance update:self.safe];
-                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-                }];
-            }
-            else {
-                [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-            }
+        BOOL quickLaunchPossible = !self.isAutoFillOpen && Settings.sharedInstance.quickLaunchUuid == nil;
+        BOOL quickLaunchNotYetPrompted = !self.safe.hasBeenPromptedForQuickLaunch;
+        
+        if (conveniencePossible && convenienceNotYetPrompted) {
+             [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible openedSafe:openedSafe cacheMode:cacheMode provider:provider data:data];
+        }
+        else if (quickLaunchPossible && quickLaunchNotYetPrompted) {
+             [self promptForQuickLaunch:openedSafe cacheMode:cacheMode provider:provider data:data];
         }
         else {
-            BOOL biometricPossible = Settings.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
-            BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
-            
-            if (!biometricPossible && !pinPossible) {
-                // Can enrol but no methods possible
-                [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
-            }
-            else {
-                // Convenience Enrol!
-                [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible openedSafe:openedSafe cacheMode:cacheMode provider:provider data:data];
-            }
+            [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
         }
+    }
+}
+
+- (void)promptForQuickLaunch:(DatabaseModel*)openedSafe
+                   cacheMode:(BOOL)cacheMode
+                    provider:(id)provider
+                        data:(NSData *)data {
+    if(!self.isAutoFillOpen && Settings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
+        [Alerts yesNo:self.viewController
+                title:@"Set Quick Launch?"
+         // TODO: Start here for localization
+              message:NSLocalizedString(@"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click.", @"Ask use if they would like to use database for quick launch")
+               action:^(BOOL response) {
+                   if(response) {
+                       Settings.sharedInstance.quickLaunchUuid = self.safe.uuid;
+                   }
+                   
+                   self.safe.hasBeenPromptedForQuickLaunch = YES;
+                   [SafesList.sharedInstance update:self.safe];
+                   [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
+               }];
     }
 }
 
@@ -930,6 +962,99 @@ BOOL providerCanFallbackToOfflineCache(id<SafeStorageProvider> provider, SafeMet
     }
     
     return NO;
+}
+
+//////////
+
+static OpenSafeSequenceHelper *sharedInstance = nil;
+
+- (void)promptForAutofillBookmarkSelect {
+    self.documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
+    self.documentPicker.delegate = self;
+    self.documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    
+    // Some Voodoo to keep this instance around otherwise the delegate never gets called... Only
+    // done in Auto Fill context but it would be nice to find a better way to do this?
+    
+    sharedInstance = self;
+    
+    [self.viewController presentViewController:self.documentPicker animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    NSLog(@"AutoFill: didPickDocumentsAtURLs: %@", urls);
+    
+    NSURL* url = [urls objectAtIndex:0];
+    
+    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    [document openWithCompletionHandler:^(BOOL success) {
+        NSData* data = document.data;
+        
+        [document closeWithCompletionHandler:nil];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self readReselectedFilesDatabase:success data:data url:url];
+        });
+    }];
+}
+
+- (void)readReselectedFilesDatabase:(BOOL)success data:(NSData*)data url:(NSURL*)url {
+    if(!success || !data) {
+        [Alerts warn:self.viewController title:@"Error Opening This Database" message:@"Could not access this file."];
+    }
+    else {
+        NSError* error;
+        
+        if (![DatabaseModel isAValidSafe:data error:&error]) {
+            [Alerts error:self.viewController
+                    title:[NSString stringWithFormat:@"Invalid Database - [%@]", url.lastPathComponent]
+                    error:error];
+            return;
+        }
+        
+        if(![url.lastPathComponent isEqualToString:self.safe.fileName]) {
+            [Alerts yesNo:self.viewController title:@"Different Filename"
+                  message:@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?"
+                   action:^(BOOL response) {
+                       if(response) {
+                           [self setAutoFillBookmark:url];
+                       }
+                   }];
+        }
+        else {
+            [self setAutoFillBookmark:url];
+        }
+    }
+}
+
+- (void)setAutoFillBookmark:(NSURL*)url {
+    NSError* error;
+    
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
+    if (!securitySucceeded) {
+        NSLog(@"Could not access secure scoped resource!");
+        return;
+    }
+    
+    NSURLBookmarkCreationOptions options = 0;
+    NSData* bookMark = [url bookmarkDataWithOptions:options includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
+    
+    [url stopAccessingSecurityScopedResource];
+    
+    if (error) {
+        [Alerts error:self.viewController title:@"Could not bookmark this file" error:error];
+        return;
+    }
+    
+    NSLog(@"Setting Auto Fill Bookmark: %@", bookMark);
+    
+    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
+    
+    self.safe = [fp setAutoFillBookmark:bookMark metadata:self.safe];
+    [SafesList.sharedInstance update:self.safe];
+    
+    [self beginSeq];
 }
 
 @end

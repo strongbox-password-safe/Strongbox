@@ -1212,7 +1212,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)sync:(void (^)(NSError *))completion {
-    [self.viewModel update:^(NSError *error) {
+    [self.viewModel update:NO handler:^(NSError *error) {
         if(!error) {
             self.editingNewRecord = NO;
             self.userSelectedNewCustomIcon = nil;

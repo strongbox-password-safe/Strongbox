@@ -256,8 +256,7 @@ viewController:(UIViewController *)viewController
     [session enqueueRequest:listingRequest];
 }
         
-
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nonnull, NSError * _Nonnull))completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self readWithProviderData:providerData viewController:viewController completion:completion];
 }
@@ -294,7 +293,7 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(NSError *))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
     [self connect:providerData.sessionConfiguration viewController:nil completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {

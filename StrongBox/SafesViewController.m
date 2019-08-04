@@ -537,7 +537,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-         
+    
+    // Clear Quick Launch if it was set...
+    if([Settings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
+        Settings.sharedInstance.quickLaunchUuid = nil;
+    }
+    
     [[SafesList sharedInstance] remove:safe.uuid];
 }
 
@@ -720,7 +725,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else if (params.method == kStorageMethodFilesAppUrl) {
         [self dismissViewControllerAnimated:YES completion:^{
             NSLog(@"Files App: [%@]", params.url);
-            [[self getInitialViewController] import:params.url canOpenInPlace:YES];
+            [[self getInitialViewController] import:params.url canOpenInPlace:YES forceOpenInPlace:YES];
         }];
     }
     else if (params.method == kStorageMethodManualUrlDownloadedData || params.method == kStorageMethodNativeStorageProvider) {
@@ -1067,7 +1072,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     
     if(!Settings.sharedInstance.quickLaunchUuid) {
-        NSLog(@"Not opening Quick Launch database as not configured");
+        // NSLog(@"Not opening Quick Launch database as not configured");
         return;
     }
     

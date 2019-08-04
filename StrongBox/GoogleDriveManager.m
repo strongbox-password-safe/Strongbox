@@ -100,13 +100,14 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     else {
         self.driveService.authorizer = user.authentication.fetcherAuthorizer;
     }
+    
+    Settings.sharedInstance.suppressPrivacyScreen = NO;
 
     if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
         return; // Do not call completion if this is a silenet sign and there is no Auth in Key...
     }
     
     if (authenticationcompletion) {
-        Settings.sharedInstance.suppressPrivacyScreen = NO;
         //NSLog(@"Google Callback: %@", authenticationcompletion);
         authenticationcompletion(error.code == kGIDSignInErrorCodeCanceled, error);
         authenticationcompletion = nil;

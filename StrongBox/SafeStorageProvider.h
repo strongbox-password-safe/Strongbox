@@ -33,11 +33,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)      read:(SafeMetaData *)safeMetaData
     viewController:(UIViewController *)viewController
-        completion:(void (^)(NSData *data, NSError *error))completion;
+        isAutoFill:(BOOL)isAutoFill
+        completion:(void (^)(NSData *_Nullable data, NSError *_Nullable error))completion;
 
 - (void)update:(SafeMetaData *)safeMetaData
           data:(NSData *)data
-    completion:(void (^)(NSError *error))completion;
+    isAutoFill:(BOOL)isAutoFill
+    completion:(void (^)(NSError *_Nullable error))completion;
 
 - (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *_Nullable error))completion;
 

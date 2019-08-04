@@ -79,12 +79,12 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="196" y="240" width="488" height="802"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
-            <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="488" height="779"/>
+            <view key="contentView" wantsLayer="YES" misplaced="YES" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="488" height="802"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="465" height="739"/>
+                        <rect key="frame" x="13" y="26" width="465" height="372"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="yNg-sv-E7G">
@@ -103,7 +103,7 @@
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pxT-nk-uUw">
-                                            <rect key="frame" x="286" y="155" width="56" height="17"/>
+                                            <rect key="frame" x="303" y="155" width="56" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="1oQ-mP-YWU">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -131,9 +131,9 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wsV-1v-9l4">
-                                            <rect key="frame" x="216" y="152" width="43" height="22"/>
+                                            <rect key="frame" x="216" y="152" width="60" height="22"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="43" id="7cT-Z8-M0h"/>
+                                                <constraint firstAttribute="width" constant="60" id="7cT-Z8-M0h"/>
                                             </constraints>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="60" drawsBackground="YES" id="7yu-Zp-WLO">
                                                 <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="t74-5E-775"/>
@@ -156,14 +156,14 @@
                                             </connections>
                                         </button>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XkJ-k9-VXm">
-                                            <rect key="frame" x="264" y="150" width="19" height="27"/>
+                                            <rect key="frame" x="281" y="150" width="19" height="27"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" minValue="15" maxValue="1200" doubleValue="60" id="dVG-hS-h7r"/>
                                             <connections>
                                                 <action selector="onStepperClearClipboard:" target="-2" id="0Zl-NP-05u"/>
                                             </connections>
                                         </stepper>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a59-6L-N1P">
-                                            <rect key="frame" x="286" y="121" width="56" height="17"/>
+                                            <rect key="frame" x="303" y="121" width="56" height="17"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="OGE-ad-bBB">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -171,9 +171,9 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1QM-ew-ATR">
-                                            <rect key="frame" x="216" y="118" width="43" height="22"/>
+                                            <rect key="frame" x="216" y="118" width="60" height="22"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="43" id="Af3-jU-4XG"/>
+                                                <constraint firstAttribute="width" constant="60" id="Af3-jU-4XG"/>
                                             </constraints>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="60" drawsBackground="YES" id="GkR-xY-LgF">
                                                 <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="NGb-U7-Vnn"/>
@@ -196,8 +196,8 @@
                                             </connections>
                                         </button>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="M1Y-fH-3um">
-                                            <rect key="frame" x="264" y="116" width="19" height="27"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="1200" doubleValue="60" id="X6T-6m-hcs"/>
+                                            <rect key="frame" x="281" y="116" width="19" height="27"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="43200" doubleValue="60" id="X6T-6m-hcs"/>
                                             <connections>
                                                 <action selector="onStepperAutoLockDatabase:" target="-2" id="xQB-Ze-5v6"/>
                                             </connections>

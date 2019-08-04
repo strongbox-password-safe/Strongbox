@@ -51,7 +51,7 @@
     return _isReadOnly;
 }
 
-- (void)update:(void (^)(NSError *error))handler {
+- (void)update:(BOOL)isAutoFill handler:(void (^)(NSError * _Nullable))handler {
     if (!_cacheMode && !_isReadOnly) {
         [self encrypt:^(NSData * _Nullable updatedSafeData, NSError * _Nullable error) {
             if (updatedSafeData == nil) {
@@ -60,8 +60,9 @@
             }
 
             [self->_storageProvider update:self.metadata
-                                data:updatedSafeData
-                          completion:^(NSError *error) {
+                                      data:updatedSafeData
+                                isAutoFill:isAutoFill
+                                completion:^(NSError *error) {
                               if(!error) {
                                   [self updateOfflineCacheWithData:updatedSafeData];
                                   [self updateAutoFillCacheWithData:updatedSafeData];

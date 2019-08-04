@@ -645,6 +645,8 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
     [localAuthContext evaluatePolicy:fallbackTitle ? LAPolicyDeviceOwnerAuthenticationWithBiometrics : LAPolicyDeviceOwnerAuthentication
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
+                                   self.suppressPrivacyScreen = NO;
+
                                    if(!success) {
                                        NSLog(@"requestBiometricId: NO -> ");
                                        [Settings logBiometricError:error];
@@ -653,8 +655,6 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
                                        NSLog(@"REQUEST-BIOMETRIC DONE SUCCESS");
                                    }
                                    completion(success, error);
-                                   
-                                   self.suppressPrivacyScreen = NO;
                                }];
 }
 

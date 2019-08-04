@@ -59,7 +59,7 @@
     
         XCTAssertNil(error);
         
-        [[self getSftp] update:metadata data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding]  completion:^(NSError *error) {
+        [[self getSftp] update:metadata data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
             NSLog(@"Done. Error = [%@]", error);
         }];
     }];
@@ -70,7 +70,7 @@
         NSLog(@"%@ [Error: %@]", metadata, error);
         
         XCTAssertNil(error);
-        [[self getSftp] read:metadata viewController:nil completion:^(NSData *data, NSError *error) {
+        [[self getSftp] read:metadata viewController:nil isAutoFill:NO completion:^(NSData *data, NSError *error) {
             NSLog(@"Got Data: %@ [Error: %@]", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], error);
         }];
     }];

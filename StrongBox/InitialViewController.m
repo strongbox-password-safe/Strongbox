@@ -395,10 +395,10 @@
     NSURL* copy = self.enqueuedImportUrl;
     self.enqueuedImportUrl = nil;
     
-    [self import:copy canOpenInPlace:self.enqueuedImportCanOpenInPlace];
+    [self import:copy canOpenInPlace:self.enqueuedImportCanOpenInPlace forceOpenInPlace:NO];
 }
 
-- (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
+- (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     [document openWithCompletionHandler:^(BOOL success) {
         NSData* data = document.data;
@@ -410,11 +410,11 @@
         // new copy or just update an old one...
         [FileManager.sharedInstance deleteAllInboxItems];
 
-        [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace];
+        [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace];
     }];
 }
 
-- (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
+- (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
     if(!success || !data) {
         [Alerts warn:self title:@"Error Opening" message:@"Could not access this file."];
     }
@@ -423,7 +423,7 @@
             [self importKey:data url:url];
         }
         else {
-            [self importSafe:data url:url canOpenInPlace:canOpenInPlace];
+            [self importSafe:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace];
         }
     }
 }
@@ -443,7 +443,7 @@
     }
 }
 
--(void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace {
+-(void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
     NSError* error;
     
     if (![DatabaseModel isAValidSafe:data error:&error]) {
@@ -454,17 +454,22 @@
     }
     
     if(canOpenInPlace) {
-        [Alerts threeOptions:self
-                       title:@"Edit or Copy?"
-                     message:@"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?"
-           defaultButtonText:@"Edit in Place"
-            secondButtonText:@"Make a Copy"
-             thirdButtonText:@"Cancel"
-                      action:^(int response) {
-                          if(response != 2) {
-                              [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0];
-                          }
-                      }];
+        if(forceOpenInPlace) {
+            [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:YES];
+        }
+        else {
+            [Alerts threeOptions:self
+                           title:@"Edit or Copy?"
+                         message:@"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?"
+               defaultButtonText:@"Edit in Place"
+                secondButtonText:@"Make a Copy"
+                 thirdButtonText:@"Cancel"
+                          action:^(int response) {
+                              if(response != 2) {
+                                  [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0];
+                              }
+                          }];
+        }
     }
     else {
         [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:NO];
@@ -627,6 +632,7 @@
     
     if (error) {
         [Alerts error:self title:@"Could not bookmark this file" error:error];
+        return;
     }
     
     NSString* filename = [url lastPathComponent];

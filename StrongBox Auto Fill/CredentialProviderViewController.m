@@ -173,7 +173,10 @@
 }
 
 - (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider {
-    return storageProvider == kiCloud || storageProvider == kWebDAV || storageProvider == kSFTP;
+    return  storageProvider == kFilesAppUrlBookmark ||
+            storageProvider == kiCloud ||
+            storageProvider == kWebDAV ||
+            storageProvider == kSFTP;
 }
 
 - (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {

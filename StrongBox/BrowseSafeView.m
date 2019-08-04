@@ -83,9 +83,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     if(!self.hasAlreadyAppeared && self.viewModel.metadata.immediateSearchOnBrowse && self.currentGroup == self.viewModel.database.rootGroup) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if ([[Settings sharedInstance] isProOrFreeTrial]) {
-                [self.searchController.searchBar becomeFirstResponder];
-            }
+            [self.searchController.searchBar becomeFirstResponder];
         });
     }
     else {
@@ -189,22 +187,15 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (void)addSearchBarToNav {
-    if ([[Settings sharedInstance] isProOrFreeTrial]) {
-        if (@available(iOS 11.0, *)) {
-            self.navigationItem.searchController = self.searchController;
-            
-            // We want the search bar visible immediately for Root
-            
-            self.navigationItem.hidesSearchBarWhenScrolling = self.currentGroup != self.viewModel.database.rootGroup;
-        } else {
-            self.tableView.tableHeaderView = self.searchController.searchBar;
-            [self.searchController.searchBar sizeToFit];
-        }
-    }
-    else {
-        if (@available(iOS 11.0, *)) {
-            self.navigationItem.searchController = nil;
-        }
+    if (@available(iOS 11.0, *)) {
+        self.navigationItem.searchController = self.searchController;
+        
+        // We want the search bar visible immediately for Root
+        
+        self.navigationItem.hidesSearchBarWhenScrolling = self.currentGroup != self.viewModel.database.rootGroup;
+    } else {
+        self.tableView.tableHeaderView = self.searchController.searchBar;
+        [self.searchController.searchBar sizeToFit];
     }
 }
 
@@ -820,7 +811,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 - (void)saveChangesToSafeAndRefreshView {
     [self refreshItems];
     
-    [self.viewModel update:^(NSError *error) {
+    [self.viewModel update:NO handler:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self setEditing:NO animated:YES];
             

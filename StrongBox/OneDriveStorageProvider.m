@@ -137,9 +137,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
 }
 
-- (void)      read:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(NSData *data, NSError *error))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
         [self authWrapperWithCompletion:^(NSError *error) {
             if(error) {
                 completion(nil, error);
@@ -220,9 +218,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData
-          data:(NSData *)data
-    completion:(void (^)(NSError *error))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
             completion(error);

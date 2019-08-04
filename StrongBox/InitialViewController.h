@@ -20,7 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Must be done after Privacy/Lock Screen is down, so we queue it up and execute on viewDidAppear or onPrivacyDismissed
 
 - (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace;
-- (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace;
+
+- (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace;
 
 - (void)appResignActive;
 - (void)appBecameActive;

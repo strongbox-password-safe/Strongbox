@@ -131,7 +131,7 @@
     return ret;
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *error))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSURL *url = [self getFileUrl:safeMetaData];
 
     NSLog(@"Local Reading at: %@", url);
@@ -141,9 +141,7 @@
     completion(data, nil);
 }
 
-- (void)update:(SafeMetaData *)safeMetaData
-          data:(NSData *)data
-    completion:(void (^)(NSError *error))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSURL* url = [self getFileUrl:safeMetaData];
 
     [data writeToFile:url.path atomically:YES];

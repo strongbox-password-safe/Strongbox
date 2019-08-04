@@ -174,7 +174,7 @@
 
     self.viewModel.database.compositeKeyFactors.password = password;
     
-    [self.viewModel update:^(NSError *error) {
+    [self.viewModel update:NO handler:^(NSError *error) {
         if (error == nil) {
             if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
                 self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;

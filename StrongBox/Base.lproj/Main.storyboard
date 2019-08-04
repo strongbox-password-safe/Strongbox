@@ -192,14 +192,14 @@
                                                             <color key="textColor" red="0.0" green="0.54117647059999996" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="🔢 PIN Codes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EUM-9Y-lcs">
-                                                            <rect key="frame" x="0.0" y="207.33333333333334" width="104" height="21"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="🗝 Touch ID" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EUM-9Y-lcs">
+                                                            <rect key="frame" x="0.0" y="207.33333333333334" width="89.666666666666671" height="21"/>
                                                             <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                             <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="🔍 Search" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PrB-RC-Xrj">
-                                                            <rect key="frame" x="0.0" y="240.33333333333334" width="77" height="21.000000000000028"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="🔢 PIN Codes" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PrB-RC-Xrj">
+                                                            <rect key="frame" x="0.0" y="240.33333333333334" width="103.66666666666667" height="21.000000000000028"/>
                                                             <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                             <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
@@ -270,7 +270,7 @@
                                                                 <constraint firstAttribute="height" constant="24" id="pKm-Z8-Bly"/>
                                                             </constraints>
                                                         </imageView>
-                                                        <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="red-cross-24" translatesAutoresizingMaskIntoConstraints="NO" id="PJQ-1M-x6r" userLabel="Clear">
+                                                        <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="green-check-24" translatesAutoresizingMaskIntoConstraints="NO" id="PJQ-1M-x6r" userLabel="Clear">
                                                             <rect key="frame" x="281" y="172.66666666666666" width="24" height="24"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="24" id="BYR-oS-itW"/>
@@ -337,8 +337,8 @@
                                                             <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="🗝 Touch ID" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7LV-RY-Anr">
-                                                            <rect key="frame" x="0.0" y="174.33333333333334" width="89.666666666666671" height="21"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="🔍 Search" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7LV-RY-Anr">
+                                                            <rect key="frame" x="0.0" y="174.33333333333334" width="76.666666666666671" height="21"/>
                                                             <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                                             <color key="textColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
@@ -757,7 +757,7 @@ Cg
                         <outlet property="buttonNope" destination="dwk-7l-n8f" id="N2e-l2-Aoh"/>
                         <outlet property="buttonRestorePrevious" destination="Zza-jJ-p2b" id="Xjr-HR-P3K"/>
                         <outlet property="buttonYearly" destination="MVG-7Q-Ejm" id="l9a-L3-b91"/>
-                        <outlet property="labelBiometricIdFeature" destination="7LV-RY-Anr" id="LA5-Ug-bWD"/>
+                        <outlet property="labelBiometricIdFeature" destination="EUM-9Y-lcs" id="067-nW-nnB"/>
                         <outlet property="labelDevMessage" destination="H08-Ci-qfi" id="TKK-W2-vZq"/>
                     </connections>
                 </tableViewController>

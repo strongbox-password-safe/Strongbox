@@ -82,7 +82,7 @@
         }
     }
 
-    [self.viewModel update:^(NSError *error) {
+    [self.viewModel update:NO handler:^(NSError *error) {
         if (error) {
             [Alerts error:self title:@"Error Saving" error:error];
         }

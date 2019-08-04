@@ -77,9 +77,7 @@
               }];
 }
 
-- (void)      read:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(NSData *data, NSError *error))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSString *path = [NSString pathWithComponents:
                       @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
     [self performTaskWithAuthorizationIfNecessary:viewController
@@ -129,9 +127,7 @@
      }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData
-          data:(NSData *)data
-    completion:(void (^)(NSError *error))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSString *path = [NSString pathWithComponents:
                       @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
 

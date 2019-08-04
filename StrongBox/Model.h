@@ -32,7 +32,7 @@
                    cacheMode:(BOOL)usingOfflineCache
                           isReadOnly:(BOOL)isReadOnly NS_DESIGNATED_INITIALIZER;
 
-- (void)update:(void (^_Nonnull)(NSError * _Nullable error))handler;
+- (void)update:(BOOL)isAutoFill handler:(void (^_Nonnull)(NSError * _Nullable error))handler;
 
 // Offline Cache Stuff
 

@@ -82,6 +82,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 @property BOOL passwordConcealedInUi;
 @property UIBarButtonItem* cancelOrDiscardBarButton;
 @property UIView* coverView;
+@property BOOL isAutoFillContext;
 
 #ifndef IS_APP_EXTENSION
 @property SetNodeIconUiHelper* sni;
@@ -143,6 +144,12 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+#ifndef IS_APP_EXTENSION
+    self.isAutoFillContext = NO;
+#else
+    self.isAutoFillContext = YES;
+#endif
+
     NSMutableArray* rightBarButtons = self.navigationItem.rightBarButtonItems ?  self.navigationItem.rightBarButtonItems.mutableCopy : @[].mutableCopy;
     
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
@@ -1116,7 +1123,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
     // Sync
     
-    [self.databaseModel update:^(NSError *error) {
+    [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
         if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
@@ -1147,7 +1154,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     // Sync
     
-    [self.databaseModel update:^(NSError *error) {
+    [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
         if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
@@ -1171,7 +1178,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     [self performFullReload];
     
-    [self.databaseModel update:^(NSError *error) {
+    [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(error);
             if(self.onChanged) {
@@ -1440,7 +1447,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     NSLog(@"SAVE: Processing Icon for Save...");
     [self processIconBeforeSave:^{ // This is behind a completion because we might go out and download the FavIcon which is async...
         NSLog(@"SAVE: Icon processed for Save...");
-        [self.databaseModel update:^(NSError *error) {
+        [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
             NSLog(@"SAVE: Storage Provider Update Done [%@]...", error);
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self onSaveChangesDone:error];

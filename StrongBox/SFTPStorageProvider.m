@@ -156,7 +156,7 @@ viewController:(UIViewController *)viewController
     completion(NO, browserItems, nil);
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completion {
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self readWithProviderData:providerData viewController:viewController completion:completion];
 }
@@ -192,7 +192,7 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data completion:(void (^)(NSError *))completion {
+- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self connectAndAuthenticate:providerData.sFtpConfiguration
                   viewController:nil
@@ -214,6 +214,7 @@ viewController:(UIViewController *)viewController
         completion(nil);
     }];
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
