@@ -36,7 +36,8 @@
             } error:&error];
             
             if(error) {
-                [Alerts error:self title:@"Error while scanning" error:error completion:^{
+                [Alerts error:self
+                        title:@"Error while scanning" error:error completion:^{
                     self.onDone(NO, @"");
                 }];
             }

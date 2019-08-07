@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Databases [Lite Version]-->
+        <!--Databases-->
         <scene sceneID="JvJ-3L-1tN">
             <objects>
                 <tableViewController storyboardIdentifier="SafesListViewController" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="9DM-GO-ZGc" customClass="SafesViewController" sceneMemberID="viewController">
@@ -43,21 +43,14 @@
                         </barButtonItem>
                         <barButtonItem systemItem="flexibleSpace" id="CQO-OD-ZxO"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="Databases [Lite Version]" id="g1g-nh-a5L">
-                        <leftBarButtonItems>
-                            <barButtonItem title="Edit" id="aVS-fM-gwN">
-                                <connections>
-                                    <action selector="onToggleEdit:" destination="9DM-GO-ZGc" id="tWT-4w-N2j"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem title="View Preferences" image="list" id="dSc-vA-VSJ">
-                                <connections>
-                                    <segue destination="hCY-hw-h3Q" kind="popoverPresentation" identifier="segueToDatabasesViewPreferences" popoverAnchorBarButtonItem="dSc-vA-VSJ" id="WAU-BN-tP9">
-                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                    </segue>
-                                </connections>
-                            </barButtonItem>
-                        </leftBarButtonItems>
+                    <navigationItem key="navigationItem" title="Databases" id="g1g-nh-a5L">
+                        <barButtonItem key="leftBarButtonItem" title="View Preferences" image="list" id="dSc-vA-VSJ">
+                            <connections>
+                                <segue destination="hCY-hw-h3Q" kind="popoverPresentation" identifier="segueToDatabasesViewPreferences" popoverAnchorBarButtonItem="dSc-vA-VSJ" id="WAU-BN-tP9">
+                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                </segue>
+                            </connections>
+                        </barButtonItem>
                         <rightBarButtonItems>
                             <barButtonItem systemItem="add" id="zN1-I2-XSj">
                                 <connections>
@@ -74,7 +67,6 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="buttonAddSafe" destination="zN1-I2-XSj" id="SD8-XN-MaW"/>
-                        <outlet property="buttonToggleEdit" destination="aVS-fM-gwN" id="j4B-ni-4cK"/>
                         <outlet property="buttonUpgrade" destination="tmo-77-bgs" id="Ll3-sF-2r3"/>
                         <outlet property="navItemHeader" destination="g1g-nh-a5L" id="VqK-HH-5Cu"/>
                         <segue destination="J3T-cl-XIs" kind="show" identifier="segueToVersionConflictResolution" id="zqQ-NH-xPv"/>

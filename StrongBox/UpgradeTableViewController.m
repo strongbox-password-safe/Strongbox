@@ -11,7 +11,6 @@
 #import "SVProgressHUD.h"
 #import "Alerts.h"
 #import "Settings.h"
-#import "LicenceCodeManager.h"
 
 static NSString* const kFontNameNoneBold =  @"Futura";
 static NSString* const kFontName =  @"Futura-Bold";
@@ -74,10 +73,12 @@ static NSString* const kFontName =  @"Futura-Bold";
     
     NSString* devMessage;
     if(Settings.sharedInstance.isFreeTrial) {
-        devMessage = [NSString stringWithFormat:@"Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark", (long)[Settings.sharedInstance getFreeTrialDaysRemaining]];
+        NSString* str =
+            NSLocalizedString(@"upgrade_vc_developer_msg_free_trial_fmt", @"Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark");
+        devMessage = [NSString stringWithFormat:str, (long)[Settings.sharedInstance getFreeTrialDaysRemaining]];
     }
     else {
-        devMessage = @"Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark";
+        devMessage = NSLocalizedString(@"upgrade_vc_developer_msg_trial_expired", @"Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark");
     }
     
     self.labelDevMessage.text = devMessage;
@@ -103,18 +104,24 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)update1MonthButton {
     UpgradeManagerState state = ProUpgradeIAPManager.sharedInstance.state;
     
-    NSAttributedString *attString = [self get2LineAttributedString:@"1 Month" subtitle:@"Loading..."];
+    NSAttributedString *attString = [self get2LineAttributedString:
+                                     NSLocalizedString(@"upgrade_vc_monthly_subscription_title", @"Monthly")
+                                                          subtitle:
+                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")];
     [self.button1Month setEnabled:NO];
     
     SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kMonthly];
     if(state == kReady && product) {
         NSString * priceText = [self getPriceTextFromProduct:product];
         
-        attString = [self get2LineAttributedString:@"1 Month" subtitle:[NSString stringWithFormat:@"%@/month", priceText]];
+        attString = [self get2LineAttributedString:NSLocalizedString(@"upgrade_vc_monthly_subscription_title", @"Monthly")
+                                          subtitle:[NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_fmt", @"%@/month"),
+                                                    priceText]];
         [self.button1Month setEnabled:YES];
     }
     else if(state == kCouldNotGetProducts) {
-        attString = [self get2LineAttributedString:@"1 Month" subtitle:@"Momentarily Unavailable"];
+        attString = [self get2LineAttributedString:NSLocalizedString(@"upgrade_vc_monthly_subscription_title", @"Monthly")
+                                          subtitle:NSLocalizedString(@"upgrade_vc_price_not_currently_available", @"Momentarily Unavailable")];
     }
     
     [[self.button1Month titleLabel] setNumberOfLines:2];
@@ -125,7 +132,11 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)update3MonthsButton {
     UpgradeManagerState state = ProUpgradeIAPManager.sharedInstance.state;
     
-    NSAttributedString *attString = [self get3LineAttributedString:@"3 Months" subtitle:@"Loading..." bonusText:@""];
+    NSAttributedString *attString = [self get3LineAttributedString:
+                                     NSLocalizedString(@"upgrade_vc_2monthly_subscription_title", @"3 Months")
+                                                          subtitle:
+                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")
+                                                         bonusText:@""];
     [self.button3Months setEnabled:NO];
     
     SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[k3Monthly];
@@ -134,17 +145,21 @@ static NSString* const kFontName =  @"Futura-Bold";
         NSString * bonusText;
         if(monthlyProduct) {
             int percentSavings = calculatePercentageSavings(product.price, monthlyProduct.price, 3);
-            bonusText = [NSString stringWithFormat:@"%@/month (Save %d%%)", [self getPriceTextFromProduct:product divisor:3], percentSavings];
+            bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_with_percentage_saving_fmt", @"%@/month (Save %d%%)"), [self getPriceTextFromProduct:product divisor:3], percentSavings];
         }
         else {
-            bonusText = [NSString stringWithFormat:@"%@/month", [self getPriceTextFromProduct:product divisor:3]];
+            bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_fmt", @"%@/month"), [self getPriceTextFromProduct:product divisor:3]];
         }
         
-        attString = [self get3LineAttributedString:@"3 Months" subtitle:[self getPriceTextFromProduct:product] bonusText:bonusText];
+        attString = [self get3LineAttributedString:NSLocalizedString(@"upgrade_vc_2monthly_subscription_title", @"3 Months")
+                                          subtitle:[self getPriceTextFromProduct:product]
+                                         bonusText:bonusText];
         [self.button3Months setEnabled:YES];
     }
     else if(state == kCouldNotGetProducts) {
-        attString = [self get3LineAttributedString:@"3 Months" subtitle:@"Momentarily Unavailable" bonusText:@"Please Try Again Later"];
+        attString = [self get3LineAttributedString:NSLocalizedString(@"upgrade_vc_2monthly_subscription_title", @"3 Months")
+                                          subtitle:NSLocalizedString(@"upgrade_vc_price_not_currently_available", @"Momentarily Unavailable")
+                                         bonusText:NSLocalizedString(@"upgrade_vc_price_not_available_try_later", @"Please Try Again Later")];
     }
     
     [[self.button3Months titleLabel] setNumberOfLines:3];
@@ -155,7 +170,11 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)update1YearButton {
     UpgradeManagerState state = ProUpgradeIAPManager.sharedInstance.state;
     
-    NSAttributedString *attString = [self get3LineAttributedString:@"1 Year" subtitle:@"Loading..." bonusText:@""];
+    NSAttributedString *attString = [self get3LineAttributedString:
+                                     NSLocalizedString(@"upgrade_vc_yearly_subscription_title", @"Yearly")
+                                                          subtitle:
+                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")
+                                                         bonusText:@""];
     [self.buttonYearly setEnabled:NO];
     
     SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kYearly];
@@ -164,17 +183,21 @@ static NSString* const kFontName =  @"Futura-Bold";
         NSString * bonusText;
         if(monthlyProduct) {
             int percentSavings = calculatePercentageSavings(product.price, monthlyProduct.price, 12);
-            bonusText = [NSString stringWithFormat:@"%@/month (Save %d%%)", [self getPriceTextFromProduct:product divisor:12], percentSavings];
+            bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_with_percentage_saving_fmt", @"%@/month (Save %d%%)"), [self getPriceTextFromProduct:product divisor:12], percentSavings];
         }
         else {
-            bonusText = [NSString stringWithFormat:@"%@/month", [self getPriceTextFromProduct:product divisor:12]];
+            bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_fmt", @"%@/month"), [self getPriceTextFromProduct:product divisor:12]];
         }
         
-        attString = [self get3LineAttributedString:@"1 Year" subtitle:[self getPriceTextFromProduct:product] bonusText:bonusText];
+        attString = [self get3LineAttributedString:NSLocalizedString(@"upgrade_vc_yearly_subscription_title", @"Yearly")
+                                          subtitle:[self getPriceTextFromProduct:product]
+                                         bonusText:bonusText];
         [self.buttonYearly setEnabled:YES];
     }
     else if(state == kCouldNotGetProducts) {
-        attString = [self get3LineAttributedString:@"1 Year" subtitle:@"Momentarily Unavailable" bonusText:@"Please Try Again Later"];
+        attString = [self get3LineAttributedString:NSLocalizedString(@"upgrade_vc_yearly_subscription_title", @"Yearly")
+                                          subtitle:NSLocalizedString(@"upgrade_vc_price_not_currently_available", @"Momentarily Unavailable")
+                                         bonusText:NSLocalizedString(@"upgrade_vc_price_not_available_try_later", @"Please Try Again Later")];
     }
     
     [[self.buttonYearly titleLabel] setNumberOfLines:3];
@@ -185,18 +208,26 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)updateLifeTimeButton {
     UpgradeManagerState state = ProUpgradeIAPManager.sharedInstance.state;
 
-    NSAttributedString *attString = [self get3LineAttributedString:@"Lifetime" subtitle:@"Loading..." bonusText:@""];
+    NSAttributedString *attString = [self get3LineAttributedString:
+                                     NSLocalizedString(@"upgrade_vc_lifetime_purchase_title", @"Lifetime")
+                                                          subtitle:
+                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")
+                                                         bonusText:@""];
     [self.buttonLifetime setEnabled:NO];
 
     SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kIapProId];
     if(state == kReady && product) {
         NSString * priceText = [self getPriceTextFromProduct:product];
 
-        attString = [self get3LineAttributedString:@"Lifetime" subtitle:priceText bonusText:@"(No Subscription)"];
+        attString = [self get3LineAttributedString:NSLocalizedString(@"upgrade_vc_lifetime_purchase_title", @"Lifetime")
+                                          subtitle:priceText
+                                         bonusText:NSLocalizedString(@"upgrade_vc_lifetime_subtitle_no_sub", @"(No Subscription)")];
         [self.buttonLifetime setEnabled:YES];
     }
     else if(state == kCouldNotGetProducts) {
-        attString = [self get3LineAttributedString:@"Lifetime" subtitle:@"Momentarily Unavailable" bonusText:@"Please Try Again Later"];
+        attString = [self get3LineAttributedString:NSLocalizedString(@"upgrade_vc_lifetime_purchase_title", @"Lifetime")
+                                          subtitle:NSLocalizedString(@"upgrade_vc_price_not_currently_available", @"Momentarily Unavailable")
+                                         bonusText:NSLocalizedString(@"upgrade_vc_price_not_available_try_later", @"Please Try Again Later")];
     }
     
     [[self.buttonLifetime titleLabel] setNumberOfLines:3];
@@ -319,11 +350,11 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
 - (void)purchase:(NSString*)productId {
     if(ProUpgradeIAPManager.sharedInstance.state != kReady || ProUpgradeIAPManager.sharedInstance.availableProducts[productId] == nil) {
         [Alerts warn:self
-               title:@"Product Error"
-             message:@"Could not access Upgrade Products on App Store. Please try again later."];
+               title:NSLocalizedString(@"upgrade_vc_product_error_title", @"Product Error")
+             message:NSLocalizedString(@"upgrade_vc_product_error_message", @"Could not access Upgrade Products on App Store. Please try again later.")];
     }
     else {
-        [SVProgressHUD showWithStatus:@"Purchasing..."];
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_purchasing", @"Purchasing...")];
         [self enableButtons:NO];
 
         [ProUpgradeIAPManager.sharedInstance purchase:productId completion:^(NSError * _Nullable error) {
@@ -338,7 +369,9 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
                 });
             }
             else{
-                [Alerts error:self title:@"Problem Purchasing" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"upgrade_vc_error_purchasing", @"Problem Purchasing")
+                        error:error];
             }
         }];
     }
@@ -346,7 +379,7 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
 
 - (IBAction)onRestorePrevious:(id)sender {
     [self enableButtons:NO];
-    [SVProgressHUD showWithStatus:@"Restoring..."];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
     
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -354,11 +387,16 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
             [SVProgressHUD dismiss];
             
             if(error) {
-                [Alerts error:self title:@"Issue Restoring Purchase" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"upgrade_vc_problem_restoring", @"Issue Restoring Purchase")
+                        error:error];
             }
             else {
                 if(!Settings.sharedInstance.isPro) {
-                    [Alerts info:self title:@"Restoration Unsuccessful" message:@"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?" completion:nil];
+                    [Alerts info:self
+                           title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
+                         message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
+                      completion:nil];
                 }
                 else {
                     dispatch_async(dispatch_get_main_queue(), ^(void) {

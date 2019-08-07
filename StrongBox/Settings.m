@@ -74,7 +74,6 @@ NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotificatio
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
-
 static NSString* cachedAppGroupName;
 
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
@@ -682,10 +681,13 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
             NSLog(@"BIOMETRIC: LAErrorBiometryLockout");
         }
     }
+    else {
+        NSLog(@"BIOMETRIC: Unknown Error: [%@]", error);
+    }
 }
 
 - (NSString*)getBiometricIdName {
-    NSString* biometricIdName = @"Touch ID";
+    NSString* biometricIdName = NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
     
     if (@available(iOS 11.0, *)) {
         NSError* error;
@@ -693,7 +695,7 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
         
         if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
             if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
-                biometricIdName = @"Face ID";
+                biometricIdName = NSLocalizedString(@"settings_face_id_name", @"Face ID");
             }
         }
     }

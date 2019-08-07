@@ -18,7 +18,8 @@ typedef NS_ENUM (unsigned int, BrowseTapAction) {
     kBrowseTapActionCopyUrl,
     kBrowseTapActionCopyEmail,
     kBrowseTapActionCopyNotes,
-    kBrowseTapActionCopyTotp
+    kBrowseTapActionCopyTotp,
+    kBrowseTapActionEdit,
 };
 
 #endif /* BrowseTapAction_h */

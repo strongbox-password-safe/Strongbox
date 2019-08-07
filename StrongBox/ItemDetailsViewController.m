@@ -161,6 +161,24 @@ static NSString* const kEditDateCell = @"EditDateCell";
         self.navigationItem.prompt = nil;
     }
     
+    [self setupTableview];
+
+    self.passwordConcealedInUi = !self.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
+    
+    if(self.createNewItem) {
+        self.item = [self createNewRecord];
+    }
+    self.model = [self modelFromItem:self.item];
+    [self bindNavBar];
+
+    if(self.createNewItem || self.editImmediately) {
+        [self setEditing:YES animated:YES];
+    }
+    
+//    [UIView setAnimationsEnabled:YES];
+}
+
+- (void)setupTableview {
     [self.tableView registerNib:[UINib nibWithNibName:kConfidentialCellId bundle:nil] forCellReuseIdentifier:kConfidentialCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kGenericKeyValueCellId bundle:nil] forCellReuseIdentifier:kGenericKeyValueCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kEditPasswordCellId bundle:nil] forCellReuseIdentifier:kEditPasswordCellId];
@@ -175,26 +193,14 @@ static NSString* const kEditDateCell = @"EditDateCell";
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.tableFooterView = [UIView new];
-
-    self.passwordConcealedInUi = !self.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
-    
-    if(self.createNewItem) {
-        self.item = [self createNewRecord];
-    }
-    self.model = [self modelFromItem:self.item];
-    [self bindNavBar];
-
-    if(self.createNewItem) {
-        [self setEditing:YES animated:YES];
-    }
-    
-//    [UIView setAnimationsEnabled:YES];
 }
 
 - (Node*)createNewRecord {
     AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
     
-    NSString *title = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
+    NSString *title = settings.titleAutoFillMode == kDefault ?
+        NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
+        settings.titleCustomAutoFill;
 
 #ifdef IS_APP_EXTENSION
     if(self.autoFillSuggestedTitle.length) {
@@ -231,7 +237,10 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)onCancel:(id)sender {
     if(self.editing) {
         if([self.model isDifferentFrom:self.preEditModelClone]) {
-            [Alerts yesNo:self title:@"Discard Changes?" message:@"Are you sure you want to discard all your changes?" action:^(BOOL response) {
+            [Alerts yesNo:self
+                    title:NSLocalizedString(@"item_details_vc_discard_changes", @"Discard Changes?")
+                  message:NSLocalizedString(@"item_details_vc_are_you_sure_discard_changes", @"Are you sure you want to discard all your changes?")
+                   action:^(BOOL response) {
                 if(response) {
                     self.model = self.preEditModelClone;
                     
@@ -297,7 +306,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
         self.editButtonItem.enabled = !self.readOnly;
         self.navigationItem.leftBarButtonItem = self.splitViewController ? self.splitViewController.displayModeButtonItem : nil;
         
-        self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title], self.readOnly ? @" (Read Only)" : @""];
+        self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
+                                     self.readOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
     }
 }
 
@@ -380,7 +390,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
         else if(indexPath.row == kRowTitle) {
             GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
             
-            [cell setKey:@"Title" value:[self maybeDereference:self.model.title]
+            [cell setKey:NSLocalizedString(@"item_details_title_field_name", @"Title")
+                   value:[self maybeDereference:self.model.title]
                  editing:self.editing
          selectAllOnEdit:self.createNewItem
          useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
@@ -396,7 +407,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         else if(indexPath.row == kRowUsername) {
             GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
             
-            [cell setKey:@"Username"
+            [cell setKey:NSLocalizedString(@"item_details_username_field_title", @"Username")
                    value:[self maybeDereference:self.model.username]
                  editing:self.editing
       suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
@@ -437,7 +448,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
             else {
                 ConfidentialTableCell* cell = [tableView dequeueReusableCellWithIdentifier:kConfidentialCellId forIndexPath:indexPath];
                 
-                [cell setKey:@"Password"
+                [cell setKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
                        value:[self maybeDereference:self.model.password]
               isConfidential:YES
                    concealed:self.passwordConcealedInUi
@@ -457,7 +468,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         else if(indexPath.row == kRowTotp) {
             if(self.editing && !self.model.totp) {
                 GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
-                cell.labelText.text = @"Setup TOTP...";
+                cell.labelText.text = NSLocalizedString(@"item_details_setup_totp", @"Setup TOTP...");
                 cell.labelText.textColor = UIColor.blueColor;
                 cell.accessoryType = UITableViewCellAccessoryNone;
                 cell.editingAccessoryType = UITableViewCellAccessoryNone;
@@ -474,7 +485,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         else if(indexPath.row == kRowURL) {
             GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
-            [cell setKey:@"URL"
+            [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
                    value:[self maybeDereference:self.model.url]
                  editing:self.editing
              formatAsUrl:isValidUrl(self.model.url)
@@ -496,18 +507,23 @@ static NSString* const kEditDateCell = @"EditDateCell";
                     [self copyAndLaunchUrl];
                 }
                 else {
-                    [self copyToClipboard:[self dereference:self.model.url] message:@"URL Copied"];
+                    [self copyToClipboard:[self dereference:self.model.url]
+                                  message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
                 }
             };
             cell.onTap = ^{
-                [self copyToClipboard:[self dereference:self.model.url] message:@"URL Copied"];
+                [self copyToClipboard:[self dereference:self.model.url]
+                              message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
             };
             
             return cell;
         }
         else if(indexPath.row == kRowEmail) {
             GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
-            [cell setKey:@"Email" value:self.model.email editing:self.editing suggestionProvider:^NSString*(NSString *text) {
+            [cell setKey:NSLocalizedString(@"item_details_email_field_title", @"Email")
+                   value:self.model.email
+                 editing:self.editing
+      suggestionProvider:^NSString*(NSString *text) {
                 NSArray* matches = [[[self.databaseModel.database.emailSet allObjects] filter:^BOOL(NSString * obj) {
                       return [obj hasPrefix:text];
                 }] sortedArrayUsingComparator:finderStringComparator];
@@ -524,7 +540,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         else if (indexPath.row == kRowExpires) {
             if(self.isEditing) {
                 EditDateCell* cell = [tableView dequeueReusableCellWithIdentifier:kEditDateCell forIndexPath:indexPath];
-                cell.keyLabel.text = @"Expires";
+                cell.keyLabel.text = NSLocalizedString(@"item_details_expires_field_title", @"Expires");
                 [cell setDate:self.model.expires];
                 
                 cell.onDateChanged = ^(NSDate * _Nullable date) {
@@ -538,9 +554,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
                 GenericKeyValueTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
                 
                 NSDate* expires = self.model.expires;
-                NSString *str = expires ? friendlyDateString(expires) : @"Never";
+                NSString *str = expires ? friendlyDateString(expires) : NSLocalizedString(@"item_details_expiry_never", @"Never");
                 
-                [cell setKey:@"Expires"
+                [cell setKey:NSLocalizedString(@"item_details_expires_field_title", @"Expires")
                        value:str
                      editing:NO
              useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
@@ -562,7 +578,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
             [self onModelEdited];
         };
         cell.onNotesDoubleTap = ^{
-            [self copyToClipboard:self.model.notes message:@"Notes Copied"];
+            [self copyToClipboard:self.model.notes
+                          message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
         };
         
         return cell;
@@ -571,7 +588,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         if(self.editing && indexPath.row == 0) {
             GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
             
-            cell.labelText.text = @"New Custom Field...";
+            cell.labelText.text = NSLocalizedString(@"item_details_new_custom_field_button", @"New Custom Field...");
             cell.labelText.textColor = UIColor.blueColor;
             cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
             
@@ -602,7 +619,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     else if (indexPath.section == kAttachmentsSectionIdx) {
         if(self.editing && indexPath.row == 0) {
             GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
-            cell.labelText.text = @"Add Attachment...";
+            cell.labelText.text = NSLocalizedString(@"item_details_add_attachment_button", @"Add Attachment...");
             cell.labelText.textColor = UIColor.blueColor;
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.editingAccessoryType = UITableViewCellAccessoryNone;
@@ -676,7 +693,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
     else if (indexPath.section == kOtherSectionIdx) {
         if(indexPath.row == 0) {
             GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
-            cell.labelText.text = self.databaseModel.database.format == kPasswordSafe ? @"Password History" : @"Item History";
+            cell.labelText.text = self.databaseModel.database.format == kPasswordSafe ?
+            NSLocalizedString(@"item_details_password_history", @"Password History") :
+            NSLocalizedString(@"item_details_item_history", @"Item History");
             cell.labelText.textColor = UIColor.blueColor;
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             return cell;
@@ -697,19 +716,19 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return nil; // nil to hide
     }
     else if (section == kCustomFieldsSectionIdx) {
-        return @"Custom Fields";
+        return NSLocalizedString(@"item_details_section_header_custom_fields", @"Custom Fields");
     }
     else if (section == kNotesSectionIdx) {
-        return @"Notes";
+        return NSLocalizedString(@"item_details_section_header_notes", @"Notes");
     }
     else if (section == kAttachmentsSectionIdx) {
-        return @"Attachments";
+        return NSLocalizedString(@"item_details_section_header_attachments", @"Attachments");
     }
     else if (section == kMetadataSectionIdx) {
-        return @"Metadata";
+        return NSLocalizedString(@"item_details_section_header_metadata", @"Metadata");
     }
     else if (section == kOtherSectionIdx) {
-        return @"History"; //@"Other";
+        return NSLocalizedString(@"item_details_section_header_history", @"History");
     }
     else {
         return @"<Unknown Section>";
@@ -941,22 +960,27 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         else if(indexPath.section == kSimpleFieldsSectionIdx) {
             if (indexPath.row == kRowTitle) {
-                [self copyToClipboard:[self dereference:self.model.title] message:@"Title Copied"];
+                [self copyToClipboard:[self dereference:self.model.title]
+                              message:NSLocalizedString(@"item_details_title_copied", @"Title Copied")];
             }
             else if (indexPath.row == kRowUsername) {
-                [self copyToClipboard:[self dereference:self.model.username] message:@"Username Copied"];
+                [self copyToClipboard:[self dereference:self.model.username]
+                              message:NSLocalizedString(@"item_details_username_copied", @"Username Copied")];
             }
             else if (indexPath.row == kRowPassword) {
-                [self copyToClipboard:[self dereference:self.model.password] message:@"Password Copied"];
+                [self copyToClipboard:[self dereference:self.model.password]
+                              message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
             }
             else if (indexPath.row == kRowTotp && self.model.totp) {
-                [self copyToClipboard:self.model.totp.password message:@"One Time Password Copied"];
+                [self copyToClipboard:self.model.totp.password
+                              message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
             }
             else if (indexPath.row == kRowURL) {
                 // Handled by Tap/ Double Tap actions on Cell
             }
             else if (indexPath.row == kRowEmail) {
-                [self copyToClipboard:self.model.email message:@"Email Copied"];
+                [self copyToClipboard:self.model.email
+                              message:NSLocalizedString(@"item_details_email_copied", @"Email Copied")];
             }
         }
         else if(indexPath.section == kNotesSectionIdx) {
@@ -964,7 +988,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         else if(indexPath.section == kCustomFieldsSectionIdx) {
             CustomFieldViewModel* customField = self.model.customFields[indexPath.row];
-            [self copyToClipboard:customField.value message:[NSString stringWithFormat:@"'%@' Copied", customField.key]];
+            [self copyToClipboard:customField.value
+                          message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), customField.key]];
         }
         else if(indexPath.section == kOtherSectionIdx && indexPath.row == 0) {
             [self performSegueWithIdentifier:self.databaseModel.database.format == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
@@ -974,7 +999,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
     if(indexPath.section == kMetadataSectionIdx) {
         ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
         if(entry.copyable) {
-            [self copyToClipboard:entry.value message:[NSString stringWithFormat:@"'%@' Copied", entry.key]];
+            [self copyToClipboard:entry.value
+                          message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), entry.key]];
         }
     }
     
@@ -1125,7 +1151,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
         if (error != nil) {
-            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+            [Alerts error:self
+                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
+                    error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
             NSLog(@"%@", error);
@@ -1156,7 +1184,10 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
         if (error != nil) {
-            [Alerts error:self title:@"Problem Saving" error:error completion:^{
+            [Alerts error:self
+                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
+                    error:error
+               completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
             NSLog(@"%@", error);
@@ -1240,11 +1271,11 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)onSetTotp {
 #ifndef IS_APP_EXTENSION
     [Alerts threeOptionsWithCancel:self
-                             title:@"How would you like to setup TOTP?"
-                           message:@"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL"
-                 defaultButtonText:@"QR Code..."
-                  secondButtonText:@"Manual (Standard/RFC 6238)..."
-                   thirdButtonText:@"Manual (Steam Token)..."
+                             title:NSLocalizedString(@"item_details_setup_totp_how_title", @"How would you like to setup TOTP?")
+                           message:NSLocalizedString(@"item_details_setup_totp_how_message", @"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL")
+                 defaultButtonText:NSLocalizedString(@"item_details_setup_totp_qr_code", @"QR Code...")
+                  secondButtonText:NSLocalizedString(@"item_details_setup_totp_manual_rfc", @"Manual (Standard/RFC 6238)...")
+                   thirdButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
                             action:^(int response) {
         if(response == 0){
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
@@ -1260,8 +1291,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
             [self presentViewController:vc animated:YES completion:nil];
         }
         else if(response == 1 || response == 2) {
-            [Alerts OkCancelWithTextField:self textFieldPlaceHolder:@"Secret or OTPAuth URL"
-                                    title:@"Please enter the secret or an OTPAuth URL"
+            [Alerts OkCancelWithTextField:self
+                     textFieldPlaceHolder:NSLocalizedString(@"item_details_setup_totp_secret_title", @"Secret or OTPAuth URL")
+                                    title:NSLocalizedString(@"item_details_setup_totp_secret_message", @"Please enter the secret or an OTPAuth URL")
                                   message:@""
                                completion:^(NSString *text, BOOL success) {
                 if(success) {
@@ -1283,7 +1315,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
         [self onModelEdited];
     }
     else {
-        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP because it could not be initialized."];
+        [Alerts warn:self
+               title:NSLocalizedString(@"item_details_setup_totp_failed_title", @"Failed to Set TOTP")
+             message:NSLocalizedString(@"item_details_setup_totp_failed_message", @"Could not set TOTP because it could not be initialized.")];
     }
 }
 
@@ -1316,7 +1350,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
     
     NSString* pw = [self dereference:self.model.password];
-    [self copyToClipboard:pw message:@"Password Copied. Launching URL..."];
+    [self copyToClipboard:pw
+                  message:NSLocalizedString(@"item_details_password_copied_and_launching", @"Password Copied. Launching URL...")];
     
 #ifndef IS_APP_EXTENSION
     if (![urlString.lowercaseString hasPrefix:@"http://"] &&
@@ -1351,8 +1386,13 @@ static NSString* const kEditDateCell = @"EditDateCell";
     if(format != kPasswordSafe) {
         [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
     }
-    [metadata addObject:[ItemMetadataEntry entryWithKey:@"Modified" value:friendlyDateString(item.fields.modified) copyable:NO]];
-    [metadata addObject:[ItemMetadataEntry entryWithKey:@"Created" value:friendlyDateString(item.fields.created) copyable:NO]];
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
+                                                  value:friendlyDateString(item.fields.modified)
+                                               copyable:NO]];
+    
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
+                                                  value:friendlyDateString(item.fields.created)
+                                               copyable:NO]];
     
     // Has History?
     
@@ -1478,7 +1518,10 @@ static NSString* const kEditDateCell = @"EditDateCell";
     [self enableUi];
     
     if (error != nil) { // TODO: This may not be correct for Split View
-        [Alerts error:self title:@"Problem Saving" error:error completion:^{
+        [Alerts error:self
+                title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
+                error:error
+           completion:^{
             [self.navigationController popToRootViewControllerAnimated:YES];
         }];
     }

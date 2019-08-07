@@ -102,7 +102,9 @@
             [self requestBiometric];
         }
         else {
-            [Alerts info:self title:@"Biometrics Unavailable" message:@"This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application."];
+            [Alerts info:self
+                   title:@"Biometrics Unavailable"
+                 message:@"This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application."];
         }
     }
     else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {

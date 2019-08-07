@@ -40,7 +40,7 @@
             forControlEvents:UIControlEventEditingChanged];
     }];
     
-    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
                                                   style:UIAlertActionStyleDefault
                                                 handler:^(UIAlertAction *a) {
                                                     completion((self.alertController.textFields[0]).text, true);
@@ -49,7 +49,7 @@
     
     self.defaultAction.enabled = NO;
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              completion(nil, false);
@@ -72,7 +72,7 @@
                           [textField addTarget:weakSelf
                                         action:validation
                               forControlEvents:UIControlEventEditingChanged];
-                          textField.placeholder = @"Password";
+                          textField.placeholder = NSLocalizedString(@"alerts_password", @"Password");
                           textField.secureTextEntry = YES;
                       }];
 
@@ -80,11 +80,11 @@
                           [textField addTarget:weakSelf
                                         action:validation
                               forControlEvents:UIControlEventEditingChanged];
-                          textField.placeholder = @"Confirm Password";
+                          textField.placeholder = NSLocalizedString(@"alerts_confirm_password", @"Confirm Password");
                           textField.secureTextEntry = YES;
                       }];
 
-    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
                                                   style:UIAlertActionStyleDefault
                                                 handler:^(UIAlertAction *a) {
                                                     completion(((self.alertController).textFields[0]).text, true);
@@ -92,7 +92,7 @@
     
     self.defaultAction.enabled = allowEmpty;
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              completion(nil, false);
@@ -125,8 +125,8 @@
     [self twoOptions:viewController
                     title:title
                   message:message
-        defaultButtonText:@"OK"
-         secondButtonText:@"Cancel"
+        defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
+         secondButtonText:NSLocalizedString(@"alerts_cancel", @"Cancel")
                    action:action];
 }
 
@@ -137,8 +137,8 @@
     [self twoOptions:viewController
                     title:title
                   message:message
-        defaultButtonText:@"Yes"
-         secondButtonText:@"No"
+        defaultButtonText:NSLocalizedString(@"alerts_yes", @"Yes")
+         secondButtonText:NSLocalizedString(@"alerts_no", @"No")
                    action:action];
 }
 
@@ -179,10 +179,12 @@
    completion:(void (^)(void))completion
 {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:error ? error.localizedDescription : @"Unknown Error"
+                                                                             message:error ? error.localizedDescription :
+                                          NSLocalizedString(@"alerts_unknown_error", @"Unknown Error")
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:
+                                    NSLocalizedString(@"alerts_ok", @"OK")
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) { if(completion) { completion(); } }];
 
@@ -225,7 +227,7 @@
                                                                              message:message
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) { if (completion) {
                                                                                             completion();
@@ -291,7 +293,7 @@
                                                            style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction *a) { action(1); }];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) { action(3); }];
     
@@ -328,7 +330,7 @@
                                                           style:UIAlertActionStyleDefault
                                                         handler:^(UIAlertAction *a) { action(2); }];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) { action(3); }];
     
@@ -346,7 +348,7 @@
                   completion:(void (^) (NSString *password, BOOL response))completion {
     [self OkCancelWithTextField:viewController
                 secureTextField:YES
-           textFieldPlaceHolder:@"Password"
+           textFieldPlaceHolder:NSLocalizedString(@"alerts_password", @"Password")
                           title:title
                         message:message
                      completion:completion];
@@ -364,13 +366,13 @@
         textField.text = textFieldText;
     }];
     
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
                                                   style:UIAlertActionStyleDefault
                                                 handler:^(UIAlertAction *a) {
                                                     completion((alertController.textFields[0]).text, true);
                                                 }];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              completion(nil, false);
@@ -392,7 +394,7 @@
                       action:@selector(validateNoneEmpty:)
             forControlEvents:UIControlEventEditingChanged];
     
-        textField.text = [textFieldText length] ? textFieldText : @"Not Empty!";
+        textField.text = [textFieldText length] ? textFieldText : NSLocalizedString(@"alerts_not_empty", @"Not Empty!");
    
         int extensionLength = textFieldText.pathExtension ? (int)textFieldText.pathExtension.length : 0;
 
@@ -403,13 +405,13 @@
         [textField setSelectedTextRange:selection];
     }];
     
-    self.defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
                                                               completion((self.alertController.textFields[0]).text, true);
                                                           }];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              completion(nil, false);
@@ -453,13 +455,13 @@
                          textField.secureTextEntry = secureTextField;
                      }];
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
                                                               completion((alertController.textFields[0]).text, true);
                                                           }];
 
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              completion(nil, false);
@@ -514,7 +516,7 @@
         index++;
     }
 
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              completion(0);

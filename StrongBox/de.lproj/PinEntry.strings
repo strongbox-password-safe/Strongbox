@@ -1,0 +1,54 @@
+
+/* Class = "UIButton"; normalTitle = "Dummy"; ObjectID = "2E1-4U-hU6"; */
+"2E1-4U-hU6.normalTitle" = "Dummy";
+
+/* Class = "UIButton"; normalTitle = "4"; ObjectID = "D74-y2-7jF"; */
+"D74-y2-7jF.normalTitle" = "4";
+
+/* Class = "UIButton"; normalTitle = "1"; ObjectID = "FWs-a8-CvG"; */
+"FWs-a8-CvG.normalTitle" = "1";
+
+/* Class = "UIButton"; normalTitle = "2"; ObjectID = "Kwd-al-cdH"; */
+"Kwd-al-cdH.normalTitle" = "2";
+
+/* Class = "UIViewController"; title = "PIN Entry"; ObjectID = "RNw-qH-q05"; */
+"RNw-qH-q05.title" = "PIN Entry";
+
+/* Class = "UIButton"; normalTitle = "9"; ObjectID = "SPV-D9-SDw"; */
+"SPV-D9-SDw.normalTitle" = "9";
+
+/* Class = "UIButton"; normalTitle = "0"; ObjectID = "V8Q-6D-zLb"; */
+"V8Q-6D-zLb.normalTitle" = "0";
+
+/* Class = "UIButton"; normalTitle = "⌫"; ObjectID = "Vfs-KL-R7i"; */
+"Vfs-KL-R7i.normalTitle" = "⌫";
+
+/* Class = "UIButton"; normalTitle = "6"; ObjectID = "Y4p-Hx-cnV"; */
+"Y4p-Hx-cnV.normalTitle" = "6";
+
+/* Class = "UIButton"; normalTitle = "7"; ObjectID = "aQe-ck-CFa"; */
+"aQe-ck-CFa.normalTitle" = "7";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "agU-6O-TvA"; */
+"agU-6O-TvA.normalTitle" = "Cancel";
+
+/* Class = "UILabel"; text = "*Warning Text which might go onto a new line"; ObjectID = "dqa-5j-hh6"; */
+"dqa-5j-hh6.text" = "*Warning Text which might go onto a new line";
+
+/* Class = "UILabel"; text = "●●●●"; ObjectID = "ein-Bi-vbL"; */
+"ein-Bi-vbL.text" = "●●●●";
+
+/* Class = "UIButton"; normalTitle = "3"; ObjectID = "es7-qH-qRO"; */
+"es7-qH-qRO.normalTitle" = "3";
+
+/* Class = "UIButton"; normalTitle = "Done"; ObjectID = "fMq-BI-n7j"; */
+"fMq-BI-n7j.normalTitle" = "Done";
+
+/* Class = "UIButton"; normalTitle = "5"; ObjectID = "o5g-fr-fK0"; */
+"o5g-fr-fK0.normalTitle" = "5";
+
+/* Class = "UIButton"; normalTitle = "8"; ObjectID = "oYl-7W-Kse"; */
+"oYl-7W-Kse.normalTitle" = "8";
+
+/* Class = "UIButton"; normalTitle = "Manual..."; ObjectID = "wcg-A1-vmB"; */
+"wcg-A1-vmB.normalTitle" = "Manual...";

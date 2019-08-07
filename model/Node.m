@@ -117,6 +117,23 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     return self;
 }
 
+- (Node*)duplicate:(NSString*)newTitle {
+    NodeFields* clonedFields = [self.fields duplicate];
+    
+    Node* ret = [[Node alloc] initWithParent:self.parent
+                                       title:newTitle
+                                     isGroup:self.isGroup
+                                        uuid:nil // Yes, verified with KeePass
+                                      fields:clonedFields
+                         childRecordsAllowed:self.childRecordsAllowed];
+    
+    ret.iconId = self.iconId;
+    ret.customIconUuid = self.customIconUuid;
+    ret.linkedData = self.linkedData; // This is possibly overdoing it, but should be safe, worst case scenario we get unwanted extras, best case user gets all attributes from original which they might like.
+    
+    return ret;
+}
+
 - (Node *)cloneForHistory {
     NodeFields* clonedFields = [self.fields cloneForHistory];
     

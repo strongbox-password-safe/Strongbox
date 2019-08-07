@@ -102,7 +102,8 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     if(cell == self.cellDeleteDataAttempts) {
-        [self promptForInteger:@"Delete Data Failed Attempt Count"
+        [self promptForInteger:
+         NSLocalizedString(@"prefs_vc_delete_data_attempt_count", @"Delete Data Failed Attempt Count")
                        options:@[@3, @5, @10, @15]
              formatAsIntervals:NO
                   currentValue:Settings.sharedInstance.deleteDataAfterFailedUnlockCount
@@ -126,7 +127,8 @@
         [self onContactSupport];
     }
     else if (cell == self.cellClearClipboardDelay) {
-        [self promptForInteger:@"Clear Clipboard Delay" options:@[@30, @45, @60, @90, @120, @180]
+        [self promptForInteger:NSLocalizedString(@"prefs_vc_clear_clipboard_delay", @"Clear Clipboard Delay")
+                       options:@[@30, @45, @60, @90, @120, @180]
              formatAsIntervals:YES
                   currentValue:Settings.sharedInstance.clearClipboardAfterSeconds
                     completion:^(BOOL success, NSInteger selectedValue) {
@@ -137,7 +139,8 @@
                     }];
     }
     else if (cell == self.cellDatabaseAutoLockDelay) {
-        [self promptForInteger:@"Auto Lock Database Delay" options:@[@0, @30, @60, @120, @180, @300, @600]
+        [self promptForInteger:NSLocalizedString(@"prefs_vc_auto_lock_database_delay", @"Auto Lock Database Delay")
+                       options:@[@0, @30, @60, @120, @180, @300, @600]
              formatAsIntervals:YES
                   currentValue:[Settings.sharedInstance getAutoLockTimeoutSeconds].integerValue
                     completion:^(BOOL success, NSInteger selectedValue) {
@@ -148,7 +151,8 @@
                     }];
     }
     else if (cell == self.cellAppLockDelay) {
-        [self promptForInteger:@"App Lock Delay" options:@[@0, @60, @120, @180, @300, @600, @900]
+        [self promptForInteger:NSLocalizedString(@"prefs_vc_app_lock_delay", @"App Lock Delay")
+                       options:@[@0, @60, @120, @180, @300, @600, @900]
              formatAsIntervals:YES
                   currentValue:Settings.sharedInstance.appLockDelay
                     completion:^(BOOL success, NSInteger selectedValue) {
@@ -196,15 +200,18 @@
 - (void)bindAboutButton {
     NSString *aboutString;
     if([[Settings sharedInstance] isPro]) {
-        aboutString = [NSString stringWithFormat:@"Pro Version %@", [Utils getAppVersion]];
+        aboutString = [NSString stringWithFormat:
+                       NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"Pro Version %@"), [Utils getAppVersion]];
     }
     else {
         if([[Settings sharedInstance] isFreeTrial]) {
-            aboutString = [NSString stringWithFormat:@"Pro Version %@ (Trial - %ld days left)",
+            aboutString = [NSString stringWithFormat:
+                           NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt", @"Pro Version %@ (Trial - %ld days left)"),
                            [Utils getAppVersion], (long)[[Settings sharedInstance] getFreeTrialDaysRemaining]];
         }
         else {
-            aboutString = [NSString stringWithFormat:@"Lite Version %@ (Please Upgrade)", [Utils getAppVersion]];
+            aboutString = [NSString stringWithFormat:
+                           NSLocalizedString(@"prefs_vc_app_version_info_free_fmt", @"Lite Version %@ (Please Upgrade)"), [Utils getAppVersion]];
         }
     }
     
@@ -219,12 +226,15 @@
 
     self.cellCloudSessions.userInteractionEnabled = (cloudSessionCount > 0);
     self.labelCloudSessions.enabled = (cloudSessionCount > 0);
-    self.labelCloudSessions.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:@"Sessions (%d)", cloudSessionCount] : @"No Sessions";
+    self.labelCloudSessions.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:
+                                                              NSLocalizedString(@"prefs_vc_cloud_sessions_count_fmt", @"Sessions (%d)"), cloudSessionCount] :
+    NSLocalizedString(@"prefs_vc_cloud_sessions_count_none", @"No Sessions");
 
     self.switchUseICloud.on = [[Settings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
     
-    self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ? @"Use iCloud" : @"Use iCloud (Unavailable)";
+    self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
+                                                                            NSLocalizedString(@"prefs_vc_use_icloud_disabled", @"Use iCloud (Unavailable)");
     self.labelUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
 }
 
@@ -234,7 +244,10 @@
         [self bindAllowPinCodeOpen];
     }
     else {
-        [Alerts yesNo:self title:@"Clear PIN Codes" message:@"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes" action:^(BOOL response) {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_title", @"Clear PIN Codes")
+              message:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes")
+               action:^(BOOL response) {
             if(response) {
                 Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
                 
@@ -272,7 +285,10 @@
         [self bindAllowBiometric];
     }
     else {
-        [Alerts yesNo:self title:@"Clear Biometrics" message:@"This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?" action:^(BOOL response) {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"prefs_vc_clear_biometrics_yesno_title", @"Clear Biometrics")
+              message:NSLocalizedString(@"prefs_vc_clear_biometrics_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?")
+               action:^(BOOL response) {
             if(response) {
                 NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
                 
@@ -317,7 +333,7 @@
 }
 
 - (void)bindAllowBiometric {
-    self.labelAllowBiometric.text = [NSString stringWithFormat:@"Allow %@", [Settings.sharedInstance getBiometricIdName]];
+    self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Enable %@"), [Settings.sharedInstance getBiometricIdName]];
     self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;
 }
 
@@ -339,7 +355,7 @@
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
-                vc2.info = @"Confirm PIN";
+                vc2.info = NSLocalizedString(@"prefs_vc_confirm_pin", @"Confirm PIN");
                 vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
                     [self dismissViewControllerAnimated:YES completion:^{
                         if(response2 == kOk) {
@@ -349,7 +365,11 @@
                                 [self bindAppLock];
                             }
                             else {
-                                [Alerts warn:self title:@"PINs do not match" message:@"Your PINs do not match." completion:nil];
+                                [Alerts warn:self
+                                       title:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_title", @"PINs do not match")
+                                     message:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_message", @"Your PINs do not match.")
+                                  completion:nil];
+                                
                                 [self bindAppLock];
                             }
                         }
@@ -379,11 +399,10 @@
     
     NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
     if([self hasLocalOrICloudSafes]) {
-        [Alerts yesNo:self title:@"Master Password Warning"
-              message:[NSString stringWithFormat:@"It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\n"
-                     @"The migration and importation process makes every effort to maintain %@ data but it is not guaranteed. "
-                     @"In any case it is important that you always know your master passwords.\n\n"
-                     @"Do you want to continue changing iCloud usage settings?", biometricIdName, biometricIdName]
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_title", @"Master Password Warning")
+              message:[NSString stringWithFormat:
+                       NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt", @"It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings?"), biometricIdName, biometricIdName]
               action:^(BOOL response) {
             if(response) {
                 [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
@@ -405,8 +424,8 @@
 - (void)onContactSupport {
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
-               title:@"Email Not Available"
-             message:@"It looks like email is not setup on this device.\n\nContact support@strongboxsafe.com for help."];
+               title:NSLocalizedString(@"prefs_vc_info_email_not_available_title", @"Email Not Available")
+             message:NSLocalizedString(@"prefs_vc_info_email_not_available_message", @"It looks like email is not setup on this device.\n\nContact support@strongboxsafe.com for help.")];
         
         return;
     }
@@ -469,14 +488,16 @@
     self.cellDeleteDataAttempts.userInteractionEnabled = enabled;
     
     NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
-        self.labelDeleteDataAttemptCount.text = enabled ? str : @"Disabled";
+        self.labelDeleteDataAttemptCount.text = enabled ? str : NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
 }
 
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; // Default
         
-        [Alerts info:self title:@"DATA DELETION: Care Required" message:@"Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences."];
+        [Alerts info:self
+               title:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_title", @"DATA DELETION: Care Required")
+             message:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_message", @"Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences.")];
     }
     else {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; // Off
@@ -505,7 +526,7 @@
     NSLog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
     
     if(!enabled) {
-        self.labelClearClipboardDelay.text = @"Disabled";
+        self.labelClearClipboardDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
         self.labelClearClipboardDelay.textColor = UIColor.darkGrayColor;
     }
     else {
@@ -516,7 +537,7 @@
 
 - (NSString*)formatTimeInterval:(NSInteger)seconds {
     if(seconds == 0) {
-        return @"None";
+        return NSLocalizedString(@"prefs_vc_time_interval_none", @"None");
     }
     
     NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
@@ -539,7 +560,7 @@
     
     if(seconds.integerValue == -1) {
         self.switchDatabaseAutoLockEnabled.on = NO;
-        self.labelDatabaseAutoLockDelay.text = @"Disabled";
+        self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
         self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
         self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
     }
@@ -567,7 +588,8 @@
 
     [self.segmentAppLock setSelectedSegmentIndex:effectiveMode];
     
-    self.labelAppLockDelay.text = effectiveMode == kNoLock ? @"Disabled" : [self formatTimeInterval:seconds.integerValue];
+    self.labelAppLockDelay.text = effectiveMode == kNoLock ?
+    NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled") : [self formatTimeInterval:seconds.integerValue];
     self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.lightGrayColor : UIColor.darkTextColor;
     self.cellAppLockDelay.userInteractionEnabled = effectiveMode != kNoLock;
     
@@ -593,7 +615,9 @@
         }
     }
     else {
-        [Alerts info:self title:@"Cannot open App Store" message:@"Please find Strongbox in the App Store and you can write a review there. Much appreciated! -Mark"];
+        [Alerts info:self
+               title:NSLocalizedString(@"prefs_vc_info_cannot_open_app_store_title", @"Cannot open App Store")
+             message:NSLocalizedString(@"prefs_vc_info_cannot_open_app_store_message", @"Please find Strongbox in the App Store and you can write a review there. Much appreciated!\n-Mark")];
     }
 }
 

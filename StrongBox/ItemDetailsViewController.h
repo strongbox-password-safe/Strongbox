@@ -21,6 +21,8 @@ extern NSString *const CellHeightsChangedNotification;
 @interface ItemDetailsViewController : UITableViewController
 
 @property BOOL createNewItem;
+@property BOOL editImmediately;
+
 @property Node* parentGroup;
 @property Node*_Nullable item;
 @property BOOL readOnly;

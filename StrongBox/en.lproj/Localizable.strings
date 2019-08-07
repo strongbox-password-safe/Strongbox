@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  Strongbox
+
+  Created by Mark on 05/08/2019.
+  Copyright © 2019 Mark McGuill. All rights reserved.
+*/
+
+"UPGRADE_INFO_BUTTON_TITLE" = "Upgrade Info";

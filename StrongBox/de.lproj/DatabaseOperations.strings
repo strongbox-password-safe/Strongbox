@@ -1,0 +1,282 @@
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "01u-4q-5Jc"; */
+"01u-4q-5Jc.text" = "Title";
+
+/* Class = "UITableViewController"; title = "Attachments Pool"; ObjectID = "0lS-7B-veY"; */
+"0lS-7B-veY.title" = "Attachments Pool";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "0uj-9f-YzH"; */
+"0uj-9f-YzH.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "1It-23-f9O"; */
+"1It-23-f9O.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "23o-sZ-KY8"; */
+"23o-sZ-KY8.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "2Iy-Kn-8Dc"; */
+"2Iy-Kn-8Dc.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "2sW-2A-LMN"; */
+"2sW-2A-LMN.text" = "Title";
+
+/* Class = "UITableViewSection"; headerTitle = "When Duress PIN Entered"; ObjectID = "39l-qS-91B"; */
+"39l-qS-91B.headerTitle" = "When Duress PIN Entered";
+
+/* Class = "UILabel"; text = "Export anywhere in iOS Files"; ObjectID = "3TO-HG-fBa"; */
+"3TO-HG-fBa.text" = "Export anywhere in iOS Files";
+
+/* Class = "UILabel"; text = "Encrypted Database Attachment"; ObjectID = "4gH-9g-QNW"; */
+"4gH-9g-QNW.text" = "Encrypted Database Attachment";
+
+/* Class = "UILabel"; text = "Allow <Biometric ID> Unlock"; ObjectID = "5Ui-WV-Edi"; */
+"5Ui-WV-Edi.text" = "Allow <Biometric ID> Unlock";
+
+/* Class = "UILabel"; text = "Records"; ObjectID = "5gZ-i5-1Iq"; */
+"5gZ-i5-1Iq.text" = "Records";
+
+/* Class = "UIButton"; normalTitle = "Change Convenience PIN..."; ObjectID = "6LL-o6-fLP"; */
+"6LL-o6-fLP.normalTitle" = "Change Convenience PIN...";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "72E-qf-FcW"; */
+"72E-qf-FcW.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "7wl-Po-6rv"; */
+"7wl-Po-6rv.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Export Database..."; ObjectID = "8t7-OA-fuK"; */
+"8t7-OA-fuK.text" = "Export Database...";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "9Cl-g9-6LS"; */
+"9Cl-g9-6LS.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "9st-TW-U58"; */
+"9st-TW-U58.text" = "Detail";
+
+/* Class = "UILabel"; text = "Copy"; ObjectID = "AV5-zd-5GG"; */
+"AV5-zd-5GG.text" = "Copy";
+
+/* Class = "UILabel"; text = "Print Database..."; ObjectID = "CCi-ZI-4Gk"; */
+"CCi-ZI-4Gk.text" = "Print Database...";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "D4f-42-z4s"; */
+"D4f-42-z4s.text" = "Title";
+
+/* Class = "UITableViewSection"; footerTitle = "Some simple statistics about the contents of your database"; ObjectID = "HNl-Z8-XsQ"; */
+"HNl-Z8-XsQ.footerTitle" = "Some simple statistics about the contents of your database";
+
+/* Class = "UITableViewSection"; headerTitle = "Statistics"; ObjectID = "HNl-Z8-XsQ"; */
+"HNl-Z8-XsQ.headerTitle" = "Statistics";
+
+/* Class = "UITableViewController"; title = "Export Database"; ObjectID = "IUA-PD-VTb"; */
+"IUA-PD-VTb.title" = "Export Database";
+
+/* Class = "UILabel"; text = "NB: Local Device database are permanently deleted"; ObjectID = "JIi-2p-HGt"; */
+"JIi-2p-HGt.text" = "NB: Local Device database are permanently deleted";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "K12-HX-nbI"; */
+"K12-HX-nbI.text" = "Detail";
+
+/* Class = "UITableViewSection"; headerTitle = "Export Options"; ObjectID = "Ltj-NU-Uru"; */
+"Ltj-NU-Uru.headerTitle" = "Export Options";
+
+/* Class = "UILabel"; text = "Copy Plaintext CSV to Pasteboard"; ObjectID = "MNT-9Y-DFQ"; */
+"MNT-9Y-DFQ.text" = "Copy Plaintext CSV to Pasteboard";
+
+/* Class = "UILabel"; text = "AutoFill Enabled"; ObjectID = "MyM-Gm-9ER"; */
+"MyM-Gm-9ER.text" = "AutoFill Enabled";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "RAl-JO-eb1"; */
+"RAl-JO-eb1.text" = "Title";
+
+/* Class = "UIButton"; normalTitle = "Turn Duress PIN On"; ObjectID = "RZ6-5I-P7D"; */
+"RZ6-5I-P7D.normalTitle" = "Turn Duress PIN On";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "TGe-Yn-oZs"; */
+"TGe-Yn-oZs.text" = "Title";
+
+/* Class = "UITableViewSection"; footerTitle = "You can use a PIN Code to open your password database. While this is handy, it will likely be less secure than using your master password. The PIN will only work on this device."; ObjectID = "TUP-XN-gQC"; */
+"TUP-XN-gQC.footerTitle" = "You can use a PIN Code to open your password database. While this is handy, it will likely be less secure than using your master password. The PIN will only work on this device.";
+
+/* Class = "UITableViewSection"; headerTitle = "Convenience PIN"; ObjectID = "TUP-XN-gQC"; */
+"TUP-XN-gQC.headerTitle" = "Convenience PIN";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "UhI-84-44C"; */
+"UhI-84-44C.text" = "Detail";
+
+/* Class = "UILabel"; text = "Most Used Username"; ObjectID = "VH1-Qr-usY"; */
+"VH1-Qr-usY.text" = "Most Used Username";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "VWV-cG-yPC"; */
+"VWV-cG-yPC.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "W8J-4g-cte"; */
+"W8J-4g-cte.text" = "Detail";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "W9N-V7-F3d"; */
+"W9N-V7-F3d.headerTitle" = "General";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "WSS-6M-gSJ"; */
+"WSS-6M-gSJ.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "WUb-FY-frt"; */
+"WUb-FY-frt.text" = "Title";
+
+/* Class = "UILabel"; text = "By Email (HTML)"; ObjectID = "WsN-Wh-Thq"; */
+"WsN-Wh-Thq.text" = "By Email (HTML)";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Z35-lH-bXP"; */
+"Z35-lH-bXP.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "ZEW-Ft-sAa"; */
+"ZEW-Ft-sAa.text" = "Detail";
+
+/* Class = "UINavigationItem"; title = "Database Management"; ObjectID = "ZFb-uk-qf5"; */
+"ZFb-uk-qf5.title" = "Database Management";
+
+/* Class = "UITableViewController"; title = "PIN Codes"; ObjectID = "aJP-12-BTT"; */
+"aJP-12-BTT.title" = "PIN Codes";
+
+/* Class = "UILabel"; text = "Unique Usernames"; ObjectID = "aSa-hW-dss"; */
+"aSa-hW-dss.text" = "Unique Usernames";
+
+/* Class = "UILabel"; text = "Open a Dummy Database"; ObjectID = "alj-hg-cxp"; */
+"alj-hg-cxp.text" = "Open a Dummy Database";
+
+/* Class = "UILabel"; text = "PIN Codes"; ObjectID = "avJ-of-dsf"; */
+"avJ-of-dsf.text" = "PIN Codes";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "bG1-bd-bVM"; */
+"bG1-bd-bVM.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Offline Enabled"; ObjectID = "bVn-RL-KZT"; */
+"bVn-RL-KZT.text" = "Offline Enabled";
+
+/* Class = "UILabel"; text = "By Email (CSV)"; ObjectID = "cU9-qG-5F5"; */
+"cU9-qG-5F5.text" = "By Email (CSV)";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "cge-eH-3aP"; */
+"cge-eH-3aP.text" = "Detail";
+
+/* Class = "UILabel"; text = "Open as Read-Only"; ObjectID = "dYn-dT-eVK"; */
+"dYn-dT-eVK.text" = "Open as Read-Only";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "dqx-dU-chI"; */
+"dqx-dU-chI.text" = "Title";
+
+/* Class = "UITableViewSection"; footerTitle = "If you use a convenience PIN then you can also use a Duress PIN. The Duress PIN indicates to Strongbox that you are opening the database under duress. Strongbox can perform a number of actions in this situation.\nNB: It is important to note that in some jurisdictions this action in itself can be seen as deceptive and/or illegal, and you may want to consider preparing yourself in other ways so that you don't need to rely on this feature."; ObjectID = "e3m-4j-ELm"; */
+"e3m-4j-ELm.footerTitle" = "If you use a convenience PIN then you can also use a Duress PIN. The Duress PIN indicates to Strongbox that you are opening the database under duress. Strongbox can perform a number of actions in this situation.\nNB: It is important to note that in some jurisdictions this action in itself can be seen as deceptive and/or illegal, and you may want to consider preparing yourself in other ways so that you don't need to rely on this feature.";
+
+/* Class = "UITableViewSection"; headerTitle = "Duress PIN"; ObjectID = "e3m-4j-ELm"; */
+"e3m-4j-ELm.headerTitle" = "Duress PIN";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "e5p-yQ-IGe"; */
+"e5p-yQ-IGe.text" = "Detail";
+
+/* Class = "UILabel"; text = "Plaintext CSV"; ObjectID = "ekA-J8-Dri"; */
+"ekA-J8-Dri.text" = "Plaintext CSV";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "f5u-Pv-yQj"; */
+"f5u-Pv-yQj.text" = "Title";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "f5w-As-4zp"; */
+"f5w-As-4zp.text" = "Title";
+
+/* Class = "UILabel"; text = "Change Master Password"; ObjectID = "gqm-VJ-fD5"; */
+"gqm-VJ-fD5.text" = "Change Master Password";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "guS-rh-2Tm"; */
+"guS-rh-2Tm.text" = "Title";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "h3O-3O-N3I"; */
+"h3O-3O-N3I.text" = "Title";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "jBC-un-3AB"; */
+"jBC-un-3AB.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "k4p-dh-U1D"; */
+"k4p-dh-U1D.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "kTS-KM-eew"; */
+"kTS-KM-eew.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "kWc-ZY-gMB"; */
+"kWc-ZY-gMB.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "kcd-E7-Vw4"; */
+"kcd-E7-Vw4.text" = "Title";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "kiY-Gs-apT"; */
+"kiY-Gs-apT.text" = "Title";
+
+/* Class = "UILabel"; text = "Groups"; ObjectID = "lxb-5g-eft"; */
+"lxb-5g-eft.text" = "Groups";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "n4X-to-Iz2"; */
+"n4X-to-Iz2.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "oFp-9b-4QN"; */
+"oFp-9b-4QN.text" = "Detail";
+
+/* Class = "UILabel"; text = "To Files"; ObjectID = "otC-rk-95J"; */
+"otC-rk-95J.text" = "To Files";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "pgp-tE-ZfR"; */
+"pgp-tE-ZfR.text" = "Title";
+
+/* Class = "UITableViewSection"; footerTitle = "Some attributes of your database (format specific) including cryptography settings, file format and metadata properties"; ObjectID = "prc-T9-fhq"; */
+"prc-T9-fhq.footerTitle" = "Some attributes of your database (format specific) including cryptography settings, file format and metadata properties";
+
+/* Class = "UITableViewSection"; headerTitle = "Database Properties"; ObjectID = "prc-T9-fhq"; */
+"prc-T9-fhq.headerTitle" = "Database Properties";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "qUM-G0-tWN"; */
+"qUM-G0-tWN.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "View Attachments Pool"; ObjectID = "qXR-Ed-fpb"; */
+"qXR-Ed-fpb.text" = "View Attachments Pool";
+
+/* Class = "UIButton"; normalTitle = "Change Duress PIN..."; ObjectID = "rHx-1W-ieK"; */
+"rHx-1W-ieK.normalTitle" = "Change Duress PIN...";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "rsC-K5-lAx"; */
+"rsC-K5-lAx.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "srg-39-01Y"; */
+"srg-39-01Y.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "tA2-Ca-LM8"; */
+"tA2-Ca-LM8.text" = "Detail";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "u12-Jd-EK6"; */
+"u12-Jd-EK6.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Remove Database"; ObjectID = "uKQ-Nd-Sst"; */
+"uKQ-Nd-Sst.text" = "Remove Database";
+
+/* Class = "UIButton"; normalTitle = "Turn Convenience PIN On"; ObjectID = "ucD-9D-yuG"; */
+"ucD-9D-yuG.normalTitle" = "Turn Convenience PIN On";
+
+/* Class = "UILabel"; text = "By Email"; ObjectID = "vk1-O2-wkx"; */
+"vk1-O2-wkx.text" = "By Email";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "w5v-ba-OEw"; */
+"w5v-ba-OEw.text" = "Detail";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "wMp-4t-10F"; */
+"wMp-4t-10F.text" = "Detail";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "xhp-df-RA7"; */
+"xhp-df-RA7.text" = "Title";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "yZK-ru-elU"; */
+"yZK-ru-elU.text" = "Detail";
+
+/* Class = "UILabel"; text = "Present a Technical Error"; ObjectID = "zOJ-be-bYv"; */
+"zOJ-be-bYv.text" = "Present a Technical Error";
+
+/* Class = "UILabel"; text = "Unique Passwords"; ObjectID = "zPs-Rc-Zqh"; */
+"zPs-Rc-Zqh.text" = "Unique Passwords";
+
+/* Class = "UILabel"; text = "Plaintext HTML"; ObjectID = "zUZ-2L-HBa"; */
+"zUZ-2L-HBa.text" = "Plaintext HTML";

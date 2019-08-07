@@ -1,0 +1,30 @@
+
+/* Class = "UITextField"; placeholder = "Name"; ObjectID = "09B-6g-J3c"; */
+"09B-6g-J3c.placeholder" = "Name";
+
+/* Class = "UILabel"; text = "Name"; ObjectID = "0LV-BO-Yfo"; */
+"0LV-BO-Yfo.text" = "Name";
+
+/* Class = "UILabel"; text = "Protected"; ObjectID = "0tk-nl-EVP"; */
+"0tk-nl-EVP.text" = "Protected";
+
+/* Class = "UILabel"; text = "Error Message"; ObjectID = "7nm-GR-d4H"; */
+"7nm-GR-d4H.text" = "Error Message";
+
+/* Class = "UILabel"; text = "Value"; ObjectID = "Goe-To-d9k"; */
+"Goe-To-d9k.text" = "Value";
+
+/* Class = "UITextView"; text = "Lorem ipsum dolor sit er"; ObjectID = "KGu-qM-fF9"; */
+"KGu-qM-fF9.text" = "Lorem ipsum dolor sit er";
+
+/* Class = "UINavigationItem"; prompt = "Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes"; ObjectID = "Wu5-96-gRh"; */
+"Wu5-96-gRh.prompt" = "Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes";
+
+/* Class = "UINavigationItem"; title = "Acme Inc."; ObjectID = "Wu5-96-gRh"; */
+"Wu5-96-gRh.title" = "Acme Inc.";
+
+/* Class = "UIBarButtonItem"; title = "Details View Preferences"; ObjectID = "rL6-Dh-Vni"; */
+"rL6-Dh-Vni.title" = "Details View Preferences";
+
+/* Class = "UINavigationItem"; title = "Edit Custom Field"; ObjectID = "vmx-db-8zS"; */
+"vmx-db-8zS.title" = "Edit Custom Field";

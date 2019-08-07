@@ -265,8 +265,8 @@
     
     if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
         [Alerts warn:self
-               title:@"iCloud no longer available"
-             message:@"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud."];
+               title:NSLocalizedString(@"safesvc_icloud_no_longer_available_title", @"iCloud no longer available")
+             message:NSLocalizedString(@"safesvc_icloud_no_longer_available_message", @"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud.")];
         
         [self removeAllICloudSafes];
     }
@@ -287,16 +287,19 @@
             return;
         }
         else if (self.presentedViewController == nil) {
-            NSString *message = existingLocalDeviceSafes ?
-            (hasOtherCloudSafes ? @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)" :
-             @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?") :
-            (hasOtherCloudSafes ? @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)" : @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
+            NSString* strA = NSLocalizedString(@"safesvc_migrate_local_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)");
+            NSString* strB = NSLocalizedString(@"safesvc_migrate_local_no_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?");
+            NSString* str1 = NSLocalizedString(@"safesvc_use_icloud_question_existing", @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)");
+            NSString* str2 = NSLocalizedString(@"safesvc_use_icloud_question_no_existing", @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
+
+            NSString *message = existingLocalDeviceSafes ? (hasOtherCloudSafes ? strA : strB) : (hasOtherCloudSafes ? str1 : str2);
             
             [Alerts twoOptions:self
-                         title:@"iCloud is Now Available"
+                         title:NSLocalizedString(@"safesvc_icloud_now_available_title", @"iCloud is Now Available")
                        message:message
-             defaultButtonText:@"Use iCloud"
-              secondButtonText:@"Local Only" action:^(BOOL response) {
+             defaultButtonText:NSLocalizedString(@"safesvc_option_use_icloud", @"Use iCloud")
+              secondButtonText:NSLocalizedString(@"safesvc_option_local_only", @"Local Only")
+                        action:^(BOOL response) {
                   if(response) {
                       Settings.sharedInstance.iCloudOn = YES;
                   }
@@ -313,9 +316,12 @@
 - (void)onICloudAvailableContinuation {
    // If iCloud newly switched on, move local docs to iCloud
    if (Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
-       [Alerts twoOptions:self title:@"iCloud Available" message:@"Would you like to migrate your current local device databases to iCloud?"
-        defaultButtonText:@"Migrate to iCloud"
-         secondButtonText:@"Keep Local" action:^(BOOL response) {
+       [Alerts twoOptions:self
+                    title:NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available")
+                  message:NSLocalizedString(@"safesvc_question_migrate_local_to_icloud", @"Would you like to migrate your current local device databases to iCloud?")
+        defaultButtonText:NSLocalizedString(@"safesvc_option_migrate_to_icloud", @"Migrate to iCloud")
+         secondButtonText:NSLocalizedString(@"safesvc_option_keep_local", @"Keep Local")
+                   action:^(BOOL response) {
              if(response) {
                  [[iCloudSafesCoordinator sharedInstance] migrateLocalToiCloud:^(BOOL show) {
                      [self showiCloudMigrationUi:show];
@@ -327,11 +333,11 @@
    // If iCloud newly switched off, move iCloud docs to local
    if (!Settings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
        [Alerts threeOptions:self
-                      title:@"iCloud Unavailable"
-                    message:@"What would you like to do with the databases currently on this device?"
-          defaultButtonText:@"Remove them, Keep on iCloud Only"
-           secondButtonText:@"Make Local Copies"
-            thirdButtonText:@"Switch iCloud Back On"
+                      title:NSLocalizedString(@"safesvc_icloud_unavailable_title", @"iCloud Unavailable")
+                    message:NSLocalizedString(@"safesvc_icloud_unavailable_question", @"What would you like to do with the databases currently on this device?")
+          defaultButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_remove", @"Remove them, Keep on iCloud Only")
+           secondButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_make_local", @"Make Local Copies")
+            thirdButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_icloud_on", @"Switch iCloud Back On")
                      action:^(int response) {
                          if(response == 2) {           // @"Switch iCloud Back On"
                              [Settings sharedInstance].iCloudOn = YES;
@@ -355,7 +361,7 @@
 - (void)showiCloudMigrationUi:(BOOL)show {
     if(show) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:@"Migrating..."];
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"safesvc_icloud_migration_progress_title_migrating", @"Migrating...")];
         });
     }
     else {
@@ -373,7 +379,7 @@
     NSError* error;
     if (![DatabaseModel isAValidSafe:importedData error:&error]) {
         [Alerts error:self
-                title:@"Invalid Database"
+                title:NSLocalizedString(@"safesvc_import_manual_url_invalid", @"Invalid Database")
                 error:error];
         
         return;
@@ -416,7 +422,9 @@
 
 - (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
     if(!success || !data) {
-        [Alerts warn:self title:@"Error Opening" message:@"Could not access this file."];
+        [Alerts warn:self
+               title:NSLocalizedString(@"safesvc_error_title_import_file_error_opening", @"Error Opening")
+             message:NSLocalizedString(@"safesvc_error_message_import_file_error_opening", @"Could not access this file.")];
     }
     else {
         if([url.pathExtension caseInsensitiveCompare:@"key"] ==  NSOrderedSame) {
@@ -436,10 +444,13 @@
     [data writeToFile:path options:kNilOptions error:&error];
     
     if(!error) {
-        [Alerts info:self title:@"Key File Copied" message:@"This key file has been imported successfully."];
+        [Alerts info:self
+               title:NSLocalizedString(@"safesvc_info_title_key_file_imported", @"Key File Imported")
+             message:NSLocalizedString(@"safesvc_info_message_key_file_imported", @"This key file has been imported successfully.")];
     }
     else {
-        [Alerts error:self title:@"Problem Copying Key File" error:error];
+        [Alerts error:self
+                title:NSLocalizedString(@"safesvc_error_title_error_importing_key_file", @"Problem Importing Key File") error:error];
     }
 }
 
@@ -448,7 +459,7 @@
     
     if (![DatabaseModel isAValidSafe:data error:&error]) {
         [Alerts error:self
-                title:[NSString stringWithFormat:@"Invalid Database - [%@]", url.lastPathComponent]
+                title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                 error:error];
         return;
     }
@@ -459,11 +470,11 @@
         }
         else {
             [Alerts threeOptions:self
-                           title:@"Edit or Copy?"
-                         message:@"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?"
-               defaultButtonText:@"Edit in Place"
-                secondButtonText:@"Make a Copy"
-                 thirdButtonText:@"Cancel"
+                           title:NSLocalizedString(@"safesvc_import_database_prompt_title_edit_copy", @"Edit or Copy?")
+                         message:NSLocalizedString(@"safesvc_import_database_prompt_message", @"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?")
+               defaultButtonText:NSLocalizedString(@"safesvc_option_edit_in_place", @"Edit in Place")
+                secondButtonText:NSLocalizedString(@"safesvc_option_make_a_copy", @"Make a Copy")
+                 thirdButtonText:NSLocalizedString(@"safes_vc_cancel", @"Cancel Option Button Title")
                           action:^(int response) {
                               if(response != 2) {
                                   [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0];
@@ -481,17 +492,19 @@
         NSString* filename = url.lastPathComponent;
         if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && Settings.sharedInstance.iCloudOn == NO) {
             [Alerts twoOptionsWithCancel:self
-                                   title:@"Update Existing Database?"
-                                 message:@"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?"
-                       defaultButtonText:@"Update Existing Database"
-                        secondButtonText:@"Create a New Database"
+                                   title:NSLocalizedString(@"safesvc_update_existing_database_title", @"Update Existing Database?")
+                                 message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
+                       defaultButtonText:NSLocalizedString(@"safesvc_update_existing_option_update", @"Update Existing Database")
+                        secondButtonText:NSLocalizedString(@"safesvc_update_existing_option_create", @"Create a New Database")
                                   action:^(int response) {
                             if(response == 0) {
                                 NSString *suggestedFilename = url.lastPathComponent;
                                 BOOL updated = [LocalDeviceStorageProvider.sharedInstance writeToDefaultStorageWithFilename:suggestedFilename overwrite:YES data:data];
                                 
                                 if(!updated) {
-                                    [Alerts warn:self title:@"Error updating file." message:@"Could not update local file."];
+                                    [Alerts warn:self
+                                           title:NSLocalizedString(@"safesvc_error_updating_title", @"Error updating file.")
+                                         message:NSLocalizedString(@"safesvc_error_updating_message", @"Could not update local file.")];
                                 }
                                 else {
                                     NSLog(@"Updated...");
@@ -551,10 +564,10 @@
     
     if(Settings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
-                               title:@"Copy to iCloud or Local?"
-                             message:@"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?"
-                   defaultButtonText:@"Copy to Local Device Only"
-                    secondButtonText:@"Copy to iCloud"
+                               title:NSLocalizedString(@"safesvc_copy_database_to_location_title", @"Copy to iCloud or Local?")
+                             message:NSLocalizedString(@"safesvc_copy_database_to_location_message", @"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?")
+                   defaultButtonText:NSLocalizedString(@"safesvc_copy_database_option_to_local", @"Copy to Local Device Only")
+                    secondButtonText:NSLocalizedString(@"safesvc_copy_database_option_to_icloud", @"Copy to iCloud")
                               action:^(int response) {
                                   if(response == 0) {
                                       [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data];
@@ -586,7 +599,9 @@
                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
             }
             else {
-                [Alerts error:self title:@"Error Importing Database" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
+                        error:error];
             }
         });
      }];
@@ -607,7 +622,9 @@
                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
             }
             else {
-                [Alerts error:self title:@"Error Importing Database" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
+                        error:error];
             }
         });
     }];
@@ -631,7 +648,9 @@
     [url stopAccessingSecurityScopedResource];
     
     if (error) {
-        [Alerts error:self title:@"Could not bookmark this file" error:error];
+        [Alerts error:self
+                title:NSLocalizedString(@"safesvc_error_title_could_not_bookmark", @"Could not bookmark this file")
+                error:error];
         return;
     }
     

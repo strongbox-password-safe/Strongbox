@@ -133,15 +133,23 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [Alerts yesNo:self title:@"Are you sure?" message:@"Are you sure you want to delete this historical item?" action:^(BOOL response) {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"keepass_history_are_you_sure", @"Are you sure?")
+              message:NSLocalizedString(@"keepass_history_are_you_sure_delete_message", @"Are you sure you want to delete this historical item?")
+               action:^(BOOL response) {
             if(response) {
                 [self onDeleteItem:indexPath];
             }
         }];
     }];
     
-    UITableViewRowAction *restoreAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Restore" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [Alerts yesNo:self title:@"Are you sure?" message:@"Are you sure you want to restore this entry to this historical state?" action:^(BOOL response) {
+    UITableViewRowAction *restoreAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                             title:NSLocalizedString(@"keepass_history_action_restore", @"Restore")
+                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"keepass_history_are_you_sure", @"Are you sure?")
+              message:NSLocalizedString(@"keepass_history_are_you_sure_restore_message", @"Are you sure you want to restore this entry to this historical state?")
+               action:^(BOOL response) {
             if(response) {
                 [self onRestoreItem:indexPath];
             }

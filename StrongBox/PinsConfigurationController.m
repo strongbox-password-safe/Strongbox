@@ -193,7 +193,9 @@
                     [self bindUiToModel];
                 }
                 else {
-                    [Alerts warn:self title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please select another."];
+                    [Alerts warn:self
+                           title:@"PIN Conflict"
+                         message:@"Your Convenience PIN conflicts with your Duress PIN. Please select another."];
                 }
             }}];
     };
@@ -212,7 +214,8 @@
         else if (indexPath.row == 2) {
             BOOL delete = self.viewModel.metadata.storageProvider == kLocalDevice || self.viewModel.metadata.storageProvider == kiCloud;
             
-            [Alerts warn:self title:@"Warning" message:delete ? @"This will permanently delete the database file." : @"This will remove the database from Strongbox but the underlying file will remain on cloud storage"];
+            [Alerts warn:self title:@"Warning"
+                 message:delete ? @"This will permanently delete the database file." : @"This will remove the database from Strongbox but the underlying file will remain on cloud storage"];
             self.viewModel.metadata.duressAction = kRemoveDatabase;
         }
 

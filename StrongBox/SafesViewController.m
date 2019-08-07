@@ -83,7 +83,13 @@
     
     self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
-    self.buttonToggleEdit.enabled = (self.collection.count > 0);
+    if (self.collection.count > 0) {
+        [self removeEditButtonInLeftBar];
+        [self insertEditButtonInLeftBar];
+    }
+    else {
+        [self removeEditButtonInLeftBar];
+    }
     
     [self.tableView reloadData];
 }
@@ -93,7 +99,10 @@
     
     self.collection = [NSArray array];
 
+    [self insertEditButtonInLeftBar];
+
     [self setupTableview];
+
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onProStatusChanged:)
                                                name:kProStatusChangedNotificationKey
@@ -111,6 +120,22 @@
     }
 }
 
+- (void)removeEditButtonInLeftBar {
+    NSMutableArray* leftBarButtonItems = self.navigationItem.leftBarButtonItems ?  self.navigationItem.leftBarButtonItems.mutableCopy : @[].mutableCopy;
+    
+    [leftBarButtonItems removeObject:self.editButtonItem];
+    
+    self.navigationItem.leftBarButtonItems = leftBarButtonItems;
+}
+
+- (void)insertEditButtonInLeftBar {
+    NSMutableArray* leftBarButtonItems = self.navigationItem.leftBarButtonItems ?  self.navigationItem.leftBarButtonItems.mutableCopy : @[].mutableCopy;
+
+    [leftBarButtonItems insertObject:self.editButtonItem atIndex:0];
+
+    self.navigationItem.leftBarButtonItems = leftBarButtonItems;
+}
+
 - (void)setupTableview {
     [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
     self.tableView.emptyDataSetSource = self;
@@ -121,7 +146,7 @@
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"No Databases";
+    NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_title", @"Title displayed in tableview when there are no databases setup");
     
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline],
                                  NSForegroundColorAttributeName: [UIColor lightGrayColor]};
@@ -131,7 +156,7 @@
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"Tap below to get started";
+    NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_subtitle", @"Subtitle displayed in tableview when there are no databases setup");
 
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
@@ -150,7 +175,7 @@
                                     NSForegroundColorAttributeName : UIColor.blueColor
                                     };
     
-    return [[NSAttributedString alloc] initWithString:@"Get Started..." attributes:attributes];
+    return [[NSAttributedString alloc] initWithString:NSLocalizedString(@"safes_vc_empty_databases_list_get_started_button_title", @"Subtitle displayed in tableview when there are no databases setup") attributes:attributes];
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
@@ -166,21 +191,6 @@
 }
 
 #pragma mark - Table view data source
-
--(void)onToggleEdit:(id)sender {
-    [self.tableView setEditing:!self.tableView.editing animated:YES];
-    
-    if (self.tableView.editing)
-    {
-        [self.buttonToggleEdit setTitle:@"Done"];
-        [self.buttonToggleEdit setStyle:UIBarButtonItemStyleDone];
-    }
-    else
-    {
-        [self.buttonToggleEdit setTitle:@"Edit"];
-        [self.buttonToggleEdit setStyle:UIBarButtonItemStylePlain];
-    }
-}
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -280,7 +290,7 @@
 
 - (NSString*)getOfflineCacheModDateString:(SafeMetaData*)database {
     NSDate* modDate = database.offlineCacheEnabled ? [CacheManager.sharedInstance getOfflineCacheFileModificationDate:database] : nil;
-    return modDate ? [NSString stringWithFormat:@"Cached: %@", friendlyDateStringVeryShort(modDate)] : @"";
+    return modDate ? [NSString stringWithFormat:NSLocalizedString(@"safes_vc_cached_date_time", @"Date and Time last cache was taken"), friendlyDateStringVeryShort(modDate)] : @"";
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -336,23 +346,29 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 }
 
+
+
+
+
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
-                                                                            title:@"Remove..."
+                                                                            title:NSLocalizedString(@"safes_vc_slide_left_remove_database_action", @"Remove this database table action")
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeSafe:indexPath];
     }];
 
     UITableViewRowAction *offlineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                            title:@"Open Offline"
-                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+                                                                             title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
+                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self openOffline:indexPath];
     }];
     offlineAction.backgroundColor = [UIColor darkGrayColor];
 
     // Other Options
     
-    UITableViewRowAction *moreActions = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"More..." handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *moreActions = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                           title:NSLocalizedString(@"safes_vc_slide_left_more_actions", @"View more actions table action")
+                                                                         handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self showDatabaseMoreActions:indexPath];
     }];
     moreActions.backgroundColor = [UIColor blueColor];
@@ -364,13 +380,13 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)showDatabaseMoreActions:(NSIndexPath*)indexPath {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Database Actions"
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"safes_vc_database_actions_sheet_title", @"Title of the 'More Actions' alert/action sheet")
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
     // Rename Action...
     
-    UIAlertAction *renameAction = [UIAlertAction actionWithTitle:@"Rename Database..."
+    UIAlertAction *renameAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_rename_database", @"Button to Rename the Database")
                                                            style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction *a) {
                                                              [self renameSafe:indexPath];
@@ -381,7 +397,9 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [Settings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
-    UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ? @"Unset as Quick Launch DB..." : @"Set as Quick Launch DB..."
+    UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ?
+                                        NSLocalizedString(@"safes_vc_action_unset_as_quick_launch", @"Button Title to Unset Quick Launch") :
+                                        NSLocalizedString(@"safes_vc_action_set_as_quick_launch", @"Button Title to Set Quick Launch")
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
                                                               [self toggleQuickLaunch:safe];
@@ -393,7 +411,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
     if(localDeviceOption) {
         BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
-        NSString* localDeviceActionTitle = shared ? @"Show in 'Files'..." : @"Make Auto Fill-able...";
+        NSString* localDeviceActionTitle = shared ? NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in Files") : NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Make AutoFillable");
 
         UIAlertAction *secondAction = [UIAlertAction actionWithTitle:localDeviceActionTitle
                                                                style:UIAlertActionStyleDefault
@@ -405,7 +423,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     // Cancel
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_cancel", @"Cancel Button")
                                                            style:UIAlertActionStyleCancel
                                                          handler:nil];
     
@@ -424,8 +442,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     else {
         [Alerts yesNo:self
-                title:@"About Quick Launch"
-              message:@"Setting this database as your Quick Launch database means you will be automatically prompted to unlock this database as soon as you launch or re-activate Strongbox. This can save you one precious tap!\n\nSet as Quick Launch Database?"
+                title:NSLocalizedString(@"safes_vc_about_quick_launch_title", @"Title of Prompt about setting Quick Launch")
+              message:NSLocalizedString(@"safes_vc_about_setting_quick_launch_and_confirm", @"Message about quick launch feature and asking to confirm yes or no")
                action:^(BOOL response) {
             if (response) {
                 Settings.sharedInstance.quickLaunchUuid = database.uuid;
@@ -436,12 +454,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)promptAboutToggleLocalStorage:(NSIndexPath*)indexPath shared:(BOOL)shared {
-    NSString* message = shared ? @"Showing this database in 'Files' will make the database available for access via 'Files' and iTunes File Sharing. However the database will no longer be fully accessible in Auto Fill contexts. This is due to iOS system design.\n\nNB: You can always reverse this action" :
-    
-    @"Making this database Auto Fill-able will allow the database to be fully accessible in Auto Fill contexts (not just a read-only cache). However it will no longer be visible to iTunes File Sharing or via the Files app. This is due to iOS system design.\n\nNB: You can always reverse this action";
+    NSString* message = shared ?
+        NSLocalizedString(@"safes_vc_show_database_in_files_info", @"Button title to Show Database in iOS Files App") :
+        NSLocalizedString(@"safes_vc_make_database_auto_fill_info", @"Button tutle to make database Auto Fill-able");
     
     [Alerts okCancel:self
-               title:@"Change Local Device Storage Mode"
+               title:NSLocalizedString(@"safes_vc_change_local_device_storage_mode_title", @"OK/Cancel prompt title for changing local storage mode")
              message:message
               action:^(BOOL response) {
                   if (response) {
@@ -455,14 +473,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     NSError* error;
     if (![LocalDeviceStorageProvider.sharedInstance toggleSharedStorage:metadata error:&error]) {
-        [Alerts error:self title:@"Could not change storage location" error:error];
+        [Alerts error:self title:NSLocalizedString(@"safes_vc_could_not_change_storage_location_error", @"error message could not change local storage") error:error];
     }
     else {
         BOOL previouslyShared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:metadata];
 
-        NSString* message = !previouslyShared ? @"This database has been made visible in 'Files'" :
-            @"This database has been made fully Auto Fill-able";
-        [Alerts info:self title:@"Local Storage Mode Changed" message:message];
+        NSString* message = !previouslyShared ?
+            NSLocalizedString(@"safes_vc_database_made_visible_in_files", @"informational message - made the file visible in iOS Files") :
+            NSLocalizedString(@"safes_vc_database_made_fully_autofillable", @"informational message - made the database fully autofillable");
+        [Alerts info:self
+               title:NSLocalizedString(@"safes_vc_local_storage_mode_changed", @"information message = title changed storage mode")
+             message:message];
     }
 }
 
@@ -481,16 +502,15 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     NSString *message;
     
     if(safe.storageProvider == kiCloud && [Settings sharedInstance].iCloudOn) {
-        message = @"This will remove the database from all your iCloud enabled devices.\n\n"
-                    @"Are you sure you want to remove this database from Strongbox and iCloud?";
+        message = NSLocalizedString(@"safes_vc_remove_icloud_databases_warning", @"warning message about removing database from icloud");
     }
     else {
-        message = [NSString stringWithFormat:@"Are you sure you want to remove this database from Strongbox?%@",
-                         (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : @" (NB: The underlying database file will not be deleted)"];
+        message = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_are_you_sure_remove_database", @"are you sure you want to remove database prompt with format string on end"),
+                         (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : NSLocalizedString(@"safes_vc_extra_info_underlying_database", @"extra info appended to string about the underlying storage type")];
     }
     
     [Alerts yesNo:self
-            title:@"Are you sure?"
+            title:NSLocalizedString(@"safes_vc_question_confirm_are_you_sure", @"Are you sure? Title")
           message:message
            action:^(BOOL response) {
                if (response) {
@@ -515,7 +535,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [[AppleICloudProvider sharedInstance] delete:safe completion:^(NSError *error) {
             if(error) {
                 NSLog(@"%@", error);
-                [Alerts error:self title:@"Error Deleting iCloud Database" error:error];
+                [Alerts error:self title:NSLocalizedString(@"safes_vc_error_delete_icloud_database", @"Error message - could not delete iCloud database") error:error];
                 return;
             }
             else {
@@ -637,10 +657,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                             if([SafesList.sharedInstance getSafesOfProvider:kiCloud].count) {
                                 [Alerts twoOptionsWithCancel:self
-                                                       title:@"Found iCloud Database"
-                                                     message:@"It looks like you already have an iCloud database, would you like to use this one, or would you like to continue adding another?"
-                                           defaultButtonText:@"Use this iCloud database"
-                                            secondButtonText:@"I'd like to add another database"
+                                                       title:NSLocalizedString(@"safes_vc_found_icloud_database", @"Informational message title - found an iCloud Database")
+                                                     message:NSLocalizedString(@"safes_vc_use_icloud_or_continue", @"question message, use iCloud database or select a different one")
+                                           defaultButtonText:NSLocalizedString(@"safes_vc_use_this_icloud_database", @"One of the options in response to prompt - Use this iCloud database")
+                                            secondButtonText:NSLocalizedString(@"safes_vc_add_another", @"Second option - Select another database")
                                                       action:^(int response) {
                                                           if(response == 1) {
                                                               [self onAddExistingSafe];
@@ -719,7 +739,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     else if (params.method == kStorageMethodErrorOccurred) {
         [self dismissViewControllerAnimated:YES completion:^{
-            [Alerts error:self title:@"Error Selecting Storage Location" error:params.error];
+            [Alerts error:self title:NSLocalizedString(@"safes_vc_error_selecting_storage_location", @"Error title - error selecting storage location") error:params.error];
         }];
     }
     else if (params.method == kStorageMethodFilesAppUrl) {
@@ -745,7 +765,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         database.likelyFormat = storageParams.likelyFormat;
         
         if(database == nil) {
-            [Alerts warn:self title:@"Error Adding" message:@"An unknown error occurred while adding this database. getMetaData."];
+            [Alerts warn:self title:NSLocalizedString(@"safes_vc_error_adding_database", @"Error title: error adding database") message:NSLocalizedString(@"safes_vc_unknown_error_while_adding_database", @"Error Message- unknown error while adding")];
         }
         else {
             [SafesList.sharedInstance add:database];
@@ -768,7 +788,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                  format:format
                              completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
                                  if(error || !metadata) {
-                                     [Alerts error:self title:@"Error Creating Database" error:error];
+                                     [Alerts error:self title:NSLocalizedString(@"safes_vc_error_creating_database", @"Error Title: Error creating database") error:error];
                                  }
                                  else {
                                      [self addDatabaseWithiCloudRaceCheck:metadata];
@@ -783,7 +803,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                       password:password
                                     completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
                                         if(error || !metadata) {
-                                            [Alerts error:self title:@"Error Creating Database" error:error];
+                                            [Alerts error:self title:NSLocalizedString(@"safes_vc_error_creating_database", @"Error Title: Error while creating database") error:error];
                                         }
                                         else {
                                             metadata = [self addDatabaseWithiCloudRaceCheck:metadata];
@@ -811,10 +831,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName data:(NSData *)data {
     if(Settings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
-                               title:@"Copy to iCloud or Local?"
-                             message:@"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?"
-                   defaultButtonText:@"Copy to Local Device Only"
-                    secondButtonText:@"Copy to iCloud"
+                               title:NSLocalizedString(@"safes_vc_copy_icloud_or_local", @"Question Title: Copy to icloud or to local")
+                             message:NSLocalizedString(@"safes_vc_copy_local_to_icloud", @"Question message: copy to iCloud or to Local")
+                   defaultButtonText:NSLocalizedString(@"safes_vc_copy_to_local", @"Default button: Copy to Local")
+                    secondButtonText:NSLocalizedString(@"safes_vc_copy_to_icloud", @"Second Button: Copy to iCLoud")
                               action:^(int response) {
                                   if(response == 0) {
                                       [self addManualDownloadUrl:NO data:data nickName:nickName];
@@ -854,7 +874,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
             }
             else {
-                [Alerts error:self title:@"Error Importing Database" error:error];
+                [Alerts error:self title:NSLocalizedString(@"safes_vc_error_importing_database", @"Error Title Error Importing Datavase") error:error];
             }
         });
      }];
@@ -865,11 +885,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
 - (IBAction)onAddSafe:(id)sender {
     UIAlertController *alertController =
-        [UIAlertController alertControllerWithTitle:@"What would you like to do?"
+        [UIAlertController alertControllerWithTitle:NSLocalizedString(@"safes_vc_what_would_you_like_to_do", @"Options Title - What would like to do? Options are to Add a Database or Create New etc")
                                             message:nil
                                       preferredStyle:UIAlertControllerStyleActionSheet];
 
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"Add Existing Database..."
+    UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_add_existing_database", @"")
                                                      style:UIAlertActionStyleDefault
                                                    handler:^(UIAlertAction *a) {
                                                        [self onAddExistingSafe];
@@ -878,7 +898,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     // Create New
     
-    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:@"New Database (Advanced)..."
+    UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_new_database_advanced", @"")
                                                      style:UIAlertActionStyleDefault
                                                    handler:^(UIAlertAction *a) {
                                                        [self onCreateNewSafe];
@@ -888,7 +908,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     // Express
     
 //    if(Settings.sharedInstance.iCloudAvailable && Settings.sharedInstance.iCloudOn) {
-        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:@"New Database (Express)"
+        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_new_database_express", @"")
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
                                                                     [self onNewExpressDatabase];
@@ -901,7 +921,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     // Cancel
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_cancel", @"")
                                                            style:UIAlertActionStyleCancel
                                                          handler:nil];
     [alertController addAction:cancelAction];
@@ -954,13 +974,6 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     self.navigationController.toolbarHidden =  [[Settings sharedInstance] isPro];
     self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
     
-    if([[Settings sharedInstance] isProOrFreeTrial]) {
-        [self.navItemHeader setTitle:@"Databases"];
-    }
-    else {
-        [self.navItemHeader setTitle:@"Databases [Lite Version]"];
-    }
-    
     if(![[Settings sharedInstance] isPro]) {
         [self.buttonUpgrade setEnabled:YES];
     
@@ -969,10 +982,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
             
             if(daysLeft > 30) {
-                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info"];
+                upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
             }
             else {
-                upgradeButtonTitle = [NSString stringWithFormat:@"Upgrade Info - (%ld Pro days left)",
+                upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title_days_remaining", @"Upgrade Button Title with Days remaining of pro trial version"),
                                   (long)daysLeft];
             }
             
@@ -981,7 +994,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             }
         }
         else {
-            upgradeButtonTitle = [NSString stringWithFormat:@"Please Upgrade..."];
+            upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Upgrade Button Title asking to Please Upgrade");
             [self.buttonUpgrade setTintColor: [UIColor redColor]];
         }
         
@@ -1048,7 +1061,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeError];
                 
-                [Alerts info:weakVc title:@"PIN Incorrect" message:@"That is not the correct PIN code." completion:^{
+                [Alerts info:weakVc
+                       title:NSLocalizedString(@"safes_vc_error_pin_incorrect_title", @"")
+                     message:NSLocalizedString(@"safes_vc_error_pin_incorrect_message", @"")
+                  completion:^{
                     [self dismissViewControllerAnimated:YES completion:nil];
                 }];
             }

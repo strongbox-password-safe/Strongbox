@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
 
+- (NodeFields*)duplicate;
 - (NodeFields *)cloneForHistory;
 
 - (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;

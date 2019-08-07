@@ -26,8 +26,6 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
-@property (weak, nonatomic) IBOutlet UILabel *labelOfflineCacheTime;
-@property (weak, nonatomic) IBOutlet UILabel *labelAutoFillCacheTime;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowOfflineCache;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
@@ -45,29 +43,24 @@
     self.viewModel.metadata.readOnly = self.switchReadOnly.on;
     [[SafesList sharedInstance] update:self.viewModel.metadata];
     
-    [Alerts info:self title:@"Re-Open Required" message:@"You must close and reopen this database for Read-Only changes to take effect."];
+    [Alerts info:self
+           title:NSLocalizedString(@"db_management_reopen_required_title", @"Re-Open Required")
+         message:NSLocalizedString(@"db_management_reopen_required_message", @"You must close and reopen this database for Read-Only changes to take effect.")];
 }
 
 - (void)bindSettings {
     NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
-    self.labelAllowBiometricSetting.text = [NSString stringWithFormat:@"Allow %@ Unlock", biometricIdName];
+    self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock"), biometricIdName];
     self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.darkTextColor : UIColor.lightGrayColor;
     
     self.switchAllowBiometric.enabled = [self canToggleTouchId];
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
 
-
-    NSDate* modDate = [[CacheManager sharedInstance] getAutoFillCacheModificationDate:self.viewModel.metadata];
-    self.labelAutoFillCacheTime.text = self.viewModel.metadata.autoFillEnabled ? getLastCachedDate(modDate) : @"";
     self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillEnabled;
 
-    modDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:self.viewModel.metadata];
-    self.labelOfflineCacheTime.text = self.viewModel.metadata.offlineCacheEnabled ? getLastCachedDate(modDate) : @"";
-    
     self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
     self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
     self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
-
     
     self.switchReadOnly.on = self.viewModel.metadata.readOnly;
 }
@@ -89,7 +82,9 @@
     
     self.cellChangeMasterCredentials.userInteractionEnabled = [self canSetCredentials];
     self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
-    self.cellChangeMasterCredentials.textLabel.text = self.viewModel.database.format == kPasswordSafe ? @"Change Master Password" : @"Change Master Credentials";
+    self.cellChangeMasterCredentials.textLabel.text = self.viewModel.database.format == kPasswordSafe ?
+    NSLocalizedString(@"db_management_change_master_password", @"Change Master Password") :
+    NSLocalizedString(@"db_management_change_master_credentials", @"Change Master Credentials");
     
     self.cellChangeMasterCredentials.tintColor =  [self canSetCredentials] ? nil : UIColor.lightGrayColor;
     
@@ -106,7 +101,7 @@
     self.navigationController.toolbar.hidden = YES;
     [self.navigationController setNavigationBarHidden:NO];
 
-    self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : @"<None>";
+    self.labelMostPopularUsername.text = self.viewModel.database.mostPopularUsername ? self.viewModel.database.mostPopularUsername : NSLocalizedString(@"db_management_statistics_none", @"<None>");
     self.labelNumberOfUniqueUsernames.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
     self.labelNumberOfUniquePasswords.text = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.passwordSet count]];
     self.labelNumberOfGroups.text =  [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfGroups];
@@ -164,7 +159,9 @@
         self.viewModel.database.compositeKeyFactors.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
         
         if(self.viewModel.database.compositeKeyFactors.keyFileDigest == nil) {
-            [Alerts error:self title:@"Could not change credentials" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
+                    error:error];
             return;
         }
     }
@@ -187,7 +184,9 @@
             self.viewModel.metadata.keyFileUrl = keyFileUrl; 
             [SafesList.sharedInstance update:self.viewModel.metadata];
 
-            [ISMessages showCardAlertWithTitle:self.viewModel.database.format == kPasswordSafe ? @"Master Password Changed" : @"Master Credentials Changed"
+            [ISMessages showCardAlertWithTitle:self.viewModel.database.format == kPasswordSafe ?
+             NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
+             NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
                                        message:nil
                                       duration:3.f
                                    hideOnSwipe:YES
@@ -197,7 +196,9 @@
                                        didHide:nil];
         }
         else {
-            [Alerts error:self title:@"Could not change credentials" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")
+                    error:error];
         }
     }];
 }
@@ -207,11 +208,13 @@
     
     if (!self.switchAllowBiometric.on) {
         NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
-        @"Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-        @"Are you sure you want to disable %@ for this database?";
+        
+        NSLocalizedString(@"db_management_disable_biometric_warning_fmt", @"Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?") :
+        
+        NSLocalizedString(@"db_management_disable_biomtric_simple_fmt", @"Are you sure you want to disable %@ for this database?");
         
         [Alerts yesNo:self
-                title:[NSString stringWithFormat:@"Disable %@?", bIdName]
+                title:[NSString stringWithFormat:NSLocalizedString(@"db_management_disable_biometric_question_fmt", @"Disable %@?"), bIdName]
               message:[NSString stringWithFormat:message, bIdName]
                action:^(BOOL response) {
                    if (response) {
@@ -226,8 +229,11 @@
                        
                        [[SafesList sharedInstance] update:self.viewModel.metadata];
 
-                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Disabled", bIdName]
-                                                  message:[NSString stringWithFormat:@"%@ for this database has been disabled.", bIdName]
+                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:
+                                                           NSLocalizedString(@"db_management_disable_biometric_notify_title_fmt", @"%@ Disabled"), bIdName]
+                                                  message:[NSString stringWithFormat:
+                                            
+                                                           NSLocalizedString(@"db_management_disable_biometric_notify_message_fmt", @"%@ for this database has been disabled."), bIdName]
                                                  duration:3.f
                                               hideOnSwipe:YES
                                                 hideOnTap:YES
@@ -249,8 +255,10 @@
         [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindSettings];
 
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"%@ Enabled", bIdName]
-                                   message:[NSString stringWithFormat:@"%@ has been enabled for this database.", bIdName]
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:
+                                            NSLocalizedString(@"db_management_enable_biometric_notify_title_fmt", @"%@ Enabled"), bIdName]
+                                   message:[NSString stringWithFormat:
+                                            NSLocalizedString(@"db_management_enable_biometric_notify_message_fmt", @"%@ has been enabled for this database."), bIdName]
                                   duration:3.f
                                hideOnSwipe:YES
                                  hideOnTap:YES
@@ -263,14 +271,14 @@
 - (IBAction)onSwitchAllowAutoFillCache:(id)sender {
     if (!self.switchAllowAutoFillCache.on) {
         [Alerts yesNo:self
-                title:@"Disable AutoFill?"
-              message:@"Are you sure you want to do this?"
+                title:NSLocalizedString(@"db_management_disable_autofill_yesno_title", @"Disable AutoFill?")
+              message:NSLocalizedString(@"db_management_disable_autofill_yesno_message", @"Are you sure you want to do this?")
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearAutoFill];
                        [self bindSettings];
                        
-                       [ISMessages showCardAlertWithTitle:@"AutoFill Disabled"
+                       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled")
                                                   message:nil
                                                  duration:3.f
                                               hideOnSwipe:YES
@@ -292,7 +300,7 @@
         [self.viewModel updateAutoFillCache:^{
             [self bindSettings];
             
-            [ISMessages                 showCardAlertWithTitle:@"AutoFill Enabled"
+            [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_done", @"AutoFill Enabled")
                                                        message:nil
                                                       duration:3.f
                                                    hideOnSwipe:YES
@@ -307,13 +315,13 @@
 - (IBAction)onSwitchAllowOfflineCache:(id)sender {
     if (!self.switchAllowOfflineCache.on) {
         [Alerts yesNo:self
-                title:@"Disable Offline Access?"
-              message:@"Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?"
+                title:NSLocalizedString(@"db_management_disable_offline_yesno_title", @"Disable Offline Access?")
+              message:NSLocalizedString(@"db_management_disable_offline_yesno_message", @"Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?")
                action:^(BOOL response) {
                    if (response) {
                        [self.viewModel disableAndClearOfflineCache];
                        [self bindSettings];
-                       [ISMessages showCardAlertWithTitle:@"Offline Disabled"
+                       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_offline_done", @"Offline Disabled")
                                                   message:nil
                                                  duration:3.f
                                               hideOnSwipe:YES
@@ -332,7 +340,7 @@
         [self.viewModel updateOfflineCache:^{
             [self bindSettings];
             
-            [ISMessages                 showCardAlertWithTitle:@"Offline Enabled"
+            [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_offline_done", @"Offline Enabled")
                                                        message:nil
                                                       duration:3.f
                                                    hideOnSwipe:YES
@@ -418,10 +426,5 @@
 - (BOOL)canToggleOfflineCache {
     return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
 }
-
-static NSString *getLastCachedDate(NSDate *modDate) {
-    return modDate ? [NSString stringWithFormat:@"(Cached %@)", friendlyDateStringVeryShort(modDate)] : @"";
-}
-
 
 @end

@@ -552,8 +552,8 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="39.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="Allow &lt;Biometric ID&gt; Unlock" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Ui-WV-Edi" userLabel="Label">
-                                                    <rect key="frame" x="20" y="9.5" width="217.5" height="20.5"/>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="&lt;Biometric ID&gt; Unlock" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Ui-WV-Edi" userLabel="Label">
+                                                    <rect key="frame" x="20" y="9.5" width="172.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -581,8 +581,8 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="39.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="AutoFill Enabled" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MyM-Gm-9ER" userLabel="Label">
-                                                    <rect key="frame" x="20" y="11" width="122.5" height="20.5"/>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="AutoFill" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MyM-Gm-9ER" userLabel="Label">
+                                                    <rect key="frame" x="20" y="11" width="56.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -593,20 +593,11 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                                         <action selector="onSwitchAllowAutoFillCache:" destination="E3R-8C-0xu" eventType="valueChanged" id="8Ex-gv-Iue"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="748" insetsLayoutMarginsFromSafeArea="NO" text="Last Cache: Friday at 12:45" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="evp-8U-yu0" userLabel="Cache Info">
-                                                    <rect key="frame" x="150.5" y="14" width="186.5" height="12"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="evp-8U-yu0" firstAttribute="leading" secondItem="MyM-Gm-9ER" secondAttribute="trailing" constant="8" id="cgG-s2-Wrm"/>
                                                 <constraint firstItem="MyM-Gm-9ER" firstAttribute="leading" secondItem="kao-w3-1dV" secondAttribute="leadingMargin" id="eQH-gF-4LY"/>
                                                 <constraint firstItem="GnR-SM-RVK" firstAttribute="centerY" secondItem="kao-w3-1dV" secondAttribute="centerY" id="jkX-Qx-uuu"/>
-                                                <constraint firstItem="evp-8U-yu0" firstAttribute="centerY" secondItem="kao-w3-1dV" secondAttribute="centerY" id="lS7-EA-tLO"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="GnR-SM-RVK" secondAttribute="trailing" id="uQA-oh-nqc"/>
-                                                <constraint firstItem="GnR-SM-RVK" firstAttribute="leading" secondItem="evp-8U-yu0" secondAttribute="trailing" constant="8" id="x8l-Ze-pnt"/>
                                                 <constraint firstItem="MyM-Gm-9ER" firstAttribute="top" secondItem="kao-w3-1dV" secondAttribute="topMargin" id="ysD-sy-c7H"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -618,8 +609,8 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="39.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="Offline Enabled" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bVn-RL-KZT" userLabel="Label">
-                                                    <rect key="frame" x="20" y="11" width="117" height="20.5"/>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="Offline Cache" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bVn-RL-KZT" userLabel="Label">
+                                                    <rect key="frame" x="20" y="11" width="104.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -630,21 +621,12 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                                         <action selector="onSwitchAllowOfflineCache:" destination="E3R-8C-0xu" eventType="valueChanged" id="D77-1G-paS"/>
                                                     </connections>
                                                 </switch>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="748" insetsLayoutMarginsFromSafeArea="NO" text="Last Cache: Friday at 12:45" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w4O-FM-i2e" userLabel="Cache Info">
-                                                    <rect key="frame" x="145" y="14" width="192" height="12"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                                    <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="bVn-RL-KZT" firstAttribute="top" secondItem="BBY-gh-RJh" secondAttribute="topMargin" id="0BG-nK-GMU"/>
-                                                <constraint firstItem="w4O-FM-i2e" firstAttribute="centerY" secondItem="BBY-gh-RJh" secondAttribute="centerY" id="9kH-Ya-FbP"/>
                                                 <constraint firstItem="wgP-rd-gw0" firstAttribute="centerY" secondItem="BBY-gh-RJh" secondAttribute="centerY" id="B1s-x8-3PO"/>
-                                                <constraint firstItem="w4O-FM-i2e" firstAttribute="leading" secondItem="bVn-RL-KZT" secondAttribute="trailing" constant="8" id="Uzy-QH-w3E"/>
                                                 <constraint firstItem="bVn-RL-KZT" firstAttribute="leading" secondItem="BBY-gh-RJh" secondAttribute="leadingMargin" id="dOI-uI-rrp"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="wgP-rd-gw0" secondAttribute="trailing" id="kdH-ec-rLp"/>
-                                                <constraint firstItem="wgP-rd-gw0" firstAttribute="leading" secondItem="w4O-FM-i2e" secondAttribute="trailing" constant="8" id="yzx-yo-FiK"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -1280,14 +1262,12 @@ NB: It is important to note that in some jurisdictions this action in itself can
                         <outlet property="cellViewAttachments" destination="1CA-pE-r8G" id="Dhf-Fv-EaX"/>
                         <outlet property="labelAllowBiometricSetting" destination="5Ui-WV-Edi" id="qDD-Yk-qlZ"/>
                         <outlet property="labelAllowOfflineCahce" destination="bVn-RL-KZT" id="DfU-kV-FOm"/>
-                        <outlet property="labelAutoFillCacheTime" destination="evp-8U-yu0" id="FVN-d4-XO5"/>
                         <outlet property="labelExportByEmail" destination="8t7-OA-fuK" id="NP3-aM-dfD"/>
                         <outlet property="labelMostPopularUsername" destination="0uj-9f-YzH" id="WS0-sy-Yph"/>
                         <outlet property="labelNumberOfGroups" destination="72E-qf-FcW" id="DwG-bh-8E0"/>
                         <outlet property="labelNumberOfRecords" destination="qUM-G0-tWN" id="Mm7-Ny-9Kb"/>
                         <outlet property="labelNumberOfUniquePasswords" destination="u12-Jd-EK6" id="VZK-i3-Cp9"/>
                         <outlet property="labelNumberOfUniqueUsernames" destination="7wl-Po-6rv" id="JWZ-bQ-FPC"/>
-                        <outlet property="labelOfflineCacheTime" destination="w4O-FM-i2e" id="8iF-ai-Rej"/>
                         <outlet property="switchAllowAutoFillCache" destination="GnR-SM-RVK" id="I4u-Kn-DLf"/>
                         <outlet property="switchAllowBiometric" destination="pGn-m2-cFN" id="boA-gW-Ugt"/>
                         <outlet property="switchAllowOfflineCache" destination="wgP-rd-gw0" id="8pN-Qy-9Nh"/>

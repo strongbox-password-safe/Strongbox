@@ -33,10 +33,10 @@
     [super viewWillAppear:animated];
     
     if(self.existing) {
-        [self.navigationItem setPrompt:@"Select where your existing database is stored"];
+        [self.navigationItem setPrompt:NSLocalizedString(@"sspc_select_where_existing_stored", @"Select where your existing database is stored")];
     }
     else {
-        [self.navigationItem setPrompt:@"Select where you would like to store your new database"];
+        [self.navigationItem setPrompt:NSLocalizedString(@"sspc_select_where_store_new", @"Select where you would like to store your new database")];
     }
 
     self.navigationController.toolbar.hidden = YES;
@@ -94,11 +94,11 @@
     CustomStorageProviderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"storageProviderReuseIdentifier" forIndexPath:indexPath];
     
     if(indexPath.row == self.providers.count) {
-        cell.text.text = @"Copy from URL...";
+        cell.text.text = NSLocalizedString(@"sspc_copy_from_url_action", @"Copy from URL...");
         cell.image.image =  [UIImage imageNamed:@"Disconnect-32x32"];
     }
     else if(indexPath.row == self.providers.count + 1) {
-        cell.text.text = @"Files...";
+        cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files...");
         cell.image.image =  [UIImage imageNamed:@"ios11-files-app-icon"];
     }
     else {
@@ -122,11 +122,8 @@
         id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
         if (provider.storageId == kLocalDevice && !self.existing) {
             [Alerts yesNo:self
-                    title:@"Local Device Database Caveat"
-                  message:@"Since a local database is only stored on this device, any loss of this device will lead to the loss of "
-             "all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones "
-             "supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating "
-             "a local device database?"
+                    title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
+                  message:NSLocalizedString(@"sspc_local_device_storage_warning_message", @"Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?")
                    action:^(BOOL response) {
                        if (response) {
                            [self segueToBrowserOrAdd:provider];
@@ -144,9 +141,9 @@
 
 - (void)initiateManualImportFromUrl {
     [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"URL"
-                            title:@"Enter URL"
-                          message:@"Please Enter the URL of the Database File."
+             textFieldPlaceHolder:NSLocalizedString(@"sspc_manual_import_placeholder_url", @"URL")
+                            title:NSLocalizedString(@"sspc_manual_import_enter_url_title", @"Enter URL")
+                          message:NSLocalizedString(@"sspc_manual_import_enter_url_message", @"Please Enter the URL of the Database File.")
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                NSURL *url = [NSURL URLWithString:text];
@@ -179,13 +176,15 @@
     NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];
     
     if(error) {
-        [Alerts error:self title:@"Error Reading from URL" error:error];
+        [Alerts error:self
+                title:NSLocalizedString(@"sspc_manual_import_error_title", @"Error Reading from URL")
+                error:error];
         return;
     }
     
     if (![DatabaseModel isAValidSafe:importedData error:&error]) {
         [Alerts error:self
-                title:@"Invalid Database"
+                title:NSLocalizedString(@"sspc_error_invalid_database", @"Invalid Database")
                 error:error];
         
         return;

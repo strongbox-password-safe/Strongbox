@@ -117,31 +117,34 @@
 - (NSString*)getTapActionString:(BrowseTapAction)action {
     switch (action) {
         case kBrowseTapActionNone:
-            return @"No Action";
+            return NSLocalizedString(@"browse_prefs_tap_action_none", @"No Action");
             break;
         case kBrowseTapActionOpenDetails:
-            return @"View Item Details";
+            return NSLocalizedString(@"browse_prefs_tap_action_view_item", @"View Item");
             break;
         case kBrowseTapActionCopyTitle:
-            return @"Copy Title";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_title", @"Copy Title");
             break;
         case kBrowseTapActionCopyUsername:
-            return @"Copy Username";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_username", @"Copy Username");
             break;
         case kBrowseTapActionCopyPassword:
-            return @"Copy Password";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_password", @"Copy Password");
             break;
         case kBrowseTapActionCopyUrl:
-            return @"Copy URL";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_url", @"Copy URL");
             break;
         case kBrowseTapActionCopyEmail:
-            return @"Copy Email";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_email", @"Copy Email");
             break;
         case kBrowseTapActionCopyNotes:
-            return @"Copy Notes";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_notes", @"Copy Notes");
             break;
         case kBrowseTapActionCopyTotp:
-            return @"Copy TOTP";
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy TOTP");
+            break;
+        case kBrowseTapActionEdit:
+            return NSLocalizedString(@"browse_prefs_tap_action_edit", @"Edit Item");
             break;
         default:
             return @"Unknown";
@@ -169,6 +172,7 @@
 - (void)onChangeTapAction:(UITableViewCell*)cell {
     NSArray<NSNumber*>* options = self.format == kPasswordSafe ? @[@(kBrowseTapActionNone),
                                     @(kBrowseTapActionOpenDetails),
+                                    @(kBrowseTapActionEdit),
                                     @(kBrowseTapActionCopyTitle),
                                     @(kBrowseTapActionCopyUsername),
                                     @(kBrowseTapActionCopyPassword),
@@ -179,6 +183,7 @@
                                                     :
                                     @[@(kBrowseTapActionNone),
                                       @(kBrowseTapActionOpenDetails),
+                                      @(kBrowseTapActionEdit),
                                       @(kBrowseTapActionCopyTitle),
                                       @(kBrowseTapActionCopyUsername),
                                       @(kBrowseTapActionCopyPassword),
@@ -194,19 +199,19 @@
     NSString* title;
     if(cell == self.cellSingleTapAction) {
         current = self.databaseMetaData.tapAction;
-        title = @"Single Tap Action";
+        title = NSLocalizedString(@"browse_prefs_single_tap_action", @"Single Tap Action");
     }
     else if(cell == self.cellDoubleTapAction) {
         current = self.databaseMetaData.doubleTapAction;
-        title = @"Double Tap Action";
+        title = NSLocalizedString(@"browse_prefs_double_tap_action", @"Double Tap Action");
     }
     else if(cell == self.cellTripleTapAction) {
         current = self.databaseMetaData.tripleTapAction;
-        title = @"Triple Tap Action";
+        title = NSLocalizedString(@"browse_prefs_triple_tap_action", @"Triple Tap Action");
     }
     else {
         current = self.databaseMetaData.longPressTapAction;
-        title = @"Long Press Action";
+        title = NSLocalizedString(@"browse_prefs_long_press_action", @"Long Press Action");
     }
     
     NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -254,7 +259,7 @@
         return obj.integerValue == current;
     }];
     
-    [self promptForString:@"View As"
+    [self promptForString:NSLocalizedString(@"browse_prefs_view_as", @"View As")
                   options:optionStrings
              currentIndex:currentIndex
                completion:^(BOOL success, NSInteger selectedIdx) {
@@ -271,13 +276,13 @@
 - (NSString*)getBrowseViewTypeName:(BrowseViewType)field {
     switch (field) {
         case kBrowseViewTypeHierarchy:
-            return @"Folder Hierarchy";
+            return NSLocalizedString(@"browse_prefs_view_as_folders", @"Folder Hierarchy");
             break;
         case kBrowseViewTypeList:
-            return @"Flat List";
+            return NSLocalizedString(@"browse_prefs_view_as_flat_list", @"Flat List");
             break;
         case kBrowseViewTypeTotpList:
-            return @"TOTP List";
+            return NSLocalizedString(@"browse_prefs_view_as_totp_list", @"TOTP List");
             break;
         default:
             return @"None";
@@ -317,7 +322,7 @@
         return obj.integerValue == current;
     }];
     
-    [self promptForString:@"Item Subtitle"
+    [self promptForString:NSLocalizedString(@"browse_prefs_item_subtitle", @"Item Subtitle")
                   options:optionStrings
              currentIndex:currentIndex
                completion:^(BOOL success, NSInteger selectedIdx) {
@@ -333,30 +338,31 @@
 - (NSString*)getBrowseItemSubtitleFieldName:(BrowseItemSubtitleField)field {
     switch (field) {
         case kBrowseItemSubtitleNoField:
-            return @"None";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_none", @"None");
             break;
         case kBrowseItemSubtitleUsername:
-            return @"Username";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_username", @"Username");
             break;
         case kBrowseItemSubtitlePassword:
-            return @"Password";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_password", @"Password");
             break;
         case kBrowseItemSubtitleUrl:
-            return @"URL";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_url", @"URL");
             break;
         case kBrowseItemSubtitleEmail:
-            return @"Email";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_email", @"Email");
             break;
         case kBrowseItemSubtitleModified:
-            return @"Date Modified";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_date_modified", @"Date Modified");
+            break;
         case kBrowseItemSubtitleNotes:
-            return @"Notes";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_notes", @"Notes");
             break;
         case kBrowseItemSubtitleCreated:
-            return @"Date Created";
+            return NSLocalizedString(@"browse_prefs_item_subtitle_date_created", @"Date Created");
             break;
         default:
-            return @"None";
+            return @"<Unknown>";
             break;
     }
 }

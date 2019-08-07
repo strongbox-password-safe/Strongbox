@@ -87,6 +87,21 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     return ret;
 }
 
+- (NodeFields*)duplicate {
+    NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username
+                                                       url:self.url
+                                                  password:self.password
+                                                     notes:self.notes
+                                                     email:self.email];
+    
+    ret.passwordModified = self.passwordModified;
+    ret.expires = self.expires;
+    ret.attachments = [self cloneAttachments];
+    ret.mutableCustomFields = [self cloneCustomFields];
+    
+    return ret;
+}
+
 - (NodeFields *)cloneForHistory {
     NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username url:self.url password:self.password notes:self.notes email:self.email];
 

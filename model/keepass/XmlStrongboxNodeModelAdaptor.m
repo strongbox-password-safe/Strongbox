@@ -133,7 +133,8 @@
     ret.url = entry.fields.url;
     ret.notes = entry.fields.notes;
     
-    // Verify it's ok to strip empty strings. Looks like it is: https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
+    // Verify it's ok to strip empty strings. Looks like it is:
+    // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
     // MMcG: Don't strip emptys, it seems to be useful to allow empty values in the custom fields, or at least the
     // Windows app allows this
 

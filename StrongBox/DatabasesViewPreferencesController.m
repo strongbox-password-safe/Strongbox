@@ -71,7 +71,7 @@
     }];
     
     if (cell == self.cellTopRight) {
-        [self promptForString:@"Select Top Right Field"
+        [self promptForString:NSLocalizedString(@"databases_preferences_select_top_right_field", @"Select Top Right Field")
                       options:options
                  currentIndex:Settings.sharedInstance.databaseCellTopSubtitle
                    completion:^(BOOL success, NSInteger selectedIdx) {
@@ -82,7 +82,7 @@
                    }];
     }
     else if (cell == self.cellSubtitle1) {
-        [self promptForString:@"Select Subtitle 1 Field"
+        [self promptForString:NSLocalizedString(@"databases_preferences_select_subtitle1_field", @"Select Subtitle 1 Field")
                       options:options
                  currentIndex:Settings.sharedInstance.databaseCellSubtitle1
                    completion:^(BOOL success, NSInteger selectedIdx) {
@@ -93,7 +93,7 @@
                    }];
     }
     else if (cell == self.cellSubtitle2) {
-        [self promptForString:@"Select Subtitle 2 Field"
+        [self promptForString:NSLocalizedString(@"databases_preferences_select_subtitle2_field", @"Select Subtitle 2 Field")
                       options:options
                  currentIndex:Settings.sharedInstance.databaseCellSubtitle2
                    completion:^(BOOL success, NSInteger selectedIdx) {
@@ -110,16 +110,16 @@
 - (NSString*)getDatabaseSubtitleFieldName:(DatabaseCellSubtitleField)field {
     switch (field) {
         case kDatabaseCellSubtitleFieldNone:
-            return @"None";
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_none", @"None");
             break;
         case kDatabaseCellSubtitleFieldFileName:
-            return @"Filename";
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_filename", @"Filename");
             break;
         case kDatabaseCellSubtitleFieldLastCachedDate:
-            return @"Last Cached Date";
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_last_cached_data", @"Last Cached Date");
             break;
         case kDatabaseCellSubtitleFieldStorage:
-            return @"Database Storage";
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_database_storage", @"Database Storage");
             break;
         default:
             return @"<Unknown Field>";

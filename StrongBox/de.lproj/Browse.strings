@@ -1,0 +1,171 @@
+
+/* Class = "UILabel"; text = "Dereference in Search"; ObjectID = "0Bw-5Z-xAK"; */
+"0Bw-5Z-xAK.text" = "Dereference in Search";
+
+/* Class = "UIBarButtonItem"; title = "View Preferences"; ObjectID = "0zc-jl-pPT"; */
+"0zc-jl-pPT.title" = "View Preferences";
+
+/* Class = "UILabel"; text = "View As"; ObjectID = "1BU-T8-wFP"; */
+"1BU-T8-wFP.text" = "View As";
+
+/* Class = "UITableViewSection"; headerTitle = "Sort By"; ObjectID = "3Fc-cj-Sc4"; */
+"3Fc-cj-Sc4.headerTitle" = "Sort By";
+
+/* Class = "UIBarButtonItem"; title = "Sort By"; ObjectID = "3Mz-oA-Fxf"; */
+"3Mz-oA-Fxf.title" = "Sort By";
+
+/* Class = "UINavigationItem"; prompt = "Tip: Try long pressing, or double/triple tapping for quick actions"; ObjectID = "5B9-6k-HF7"; */
+"5B9-6k-HF7.prompt" = "Tip: Try long pressing, or double/triple tapping for quick actions";
+
+/* Class = "UINavigationItem"; title = "<Group Name>"; ObjectID = "5B9-6k-HF7"; */
+"5B9-6k-HF7.title" = "<Group Name>";
+
+/* Class = "UITableViewSection"; footerTitle = "Strongbox can perform different actions based on your taps"; ObjectID = "5Ed-gO-hgQ"; */
+"5Ed-gO-hgQ.footerTitle" = "Strongbox can perform different actions based on your taps";
+
+/* Class = "UITableViewSection"; headerTitle = "Tap Actions"; ObjectID = "5Ed-gO-hgQ"; */
+"5Ed-gO-hgQ.headerTitle" = "Tap Actions";
+
+/* Class = "UILabel"; text = "Double Tap"; ObjectID = "5HW-17-RA2"; */
+"5HW-17-RA2.text" = "Double Tap";
+
+/* Class = "UITableViewSection"; headerTitle = "Folders"; ObjectID = "7vh-io-f0f"; */
+"7vh-io-f0f.headerTitle" = "Folders";
+
+/* Class = "UILabel"; text = "Copy Password"; ObjectID = "8b5-7M-Fbk"; */
+"8b5-7M-Fbk.text" = "Copy Password";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "9Ml-Sp-3Td"; */
+"9Ml-Sp-3Td.text" = "Title";
+
+/* Class = "UITableViewSection"; headerTitle = "Recycle Bin"; ObjectID = "9hi-n3-gAk"; */
+"9hi-n3-gAk.headerTitle" = "Recycle Bin";
+
+/* Class = "UILabel"; text = "Copy Username"; ObjectID = "Atk-hW-7JK"; */
+"Atk-hW-7JK.text" = "Copy Username";
+
+/* Class = "UINavigationItem"; title = "View Preferences"; ObjectID = "BpH-Gn-gw4"; */
+"BpH-Gn-gw4.title" = "View Preferences";
+
+/* Class = "UILabel"; text = "Show Flags"; ObjectID = "CvN-K1-pRX"; */
+"CvN-K1-pRX.text" = "Show Flags";
+
+/* Class = "UIBarButtonItem"; title = "Add Folder"; ObjectID = "Dce-Xl-qQu"; */
+"Dce-Xl-qQu.title" = "Add Folder";
+
+/* Class = "UILabel"; text = "Date Created"; ObjectID = "EWb-Du-jaS"; */
+"EWb-Du-jaS.text" = "Date Created";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "F2X-Ry-32P"; */
+"F2X-Ry-32P.headerTitle" = "General";
+
+/* Class = "UILabel"; text = "Username"; ObjectID = "FWO-Fb-J8y"; */
+"FWO-Fb-J8y.text" = "Username";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "K9P-j2-L7I"; */
+"K9P-j2-L7I.text" = "Title";
+
+/* Class = "UILabel"; text = "Start with Search"; ObjectID = "KiA-68-F8c"; */
+"KiA-68-F8c.text" = "Start with Search";
+
+/* Class = "UIBarButtonItem"; title = "Move Here"; ObjectID = "LRN-ai-y1k"; */
+"LRN-ai-y1k.title" = "Move Here";
+
+/* Class = "UILabel"; text = "Notes"; ObjectID = "NJN-OP-Jbu"; */
+"NJN-OP-Jbu.text" = "Notes";
+
+/* Class = "UILabel"; text = "Descending"; ObjectID = "NTb-hT-cdX"; */
+"NTb-hT-cdX.text" = "Descending";
+
+/* Class = "UILabel"; text = "Dereference Fields"; ObjectID = "O9s-fM-wyE"; */
+"O9s-fM-wyE.text" = "Dereference Fields";
+
+/* Class = "UILabel"; text = "Password"; ObjectID = "Onb-Pt-yAr"; */
+"Onb-Pt-yAr.text" = "Password";
+
+/* Class = "UIBarButtonItem"; title = "Close"; ObjectID = "QGn-9Z-cSb"; */
+"QGn-9Z-cSb.title" = "Close";
+
+/* Class = "UILabel"; text = "Show TOTP"; ObjectID = "Rhh-0I-HvN"; */
+"Rhh-0I-HvN.text" = "Show TOTP";
+
+/* Class = "UILabel"; text = "Copy TOTP"; ObjectID = "Srz-kD-9f4"; */
+"Srz-kD-9f4.text" = "Copy TOTP";
+
+/* Class = "UILabel"; text = "Show Backup Folder"; ObjectID = "Tas-1u-V2K"; */
+"Tas-1u-V2K.text" = "Show Backup Folder";
+
+/* Class = "UILabel"; text = "Open Item Details"; ObjectID = "Vt9-MG-2Il"; */
+"Vt9-MG-2Il.text" = "Open Item Details";
+
+/* Class = "UILabel"; text = "Folder Child Count"; ObjectID = "WMV-JS-gq8"; */
+"WMV-JS-gq8.text" = "Folder Child Count";
+
+/* Class = "UILabel"; text = "Sort Folders Separately"; ObjectID = "X6N-nT-mTb"; */
+"X6N-nT-mTb.text" = "Sort Folders Separately";
+
+/* Class = "UIBarButtonItem"; title = "Database Management"; ObjectID = "YZa-t7-Q9A"; */
+"YZa-t7-Q9A.title" = "Database Management";
+
+/* Class = "UILabel"; text = "Folder Hierarchy"; ObjectID = "Yxs-mQ-Cm1"; */
+"Yxs-mQ-Cm1.text" = "Folder Hierarchy";
+
+/* Class = "UINavigationItem"; title = "Select Destination"; ObjectID = "Zem-1r-Ve6"; */
+"Zem-1r-Ve6.title" = "Select Destination";
+
+/* Class = "UILabel"; text = "URL"; ObjectID = "aiy-Vk-67a"; */
+"aiy-Vk-67a.text" = "URL";
+
+/* Class = "UILabel"; text = "Single Tap"; ObjectID = "eFj-ev-PsQ"; */
+"eFj-ev-PsQ.text" = "Single Tap";
+
+/* Class = "UILabel"; text = "None (Custom Order)"; ObjectID = "eWo-RW-Sin"; */
+"eWo-RW-Sin.text" = "None (Custom Order)";
+
+/* Class = "UILabel"; text = "Long Press"; ObjectID = "gAT-pc-Dhv"; */
+"gAT-pc-Dhv.text" = "Long Press";
+
+/* Class = "UILabel"; text = "Username"; ObjectID = "gg0-ep-FLv"; */
+"gg0-ep-FLv.text" = "Username";
+
+/* Class = "UILabel"; text = "Show in Search"; ObjectID = "ghT-vf-Zmr"; */
+"ghT-vf-Zmr.text" = "Show in Search";
+
+/* Class = "UILabel"; text = "Email"; ObjectID = "iB0-dh-9Kv"; */
+"iB0-dh-9Kv.text" = "Email";
+
+/* Class = "UILabel"; text = "Ascending"; ObjectID = "iKt-J3-eUP"; */
+"iKt-J3-eUP.text" = "Ascending";
+
+/* Class = "UILabel"; text = "Show Recycle Bin"; ObjectID = "jF4-sY-wDr"; */
+"jF4-sY-wDr.text" = "Show Recycle Bin";
+
+/* Class = "UIBarButtonItem"; title = "Back"; ObjectID = "lYD-hO-nkg"; */
+"lYD-hO-nkg.title" = "Back";
+
+/* Class = "UITableViewSection"; headerTitle = "Field Dereferencing"; ObjectID = "rF2-Qb-rIF"; */
+"rF2-Qb-rIF.headerTitle" = "Field Dereferencing";
+
+/* Class = "UILabel"; text = "Date Modified"; ObjectID = "tU7-0J-pH7"; */
+"tU7-0J-pH7.text" = "Date Modified";
+
+/* Class = "UILabel"; text = "Item Subtitle"; ObjectID = "uiZ-pj-7cP"; */
+"uiZ-pj-7cP.text" = "Item Subtitle";
+
+/* Class = "UINavigationItem"; prompt = "(NB: Does not affect underlying database order)"; ObjectID = "vcy-Nr-1EX"; */
+"vcy-Nr-1EX.prompt" = "(NB: Does not affect underlying database order)";
+
+/* Class = "UINavigationItem"; title = "View Sorted By"; ObjectID = "vcy-Nr-1EX"; */
+"vcy-Nr-1EX.title" = "View Sorted By";
+
+/* Class = "UITableViewController"; title = "Sort Order"; ObjectID = "vsk-JF-dyN"; */
+"vsk-JF-dyN.title" = "Sort Order";
+
+/* Class = "UIBarButtonItem"; title = "Move Items"; ObjectID = "xfT-gV-3qh"; */
+"xfT-gV-3qh.title" = "Move Items";
+
+/* Class = "UITableViewSection"; headerTitle = "Sort Direction"; ObjectID = "yAo-Vv-xce"; */
+"yAo-Vv-xce.headerTitle" = "Sort Direction";
+
+/* Class = "UILabel"; text = "Triple Tap"; ObjectID = "zPh-T1-OfL"; */
+"zPh-T1-OfL.text" = "Triple Tap";

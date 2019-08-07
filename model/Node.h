@@ -82,6 +82,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)restoreFromHistoricalNode:(Node*)historicalItem;
 
+- (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
+
 ///////////////////////////////////////////////
 // For use by any Safe Format Provider
 //

@@ -50,7 +50,7 @@
     [self cleanupInbox:launchOptions];
     
     [self observeClipboardChangeNotifications];
-    
+
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
     
     [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents

@@ -94,7 +94,10 @@
                                           password:self.password
                                         completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
                                             if(error) {
-                                                [Alerts error:self title:@"Error Creating Database" error:error completion:^{
+                                                [Alerts error:self
+                                                        title:NSLocalizedString(@"welcome_vc_error_creating", @"Error Creating Database")
+                                                        error:error
+                                                   completion:^{
                                                     self.onDone(NO, nil);
                                                 }];
                                             }
@@ -144,7 +147,7 @@
     
     [checkbox addTarget:self action:@selector(toggleShowHidePasswordText:) forControlEvents:UIControlEventTouchUpInside];
     
-    [checkbox setAccessibilityLabel:@"Show/Hide Password"];
+    [checkbox setAccessibilityLabel:NSLocalizedString(@"welcome_vc_accessibility_show_hide_password", @"Show/Hide Password")];
     
     // Setup image for button
     [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];

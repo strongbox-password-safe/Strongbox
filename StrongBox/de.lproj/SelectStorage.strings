@@ -1,0 +1,18 @@
+
+/* Class = "UILabel"; text = "This is a fairly long provider text"; ObjectID = "65L-Di-ago"; */
+"65L-Di-ago.text" = "This is a fairly long provider text";
+
+/* Class = "UITableViewController"; title = "Storage Browser"; ObjectID = "WCV-cO-CwF"; */
+"WCV-cO-CwF.title" = "Storage Browser";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "aXI-hl-I3Z"; */
+"aXI-hl-I3Z.text" = "Title";
+
+/* Class = "UIBarButtonItem"; title = "Select This Folder"; ObjectID = "c3E-XJ-xgJ"; */
+"c3E-XJ-xgJ.title" = "Select This Folder";
+
+/* Class = "UINavigationItem"; prompt = "Select Where You Would Like to Store Your Database"; ObjectID = "yFP-XA-jum"; */
+"yFP-XA-jum.prompt" = "Select Where You Would Like to Store Your Database";
+
+/* Class = "UINavigationItem"; title = "Select Storage Location"; ObjectID = "yFP-XA-jum"; */
+"yFP-XA-jum.title" = "Select Storage Location";

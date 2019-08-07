@@ -93,7 +93,9 @@
     else {
         // TODO: We should probably downgrade now... Something very funny is up
         // For now - we will warn and ask to message support so we can handle this gracefully if someone is struggling...
-        [Alerts info:vc title:@"Strongbox Entitlements Error" message:@"Strongbox is having trouble verifying its App Store entitlements. This could lead to a future App downgrade. Please contact support@strongboxsafe.com to get some help with this."];
+        [Alerts info:vc
+               title:NSLocalizedString(@"upgrade_mgr_entitlements_error_title", @"Strongbox Entitlements Error")
+             message:NSLocalizedString(@"upgrade_mgr_entitlements_error_message", @"Strongbox is having trouble verifying its App Store entitlements. This could lead to a future App downgrade. Please contact support@strongboxsafe.com to get some help with this.")];
     
         [self checkReceiptAndProEntitlements:vc];
     }
@@ -138,7 +140,9 @@
             NSLog(@"Downgrading App as Entitlement NOT found in Receipt...");
             
             if(vc) {
-                [Alerts info:vc title:@"Strongbox Downgrade" message:@"It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt."];
+                [Alerts info:vc
+                       title:NSLocalizedString(@"upgrade_mgr_downgrade_title", @"Strongbox Downgrade")
+                     message:NSLocalizedString(@"upgrade_mgr_downgrade_message", @"It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt.")];
             }
             [Settings.sharedInstance setPro:NO];
         }
@@ -204,7 +208,7 @@
 
 - (void)purchase:(NSString *)productId completion:(PurchaseCompletionBlock)completion {
     if(![SKPaymentQueue canMakePayments]) {
-        completion([Utils createNSError:@"Purchases are disabled on your device." errorCode:-1]);
+        completion([Utils createNSError:NSLocalizedString(@"upgrade_mgr_purchases_are_disabled", @"Purchases are disabled on your device.") errorCode:-1]);
         return;
     }
     

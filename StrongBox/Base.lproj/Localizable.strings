@@ -1,0 +1,510 @@
+/* 
+  Localizable.strings
+  Strongbox
+
+  Created by Mark on 05/08/2019.
+  Copyright © 2019 Mark McGuill. All rights reserved.
+*/
+
+// Possibly useful to have these as common
+
+"safes_vc_cancel" = "Cancel";
+
+"safes_vc_what_would_you_like_to_do" = "What would you like to do?";
+
+"safes_vc_question_confirm_are_you_sure" = "Are you sure?";
+
+//
+
+"safes_vc_upgrade_info_button_title" = "Upgrade Info";
+
+"safes_vc_upgrade_info_button_title_days_remaining" = "Upgrade Info - (%ld Pro days left)";
+
+"safes_vc_upgrade_info_button_title_please_upgrade" = "Please Upgrade...";
+
+"safes_vc_empty_databases_list_tableview_title" = "No Databases";
+
+"safes_vc_empty_databases_list_tableview_subtitle" = "Tap below to get started";
+
+"safes_vc_empty_databases_list_get_started_button_title" = "Get Started...";
+
+"safes_vc_cached_date_time" = "Cached: %@";
+
+"safes_vc_slide_left_remove_database_action" = "Remove...";
+
+"safes_vc_slide_left_open_offline_action" = "Open Offline";
+
+"safes_vc_slide_left_more_actions" = "More...";
+
+"safes_vc_database_actions_sheet_title" = "Database Actions";
+
+"safes_vc_action_rename_database" = "Rename Database...";
+
+"safes_vc_action_unset_as_quick_launch" = "Unset as Quick Launch DB...";
+
+"safes_vc_action_set_as_quick_launch" = "Set as Quick Launch DB...";
+
+"safes_vc_show_in_files" = "Show in 'Files'...";
+
+"safes_vc_make_autofillable" = "Make Auto Fill-able...";
+
+"safes_vc_about_quick_launch_title" = "About Quick Launch";
+
+"safes_vc_about_setting_quick_launch_and_confirm" = "Setting this database as your Quick Launch database means you will be automatically prompted to unlock this database as soon as you launch or re-activate Strongbox. This can save you one precious tap!\n\nSet as Quick Launch Database?";
+
+"safes_vc_show_database_in_files_info" = "Showing this database in 'Files' will make the database available for access via 'Files' and iTunes File Sharing. However the database will no longer be fully accessible in Auto Fill contexts. This is due to iOS system design.\n\nNB: You can always reverse this action";
+
+"safes_vc_make_database_auto_fill_info" = "Making this database Auto Fill-able will allow the database to be fully accessible in Auto Fill contexts (not just a read-only cache). However it will no longer be visible to iTunes File Sharing or via the Files app. This is due to iOS system design.\n\nNB: You can always reverse this action";
+
+"safes_vc_change_local_device_storage_mode_title" = "Change Local Device Storage Mode";
+
+"safes_vc_could_not_change_storage_location_error" = "Could not change storage location";
+
+"safes_vc_database_made_visible_in_files" = "This database has been made visible in 'Files'";
+
+"safes_vc_database_made_fully_autofillable" = "This database has been made fully Auto Fill-able";
+
+"safes_vc_local_storage_mode_changed" = "Local Storage Mode Changed";
+
+"safes_vc_remove_icloud_databases_warning" = "This will remove the database from all your iCloud enabled devices.\n\nAre you sure you want to remove this database from Strongbox and iCloud?";
+
+"safes_vc_are_you_sure_remove_database" = "Are you sure you want to remove this database from Strongbox?%@";
+
+"safes_vc_extra_info_underlying_database" = " (NB: The underlying database file will not be deleted)";
+
+"safes_vc_error_delete_icloud_database" = "Error Deleting iCloud Database";
+
+"safes_vc_found_icloud_database" = "Found iCloud Database";
+
+"safes_vc_use_icloud_or_continue" = "It looks like you already have an iCloud database, would you like to use this one, or would you like to continue adding another?";
+
+"safes_vc_use_this_icloud_database" = "Use this iCloud database";
+
+"safes_vc_add_another" = "I'd like to add another database";
+
+"safes_vc_error_selecting_storage_location" = "Error Selecting Storage Location";
+
+"safes_vc_error_adding_database" = "Error Adding";
+
+"safes_vc_unknown_error_while_adding_database" = "An unknown error occurred while adding this database";
+
+"safes_vc_error_creating_database" = "Error Creating Database";
+
+"safes_vc_copy_icloud_or_local" = "Copy to iCloud or Local?";
+
+"safes_vc_copy_local_to_icloud" = "iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?";
+
+"safes_vc_copy_to_local" = "Copy to Local Device Only";
+
+"safes_vc_copy_to_icloud" = "Copy to iCloud";
+
+"safes_vc_error_importing_database" = "Error Importing Database";
+
+"safes_vc_add_existing_database" = "Add Existing Database...";
+
+"safes_vc_new_database_advanced" = "New Database (Advanced)...";
+
+"safes_vc_new_database_express" = "New Database (Express)";
+
+"safes_vc_error_pin_incorrect_title" = "PIN Incorrect";
+
+"safes_vc_error_pin_incorrect_message" = "That is not the correct PIN code.";
+
+"safesvc_icloud_no_longer_available_title" = "iCloud no longer available";
+
+"safesvc_icloud_no_longer_available_message" = "Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud.";
+
+"safesvc_migrate_local_existing" = "You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)";
+
+"safesvc_migrate_local_no_existing" = "You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?";
+
+"safesvc_use_icloud_question_existing" = "Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)";
+
+"safesvc_use_icloud_question_no_existing" = "You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?";
+
+"safesvc_icloud_now_available_title" = "iCloud is Now Available";
+
+"safesvc_option_use_icloud" = "Use iCloud";
+
+"safesvc_option_local_only" = "Local Only";
+
+"safesvc_icloud_available_title" = "iCloud Available";
+
+"safesvc_question_migrate_local_to_icloud" = "Would you like to migrate your current local device databases to iCloud?";
+
+"safesvc_option_migrate_to_icloud" = "Migrate to iCloud";
+
+"safesvc_option_keep_local" = "Keep Local";
+
+"safesvc_icloud_unavailable_title" = "iCloud Unavailable";
+
+"safesvc_icloud_unavailable_question" = "What would you like to do with the databases currently on this device?";
+
+"safesvc_icloud_unavailable_option_remove" = "Remove them, Keep on iCloud Only";
+
+"safesvc_icloud_unavailable_option_make_local" = "Make Local Copies";
+
+"safesvc_icloud_unavailable_option_icloud_on" = "Switch iCloud Back On";
+
+"safesvc_icloud_migration_progress_title_migrating" = "Migrating...";
+
+"safesvc_import_manual_url_invalid" = "Invalid Database";
+
+"safesvc_error_title_import_file_error_opening" = "Error Opening";
+
+"safesvc_error_message_import_file_error_opening" = "Could not access this file.";
+
+"safesvc_info_title_key_file_imported" = "Key File Imported";
+
+"safesvc_info_message_key_file_imported" = "This key file has been imported successfully.";
+
+"safesvc_error_title_error_importing_key_file" = "Problem Importing Key File";
+
+"safesvc_error_title_import_database_fmt" = "Invalid Database - [%@]";
+
+"safesvc_import_database_prompt_title_edit_copy" = "Edit or Copy?";
+
+"safesvc_import_database_prompt_message" = "Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?";
+
+"safesvc_option_edit_in_place" = "Edit in Place";
+
+"safesvc_option_make_a_copy" = "Make a Copy";
+
+"safesvc_update_existing_database_title" = "Update Existing Database?";
+
+"safesvc_update_existing_question" = "A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?";
+
+"safesvc_update_existing_option_update" = "Update Existing Database";
+
+"safesvc_update_existing_option_create" = "Create a New Database";
+
+"safesvc_error_updating_title" = "Error updating file.";
+
+"safesvc_error_updating_message" = "Could not update local file.";
+
+"safesvc_copy_database_to_location_title" = "Copy to iCloud or Local?";
+
+"safesvc_copy_database_to_location_message" = "iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?";
+
+"safesvc_copy_database_option_to_local" = "Copy to Local Device Only";
+
+"safesvc_copy_database_option_to_icloud" = "Copy to iCloud";
+
+"safesvc_error_importing_title" = "Error Importing Database";
+
+"safesvc_error_importing_title" = "Error Importing Database";
+
+"safesvc_error_title_could_not_bookmark" = "Could not bookmark this file";
+
+
+///
+
+"alerts_cancel" = "Cancel";
+"alerts_confirm_password" = "Confirm Password";
+"alerts_no" = "No";
+"alerts_not_empty" = "Not Empty!";
+"alerts_ok" = "OK";
+"alerts_password" = "Password";
+"alerts_unknown_error" = "Unknown Error";
+"alerts_yes" = "Yes";
+
+//
+
+"browse_prefs_double_tap_action" = "Double Tap Action";
+"browse_prefs_item_subtitle" = "Item Subtitle";
+"browse_prefs_item_subtitle_date_created" = "Date Created";
+"browse_prefs_item_subtitle_date_modified" = "Date Modified";
+"browse_prefs_item_subtitle_email" = "Email";
+"browse_prefs_item_subtitle_none" = "None";
+"browse_prefs_item_subtitle_notes" = "Notes";
+"browse_prefs_item_subtitle_password" = "Password";
+"browse_prefs_item_subtitle_url" = "URL";
+"browse_prefs_item_subtitle_username" = "Username";
+"browse_prefs_long_press_action" = "Long Press Action";
+"browse_prefs_single_tap_action" = "Single Tap Action";
+"browse_prefs_tap_action_copy_copy_email" = "Copy Email";
+"browse_prefs_tap_action_copy_copy_notes" = "Copy Notes";
+"browse_prefs_tap_action_copy_copy_password" = "Copy Password";
+"browse_prefs_tap_action_copy_copy_totp" = "Copy TOTP";
+"browse_prefs_tap_action_copy_copy_url" = "Copy URL";
+"browse_prefs_tap_action_copy_title" = "Copy Title";
+"browse_prefs_tap_action_copy_username" = "Copy Username";
+"browse_prefs_tap_action_edit" = "Edit Item";
+"browse_prefs_tap_action_none" = "No Action";
+"browse_prefs_tap_action_view_item" = "View Item";
+"browse_prefs_triple_tap_action" = "Triple Tap Action";
+"browse_prefs_view_as" = "View As";
+"browse_prefs_view_as_flat_list" = "Flat List";
+"browse_prefs_view_as_folders" = "Folder Hierarchy";
+"browse_prefs_view_as_totp_list" = "TOTP List";
+
+//
+
+"browse_vc_action_delete" = "Delete";
+"browse_vc_action_duplicate" = "Duplicate";
+"browse_vc_action_edit" = "Edit";
+"browse_vc_action_rename" = "Rename";
+"browse_vc_action_set_icon" = "Set Icon";
+"browse_vc_are_you_sure" = "Are you sure?";
+"browse_vc_are_you_sure_delete" = "Are you sure you want to permanently delete these item(s)?";
+"browse_vc_are_you_sure_delete_fmt" = "Are you sure you want to permanently delete '%@'?";
+"browse_vc_are_you_sure_recycle" = "Are you sure you want to send these item(s) to the Recycle Bin?";
+"browse_vc_are_you_sure_recycle_fmt" = "Are you sure you want to send '%@' to the Recycle Bin?";
+"browse_vc_cannot_create_group" = "Cannot create group";
+"browse_vc_cannot_create_group_message" = "Could not create a group with this name here, possibly because one with this name already exists.";
+"browse_vc_delete_error_message" = "There was an error trying to delete this item.";
+"browse_vc_delete_failed" = "Delete Failed";
+"browse_vc_duplicate_title_suffix" = " Copy";
+"browse_vc_email_copied_fmt" = "'%@' Email Copied";
+"browse_vc_enter_group_name" = "Enter Group Name";
+"browse_vc_enter_group_name_message" = "Please Enter the New Group Name:";
+"browse_vc_error_deleting" = "Error Deleting";
+"browse_vc_error_deleting_message" = "There was a problem deleting a least one of these items.";
+"browse_vc_error_saving" = "Error Saving";
+"browse_vc_group_name" = "Group Name";
+"browse_vc_group_path_string_fmt" = "(in %@)";
+"browse_vc_no_totp_to_copy" = "'%@': No TOTP setup to Copy!";
+"browse_vc_notes_copied_fmt" = "'%@' Notes Copied";
+"browse_vc_offline_suffix" = " (Offline)";
+"browse_vc_password_copied_fmt" = "'%@' Password Copied";
+"browse_vc_read_only_suffix" = " (Read Only)";
+"browse_vc_rename_item" = "Rename Item";
+"browse_vc_rename_item_enter_title" = "Please enter a new title for this item";
+"browse_vc_search_scope_all" = "All Fields";
+"browse_vc_search_scope_password" = "Password";
+"browse_vc_search_scope_title" = "Title";
+"browse_vc_search_scope_url" = "URL";
+"browse_vc_search_scope_username" = "Username";
+"browse_vc_sort_by_title" = "Sort Items By Title?";
+"browse_vc_sort_by_title_message" = "Do you want to sort all the items in this folder by Title? This will set the order in which they are stored in your database.";
+"browse_vc_tip_fast_tap_message" = "You can long press, or double/triple tap to quickly copy fields... Give it a try!";
+"browse_vc_tip_fast_tap_title" = "Fast Tap Actions";
+"browse_vc_title_copied_fmt" = "'%@' Title Copied";
+"browse_vc_totp_copied_fmt" = "'%@' OTP Code Copied";
+"browse_vc_totp_copied_fmt" = "'%@' TOTP Copied";
+"browse_vc_url_copied_fmt" = "'%@' URL Copied";
+"browse_vc_username_copied_fmt" = "'%@' Username Copied";
+"browse_vc_view_as_database_empty" = "No Entries";
+"browse_vc_view_as_totp_no_totps" = "View As: TOTP List (No TOTP Entries)";
+"browse_vc_view_search_no_matches" = "No matching entries found";
+
+//
+
+"casg_accessibility_label_show_hide_pw" = "Show/Hide Password";
+"casg_add_action" = "Add";
+"casg_add_existing_database_action" = "Add Existing Database";
+"casg_create_action" = "Create";
+"casg_create_database_action" = "Create Database";
+"casg_database_format_information_kp1" = "KDB, AES (Supports Icons & Attachments)";
+"casg_database_format_information_kp31" = "KDBX 3.1, Salsa20 and AES (Most Compatible)";
+"casg_database_format_information_kp4" = "KDBX 4.0, ChaCha20, Argon2D (GPU Brute Force Resistant)";
+"casg_database_format_information_pwsafe" = "PSAFE3 version 3.x, TwoFish, SHA256";
+"casg_detail_label_one_off_key_file_selected" = "One Off";
+"casg_key_file_auto_detected" = "Auto-Detected";
+"casg_key_file_configured" = "Configured";
+"casg_key_file_configured_but_not_found" = "Configured Key File Not Found";
+"casg_key_file_select_action" = "Select...";
+"casg_question_message_empty_password" = "You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.";
+"casg_question_option_empty" = "Empty Password";
+"casg_question_option_none" = "No Password";
+"casg_question_title_empty_password" = "Empty Password or None?";
+"casg_rename_action" = "Rename";
+"casg_rename_database_action" = "Rename Database";
+"casg_set_action" = "Set";
+"casg_set_master_password" = "Set Master Password";
+"casg_set_master_credentials" = "Set Master Credentials";
+"casg_suggested_database_name_default" = "My Database";
+"casg_suggested_database_name_users_database_fmt" = "%@'s Database";
+"casg_suggested_database_name_users_database_number_suffix_fmt" = "%@'s Database %d";
+"casg_text_field_placeholder_password" = "Password";
+"casg_text_field_placeholder_password_required" = "Password (Required)";
+"casg_text_label_key_selected_key_file" = "Selected Key File";
+"casg_unlock_action" = "Unlock";
+
+//
+
+"db_management_biometric_unlock_fmt" = "%@ Unlock";
+"db_management_change_master_credentials" = "Change Master Credentials";
+"db_management_change_master_password" = "Change Master Password";
+"db_management_couldnt_change_credentials" = "Could not change credentials";
+"db_management_credentials_changed" = "Master Credentials Changed";
+"db_management_disable_autofill_yesno_message" = "Are you sure you want to do this?";
+"db_management_disable_autofill_yesno_title" = "Disable AutoFill?";
+"db_management_disable_biometric_notify_message_fmt" = "%@ for this database has been disabled.";
+"db_management_disable_biometric_notify_title_fmt" = "%@ Disabled";
+"db_management_disable_biometric_question_fmt" = "Disable %@?";
+"db_management_disable_biometric_warning_fmt" = "Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?";
+"db_management_disable_biomtric_simple_fmt" = "Are you sure you want to disable %@ for this database?";
+"db_management_disable_done" = "AutoFill Disabled";
+"db_management_disable_offline_done" = "Offline Disabled";
+"db_management_disable_offline_yesno_message" = "Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?";
+"db_management_disable_offline_yesno_title" = "Disable Offline Access?";
+"db_management_enable_biometric_notify_message_fmt" = "%@ has been enabled for this database.";
+"db_management_enable_biometric_notify_title_fmt" = "%@ Enabled";
+"db_management_enable_done" = "AutoFill Enabled";
+"db_management_enable_offline_done" = "Offline Enabled";
+"db_management_error_title_couldnt_change_credentials" = "Could not change credentials";
+"db_management_password_changed" = "Master Password Changed";
+"db_management_reopen_required_message" = "You must close and reopen this database for Read-Only changes to take effect.";
+"db_management_reopen_required_title" = "Re-Open Required";
+"db_management_statistics_none" = "<None>";
+
+//
+
+"item_details_add_attachment_button" = "Add Attachment...";
+"item_details_email_copied" = "Email Copied";
+"item_details_email_field_title" = "Email";
+"item_details_expires_field_title" = "Expires";
+"item_details_expiry_never" = "Never";
+"item_details_item_history" = "Item History";
+"item_details_metadata_created_field_title" = "Created";
+"item_details_metadata_modified_field_title" = "Modified";
+"item_details_new_custom_field_button" = "New Custom Field...";
+"item_details_notes_copied" = "Notes Copied";
+"item_details_password_copied" = "Password Copied";
+"item_details_password_copied_and_launching" = "Password Copied. Launching URL...";
+"item_details_password_field_title" = "Password";
+"item_details_password_history" = "Password History";
+"item_details_problem_saving" = "Problem Saving";
+"item_details_read_only_suffix" = " (Read Only)";
+"item_details_section_header_attachments" = "Attachments";
+"item_details_section_header_custom_fields" = "Custom Fields";
+"item_details_section_header_history" = "History";
+"item_details_section_header_metadata" = "Metadata";
+"item_details_section_header_notes" = "Notes";
+"item_details_setup_totp" = "Setup TOTP...";
+"item_details_setup_totp_failed_message" = "Could not set TOTP because it could not be initialized.";
+"item_details_setup_totp_failed_title" = "Failed to Set TOTP";
+"item_details_setup_totp_how_message" = "You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL";
+"item_details_setup_totp_how_title" = "How would you like to setup TOTP?";
+"item_details_setup_totp_manual_rfc" = "Manual (Standard/RFC 6238)...";
+"item_details_setup_totp_manual_steam" = "Manual (Steam Token)...";
+"item_details_setup_totp_qr_code" = "QR Code...";
+"item_details_setup_totp_secret_message" = "Please enter the secret or an OTPAuth URL";
+"item_details_setup_totp_secret_title" = "Secret or OTPAuth URL";
+"item_details_something_copied_fmt" = "'%@' Copied";
+"item_details_title_copied" = "Title Copied";
+"item_details_title_field_name" = "Title";
+"item_details_totp_copied" = "One Time Password Copied";
+"item_details_url_copied" = "URL Copied";
+"item_details_url_field_title" = "URL";
+"item_details_username_copied" = "Username Copied";
+"item_details_username_field_title" = "Username";
+"item_details_vc_are_you_sure_discard_changes" = "Are you sure you want to discard all your changes?";
+"item_details_vc_discard_changes" = "Discard Changes?";
+"item_details_vc_new_item_title" = "Untitled";
+
+//
+
+"keepass_history_action_restore" = "Restore";
+"keepass_history_are_you_sure" = "Are you sure?";
+"keepass_history_are_you_sure_delete_message" = "Are you sure you want to delete this historical item?";
+"keepass_history_are_you_sure_restore_message" = "Are you sure you want to restore this entry to this historical state?";
+
+//
+
+"prefs_vc_app_lock_delay" = "App Lock Delay";
+"prefs_vc_app_version_info_free_fmt" = "Lite Version %@ (Please Upgrade)";
+"prefs_vc_app_version_info_pro_fmt" = "Pro Version %@";
+"prefs_vc_app_version_info_pro_trial_fmt" = "Pro Version %@ (Trial - %ld days left)";
+"prefs_vc_auto_lock_database_delay" = "Auto Lock Database Delay";
+"prefs_vc_clear_biometrics_yesno_message" = "This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?";
+"prefs_vc_clear_biometrics_yesno_title" = "Clear Biometrics";
+"prefs_vc_clear_clipboard_delay" = "Clear Clipboard Delay";
+"prefs_vc_clear_pin_codes_yesno_message" = "This will clear any existing databases with stored Master Credentials that are backed by PIN Codes";
+"prefs_vc_clear_pin_codes_yesno_title" = "Clear PIN Codes";
+"prefs_vc_cloud_sessions_count_fmt" = "Sessions (%d)";
+"prefs_vc_cloud_sessions_count_none" = "No Sessions";
+"prefs_vc_confirm_pin" = "Confirm PIN";
+"prefs_vc_delete_data_attempt_count" = "Delete Data Failed Attempt Count";
+"prefs_vc_enable_biometric_fmt" = "Enable %@";
+"prefs_vc_info_cannot_open_app_store_message" = "Please find Strongbox in the App Store and you can write a review there. Much appreciated!\n-Mark";
+"prefs_vc_info_cannot_open_app_store_title" = "Cannot open App Store";
+"prefs_vc_info_data_deletion_care_required_message" = "Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences.";
+"prefs_vc_info_data_deletion_care_required_title" = "DATA DELETION: Care Required";
+"prefs_vc_info_email_not_available_message" = "It looks like email is not setup on this device.\n\nContact support@strongboxsafe.com for help.";
+"prefs_vc_info_email_not_available_title" = "Email Not Available";
+
+"prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt" = "It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings?";
+
+"prefs_vc_master_password_icloud_migration_yesno_warning_title" = "Master Password Warning";
+"prefs_vc_pins_dont_match_warning_message" = "Your PINs do not match.";
+"prefs_vc_pins_dont_match_warning_title" = "PINs do not match";
+"prefs_vc_setting_disabled" = "Disabled";
+"prefs_vc_time_interval_none" = "None";
+"prefs_vc_use_icloud_action" = "Use iCloud";
+"prefs_vc_use_icloud_disabled" = "Use iCloud (Unavailable)";
+
+//
+
+"sbtvc_empty_table_loading" = "Loading...";
+"sbtvc_empty_table_no_files_found" = "No Files or Folders Found";
+"sbtvc_error_reading_database" = "Error Reading Database File";
+"sbtvc_invalid_database_file" = "Invalid Database File";
+"sbtvc_root_folder_only_message" = "You can only have databases in the Root folder for this storage type.";
+"sbtvc_root_folder_only_title" = "Root Folder Only";
+"sbtvc_select_database_file" = "Please Select Database File";
+"sbtvc_select_new_database_location" = "Select Folder For New Database";
+
+//
+
+"settings_face_id_name" = "Face ID";
+"settings_touch_id_name" = "Touch ID";
+
+//
+
+"sspc_copy_from_url_action" = "Copy from URL...";
+"sspc_error_invalid_database" = "Invalid Database";
+"sspc_ios_files_storage_location" = "Files...";
+
+"sspc_local_device_storage_warning_message" = "Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?";
+
+"sspc_local_device_storage_warning_title" = "Local Device Database Caveat";
+"sspc_manual_import_enter_url_message" = "Please Enter the URL of the Database File.";
+"sspc_manual_import_enter_url_title" = "Enter URL";
+"sspc_manual_import_error_title" = "Error Reading from URL";
+"sspc_manual_import_placeholder_url" = "URL";
+"sspc_select_where_existing_stored" = "Select where your existing database is stored";
+"sspc_select_where_store_new" = "Select where you would like to store your new database";
+
+//
+
+"upgrade_vc_2monthly_subscription_title" = "3 Months";
+
+"upgrade_vc_developer_msg_free_trial_fmt" = "Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your support allows me to keep doing so.Thanks in advance!\n-Mark";
+
+"upgrade_vc_developer_msg_trial_expired" = "Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance!\n-Mark";
+
+"upgrade_vc_error_purchasing" = "Problem Purchasing";
+"upgrade_vc_lifetime_purchase_title" = "Lifetime";
+"upgrade_vc_lifetime_subtitle_no_sub" = "(No Subscription)";
+"upgrade_vc_monthly_subscription_title" = "Monthly";
+"upgrade_vc_price_not_available_try_later" = "Please Try Again Later";
+"upgrade_vc_price_not_currently_available" = "Momentarily Unavailable";
+"upgrade_vc_price_per_month_fmt" = "%@/month";
+"upgrade_vc_price_per_month_with_percentage_saving_fmt" = "%@/month (Save %d%%)";
+"upgrade_vc_problem_restoring" = "Issue Restoring Purchase";
+"upgrade_vc_product_error_message" = "Could not access Upgrade Products on App Store. Please try again later.";
+"upgrade_vc_product_error_title" = "Product Error";
+"upgrade_vc_progress_purchasing" = "Purchasing...";
+"upgrade_vc_progress_restoring" = "Restoring...";
+"upgrade_vc_restore_unsuccessful_message" = "Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?";
+"upgrade_vc_restore_unsuccessful_title" = "Restoration Unsuccessful";
+"upgrade_vc_subtitle_loading_price" = "Loading...";
+"upgrade_vc_yearly_subscription_title" = "Yearly";
+"welcome_vc_accessibility_show_hide_password" = "Show/Hide Password";
+"welcome_vc_add_existing_database" = "Add Existing Database";
+"welcome_vc_error_creating" = "Error Creating Database";
+"welcome_vc_view_database" = "View Your Database";
+"welcome_vc_view_databases" = "View Your Databases";
+
+//
+
+"databases_preferences_select_subtitle1_field" = "Select Subtitle 1 Field";
+"databases_preferences_select_subtitle2_field" = "Select Subtitle 2 Field";
+"databases_preferences_select_top_right_field" = "Select Top Right Field";
+"databases_preferences_subtitle_field_name_database_storage" = "Database Storage";
+"databases_preferences_subtitle_field_name_filename" = "Filename";
+"databases_preferences_subtitle_field_name_last_cached_data" = "Last Cached Date";
+"databases_preferences_subtitle_field_name_none" = "None";
+

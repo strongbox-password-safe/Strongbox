@@ -1,0 +1,24 @@
+
+/* Class = "UINavigationItem"; title = "Details View Preferences"; ObjectID = "1ds-mg-A8e"; */
+"1ds-mg-A8e.title" = "Details View Preferences";
+
+/* Class = "UITableViewController"; title = "View Preferences"; ObjectID = "DJ8-O7-3po"; */
+"DJ8-O7-3po.title" = "View Preferences";
+
+/* Class = "UILabel"; text = "Show TOTP"; ObjectID = "JXP-bS-unU"; */
+"JXP-bS-unU.text" = "Show TOTP";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "QHE-JP-2G6"; */
+"QHE-JP-2G6.headerTitle" = "General";
+
+/* Class = "UILabel"; text = "Auto FavIcon on New"; ObjectID = "ZQh-5E-5cv"; */
+"ZQh-5E-5cv.text" = "Auto FavIcon on New";
+
+/* Class = "UILabel"; text = "Show Empty Fields"; ObjectID = "dZC-zN-phe"; */
+"dZC-zN-phe.text" = "Show Empty Fields";
+
+/* Class = "UILabel"; text = "Reveal Password Immediately"; ObjectID = "lDr-mY-lNU"; */
+"lDr-mY-lNU.text" = "Reveal Password Immediately";
+
+/* Class = "UILabel"; text = "Easy-Read Font on All Fields"; ObjectID = "pNB-Kd-xhE"; */
+"pNB-Kd-xhE.text" = "Easy-Read Font on All Fields";

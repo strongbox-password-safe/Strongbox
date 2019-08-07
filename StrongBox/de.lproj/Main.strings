@@ -1,0 +1,141 @@
+
+/* Class = "UILabel"; text = "Pro"; ObjectID = "0mO-fk-0Lk"; */
+"0mO-fk-0Lk.text" = "Pro";
+
+/* Class = "UIBarButtonItem"; title = "Preferences"; ObjectID = "1nK-Pq-30i"; */
+"1nK-Pq-30i.title" = "Preferences";
+
+/* Class = "UILabel"; text = "Upgrade Features"; ObjectID = "3p7-dZ-Noc"; */
+"3p7-dZ-Noc.text" = "Upgrade Features";
+
+/* Class = "UILabel"; text = "Free"; ObjectID = "7AC-9K-6Us"; */
+"7AC-9K-6Us.text" = "Free";
+
+/* Class = "UILabel"; text = "🔍 Search"; ObjectID = "7LV-RY-Anr"; */
+"7LV-RY-Anr.text" = "🔍 Search";
+
+/* Class = "UILabel"; text = "😀 Support Developer"; ObjectID = "BOn-UO-zWm"; */
+"BOn-UO-zWm.text" = "😀 Support Developer";
+
+/* Class = "UILabel"; text = "Show Status Indicator"; ObjectID = "DQn-qm-ozr"; */
+"DQn-qm-ozr.text" = "Show Status Indicator";
+
+/* Class = "UIBarButtonItem"; title = "Back"; ObjectID = "DbD-WB-KbL"; */
+"DbD-WB-KbL.title" = "Back";
+
+/* Class = "UILabel"; text = "🗝 Touch ID"; ObjectID = "EUM-9Y-lcs"; */
+"EUM-9Y-lcs.text" = "🗝 Touch ID";
+
+/* Class = "UILabel"; text = "Hi! I was wondering if you would you consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark"; ObjectID = "H08-Ci-qfi"; */
+"H08-Ci-qfi.text" = "Hi! I was wondering if you would you consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark";
+
+/* Class = "UILabel"; text = "Filename"; ObjectID = "J1f-Hw-xlG"; */
+"J1f-Hw-xlG.text" = "Filename";
+
+/* Class = "UITableViewController"; title = "Conflicting Versions"; ObjectID = "J3T-cl-XIs"; */
+"J3T-cl-XIs.title" = "Conflicting Versions";
+
+/* Class = "UILabel"; text = "Pro Tier Trial Note"; ObjectID = "Jcl-ka-nP2"; */
+"Jcl-ka-nP2.text" = "Pro Tier Trial Note";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "L81-CV-oTk"; */
+"L81-CV-oTk.text" = "Subtitle";
+
+/* Class = "UILabel"; text = "Show Storage Icon"; ObjectID = "LWG-mi-sle"; */
+"LWG-mi-sle.text" = "Show Storage Icon";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "N33-Id-p5j"; */
+"N33-Id-p5j.text" = "Title";
+
+/* Class = "UILabel"; text = "Thank You"; ObjectID = "NCd-Wh-dQk"; */
+"NCd-Wh-dQk.text" = "Thank You";
+
+/* Class = "UILabel"; text = "You are currently using Strongbox on the Pro tier with all the bells and whistles. You can evaluate this Pro tier for free over the next three months.\n\nAfter this I'd love if you chose to contribute to its development. If you choose not to support the app you will be transitioned to the free tier of Strongbox which is pretty great too!   Don't worry, you'll never lose any of your databases, secrets or passwords. Most of the features will still be available, however you might see an annoying upgrade message every now and then...\n\nYou can find out more about the differences between Free and Pro tiers by tapping the Upgrade bar at anytime. \n\nI really hope you enjoy the app, find it useful, and choose to support it!\n\nCheers,\n-Mark (Strongbox Developer)"; ObjectID = "NFt-Mf-4lm"; */
+"NFt-Mf-4lm.text" = "You are currently using Strongbox on the Pro tier with all the bells and whistles. You can evaluate this Pro tier for free over the next three months.\n\nAfter this I'd love if you chose to contribute to its development. If you choose not to support the app you will be transitioned to the free tier of Strongbox which is pretty great too!   Don't worry, you'll never lose any of your databases, secrets or passwords. Most of the features will still be available, however you might see an annoying upgrade message every now and then...\n\nYou can find out more about the differences between Free and Pro tiers by tapping the Upgrade bar at anytime. \n\nI really hope you enjoy the app, find it useful, and choose to support it!\n\nCheers,\n-Mark (Strongbox Developer)";
+
+/* Class = "UILabel"; text = "Last Cached Date"; ObjectID = "O5J-1b-Zbl"; */
+"O5J-1b-Zbl.text" = "Last Cached Date";
+
+/* Class = "UILabel"; text = "🔢 PIN Codes"; ObjectID = "PrB-RC-Xrj"; */
+"PrB-RC-Xrj.text" = "🔢 PIN Codes";
+
+/* Class = "UIButton"; normalTitle = "Got It!"; ObjectID = "Qeh-Q2-E7Z"; */
+"Qeh-Q2-E7Z.normalTitle" = "Got It!";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "QgX-Yi-gxf"; */
+"QgX-Yi-gxf.headerTitle" = "General";
+
+/* Class = "UILabel"; text = "Feature"; ObjectID = "XOD-K3-JI7"; */
+"XOD-K3-JI7.text" = "Feature";
+
+/* Class = "UILabel"; text = "Storage"; ObjectID = "Yfh-Hh-J6T"; */
+"Yfh-Hh-J6T.text" = "Storage";
+
+/* Class = "UIButton"; normalTitle = "Restore Previous Purchase"; ObjectID = "Zza-jJ-p2b"; */
+"Zza-jJ-p2b.normalTitle" = "Restore Previous Purchase";
+
+/* Class = "UIBarButtonItem"; title = "Edit"; ObjectID = "aVS-fM-gwN"; */
+"aVS-fM-gwN.title" = "Edit";
+
+/* Class = "UINavigationItem"; prompt = "Please select the correct version to use for this Database"; ObjectID = "byK-cW-Vhn"; */
+"byK-cW-Vhn.prompt" = "Please select the correct version to use for this Database";
+
+/* Class = "UINavigationItem"; title = "Version Conflicts"; ObjectID = "byK-cW-Vhn"; */
+"byK-cW-Vhn.title" = "Version Conflicts";
+
+/* Class = "UILabel"; text = "Upgrade Options"; ObjectID = "cVU-HA-r0i"; */
+"cVU-HA-r0i.text" = "Upgrade Options";
+
+/* Class = "UIBarButtonItem"; title = "View Preferences"; ObjectID = "dSc-vA-VSJ"; */
+"dSc-vA-VSJ.title" = "View Preferences";
+
+/* Class = "UILabel"; text = "Developer Message"; ObjectID = "dgQ-BX-hMy"; */
+"dgQ-BX-hMy.text" = "Developer Message";
+
+/* Class = "UIButton"; normalTitle = "No Thanks, I'm ok with the Free version..."; ObjectID = "dwk-7l-n8f"; */
+"dwk-7l-n8f.normalTitle" = "No Thanks, I'm ok with the Free version...";
+
+/* Class = "UILabel"; text = "✏ Manage Passwords"; ObjectID = "efk-By-6ZZ"; */
+"efk-By-6ZZ.text" = "✏ Manage Passwords";
+
+/* Class = "UINavigationItem"; title = "Databases [Lite Version]"; ObjectID = "g1g-nh-a5L"; */
+"g1g-nh-a5L.title" = "Databases [Lite Version]";
+
+/* Class = "UILabel"; text = "Other Options"; ObjectID = "jn9-KB-abf"; */
+"jn9-KB-abf.text" = "Other Options";
+
+/* Class = "UILabel"; text = "☁ Cloud Databases"; ObjectID = "jou-fh-1Bc"; */
+"jou-fh-1Bc.text" = "☁ Cloud Databases";
+
+/* Class = "UILabel"; text = "Thank you for trying out Strongbox"; ObjectID = "lB8-77-60X"; */
+"lB8-77-60X.text" = "Thank you for trying out Strongbox";
+
+/* Class = "UILabel"; text = "Show Separator"; ObjectID = "pUm-hy-yKh"; */
+"pUm-hy-yKh.text" = "Show Separator";
+
+/* Class = "UITabBarItem"; title = "Databases"; ObjectID = "qEb-5H-93x"; */
+"qEb-5H-93x.title" = "Databases";
+
+/* Class = "UILabel"; text = "🌍 KeePass FavIcons"; ObjectID = "qHp-ql-XfJ"; */
+"qHp-ql-XfJ.text" = "🌍 KeePass FavIcons";
+
+/* Class = "UILabel"; text = "Subtitle 1"; ObjectID = "qTF-1a-gbp"; */
+"qTF-1a-gbp.text" = "Subtitle 1";
+
+/* Class = "UINavigationItem"; title = "View Preferences"; ObjectID = "raT-Zl-aJk"; */
+"raT-Zl-aJk.title" = "View Preferences";
+
+/* Class = "UILabel"; text = "Subtitle 2"; ObjectID = "tV1-x8-Tcd"; */
+"tV1-x8-Tcd.text" = "Subtitle 2";
+
+/* Class = "UIBarButtonItem"; title = "Upgrade Info..."; ObjectID = "tmo-77-bgs"; */
+"tmo-77-bgs.title" = "Upgrade Info...";
+
+/* Class = "UILabel"; text = "Top Right Field"; ObjectID = "twk-09-o4B"; */
+"twk-09-o4B.text" = "Top Right Field";
+
+/* Class = "UIButton"; normalTitle = "Got it!"; ObjectID = "zdO-Eb-bpA"; */
+"zdO-Eb-bpA.normalTitle" = "Got it!";
+
+/* Class = "UILabel"; text = "↔️ Import & Export"; ObjectID = "zhf-Xu-Fxs"; */
+"zhf-Xu-Fxs.text" = "↔️ Import & Export";

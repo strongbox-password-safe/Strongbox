@@ -31,6 +31,9 @@
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
+static NSString* const kItemToEditParam = @"itemToEdit";
+static NSString* const kEditImmediatelyParam = @"editImmediately";
+
 @interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource>
 
 @property (strong, nonatomic) NSArray<Node*> *searchResults;
@@ -164,8 +167,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
                                  (self.currentGroup.parent == nil) ?
                                  self.viewModel.metadata.nickName : self.currentGroup.title,
-                                 self.viewModel.isUsingOfflineCache ? @" (Offline)" : @"",
-                                 self.viewModel.isReadOnly ? @" (Read Only)" : @""];
+                                 self.viewModel.isUsingOfflineCache ? NSLocalizedString(@"browse_vc_offline_suffix", @" (Offline)") : @"",
+                                 self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @""];
     
     if (@available(iOS 11.0, *)) {
         self.navigationController.navigationBar.prefersLargeTitles = NO;
@@ -182,7 +185,12 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     self.searchController.searchResultsUpdater = self;
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
-    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
+    self.searchController.searchBar.scopeButtonTitles = @[
+                                                          NSLocalizedString(@"browse_vc_search_scope_title", @"Title"),
+                                                          NSLocalizedString(@"browse_vc_search_scope_username", @"Username"),
+                                                          NSLocalizedString(@"browse_vc_search_scope_password", @"Password"),
+                                                          NSLocalizedString(@"browse_vc_search_scope_url", @"URL"),
+                                                          NSLocalizedString(@"browse_vc_search_scope_all", @"All Fields")];
     self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
 }
 
@@ -205,8 +213,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
     
     if (!Settings.sharedInstance.hideTips && (!self.currentGroup || self.currentGroup.parent == nil)) {
-        [ISMessages showCardAlertWithTitle:@"Fast Tap Actions"
-                                   message:@"You can long press, or double/triple tap to quickly copy fields... Give it a try!"
+        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_tip_fast_tap_title", @"Fast Tap Actions")
+                                   message:NSLocalizedString(@"browse_vc_tip_fast_tap_message", @"You can long press, or double/triple tap to quickly copy fields... Give it a try!")
                                   duration:2.5f
                                hideOnSwipe:YES
                                  hideOnTap:YES
@@ -283,8 +291,9 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 - (IBAction)onSortItems:(id)sender {
     if(self.isEditing) {
         [Alerts yesNo:self
-                title:@"Sort Items By Title?"
-              message:@"Do you want to sort all the items in this folder by Title? This will set the order in which they are stored in your database." action:^(BOOL response) {
+                title:NSLocalizedString(@"browse_vc_sort_by_title", @"Sort Items By Title?")
+              message:NSLocalizedString(@"browse_vc_sort_by_title_message", @"Do you want to sort all the items in this folder by Title? This will set the order in which they are stored in your database.")
+               action:^(BOOL response) {
             if(response) {
                 self.reorderItemOperations = nil; // Discard existing reordering ops...
                 self.sortOrderForAutomaticSortDuringEditing = !self.sortOrderForAutomaticSortDuringEditing;
@@ -310,8 +319,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     [Alerts OkCancelWithTextField:self
                     textFieldText:item.title
-                            title:@"Rename Item"
-                          message:@"Please enter a new title for this item"
+                            title:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item")
+                          message:NSLocalizedString(@"browse_vc_rename_item_enter_title", @"Please enter a new title for this item")
                        completion:^(NSString *text, BOOL response) {
                            if(response && [text length]) {
                                if(!item.isGroup) {
@@ -334,12 +343,16 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
 
     [Alerts yesNo:self.searchController.isActive ? self.searchController : self
-            title:@"Are you sure?"
-          message:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%@' to the Recycle Bin?" : @"Are you sure you want to permanently delete '%@'?", [self dereference:item.title node:item]]
+            title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
+          message:[NSString stringWithFormat:willRecycle ?
+                   NSLocalizedString(@"browse_vc_are_you_sure_recycle_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
+                   NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"), [self dereference:item.title node:item]]
            action:^(BOOL response) {
                if (response) {
                    if(![self.viewModel deleteItem:item]) {
-                       [Alerts warn:self title:@"Delete Failed" message:@"There was an error trying to delete this item."];
+                       [Alerts warn:self
+                              title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
+                            message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
                    }
                    else {
                        [self saveChangesToSafeAndRefreshView];
@@ -399,22 +412,56 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Delete" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    Node *item = [[self getDataSource] objectAtIndex:indexPath.row];
+
+    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
+                                                                            title:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onDeleteSingleItem:indexPath];
     }];
     
-    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Rename" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                            title:NSLocalizedString(@"browse_vc_action_rename", @"Rename")
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onRenameItem:indexPath];
     }];
     renameAction.backgroundColor = UIColor.blueColor;
     
-    UITableViewRowAction *setIconAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Set Icon" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *setIconAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                             title:NSLocalizedString(@"browse_vc_action_set_icon", @"Set Icon") handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onSetIconForItem:indexPath];
     }];
-    
     setIconAction.backgroundColor = UIColor.purpleColor;
 
-    return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction] : @[removeAction, renameAction];
+    UITableViewRowAction *duplicateItemAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                                   title:NSLocalizedString(@"browse_vc_action_duplicate", @"Duplicate")
+                                                                                 handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self duplicateItem:item];
+    }];
+    duplicateItemAction.backgroundColor = UIColor.purpleColor;
+    
+    UITableViewRowAction *editItemAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                                   title:NSLocalizedString(@"browse_vc_action_edit", @"Edit")
+                                                                                 handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+                                                                                     [self editEntry:item];
+                                                                                 }];
+    editItemAction.backgroundColor = UIColor.magentaColor;
+    
+    if(item.isGroup) {
+        return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction] : @[removeAction, renameAction];
+    }
+    else {
+        return @[removeAction, renameAction, duplicateItemAction, editItemAction];
+    }
+}
+
+-(void)duplicateItem:(Node*)item {
+    Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
+    
+    item.fields.accessed = [NSDate date];
+    [item.parent addChild:dupe allowDuplicateGroupTitles:NO];
+
+    [self saveChangesToSafeAndRefreshView];
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
@@ -624,7 +671,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
-    return [NSString stringWithFormat:@"(in %@)", [self.viewModel.database getSearchParentGroupPathDisplayString:vm]];
+    return [NSString stringWithFormat:NSLocalizedString(@"browse_vc_group_path_string_fmt", @"(in %@)"),
+            [self.viewModel.database getSearchParentGroupPathDisplayString:vm]];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -636,11 +684,14 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToItemDetails"]) {
-        Node *record = (Node *)sender;
-
         ItemDetailsViewController *vc = segue.destinationViewController;
         
+        NSDictionary* params = (NSDictionary*)sender;
+        Node* record = params[kItemToEditParam];
+        NSNumber* editImmediately = params[kEditImmediatelyParam];
         vc.createNewItem = record == nil;
+        vc.editImmediately = editImmediately.boolValue;
+        
         vc.item = record;
         vc.parentGroup = self.currentGroup;
         vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
@@ -650,12 +701,15 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         };
     }
     else if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"]) {
-        Node *record = (Node *)sender;
-        
         UINavigationController* nav = segue.destinationViewController;
         ItemDetailsViewController *vc = (ItemDetailsViewController*)nav.topViewController;
         
+        NSDictionary* params = (NSDictionary*)sender;
+        Node* record = params[kItemToEditParam];
+        NSNumber* editImmediately = params[kEditImmediatelyParam];
         vc.createNewItem = record == nil;
+        vc.editImmediately = editImmediately.boolValue;
+        
         vc.item = record;
         vc.parentGroup = self.currentGroup;
         vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
@@ -722,32 +776,84 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 - (IBAction)onAddGroup:(id)sender {
     [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Group Name"
-                            title:@"Enter Group Name"
-                          message:@"Please Enter the New Group Name:"
+             textFieldPlaceHolder:NSLocalizedString(@"browse_vc_group_name", @"Group Name")
+                            title:NSLocalizedString(@"browse_vc_enter_group_name", @"Enter Group Name")
+                          message:NSLocalizedString(@"browse_vc_enter_group_name_message", @"Please Enter the New Group Name:")
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                if ([self.viewModel addNewGroup:self.currentGroup title:text] != nil) {
                                    [self saveChangesToSafeAndRefreshView];
                                }
                                else {
-                                   [Alerts warn:self title:@"Cannot create group" message:@"Could not create a group with this name here, possibly because one with this name already exists."];
+                                   [Alerts warn:self
+                                          title:NSLocalizedString(@"browse_vc_cannot_create_group", @"Cannot create group")
+                                        message:NSLocalizedString(@"browse_vc_cannot_create_group_message", @"Could not create a group with this name here, possibly because one with this name already exists.")];
                                }
                            }
                        }];
 }
 
 - (IBAction)onAddRecord:(id)sender {
-    if (@available(iOS 11.0, *)) {
-        if(self.splitViewController) {
-            [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:nil];
+    [self showEntry:nil editImmediately:YES];
+}
+
+- (void)editEntry:(Node*)item {
+    if(item.isGroup) {
+        return;
+    }
+    
+    [self showEntry:item editImmediately:YES];
+}
+
+- (void)openEntryDetails:(Node*)item {
+    if(item.isGroup) {
+        return;
+    }
+    
+    [self showEntry:item editImmediately:NO];
+}
+
+- (void)updateSplitViewDetailsView:(Node*)item {
+    [self updateSplitViewDetailsView:item editMode:NO];
+}
+
+- (void)updateSplitViewDetailsView:(Node*)item editMode:(BOOL)editMode {
+    if(self.splitViewController) {
+        if(item) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:@{ kItemToEditParam : item, kEditImmediatelyParam : @(editMode) } ];
         }
-        else {
-            [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
+        else if(!self.splitViewController.isCollapsed) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToEmptyDetail" sender:nil];
         }
     }
-    else {
-        [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
+}
+
+- (void)showEntry:(Node*)item editImmediately:(BOOL)editImmediately {
+    if(item) { // TODO: Why the difference? Can't we unify?
+        if(self.splitViewController) {
+            [self updateSplitViewDetailsView:item editMode:editImmediately];
+        }
+        else {
+            if (@available(iOS 11.0, *)) {
+                [self performSegueWithIdentifier:@"segueToItemDetails" sender:@{ kItemToEditParam : item, kEditImmediatelyParam : @(editImmediately) } ];
+            }
+            else {
+                [self performSegueWithIdentifier:@"segueToRecord" sender:item];
+            }
+        }
+    }
+    else { // Only via Add New Entry -> Which is why different from above - Does not segueMasterDetailToEmptyDetail
+        if (@available(iOS 11.0, *)) {
+            if(self.splitViewController) {
+                [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:nil];
+            }
+            else {
+                [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
+            }
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
+        }
     }
 }
 
@@ -774,8 +880,10 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
         
         [Alerts yesNo:self.searchController.isActive ? self.searchController : self
-                title:@"Are you sure?"
-              message:willRecycle ? @"Are you sure you want to send these item(s) to the Recycle Bin?" : @"Are you sure you want to permanently delete these item(s)?"
+                title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
+              message:willRecycle ?
+         NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?") :
+         NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?")
                action:^(BOOL response) {
                    if (response) {
                        NSArray<Node *> *items = [self getSelectedItems:selectedRows];
@@ -788,7 +896,9 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                        }
                        
                        if(fail) {
-                           [Alerts warn:self title:@"Error Deleting" message:@"There was a problem deleting a least one of these items."];
+                           [Alerts warn:self
+                                  title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                                message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
                        }
                        
                        [self saveChangesToSafeAndRefreshView];
@@ -817,10 +927,12 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             
             [self refreshItems];
             
-            [self updateSplitViewDetailsView:nil];
+            [self updateSplitViewDetailsView:nil editMode:NO];
             
             if (error) {
-                [Alerts error:self title:@"Error Saving" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"browse_vc_error_saving", @"Error Saving")
+                        error:error];
             }
         });
     }];
@@ -989,6 +1101,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         case kBrowseTapActionCopyTotp:
             [self copyTotp:item];
             break;
+        case kBrowseTapActionEdit:
+            [self editEntry:item];
        default:
             break;
     }
@@ -999,7 +1113,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     pasteboard.string = [self dereference:item.title node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Title Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_title_copied_fmt", @"'%@' Title Copied"), [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1014,7 +1128,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     pasteboard.string = [self dereference:item.fields.url node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' URL Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_url_copied_fmt", @"'%@' URL Copied"),
+                                        [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1029,7 +1144,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     pasteboard.string = [self dereference:item.fields.email node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Email Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_email_copied_fmt", @"'%@' Email Copied"),
+                                        [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1044,7 +1160,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     pasteboard.string = [self dereference:item.fields.notes node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Notes Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_notes_copied_fmt", @"'%@' Notes Copied"),
+                                        [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1059,7 +1176,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     pasteboard.string = [self dereference:item.fields.username node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Username Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_username_copied_fmt", @"'%@' Username Copied"),
+                                        [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1073,7 +1191,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 - (void)copyTotp:(Node*)item {
     if(!item.fields.otpToken) {
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@': No TOTP setup to Copy!", [self dereference:item.title node:item]]
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_no_totp_to_copy", @"'%@': No TOTP setup to Copy!"),
+                                            [self dereference:item.title node:item]]
                                    message:nil
                                   duration:3.f
                                hideOnSwipe:YES
@@ -1089,7 +1208,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     pasteboard.string = item.fields.otpToken.password;
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' TOTP Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_totp_copied_fmt", @"'%@' TOTP Copied"),
+                                        [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1108,7 +1228,10 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
     pasteboard.string = copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ? @"'%@' OTP Code Copied" : @"'%@' Password Copied", [self dereference:item.title node:item]]
+    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ?
+                                        NSLocalizedString(@"browse_vc_totp_copied_fmt", @"'%@' OTP Code Copied") :
+                                        NSLocalizedString(@"browse_vc_password_copied_fmt", @"'%@' Password Copied"),
+                                        [self dereference:item.title node:item]]
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -1116,35 +1239,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                              alertType:ISAlertTypeSuccess
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
-}
-
-- (void)openEntryDetails:(Node*)item {
-    if(item.isGroup) {
-        return;
-    }
-    
-    if(self.splitViewController) {
-        [self updateSplitViewDetailsView:item];
-    }
-    else {
-        if (@available(iOS 11.0, *)) {
-            [self performSegueWithIdentifier:@"segueToItemDetails" sender:item];
-        }
-        else {
-            [self performSegueWithIdentifier:@"segueToRecord" sender:item];
-        }
-    }
-}
-
-- (void)updateSplitViewDetailsView:(Node*)item {
-    if(self.splitViewController) {
-        if(item) {
-            [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:item];
-        }
-        else if(!self.splitViewController.isCollapsed) {
-            [self performSegueWithIdentifier:@"segueMasterDetailToEmptyDetail" sender:nil];
-        }
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1157,13 +1251,13 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     NSString *text = @"";
     
     if(self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
-        text = @"View As: TOTP List (No TOTP Entries)";
+        text = NSLocalizedString(@"browse_vc_view_as_totp_no_totps", @"View As: TOTP List (No TOTP Entries)");
     }
     else if(self.searchController.isActive) {
-        text = @"No matching entries found";
+        text = NSLocalizedString(@"browse_vc_view_search_no_matches", @"No matching entries found");
     }
     else {
-        text = @"No Entries";
+        text = NSLocalizedString(@"browse_vc_view_as_database_empty", @"No Entries");
     }
     
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleBody],
@@ -1171,8 +1265,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
-
-//
 
 - (void)killOtpTimer {
     if(self.timerRefreshOtp) {

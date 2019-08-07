@@ -58,7 +58,9 @@
     self.tableView.emptyDataSetDelegate = self;
     self.tableView.tableFooterView = [UIView new];
     
-    self.navigationItem.prompt = self.existing ? @"Please Select Database File" : @"Select Folder For New Database";
+    self.navigationItem.prompt = self.existing ?
+    NSLocalizedString(@"sbtvc_select_database_file", @"Please Select Database File") :
+    NSLocalizedString(@"sbtvc_select_new_database_location", @"Select Folder For New Database");
 
     // HACK: This seems to be necessary for Dropbox sign-in - Not super clear on why :(
     
@@ -118,7 +120,9 @@
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
-    NSString *text =  self.listDone ? @"No Files or Folders Found" : @"Loading...";
+    NSString *text =  self.listDone ?
+    NSLocalizedString(@"sbtvc_empty_table_no_files_found", @"No Files or Folders Found") :
+        NSLocalizedString(@"sbtvc_empty_table_loading", @"Loading...");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:17.0f] };
     
@@ -177,7 +181,9 @@
     
     if (file.folder) {
         if(self.safeStorageProvider.rootFolderOnly) {
-            [Alerts info:self title:@"Root Folder Only" message:@"You can only have databases in the Root folder for this storage type."];
+            [Alerts info:self
+                   title:NSLocalizedString(@"sbtvc_root_folder_only_title", @"Root Folder Only")
+                 message:NSLocalizedString(@"sbtvc_root_folder_only_message", @"You can only have databases in the Root folder for this storage type.")];
             [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
         }
         else {
@@ -230,12 +236,16 @@
             self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file likelyFormat:likelyFormat]);
         }
         else {
-            [Alerts error:self title:@"Invalid Database File" error:err];
+            [Alerts error:self
+                    title:NSLocalizedString(@"sbtvc_invalid_database_file", @"Invalid Database File")
+                    error:err];
         }
     }
     else {
         NSLog(@"%@", error);
-        [Alerts error:self title:@"Error Reading Database File" error:error];
+        [Alerts error:self
+                title:NSLocalizedString(@"sbtvc_error_reading_database", @"Error Reading Database File")
+                error:error];
     }
 }
 

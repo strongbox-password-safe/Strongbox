@@ -42,8 +42,6 @@
 @property (nullable) NSURL* selectedKeyFileUrl;
 @property (nullable) NSData* selectedOneTimeKeyFileData;
 @property DatabaseFormat selectedFormat;
-@property (weak, nonatomic) IBOutlet UILabel *labelOfflineCache;
-
 @property BOOL userHasChangedNameAtLeastOnce;
 
 @end
@@ -68,30 +66,30 @@
 
 - (void)setupUi {
     if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
-        [self  setTitle:@"Create Database"];
-        [self.buttonDone setAccessibilityLabel:@"Create"];
-        [self.buttonDone setTitle:@"Create"];
+        [self setTitle:NSLocalizedString(@"casg_create_database_action", @"Create Database")];
+        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_create_action", @"Create")];
+        [self.buttonDone setTitle:NSLocalizedString(@"casg_create_action", @"Create")];
     }
     else if(self.mode == kCASGModeSetCredentials) {
-        [self setTitle:self.initialFormat == kPasswordSafe ? @"Set Master Password" : @"Set Master Credentials"];
-        [self.buttonDone setAccessibilityLabel:@"Set"];
-        [self.buttonDone setTitle:@"Set"];
+        [self setTitle:self.initialFormat == kPasswordSafe ? NSLocalizedString(@"casg_set_master_password", @"Set Master Password") : NSLocalizedString(@"casg_set_master_credentials", @"Set Master Credentials")];
+        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_set_action", @"Set")];
+        [self.buttonDone setTitle:NSLocalizedString(@"casg_set_action", @"Set")];
     }
     else if(self.mode == kCASGModeAddExisting) {
-        [self setTitle:@"Add Existing Database"];
-        [self.buttonDone setAccessibilityLabel:@"Add"];
-        [self.buttonDone setTitle:@"Add"];
+        [self setTitle:NSLocalizedString(@"casg_add_existing_database_action", @"Add Existing Database")];
+        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
+        [self.buttonDone setTitle:NSLocalizedString(@"casg_add_action", @"Add")];
     }
     else if(self.mode == kCASGModeGetCredentials) {
-        [self setTitle:@"Unlock"];
+        [self setTitle:NSLocalizedString(@"casg_unlock_action", @"Unlock")];
         [self.buttonDone setTitle:nil];
-        [self.buttonDone setAccessibilityLabel:@"Unlock"];
+        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_unlock_action", @"Unlock")];
         [self.buttonDone setImage:[UIImage imageNamed:@"unlock"]];
     }
     else if(self.mode == kCASGModeRenameDatabase) {
-        [self setTitle:@"Rename Database"];
-        [self.buttonDone setAccessibilityLabel:@"Rename"];
-        [self.buttonDone setTitle:@"Rename"];
+        [self setTitle:NSLocalizedString(@"casg_rename_database_action", @"Rename Database")];
+        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_rename_action", @"Rename")];
+        [self.buttonDone setTitle:NSLocalizedString(@"casg_rename_action", @"Rename")];
     }
     
     [self.textFieldName addTarget:self
@@ -130,7 +128,8 @@
     
     self.textFieldPassword.placeholder =
         (self.mode == kCASGModeGetCredentials || Settings.sharedInstance.allowEmptyOrNoPasswordEntry) ?
-            @"Password" : @"Password (Required)";
+            NSLocalizedString(@"casg_text_field_placeholder_password", @"Password") :
+    NSLocalizedString(@"casg_text_field_placeholder_password_required", @"Password (Required)");
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -186,10 +185,10 @@
 
 - (void)askAboutEmptyOrNonePasswordAndContinue {
     [Alerts twoOptionsWithCancel:self
-                           title:@"Empty Password or None?"
-                         message:@"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want."
-               defaultButtonText:@"Empty Password"
-                secondButtonText:@"No Password"
+                           title:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
+                         message:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
+               defaultButtonText:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
+                secondButtonText:NSLocalizedString(@"casg_question_option_none", @"No Password")
                           action:^(int response) {
                               if(response == 0) {
                                   self.selectedPassword = @"";
@@ -265,10 +264,7 @@
                                                      self.initialFormat == kPasswordSafe ||
                                                      self.initialFormat == kKeePass1];
 
-        if(self.offlineCacheDate) {
-            self.labelOfflineCache.text = [NSString stringWithFormat:@"Open Offline Cache (%@)",friendlyDateStringVeryShort(self.offlineCacheDate)];
-        }
-        else {
+        if(!self.offlineCacheDate) {
             [self cell:self.cellOpenOffline setHidden:YES];
         }
     }
@@ -302,9 +298,9 @@
 
 - (void)bindKeyFile {
     if(self.selectedOneTimeKeyFileData) {
-        self.cellKeyFile.textLabel.text = @"Selected Key File";
+        self.cellKeyFile.textLabel.text = NSLocalizedString(@"casg_text_label_key_selected_key_file", @"Selected Key File");
         self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
-        self.cellKeyFile.detailTextLabel.text = @"One Off";
+        self.cellKeyFile.detailTextLabel.text = NSLocalizedString(@"casg_detail_label_one_off_key_file_selected", @"One Off");
         self.cellKeyFile.detailTextLabel.textColor = nil;
     }
     else if (self.selectedKeyFileUrl) {
@@ -312,24 +308,28 @@
             self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
             
             if(Settings.sharedInstance.hideKeyFileOnUnlock) {
-                self.cellKeyFile.textLabel.text = self.autoDetectedKeyFileUrl ? @"Auto-Detected" : @"Configured";
+                self.cellKeyFile.textLabel.text = self.autoDetectedKeyFileUrl ?
+                NSLocalizedString(@"casg_key_file_auto_detected", @"Auto-Detected") :
+                NSLocalizedString(@"casg_key_file_configured", @"Configured");
                 self.cellKeyFile.detailTextLabel.text = nil;
                 self.cellKeyFile.detailTextLabel.textColor = nil;
             }
             else {
                 self.cellKeyFile.textLabel.text = self.selectedKeyFileUrl.lastPathComponent;
-                self.cellKeyFile.detailTextLabel.text = self.autoDetectedKeyFileUrl ? @"Auto-Detected" : @"Configured";
+                self.cellKeyFile.detailTextLabel.text = self.autoDetectedKeyFileUrl ?
+                NSLocalizedString(@"casg_key_file_auto_detected", @"Auto-Detected") :
+                NSLocalizedString(@"casg_key_file_configured", @"Configured");
                 self.cellKeyFile.detailTextLabel.textColor = nil;
             }
         }
         else {
-            self.cellKeyFile.textLabel.text = @"Select...";
-            self.cellKeyFile.detailTextLabel.text = @"Configured Key File Not Found";
+            self.cellKeyFile.textLabel.text = NSLocalizedString(@"casg_key_file_select_action", @"Select...");
+            self.cellKeyFile.detailTextLabel.text = NSLocalizedString(@"casg_key_file_configured_but_not_found", @"Configured Key File Not Found");
             self.cellKeyFile.detailTextLabel.textColor = UIColor.redColor;
         }
     }
     else {
-        self.cellKeyFile.textLabel.text = @"Select...";
+        self.cellKeyFile.textLabel.text = NSLocalizedString(@"casg_key_file_select_action", @"Select...");
         self.cellKeyFile.imageView.image = nil;
         self.cellKeyFile.detailTextLabel.text = nil;
     }
@@ -365,16 +365,16 @@
 - (NSString*)getFormatSubtitle:(DatabaseFormat)format {
     switch (format) {
         case kKeePass1:
-            return @"KDB, AES (Supports Icons & Attachments)";
+            return NSLocalizedString(@"casg_database_format_information_kp1", @"KDB, AES (Supports Icons & Attachments)");
             break;
         case kKeePass:
-            return @"KDBX 3.1, Salsa20 and AES (Most Compatible)";
+            return NSLocalizedString(@"casg_database_format_information_kp31", @"KDBX 3.1, Salsa20 and AES (Most Compatible)");
             break;
         case kKeePass4:
-            return @"KDBX 4.0, ChaCha20, Argon2D (GPU Brute Force Resistant)";
+            return NSLocalizedString(@"casg_database_format_information_kp4", @"KDBX 4.0, ChaCha20, Argon2D (GPU Brute Force Resistant)");
             break;
         case kPasswordSafe:
-            return @"PSAFE3 version 3.x, TwoFish, SHA256";
+            return NSLocalizedString(@"casg_database_format_information_pwsafe", @"PSAFE3 version 3.x, TwoFish, SHA256");
             break;
         default:
             return @"Unknown!";
@@ -413,11 +413,15 @@
     NSString* name = [IOsUtils nameFromDeviceName];
     name = [SafesList sanitizeSafeNickName:name];
 
-    NSString *suggestion = name.length ? [NSString stringWithFormat:@"%@'s Database", name] : @"My Database";
+    NSString *suggestion = name.length ?
+    [NSString stringWithFormat:
+        NSLocalizedString(@"casg_suggested_database_name_users_database_fmt", @"%@'s Database"), name] :
+        NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
    
     int attempt = 2;
     while(![[SafesList sharedInstance] isValidNickName:suggestion] && attempt < 100) {
-        suggestion = [NSString stringWithFormat:@"%@'s Database %d", name, attempt++];
+        suggestion = [NSString stringWithFormat:
+                      NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt", @"%@'s Database %d"), name, attempt++];
     }
     
     return [[SafesList sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
@@ -473,7 +477,7 @@
     
     [checkbox addTarget:self action:@selector(toggleShowHidePasswordText:) forControlEvents:UIControlEventTouchUpInside];
     
-    [checkbox setAccessibilityLabel:@"Show/Hide Password"];
+    [checkbox setAccessibilityLabel:NSLocalizedString(@"casg_accessibility_label_show_hide_pw", @"Show/Hide Password")];
     
     // Setup image for button
     [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];

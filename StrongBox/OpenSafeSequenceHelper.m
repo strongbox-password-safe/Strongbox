@@ -475,7 +475,10 @@
 
         if(self.undigestedKeyFileData == nil) {
             // TODO: Move error messaging out of here
-            [Alerts error:self.viewController title:@"Error Reading Key File" error:error completion:^{
+            [Alerts error:self.viewController
+                    title:@"Error Reading Key File"
+                    error:error
+               completion:^{
                 self.completion(nil, error);
             }];
             return;
@@ -741,8 +744,7 @@
     if(!self.isAutoFillOpen && Settings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
         [Alerts yesNo:self.viewController
                 title:@"Set Quick Launch?"
-         // TODO: Start here for localization
-              message:NSLocalizedString(@"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click.", @"Ask use if they would like to use database for quick launch")
+              message:@"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click."
                action:^(BOOL response) {
                    if(response) {
                        Settings.sharedInstance.quickLaunchUuid = self.safe.uuid;

@@ -70,7 +70,11 @@
 
 - (void)onDatabasesChanged {
     NSInteger count = SafesList.sharedInstance.snapshot.count;
-    [self.buttonAdd setTitle:count ? (count == 1 ? @"View Your Database" : @"View Your Databases") : @"Add Existing Database" forState:UIControlStateNormal];
+    [self.buttonAdd setTitle:count ? (count == 1 ?
+                                      NSLocalizedString(@"welcome_vc_view_database", @"View Your Database") :
+                                      NSLocalizedString(@"welcome_vc_view_databases", @"View Your Databases")) :
+                                            NSLocalizedString(@"welcome_vc_add_existing_database", @"Add Existing Database")
+                    forState:UIControlStateNormal];
 }
 
 - (void)setupUi {
