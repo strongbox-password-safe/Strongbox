@@ -29,8 +29,8 @@
 /* Class = "UILabel"; text = "Encrypted Database Attachment"; ObjectID = "4gH-9g-QNW"; */
 "4gH-9g-QNW.text" = "Encrypted Database Attachment";
 
-/* Class = "UILabel"; text = "Allow <Biometric ID> Unlock"; ObjectID = "5Ui-WV-Edi"; */
-"5Ui-WV-Edi.text" = "Allow <Biometric ID> Unlock";
+/* Class = "UILabel"; text = "<Biometric ID> Unlock"; ObjectID = "5Ui-WV-Edi"; */
+"5Ui-WV-Edi.text" = "<Biometric ID> Unlock";
 
 /* Class = "UILabel"; text = "Records"; ObjectID = "5gZ-i5-1Iq"; */
 "5gZ-i5-1Iq.text" = "Records";
@@ -83,8 +83,8 @@
 /* Class = "UILabel"; text = "Copy Plaintext CSV to Pasteboard"; ObjectID = "MNT-9Y-DFQ"; */
 "MNT-9Y-DFQ.text" = "Copy Plaintext CSV to Pasteboard";
 
-/* Class = "UILabel"; text = "AutoFill Enabled"; ObjectID = "MyM-Gm-9ER"; */
-"MyM-Gm-9ER.text" = "AutoFill Enabled";
+/* Class = "UILabel"; text = "AutoFill"; ObjectID = "MyM-Gm-9ER"; */
+"MyM-Gm-9ER.text" = "AutoFill";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "RAl-JO-eb1"; */
 "RAl-JO-eb1.text" = "Title";
@@ -149,8 +149,8 @@
 /* Class = "UILabel"; text = "Subtitle"; ObjectID = "bG1-bd-bVM"; */
 "bG1-bd-bVM.text" = "Subtitle";
 
-/* Class = "UILabel"; text = "Offline Enabled"; ObjectID = "bVn-RL-KZT"; */
-"bVn-RL-KZT.text" = "Offline Enabled";
+/* Class = "UILabel"; text = "Offline Cache"; ObjectID = "bVn-RL-KZT"; */
+"bVn-RL-KZT.text" = "Offline Cache";
 
 /* Class = "UILabel"; text = "By Email (CSV)"; ObjectID = "cU9-qG-5F5"; */
 "cU9-qG-5F5.text" = "By Email (CSV)";

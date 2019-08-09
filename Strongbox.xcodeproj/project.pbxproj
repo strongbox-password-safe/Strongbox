@@ -68,6 +68,7 @@
 		4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */; };
 		4D12085422A7A67300139570 /* WelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D12085322A7A67300139570 /* WelcomeViewController.m */; };
 		4D12085A22A7C26800139570 /* WelcomeCreateDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D12085922A7C26800139570 /* WelcomeCreateDatabaseViewController.m */; };
+		4D12E59122FB866F00CBFECC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F11222F8A16A0095F51F /* Localizable.strings */; };
 		4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
 		4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
@@ -3325,6 +3326,7 @@
 				4D36B0CB22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
 				4DE7F0CF22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
+				4D12E59122FB866F00CBFECC /* Localizable.strings in Resources */,
 				4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,

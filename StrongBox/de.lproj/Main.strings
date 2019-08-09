@@ -74,9 +74,6 @@
 /* Class = "UIButton"; normalTitle = "Restore Previous Purchase"; ObjectID = "Zza-jJ-p2b"; */
 "Zza-jJ-p2b.normalTitle" = "Restore Previous Purchase";
 
-/* Class = "UIBarButtonItem"; title = "Edit"; ObjectID = "aVS-fM-gwN"; */
-"aVS-fM-gwN.title" = "Edit";
-
 /* Class = "UINavigationItem"; prompt = "Please select the correct version to use for this Database"; ObjectID = "byK-cW-Vhn"; */
 "byK-cW-Vhn.prompt" = "Please select the correct version to use for this Database";
 
@@ -98,8 +95,8 @@
 /* Class = "UILabel"; text = "✏ Manage Passwords"; ObjectID = "efk-By-6ZZ"; */
 "efk-By-6ZZ.text" = "✏ Manage Passwords";
 
-/* Class = "UINavigationItem"; title = "Databases [Lite Version]"; ObjectID = "g1g-nh-a5L"; */
-"g1g-nh-a5L.title" = "Databases [Lite Version]";
+/* Class = "UINavigationItem"; title = "Databases"; ObjectID = "g1g-nh-a5L"; */
+"g1g-nh-a5L.title" = "Databases";
 
 /* Class = "UILabel"; text = "Other Options"; ObjectID = "jn9-KB-abf"; */
 "jn9-KB-abf.text" = "Other Options";
