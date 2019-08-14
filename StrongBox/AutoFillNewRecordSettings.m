@@ -14,22 +14,22 @@
     AutoFillNewRecordSettings *defaultInstance = [[AutoFillNewRecordSettings alloc] init];
         
     defaultInstance.titleAutoFillMode = kDefault;
-    defaultInstance.titleCustomAutoFill = @"Custom Title Autofill Text";
+    defaultInstance.titleCustomAutoFill = NSLocalizedString(@"defaults_model_custom_title_default", @"Custom Title Default Text");
     
     defaultInstance.usernameAutoFillMode = kMostUsed;
-    defaultInstance.usernameCustomAutoFill = @"Custom Username Autofill Text";
+    defaultInstance.usernameCustomAutoFill = NSLocalizedString(@"defaults_model_custom_username_default", @"Custom Username Default Text");
     
     defaultInstance.passwordAutoFillMode = kGenerated;
-    defaultInstance.passwordCustomAutoFill = @"Custom Password Autofill Text";
+    defaultInstance.passwordCustomAutoFill = NSLocalizedString(@"defaults_model_custom_password_default", @"Custom Password Default Text");
     
     defaultInstance.emailAutoFillMode = kMostUsed;
-    defaultInstance.emailCustomAutoFill = @"Custom Email Autofill Text";
+    defaultInstance.emailCustomAutoFill = NSLocalizedString(@"defaults_model_custom_email_default", @"Custom Email Default Text");
     
     defaultInstance.urlAutoFillMode = kNone;
-    defaultInstance.urlCustomAutoFill = @"Custom URL Autofill Text";
+    defaultInstance.urlCustomAutoFill = NSLocalizedString(@"defaults_model_custom_url_default", @"Custom URL Default Text");
     
     defaultInstance.notesAutoFillMode = kNone;
-    defaultInstance.notesCustomAutoFill = @"Custom Notes Autofill Text";
+    defaultInstance.notesCustomAutoFill = NSLocalizedString(@"defaults_model_custom_notes_default", @"Custom Notes Default Text");
     
     return defaultInstance;
 }

@@ -113,10 +113,10 @@
     }];
     
     if(fa) {
-        return forDisplay ? [NSString stringWithFormat:@"%@ (Historical)", fa.filename] : fa.filename;
+        return forDisplay ? [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_historical_fmt", @"%@ (Historical)"), fa.filename] : fa.filename;
     }
     
-    NSString* unknown = [NSString stringWithFormat:@"<Orphan Attachment> [%lu]", (unsigned long)poolIndex];
+    NSString* unknown = [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_orphan_fmt", @"<Orphan Attachment> [%lu]"), (unsigned long)poolIndex];
     
     return unknown;
 }

@@ -64,9 +64,9 @@ const static NSSet<NSString*> *keePassReservedNames;
     self.textView.text = self.customField.value;
     self.switchProtected.on = self.customField.protected;
 
-    self.keyTextField.accessibilityLabel = @"Custom Field Name";
-    self.textView.accessibilityLabel = @"Custom Field Value";
-    self.switchProtected.accessibilityLabel = @"Custom Field Protected";
+    self.keyTextField.accessibilityLabel = NSLocalizedString(@"custom_field_vc_accessibility_label_name", @"Custom Field Name");
+    self.textView.accessibilityLabel = NSLocalizedString(@"custom_field_vc_accessibility_label_value", @"Custom Field Value");
+    self.switchProtected.accessibilityLabel = NSLocalizedString(@"custom_field_vc_accessibility_label_protected", @"Custom Field Protected");
     
     [self.keyTextField becomeFirstResponder];
     
@@ -93,13 +93,13 @@ const static NSSet<NSString*> *keePassReservedNames;
     BOOL keyIsValid = candidate.length != 0;
     
     if(!keyIsValid) {
-        error = @"Name cannot be empty";
+        error = NSLocalizedString(@"custom_field_vc_validation_name_not_empty_error", @"Name cannot be empty");
     }
     
     if(keyIsValid) {
         keyIsValid = ![keePassReservedNames containsObject:[candidate lowercaseString]];
         if(!keyIsValid) {
-            error = @"Name cannot be one of the reserved KeePass Field names";
+            error = NSLocalizedString(@"custom_field_vc_validation_name_not_reserved_error", @"Name cannot be one of the reserved KeePass Field names");
         }
     }
     
@@ -117,7 +117,7 @@ const static NSSet<NSString*> *keePassReservedNames;
         }
         
         if(!keyIsValid) {
-            error = @"This key is already in use by another custom field.";
+            error = NSLocalizedString(@"custom_field_vc_validation_name_already_in_use_error", @"This key is already in use by another custom field.");
         }
     }
     

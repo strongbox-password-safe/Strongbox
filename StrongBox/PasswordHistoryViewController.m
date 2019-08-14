@@ -46,8 +46,8 @@
 - (IBAction)onTogglePasswordHistoryEnabled:(id)sender {
     if (!self.uiSwitchEnabled.on && (_model.entries).count > 0) {
         [Alerts yesNo:self
-                title:@"Disable History?"
-              message:@"Are you sure you want to disable history? This will clear previous passwords."
+                title:NSLocalizedString(@"pw_history_vc_prompt_disable_history_title", @"Disable History?")
+              message:NSLocalizedString(@"pw_history_vc_prompt_disable_history_message", @"Are you sure you want to disable history? This will clear previous passwords.")
                action:^(BOOL response) {
                    if (response) {
                        self.model.enabled = NO;
@@ -72,7 +72,9 @@
 - (void)save {
     self.saveFunction(self.model, ^(NSError *error) {
         if (error) {
-            [Alerts error:self title:@"Problem Saving Database" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"pw_history_vc_error_problem_saving", @"Problem Saving Database")
+                    error:error];
         }
         
         [self bindToModel];
@@ -101,10 +103,10 @@
     self.uiLabelPreviousPasswords.enabled = _model.enabled;
 
     if ((_model.entries).count > 0) {
-        self.uiLabelPreviousPasswords.text = [NSString stringWithFormat:@"Old Passwords (%lu)", (unsigned long)(_model.entries).count];
+        self.uiLabelPreviousPasswords.text = [NSString stringWithFormat:NSLocalizedString(@"pw_history_vc_previous_passwords_count_fmt", @"Old Passwords (%lu)"), (unsigned long)(_model.entries).count];
     }
     else {
-        self.uiLabelPreviousPasswords.text = [NSString stringWithFormat:@"Old Passwords (None)"];
+        self.uiLabelPreviousPasswords.text = [NSString stringWithFormat:NSLocalizedString(@"pw_history_vc_previous_passwords_count_none", @"Old Passwords (None)")];
         self.uiLabelPreviousPasswords.enabled = NO;
         self.uiTableViewCellPreviousPasswords.userInteractionEnabled = NO;
         self.uiTableViewCellPreviousPasswords.textLabel.enabled = NO;

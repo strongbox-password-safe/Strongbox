@@ -75,7 +75,10 @@
     for(Node* itemToMove in self.itemsToMove) {
         if(![itemToMove changeParent:self.currentGroup allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe]) {
             NSLog(@"Error Changing Parents.");
-            [Alerts warn:self title:@"Error Changing Parents" message:@"Error Changing Parents" completion:^{
+            [Alerts warn:self
+                   title:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving")
+                 message:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving")
+              completion:^{
                 self.onDone();
             }];
             return;
@@ -84,7 +87,9 @@
 
     [self.viewModel update:NO handler:^(NSError *error) {
         if (error) {
-            [Alerts error:self title:@"Error Saving" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"moveentry_vc_error_saving", @"Error Saving")
+                    error:error];
         }
 
         self.onDone();
@@ -93,13 +98,15 @@
 
 - (IBAction)onAddGroup:(id)sender {
     [Alerts OkCancelWithTextField:self
-             textFieldPlaceHolder:@"Group Name"
-                            title:@"Enter Group Name"
-                          message:@"Please Enter the New Group Name"
+             textFieldPlaceHolder:NSLocalizedString(@"moveentry_vc_add_group_prompt_placeholder", @"Group Name")
+                            title:NSLocalizedString(@"moveentry_vc_add_group_prompt_title", @"Enter Group Name")
+                          message:NSLocalizedString(@"moveentry_vc_add_group_prompt_message", @"Please Enter the New Group Name")
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                if(![self.viewModel addNewGroup:self.currentGroup title:text]) {
-                                   [Alerts warn:self title:@"Could not create group" message:@"Could not create group with that title here."];
+                                   [Alerts warn:self
+                                          title:NSLocalizedString(@"moveentry_vc_warn_creating_group_title", @"Could not create group")
+                                        message:NSLocalizedString(@"moveentry_vc_warn_creating_group_message", @"Could not create group with that title here.")];
                                }
                                else {
                                    [self refresh];

@@ -40,21 +40,21 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             wordLists = @{
-                          kWordListSecureDrop : @"SecureDrop",
-                          kWordListEffLarge : @"EFF Large",
-                          kWordListBeale : @"Beale",
-                          kWordListCatalan : @"Catalan",
-                          kWordListDiceware : @"Diceware (Arnold G. Reinhold's Original)",
-                          kWordListDutch : @"Dutch",
-                          kWordListEffShort1 : @"EFF Short (v1.0)",
-                          kWordListEffShort2 : @"EFF Short (v2.0 - More memorable, unique prefix)",
-                          kWordListFrench : @"French",
-                          kWordListGerman : @"German",
-                          kWordListGoogleUsNoSwears : @"Google (U.S. English, No Swears)",
-                          kWordListItalian : @"Italian",
-                          kWordListJapanese : @"Japanese",
-                          kWordListPolish : @"Polish",
-                          kWordListSwedish : @"Swedish",
+                          kWordListSecureDrop : NSLocalizedString(@"pwgen_wordlist_securedrop", @"SecureDrop"),
+                          kWordListEffLarge : NSLocalizedString(@"pwgen_wordlist_eff_large", @"EFF Large"),
+                          kWordListBeale : NSLocalizedString(@"pwgen_wordlist_beale", @"Beale"),
+                          kWordListCatalan : NSLocalizedString(@"pwgen_wordlist_catalan", @"Catalan"),
+                          kWordListDiceware : NSLocalizedString(@"pwgen_wordlist_diceware", @"Diceware (Arnold G. Reinhold's Original)"),
+                          kWordListDutch : NSLocalizedString(@"pwgen_wordlist_dutch", @"Dutch"),
+                          kWordListEffShort1 : NSLocalizedString(@"pwgen_wordlist_eff_short_1", @"EFF Short (v1.0)"),
+                          kWordListEffShort2 : NSLocalizedString(@"pwgen_wordlist_eff_short_2", @"EFF Short (v2.0 - More memorable, unique prefix)"),
+                          kWordListFrench : NSLocalizedString(@"pwgen_wordlist_french", @"French"),
+                          kWordListGerman : NSLocalizedString(@"pwgen_wordlist_german", @"German"),
+                          kWordListGoogleUsNoSwears : NSLocalizedString(@"pwgen_wordlist_google", @"Google (U.S. English, No Swears)"),
+                          kWordListItalian : NSLocalizedString(@"pwgen_wordlist_italian", @"Italian"),
+                          kWordListJapanese : NSLocalizedString(@"pwgen_wordlist_japanese", @"Japanese"),
+                          kWordListPolish : NSLocalizedString(@"pwgen_wordlist_polish", @"Polish"),
+                          kWordListSwedish : NSLocalizedString(@"pwgen_wordlist_swedish", @"Swedish"),
                          };
         });
     }
@@ -143,19 +143,19 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
 + (NSString*)getCasingStringForCasing:(PasswordGenerationWordCasing)casing {
     switch (casing) {
         case kPasswordGenerationWordCasingNoChange:
-            return @"Do Not Change";
+            return NSLocalizedString(@"pwgen_casing_do_not_change", @"Do Not Change");
             break;
         case kPasswordGenerationWordCasingLower:
-            return @"Lowercase";
+            return NSLocalizedString(@"pwgen_casing_lowercase", @"Lowercase");
             break;
         case kPasswordGenerationWordCasingUpper:
-            return @"Uppercase";
+            return NSLocalizedString(@"pwgen_casing_uppercase", @"Uppercase");
             break;
         case kPasswordGenerationWordCasingTitle:
-            return @"Title Case";
+            return NSLocalizedString(@"pwgen_casing_title_case", @"Title Case");
             break;
         case kPasswordGenerationWordCasingRandom:
-            return @"Random";
+            return NSLocalizedString(@"pwgen_casing_random", @"Random");
             break;
         default:
             return @"Unknown";
@@ -166,16 +166,16 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
 + (NSString*)characterPoolToPoolString:(PasswordGenerationCharacterPool)pool {
     switch (pool) {
         case kPasswordGenerationCharacterPoolLower:
-            return @"Lowercase";
+            return NSLocalizedString(@"pwgen_casing_lowercase", @"Lowercase");
             break;
         case kPasswordGenerationCharacterPoolUpper:
-            return @"Uppercase";
+            return NSLocalizedString(@"pwgen_casing_uppercase", @"Uppercase");
             break;
         case kPasswordGenerationCharacterPoolNumeric:
-            return @"Numeric";
+            return NSLocalizedString(@"pwgen_casing_numeric", @"Numeric");
             break;
         case kPasswordGenerationCharacterPoolSymbols:
-            return @"Symbols";
+            return NSLocalizedString(@"pwgen_casing_symbols", @"Symbols");
             break;
         default:
             return @"Unknown";
@@ -186,19 +186,19 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
 + (NSString*)getHackerifyLevel:(PasswordGenerationHackerifyLevel)level {
     switch (level) {
         case kPasswordGenerationHackerifyLevelNone:
-            return @"None";
+            return NSLocalizedString(@"pwgen_hacker_level_none", @"None");
             break;
         case kPasswordGenerationHackerifyLevelBasicSome:
-            return @"Basic (Some Words)";
+            return NSLocalizedString(@"pwgen_hacker_level_basic_some", @"Basic (Some Words)");
             break;
         case kPasswordGenerationHackerifyLevelBasicAll:
-            return @"Basic (All Words)";
+            return NSLocalizedString(@"pwgen_hacker_level_basic_all", @"Basic (All Words)");
             break;
         case kPasswordGenerationHackerifyLevelProSome:
-            return @"Pro (Some Words)";
+            return NSLocalizedString(@"pwgen_hacker_level_pro_some", @"Pro (Some Words)");
             break;
         case kPasswordGenerationHackerifyLevelProAll:
-            return @"Pro (All Words)";
+            return NSLocalizedString(@"pwgen_hacker_level_pro_all", @"Pro (All Words)");
             break;
     }
 }
@@ -206,16 +206,16 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
 + (NSString*)getSaltLevel:(PasswordGenerationSaltConfig)salt {
     switch (salt) {
         case kPasswordGenerationSaltConfigNone:
-            return @"None";
+            return NSLocalizedString(@"pwgen_salt_mode_none", @"None");
             break;
         case kPasswordGenerationSaltConfigPrefix:
-            return @"Prefix";
+            return NSLocalizedString(@"pwgen_salt_mode_prefix", @"Prefix");
             break;
         case kPasswordGenerationSaltConfigSprinkle:
-            return @"Sprinkle";
+            return NSLocalizedString(@"pwgen_salt_mode_sprinkle", @"Sprinkle");
             break;
         case kPasswordGenerationSaltConfigSuffix:
-            return @"Suffix";
+            return NSLocalizedString(@"pwgen_salt_mode_suffix", @"Suffix");
             break;
     }
 }

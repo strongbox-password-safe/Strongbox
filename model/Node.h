@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildRecords;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildGroups;
 
+@property (readonly) BOOL expired;
+
 - (NSString*)getSerializationId:(BOOL)groupCanUseUuid;
 
 - (BOOL)contains:(Node*)test;

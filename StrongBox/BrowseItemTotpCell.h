@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowseItemTotpCell : UITableViewCell
 
-- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon otpToken:(OTPToken*)otpToken;
+- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon expired:(BOOL)expired otpToken:(OTPToken*)otpToken;
 
 @end
 

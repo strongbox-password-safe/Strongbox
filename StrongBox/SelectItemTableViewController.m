@@ -52,8 +52,8 @@
     if(self.multipleSelectMode) {
         if(self.multipleSelectDisallowEmpty && self.selectedIndices.count == 1 && indexPath.row == self.selectedIndices.firstIndex) {
             [self.tableView deselectRowAtIndexPath:indexPath animated:UITableViewRowAnimationAutomatic];
-            [ISMessages showCardAlertWithTitle:@"Select One"
-                                       message:@"You must select at least one item"
+            [ISMessages showCardAlertWithTitle:NSLocalizedString(@"select_item_vc_title_select_one", @"Select One")
+                                       message:NSLocalizedString(@"select_item_vc_message_select_one", @"You must select at least one item")
                                       duration:0.5f
                                    hideOnSwipe:YES
                                      hideOnTap:YES

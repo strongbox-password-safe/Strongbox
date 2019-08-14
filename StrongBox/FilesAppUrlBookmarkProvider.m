@@ -118,7 +118,7 @@ viewController:(UIViewController *)viewController
             completion(nil);
         }
         else {
-            NSError *err = [Utils createNSError:@"Problem Saving to External File" errorCode:-1];
+            NSError *err = [Utils createNSError:NSLocalizedString(@"files_provider_problem_saving", @"Problem Saving to External File") errorCode:-1];
             completion(err);
         }
     }];
@@ -187,7 +187,7 @@ viewController:(UIViewController *)viewController
     
     if(bookmarkIsStale) {
         url = nil;
-        error = [Utils createNSError:@"Strongbox's reference to this external file is stale. Please remove and re-add this database." errorCode:-45];   
+        error = [Utils createNSError:NSLocalizedString(@"files_provider_stale_reference", @"Strongbox's reference to this external file is stale. Please remove and re-add this database.") errorCode:-45];   
     }
     
     if(error) {

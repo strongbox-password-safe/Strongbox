@@ -24,8 +24,6 @@
 		4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
 		4D01BA2722BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */; };
 		4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */; };
-		4D036E462298243700AC892B /* SelectStringViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E442298243700AC892B /* SelectStringViewController.m */; };
-		4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D036E452298243700AC892B /* SelectStringViewController.xib */; };
 		4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E492298443100AC892B /* CloudSessionsTableViewController.m */; };
 		4D06943922083E5200FB826C /* ProUpgradeIAPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */; };
 		4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D06E12022859F0100A754F5 /* BrowseItemCell.xib */; };
@@ -42,8 +40,6 @@
 		4D0835C22284748200CA7405 /* SFTPProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835BF2284748100CA7405 /* SFTPProviderData.m */; };
 		4D0835CB228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */; };
 		4D0835CC228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */; };
-		4D0835CD228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835C7228474D700CA7405 /* WebDAVConfigurationViewController.xib */; };
-		4D0835CE228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0835C7228474D700CA7405 /* WebDAVConfigurationViewController.xib */; };
 		4D0835CF228474D800CA7405 /* WebDAVStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C9228474D700CA7405 /* WebDAVStorageProvider.m */; };
 		4D0835D0228474D800CA7405 /* WebDAVStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C9228474D700CA7405 /* WebDAVStorageProvider.m */; };
 		4D0835D1228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */; };
@@ -59,9 +55,7 @@
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
-		4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */; };
 		4D0F122021C1418000C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
-		4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */; };
 		4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */; };
@@ -255,7 +249,6 @@
 		4D3AC32321908D4A0010CFCD /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
 		4D3AC32421908D4A0010CFCD /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
 		4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */; };
-		4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
@@ -385,8 +378,18 @@
 		4D766D5422204E4A00AEF439 /* IconViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5222204E4A00AEF439 /* IconViewCell.m */; };
 		4D766D5F22204EED00AEF439 /* IconsCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */; };
 		4D766D6022204EED00AEF439 /* IconsCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */; };
-		4D766D6122204EED00AEF439 /* IconsCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */; };
-		4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */; };
+		4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F892303249D00CBE244 /* EditPasswordCell.xib */; };
+		4D770F872303249D00CBE244 /* EditPasswordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F892303249D00CBE244 /* EditPasswordCell.xib */; };
+		4D770F8A230324A800CBE244 /* IconTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F8D230324A800CBE244 /* IconTableCell.xib */; };
+		4D770F8B230324A800CBE244 /* IconTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F8D230324A800CBE244 /* IconTableCell.xib */; };
+		4D770F8E2303262400CBE244 /* QRCodeScannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F902303262400CBE244 /* QRCodeScannerViewController.xib */; };
+		4D770F912303263100CBE244 /* PrivacyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F932303263100CBE244 /* PrivacyViewController.xib */; };
+		4D770F97230326A200CBE244 /* IconsCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F9A230326A200CBE244 /* IconsCollectionViewController.xib */; };
+		4D770F98230326A200CBE244 /* IconsCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F9A230326A200CBE244 /* IconsCollectionViewController.xib */; };
+		4D770F9B230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F9E230326B900CBE244 /* SFTPSessionConfigurationViewController.xib */; };
+		4D770F9C230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F9E230326B900CBE244 /* SFTPSessionConfigurationViewController.xib */; };
+		4D770F9F230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770FA2230326BE00CBE244 /* WebDAVConfigurationViewController.xib */; };
+		4D770FA0230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770FA2230326BE00CBE244 /* WebDAVConfigurationViewController.xib */; };
 		4D77A0B7216651C1003CB5CB /* AutoFillNewRecordSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */; };
 		4D77A0BA2166598B003CB5CB /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
 		4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
@@ -476,8 +479,6 @@
 		4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */; };
 		4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */; };
-		4DAE98A62270B4E200A811C4 /* IconTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98842270B4E200A811C4 /* IconTableCell.xib */; };
-		4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98842270B4E200A811C4 /* IconTableCell.xib */; };
 		4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */; };
 		4DAE98AA2270B4E200A811C4 /* ConfidentialTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */; };
 		4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */; };
@@ -492,8 +493,6 @@
 		4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */; };
 		4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
 		4DAE98B72270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
-		4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */; };
-		4DAE98B92270B4E200A811C4 /* EditPasswordCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */; };
 		4DAE98BA2270B4E200A811C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
 		4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
 		4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */; };
@@ -600,8 +599,6 @@
 		4DE7F0F922F89D8D0095F51F /* PasswordGenerationPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0FB22F89D8D0095F51F /* PasswordGenerationPreferences.storyboard */; };
 		4DE7F11422F8A16A0095F51F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F11222F8A16A0095F51F /* Localizable.strings */; };
 		4DE9A60521F5FEF700128560 /* QRCodeScannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */; };
-		4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE9A60421F5FEF700128560 /* QRCodeScannerViewController.xib */; };
-		4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DED20C22168AC9A00A5800A /* InitialViewController.m */; };
 		4DEDF7DB22AA7F9800EFA5C9 /* ProExplanationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEDF7DA22AA7F9800EFA5C9 /* ProExplanationViewController.m */; };
 		4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -719,9 +716,6 @@
 		4D01BA2522BD2A4F0044226F /* DatabaseSearchAndSorter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseSearchAndSorter.h; path = StrongBox/DatabaseSearchAndSorter.h; sourceTree = "<group>"; };
 		4D01BA2622BD2A4F0044226F /* DatabaseSearchAndSorter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseSearchAndSorter.m; path = StrongBox/DatabaseSearchAndSorter.m; sourceTree = "<group>"; };
 		4D01BA2A22BD30160044226F /* SearchScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SearchScope.h; path = model/SearchScope.h; sourceTree = "<group>"; };
-		4D036E432298243700AC892B /* SelectStringViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectStringViewController.h; path = StrongBox/SelectStringViewController.h; sourceTree = "<group>"; };
-		4D036E442298243700AC892B /* SelectStringViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectStringViewController.m; path = StrongBox/SelectStringViewController.m; sourceTree = "<group>"; };
-		4D036E452298243700AC892B /* SelectStringViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SelectStringViewController.xib; path = StrongBox/SelectStringViewController.xib; sourceTree = "<group>"; };
 		4D036E482298443100AC892B /* CloudSessionsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CloudSessionsTableViewController.h; path = "StrongBox Auto Fill/CloudSessionsTableViewController.h"; sourceTree = "<group>"; };
 		4D036E492298443100AC892B /* CloudSessionsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CloudSessionsTableViewController.m; path = "StrongBox Auto Fill/CloudSessionsTableViewController.m"; sourceTree = "<group>"; };
 		4D06943722083E5200FB826C /* ProUpgradeIAPManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProUpgradeIAPManager.h; path = StrongBox/ProUpgradeIAPManager.h; sourceTree = "<group>"; };
@@ -744,7 +738,6 @@
 		4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDAVSessionConfiguration.m; path = StrongBox/WebDAVSessionConfiguration.m; sourceTree = "<group>"; };
 		4D0835C5228474D700CA7405 /* WebDAVConfigurationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDAVConfigurationViewController.h; path = StrongBox/WebDAVConfigurationViewController.h; sourceTree = "<group>"; };
 		4D0835C6228474D700CA7405 /* WebDAVStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDAVStorageProvider.h; path = StrongBox/WebDAVStorageProvider.h; sourceTree = "<group>"; };
-		4D0835C7228474D700CA7405 /* WebDAVConfigurationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = WebDAVConfigurationViewController.xib; path = StrongBox/WebDAVConfigurationViewController.xib; sourceTree = "<group>"; };
 		4D0835C8228474D700CA7405 /* WebDAVSessionConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDAVSessionConfiguration.h; path = StrongBox/WebDAVSessionConfiguration.h; sourceTree = "<group>"; };
 		4D0835C9228474D700CA7405 /* WebDAVStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDAVStorageProvider.m; path = StrongBox/WebDAVStorageProvider.m; sourceTree = "<group>"; };
 		4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDAVConfigurationViewController.m; path = StrongBox/WebDAVConfigurationViewController.m; sourceTree = "<group>"; };
@@ -765,7 +758,6 @@
 		4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferencesTableViewController.m; path = StrongBox/PreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D0F121B21C1400500C4451D /* SFTPSessionConfigurationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPSessionConfigurationViewController.h; path = StrongBox/SFTPSessionConfigurationViewController.h; sourceTree = "<group>"; };
 		4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPSessionConfigurationViewController.m; path = StrongBox/SFTPSessionConfigurationViewController.m; sourceTree = "<group>"; };
-		4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SFTPSessionConfigurationViewController.xib; path = StrongBox/SFTPSessionConfigurationViewController.xib; sourceTree = "<group>"; };
 		4D108BFC224A40EC00C17095 /* AesKdfCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesKdfCipher.h; path = model/keepass/AesKdfCipher.h; sourceTree = "<group>"; };
 		4D108BFD224A40EC00C17095 /* AesKdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesKdfCipher.m; path = model/keepass/AesKdfCipher.m; sourceTree = "<group>"; };
 		4D1140A5229D7D1F00DEECF3 /* KeyFilesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeyFilesTableViewController.h; path = StrongBox/KeyFilesTableViewController.h; sourceTree = "<group>"; };
@@ -947,7 +939,6 @@
 		4D3AC32221908D4A0010CFCD /* Keys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Keys.m; path = model/keepass/Keys.m; sourceTree = "<group>"; };
 		4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivacyViewController.h; path = StrongBox/PrivacyViewController.h; sourceTree = "<group>"; };
 		4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PrivacyViewController.m; path = StrongBox/PrivacyViewController.m; sourceTree = "<group>"; };
-		4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PrivacyViewController.xib; path = StrongBox/PrivacyViewController.xib; sourceTree = "<group>"; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppleICloudOrLocalSafeFile.h; path = StrongBox/AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
 		4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppleICloudOrLocalSafeFile.m; path = StrongBox/AppleICloudOrLocalSafeFile.m; sourceTree = "<group>"; };
 		4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxSerializationCommon.m; path = model/keepass/KdbxSerializationCommon.m; sourceTree = SOURCE_ROOT; };
@@ -1091,7 +1082,13 @@
 		4D766D5222204E4A00AEF439 /* IconViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconViewCell.m; path = StrongBox/IconViewCell.m; sourceTree = "<group>"; };
 		4D766D5C22204EED00AEF439 /* IconsCollectionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IconsCollectionViewController.h; path = StrongBox/IconsCollectionViewController.h; sourceTree = "<group>"; };
 		4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = IconsCollectionViewController.m; path = StrongBox/IconsCollectionViewController.m; sourceTree = "<group>"; };
-		4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = IconsCollectionViewController.xib; path = StrongBox/IconsCollectionViewController.xib; sourceTree = "<group>"; };
+		4D770F882303249D00CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/EditPasswordCell.xib; sourceTree = "<group>"; };
+		4D770F8C230324A800CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/IconTableCell.xib; sourceTree = "<group>"; };
+		4D770F8F2303262400CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/QRCodeScannerViewController.xib; sourceTree = "<group>"; };
+		4D770F922303263100CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PrivacyViewController.xib; sourceTree = "<group>"; };
+		4D770F99230326A200CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/IconsCollectionViewController.xib; sourceTree = "<group>"; };
+		4D770F9D230326B900CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SFTPSessionConfigurationViewController.xib; sourceTree = "<group>"; };
+		4D770FA1230326BE00CBE244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/WebDAVConfigurationViewController.xib; sourceTree = "<group>"; };
 		4D77A0B5216651C1003CB5CB /* AutoFillNewRecordSettingsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillNewRecordSettingsController.h; path = StrongBox/AutoFillNewRecordSettingsController.h; sourceTree = "<group>"; };
 		4D77A0B6216651C1003CB5CB /* AutoFillNewRecordSettingsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillNewRecordSettingsController.m; path = StrongBox/AutoFillNewRecordSettingsController.m; sourceTree = "<group>"; };
 		4D77A0B82166598B003CB5CB /* AutoFillNewRecordSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillNewRecordSettings.h; path = StrongBox/AutoFillNewRecordSettings.h; sourceTree = "<group>"; };
@@ -1331,7 +1328,6 @@
 		4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomStorageProviderTableViewCell.h; path = StrongBox/CustomStorageProviderTableViewCell.h; sourceTree = "<group>"; };
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomStorageProviderTableViewCell.m; path = StrongBox/CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenericBasicCell.xib; sourceTree = "<group>"; };
-		4DAE98842270B4E200A811C4 /* IconTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IconTableCell.xib; sourceTree = "<group>"; };
 		4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewCell.m; sourceTree = "<group>"; };
 		4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConfidentialTableCell.m; sourceTree = "<group>"; };
 		4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericKeyValueTableViewCell.m; sourceTree = "<group>"; };
@@ -1346,7 +1342,6 @@
 		4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenericKeyValueTableViewCell.xib; sourceTree = "<group>"; };
 		4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericKeyValueTableViewCell.h; sourceTree = "<group>"; };
 		4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfidentialTableCell.xib; sourceTree = "<group>"; };
-		4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EditPasswordCell.xib; sourceTree = "<group>"; };
 		4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditAttachmentCell.m; sourceTree = "<group>"; };
 		4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditPasswordTableViewCell.m; sourceTree = "<group>"; };
 		4DAE98962270B4E200A811C4 /* GenericBasicCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericBasicCell.m; sourceTree = "<group>"; };
@@ -1469,9 +1464,6 @@
 		4DE7F11322F8A16A0095F51F /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = StrongBox/Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4DE9A60221F5FEF700128560 /* QRCodeScannerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QRCodeScannerViewController.h; path = StrongBox/QRCodeScannerViewController.h; sourceTree = "<group>"; };
 		4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QRCodeScannerViewController.m; path = StrongBox/QRCodeScannerViewController.m; sourceTree = "<group>"; };
-		4DE9A60421F5FEF700128560 /* QRCodeScannerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = QRCodeScannerViewController.xib; path = StrongBox/QRCodeScannerViewController.xib; sourceTree = "<group>"; };
-		4DED20C12168AC9A00A5800A /* InitialViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InitialViewController.h; path = StrongBox/InitialViewController.h; sourceTree = "<group>"; };
-		4DED20C22168AC9A00A5800A /* InitialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InitialViewController.m; path = StrongBox/InitialViewController.m; sourceTree = "<group>"; };
 		4DEDF7D922AA7F9800EFA5C9 /* ProExplanationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProExplanationViewController.h; path = StrongBox/ProExplanationViewController.h; sourceTree = "<group>"; };
 		4DEDF7DA22AA7F9800EFA5C9 /* ProExplanationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProExplanationViewController.m; path = StrongBox/ProExplanationViewController.m; sourceTree = "<group>"; };
 		4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetector.h; path = StrongBox/OfflineDetector.h; sourceTree = "<group>"; };
@@ -1656,7 +1648,7 @@
 				4DF299782243B8020080F9DC /* IconsSectionHeaderReusableView.h */,
 				4DF299792243B8020080F9DC /* IconsSectionHeaderReusableView.m */,
 				4DF2997A2243B8020080F9DC /* IconsSectionHeaderReusableView.xib */,
-				4D766D5E22204EED00AEF439 /* IconsCollectionViewController.xib */,
+				4D770F9A230326A200CBE244 /* IconsCollectionViewController.xib */,
 				4D766D5C22204EED00AEF439 /* IconsCollectionViewController.h */,
 				4D766D5D22204EED00AEF439 /* IconsCollectionViewController.m */,
 			);
@@ -1676,9 +1668,6 @@
 				4DB7D51E229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.h */,
 				4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */,
 				4D7D2191229FD15800C1C925 /* BrowseItemSubtitleField.h */,
-				4D036E432298243700AC892B /* SelectStringViewController.h */,
-				4D036E442298243700AC892B /* SelectStringViewController.m */,
-				4D036E452298243700AC892B /* SelectStringViewController.xib */,
 				4DE7F0F722F89D870095F51F /* SelectItem.storyboard */,
 				4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */,
 				4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */,
@@ -1735,7 +1724,7 @@
 				4DF972B821BFE63C00F384C9 /* SFTPSessionConfiguration.m */,
 				4D0F121B21C1400500C4451D /* SFTPSessionConfigurationViewController.h */,
 				4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */,
-				4D0F121D21C1400500C4451D /* SFTPSessionConfigurationViewController.xib */,
+				4D770F9E230326B900CBE244 /* SFTPSessionConfigurationViewController.xib */,
 			);
 			name = SFTP;
 			sourceTree = "<group>";
@@ -1745,7 +1734,7 @@
 			children = (
 				4D0835C5228474D700CA7405 /* WebDAVConfigurationViewController.h */,
 				4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */,
-				4D0835C7228474D700CA7405 /* WebDAVConfigurationViewController.xib */,
+				4D770FA2230326BE00CBE244 /* WebDAVConfigurationViewController.xib */,
 				4D0835C8228474D700CA7405 /* WebDAVSessionConfiguration.h */,
 				4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */,
 				4D0835C6228474D700CA7405 /* WebDAVStorageProvider.h */,
@@ -1826,7 +1815,7 @@
 			children = (
 				4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */,
 				4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */,
-				4D3D0A0A228AF81400C38C94 /* PrivacyViewController.xib */,
+				4D770F932303263100CBE244 /* PrivacyViewController.xib */,
 			);
 			name = "Privacy and Lock";
 			sourceTree = "<group>";
@@ -1968,6 +1957,14 @@
 		4D326EA1223032C800DCD8C7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
+				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
+				4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */,
+				4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */,
+				4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */,
+				4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */,
+				4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */,
+				4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */,
 				4D9AC55822A155D900449F3F /* StaticDataTableViewController */,
 				4DC66F3F229E71C800EC83C6 /* TPKeyboardAvoidingScrollView */,
 				4D326EA2223037A200DCD8C7 /* GZIP */,
@@ -1978,8 +1975,6 @@
 				4D4D6AF4222EF3D80056514E /* RMStore */,
 				4D8EC29E22301201008EE004 /* OpenSSL-1.0.2r */,
 				4D8EC43022302739008EE004 /* NMSSH */,
-				4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */,
-				4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -2702,7 +2697,7 @@
 				4D0835E02284775E00CA7405 /* Deprecated */,
 				4DE9A60221F5FEF700128560 /* QRCodeScannerViewController.h */,
 				4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */,
-				4DE9A60421F5FEF700128560 /* QRCodeScannerViewController.xib */,
+				4D770F902303262400CBE244 /* QRCodeScannerViewController.xib */,
 				4D0835AF2284742000CA7405 /* CustomFieldEditorViewController.h */,
 				4D0835B12284742000CA7405 /* CustomFieldEditorViewController.m */,
 				4D0835B42284742000CA7405 /* FontManager.h */,
@@ -2733,10 +2728,10 @@
 				4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */,
 				4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */,
 				4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */,
-				4DAE98932270B4E200A811C4 /* EditPasswordCell.xib */,
+				4D770F892303249D00CBE244 /* EditPasswordCell.xib */,
 				4DAE988D2270B4E200A811C4 /* EditPasswordTableViewCell.h */,
 				4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */,
-				4DAE98842270B4E200A811C4 /* IconTableCell.xib */,
+				4D770F8D230324A800CBE244 /* IconTableCell.xib */,
 				4DE498BB2271E911007EF98C /* IconTableCell.h */,
 				4DE498BC2271E911007EF98C /* IconTableCell.m */,
 				4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */,
@@ -2847,14 +2842,8 @@
 				4D78AC2C1FB1E27700A68A92 /* Utils.m */,
 				4D29E46A206D328900AD537E /* PasswordGenerationParameters.h */,
 				4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */,
-				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
-				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
-				4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */,
-				4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */,
 				4D446807216CE02C00F6358D /* Csv.h */,
 				4D446808216CE02C00F6358D /* Csv.m */,
-				4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */,
-				4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */,
 				4D8C147B2074F5D100CE9CAE /* CHCSVParser.h */,
 				4D8C147C2074F5D100CE9CAE /* CHCSVParser.m */,
 				4DA6335A1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.h */,
@@ -2955,8 +2944,6 @@
 		4DED20C72168BF1800A5800A /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				4DED20C12168AC9A00A5800A /* InitialViewController.h */,
-				4DED20C22168AC9A00A5800A /* InitialViewController.m */,
 				4D1A5C001F7927D60036684C /* VersionConflictController.h */,
 				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
 				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
@@ -3256,19 +3243,18 @@
 				4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
 				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
-				4D036E472298243700AC892B /* SelectStringViewController.xib in Resources */,
 				4DE7F0E822F89D680095F51F /* SelectStorage.storyboard in Resources */,
 				4D36B0D022C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D36B0C422C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
 				4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */,
-				4D0835CD228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */,
+				4D770F9F230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */,
 				4DE7F0EF22F89D790095F51F /* DatabaseOperations.storyboard in Resources */,
 				4DE7F0E122F89D550095F51F /* PasswordSafeHistory.storyboard in Resources */,
 				4D36B0CE22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0C222C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
-				4D766D6122204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
+				4D770F97230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
 				4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
@@ -3282,13 +3268,13 @@
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4DE7F0DE22F89D510095F51F /* KeePassHistory.storyboard in Resources */,
 				4DE7F11422F8A16A0095F51F /* Localizable.strings in Resources */,
-				4D0F121F21C1400500C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
+				4D770F9B230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
-				4DE9A60621F5FEF700128560 /* QRCodeScannerViewController.xib in Resources */,
+				4D770F8E2303262400CBE244 /* QRCodeScannerViewController.xib in Resources */,
 				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D36B0C822C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4DE7F0D222F89D1D0095F51F /* Welcome.storyboard in Resources */,
-				4DAE98A62270B4E200A811C4 /* IconTableCell.xib in Resources */,
+				4D770F8A230324A800CBE244 /* IconTableCell.xib in Resources */,
 				4D36B0B222C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D36B0BA22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
@@ -3297,7 +3283,7 @@
 				4DE7F0CB22F89CE30095F51F /* MasterDetail.storyboard in Resources */,
 				4DE7F0D522F89D270095F51F /* Browse.storyboard in Resources */,
 				4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */,
-				4DAE98B82270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
+				4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */,
 				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4DE7F0F522F89D870095F51F /* SelectItem.storyboard in Resources */,
 				4DE7F0CE22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
@@ -3305,7 +3291,7 @@
 				4D36B0C022C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 				4DE7F0D822F89D3E0095F51F /* ItemDetails.storyboard in Resources */,
-				4D3D0A0C228AF81400C38C94 /* PrivacyViewController.xib in Resources */,
+				4D770F912303263100CBE244 /* PrivacyViewController.xib in Resources */,
 				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
 				4DE7F0DB22F89D480095F51F /* ItemDetailsPreferences.storyboard in Resources */,
 				4DE7F0C722F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
@@ -3334,7 +3320,7 @@
 				4D36B0C522C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0B522C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
-				4DAE98B92270B4E200A811C4 /* EditPasswordCell.xib in Resources */,
+				4D770F872303249D00CBE244 /* EditPasswordCell.xib in Resources */,
 				4D36B0C122C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D36B0B922C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */,
@@ -3343,21 +3329,21 @@
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
 				4DE7F0C822F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4D36B0B722C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
-				4D766D6222204EED00AEF439 /* IconsCollectionViewController.xib in Resources */,
+				4D770F98230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */,
 				4D36B0B322C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D36B0D122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
-				4D0F122121C1418400C4451D /* SFTPSessionConfigurationViewController.xib in Resources */,
+				4D770F9C230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D36B0C922C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4DE7F0F922F89D8D0095F51F /* PasswordGenerationPreferences.storyboard in Resources */,
-				4DAE98A72270B4E200A811C4 /* IconTableCell.xib in Resources */,
+				4D770F8B230324A800CBE244 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4D36B0C322C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
-				4D0835CE228474D800CA7405 /* WebDAVConfigurationViewController.xib in Resources */,
+				4D770FA0230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */,
 				4D36B0BF22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0CD22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0BB22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
@@ -3716,7 +3702,6 @@
 				4D3652142184A24700A56519 /* regdom.c in Sources */,
 				4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
-				4D036E462298243700AC892B /* SelectStringViewController.m in Sources */,
 				4D2259F922C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */,
 				4D74B929218C40B000FC369E /* V3Binary.m in Sources */,
@@ -3779,7 +3764,6 @@
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
 				4D4ACAE622A1275700D486B0 /* CASGTableViewController.m in Sources */,
 				4DB93DE722C177DC0019F481 /* ExportOptionsTableViewController.m in Sources */,
-				4DED20C32168AC9A00A5800A /* InitialViewController.m in Sources */,
 				4D876B4321AC36F800805DED /* CustomField.m in Sources */,
 				4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CDF21F4C26700E2B194 /* OTPToken+Generation.m in Sources */,
@@ -4047,6 +4031,67 @@
 				4D5F5B85218B4CCB00A0739A /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4D770F892303249D00CBE244 /* EditPasswordCell.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770F882303249D00CBE244 /* Base */,
+			);
+			name = EditPasswordCell.xib;
+			sourceTree = "<group>";
+		};
+		4D770F8D230324A800CBE244 /* IconTableCell.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770F8C230324A800CBE244 /* Base */,
+			);
+			name = IconTableCell.xib;
+			sourceTree = "<group>";
+		};
+		4D770F902303262400CBE244 /* QRCodeScannerViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770F8F2303262400CBE244 /* Base */,
+			);
+			name = QRCodeScannerViewController.xib;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D770F932303263100CBE244 /* PrivacyViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770F922303263100CBE244 /* Base */,
+			);
+			name = PrivacyViewController.xib;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D770F9A230326A200CBE244 /* IconsCollectionViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770F99230326A200CBE244 /* Base */,
+			);
+			name = IconsCollectionViewController.xib;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D770F9E230326B900CBE244 /* SFTPSessionConfigurationViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770F9D230326B900CBE244 /* Base */,
+			);
+			name = SFTPSessionConfigurationViewController.xib;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D770FA2230326BE00CBE244 /* WebDAVConfigurationViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D770FA1230326BE00CBE244 /* Base */,
+			);
+			name = WebDAVConfigurationViewController.xib;
+			path = StrongBox;
 			sourceTree = "<group>";
 		};
 		4DE7F0CA22F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard */ = {

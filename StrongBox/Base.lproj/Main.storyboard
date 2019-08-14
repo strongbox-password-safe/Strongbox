@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="9bz-F2-hsA">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
     <device id="retina6_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -79,11 +79,13 @@
                         <segue destination="HPH-se-OaK" kind="presentation" identifier="segueToMasterDetail" id="AoX-b8-d4D"/>
                         <segue destination="AEq-P2-zat" kind="presentation" identifier="segueToWelcome" id="TbP-2h-qbB"/>
                         <segue destination="GLJ-ng-wZL" kind="presentation" identifier="segueToCreateExpressDone" id="ngy-sF-V08"/>
+                        <segue destination="sl8-tU-MbC" kind="presentation" identifier="segueFromInitialToAddDatabase" id="1mX-Fy-JBZ"/>
+                        <segue destination="Qjo-2b-n6U" kind="presentation" identifier="segueToProExplanation" id="xeA-8L-Kqa"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aFA-j3-EVC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3401" y="1292"/>
+            <point key="canvasLocation" x="-3842" y="1183"/>
         </scene>
         <!--Preferences-->
         <scene sceneID="RB0-75-mqu">
@@ -123,7 +125,7 @@
                 <viewControllerPlaceholder storyboardName="CreateDatabaseOrSetCredentials" id="sl8-tU-MbC" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M0S-K2-ck3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2729" y="1797"/>
+            <point key="canvasLocation" x="-3116" y="860"/>
         </scene>
         <!--Upgrade Table Scene-->
         <scene sceneID="EYQ-MP-DEI">
@@ -755,7 +757,7 @@ Cg
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lYF-fU-0IE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4800" y="2217"/>
+            <point key="canvasLocation" x="-4329" y="2056"/>
         </scene>
         <!--CreateDone-->
         <scene sceneID="ulL-q1-rbu">
@@ -817,7 +819,7 @@ Cg
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zO6-36-feS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2164" y="593"/>
+            <point key="canvasLocation" x="-1836" y="2056"/>
         </scene>
         <!--Databases Navigation Controller-->
         <scene sceneID="1kV-wb-Lxz">
@@ -831,7 +833,7 @@ Cg
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" id="ZOq-uY-37z">
-                        <rect key="frame" x="0.0" y="769" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="813" width="414" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </toolbar>
                     <connections>
@@ -840,28 +842,7 @@ Cg
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="k7a-hR-PUh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4351" y="1292"/>
-        </scene>
-        <!--Initial View Controller-->
-        <scene sceneID="A2h-Qc-mpt">
-            <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="9bz-F2-hsA" customClass="InitialViewController" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <tabBar key="tabBar" hidden="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="dVy-zq-SQa">
-                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </tabBar>
-                    <connections>
-                        <segue destination="waq-lN-OIc" kind="relationship" relationship="viewControllers" id="pRI-aQ-vJn"/>
-                        <segue destination="sl8-tU-MbC" kind="presentation" identifier="segueFromInitialToAddDatabase" id="aBO-WC-Gww"/>
-                        <segue destination="sg8-gK-UaO" kind="presentation" identifier="segueToUpgrade" id="ffc-T4-bJd"/>
-                        <segue destination="Qjo-2b-n6U" kind="presentation" identifier="segueToProExplanation" id="Bvy-zq-kdU"/>
-                    </connections>
-                </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="9KZ-62-1MR" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-5268" y="1292"/>
+            <point key="canvasLocation" x="-4643" y="1183"/>
         </scene>
         <!--Pro Explanation Notice-->
         <scene sceneID="iAj-rC-glg">
@@ -984,7 +965,7 @@ Cheers,
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hBO-Ai-nxc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-5601" y="2217"/>
+            <point key="canvasLocation" x="-5065" y="2057"/>
         </scene>
         <!--View Preferences-->
         <scene sceneID="Mkz-4h-HZ3">
@@ -1209,7 +1190,7 @@ Cheers,
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2vM-q4-WQa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2929" y="2247"/>
+            <point key="canvasLocation" x="-2929" y="2056"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="JVg-gA-ht0">
@@ -1227,7 +1208,7 @@ Cheers,
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WPP-6H-5gz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3874" y="2247"/>
+            <point key="canvasLocation" x="-3564" y="2056"/>
         </scene>
     </scenes>
     <resources>
@@ -1237,7 +1218,6 @@ Cheers,
         <image name="services" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="okm-JQ-5uE"/>
-        <segue reference="n8a-mD-byL"/>
+        <segue reference="1mX-Fy-JBZ"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -86,7 +86,7 @@ viewController:(UIViewController *)viewController
     NSString *path = [NSString pathWithComponents:@[dir, desiredFilename]];
 
     if(![sftp writeContents:data toFileAtPath:path progress:nil]) {
-        NSError* error = [Utils createNSError:@"Could not create file" errorCode:-3];
+        NSError* error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_create", @"Could not create file") errorCode:-3];
         completion(nil, error);
         return;
     }
@@ -181,7 +181,7 @@ viewController:(UIViewController *)viewController
           });
              
         if(!data) {
-            error = [Utils createNSError:@"Could not read file" errorCode:-3];
+            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
             completionHandler(nil, error);
             return;
         }
@@ -204,7 +204,7 @@ viewController:(UIViewController *)viewController
         
         
         if(![sftp writeContents:data toFileAtPath:providerData.filePath progress:nil]) {
-            error = [Utils createNSError:@"Could not update file" errorCode:-3];
+            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
             completion(error);
             return;
         }
@@ -339,14 +339,14 @@ viewController:(UIViewController *)viewController
 
         if (!session.isAuthorized) {
             if(error) {
-                *error = [Utils createNSError:[NSString stringWithFormat:@"Authentication Failed for [user: %@]", sessionConfiguration.username] errorCode:-2];
+                *error = [Utils createNSError:[NSString stringWithFormat:NSLocalizedString(@"sftp_provider_auth_failed_fmt", @"Authentication Failed for [user: %@]"), sessionConfiguration.username] errorCode:-2];
             }
             return nil;
         }
     }
     else {
         if(error) {
-            *error = [Utils createNSError:[NSString stringWithFormat:@"Could not connect to host: %@ [user: %@]",
+            *error = [Utils createNSError:[NSString stringWithFormat:NSLocalizedString(@"sftp_provider_connect_failed_fmt", @"Could not connect to host: %@ [user: %@]"),
                                            sessionConfiguration.host, sessionConfiguration.username] errorCode:-1];
         }
         return nil;

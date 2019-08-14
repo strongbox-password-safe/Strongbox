@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/AppDelegate.m"
-            timestampString = "586832255.1631989"
+            timestampString = "587434151.596035"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "111"
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/OpenSafeSequenceHelper.m"
-            timestampString = "586487796.2204241"
+            timestampString = "587434349.809886"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "722"
-            endingLineNumber = "722"
+            startingLineNumber = "737"
+            endingLineNumber = "737"
             landmarkName = "-openSafeWithDataDone:openedSafe:cacheMode:provider:data:"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,13 +42,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/OpenSafeSequenceHelper.m"
-            timestampString = "586487796.220492"
+            timestampString = "587434349.810293"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "972"
-            endingLineNumber = "972"
-            landmarkName = "-promptForAutofillBookmarkSelect"
-            landmarkType = "7">
+            startingLineNumber = "991"
+            endingLineNumber = "991"
+            landmarkName = "@implementation OpenSafeSequenceHelper"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -58,12 +58,140 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StrongBox/ItemDetailsViewController.m"
-            timestampString = "586832255.163573"
+            timestampString = "587333227.1776789"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "174"
-            endingLineNumber = "174"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
             landmarkName = "-viewDidLoad"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/AppDelegate.m"
+            timestampString = "587434151.596226"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "192"
+            endingLineNumber = "192"
+            landmarkName = "-getInitialViewController"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/SafesViewController.m"
+            timestampString = "587434349.810626"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1325"
+            endingLineNumber = "1325"
+            landmarkName = "-openQuickLaunchDatabase:"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[SafesViewController openQuickLaunchDatabase:]"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
+                  timestampString = "587328304.826269"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1273"
+                  endingLineNumber = "1273"
+                  offsetFromSymbolStart = "44">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__47-[SafesViewController openQuickLaunchDatabase:]_block_invoke"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
+                  timestampString = "587328304.828071"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1273"
+                  endingLineNumber = "1273"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/SafesViewController.m"
+            timestampString = "587434349.810679"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1326"
+            endingLineNumber = "1326"
+            landmarkName = "-openQuickLaunchDatabase:"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__33-[SafesViewController requestPin]_block_invoke"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
+                  timestampString = "587328305.51452"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1275"
+                  endingLineNumber = "1275"
+                  offsetFromSymbolStart = "1207">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__copy_helper_block_e8_32s40w"
+                  moduleName = "Strongbox"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
+                  timestampString = "587328305.5162081"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1251"
+                  endingLineNumber = "1251"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/BrowseItemCell.m"
+            timestampString = "587412386.5212131"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
+            landmarkName = "-setRecord:subtitle:icon:groupLocation:flags:expired:otpToken:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

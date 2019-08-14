@@ -231,10 +231,14 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
     NSString* password = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 
-    Node* sampleFolder = [[Node alloc] initAsGroup:@"Sample Folder" parent:parent allowDuplicateGroupTitles:YES uuid:nil];
+    Node* sampleFolder = [[Node alloc] initAsGroup:NSLocalizedString(@"model_sample_group_title", @"Sample Group")
+                                            parent:parent
+                         allowDuplicateGroupTitles:YES
+                                              uuid:nil];
+    
     [parent addChild:sampleFolder allowDuplicateGroupTitles:NO];
     
-    NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username"
+    NodeFields *fields = [[NodeFields alloc] initWithUsername:NSLocalizedString(@"model_sample_entry_username", @"username")
                                                           url:@"https://strongboxsafe.com"
                                                      password:password
                                                         notes:@""
@@ -245,9 +249,9 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     fields.accessed = date;
     fields.modified = date;
 
-    [sampleFolder addChild:[[Node alloc] initAsRecord:@"Sample"
-                                                 parent:sampleFolder
-                                                 fields:fields
+    [sampleFolder addChild:[[Node alloc]    initAsRecord:NSLocalizedString(@"model_sample_entry_title", @"Sample")
+                                                  parent:sampleFolder
+                                                  fields:fields
                                                     uuid:nil]
       allowDuplicateGroupTitles:NO];
 }

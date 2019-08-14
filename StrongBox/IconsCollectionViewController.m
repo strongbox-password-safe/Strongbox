@@ -92,7 +92,9 @@
     if (kind == UICollectionElementKindSectionHeader) {
         IconsSectionHeaderReusableView *collectionHeader = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"IconsSectionHeaderReusableView" forIndexPath:indexPath];
         
-        collectionHeader.labelTitle.text = ([self hasCustomIcons] && indexPath.section == 0) ? @"Database Icons" : @"KeePass Icons";
+        collectionHeader.labelTitle.text = ([self hasCustomIcons] && indexPath.section == 0) ?
+        NSLocalizedString(@"icons_vc_header_database_icons_title", @"Database Icons") :
+        NSLocalizedString(@"icons_vc_header_keepass_icons_title", @"KeePass Icons");
         
         reusableView = collectionHeader;
     }

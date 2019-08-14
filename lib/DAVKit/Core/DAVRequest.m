@@ -22,7 +22,7 @@
 
 NSString *const DAVClientErrorDomain = @"com.MattRajca.DAVKit.error";
 
-#define DEFAULT_TIMEOUT 10 // seconds
+#define DEFAULT_TIMEOUT 5 // seconds
 
 @synthesize path = _path;
 @synthesize delegate = _delegate;

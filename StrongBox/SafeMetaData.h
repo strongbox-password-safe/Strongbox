@@ -80,6 +80,8 @@
 @property BOOL showRecycleBinInSearchResults;
 @property BOOL viewDereferencedFields;
 @property BOOL searchDereferencedFields;
+@property BOOL showExpiredInSearch;
+@property BOOL showExpiredInBrowse;
 
 // Details View
 @property BOOL showEmptyFieldsInDetailsView;
@@ -88,6 +90,7 @@
 @property BOOL hideTotp;
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
+@property BOOL alwaysUseCacheForAutoFill; // Some users want this...
 
 @end
 

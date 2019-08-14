@@ -34,12 +34,21 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFillAlwaysUseCache;
 
 @end
 
 @implementation SafeDetailsView
 
-- (IBAction)onSettingChanged:(id)sender {
+- (IBAction)onGenericSettingChanged:(id)sender {
+    self.viewModel.metadata.alwaysUseCacheForAutoFill = self.switchAutoFillAlwaysUseCache.on;
+    
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+    
+    [self bindSettings];
+}
+
+- (IBAction)onReadOnlyChanged:(id)sender {
     self.viewModel.metadata.readOnly = self.switchReadOnly.on;
     [[SafesList sharedInstance] update:self.viewModel.metadata];
     
@@ -63,6 +72,7 @@
     self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
     
     self.switchReadOnly.on = self.viewModel.metadata.readOnly;
+    self.switchAutoFillAlwaysUseCache.on = self.viewModel.metadata.alwaysUseCacheForAutoFill;
 }
 
 - (void)viewDidLoad {

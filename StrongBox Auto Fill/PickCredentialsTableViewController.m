@@ -69,7 +69,13 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     self.searchController.searchResultsUpdater = self;
     self.searchController.dimsBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
-    self.searchController.searchBar.scopeButtonTitles = @[@"Title", @"Username", @"Password", @"URL", @"All Fields"];
+    self.searchController.searchBar.scopeButtonTitles =
+        @[NSLocalizedString(@"pick_creds_vc_search_scope_title", @"Title"),
+          NSLocalizedString(@"pick_creds_vc_search_scope_username", @"Username"),
+          NSLocalizedString(@"pick_creds_vc_search_scope_password", @"Password"),
+          NSLocalizedString(@"pick_creds_vc_search_scope_url", @"URL"),
+          NSLocalizedString(@"pick_creds_vc_search_scope_all_fields", @"All Fields")];
+    
     self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
     
     if (@available(iOS 11.0, *)) {
@@ -258,7 +264,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                       scope:scope
                 dereference:self.model.metadata.searchDereferencedFields
       includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
-          includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults];
+          includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
+             includeExpired:self.model.metadata.showExpiredInSearch];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
@@ -309,6 +316,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                    icon:icon
           groupLocation:groupLocation
                   flags:flags
+                expired:node.expired
                otpToken:Settings.sharedInstance.hideTotpInAutoFill ? nil : node.fields.otpToken];
     }
     
@@ -320,7 +328,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     NSString *path = [[hierarchy subarrayWithRange:NSMakeRange(0, hierarchy.count - 1)] componentsJoinedByString:@"/"];
     
-    return hierarchy.count == 1 ? @"(in /)" : [NSString stringWithFormat:@"(in /%@)", path];
+    return hierarchy.count == 1 ?
+        NSLocalizedString(@"pick_creds_vc_group_path_display_string_root", @"(in /)") :
+        [NSString stringWithFormat:NSLocalizedString(@"pick_creds_vc_group_path_display_string_fmt", @"(in /%@)"), path];
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
@@ -382,7 +392,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         [self segueToCreateNew];
     }
     else {
-        [Alerts info:self title:@"Unsupported Storage" message:@"This database is stored on a Storage Provider that does not support Live editing in App Extensions. Cannot Create New Record."];
+        [Alerts info:self
+               title:NSLocalizedString(@"pick_creds_vc_cannot_create_new_unsupported_storage_type_title", @"Unsupported Storage")
+             message:NSLocalizedString(@"pick_creds_vc_cannot_create_new_unsupported_storage_type_message", @"This database is stored on a Storage Provider that does not support Live editing in App Extensions. Cannot Create New Record.")];
     }
 }
 
@@ -392,12 +404,15 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                                  NSForegroundColorAttributeName: [UIColor blueColor]
                                  };
     
-    return [[NSAttributedString alloc] initWithString: @"Create New Record..." attributes:attributes];
+    return [[NSAttributedString alloc] initWithString:NSLocalizedString(@"pick_creds_vc_create_new_button_title", @"Create New Record...")
+                                           attributes:attributes];
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = self.searchController.isActive ? @"No Matching Records" : @"Empty Database";
+    NSString *text = self.searchController.isActive ?
+        NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Records") :
+        NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
                                  NSForegroundColorAttributeName: [UIColor darkGrayColor]};
@@ -407,7 +422,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = self.searchController.isActive ? @"Could not find any matching records" : @"It appears your database is empty";
+    NSString *text = self.searchController.isActive ?
+        NSLocalizedString(@"pick_creds_vc_empty_search_dataset_subtitle", @"Could not find any matching records") :
+        NSLocalizedString(@"pick_creds_vc_empty_dataset_subtitle", @"It appears your database is empty");
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;

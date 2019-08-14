@@ -153,6 +153,10 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
 
 /////////////
 
+- (BOOL)expired {
+    return self.fields.expired;
+}
+
 - (NSArray<Node*>*)children {
     return self.isGroup ? [self filterChildren:NO predicate:nil] : [NSArray array];
 }

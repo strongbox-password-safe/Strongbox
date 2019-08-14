@@ -7,7 +7,6 @@
 //
 
 #import "BrowsePreferencesTableViewController.h"
-//#import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "SafesList.h"
@@ -44,6 +43,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelTripleTapAction;
 @property (weak, nonatomic) IBOutlet UILabel *labelLongPressAction;
 
+@property (weak, nonatomic) IBOutlet UISwitch *swtichShowExpiredInBrowse;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowExpiredInSearch;
 
 @end
 
@@ -81,6 +82,10 @@
 
     self.databaseMetaData.hideTotpInBrowse = !self.switchShowTotpBrowseView.on;
     self.databaseMetaData.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
+    
+    self.databaseMetaData.showExpiredInBrowse = self.swtichShowExpiredInBrowse.on;
+    self.databaseMetaData.showExpiredInSearch = self.switchShowExpiredInSearch.on;
+    
     [SafesList.sharedInstance update:self.databaseMetaData];
     
     [self bindPreferences];
@@ -105,6 +110,11 @@
     self.switchShowRecycleBinInBrowse.on = !self.databaseMetaData.doNotShowRecycleBinInBrowse;
 
     self.labelViewAs.text = [self getBrowseViewTypeName:self.databaseMetaData.browseViewType];
+    
+    // Expired
+    
+    self.swtichShowExpiredInBrowse.on = self.databaseMetaData.showExpiredInBrowse;
+    self.switchShowExpiredInSearch.on = self.databaseMetaData.showExpiredInSearch;
     
     // Tap Actions
     

@@ -43,14 +43,14 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     self.usedFilenames = [NSSet setWithArray:usedFilenames]; // Not case sensitive in original app - no need to lowercase
     
     UIAlertController *alertController =
-    [UIAlertController alertControllerWithTitle:@"Attachment Location"
+    [UIAlertController alertControllerWithTitle:NSLocalizedString(@"add_attachment_vc_prompt_title", @"Attachment Location")
                                         message:nil
                                  preferredStyle:UIAlertControllerStyleAlert];
     
     NSArray<NSString*>* buttonTitles =
-    @[  @"Photos",
-        @"Camera",
-        @"Files"];
+    @[  NSLocalizedString(@"add_attachment_vc_prompt_source_option_photos", @"Photos"),
+        NSLocalizedString(@"add_attachment_vc_prompt_source_option_camera", @"Camera"),
+        NSLocalizedString(@"add_attachment_vc_prompt_source_option_files", @"Files")];
     
     int index = 1;
     for (NSString *title in buttonTitles) {
@@ -63,7 +63,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
         index++;
     }
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"add_attachment_vc_prompt_source_option_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              [self onAddAttachmentLocationResponse:0];
@@ -93,7 +93,11 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
         BOOL available = [UIImagePickerController isSourceTypeAvailable:source];
         
         if(!available) {
-            [Alerts info:self.parentViewController title:@"Source Unavailable" message:response == 2 ? @"Strongbox could not access the camera. Does it have permission?" : @"Strongbox could not access photos. Does it have permission?"];
+            [Alerts info:self.parentViewController
+                   title:NSLocalizedString(@"add_attachment_vc_error_source_unavailable_title", @"Source Unavailable")
+                 message:response == 2 ?
+                                           NSLocalizedString(@"add_attachment_vc_error_source_unavailable_camera", @"Strongbox could not access the camera. Does it have permission?") :
+                                           NSLocalizedString(@"add_attachment_vc_error_source_unavailable_photos", @"Strongbox could not access photos. Does it have permission?")];
             return;
         }
         
@@ -114,7 +118,9 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     
     if(!data) {
         NSLog(@"Error: %@", error);
-        [Alerts warn:self.parentViewController title:@"Error Reading" message:@"Could not read the data for this item."];
+        [Alerts warn:self.parentViewController
+               title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
+             message:NSLocalizedString(@"add_attachment_vc_error_reading_message", @"Could not read the data for this item.")];
         return;
     }
     
@@ -140,7 +146,9 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
             UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
             
             if(!image) {
-                [Alerts warn:self.parentViewController title:@"Error Reading" message:@"Could not read the data for this item."];
+                [Alerts warn:self.parentViewController
+                       title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
+                     message:NSLocalizedString(@"add_attachment_vc_error_reading_message", @"Could not read the data for this item.")];
                 return;
             }
             
@@ -164,7 +172,9 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
         NSLog(@"Error: %@", error);
         
         [picker dismissViewControllerAnimated:YES completion:^{
-            [Alerts warn:self.parentViewController title:@"Error Reading" message:@"Could not read the data for this item."];
+            [Alerts warn:self.parentViewController
+                   title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
+                 message:NSLocalizedString(@"add_attachment_vc_error_reading_message", @"Could not read the data for this item.")];
         }];
         return;
     }
@@ -182,10 +192,10 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
             [self prepareLargeImageRescalingOptions:suggestedFilename image:image data:data];
         }
         else {
-            NSString* message = [NSString stringWithFormat:@"This is quite a large file (%@), and could significantly affect the performance of Strongbox and slow down syncs across networks. Is there a smaller version you could use?\n\nContinue adding this attachment anyway?", friendlyFileSizeString(data.length)];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"add_attachment_vc_large_file_message_fmt", @"This is quite a large file (%@), and could significantly affect the performance of Strongbox and slow down syncs across networks. Is there a smaller version you could use?\n\nContinue adding this attachment anyway?"), friendlyFileSizeString(data.length)];
 
             [Alerts yesNo:self.parentViewController
-                    title:@"Large Attachment"
+                    title:NSLocalizedString(@"add_attachment_vc_large_file_title", @"Large Attachment")
                   message:message
                    action:^(BOOL response) {
                        if(response) {
@@ -200,7 +210,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 }
 
 - (void)prepareLargeImageRescalingOptions:(NSString*)suggestedFilename image:(UIImage*)image data:(NSData*)data {
-    [SVProgressHUD showWithStatus:@"Analyzing Image..."];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"add_attachment_vc_large_file_analyzing_progress_title", @"Analyzing Image...")];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         NSMutableDictionary<NSString*, NSData*> *resized = [NSMutableDictionary dictionary];
@@ -234,9 +244,13 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
  sortedKeys:(NSArray<NSString*>*)sortedKeys {
     [SVProgressHUD dismiss];
     
-    NSString* message = resized.count > 0 ? @"This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Would you like to rescale this image to one of the streamlined options below?" :
-    @"This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use?";
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:resized.count > 0 ? @"Rescale Large Image?" : @"Use Large Image?"
+    NSString* message = resized.count > 0 ?
+    NSLocalizedString(@"add_attachment_vc_large_image_message_rescale",  @"This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Would you like to rescale this image to one of the streamlined options below?") :
+    NSLocalizedString(@"add_attachment_vc_large_image_message", @"This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use?");
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:resized.count > 0 ?
+                                          NSLocalizedString(@"add_attachment_vc_large_image_prompt_rescale_title", @"Rescale Large Image?") :
+                                          NSLocalizedString(@"add_attachment_vc_large_image_prompt_use", @"Use Large Image?")
                                                                              message:message
                                                                       preferredStyle:UIAlertControllerStyleAlert];
     
@@ -253,14 +267,19 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     }
     
     NSString* size = friendlyFileSizeString(data.length);
-    UIAlertAction *originalAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:resized.count > 0 ? @"Original (%d x %d) %@" : @"Use Anyway (%d x %d) %@", (int)image.size.width, (int)image.size.height, size]
+    UIAlertAction *originalAction =
+        [UIAlertAction actionWithTitle:[NSString stringWithFormat:resized.count > 0 ?
+            NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_original_size_fmt", @"Original (%d x %d) %@") :
+            NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_use_anyway_size_fmt", @"Use Anyway (%d x %d) %@"),
+                                                                    (int)image.size.width, (int)image.size.height, size]
                                                              style:UIAlertActionStyleDefault
                                                            handler:^(UIAlertAction *a) {
                                                                [self addAttachmentNoWarn:suggestedFilename data:data];
                                                            }];
     [alertController addAction:originalAction];
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:
+                                   NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) { }];
     [alertController addAction:cancelAction];
@@ -269,7 +288,8 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 }
 
 - (void)addAttachmentNoWarn:(NSString*)suggestedFilename data:(NSData*)data {
-    Alerts *x = [[Alerts alloc] initWithTitle:@"Filename" message:@"Enter a filename for this item"];
+    Alerts *x = [[Alerts alloc] initWithTitle:NSLocalizedString(@"add_attachment_vc_prompt_filename_title", @"Filename")
+                                      message:NSLocalizedString(@"add_attachment_vc_prompt_filename_message", @"Enter a filename for this item")];
 
     [x OkCancelWithTextFieldNotEmpty:self.parentViewController
                        textFieldText:suggestedFilename
@@ -277,8 +297,9 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
                               if(response) {
                                   if([self.usedFilenames containsObject:trim(text)]) {
                                       [Alerts warn:self.parentViewController
-                                             title:@"Filename in Use"
-                                           message:@"This filename is already in use. Please enter a different name." completion:^{
+                                             title:NSLocalizedString(@"add_attachment_vc_warn_filename_used_title", @"Filename in Use")
+                                           message:NSLocalizedString(@"add_attachment_vc_warn_filename_used_message", @"This filename is already in use. Please enter a different name.")
+                                        completion:^{
                                           [self addAttachmentNoWarn:suggestedFilename data:data];
                                       }];
                                   }
@@ -294,6 +315,5 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
                               }
                           }];
 }
-
 
 @end

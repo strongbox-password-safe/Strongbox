@@ -58,13 +58,15 @@
                     scope:(SearchScope)scope
               dereference:(BOOL)dereference
     includeKeePass1Backup:(BOOL)includeKeePass1Backup
-        includeRecycleBin:(BOOL)includeRecycleBin {
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired {
     return [self searchNodes:self.database.allNodes
                   searchText:searchText
                        scope:scope
                  dereference:dereference
        includeKeePass1Backup:includeKeePass1Backup
-           includeRecycleBin:includeRecycleBin];
+           includeRecycleBin:includeRecycleBin
+              includeExpired:includeExpired];
 }
 
 - (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
@@ -72,7 +74,9 @@
                          scope:(SearchScope)scope
                    dereference:(BOOL)dereference
          includeKeePass1Backup:(BOOL)includeKeePass1Backup
-             includeRecycleBin:(BOOL)includeRecycleBin {
+             includeRecycleBin:(BOOL)includeRecycleBin
+                includeExpired:(BOOL)includeExpired
+{
     NSMutableArray* results = [nodes mutableCopy]; // Mutable for memory/perf reasons
     
     NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
@@ -84,7 +88,10 @@
                 dereference:dereference];
     }
     
-    [self filterExcludedSearchItems:results includeKeePass1Backup:includeKeePass1Backup includeRecycleBin:includeRecycleBin];
+    [self filterExcludedSearchItems:results
+              includeKeePass1Backup:includeKeePass1Backup
+                  includeRecycleBin:includeRecycleBin
+                     includeExpired:includeExpired];
     
     return [self sortItemsForBrowse:results];
 }
@@ -142,7 +149,8 @@
 
 - (void)filterExcludedSearchItems:(NSMutableArray<Node*>*)matches
             includeKeePass1Backup:(BOOL)includeKeePass1Backup
-                includeRecycleBin:(BOOL)includeRecycleBin {
+                includeRecycleBin:(BOOL)includeRecycleBin
+                   includeExpired:(BOOL)includeExpired {
     if(!includeKeePass1Backup) {
         if (self.database.format == kKeePass1) {
             Node* backupGroup = self.database.keePass1BackupNode;
@@ -158,6 +166,12 @@
     if(!includeRecycleBin && recycleBin) {
         [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
             return obj != recycleBin && ![recycleBin contains:obj];
+        }];
+    }
+    
+    if(!includeExpired) {
+        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return !obj.expired;
         }];
     }
 }

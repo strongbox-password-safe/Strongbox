@@ -71,20 +71,20 @@
     NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     
     if(!host.length) {
-        self.labelValidation.text = @"🛑 Please Enter a Host";
+        self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_enter_host", @"🛑 Please Enter a Host");
         self.labelValidation.textColor = [UIColor redColor];
         self.buttonConnect.enabled = NO;
         return;
     }
     
     if(self.switchUsePrivateKey.on && self.privateKey.length == 0) {
-        self.labelValidation.text = @"🛑 Select a Private Key...";
+        self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_select_private_key", @"🛑 Select a Private Key...");
         self.labelValidation.textColor = [UIColor redColor];
         self.buttonConnect.enabled = NO;
         return;
     }
 
-    self.labelValidation.text = @"✅ Looks Good";
+    self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_ok", @"✅ Looks Good");
     self.buttonConnect.enabled = YES;
     return;
 }
@@ -108,7 +108,9 @@
         [self.buttonLocateKey setTitle:[url lastPathComponent] forState:UIControlStateNormal];
     }
     else {
-        [Alerts warn:self title:@"Invalid Key" message:@"This does not look like a valid private key"];
+        [Alerts warn:self
+               title:NSLocalizedString(@"sftp_vc_warn_invalid_key_title", @"Invalid Key")
+             message:NSLocalizedString(@"sftp_vc_warn_invalid_key_message", @"This does not look like a valid private key")];
     }
     
     [self bindUi];

@@ -35,7 +35,9 @@
     self.tableView.tableFooterView = [UIView new];
     self.tableView.emptyDataSetSource = self;
     
-    self.title = self.manageMode ? @"Manage Key Files" : @"Select Key File";
+    self.title = self.manageMode ?
+    NSLocalizedString(@"key_files_vc_manage_title", @"Manage Key Files") :
+    NSLocalizedString(@"key_files_vc_select_title", @"Select Key File");
     self.buttonOptions.enabled = !self.manageMode;
     self.buttonOptions.tintColor = self.manageMode ? UIColor.clearColor : nil;
     
@@ -43,7 +45,7 @@
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
-    NSString *text = @"No Key Files Found. Tap '+' to import one.";
+    NSString *text = NSLocalizedString(@"key_files_vc_empty_key_files_title", @"No Key Files Found. Tap '+' to import one.");
     
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleBody],
                                  NSForegroundColorAttributeName: [UIColor lightGrayColor]};
@@ -141,11 +143,11 @@
 
 - (IBAction)onAdvancedOptions:(id)sender {
     [Alerts threeOptions:self
-                   title:@"One Time Key File Source"
-                 message:@"Select where you would like to choose your Key File from. This file will not be stored locally or remembered."
-       defaultButtonText:@"Files..."
-        secondButtonText:@"Photo Library..."
-         thirdButtonText:@"Cancel"
+                   title:NSLocalizedString(@"key_files_vc_one_time_key_file_source_title", @"One Time Key File Source")
+                 message:NSLocalizedString(@"key_files_vc_one_time_key_file_source_message", @"Select where you would like to choose your Key File from. This file will not be stored locally or remembered.")
+       defaultButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_files", @"Files...")
+        secondButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_photos", @"Photo Library...")
+         thirdButtonText:NSLocalizedString(@"key_files_vc_option_cancel", @"Cancel")
                   action:^(int response) {
                       if(response == 0) {
                           UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
@@ -161,8 +163,8 @@
                           
                           if(!available) {
                               [Alerts info:self
-                                     title:@"Photo Library Unavailable"
-                                   message:@"Could not access Photo Library. Does Strongbox have Permission?"];
+                                     title:NSLocalizedString(@"key_files_vc_error_photos_unavailable_title", @"Photo Library Unavailable")
+                                   message:NSLocalizedString(@"key_files_vc_error_photos_unavailable_message", @"Could not access Photo Library. Does Strongbox have Permission?")];
                               return;
                           }
                           
@@ -181,7 +183,9 @@
         
         if(!data) {
             NSLog(@"Error: %@", error);
-            [Alerts error:self title:@"Error Reading Image" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"key_files_vc_error_reading", @"Error Reading")
+                    error:error];
         }
         else {
             NSLog(@"info = [%@]", info);
@@ -218,7 +222,10 @@
     
     if(!data) {
         NSLog(@"Error: %@", err);
-        [Alerts error:self title:@"There was an error reading the Key File" error:err completion:nil];
+        [Alerts error:self
+                title:NSLocalizedString(@"key_files_vc_error_reading", @"There was an error reading the Key File")
+                error:err
+           completion:nil];
         return;
     }
 
@@ -227,7 +234,10 @@
         
         if(!localUrl) {
             NSLog(@"Error: %@", error);
-            [Alerts error:self title:@"There was an importing the Key File (does it already exist?)" error:error completion:nil];
+            [Alerts error:self
+                    title:NSLocalizedString(@"key_files_vc_error_importing", @"There was an importing the Key File (does it already exist?)")
+                    error:error
+               completion:nil];
             return;
         }
         else {
@@ -269,7 +279,9 @@
         }
     }
     else {
-        [Alerts info:self title:@"File Already Exists" message:@"A file with this name already exists in the Key Files directory."];
+        [Alerts info:self
+               title:NSLocalizedString(@"key_files_vc_error_file_already_exists_title", @"File Already Exists")
+             message:NSLocalizedString(@"key_files_vc_error_file_already_exists_message", @"A file with this name already exists in the Key Files directory.")];
     }
     
     return nil;
@@ -286,10 +298,10 @@
         return nil;
     }
     else if (section == 1) {
-        return self.keyFiles.count == 0 ? nil : @"Imported Key Files (Auto-Fill Enabled)";
+        return self.keyFiles.count == 0 ? nil : NSLocalizedString(@"key_files_vc_section_header_imported", @"Imported Key Files (Auto-Fill Enabled)");
     }
     else if (section == 2) {
-        return self.otherFiles.count == 0 ? nil : @"Application Local Files";
+        return self.otherFiles.count == 0 ? nil : NSLocalizedString(@"key_files_vc_section_header_local", @"Application Local Files");
     }
 
     return nil;
@@ -314,7 +326,7 @@
     cell.accessoryType = UITableViewCellAccessoryNone;
     
     if(indexPath.section == 0) {
-        cell.textLabel.text = @"No Key File";
+        cell.textLabel.text = NSLocalizedString(@"key_files_vc_no_key_file", @"No Key File");
         cell.imageView.image = [UIImage imageNamed:@"cancel"];
         cell.imageView.tintColor = UIColor.darkGrayColor;
         
@@ -381,11 +393,15 @@
 }
 
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault
+                                                                            title:NSLocalizedString(@"key_files_vc_option_remove", @"Remove")
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeFile:indexPath];
     }];
     
-    UITableViewRowAction *importAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Import" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *importAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault
+                                                                            title:NSLocalizedString(@"key_files_vc_option_import", @"Import")
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self importLocalFile:indexPath];
     }];
     importAction.backgroundColor = UIColor.blueColor;
@@ -399,17 +415,26 @@
     
     NSLog(@"Importing Local Key File: [%@] => [%@]", url, destination);
     
-    [Alerts twoOptionsWithCancel:self title:@"Remove After Import" message:@"Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing?" defaultButtonText:@"Yes, Remove Local Copy" secondButtonText:@"No, Keep Local Copy" action:^(int response) {
+    [Alerts twoOptionsWithCancel:self
+                           title:NSLocalizedString(@"key_files_vc_remove_after_import_title", @"Remove After Import")
+                         message:NSLocalizedString(@"key_files_vc_remove_after_import_message", @"Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing?")
+               defaultButtonText:NSLocalizedString(@"key_files_vc_remove_after_import_option_yes", @"Yes, Remove Local Copy")
+                secondButtonText:NSLocalizedString(@"key_files_vc_remove_after_import_option_no", @"No, Keep Local Copy")
+                          action:^(int response) {
         
         NSError* error;
         if(response == 1) {
             if(![NSFileManager.defaultManager copyItemAtURL:url toURL:destination error:&error]) {
-                [Alerts error:self title:@"File could not be Imported" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"key_files_vc_import_error_title", @"File could not be Imported")
+                        error:error];
             }
         }
         else if (response == 0) {
             if(![NSFileManager.defaultManager moveItemAtURL:url toURL:destination error:&error]) {
-                [Alerts error:self title:@"File could not be Imported" error:error];
+                [Alerts error:self
+                        title:NSLocalizedString(@"key_files_vc_import_error_title", @"File could not be Imported")
+                        error:error];
             }
         }
         
@@ -432,7 +457,9 @@
     }
     
     if(![NSFileManager.defaultManager removeItemAtURL:url error:&error]) {
-        [Alerts error:self title:@"File not removed" error:error];
+        [Alerts error:self
+                title:NSLocalizedString(@"key_files_vc_error_file_not_removed", @"File not removed")
+                error:error];
     }
     
     [self refresh];
@@ -442,10 +469,12 @@
     NSArray<SafeMetaData*>* assoc = [self getAssociatedDatabase:indexPath.section == 1 ? self.keyFiles[indexPath.row] : self.otherFiles[indexPath.row]];
     
     if(assoc.count) {
-        return [NSString stringWithFormat:@"Used by %@", assoc.count > 1 ? @"multiple databases" : assoc.firstObject.nickName];
+        return [NSString stringWithFormat:
+                NSLocalizedString(@"key_files_vc_key_file_used_by_fmt", @"Used by %@"), assoc.count > 1 ?
+                NSLocalizedString(@"key_files_vc_key_file_used_by_multiple", @"multiple databases") : assoc.firstObject.nickName];
     }
     else {
-        return @"No Known Database Associations";
+        return NSLocalizedString(@"key_files_vc_key_file_used_by_none", @"No Known Database Associations");
     }
 }
 

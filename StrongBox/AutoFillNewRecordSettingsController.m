@@ -28,8 +28,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
-    Alerts *alerts = [[Alerts alloc] initWithTitle:@"Custom Auto Fill"
-                                           message:@"Please enter a new custom auto fill for this field"];
+    Alerts *alerts = [[Alerts alloc] initWithTitle:NSLocalizedString(@"entry_defaults_vc_prompt_custom_title", @"Custom Default")
+                                           message:NSLocalizedString(@"entry_defaults_vc_prompt_custom_message", @"Please enter a new custom default for this field")];
     
     if(indexPath.section == 0 && indexPath.row == 1)
     {

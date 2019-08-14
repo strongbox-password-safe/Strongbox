@@ -105,7 +105,7 @@
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"You Have No Strongbox Databases :(";
+    NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_title", @"You Have No Databases Yet :(");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
                                  NSForegroundColorAttributeName: [UIColor darkGrayColor]};
@@ -115,7 +115,7 @@
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App.";
+    NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_subtitle", @"To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App.");
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
@@ -136,7 +136,10 @@
 
 - (NSString*)getAutoFillCacheDate:(SafeMetaData*)safe {
     NSDate* mod = [CacheManager.sharedInstance getAutoFillCacheModificationDate:safe];
-    return mod ? [NSString stringWithFormat:@"Cached: %@", friendlyDateStringVeryShort(mod)] : @"";
+    return mod ? [NSString stringWithFormat:NSLocalizedString(@"autofill_safes_vc_cache_date_fmt", @"Cached%@: %@"),
+                  safe.alwaysUseCacheForAutoFill ?
+                  NSLocalizedString(@"autofill_safes_vc_cache_is_forced_fmt", @" (Forced)") : @"",
+                  friendlyDateStringVeryShort(mod)] : @"";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -186,7 +189,9 @@
     
     if(disabled) {
         databaseIcon = Settings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
-        subtitle2 = database.autoFillEnabled ? @"[No Auto Fill Cache File Yet]" : @"[Auto Fill Disabled]";
+        subtitle2 = database.autoFillEnabled ?
+        NSLocalizedString(@"autofill_safes_vc_item_subtitle_no_cache_yet", @"[No Auto Fill Cache File Yet]") :
+        NSLocalizedString(@"autofill_safes_vc_item_subtitle_cache_disabled", @"[Auto Fill Disabled]");
     }
     else {
         if(![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:database]) {
@@ -232,7 +237,9 @@
         id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
         providerString = provider.displayName;
         if(database.storageProvider == kLocalDevice) {
-            providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ? @"Local" : @"Local (Documents)";
+            providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
+            NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
+            NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
         }
     }
     

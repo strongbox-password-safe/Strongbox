@@ -37,13 +37,18 @@
             
             if(error) {
                 [Alerts error:self
-                        title:@"Error while scanning" error:error completion:^{
+                        title:NSLocalizedString(@"qr_code_vc_error_scanning_title", @"Error while scanning")
+                        error:error
+                   completion:^{
                     self.onDone(NO, @"");
                 }];
             }
         } else {
             NSLog(@"The user denied access to the camera");
-            [Alerts info:self title:@"Could not access camera" message:@"Strongbox could not access the camera on this device. Does it have permission?" completion:^{
+            [Alerts info:self
+                   title:NSLocalizedString(@"qr_code_vc_warn_problem_accessing_camera_title", @"Could not access camera")
+                 message:NSLocalizedString(@"qr_code_vc_warn_problem_accessing_camera_message", @"Strongbox could not access the camera on this device. Does it have permission?")
+              completion:^{
                 self.onDone(NO, @"");
             }];
         }

@@ -114,7 +114,7 @@ viewController:(UIViewController *)viewController
     else {
         [self connect:nil viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
             if(userCancelled || !session || error) {
-                NSError* error = [Utils createNSError:@"Could not connect to server." errorCode:-2];
+                NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
                 completion(nil, error);
                 return;
             }
@@ -190,7 +190,7 @@ viewController:(UIViewController *)viewController
             }
         
             if(!session || error) {
-                NSError* error = [Utils createNSError:@"Could not connect to server." errorCode:-2];
+                NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
                 completion(NO, nil, error);
                 return;
             }
@@ -265,7 +265,7 @@ viewController:(UIViewController *)viewController
     WebDAVProviderData* pd = (WebDAVProviderData*)providerData;
     [self connect:pd.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
-            NSError* error = [Utils createNSError:@"Could not connect to server." errorCode:-2];
+            NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
             completionHandler(nil, error);
             return;
         }
@@ -298,7 +298,7 @@ viewController:(UIViewController *)viewController
     
     [self connect:providerData.sessionConfiguration viewController:nil completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
-            NSError* error = [Utils createNSError:@"Could not connect to server." errorCode:-2];
+            NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
             completion(error);
             return;
         }

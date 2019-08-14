@@ -29,15 +29,19 @@
 
 -(void)prepareForReuse {
     [super prepareForReuse];
+
+    self.contentView.alpha = 1.0f;
     [self stopObservingOtpUpdateTimer];
 }
 
-- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon otpToken:(OTPToken*)otpToken {
+- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon expired:(BOOL)expired otpToken:(OTPToken*)otpToken {
     self.labelTitle.text = title;
     self.labelUsername.text = subtitle;
     self.icon.image = icon;
     
     self.otpToken = otpToken;
+    
+    self.contentView.alpha = expired ? 0.35 : 1.0f;
     
     [self updateOtpCode];
     [self subscribeToOtpUpdateTimerIfNecessary];

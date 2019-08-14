@@ -62,32 +62,43 @@
         }];
         
         if(safe) {
-            [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                               safe:safe
-                                                  openAutoFillCache:YES
-                                                canConvenienceEnrol:NO
-                                                     isAutoFillOpen:YES
-                                             manualOpenOfflineCache:NO
-                                        biometricAuthenticationDone:NO
-                                                         completion:^(Model * _Nullable model, NSError * _Nullable error) {
-                                                             NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
-                if(model) {
-                    [self onOpenedQuickType:model identifier:identifier];
-                }
-                else if(error == nil) {
-                    [self cancel:nil]; // User cancelled
-                }
-                else {
-                    [Alerts error:self title:@"Strongbox: Error Opening Database" error:error completion:^{
-                        [self.extensionContext cancelRequestWithError:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
-                    }];
-                }
-            }];
+            // Delay a litte to avoid UI Weirdness glitch
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                BOOL useAutoFillCache = ![self liveAutoFillIsPossibleWithSafe:safe];
+
+                [OpenSafeSequenceHelper beginSequenceWithViewController:self
+                                                                   safe:safe
+                                                      openAutoFillCache:useAutoFillCache
+                                                    canConvenienceEnrol:NO
+                                                         isAutoFillOpen:YES
+                                                 manualOpenOfflineCache:NO
+                                            biometricAuthenticationDone:NO
+                                                             completion:^(Model * _Nullable model, NSError * _Nullable error) {
+                                                                 NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
+                    if(model) {
+                        [self onOpenedQuickType:model identifier:identifier];
+                    }
+                    else if(error == nil) {
+                        [self cancel:nil]; // User cancelled
+                    }
+                    else {
+                        [Alerts error:self
+                                title:NSLocalizedString(@"cred_vc_error_opening_title", @"Strongbox: Error Opening Database")
+                                error:error
+                           completion:^{
+                            [self.extensionContext cancelRequestWithError:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+                        }];
+                    }
+                }];
+            });
         }
         else {
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             
-            [Alerts info:self title:@"Strongbox: Unknown Database" message:@"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
+            [Alerts info:self
+                   title:@"Strongbox: Unknown Database"
+                 message:@"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
+              completion:^{
                 [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
             }];
         }
@@ -180,7 +191,7 @@
 }
 
 - (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
-    if(!safeMetaData.autoFillEnabled) {
+    if(!safeMetaData.autoFillEnabled || safeMetaData.alwaysUseCacheForAutoFill) {
         return NO;
     }
     
@@ -200,7 +211,7 @@
         return NO;
     }
     
-    if([self isLiveAutoFillProvider:safeMetaData.storageProvider]) {
+    if([self isLiveAutoFillProvider:safeMetaData.storageProvider] && !safeMetaData.alwaysUseCacheForAutoFill) {
         return YES;
     }
     

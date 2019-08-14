@@ -61,10 +61,10 @@
         NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;
         
         if(remaining > 0) {
-            self.labelUnlockAttemptsRemaining.text = [NSString stringWithFormat:@"Unlock Attempts Remaining: %ld", (long)remaining];
+            self.labelUnlockAttemptsRemaining.text = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_label_unlock_attempts_fmt", @"Unlock Attempts Remaining: %ld"), (long)remaining];
         }
         else {
-            self.labelUnlockAttemptsRemaining.text = @"Unlock Attempts Exceeded";
+            self.labelUnlockAttemptsRemaining.text = NSLocalizedString(@"privacy_vc_label_unlock_attempts_exceeded", @"Unlock Attempts Exceeded");
         }
         
         self.labelUnlockAttemptsRemaining.hidden = NO;
@@ -103,8 +103,8 @@
         }
         else {
             [Alerts info:self
-                   title:@"Biometrics Unavailable"
-                 message:@"This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application."];
+                   title:NSLocalizedString(@"privacy_vc_prompt_biometrics_unavailable_title", @"Biometrics Unavailable")
+                 message:NSLocalizedString(@"privacy_vc_prompt_biometrics_unavailable_message", @"This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application.")];
         }
     }
     else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
@@ -118,7 +118,7 @@
 
 - (void)requestBiometric {
     //NSLog(@"REQUEST-BIOMETRIC: Privacy Screen");
-    [Settings.sharedInstance requestBiometricId:@"Identify to Open Strongbox"
+    [Settings.sharedInstance requestBiometricId:NSLocalizedString(@"privacy_vc_prompt_identify_to_open", @"Identify to Open Strongbox")
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -151,7 +151,7 @@
         NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;
         
         if(remaining > 0) {
-            pinEntryVc.warning = [NSString stringWithFormat:@"%ld Attempts Remaining", (long)remaining];
+            pinEntryVc.warning = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_prompt_pin_attempts_remaining_fmt", @"%ld Attempts Remaining"), (long)remaining];
         }
     }
     

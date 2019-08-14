@@ -480,7 +480,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                     scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
                               dereference:self.viewModel.metadata.searchDereferencedFields
                     includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                        includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults];
+                        includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults
+                           includeExpired:self.viewModel.metadata.showExpiredInSearch];
     
     [self.tableView reloadData];
 }
@@ -504,7 +505,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
         NSString* subtitle = [searcher getBrowseItemSubtitle:node];
         
-        [cell setItem:title subtitle:subtitle icon:icon otpToken:node.fields.otpToken];
+        [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken];
         
         return cell;
     }
@@ -530,6 +531,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                        icon:icon
               groupLocation:groupLocation
                       flags:flags
+                    expired:node.expired
                    otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
         }
         
@@ -644,6 +646,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 return obj != recycleBin;
             }];
         }
+    }
+    
+    if(!self.viewModel.metadata.showExpiredInBrowse) {
+        ret = [ret filter:^BOOL(Node * _Nonnull obj) {
+            return !obj.expired;
+        }];
     }
     
     DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
@@ -1191,7 +1199,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)copyTotp:(Node*)item {
     if(!item.fields.otpToken) {
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_no_totp_to_copy", @"'%@': No TOTP setup to Copy!"),
+        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_no_totp_to_copy_fmt", @"'%@': No TOTP setup to Copy!"),
                                             [self dereference:item.title node:item]]
                                    message:nil
                                   duration:3.f

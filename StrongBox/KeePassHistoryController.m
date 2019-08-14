@@ -88,6 +88,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                icon:icon
       groupLocation:groupLocation
               flags:flags
+            expired:node.expired
            otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
     
     return cell;

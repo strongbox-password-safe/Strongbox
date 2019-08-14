@@ -118,7 +118,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)
     self.valueText.text = value;
     self.valueText.enabled = editing;
     self.valueText.suggestionProvider = suggestionProvider;
-    self.valueText.accessibilityLabel = [key stringByAppendingString:@" Text Field"];
+    self.valueText.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
     
     self.valueText.textColor = formatAsUrl ? UIColor.blueColor : UIColor.darkTextColor;
     
@@ -153,7 +153,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)
     if(self.showUiValidationOnEmpty) {
         if(self.valueText.text.length == 0) {
             self.horizontalLine.backgroundColor = UIColor.redColor;
-            self.valueText.placeholder = [NSString stringWithFormat:@"%@ (Required)", self.keyLabel.text];
+            self.valueText.placeholder = [NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"), self.keyLabel.text];
         }
         else {
             self.horizontalLine.backgroundColor = UIColor.blueColor;

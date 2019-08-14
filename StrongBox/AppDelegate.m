@@ -14,7 +14,7 @@
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
 #import "GoogleDriveManager.h"
 #import "Settings.h"
-#import "InitialViewController.h"
+#import "SafesViewController.h"
 #import "SafesViewController.h"
 #import "OfflineDetector.h"
 #import "real-secrets.h"
@@ -50,7 +50,7 @@
     [self cleanupInbox:launchOptions];
     
     [self observeClipboardChangeNotifications];
-
+    
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
     
     [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
@@ -176,11 +176,11 @@
                                           annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
     }
     else {
-        InitialViewController *initialViewController = [self getInitialViewController];
+        SafesViewController *safesViewController = [self getInitialViewController];
 
         NSNumber* num = [options objectForKey:UIApplicationOpenURLOptionsOpenInPlaceKey];
 
-        [initialViewController enqueueImport:url canOpenInPlace:num ? num.boolValue : NO];
+        [safesViewController enqueueImport:url canOpenInPlace:num ? num.boolValue : NO];
 
         return YES;
     }
@@ -188,22 +188,18 @@
     return NO;
 }
 
-- (InitialViewController *)getInitialViewController {
-    InitialViewController *ivc = (InitialViewController*)self.window.rootViewController;
+- (SafesViewController *)getInitialViewController {
+    UINavigationController* nav = (UINavigationController*)self.window.rootViewController;
+    SafesViewController *ivc = (SafesViewController*)nav.viewControllers.firstObject;
     return ivc;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     [OfflineDetector.sharedInstance stopMonitoringConnectivitity];
-
-    [[self getInitialViewController] appResignActive];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [OfflineDetector.sharedInstance startMonitoringConnectivitity];
-
-    [[self getInitialViewController] appBecameActive];
-    
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity];    
     [self performedScheduledEntitlementsCheck];
 }
 

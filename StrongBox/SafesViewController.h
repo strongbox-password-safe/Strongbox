@@ -9,15 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
-@interface SafesViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
+@interface SafesViewController : UITableViewController
 
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
-@property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
-
-- (IBAction)onAddSafe:(id)sender;
-- (IBAction)onUpgrade:(id)sender;
-
-- (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication;
+- (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace;
 
 @end

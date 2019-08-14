@@ -82,7 +82,7 @@
         self.progressView.tintColor = color;
     }
     else {
-        self.labelTotp.text = @"No TOTP Setup";
+        self.labelTotp.text = NSLocalizedString(@"totp_cell_no_totp_has_been_setup", @"No TOTP Setup");
         self.labelTotp.textColor = nil;
     }
 }

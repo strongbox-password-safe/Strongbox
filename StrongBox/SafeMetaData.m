@@ -98,6 +98,11 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.hideTotp = self.old_hideTotp;
         self.tryDownloadFavIconForNewRecord = self.old_tryDownloadFavIconForNewRecord;
         self.showPasswordByDefaultOnEditScreen = self.old_showPasswordByDefaultOnEditScreen;
+        
+        //
+        
+        self.showExpiredInBrowse = YES;
+        self.showExpiredInSearch = YES;
     }
     
     return self;
@@ -191,6 +196,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     //
     
     [encoder encodeBool:self.hasBeenPromptedForQuickLaunch forKey:@"hasBeenPromptedForQuickLaunch"];
+    [encoder encodeBool:self.alwaysUseCacheForAutoFill forKey:@"alwaysUseCacheForAutoFill"];
+    
+    [encoder encodeBool:self.showExpiredInSearch forKey:@"showExpiredInSearch"];
+    [encoder encodeBool:self.showExpiredInBrowse forKey:@"showExpiredInBrowse"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -325,6 +334,17 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         
         if([decoder containsValueForKey:@"hasBeenPromptedForQuickLaunch"]) {
             self.hasBeenPromptedForQuickLaunch = [decoder decodeBoolForKey:@"hasBeenPromptedForQuickLaunch"];
+        }
+
+        if([decoder containsValueForKey:@"alwaysUseCacheForAutoFill"]) {
+            self.alwaysUseCacheForAutoFill = [decoder decodeBoolForKey:@"alwaysUseCacheForAutoFill"];
+        }
+        
+        if([decoder containsValueForKey:@"showExpiredInSearch"]) {
+            self.showExpiredInSearch = [decoder decodeBoolForKey:@"showExpiredInSearch"];
+        }
+        if([decoder containsValueForKey:@"showExpiredInBrowse"]) {
+            self.showExpiredInBrowse = [decoder decodeBoolForKey:@"showExpiredInBrowse"];
         }
     }
     

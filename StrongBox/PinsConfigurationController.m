@@ -31,20 +31,23 @@
 
 - (void)bindUiToModel {
     if(self.viewModel.metadata.conveniencePin != nil) {
-        [self.buttonPinOnOff setTitle:@"Turn Convenience PIN Off" forState:UIControlStateNormal];
+        [self.buttonPinOnOff setTitle:NSLocalizedString(@"pins_config_vc_button_title_turn_convenience_pin_off", @"Turn Convenience PIN Off")
+                             forState:UIControlStateNormal];
         self.buttonChangePin.enabled = YES;
         self.buttonDuressPinOnOff.enabled = YES;
         self.buttonChangeDuressPin.enabled = YES;
     }
     else {
-        [self.buttonPinOnOff setTitle:@"Turn Convenience PIN On" forState:UIControlStateNormal];
+        [self.buttonPinOnOff setTitle:NSLocalizedString(@"pins_config_vc_button_title_turn_convenience_pin_on", @"Turn Convenience PIN On")
+                             forState:UIControlStateNormal];
         self.buttonChangePin.enabled = NO;
         self.buttonDuressPinOnOff.enabled = NO;
         self.buttonChangeDuressPin.enabled = NO;
     }
     
     if(self.viewModel.metadata.duressPin != nil && self.viewModel.metadata.conveniencePin != nil) {
-        [self.buttonDuressPinOnOff setTitle:@"Turn Duress PIN Off" forState:UIControlStateNormal];
+        [self.buttonDuressPinOnOff setTitle:NSLocalizedString(@"pins_config_vc_button_title_turn_duress_pin_off", @"Turn Duress PIN Off")
+                                   forState:UIControlStateNormal];
         self.buttonChangeDuressPin.enabled = YES;
 
         self.cellDuressActionOpenDummy.userInteractionEnabled = YES;
@@ -55,7 +58,8 @@
         self.cellDuressActionRemoveDatabase.textLabel.enabled = YES;
     }
     else {
-        [self.buttonDuressPinOnOff setTitle:@"Turn Duress PIN On" forState:UIControlStateNormal];
+        [self.buttonDuressPinOnOff setTitle:NSLocalizedString(@"pins_config_vc_button_title_turn_duress_pin_on", @"Turn Duress PIN On")
+                                   forState:UIControlStateNormal];
         self.buttonChangeDuressPin.enabled = NO;
         
         self.cellDuressActionOpenDummy.userInteractionEnabled = NO;
@@ -81,18 +85,18 @@
     }
     
     if(self.viewModel.metadata.storageProvider == kLocalDevice) {
-        self.labelRemoveDatabase.text = @"Delete Database";
-        self.labelRemoveDatabaseWarning.text = @"Local Device database will be permanently deleted.";
+        self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_delete_database", @"Delete Database");
+        self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_local_permanent", @"Local Device database will be permanently deleted.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor redColor];
     }
-    else if(self.viewModel.metadata.storageProvider == kLocalDevice) {
-        self.labelRemoveDatabase.text = @"Delete Database";
-        self.labelRemoveDatabaseWarning.text = @"iCloud Device database will be permanently deleted from iCloud.";
+    else if(self.viewModel.metadata.storageProvider == kiCloud) {
+        self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_delete_database", @"Delete Database");
+        self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_icloud_permanent", @"iCloud database will be permanently deleted from iCloud.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor redColor];
     }
     else {
-        self.labelRemoveDatabase.text = @"Remove Database from Strongbox";
-        self.labelRemoveDatabaseWarning.text = @"NB: Database file will remain on remote storage.";
+        self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_remove_database", @"Remove Database from Strongbox");
+        self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_remove_database_warning", @"NB: Database file will remain on remote storage.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor orangeColor];
     }
     
@@ -114,18 +118,20 @@
         if (@available(iOS 11.0, *)) {
             self.navigationController.navigationBar.prefersLargeTitles = NO;
         }
-        self.title = @"PIN Codes (Pro Feature Only)";
+        self.title = NSLocalizedString(@"pins_config_vc_title_pro_only", @"PIN Codes (Pro Feature Only)");
     }
 }
 
 - (IBAction)onPinOnOff:(id)sender {
     if(self.viewModel.metadata.conveniencePin != nil) {
         NSString *message = self.viewModel.metadata.isEnrolledForConvenience && !self.viewModel.metadata.isTouchIdEnabled ?
-            @"Turning the PIN Off for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?" :
-            @"Are you sure you want to turn off the PIN for this database?";
+        
+        NSLocalizedString(@"pins_config_vc_turn_pin_off_warning", @"Turning the PIN Off for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?") :
+        
+        NSLocalizedString(@"pins_config_vc_turn_pin_off_confirm", @"Are you sure you want to turn off the PIN for this database?");
         
         [Alerts yesNo:self
-                title:@"Turn off PIN?"
+                title:NSLocalizedString(@"pins_config_vc_turn_pin_off_prompt_title", @"Turn off PIN?")
               message:message
                action:^(BOOL response) {
                    if (response) {
@@ -171,7 +177,7 @@
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
-    pinEntryVc.info = duressPin ? @"Enter Duress PIN" : @"";
+    pinEntryVc.info = duressPin ? NSLocalizedString(@"pins_config_vc_enter_duress_pin", @"Enter Duress PIN") : @"";
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
@@ -194,8 +200,8 @@
                 }
                 else {
                     [Alerts warn:self
-                           title:@"PIN Conflict"
-                         message:@"Your Convenience PIN conflicts with your Duress PIN. Please select another."];
+                           title:NSLocalizedString(@"pins_config_vc_error_pin_conflict_title", @"PIN Conflict")
+                         message:NSLocalizedString(@"pins_config_vc_error_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please select another.")];
                 }
             }}];
     };
@@ -214,8 +220,11 @@
         else if (indexPath.row == 2) {
             BOOL delete = self.viewModel.metadata.storageProvider == kLocalDevice || self.viewModel.metadata.storageProvider == kiCloud;
             
-            [Alerts warn:self title:@"Warning"
-                 message:delete ? @"This will permanently delete the database file." : @"This will remove the database from Strongbox but the underlying file will remain on cloud storage"];
+            [Alerts warn:self
+                   title:NSLocalizedString(@"pins_config_vc_warn_remove_database_title", @"Warning")
+                 message:delete ?
+             NSLocalizedString(@"pins_config_vc_warn_remove_database_delete_message", @"This will permanently delete the database file.") :
+             NSLocalizedString(@"pins_config_vc_warn_remove_database_remove_message", @"This will remove the database from Strongbox but the underlying file will remain on cloud storage")];
             self.viewModel.metadata.duressAction = kRemoveDatabase;
         }
 

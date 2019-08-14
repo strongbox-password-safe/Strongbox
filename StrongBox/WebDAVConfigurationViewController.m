@@ -62,13 +62,13 @@
     NSURL *urlHost = [NSURL URLWithString:[host stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     
     if(!(urlHost && urlHost.scheme && urlHost.host)) {
-        self.labelValidation.text = @"🛑 URL Invalid";
+        self.labelValidation.text = NSLocalizedString(@"webdav_vc_validation_url_invalid", @"🛑 URL Invalid");
         self.labelValidation.textColor = [UIColor redColor];
         self.buttonConnect.enabled = NO;
         return;
     }
     
-    self.labelValidation.text = @"✅ Looks Good";
+    self.labelValidation.text = NSLocalizedString(@"webdav_vc_validation_ok", @"✅ Looks Good");
     self.buttonConnect.enabled = YES;
     return;
 }

@@ -79,7 +79,7 @@
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     pasteboard.string = newStr;
 
-    [ISMessages showCardAlertWithTitle:@"Database CSV Copied to Clipboard"
+    [ISMessages showCardAlertWithTitle:NSLocalizedString(@"export_vc_message_csv_copied", @"Database CSV Copied to Clipboard")
                                message:nil
                               duration:3.f
                            hideOnSwipe:YES
@@ -106,7 +106,9 @@
 - (void)exportEncryptedSafeByEmail {
     [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
         if(!safeData) {
-            [Alerts error:self title:@"Could not get database data" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
+                    error:error];
             return;
         }
         
@@ -120,19 +122,19 @@
 - (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data {
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
-               title:@"Email Not Available"
-             message:@"It looks like email is not setup on this device and so the database cannot be exported by email."];
+               title:NSLocalizedString(@"export_vc_email_unavailable_title", @"Email Not Available")
+             message:NSLocalizedString(@"export_vc_email_unavailable_message", @"It looks like email is not setup on this device and so the database cannot be exported by email.")];
         return;
     }
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     
-    [picker setSubject:[NSString stringWithFormat:@"Strongbox Database: '%@'", self.viewModel.metadata.nickName]];
+    [picker setSubject:[NSString stringWithFormat:NSLocalizedString(@"export_vc_email_subject", @"Strongbox Database: '%@'"), self.viewModel.metadata.nickName]];
     
     [picker addAttachmentData:data mimeType:mimeType fileName:attachmentName];
     
     [picker setToRecipients:[NSArray array]];
-    [picker setMessageBody:[NSString stringWithFormat:@"Here's a copy of my '%@' Strongbox Database.", self.viewModel.metadata.nickName] isHTML:NO];
+    [picker setMessageBody:[NSString stringWithFormat:NSLocalizedString(@"export_vc_email_message_body_fmt", @"Here's a copy of my '%@' Strongbox Database."), self.viewModel.metadata.nickName] isHTML:NO];
     picker.mailComposeDelegate = self;
     
     [self presentViewController:picker animated:YES completion:^{ }];
@@ -143,10 +145,15 @@
                         error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:^{
         if(result == MFMailComposeResultFailed || error) {
-            [Alerts error:self title:@"Error Sending" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_email_error_sending", @"Error Sending")
+                    error:error];
         }
         else if(result == MFMailComposeResultSent) {
-            [Alerts info:self title:@"Export Successful" message:@"Your database was successfully exported." completion:^{
+            [Alerts info:self
+                   title:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
+                 message:NSLocalizedString(@"export_vc_export_successful_message", @"Your database was successfully exported.")
+              completion:^{
                 [self.navigationController popViewControllerAnimated:YES];
             }];
         }
@@ -156,7 +163,9 @@
 - (void)onFiles {
     [self.viewModel encrypt:^(NSData * _Nullable data, NSError * _Nullable err) {
         if(!data) {
-            [Alerts error:self title:@"Could not get database data" error:err];
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
+                    error:err];
             return;
         }
         
@@ -165,7 +174,9 @@
         NSError* error;
         [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
         if(error) {
-            [Alerts error:self title:@"Error Writing Database" error:error];
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_writing", @"Error Writing Database")
+                    error:error];
             NSLog(@"error: %@", error);
             return;
         }
@@ -186,7 +197,9 @@
     NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
     
     if(!data || error) {
-        [Alerts error:self title:@"Error Exporting" error:error];
+        [Alerts error:self
+                title:NSLocalizedString(@"export_vc_error_exporting", @"Error Exporting")
+                error:error];
         NSLog(@"%@", error);
         return;
     }
@@ -197,10 +210,15 @@
        forSaveOperation:UIDocumentSaveForCreating | UIDocumentSaveForOverwriting
       completionHandler:^(BOOL success) {
         if(!success) {
-            [Alerts warn:self title:@"Error Exporting" message:@""];
+            [Alerts warn:self
+                   title:NSLocalizedString(@"export_vc_error_exporting", @"Error Exporting")
+                 message:@""];
         }
         else {
-            [Alerts info:self title:@"Export Successful" message:@"Your database was successfully exported." completion:^{
+            [Alerts info:self
+                   title:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
+                 message:NSLocalizedString(@"export_vc_export_successful_message", @"Your database was successfully exported.")
+              completion:^{
                 [self.navigationController popViewControllerAnimated:YES];
             }];
         }

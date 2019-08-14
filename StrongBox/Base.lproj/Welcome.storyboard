@@ -388,7 +388,7 @@
                                 <rect key="frame" x="0.0" y="88" width="414" height="725"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nbY-4r-107">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="385.33333333333331"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="451.33333333333331"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Master Password" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HFu-c5-YPy" userLabel="Heading">
                                                 <rect key="frame" x="20" y="20" width="374" height="36"/>
@@ -397,14 +397,16 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ibj-Uq-3zn" userLabel="Password Hint">
-                                                <rect key="frame" x="20" y="76" width="374" height="108.33333333333331"/>
-                                                <string key="text">Great! Now we need a strong master password to protect all your secrets.   You must always remember this, it is the only way to unlock your database.</string>
+                                                <rect key="frame" x="20" y="76.000000000000014" width="374" height="174.33333333333337"/>
+                                                <string key="text">Great! Now we need a strong master password to protect all your secrets.   You must always remember this, it is the only way to unlock your database.
+
+You will have the chance to print this password out on the next screen for emergencies.</string>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password (Required)" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="nhg-yK-eKQ">
-                                                <rect key="frame" x="20" y="204.33333333333331" width="374" height="44"/>
+                                                <rect key="frame" x="20" y="270.33333333333331" width="374" height="44"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="44" id="Ll7-u1-3ea"/>
                                                 </constraints>
@@ -413,7 +415,7 @@
                                                 <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CeT-uY-c3o" userLabel="Create Button">
-                                                <rect key="frame" x="82" y="278.33333333333331" width="250" height="55"/>
+                                                <rect key="frame" x="82" y="344.33333333333331" width="250" height="55"/>
                                                 <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="55" id="67h-Fd-zqX"/>
@@ -429,7 +431,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qLz-La-osG">
-                                                <rect key="frame" x="178.66666666666666" y="353.33333333333331" width="57" height="32"/>
+                                                <rect key="frame" x="178.66666666666666" y="419.33333333333331" width="57" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Dismiss">
                                                     <color key="titleColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -626,6 +628,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="E5F-62-0vl"/>
+        <segue reference="xDs-2z-Iqv"/>
     </inferredMetricsTieBreakers>
 </document>

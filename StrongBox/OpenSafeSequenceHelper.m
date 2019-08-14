@@ -146,8 +146,8 @@
         
         if(![fp autoFillBookMarkIsSet:self.safe]) {
             [Alerts info:self.viewController
-                   title:@"Database File Select Required"
-                 message:@"For technical reasons, you need to re-select your database file to enable Auto Fill. You will only need to do this once.\n\nThanks!\n-Mark"
+                   title:NSLocalizedString(@"open_sequence_prompt_database_reselect_required_title", @"Database File Select Required")
+                 message:NSLocalizedString(@"open_sequence_prompt_database_reselect_required_message", @"For technical reasons, you need to re-select your database file to enable Auto Fill. You will only need to do this once.\n\nThanks!\n-Mark")
               completion:^{
                   [self promptForAutofillBookmarkSelect];
               }];
@@ -192,7 +192,8 @@
     vc.showFallbackOption = YES;
     
     if(self.safe.failedPinAttempts > 0) {
-        vc.warning = [NSString stringWithFormat:@"%d attempts remaining", maxFailedPinAttempts - self.safe.failedPinAttempts];
+        vc.warning = [NSString stringWithFormat:
+                      NSLocalizedString(@"open_sequence_pin_attempts_remaining_fmt",@"%d attempts remaining"), maxFailedPinAttempts - self.safe.failedPinAttempts];
     }
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
@@ -235,8 +236,8 @@
                         [SafesList.sharedInstance update:self.safe];
 
                         [Alerts warn:self.viewController
-                               title:@"Too Many Incorrect PINs"
-                             message:@"You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this database."];
+                               title:NSLocalizedString(@"open_sequence_prompt_too_many_incorrect_pins_title",@"Too Many Incorrect PINs")
+                             message:NSLocalizedString(@"open_sequence_prompt_too_many_incorrect_pins_message",@"You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this database.")];
                     }
                     else {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -271,15 +272,18 @@
         self.completion(viewModel, nil);
     }
     else if (self.safe.duressAction == kPresentError) {
-        NSError *error = [Utils createNSError:@"There was a technical error opening the database." errorCode:-1729];
-        [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
+        NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message", @"There was a technical error opening the database.") errorCode:-1729];
+        [Alerts error:self.viewController
+                title:NSLocalizedString(@"open_sequence_duress_technical_error_title",@"Technical Issue")
+                error:error completion:^{
             self.completion(nil, error);
         }];
     }
     else if (self.safe.duressAction == kRemoveDatabase) {
         [self removeOrDeleteSafe];
-        NSError *error = [Utils createNSError:@"There was a technical error opening the database." errorCode:-1729];
-        [Alerts error:self.viewController title:@"Technical Issue" error:error completion:^{
+        NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message",@"There was a technical error opening the database.") errorCode:-1729];
+        [Alerts error:self.viewController
+                title:NSLocalizedString(@"open_sequence_duress_technical_error_title",@"Technical Issue") error:error completion:^{
             self.completion(nil, error);
         }];
     }
@@ -313,8 +317,8 @@
         [self onBiometricAuthenticationDone:YES error:nil];
     }
     else {
-        [Settings.sharedInstance requestBiometricId:@"Identify to Login"
-                                      fallbackTitle:@"Unlock Manually..."
+        [Settings.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
+                                      fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
                                          completion:^(BOOL success, NSError * _Nullable error) {
             [self onBiometricAuthenticationDone:success error:error];
         }];
@@ -344,8 +348,8 @@
         if (error.code == LAErrorAuthenticationFailed) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self.viewController
-                         title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
-                       message:[NSString stringWithFormat:@"%@ Authentication Failed. You must now enter your password manually to open the database.", self.biometricIdName]
+                         title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), self.biometricIdName]
+                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_message_fmt", @"%@ Authentication Failed. You must now enter your password manually to open the database."), self.biometricIdName]
                     completion:^{
                         [self promptForManualCredentials];
                     }];
@@ -361,8 +365,8 @@
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self.viewController
-                         title:[NSString stringWithFormat:@"%@ Failed", self.biometricIdName]
-                       message:[NSString stringWithFormat:@"%@ has not been setup or system has cancelled. You must now enter your password manually to open the database.", self.biometricIdName]
+                         title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), self.biometricIdName]
+                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has not been setup or system has cancelled. You must now enter your password manually to open the database."), self.biometricIdName]
                     completion:^{
                         [self promptForManualCredentials];
                     }];
@@ -476,7 +480,7 @@
         if(self.undigestedKeyFileData == nil) {
             // TODO: Move error messaging out of here
             [Alerts error:self.viewController
-                    title:@"Error Reading Key File"
+                    title:NSLocalizedString(@"open_sequence_error_reading_key_file", @"Error Reading Key File")
                     error:error
                completion:^{
                 self.completion(nil, error);
@@ -528,14 +532,16 @@
                  }];
             }
             else {
-                [Alerts warn:self.viewController title:@"Could Not Open Offline" message:@"Could not open this database in offline mode. Does the Offline Cache exist?"];
+                [Alerts warn:self.viewController
+                       title:NSLocalizedString(@"open_sequence_couldnt_open_offline_title", @"Could Not Open Offline")
+                     message:NSLocalizedString(@"open_sequence_couldnt_open_offline_message", @"Could not open this database in offline mode. Does the Offline Cache exist?")];
                 self.completion(nil, nil);
             }
             return;
         }
         else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
             NSString * modDateStr = getLastCachedDate(self.safe);
-            NSString* message = [NSString stringWithFormat:@"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
             
             [self openWithOfflineCacheFile:message];
         }
@@ -559,19 +565,25 @@
             NSLog(@"Error: %@", error);
             if(providerCanFallbackToOfflineCache(provider, self.safe)) {
                 NSString * modDateStr = getLastCachedDate(self.safe);
-                NSString* message = [NSString stringWithFormat:@"There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@", provider.displayName, modDateStr];
+                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
                 
                 [self openWithOfflineCacheFile:message];
             }
             else {
-                [Alerts error:self.viewController title:@"There was a problem opening the database." error:error completion:^{
+                [Alerts error:self.viewController
+                        title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                        error:error
+                                                completion:^{
                     self.completion(nil, error);
                 }];
             }
         }
         else {
             if(self.isAutoFillOpen && !Settings.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseModel isAutoFillLikelyToCrash:data]) {
-                [Alerts warn:self.viewController title:@"AutoFill Crash Likely" message:@"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB)." completion:^{
+                [Alerts warn:self.viewController
+                       title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
+                     message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
+                completion:^{
                     Settings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
                     [self openSafeWithData:data provider:provider cacheMode:cacheMode];
                 }];
@@ -611,7 +623,7 @@
         return;
     }
     
-    [SVProgressHUD showWithStatus:@"Decrypting..."];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
 
     DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
     if (self.undigestedKeyFileData) {
@@ -678,7 +690,9 @@
     
     if (openedSafe == nil) {
         if(!error) {
-            [Alerts error:self.viewController title:@"There was a problem opening the database." error:error];
+            [Alerts error:self.viewController
+                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                    error:error];
             self.completion(nil, error);
             return;
         }
@@ -695,17 +709,18 @@
                 [SafesList.sharedInstance update:self.safe];
                 
                 [Alerts info:self.viewController
-                       title:@"Could not open database"
-                     message:[NSString stringWithFormat:@"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled."]] ;
+                       title:NSLocalizedString(@"open_sequence_problem_opening_title", @"Could not open database")
+                     message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_problem_opening_convenience_incorrect_message", @"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.")]] ;
             }
             else {
                 [Alerts info:self.viewController
-                       title:@"Incorrect Credentials"
-                     message:@"The credentials were incorrect for this database."];
+                       title:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
+                     message:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.")];
             }
         }
         else {
-            [Alerts error:self.viewController title:@"There was a problem opening the database." error:error];
+            [Alerts error:self.viewController
+                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error];
         }
         
         self.completion(nil, error);
@@ -743,8 +758,8 @@
                         data:(NSData *)data {
     if(!self.isAutoFillOpen && Settings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
         [Alerts yesNo:self.viewController
-                title:@"Set Quick Launch?"
-              message:@"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click."
+                title:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_title", @"Set Quick Launch?")
+              message:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_message", @"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click.")
                action:^(BOOL response) {
                    if(response) {
                        Settings.sharedInstance.quickLaunchUuid = self.safe.uuid;
@@ -767,21 +782,20 @@
     NSString *message;
     
     if(biometricPossible && pinPossible) {
-        title = [NSString stringWithFormat:@"Convenience Unlock: Use %@ or PIN Code in Future?", self.biometricIdName];
-        message = [NSString stringWithFormat:@"You can use either %@ or a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
+        title = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_both_title_fmt", @"Convenience Unlock: Use %@ or PIN Code in Future?"), self.biometricIdName];
+        message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_both_message_fmt", @"You can use either %@ or a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password"), self.biometricIdName];
     }
     else if (biometricPossible) {
-        title = [NSString stringWithFormat:@"Convenience Unlock: Use %@ to Unlock in Future?", self.biometricIdName];
-        message = [NSString stringWithFormat:@"You can use %@ to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password", self.biometricIdName];
+        title = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_bio_title_fmt", @"Convenience Unlock: Use %@ to Unlock in Future?"), self.biometricIdName];
+        message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_bio_message_fmt", @"You can use %@ to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password"), self.biometricIdName];
     }
     else if (pinPossible) {
-        title = @"Convenience Unlock: Use a PIN Code to Unlock in Future?";
-        message = @"You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password";
+        title = NSLocalizedString(@"open_sequence_prompt_use_convenience_pin_title", @"Convenience Unlock: Use a PIN Code to Unlock in Future?");
+        message = NSLocalizedString(@"open_sequence_prompt_use_convenience_pin_message", @"You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password");
     }
     
-    
     if (!Settings.sharedInstance.isPro) {
-        message = [message stringByAppendingFormat:@"\n\nNB: Convenience Unlock is a Pro feature"];
+        message = [message stringByAppendingFormat:NSLocalizedString(@"open_sequence_append_convenience_pro_warning", @"\n\nNB: Convenience Unlock is a Pro feature")];
     }
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
@@ -789,7 +803,8 @@
                                                                       preferredStyle:UIAlertControllerStyleAlert];
     
     if(biometricPossible) {
-        UIAlertAction *biometricAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Use %@", self.biometricIdName]
+        UIAlertAction *biometricAction = [UIAlertAction actionWithTitle:
+                                          [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_bio_fmt", @"Use %@"), self.biometricIdName]
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) {
                                                                 self.safe.isTouchIdEnabled = YES;
@@ -809,7 +824,8 @@
     }
     
     if (pinPossible) {
-        UIAlertAction *pinCodeAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"Use a PIN Code..."]
+        UIAlertAction *pinCodeAction = [UIAlertAction actionWithTitle:
+                                        [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_pin", @"Use a PIN Code...")]
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
                                                               [self setupConveniencePinAndOpen:openedSafe cacheMode:cacheMode provider:provider data:data];
@@ -817,7 +833,7 @@
         [alertController addAction:pinCodeAction];
     }
     
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No"
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"open_sequence_prompt_option_no", @"No")
                                                        style:UIAlertActionStyleCancel
                                                      handler:^(UIAlertAction *a) {
                                                          self.safe.isTouchIdEnabled = NO;
@@ -866,7 +882,10 @@
                     [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                 }
                 else {
-                    [Alerts warn:self.viewController title:@"PIN Conflict" message:@"Your Convenience PIN conflicts with your Duress PIN. Please configure in the Database Settings" completion:^{
+                    [Alerts warn:self.viewController
+                           title:NSLocalizedString(@"open_sequence_warn_pin_conflict_title", @"PIN Conflict")
+                        message:NSLocalizedString(@"open_sequence_warn_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings")
+                    completion:^{
                         [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                     }];
                 }
@@ -915,7 +934,7 @@
 
 - (void)openWithOfflineCacheFile:(NSString *)message {
     [Alerts yesNo:self.viewController
-            title:@"Use Offline Cache?"
+            title:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_title", @"Use Offline Cache?")
           message:message
            action:^(BOOL response) {
                if (response) {
@@ -1003,21 +1022,24 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
 
 - (void)readReselectedFilesDatabase:(BOOL)success data:(NSData*)data url:(NSURL*)url {
     if(!success || !data) {
-        [Alerts warn:self.viewController title:@"Error Opening This Database" message:@"Could not access this file."];
+        [Alerts warn:self.viewController
+               title:@"Error Opening This Database"
+             message:@"Could not access this file."];
     }
     else {
         NSError* error;
         
         if (![DatabaseModel isAValidSafe:data error:&error]) {
             [Alerts error:self.viewController
-                    title:[NSString stringWithFormat:@"Invalid Database - [%@]", url.lastPathComponent]
+                    title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                     error:error];
             return;
         }
         
         if(![url.lastPathComponent isEqualToString:self.safe.fileName]) {
-            [Alerts yesNo:self.viewController title:@"Different Filename"
-                  message:@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?"
+            [Alerts yesNo:self.viewController
+                    title:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
+                  message:NSLocalizedString(@"open_sequence_database_different_filename_message",@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?")
                    action:^(BOOL response) {
                        if(response) {
                            [self setAutoFillBookmark:url];
@@ -1045,7 +1067,9 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
     [url stopAccessingSecurityScopedResource];
     
     if (error) {
-        [Alerts error:self.viewController title:@"Could not bookmark this file" error:error];
+        [Alerts error:self.viewController
+                title:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
+                error:error];
         return;
     }
     

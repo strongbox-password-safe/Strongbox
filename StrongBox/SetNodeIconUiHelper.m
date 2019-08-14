@@ -46,28 +46,35 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
         NSURL* url = [self smartDetermineUrlFromHint:urlHint];
         
         if (url) { // FavIcon support not available on free tier
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Select Icon Source"
-                                                                                     message:@"Select the source of the icon you would like to use for this entry"
-                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController =
+            [UIAlertController alertControllerWithTitle:
+             NSLocalizedString(@"set_icon_vc_select_icon_source_title", @"Select Icon Source")
+                                                message:
+             NSLocalizedString(@"set_icon_vc_select_icon_source_message", @"Select the source of the icon you would like to use for this entry")
+                                         preferredStyle:UIAlertControllerStyleAlert];
             
             // this is the center of the screen currently but it can be any point in the view
             
             
-            UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:@"KeePass & Database Icon Set"
+            UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:
+                                            NSLocalizedString(@"set_icon_vc_icon_source_keepass_set", @"KeePass & Database Icon Set")
                                                                     style:UIAlertActionStyleDefault
                                                                   handler:^(UIAlertAction *a) { [self presentKeePassAndDatabaseIconSets]; }];
             
-            UIAlertAction *secondAction = [UIAlertAction actionWithTitle:@"Media Library"
+            UIAlertAction *secondAction = [UIAlertAction actionWithTitle:
+                                           NSLocalizedString(@"set_icon_vc_icon_source_media_libary", @"Media Library")
                                                                    style:UIAlertActionStyleDefault
                                                                  handler:^(UIAlertAction *a) { [self presentCustomIconImagePicker]; }];
             
-            UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ? @"Download FavIcon" : @"Download FavIcon (Pro Only)"
+            UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+                                          NSLocalizedString(@"set_icon_vc_icon_source_download_favicon", @"Download FavIcon") :
+                                          NSLocalizedString(@"set_icon_vc_icon_source_download_favicon_pro_only", @"Download FavIcon (Pro Only)")
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {  [self downloadFavIcon:url silent:NO completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
                 completion(goNoGo, nil, nil, userSelectedNewCustomIcon);
             }]; }];
             
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"set_icon_vc_option_cancel", @"Cancel")
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, nil); }];
             
@@ -82,11 +89,11 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
         }
         else {
             [Alerts threeOptions:viewController
-                           title:@"Select Icon Source"
-                         message:@"Select the source of the icon you would like to use for this entry"
-               defaultButtonText:@"KeePass & Database Icon Set"
-                secondButtonText:@"Media Library"
-                 thirdButtonText:@"Cancel"
+                           title:NSLocalizedString(@"set_icon_vc_select_icon_source_title", @"Select Icon Source")
+                         message:NSLocalizedString(@"set_icon_vc_select_icon_source_message", @"Select the source of the icon you would like to use for this entry")
+               defaultButtonText:NSLocalizedString(@"set_icon_vc_icon_source_keepass_set", @"KeePass & Database Icon Set")
+                secondButtonText:NSLocalizedString(@"set_icon_vc_icon_source_media_libary", @"Media Library")
+                 thirdButtonText:NSLocalizedString(@"set_icon_vc_option_cancel", @"Cancel")
                           action:^(int response) {
                    if(response == 0) {
                        [self presentKeePassAndDatabaseIconSets];
@@ -160,7 +167,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 
 - (void)downloadFavIcon:(NSURL*)url silent:(BOOL)silent completion:(DownloadFavIconCompletionBlock)completion {
     //[Fav downloadPreferred:];
-    [SVProgressHUD showWithStatus:@"Downloading FavIcon"];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_downloading_favicon", @"Downloading FavIcon")];
     NSLog(@"attempting to download favicon for: [%@]", url);
     [FavIcon downloadPreferred:url width:kMaxRecommendedCustomIconDimension height:kMaxRecommendedCustomIconDimension completion:^(UIImage * _Nullable image) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -172,7 +179,9 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             }
             else {
                 if(!silent) {
-                    [Alerts warn:self.viewController title:@"FavIcon Problem" message:@"Could not download favicon for this item"];
+                    [Alerts warn:self.viewController
+                           title:NSLocalizedString(@"set_icon_vc_error_downloading_favicon_title", @"FavIcon Problem")
+                         message:NSLocalizedString(@"set_icon_vc_error_downloading_favicon_message", @"Could not download favicon for this item")];
                 }
                 completion(NO, nil);
             }
@@ -208,7 +217,9 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
     BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
     
     if(!available) {
-        [Alerts info:self.viewController title:@"Image Source Unavailable" message:@"Could not access photos source."];
+        [Alerts info:self.viewController
+               title:NSLocalizedString(@"set_icon_vc_image_src_unavailable_title", @"Image Source Unavailable")
+             message:NSLocalizedString(@"set_icon_vc_image_src_photos_unavailable_message", @"Could not access photos source.")];
         self.completionBlock(NO, nil, nil, nil);
         return;
     }
@@ -234,7 +245,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 }
 
 - (void)onDonePickingCustomIcon:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
-    [SVProgressHUD showWithStatus:@"Reading Data..."];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         NSError* error;
@@ -244,7 +255,9 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
             [SVProgressHUD dismiss];
             if(!data) {
                 NSLog(@"Error: %@", error);
-                [Alerts error:self.viewController title:@"Error Reading Image" error:error];
+                [Alerts error:self.viewController
+                        title:NSLocalizedString(@"set_icon_vc_error_reading_image", @"Error Reading Image")
+                        error:error];
                 self.completionBlock(NO, nil, nil, nil);
             }
             else {
@@ -255,7 +268,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 }
 
 - (void)analyzeCustomIconAndSet:(NSData*)data {
-    [SVProgressHUD showWithStatus:@"Analyzing Image..."];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_analyzing_image", @"Analyzing Image...")];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         UIImage* image = [UIImage imageWithData:data];
@@ -272,9 +285,13 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
                 if(dataOriginal.length > rescaledData.length) {
                     NSUInteger saving = dataOriginal.length - rescaledData.length;
                     NSString* savingString = friendlyFileSizeString(saving);
-                    NSString* message = [NSString stringWithFormat:@"This is a rather large image (%dx%d), would you like to rescale it to a maximum dimension of %d pixels for a file size saving of roughly %@", (int)image.size.width, (int)image.size.height, kMaxRecommendedCustomIconDimension, savingString];
+                    NSString* message = [NSString stringWithFormat:
+                                         NSLocalizedString(@"set_icon_vc_prompt_rescale_image_message_fmt", @"This is a rather large image (%dx%d), would you like to rescale it to a maximum dimension of %d pixels for a file size saving of roughly %@"), (int)image.size.width, (int)image.size.height, kMaxRecommendedCustomIconDimension, savingString];
                     
-                    [Alerts yesNo:self.viewController title:@"Large Custom Icon Image, Rescale?" message:message action:^(BOOL response) {
+                    [Alerts yesNo:self.viewController
+                            title:NSLocalizedString(@"set_icon_vc_prompt_rescale_image_title", @"Large Custom Icon Image, Rescale?")
+                          message:message
+                           action:^(BOOL response) {
                         self.completionBlock(YES, nil, nil, response ? rescaled : image);
                     }];
                 }

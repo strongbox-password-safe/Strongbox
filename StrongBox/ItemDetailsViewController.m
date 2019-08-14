@@ -130,9 +130,11 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     [UIView setAnimationsEnabled:YES];
     
-    if(self.splitViewController) {
-        self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-    }
+    // Do not do this - It's incorrect if we're editing... Shouldn't need to change this here anyway
+    //
+//    if(self.splitViewController) {
+//        self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+//    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -156,6 +158,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     self.navigationItem.rightBarButtonItems = rightBarButtons;
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
+    
     self.navigationController.navigationBar.prefersLargeTitles = NO;
     if(Settings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;

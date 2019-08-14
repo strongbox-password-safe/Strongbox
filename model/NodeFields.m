@@ -440,6 +440,12 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     return nil;
 }
 
+//
+
+- (BOOL)expired {
+    return self.expires != nil && [NSDate.date compare:self.expires] == NSOrderedDescending;
+}
+
 -(NSString *)description {
     return [NSString stringWithFormat:@"{\n    password = [%@]\n    username = [%@]\n    email = [%@]\n    url = [%@]\n}",
             self.password,

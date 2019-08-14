@@ -31,12 +31,12 @@
     [self.timePicker addTarget:self action:@selector(onDateChanged:) forControlEvents:UIControlEventValueChanged];
 
     self.dateTextField.inputView = self.datePicker;
-    self.dateTextField.placeholder = @"Date";
-    self.dateTextField.accessibilityLabel = @"Date Text Field";
+    self.dateTextField.placeholder = NSLocalizedString(@"edit_date_cell_date_field_placeholder", @"Date");
+    self.dateTextField.accessibilityLabel = NSLocalizedString(@"edit_date_cell_date_field_accessibility_label", @"Date Text Field");
     
     self.timeTextField.inputView = self.timePicker;
-    self.timeTextField.placeholder = @"Time";
-    self.timeTextField.accessibilityLabel = @"Time Text Field";
+    self.timeTextField.placeholder = NSLocalizedString(@"edit_date_cell_time_field_placeholder", @"Time");
+    self.timeTextField.accessibilityLabel = NSLocalizedString(@"edit_date_cell_time_field_accessibility_label", @"Time Text Field");
 }
 
 - (IBAction)clearDate:(id)sender {

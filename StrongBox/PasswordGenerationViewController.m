@@ -95,7 +95,7 @@
 
     NSLog(@"onSampleLongPress");
     UITableViewCell* cell = (UITableViewCell*)gr.view;
-    [self copyToClipboard:cell.textLabel.text message:@"Sample Copied"];
+    [self copyToClipboard:cell.textLabel.text message:NSLocalizedString(@"password_gen_vc_sample_password_copied", @"Sample Password Copied")];
 }
 
 - (void)copyToClipboard:(NSString *)value message:(NSString *)message {
@@ -156,17 +156,17 @@
 
 - (NSString*)getSamplePassword {
     NSString* str = [PasswordMaker.sharedInstance generateForConfig:self.config];
-    return str ? str : @"<Generation Failed>";
+    return str ? str : NSLocalizedString(@"password_gen_vc_generation_failed", @"<Generation Failed>");
 }
 
 - (void)bindUi {
-    self.cellAlgorithm.detailTextLabel.text = self.config.algorithm == kPasswordGenerationAlgorithmBasic ? @"Basic" : @"Diceware (XKCD)";
+    self.cellAlgorithm.detailTextLabel.text = self.config.algorithm == kPasswordGenerationAlgorithmBasic ? NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") : @"Diceware (XKCD)";
     
     NSArray<NSString*> *characterGroups = [self.config.useCharacterGroups map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
     }];
     NSString* useGroups = [characterGroups componentsJoinedByString:@", "];
-    self.cellUseCharacterGroups.detailTextLabel.text = [NSString stringWithFormat:@"Using: %@", useGroups];
+    self.cellUseCharacterGroups.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"password_gen_vc_using_character_groups_fmt", @"Using: %@"), useGroups];
     
     self.cellEasyReadCharactersOnly.accessoryType = self.config.easyReadCharactersOnly ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
@@ -186,7 +186,7 @@
     }];
     
     NSString* friendlyWordListsCombined = [friendlyWordLists componentsJoinedByString:@", "];
-    self.cellWordLists.detailTextLabel.text = [NSString stringWithFormat:@"Using: %@", friendlyWordListsCombined];
+    self.cellWordLists.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"password_gen_vc_using_wordlists_fmt", @"Using: %@"), friendlyWordListsCombined];
     
     self.cellWordSeparator.detailTextLabel.text = self.config.wordSeparator;
     
@@ -236,8 +236,9 @@
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
     if(cell == self.cellAlgorithm) {
-        [self promptForItem:@"Select Algorithm"
-                    options:@[@"Basic", @"Diceware (XKCD)"]
+        [self promptForItem:NSLocalizedString(@"password_gen_vc_select_mode", @"Select Algorithm")
+                    options:@[NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic"),
+                              @"Diceware (XKCD)"]
                currentIndex:self.config.algorithm == kPasswordGenerationAlgorithmBasic ? 0 : 1
                  completion:^(NSInteger selected) {
                      self.config.algorithm = selected == 0 ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
@@ -312,7 +313,7 @@
     
     NSUInteger index = [opt indexOfObject:@(self.config.saltConfig)];
     
-    [self promptForItem:@"Select Salt Type"
+    [self promptForItem:NSLocalizedString(@"password_gen_vc_select_salt_type", @"Select Salt Type")
                 options:options
            currentIndex:index
              completion:^(NSInteger selected) {
@@ -336,7 +337,7 @@
     
     NSUInteger index = [opt indexOfObject:@(self.config.hackerify)];
     
-    [self promptForItem:@"Select l33t Level"
+    [self promptForItem:NSLocalizedString(@"password_gen_vc_select_hacker_level", @"Select l33t Level")
                 options:options
            currentIndex:index
              completion:^(NSInteger selected) {
@@ -360,7 +361,7 @@
     
     NSUInteger index = [opt indexOfObject:@(self.config.wordCasing)];
     
-    [self promptForItem:@"Select Word Casing"
+    [self promptForItem:NSLocalizedString(@"password_gen_vc_select_casing_type", @"Select Word Casing")
                 options:options
            currentIndex:index
              completion:^(NSInteger selected) {
@@ -390,7 +391,7 @@
         }
     }
     
-    [self promptForItems:@"Select Word Lists"
+    [self promptForItems:NSLocalizedString(@"password_gen_vc_select_wordlists", @"Select Word Lists")
                  options:friendlySortedNames
          selectedIndices:sel
               completion:^(NSIndexSet *selected) {
@@ -422,7 +423,7 @@
         }
     }
     
-    [self promptForItems:@"Select Character Groups"
+    [self promptForItems:NSLocalizedString(@"password_gen_vc_select_character_groups", @"Select Character Groups")
                  options:poolsStrings
          selectedIndices:selected
               completion:^(NSIndexSet *selected) {
@@ -442,7 +443,7 @@
     if(self.config.wordSeparator.length) {
         [Alerts OkCancelWithTextField:self
                         textFieldText:self.config.wordSeparator
-                                title:@"Word Separator"
+                                title:NSLocalizedString(@"password_gen_vc_prompt_word_separator", @"Word Separator")
                               message:@""
                            completion:^(NSString *text, BOOL response) {
                                if(response) {
@@ -455,8 +456,8 @@
     }
     else {
         [Alerts OkCancelWithTextField:self
-                textFieldPlaceHolder:@"Separator"
-                                title:@"Word Separator"
+                textFieldPlaceHolder:NSLocalizedString(@"password_gen_vc_word_separator_placeholder", @"Separator")
+                                title:NSLocalizedString(@"password_gen_vc_prompt_word_separator", @"Word Separator")
                               message:@""
                            completion:^(NSString *text, BOOL response) {
                                if(response) {

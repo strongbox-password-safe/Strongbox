@@ -34,6 +34,9 @@
 
 -(void)prepareForReuse {
     [super prepareForReuse];
+
+    self.contentView.alpha = 1.0f;
+
     [self stopObservingOtpUpdateTimer];
 }
 
@@ -77,6 +80,7 @@
              icon:(UIImage *)icon
     groupLocation:(NSString *)groupLocation
             flags:(NSString*)flags
+          expired:(BOOL)expired
          otpToken:(OTPToken*)otpToken {
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
@@ -93,6 +97,9 @@
 
     self.otpLabel.hidden = NO;
     self.otpToken = otpToken;
+    
+    self.contentView.alpha = expired ? 0.35 : 1.0f;
+    
     [self updateOtpCode];
     [self subscribeToOtpUpdateTimerIfNecessary];
 }

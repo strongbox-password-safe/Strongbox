@@ -23,14 +23,16 @@ NS_ASSUME_NONNULL_BEGIN
                     scope:(SearchScope)scope
               dereference:(BOOL)dereference
     includeKeePass1Backup:(BOOL)includeKeePass1Backup
-        includeRecycleBin:(BOOL)includeRecycleBin;
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired;
 
 - (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
                     searchText:(NSString *)searchText
                          scope:(SearchScope)scope
                    dereference:(BOOL)dereference
          includeKeePass1Backup:(BOOL)includeKeePass1Backup
-             includeRecycleBin:(BOOL)includeRecycleBin;
+             includeRecycleBin:(BOOL)includeRecycleBin
+                includeExpired:(BOOL)includeExpired;
 
 - (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items;
 - (NSString*)getBrowseItemSubtitle:(Node*)node;
