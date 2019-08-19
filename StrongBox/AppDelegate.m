@@ -271,9 +271,6 @@
     
     if(clipboardChangeCount == UIPasteboard.generalPasteboard.changeCount) {
         NSLog(@"Clearing Clipboard...");
-
-        [NSNotificationCenter.defaultCenter removeObserver:self.clipboardNotificationIdentifier];
-        self.clipboardNotificationIdentifier = nil;
         
         [self unobserveClipboardChangeNotifications];
         
@@ -296,13 +293,16 @@
 - (void)observeClipboardChangeNotifications {
     if(Settings.sharedInstance.clearClipboardEnabled) {
         if(!self.clipboardNotificationIdentifier) {
-            self.clipboardNotificationIdentifier = [NSNotificationCenter.defaultCenter
-                                                    addObserverForName:UIPasteboardChangedNotification
-                                                            object:nil
-                                                            queue:nil
-                                                    usingBlock:^(NSNotification * _Nonnull note) {
-                                                        [self onClipboardChangedNotification:note];
-                                                    }];
+            // Delay by a small bit because we're definitely getting an odd crash or two somehow due to infinite loop now
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                self.clipboardNotificationIdentifier =
+                [NSNotificationCenter.defaultCenter addObserverForName:UIPasteboardChangedNotification
+                                                                object:nil
+                                                                 queue:nil
+                                                            usingBlock:^(NSNotification * _Nonnull note) {
+                                                                [self onClipboardChangedNotification:note];
+                                                            }];
+            });
         }
     }
 }

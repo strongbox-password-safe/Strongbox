@@ -34,7 +34,11 @@ NS_ASSUME_NONNULL_BEGIN
              includeRecycleBin:(BOOL)includeRecycleBin
                 includeExpired:(BOOL)includeExpired;
 
-- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items;
+- (NSArray<Node*>*)filterAndSortForBrowse:(NSMutableArray<Node*>*)nodes
+                    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+                        includeRecycleBin:(BOOL)includeRecycleBin
+                           includeExpired:(BOOL)includeExpired;
+
 - (NSString*)getBrowseItemSubtitle:(Node*)node;
 
 @end

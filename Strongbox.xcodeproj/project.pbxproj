@@ -414,6 +414,9 @@
 		4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B3E21AC30BA00805DED /* CustomFieldsViewController.m */; };
 		4D876B4321AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
 		4D876B4421AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
+		4D8A99A6230AF31700AB98DC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99A4230AF31700AB98DC /* InfoPlist.strings */; };
+		4D8A99A9230AF31700AB98DC /* RMStore.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99A7230AF31700AB98DC /* RMStore.strings */; };
+		4D8A99AC230AF31700AB98DC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99AA230AF31700AB98DC /* InfoPlist.strings */; };
 		4D8C147D2074F5D100CE9CAE /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C147C2074F5D100CE9CAE /* CHCSVParser.m */; };
 		4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14802074F5F700CE9CAE /* PwSafeSerialization.m */; };
 		4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14822074F5F700CE9CAE /* PasswordHistoryEntry.m */; };
@@ -1131,6 +1134,33 @@
 		4D876B3E21AC30BA00805DED /* CustomFieldsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldsViewController.m; path = StrongBox/CustomFieldsViewController.m; sourceTree = "<group>"; };
 		4D876B4121AC36F800805DED /* CustomField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomField.h; path = StrongBox/CustomField.h; sourceTree = "<group>"; };
 		4D876B4221AC36F800805DED /* CustomField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomField.m; path = StrongBox/CustomField.m; sourceTree = "<group>"; };
+		4D8A99A5230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D8A99A8230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/RMStore.strings; sourceTree = "<group>"; };
+		4D8A99AB230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D8A99AD230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = StrongBox/de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4D8A99AE230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PinEntry.strings; sourceTree = "<group>"; };
+		4D8A99AF230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/QRCodeScannerViewController.strings; sourceTree = "<group>"; };
+		4D8A99B0230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ItemDetails.strings; sourceTree = "<group>"; };
+		4D8A99B1230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SelectStorage.strings; sourceTree = "<group>"; };
+		4D8A99B2230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/WebDAVConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D8A99B3230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/KeePassHistory.strings; sourceTree = "<group>"; };
+		4D8A99B4230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Welcome.strings; sourceTree = "<group>"; };
+		4D8A99B5230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MasterDetail.strings; sourceTree = "<group>"; };
+		4D8A99B6230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/IconsCollectionViewController.strings; sourceTree = "<group>"; };
+		4D8A99B7230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CreateDatabaseOrSetCredentials.strings; sourceTree = "<group>"; };
+		4D8A99B8230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Browse.strings; sourceTree = "<group>"; };
+		4D8A99B9230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/EditPasswordCell.strings; sourceTree = "<group>"; };
+		4D8A99BA230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/IconTableCell.strings; sourceTree = "<group>"; };
+		4D8A99BB230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ItemDetailsPreferences.strings; sourceTree = "<group>"; };
+		4D8A99BC230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
+		4D8A99BD230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Preferences.strings; sourceTree = "<group>"; };
+		4D8A99BE230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = "StrongBox Auto Fill/de.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		4D8A99BF230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SelectKeyFile.strings; sourceTree = "<group>"; };
+		4D8A99C0230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = StrongBox/de.lproj/Main.strings; sourceTree = "<group>"; };
+		4D8A99C1230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SFTPSessionConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D8A99C2230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DatabaseOperations.strings; sourceTree = "<group>"; };
+		4D8A99C3230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PasswordSafeHistory.strings; sourceTree = "<group>"; };
+		4D8A99C4230AF31700AB98DC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
 		4D8C147B2074F5D100CE9CAE /* CHCSVParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHCSVParser.h; path = lib/chcsv/CHCSVParser.h; sourceTree = SOURCE_ROOT; };
 		4D8C147C2074F5D100CE9CAE /* CHCSVParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CHCSVParser.m; path = lib/chcsv/CHCSVParser.m; sourceTree = SOURCE_ROOT; };
 		4D8C147E2074F5F700CE9CAE /* PwSafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeDatabase.h; path = model/pwsafe/PwSafeDatabase.h; sourceTree = SOURCE_ROOT; };
@@ -2795,6 +2825,8 @@
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
+				4D8A99AA230AF31700AB98DC /* InfoPlist.strings */,
+				4D8A99A7230AF31700AB98DC /* RMStore.strings */,
 				4D62D6941C85F2B50051E13B /* UI */,
 				4DE48A57216F54A300C9C991 /* Auto-Fill-Extension */,
 				4D78AC241FB1E23B00A68A92 /* PwSafe */,
@@ -2930,6 +2962,7 @@
 				4DE48A58216F54A300C9C991 /* CredentialProviderViewController.h */,
 				4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */,
 				4DE48A5E216F54A300C9C991 /* Info.plist */,
+				4D8A99A4230AF31700AB98DC /* InfoPlist.strings */,
 				4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */,
 				4D34940E216FB87200C411B1 /* SafesListTableViewController.h */,
 				4D34940F216FB87200C411B1 /* SafesListTableViewController.m */,
@@ -3169,6 +3202,7 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
@@ -3238,10 +3272,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D36B0B822C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */,
+				4D8A99AC230AF31700AB98DC /* InfoPlist.strings in Resources */,
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4DE18BB622F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
 				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
+				4D8A99A9230AF31700AB98DC /* RMStore.strings in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4DE7F0E822F89D680095F51F /* SelectStorage.storyboard in Resources */,
 				4D36B0D022C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
@@ -3313,6 +3349,7 @@
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
 				4DE7F0CF22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
 				4D12E59122FB866F00CBFECC /* Localizable.strings in Resources */,
+				4D8A99A6230AF31700AB98DC /* InfoPlist.strings in Resources */,
 				4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,
@@ -4021,6 +4058,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D5F5B81218B4C9300A0739A /* Base */,
+				4D8A99BE230AF31700AB98DC /* de */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -4029,6 +4067,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D5F5B85218B4CCB00A0739A /* Base */,
+				4D8A99C0230AF31700AB98DC /* de */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -4037,6 +4076,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770F882303249D00CBE244 /* Base */,
+				4D8A99B9230AF31700AB98DC /* de */,
 			);
 			name = EditPasswordCell.xib;
 			sourceTree = "<group>";
@@ -4045,6 +4085,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770F8C230324A800CBE244 /* Base */,
+				4D8A99BA230AF31700AB98DC /* de */,
 			);
 			name = IconTableCell.xib;
 			sourceTree = "<group>";
@@ -4053,6 +4094,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770F8F2303262400CBE244 /* Base */,
+				4D8A99AF230AF31700AB98DC /* de */,
 			);
 			name = QRCodeScannerViewController.xib;
 			path = StrongBox;
@@ -4062,6 +4104,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770F922303263100CBE244 /* Base */,
+				4D8A99BC230AF31700AB98DC /* de */,
 			);
 			name = PrivacyViewController.xib;
 			path = StrongBox;
@@ -4071,6 +4114,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770F99230326A200CBE244 /* Base */,
+				4D8A99B6230AF31700AB98DC /* de */,
 			);
 			name = IconsCollectionViewController.xib;
 			path = StrongBox;
@@ -4080,6 +4124,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770F9D230326B900CBE244 /* Base */,
+				4D8A99C1230AF31700AB98DC /* de */,
 			);
 			name = SFTPSessionConfigurationViewController.xib;
 			path = StrongBox;
@@ -4089,8 +4134,36 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D770FA1230326BE00CBE244 /* Base */,
+				4D8A99B2230AF31700AB98DC /* de */,
 			);
 			name = WebDAVConfigurationViewController.xib;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D8A99A4230AF31700AB98DC /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D8A99A5230AF31700AB98DC /* de */,
+			);
+			name = InfoPlist.strings;
+			path = "Strongbox Auto Fill";
+			sourceTree = "<group>";
+		};
+		4D8A99A7230AF31700AB98DC /* RMStore.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D8A99A8230AF31700AB98DC /* de */,
+			);
+			name = RMStore.strings;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D8A99AA230AF31700AB98DC /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D8A99AB230AF31700AB98DC /* de */,
+			);
+			name = InfoPlist.strings;
 			path = StrongBox;
 			sourceTree = "<group>";
 		};
@@ -4098,6 +4171,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0C922F89BDD0095F51F /* Base */,
+				4D8A99B7230AF31700AB98DC /* de */,
 			);
 			name = CreateDatabaseOrSetCredentials.storyboard;
 			path = StrongBox;
@@ -4107,6 +4181,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0CC22F89CE30095F51F /* Base */,
+				4D8A99B5230AF31700AB98DC /* de */,
 			);
 			name = MasterDetail.storyboard;
 			path = StrongBox;
@@ -4125,6 +4200,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0D322F89D1D0095F51F /* Base */,
+				4D8A99B4230AF31700AB98DC /* de */,
 			);
 			name = Welcome.storyboard;
 			path = StrongBox;
@@ -4134,6 +4210,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0D622F89D270095F51F /* Base */,
+				4D8A99B8230AF31700AB98DC /* de */,
 			);
 			name = Browse.storyboard;
 			path = StrongBox;
@@ -4143,6 +4220,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0D922F89D3E0095F51F /* Base */,
+				4D8A99B0230AF31700AB98DC /* de */,
 			);
 			name = ItemDetails.storyboard;
 			path = StrongBox;
@@ -4152,6 +4230,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0DC22F89D480095F51F /* Base */,
+				4D8A99BB230AF31700AB98DC /* de */,
 			);
 			name = ItemDetailsPreferences.storyboard;
 			path = StrongBox;
@@ -4161,6 +4240,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0DF22F89D510095F51F /* Base */,
+				4D8A99B3230AF31700AB98DC /* de */,
 			);
 			name = KeePassHistory.storyboard;
 			path = StrongBox;
@@ -4170,6 +4250,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0E222F89D550095F51F /* Base */,
+				4D8A99C3230AF31700AB98DC /* de */,
 			);
 			name = PasswordSafeHistory.storyboard;
 			path = StrongBox;
@@ -4179,6 +4260,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0E622F89D610095F51F /* Base */,
+				4D8A99BF230AF31700AB98DC /* de */,
 			);
 			name = SelectKeyFile.storyboard;
 			path = StrongBox;
@@ -4188,6 +4270,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0E922F89D680095F51F /* Base */,
+				4D8A99B1230AF31700AB98DC /* de */,
 			);
 			name = SelectStorage.storyboard;
 			path = StrongBox;
@@ -4197,6 +4280,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0ED22F89D6F0095F51F /* Base */,
+				4D8A99AE230AF31700AB98DC /* de */,
 			);
 			name = PinEntry.storyboard;
 			path = StrongBox;
@@ -4206,6 +4290,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0F022F89D790095F51F /* Base */,
+				4D8A99C2230AF31700AB98DC /* de */,
 			);
 			name = DatabaseOperations.storyboard;
 			path = StrongBox;
@@ -4215,6 +4300,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0F322F89D820095F51F /* Base */,
+				4D8A99BD230AF31700AB98DC /* de */,
 			);
 			name = Preferences.storyboard;
 			path = StrongBox;
@@ -4233,6 +4319,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F0FA22F89D8D0095F51F /* Base */,
+				4D8A99C4230AF31700AB98DC /* de */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -4242,6 +4329,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE7F11322F8A16A0095F51F /* Base */,
+				4D8A99AD230AF31700AB98DC /* de */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

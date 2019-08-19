@@ -88,12 +88,22 @@
                 dereference:dereference];
     }
     
-    [self filterExcludedSearchItems:results
-              includeKeePass1Backup:includeKeePass1Backup
-                  includeRecycleBin:includeRecycleBin
-                     includeExpired:includeExpired];
+    return [self filterAndSortForBrowse:results
+                  includeKeePass1Backup:includeKeePass1Backup
+                      includeRecycleBin:includeRecycleBin
+                         includeExpired:includeExpired];
+}
+
+- (NSArray<Node*>*)filterAndSortForBrowse:(NSMutableArray<Node*>*)nodes
+                    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+                        includeRecycleBin:(BOOL)includeRecycleBin
+                           includeExpired:(BOOL)includeExpired {
+    [self filterExcluded:nodes
+   includeKeePass1Backup:includeKeePass1Backup
+       includeRecycleBin:includeRecycleBin
+          includeExpired:includeExpired];
     
-    return [self sortItemsForBrowse:results];
+    return [self sortItemsForBrowse:nodes];
 }
 
 - (void)filterForWord:(NSMutableArray<Node*>*)searchNodes
@@ -147,10 +157,10 @@
     }];
 }
 
-- (void)filterExcludedSearchItems:(NSMutableArray<Node*>*)matches
-            includeKeePass1Backup:(BOOL)includeKeePass1Backup
-                includeRecycleBin:(BOOL)includeRecycleBin
-                   includeExpired:(BOOL)includeExpired {
+- (void)filterExcluded:(NSMutableArray<Node*>*)matches
+ includeKeePass1Backup:(BOOL)includeKeePass1Backup
+     includeRecycleBin:(BOOL)includeRecycleBin
+        includeExpired:(BOOL)includeExpired {
     if(!includeKeePass1Backup) {
         if (self.database.format == kKeePass1) {
             Node* backupGroup = self.database.keePass1BackupNode;
@@ -161,14 +171,14 @@
             }
         }
     }
-    
+
     Node* recycleBin = self.database.recycleBinNode;
     if(!includeRecycleBin && recycleBin) {
         [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
             return obj != recycleBin && ![recycleBin contains:obj];
         }];
     }
-    
+
     if(!includeExpired) {
         [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
             return !obj.expired;

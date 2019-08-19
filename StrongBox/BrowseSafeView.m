@@ -625,38 +625,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         default:
             break;
     }
-    
-    // Filter KeePass 1 Backup Group
-    
-    if(self.viewModel.database.format == kKeePass1 && !self.viewModel.metadata.showKeePass1BackupGroup) {
-        Node* backupGroup = self.viewModel.database.keePass1BackupNode;
-        
-        if(backupGroup) {
-                ret = [ret filter:^BOOL(Node * _Nonnull obj) {
-                    return obj != backupGroup;
-                }];
-        }
-    }
-    // Filter KeePass 2 Recycle Bin?
-    else if(self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4) {
-        Node* recycleBin = self.viewModel.database.recycleBinNode;
-        
-        if(self.viewModel.metadata.doNotShowRecycleBinInBrowse && recycleBin) {
-            ret = [ret filter:^BOOL(Node * _Nonnull obj) {
-                return obj != recycleBin;
-            }];
-        }
-    }
-    
-    if(!self.viewModel.metadata.showExpiredInBrowse) {
-        ret = [ret filter:^BOOL(Node * _Nonnull obj) {
-            return !obj.expired;
-        }];
-    }
-    
+ 
     DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
-    
-    return [searcher sortItemsForBrowse:ret];
+
+    return [searcher filterAndSortForBrowse:ret.mutableCopy
+                      includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
+                          includeRecycleBin:!self.viewModel.metadata.doNotShowRecycleBinInBrowse
+                             includeExpired:self.viewModel.metadata.showExpiredInBrowse];
 }
 
 - (void)refreshItems {

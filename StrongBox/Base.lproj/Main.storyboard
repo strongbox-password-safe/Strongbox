@@ -119,6 +119,62 @@
             </objects>
             <point key="canvasLocation" x="-2694" y="1205"/>
         </scene>
+        <!--App Store Description Dummy-->
+        <scene sceneID="flw-ha-yfD">
+            <objects>
+                <viewController title="App Store Description Dummy" id="glp-Ie-yhx" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="yj2-dM-njB">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="6tI-B2-q0P">
+                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <mutableString key="text">Strongbox is an application for keeping all your passwords safely stored and protected by one master password. Supporting the open source Password Safe and KeePass formats. Strongbox is a Freemium application offering enhanced Premium options as well as a super functional basic feature set.
+
+Face ID &amp; Touch ID capability or PIN Codes, for the ultimate in convenience and speed. 
+
+Cloud Support, so you can access your cloud safes using iCloud, Dropbox, OneDrive, Google Drive, WebDAV or SFTP even when offline. Use the built in Files app for many other storage options,  or store them securely only on your local device. You choose your storage.
+
+Secure, protected by time tested industrial strength cryptography.
+
+Search your entire set of passwords and secrets instantly and powerfully, with deep search. Autocomplete new entries, and auto generate secure passwords. 
+
+Timed Auto Clear Clipboard, Entry History, Field References, Place Holders, KeePass Custom &amp; FavIcon Icon support &amp; Two Factor Authentication codes (TOTP)
+
+Standards compliant, using the time tested Password Safe and KeePass formats so you can import any existing password safe you have.
+
+Import/Export by Files app, Email, CSV, iTunes File Sharing or use cloud storage.
+---------------------------------------------------------------------
+• Strongbox Password Safe provides In-App Purchases (both auto renewable subscriptions and one-off non consumable) for Pro versions of the App
+• Subscriptions are auto renewable with recurring billing. Cancel anytime.
+• The time period of the subscriptions are monthly, 3-monthly or yearly at users discretion
+• The user can also choose to purchase a 'Lifetime' one-off Pro version of the App
+• Payment will be charged to iTunes Account at confirmation of purchase
+• Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period
+• Account will be charged for renewal within 24-hours prior to the end of the current period, and identify the cost of the renewal
+• Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase
+• Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription to that publication, where applicable
+• Strongbox Privacy Policy may be found here: https://strongboxsafe.com/privacy-policy/
+• Strongbox Terms of Use may be found here: https://strongboxsafe.com/terms/</mutableString>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="6tI-B2-q0P" firstAttribute="leading" secondItem="1Sf-KY-7JS" secondAttribute="leading" id="6I5-3l-gPU"/>
+                            <constraint firstItem="1Sf-KY-7JS" firstAttribute="trailing" secondItem="6tI-B2-q0P" secondAttribute="trailing" id="CYh-ZZ-pMW"/>
+                            <constraint firstItem="6tI-B2-q0P" firstAttribute="top" secondItem="1Sf-KY-7JS" secondAttribute="top" id="UYn-sc-vP4"/>
+                            <constraint firstItem="1Sf-KY-7JS" firstAttribute="bottom" secondItem="6tI-B2-q0P" secondAttribute="bottom" id="bb7-G1-Oy5"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="1Sf-KY-7JS"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Azx-BP-KO6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2986" y="384"/>
+        </scene>
         <!--CreateDatabaseOrSetCredentials-->
         <scene sceneID="IZq-qB-8dq">
             <objects>
@@ -819,7 +875,7 @@ Cg
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zO6-36-feS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1836" y="2056"/>
+            <point key="canvasLocation" x="-2193" y="2056"/>
         </scene>
         <!--Databases Navigation Controller-->
         <scene sceneID="1kV-wb-Lxz">
