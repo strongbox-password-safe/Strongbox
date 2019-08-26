@@ -289,6 +289,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     return [self getDataSource].count;
 }
 
+- (BOOL)isPinned:(Node*)item { // TODO: We need this to be part of the model somehow...
+    NSMutableSet<NSString*>* favs = [NSMutableSet setWithArray:self.model.metadata.favourites];
+    NSString* sid = [item getSerializationId:self.model.database.format != kPasswordSafe];
+    return [favs containsObject:sid];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
@@ -302,22 +308,26 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         
         NSString* childCount = self.model.metadata.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
         
-        [cell setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation];
+        [cell setGroup:title
+                  icon:icon
+            childCount:childCount
+                italic:italic
+         groupLocation:groupLocation
+                pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO];
     }
     else {
         DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
         
         NSString* subtitle = [searcher getBrowseItemSubtitle:node];
-        NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
-        flags = self.model.metadata.showFlagsInBrowse ? flags : @"";
-       
+        
         [cell setRecord:title
                subtitle:subtitle
                    icon:icon
           groupLocation:groupLocation
-                  flags:flags
+                 pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+         hasAttachments:self.model.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
                 expired:node.expired
-               otpToken:Settings.sharedInstance.hideTotpInAutoFill ? nil : node.fields.otpToken];
+               otpToken:node.fields.otpToken];
     }
     
     return cell;

@@ -42,14 +42,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *clearClipboardEnabled;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellClearClipboardDelay;
 @property (weak, nonatomic) IBOutlet UILabel *labelClearClipboardDelay;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
-@property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
-@property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAppLockDelay;
 @property (weak, nonatomic) IBOutlet UILabel *labelAppLockDelay;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
-@property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
@@ -85,9 +79,6 @@
     
     [self bindCloudSessions];
     [self bindAboutButton];
-    [self bindAllowPinCodeOpen];
-    [self bindAllowBiometric];
-    [self bindDatabaseLock];
     [self bindHideTips];
     [self bindClearClipboard];
     [self bindAppLock];
@@ -136,18 +127,6 @@
                             Settings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
                         }
                         [self bindClearClipboard];
-                    }];
-    }
-    else if (cell == self.cellDatabaseAutoLockDelay) {
-        [self promptForInteger:NSLocalizedString(@"prefs_vc_auto_lock_database_delay", @"Auto Lock Database Delay")
-                       options:@[@0, @30, @60, @120, @180, @300, @600]
-             formatAsIntervals:YES
-                  currentValue:[Settings.sharedInstance getAutoLockTimeoutSeconds].integerValue
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            [Settings.sharedInstance setAutoLockTimeoutSeconds:@(selectedValue)];
-                        }
-                        [self bindDatabaseLock];
                     }];
     }
     else if (cell == self.cellAppLockDelay) {
@@ -238,87 +217,6 @@
     self.labelUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
 }
 
-- (IBAction)onAllowPinCodeOpen:(id)sender {
-    if(self.switchAllowPinCodeOpen.on) {
-        Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
-        [self bindAllowPinCodeOpen];
-    }
-    else {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_title", @"Clear PIN Codes")
-              message:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes")
-               action:^(BOOL response) {
-            if(response) {
-                Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
-                
-                // Clear any Convenience Enrolled PIN Using Safes
-                
-                NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                    return obj.conveniencePin != nil && obj.isEnrolledForConvenience;
-                }];
-                
-                for (SafeMetaData* safe in clear) {
-                    safe.isEnrolledForConvenience = NO;
-                    safe.isTouchIdEnabled = NO;
-                    safe.convenienceMasterPassword = nil;
-                    safe.convenenienceKeyFileDigest = nil;
-                    safe.convenenienceYubikeySecret = nil;
-                    safe.conveniencePin = nil;
-                    safe.duressPin = nil;
-                    safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
-                    
-                    [SafesList.sharedInstance update:safe];
-                }
-                
-                [self bindAllowPinCodeOpen];
-            }
-        }];
-    }
-}
-
-- (IBAction)onAllowBiometric:(id)sender {
-    if(self.switchAllowBiometric.on) {
-        NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
-        
-        Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
-        
-        [self bindAllowBiometric];
-    }
-    else {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"prefs_vc_clear_biometrics_yesno_title", @"Clear Biometrics")
-              message:NSLocalizedString(@"prefs_vc_clear_biometrics_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?")
-               action:^(BOOL response) {
-            if(response) {
-                NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
-                
-                Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
-                
-                // Clear any Convenience Enrolled Biometric Using Safes
-                
-                NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                    return obj.isTouchIdEnabled && obj.isEnrolledForConvenience;
-                }];
-                
-                for (SafeMetaData* safe in clear) {
-                    safe.isEnrolledForConvenience = NO;
-                    safe.convenienceMasterPassword = nil;
-                    safe.convenenienceKeyFileDigest = nil;
-                    safe.convenenienceYubikeySecret = nil;
-                    safe.conveniencePin = nil;
-                    safe.isTouchIdEnabled = NO;
-                    safe.duressPin = nil;
-                    safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
-
-                    [SafesList.sharedInstance update:safe];
-                }
-                
-                [self bindAllowBiometric];
-            }
-        }];
-    }
-}
-
 - (void)bindHideTips {
     self.switchShowTips.on = !Settings.sharedInstance.hideTips;
 }
@@ -326,15 +224,6 @@
 - (IBAction)onHideTips:(id)sender {
     Settings.sharedInstance.hideTips = !self.switchShowTips.on;
     [self bindHideTips];
-}
-
-- (void)bindAllowPinCodeOpen {
-    self.switchAllowPinCodeOpen.on = !Settings.sharedInstance.disallowAllPinCodeOpens;
-}
-
-- (void)bindAllowBiometric {
-    self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Enable %@"), [Settings.sharedInstance getBiometricIdName]];
-    self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;
 }
 
 - (IBAction)onAppLockChanged:(id)sender {
@@ -530,45 +419,8 @@
         self.labelClearClipboardDelay.textColor = UIColor.darkGrayColor;
     }
     else {
-        self.labelClearClipboardDelay.text = [self formatTimeInterval:seconds];
+        self.labelClearClipboardDelay.text = [Utils formatTimeInterval:seconds];
         self.labelClearClipboardDelay.textColor = UIColor.darkTextColor;
-    }
-}
-
-- (NSString*)formatTimeInterval:(NSInteger)seconds {
-    if(seconds == 0) {
-        return NSLocalizedString(@"prefs_vc_time_interval_none", @"None");
-    }
-    
-    NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
-    
-    fmt.allowedUnits =  NSCalendarUnitMinute | NSCalendarUnitSecond;
-    fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
-
-    return [fmt stringFromTimeInterval:seconds];
-}
-
-//////
-
-- (IBAction)onSwitchDatabaseAutoLockEnabled:(id)sender {
-    [Settings.sharedInstance setAutoLockTimeoutSeconds:self.switchDatabaseAutoLockEnabled.on ? @(60) : @(-1)];
-    [self bindDatabaseLock];
-}
-
--(void)bindDatabaseLock {
-    NSNumber* seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
-    
-    if(seconds.integerValue == -1) {
-        self.switchDatabaseAutoLockEnabled.on = NO;
-        self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
-        self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
-    }
-    else {
-        self.switchDatabaseAutoLockEnabled.on = YES;
-        self.labelDatabaseAutoLockDelay.text = [self formatTimeInterval:seconds.integerValue];
-        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkTextColor;
-        self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
     }
 }
 
@@ -589,7 +441,7 @@
     [self.segmentAppLock setSelectedSegmentIndex:effectiveMode];
     
     self.labelAppLockDelay.text = effectiveMode == kNoLock ?
-    NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled") : [self formatTimeInterval:seconds.integerValue];
+    NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled") : [Utils formatTimeInterval:seconds.integerValue];
     self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.lightGrayColor : UIColor.darkTextColor;
     self.cellAppLockDelay.userInteractionEnabled = effectiveMode != kNoLock;
     
@@ -633,7 +485,7 @@
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
     vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return formatAsIntervals ? [self formatTimeInterval:obj.integerValue] : obj.stringValue;
+        return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
     }];
     
     NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];

@@ -87,6 +87,80 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     return ret;
 }
 
++ (NodeFields *)deserialize:(NSDictionary *)dict {
+    NSString* username = dict[@"username"];
+    NSString* url = dict[@"url"];
+    NSString* password = dict[@"password"];
+    NSString* notes = dict[@"notes"];
+    NSString* email = dict[@"email"];
+    NSNumber* passwordModified = dict[@"passwordModified"];
+    NSNumber* expires = dict[@"expires"];
+    NSArray<NSDictionary*>* attachments = dict[@"attachments"];
+    NSArray<NSDictionary*>* customFields = dict[@"customFields"];
+
+    NodeFields* ret = [[NodeFields alloc] initWithUsername:username
+                                                       url:url
+                                                  password:password
+                                                     notes:notes
+                                                     email:email];
+
+    ret.passwordModified = passwordModified ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
+    ret.expires = expires ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
+    
+    // Attachments... These need to be fixed up to fit into destination
+    
+    NSArray<NodeFileAttachment*>* nfas = [attachments map:^id _Nonnull(NSDictionary * _Nonnull obj, NSUInteger idx) {
+        NSString* filename = obj.allKeys.firstObject;
+        NSNumber* index = obj[filename];
+        
+        return [NodeFileAttachment attachmentWithName:filename index:index.unsignedIntValue linkedObject:nil];
+    }];
+    [ret.attachments addObjectsFromArray:nfas];
+    
+    // Custom Fields
+    
+    for (NSDictionary* obj in customFields) {
+        NSString* key = obj[@"key"];
+        NSString* value = obj[@"value"];
+        NSNumber* protected = obj[@"protected"];
+        [ret setCustomField:key value:[StringValue valueWithString:value protected:protected.boolValue]];
+    }
+    
+    return ret;
+}
+
+- (NSDictionary *)serialize:(SerializationPackage *)serialization {
+    NSMutableDictionary* ret = [NSMutableDictionary dictionary];
+    
+    ret[@"username"] = self.username;
+    ret[@"url"] = self.url;
+    ret[@"password"] = self.password;
+    ret[@"notes"] = self.notes;
+    ret[@"email"] = self.email;
+    
+    if(self.passwordModified) {
+        ret[@"passwordModified"] = @((NSUInteger)[self.passwordModified timeIntervalSince1970]);
+    }
+    if(self.expires) {
+        ret[@"expires"] = @((NSUInteger)[self.expires timeIntervalSince1970]);
+    }
+    
+    NSArray<NSDictionary*>* attachments = [self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
+        [serialization.usedAttachmentIndices addObject:@(obj.index)];
+        return @{ obj.filename : @(obj.index) };
+    }];
+    ret[@"attachments"] = attachments;
+    
+    NSArray<NSDictionary*>* customFields = [self.customFields.allKeys map:^id _Nonnull(NSString * _Nonnull key, NSUInteger idx) {
+        StringValue* value = self.customFields[key];
+        return @{ @"key" : key, @"value" : value.value, @"protected" : @(value.protected) };
+    }];
+    
+    ret[@"customFields"] = customFields;
+    
+    return ret;
+}
+
 - (NodeFields*)duplicate {
     NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username
                                                        url:self.url
@@ -444,6 +518,22 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 
 - (BOOL)expired {
     return self.expires != nil && [NSDate.date compare:self.expires] == NSOrderedDescending;
+}
+
+- (BOOL)nearlyExpired {
+    if(self.expires == nil || self.expired) {
+        return NO;
+    }
+    
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
+                                                fromDate:[NSDate date]
+                                                  toDate:self.expires
+                                                 options:0];
+    
+    NSInteger days = [components day];
+
+    return days < 14;
 }
 
 -(NSString *)description {

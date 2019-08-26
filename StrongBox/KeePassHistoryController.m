@@ -27,6 +27,19 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 @implementation KeePassHistoryController
 
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    // Tips - Must be done here to avoid jumpy initial animation
+    
+    if(Settings.sharedInstance.hideTips) {
+        self.navigationItem.prompt = nil;
+    }
+    else {
+        self.navigationItem.prompt = NSLocalizedString(@"keepass_history_tip", @"Tip: Slide Left for Options or Tap to View");
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -37,7 +50,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
-
+    
     self.df = [[NSDateFormatter alloc] init];
     self.df.timeStyle = NSDateFormatterShortStyle;
     self.df.dateStyle = NSDateFormatterShortStyle;
@@ -66,6 +79,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     return self.items.count;
 }
 
+- (BOOL)isPinned:(Node*)item { // TODO: We need this to be part of the model somehow...
+    NSMutableSet<NSString*>* favs = [NSMutableSet setWithArray:self.viewModel.metadata.favourites];
+    NSString* sid = [item getSerializationId:self.viewModel.database.format != kPasswordSafe];
+    return [favs containsObject:sid];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node* node = self.items[indexPath.row];
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
@@ -80,14 +99,12 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
 
-    NSString* flags = node.fields.attachments.count > 0 ? @"📎" : @"";
-    flags = self.viewModel.metadata.showFlagsInBrowse ? flags : @"";
-    
     [cell setRecord:title
            subtitle:subtitle
                icon:icon
       groupLocation:groupLocation
-              flags:flags
+             pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+     hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
             expired:node.expired
            otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
     

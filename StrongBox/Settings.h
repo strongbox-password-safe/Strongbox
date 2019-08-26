@@ -55,9 +55,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 - (NSInteger)getLaunchCount;
 - (void)incrementLaunchCount;
 
-- (NSNumber*)getAutoLockTimeoutSeconds;
-- (void)setAutoLockTimeoutSeconds:(NSNumber*)value;
-
 - (NSString*)getFlagsStringForDiagnostics;
 - (NSString*)getBiometricIdName;
 
@@ -88,9 +85,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
 
-@property BOOL hideTotpInAutoFill;
-
-@property BOOL doNotAutoDetectKeyFiles;
 @property (nullable) NSDate* lastEntitlementCheckAttempt;
 @property NSUInteger numberOfEntitlementCheckFails;
 @property BOOL doNotCopyOtpCodeOnAutoFillSelect;
@@ -105,7 +99,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property NSUInteger failedUnlockAttempts;
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL hideKeyFileOnUnlock;
-@property BOOL doNotUseNewSplitViewController;
 @property BOOL allowEmptyOrNoPasswordEntry;
 @property BOOL migratedLocalDatabasesToNewSystem;
 
@@ -120,7 +113,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property BOOL showYubikeySecretWorkaroundField;
 @property BOOL coalesceAppLockAndQuickLaunchBiometricAuths;
-@property BOOL useLocalSharedStorage;
 
 @property (nullable) NSString* quickLaunchUuid;
 @property BOOL migratedToNewQuickLaunchSystem;
@@ -131,6 +123,9 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property DatabaseCellSubtitleField databaseCellTopSubtitle;
 @property DatabaseCellSubtitleField databaseCellSubtitle1;
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
+
+@property (readonly) BOOL useLocalSharedStorage; // TODO: Remove
+@property (readonly) BOOL doNotAutoDetectKeyFiles;  // TODO: Remove
 
 NS_ASSUME_NONNULL_END
 

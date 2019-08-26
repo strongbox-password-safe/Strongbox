@@ -132,11 +132,13 @@ static NSImage* kDefaultAttachmentIcon;
                        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
                        [self.model deleteItem:self.node];
                        [self close];
+                       [self onWindowClosed];
                    }
                    else {
                        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
                        [self setModelForEditField:self.currentlyEditingUIControl];
                        [self close];
+                       [self onWindowClosed];
                    }
                }
                else {
@@ -144,9 +146,11 @@ static NSImage* kDefaultAttachmentIcon;
                        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
                        [self setModelForEditField:self.currentlyEditingUIControl];
                        [self close];
+                       [self onWindowClosed];
                    }
                    else {
                        [self close];
+                       [self onWindowClosed];
                    }
                }
            }];
@@ -216,6 +220,10 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
+    [self onWindowClosed];
+}
+
+- (void)onWindowClosed {
     if(self.timerRefreshOtp) {
         [self.timerRefreshOtp invalidate];
         self.timerRefreshOtp = nil;
@@ -268,7 +276,7 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)setupUi {
-    [self showHideForPasswordSafe];
+    [self showHideForDatabaseFormat];
     [self setupSimpleUI];
     [self setupCustomFieldsUI];
     [self setupAttachmentsUI];
@@ -431,12 +439,15 @@ static NSImage* kDefaultAttachmentIcon;
     return [MacNodeIconHelper getIconForNode:self.model vm:self.node large:NO];
 }
 
-- (void)showHideForPasswordSafe {
+- (void)showHideForDatabaseFormat {
     self.emailRow.hidden = self.model.format != kPasswordSafe;
     
     if(self.model.format == kPasswordSafe) {
         [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Custom Fields
         [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Atachments
+    }
+    else if (self.model.format == kKeePass1) {
+        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Custom Fields
     }
 }
 
@@ -957,19 +968,22 @@ NSString* trimField(NSTextField* textField) {
 
 - (IBAction)onAddAttachment:(id)sender {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    openPanel.allowsMultipleSelection = YES;
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            NSError* error;
-            NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
-            
-            if(!data) {
-                NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
-                return;
+            for (NSURL* url in openPanel.URLs) {
+                NSError* error;
+                NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
+                
+                if(!data) {
+                    NSLog(@"Could not read file at %@. Error: %@", url, error);
+                    return;
+                }
+                
+                NSString* filename = url.lastPathComponent;
+                
+                [self.model addItemAttachment:self.node attachment:[[UiAttachment alloc] initWithFilename:filename data:data]];
             }
-            
-            NSString* filename = openPanel.URL.lastPathComponent;
-            
-            [self.model addItemAttachment:self.node attachment:[[UiAttachment alloc] initWithFilename:filename data:data]];
         }
     }];
 }

@@ -241,12 +241,13 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
     if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
         Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
         
+        // TODO: Localize
+        
         [Alerts info:vc title:@"Welcome to Strongbox Auto Fill"
              message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:" \
          "\n\n- Dropbox"\
          "\n- OneDrive"\
          "\n- Google Drive"\
-         "\n- 'Files' based databases"\
          "\n- Non Auto-Fill Enabled Local Databases\n\n"\
          "In these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy Auto Fill!\n-Mark"];
     }

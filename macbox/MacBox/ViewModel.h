@@ -49,13 +49,21 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (void)setItemUrl:(Node*)item url:(NSString*)url;
 - (void)setItemPassword:(Node*)item password:(NSString*)password;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData* _Nullable)custom;
+
+- (void)setItemIcon:(Node *)item index:(NSNumber*_Nullable)index existingCustom:(NSUUID*_Nullable)existingCustom custom:(NSData*_Nullable)custom;
+- (void)setItemIcon:(Node *)item
+              index:(NSNumber*_Nullable)index
+     existingCustom:(NSUUID*_Nullable)existingCustom
+             custom:(NSData* _Nullable)custom
+        rationalize:(BOOL)rationalize;
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
     
 - (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
+
 - (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
+- (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
 
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
@@ -63,6 +71,7 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
 
+- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
 - (BOOL)addNewRecord:(Node *)parentGroup;
 - (void)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 

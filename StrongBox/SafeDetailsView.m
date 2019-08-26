@@ -20,6 +20,8 @@
 #import "CacheManager.h"
 #import "ExportOptionsTableViewController.h"
 #import "AttachmentsPoolViewController.h"
+#import "SelectItemTableViewController.h"
+#import "NSArray+Extensions.h"
 
 @interface SafeDetailsView ()
 
@@ -27,14 +29,18 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowOfflineCache;
-@property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
+//@property (weak, nonatomic) IBOutlet UISwitch *switchAllowOfflineCache;
+//@property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeMasterCredentials;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoFillAlwaysUseCache;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
+@property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
 
 @end
 
@@ -67,12 +73,14 @@
 
     self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillEnabled;
 
-    self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
-    self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
-    self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
-    
+//    self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
+//    self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
+//    self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
+
     self.switchReadOnly.on = self.viewModel.metadata.readOnly;
     self.switchAutoFillAlwaysUseCache.on = self.viewModel.metadata.alwaysUseCacheForAutoFill;
+    
+    [self bindDatabaseLock];
 }
 
 - (void)viewDidLoad {
@@ -322,46 +330,6 @@
     }
 }
 
-- (IBAction)onSwitchAllowOfflineCache:(id)sender {
-    if (!self.switchAllowOfflineCache.on) {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"db_management_disable_offline_yesno_title", @"Disable Offline Access?")
-              message:NSLocalizedString(@"db_management_disable_offline_yesno_message", @"Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?")
-               action:^(BOOL response) {
-                   if (response) {
-                       [self.viewModel disableAndClearOfflineCache];
-                       [self bindSettings];
-                       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_offline_done", @"Offline Disabled")
-                                                  message:nil
-                                                 duration:3.f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:nil];
-                   }
-                   else {
-                      [self bindSettings];
-                   }
-               }];
-    }
-    else {
-        [self.viewModel enableOfflineCache];
-        [self.viewModel updateOfflineCache:^{
-            [self bindSettings];
-            
-            [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_offline_done", @"Offline Enabled")
-                                                       message:nil
-                                                      duration:3.f
-                                                   hideOnSwipe:YES
-                                                     hideOnTap:YES
-                                                     alertType:ISAlertTypeSuccess
-                                                 alertPosition:ISAlertPositionTop
-                                                       didHide:nil];
-        }];
-    }
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
@@ -380,8 +348,48 @@
     else if (cell == self.cellViewAttachments) {
         [self viewAttachments];
     }
+    else if (cell == self.cellDatabaseAutoLockDelay) {
+        [self promptForAutoLockTimeout];
+    }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)promptForAutoLockTimeout {
+    [self promptForInteger:NSLocalizedString(@"prefs_vc_auto_lock_database_delay", @"Auto Lock Delay")
+                   options:@[@0, @30, @60, @120, @180, @300, @600]
+         formatAsIntervals:YES
+              currentValue:self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds.integerValue : 60
+                completion:^(BOOL success, NSInteger selectedValue) {
+                    if (success) {
+                        self.viewModel.metadata.autoLockTimeoutSeconds = @(selectedValue);
+                        [SafesList.sharedInstance update:self.viewModel.metadata];
+                    }
+                    [self bindDatabaseLock];
+                }];
+}
+
+- (IBAction)onSwitchDatabaseAutoLockEnabled:(id)sender {
+    self.viewModel.metadata.autoLockTimeoutSeconds = self.switchDatabaseAutoLockEnabled.on ? @(60) : @(-1);
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+    [self bindDatabaseLock];
+}
+
+-(void)bindDatabaseLock {
+    NSNumber* seconds = self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds : @(-1);
+    
+    if(seconds.integerValue == -1) {
+        self.switchDatabaseAutoLockEnabled.on = NO;
+        self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
+        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
+        self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
+    }
+    else {
+        self.switchDatabaseAutoLockEnabled.on = YES;
+        self.labelDatabaseAutoLockDelay.text = [Utils formatTimeInterval:seconds.integerValue];
+        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkTextColor;
+        self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
+    }
 }
 
 - (void)viewAttachments {
@@ -391,7 +399,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     
-    if(indexPath.section == 2) {
+    if(indexPath.section == 3) {
         BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
 
         if(indexPath.row < metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
@@ -407,7 +415,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     BasicOrderedDictionary<NSString*, NSString*> *metadataKvps = [self.viewModel.database.metadata kvpForUi];
-    if(indexPath.section == 2 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
+    if(indexPath.section == 3 && indexPath.row >= metadataKvps.allKeys.count) // Hide extra metadata pairs beyond actual metadata
     {
         return 0;
     }
@@ -437,4 +445,72 @@
     return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
 }
 
+- (void)promptForInteger:(NSString*)title
+                 options:(NSArray<NSNumber*>*)options
+       formatAsIntervals:(BOOL)formatAsIntervals
+            currentValue:(NSInteger)currentValue
+              completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+    
+    vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
+    }];
+    
+    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
+    vc.selected = [NSIndexSet indexSetWithIndex:currentlySelectIndex];
+    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
+        NSInteger selectedValue = options[selectedIndices.firstIndex].integerValue;
+        [self.navigationController popViewControllerAnimated:YES];
+        completion(YES, selectedValue);
+    };
+    
+    vc.title = title;
+    
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
 @end
+
+
+
+//- (IBAction)onSwitchAllowOfflineCache:(id)sender {
+//    if (!self.switchAllowOfflineCache.on) {
+//        [Alerts yesNo:self
+//                title:NSLocalizedString(@"db_management_disable_offline_yesno_title", @"Disable Offline Access?")
+//              message:NSLocalizedString(@"db_management_disable_offline_yesno_message", @"Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?")
+//               action:^(BOOL response) {
+//                   if (response) {
+//                       [self.viewModel disableAndClearOfflineCache];
+//                       [self bindSettings];
+//                       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_offline_done", @"Offline Disabled")
+//                                                  message:nil
+//                                                 duration:3.f
+//                                              hideOnSwipe:YES
+//                                                hideOnTap:YES
+//                                                alertType:ISAlertTypeSuccess
+//                                            alertPosition:ISAlertPositionTop
+//                                                  didHide:nil];
+//                   }
+//                   else {
+//                      [self bindSettings];
+//                   }
+//               }];
+//    }
+//    else {
+//        [self.viewModel enableOfflineCache];
+//        [self.viewModel updateOfflineCache:^{
+//            [self bindSettings];
+//
+//            [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_offline_done", @"Offline Enabled")
+//                                                       message:nil
+//                                                      duration:3.f
+//                                                   hideOnSwipe:YES
+//                                                     hideOnTap:YES
+//                                                     alertType:ISAlertTypeSuccess
+//                                                 alertPosition:ISAlertPositionTop
+//                                                       didHide:nil];
+//        }];
+//    }
+//}

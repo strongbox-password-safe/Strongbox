@@ -33,6 +33,8 @@
     self.switchUsePrivateKey.on = NO;
     
     [self bindUi];
+    
+    [self.textFieldHost becomeFirstResponder];
 }
 
 - (IBAction)onTextFieldChanged:(id)sender {
@@ -71,20 +73,20 @@
     NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     
     if(!host.length) {
-        self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_enter_host", @"🛑 Please Enter a Host");
+        self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_enter_host", @"Please Enter a Host");
         self.labelValidation.textColor = [UIColor redColor];
         self.buttonConnect.enabled = NO;
         return;
     }
     
     if(self.switchUsePrivateKey.on && self.privateKey.length == 0) {
-        self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_select_private_key", @"🛑 Select a Private Key...");
+        self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_select_private_key", @"Select a Private Key...");
         self.labelValidation.textColor = [UIColor redColor];
         self.buttonConnect.enabled = NO;
         return;
     }
 
-    self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_ok", @"✅ Looks Good");
+    self.labelValidation.text = @"";
     self.buttonConnect.enabled = YES;
     return;
 }

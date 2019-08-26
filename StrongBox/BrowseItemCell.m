@@ -18,8 +18,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
 @property (weak, nonatomic) IBOutlet UILabel *pathLabel;
-@property (weak, nonatomic) IBOutlet UILabel *flagsLabel;
 @property (weak, nonatomic) IBOutlet UILabel *childCountLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *imageFlag1;
+@property (weak, nonatomic) IBOutlet UIImageView *imageFlag2;
 
 @property OTPToken* otpToken;
 
@@ -36,7 +37,9 @@
     [super prepareForReuse];
 
     self.contentView.alpha = 1.0f;
-
+    
+    [self setFlags:NO hasAttachments:NO];
+    
     [self stopObservingOtpUpdateTimer];
 }
 
@@ -44,8 +47,9 @@
             icon:(UIImage*)icon
       childCount:(NSString*)childCount
           italic:(BOOL)italic
-   groupLocation:(NSString*)groupLocation {
-    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil];
+   groupLocation:(NSString*)groupLocation
+          pinned:(BOOL)pinned {
+    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil pinned:pinned];
 }
 
 - (void)setGroup:(NSString *)title
@@ -53,7 +57,8 @@
       childCount:(NSString *)childCount
           italic:(BOOL)italic
    groupLocation:(NSString *)groupLocation
-       tintColor:(UIColor*)tintColor {
+       tintColor:(UIColor*)tintColor
+          pinned:(BOOL)pinned {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
     
@@ -63,11 +68,11 @@
     self.usernameLabel.text = @"";
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
-    self.flagsLabel.text = @"";
+    [self setFlags:pinned hasAttachments:NO];
+
     self.otpLabel.text = @"";
     self.otpLabel.hidden = YES;
-    self.flagsLabel.hidden = YES;
-
+    
     self.childCountLabel.hidden = childCount.length == 0;
     self.childCountLabel.text = childCount;
     
@@ -79,7 +84,8 @@
          subtitle:(NSString *)subtitle
              icon:(UIImage *)icon
     groupLocation:(NSString *)groupLocation
-            flags:(NSString*)flags
+           pinned:(BOOL)pinned
+   hasAttachments:(BOOL)hasAttachments
           expired:(BOOL)expired
          otpToken:(OTPToken*)otpToken {
     self.titleLabel.text = title;
@@ -90,8 +96,9 @@
     self.usernameLabel.text = subtitle;
     self.pathLabel.text = groupLocation;
     self.accessoryType = UITableViewCellAccessoryNone;
-    self.flagsLabel.text = flags;
-    self.flagsLabel.hidden = NO;
+    
+    [self setFlags:pinned hasAttachments:hasAttachments];
+
     self.childCountLabel.hidden = YES;
     self.bottomRow.hidden = subtitle.length == 0 && groupLocation.length == 0;
 
@@ -102,6 +109,21 @@
     
     [self updateOtpCode];
     [self subscribeToOtpUpdateTimerIfNecessary];
+}
+
+- (void)setFlags:(BOOL)pinned hasAttachments:(BOOL)hasAttachments {
+    if(pinned) {
+        self.imageFlag1.image = pinned ? [UIImage imageNamed:@"pin"] : nil;
+        self.imageFlag1.hidden = !pinned;
+        self.imageFlag2.image = hasAttachments ? [UIImage imageNamed:@"attach"] : nil;
+        self.imageFlag2.hidden = !hasAttachments;
+    }
+    else {
+        self.imageFlag1.image = hasAttachments ? [UIImage imageNamed:@"attach"] : nil;
+        self.imageFlag1.hidden = !hasAttachments;
+        self.imageFlag2.image = nil;
+        self.imageFlag2.hidden = YES;
+    }
 }
 
 - (void)stopObservingOtpUpdateTimer {

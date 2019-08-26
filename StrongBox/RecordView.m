@@ -723,8 +723,9 @@ static const int kMinNotesCellHeight = 160;
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToKeePassHistory"] && (self.record != nil)) {
-        KeePassHistoryController *vc = segue.destinationViewController;
-        
+        UINavigationController* nav = segue.destinationViewController;
+        KeePassHistoryController *vc = (KeePassHistoryController *)nav.topViewController;
+
         vc.historicalItems = self.record.fields.keePassHistory;
         vc.viewModel = self.viewModel;
         
@@ -1168,7 +1169,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     if(self.userSelectedNewCustomIcon) {
         NSData *data = UIImagePNGRepresentation(self.userSelectedNewCustomIcon);
-        [self.viewModel.database setNodeCustomIcon:self.record data:data];
+        [self.viewModel.database setNodeCustomIcon:self.record data:data rationalize:YES];
     }
     else if(self.userSelectedNewExistingCustomIconId) {
         self.record.customIconUuid = self.userSelectedNewExistingCustomIconId;
@@ -1199,7 +1200,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
                 if(goNoGo && userSelectedNewCustomIcon) {
                     NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                    [self.viewModel.database setNodeCustomIcon:self.record data:data];
+                    [self.viewModel.database setNodeCustomIcon:self.record data:data rationalize:YES];
                 }
                 
                 [self sync:completion];

@@ -11,6 +11,7 @@
 #import "NodeFileAttachment.h"
 #import "StringValue.h"
 #import "OTPToken.h"
+#import "SerializationPackage.h"
 
 @class Node;
 
@@ -39,6 +40,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
+
++ (NodeFields *)deserialize:(NSDictionary *)dict;
+- (NSDictionary*)serialize:(SerializationPackage*)serialization;
 
 - (NodeFields*)duplicate;
 - (NodeFields *)cloneForHistory;
@@ -71,6 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 //
 
 @property (readonly) BOOL expired;
+@property (readonly) BOOL nearlyExpired;
 
 @end
 

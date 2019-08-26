@@ -56,6 +56,7 @@
 @property BOOL privacyScreenSuppressedForBiometricAuth;
 
 @property BOOL hasAppearedOnce; // Used for App Lock initial load
+@property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet...
 
 @end
 
@@ -106,6 +107,70 @@
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
+        self.tableView.contentOffset = CGPointZero;
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationItem.hidesBackButton = YES;
+    [self.navigationController setNavigationBarHidden:NO];
+    
+    [self setupTips];
+    
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+    
+    [self bindProOrFreeTrialUi];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.collection = [NSArray array];
+    
+    // [self insertEditButtonInLeftBar]; Causes Truncation in German - Not a lot of real estate and isn't necessary
+    
+    [self setupTableview];
+    
+    [self internalRefresh];
+    
+    [self listenToNotifications];
+    
+    if([Settings.sharedInstance getLaunchCount] == 1) {
+        [self startOnboarding];
+    }
+}
+
+- (void)refresh {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self internalRefresh];
+    });
+}
+
+- (void)internalRefresh {
+    self.collection = SafesList.sharedInstance.snapshot;
+    
+    self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+    
+//    if (self.collection.count > 0) {
+////        [self removeEditButtonInLeftBar];
+////        [self insertEditButtonInLeftBar];
+//    }
+//    else {
+////        [self removeEditButtonInLeftBar];
+//    }
+    
+    [self.tableView reloadData];
+}
+
 - (void)showPrivacyScreen:(BOOL)startupLockMode {
     if(self.privacyAndLockVc) {
         NSLog(@"Privacy Screen Already Up... No need to re show");
@@ -135,7 +200,9 @@
 
 - (void)hidePrivacyScreen:(BOOL)userJustCompletedBiometricAuthentication {
     if (self.privacyAndLockVc) {
-        if ([self shouldLockSafes]) {
+        if ([self shouldLockOpenDatabase]) {
+            self.lastOpenedDatabase = nil; // Clear
+            
             UINavigationController* nav = self.navigationController;
             [nav popToRootViewControllerAnimated:NO];
             
@@ -154,20 +221,25 @@
     }
 }
 
-- (BOOL)shouldLockSafes {
-    if (self.enterBackgroundTime) {
+- (BOOL)shouldLockOpenDatabase {
+    if (self.enterBackgroundTime && self.lastOpenedDatabase) {
         NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
-        NSNumber *seconds = [[Settings sharedInstance] getAutoLockTimeoutSeconds];
+        
+        NSNumber *seconds = self.lastOpenedDatabase.autoLockTimeoutSeconds;
+        
+        NSLog(@"Autolock Time [%@s] - background Time: [%f].", seconds, secondsBetween);
         
         if (seconds.longValue != -1  && secondsBetween > seconds.longValue) // -1 = never
         {
-            NSLog(@"Autolock Time [%@s] exceeded, locking safe.", seconds);
+            NSLog(@"Locking Database...");
             return YES;
         }
     }
     
     return NO;
 }
+
+// App Activation Sequence....
 
 - (void)onPrivacyScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
     self.privacyAndLockVc = nil;
@@ -179,69 +251,161 @@
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     NSLog(@"doAppActivationTasks");
-    // Whole thing needs to flow charted and managed with continuations... TODO
-    
-    if(!self.enqueuedImportUrl) {
-        // Does not belong here or will interfere if iCloud processing is required...
-        
-        if(![[Settings sharedInstance] isPro]) {
-            if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
-                if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 2) {
-                    [self performSegueWithIdentifier:@"segueToProExplanation" sender:nil];
-                    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
-                }
-            }
-            else {
-                // TODO: Move Nag Screen to on Unlock database - will make it easier to tidy this and is more appropriate?
 
-                NSInteger percentageChanceOfShowing;
-                NSInteger freeTrialDays = [Settings.sharedInstance getFreeTrialDaysRemaining];
-                
-                if(freeTrialDays > 40) {
-                    NSLog(@"More than 40 days left in free trial... not showing Nag Screen");
-                    [self continueAppActivationTasks:userJustCompletedBiometricAuthentication];
-                    return;
-                }
-                else if(Settings.sharedInstance.isFreeTrial) {
-                    percentageChanceOfShowing = 10;
-                }
-                else {
-                    percentageChanceOfShowing = 20;
-                }
-                
-                NSInteger random = arc4random_uniform(100);
-                
-                //NSLog(@"Random: %ld", (long)random);
-                
-                if(random < percentageChanceOfShowing) {
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                        [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-                    });
-                }
-                else {
-                    [self continueAppActivationTasks:userJustCompletedBiometricAuthentication];
-                }
-            }
-        }
-        else {
-            [self continueAppActivationTasks:userJustCompletedBiometricAuthentication];
-        }
+    if(!self.enqueuedImportUrl) {
+        [self checkICloudAvailabilityAndPerformAppActivationTasks:userJustCompletedBiometricAuthentication];
     }
     else {
         [self processEnqueuedImport];
+    }
+}
+
+- (void)checkICloudAvailabilityAndPerformAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
+    [self checkICloudAvailability:userJustCompletedBiometricAuthentication isAppActivation:YES];
+}
+
+- (void)checkICloudAvailability:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
+    NSLog(@"checkICloudAvailability...");
+    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
+        Settings.sharedInstance.iCloudAvailable = available;
         
-        // Really should call continueAppActivationTasks now - TODO:
+        if (!Settings.sharedInstance.iCloudAvailable) {
+            NSLog(@"iCloud Not Available...");
+            [self onICloudNotAvailable:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+        }
+        else {
+            NSLog(@"iCloud Available...");
+            [self onICloudAvailable:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+        }
+    }];
+}
+
+- (void)onICloudNotAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
+    // If iCloud isn't available, set promoted to no (so we can ask them next time it becomes available)
+    [Settings sharedInstance].iCloudPrompted = NO;
+    
+    if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
+        [Alerts warn:self
+               title:NSLocalizedString(@"safesvc_icloud_no_longer_available_title", @"iCloud no longer available")
+             message:NSLocalizedString(@"safesvc_icloud_no_longer_available_message", @"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud.")];
+        
+        [self removeAllICloudSafes];
+    }
+    
+    // No matter what, iCloud isn't available so switch it to off.???
+    [Settings sharedInstance].iCloudOn = NO;
+    [Settings sharedInstance].iCloudWasOn = NO;
+    
+    [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+}
+
+- (void)onICloudAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation{
+    if (!Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+        BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
+        BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
+        
+        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { // Empty Databases - Possibly first time user - onboarding will ask
+                                                                //Settings.sharedInstance.iCloudOn = YES; // Empty
+            [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+            return;
+        }
+        else if (self.presentedViewController == nil) {
+            NSString* strA = NSLocalizedString(@"safesvc_migrate_local_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)");
+            NSString* strB = NSLocalizedString(@"safesvc_migrate_local_no_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?");
+            NSString* str1 = NSLocalizedString(@"safesvc_use_icloud_question_existing", @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)");
+            NSString* str2 = NSLocalizedString(@"safesvc_use_icloud_question_no_existing", @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
+            
+            NSString *message = existingLocalDeviceSafes ? (hasOtherCloudSafes ? strA : strB) : (hasOtherCloudSafes ? str1 : str2);
+            
+            [Alerts twoOptions:self
+                         title:NSLocalizedString(@"safesvc_icloud_now_available_title", @"iCloud is Now Available")
+                       message:message
+             defaultButtonText:NSLocalizedString(@"safesvc_option_use_icloud", @"Use iCloud")
+              secondButtonText:NSLocalizedString(@"safesvc_option_local_only", @"Local Only")
+                        action:^(BOOL response) {
+                            if(response) {
+                                Settings.sharedInstance.iCloudOn = YES;
+                            }
+                            [Settings sharedInstance].iCloudPrompted = YES;
+                            [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+                        }];
+        }
+    }
+    else {
+        [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+    }
+}
+
+- (void)onICloudAvailableContinuation:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
+    // If iCloud newly switched on, move local docs to iCloud
+    if (Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
+        [Alerts twoOptions:self
+                     title:NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available")
+                   message:NSLocalizedString(@"safesvc_question_migrate_local_to_icloud", @"Would you like to migrate your current local device databases to iCloud?")
+         defaultButtonText:NSLocalizedString(@"safesvc_option_migrate_to_icloud", @"Migrate to iCloud")
+          secondButtonText:NSLocalizedString(@"safesvc_option_keep_local", @"Keep Local")
+                    action:^(BOOL response) {
+                        if(response) {
+                            [[iCloudSafesCoordinator sharedInstance] migrateLocalToiCloud:^(BOOL show) {
+                                [self showiCloudMigrationUi:show];
+                            }];
+                        }
+                    }];
+    }
+    
+    // If iCloud newly switched off, move iCloud docs to local
+    if (!Settings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
+        [Alerts threeOptions:self
+                       title:NSLocalizedString(@"safesvc_icloud_unavailable_title", @"iCloud Unavailable")
+                     message:NSLocalizedString(@"safesvc_icloud_unavailable_question", @"What would you like to do with the databases currently on this device?")
+           defaultButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_remove", @"Remove them, Keep on iCloud Only")
+            secondButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_make_local", @"Make Local Copies")
+             thirdButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_icloud_on", @"Switch iCloud Back On")
+                      action:^(int response) {
+                          if(response == 2) {           // @"Switch iCloud Back On"
+                              [Settings sharedInstance].iCloudOn = YES;
+                              [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
+                          }
+                          else if(response == 1) {      // @"Keep a Local Copy"
+                              [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
+                                  [self showiCloudMigrationUi:show];
+                              }];
+                          }
+                          else if(response == 0) {
+                              [self removeAllICloudSafes];
+                          }
+                      }];
+    }
+    
+    Settings.sharedInstance.iCloudWasOn = Settings.sharedInstance.iCloudOn;
+    [[iCloudSafesCoordinator sharedInstance] startQuery];
+    
+    [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
+}
+
+- (void)onICloudCheckDone:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
+    if(isAppActivation) {
+        [self continueAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication];
     }
 }
 
 - (void)continueAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
-    // TODO: this should be done after iCloud availability check - TODO:
+    if(![[Settings sharedInstance] isPro]) {
+        if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
+            if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 2) {
+                [self performSegueWithIdentifier:@"segueToProExplanation" sender:nil];
+                [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
+                return;
+            }
+        }
+    }
+    
     if([self isVisibleViewController]) {
         [self openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
     }
-    
-    [self checkICloudAvailability];
 }
+
+//////
 
 - (BOOL)isVisibleViewController {
     NSLog(@"isVisibleViewController == (%@ == %@)", self.navigationController.visibleViewController, self);
@@ -262,69 +426,6 @@
     NSURL* copy = self.enqueuedImportUrl;
     self.enqueuedImportUrl = nil;
     [self import:copy canOpenInPlace:self.enqueuedImportCanOpenInPlace forceOpenInPlace:NO];
-}
-
-- (void)refresh {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self internalRefresh];
-    });
-}
-
-- (void)internalRefresh {
-    self.collection = SafesList.sharedInstance.snapshot;
-    
-    self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
-
-    if (self.collection.count > 0) {
-        [self removeEditButtonInLeftBar];
-        [self insertEditButtonInLeftBar];
-    }
-    else {
-        [self removeEditButtonInLeftBar];
-    }
-    
-    [self.tableView reloadData];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
-        self.tableView.contentOffset = CGPointZero;
-    }
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationItem.hidesBackButton = YES;
-    [self.navigationItem setPrompt:nil];
-    [self.navigationController setNavigationBarHidden:NO];
-    
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-    
-    [self bindProOrFreeTrialUi];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    self.collection = [NSArray array];
-
-    [self insertEditButtonInLeftBar];
-
-    [self setupTableview];
-
-    [self internalRefresh];
-    
-    [self listenToNotifications];
-    
-    if([Settings.sharedInstance getLaunchCount] == 1) {
-        [self startOnboarding];
-    }
 }
 
 - (void)listenToNotifications {
@@ -349,6 +450,18 @@
                                              object:nil];
 }
 
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+
+    if(editing) {
+        [self removeEditButtonInLeftBar];
+        [self insertEditButtonInLeftBar];
+    }
+    else {
+        [self removeEditButtonInLeftBar];
+    }
+}
+
 - (void)removeEditButtonInLeftBar {
     NSMutableArray* leftBarButtonItems = self.navigationItem.leftBarButtonItems ?  self.navigationItem.leftBarButtonItems.mutableCopy : @[].mutableCopy;
     
@@ -371,6 +484,15 @@
     self.tableView.emptyDataSetDelegate = self;
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = UITableViewAutomaticDimension;
+}
+
+- (void)setupTips {
+    if(Settings.sharedInstance.hideTips) {
+        self.navigationItem.prompt = nil;
+    }
+    else {
+        self.navigationItem.prompt = NSLocalizedString(@"safes_vc_tip", @"Tip displayed at top of screen. Slide left on Database for options");
+    }
 }
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
@@ -421,8 +543,7 @@
 
 #pragma mark - Table view data source
 
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
 }
 
@@ -558,12 +679,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                      completion:^(Model * _Nullable model, NSError * _Nullable error) {
             if(model) {
                 if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
-                    if(!Settings.sharedInstance.doNotUseNewSplitViewController) {
-                        [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
-                    }
-                    else {
-                        [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
-                    }
+                    [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
                 }
                 else {
                     [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
@@ -630,6 +746,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                               [self toggleQuickLaunch:safe];
                                                           } ];
     [alertController addAction:quickLaunchAction];
+
+    // Start Re-ordering...
+    
+    UIAlertAction *reorderAction = [UIAlertAction actionWithTitle:
+            NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+                                                              [self setEditing:YES];
+                                                        } ];
+    
+    [alertController addAction:reorderAction];
     
     // Local Device options
     
@@ -794,18 +921,20 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 //////////////////////////////////////////////////////////////////////////////////
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
-        BrowseSafeView *vc = segue.destinationViewController;
-        vc.viewModel = (Model *)sender;
-        vc.currentGroup = vc.viewModel.database.rootGroup;
-    }
-    else if ([segue.identifier isEqualToString:@"segueToMasterDetail"]) {
-        UISplitViewController *svc = segue.destinationViewController;
-        UINavigationController *nav = [svc.viewControllers firstObject];
+    if ([segue.identifier isEqualToString:@"segueToMasterDetail"] || [segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
+        BrowseSafeView *vc;
+        if ([segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
+            vc = segue.destinationViewController;
+        }
+        else {
+            UISplitViewController *svc = segue.destinationViewController;
+            UINavigationController *nav = [svc.viewControllers firstObject];
+            vc = (BrowseSafeView*)nav.topViewController;
+        }
         
-        BrowseSafeView *vc = (BrowseSafeView*)nav.topViewController;
         vc.viewModel = (Model *)sender;
         vc.currentGroup = vc.viewModel.database.rootGroup;
+        self.lastOpenedDatabase = vc.viewModel.metadata;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
     {
@@ -831,7 +960,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         
         vc.onDone = ^{
             [self dismissViewControllerAnimated:YES completion:^{
-                [self checkICloudAvailability];
+                [self checkICloudAvailability:NO isAppActivation:NO];
             }];
         };
     }
@@ -1374,121 +1503,6 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return SafesList.sharedInstance.snapshot.count - ([self getICloudSafes].count + [self getLocalDeviceSafes].count) > 0;
 }
 
-- (void)checkICloudAvailability {
-    NSLog(@"checkICloudAvailability...");
-    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
-        Settings.sharedInstance.iCloudAvailable = available;
-        
-        if (!Settings.sharedInstance.iCloudAvailable) {
-            NSLog(@"iCloud Not Available...");
-            [self onICloudNotAvailable];
-        }
-        else {
-            NSLog(@"iCloud Available...");
-            [self onICloudAvailable];
-        }
-    }];
-}
-
-- (void)onICloudNotAvailable {
-    // If iCloud isn't available, set promoted to no (so we can ask them next time it becomes available)
-    [Settings sharedInstance].iCloudPrompted = NO;
-    
-    if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
-        [Alerts warn:self
-               title:NSLocalizedString(@"safesvc_icloud_no_longer_available_title", @"iCloud no longer available")
-             message:NSLocalizedString(@"safesvc_icloud_no_longer_available_message", @"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud.")];
-        
-        [self removeAllICloudSafes];
-    }
-    
-    // No matter what, iCloud isn't available so switch it to off.???
-    [Settings sharedInstance].iCloudOn = NO;
-    [Settings sharedInstance].iCloudWasOn = NO;
-}
-
-- (void)onICloudAvailable {
-    if (!Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
-        BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
-        BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
-        
-        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { // Empty Databases - Possibly first time user - onboarding will ask
-                                                                //Settings.sharedInstance.iCloudOn = YES; // Empty
-            [self onICloudAvailableContinuation];
-            return;
-        }
-        else if (self.presentedViewController == nil) {
-            NSString* strA = NSLocalizedString(@"safesvc_migrate_local_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)");
-            NSString* strB = NSLocalizedString(@"safesvc_migrate_local_no_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?");
-            NSString* str1 = NSLocalizedString(@"safesvc_use_icloud_question_existing", @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)");
-            NSString* str2 = NSLocalizedString(@"safesvc_use_icloud_question_no_existing", @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
-            
-            NSString *message = existingLocalDeviceSafes ? (hasOtherCloudSafes ? strA : strB) : (hasOtherCloudSafes ? str1 : str2);
-            
-            [Alerts twoOptions:self
-                         title:NSLocalizedString(@"safesvc_icloud_now_available_title", @"iCloud is Now Available")
-                       message:message
-             defaultButtonText:NSLocalizedString(@"safesvc_option_use_icloud", @"Use iCloud")
-              secondButtonText:NSLocalizedString(@"safesvc_option_local_only", @"Local Only")
-                        action:^(BOOL response) {
-                            if(response) {
-                                Settings.sharedInstance.iCloudOn = YES;
-                            }
-                            [Settings sharedInstance].iCloudPrompted = YES;
-                            [self onICloudAvailableContinuation];
-                        }];
-        }
-    }
-    else {
-        [self onICloudAvailableContinuation];
-    }
-}
-
-- (void)onICloudAvailableContinuation {
-    // If iCloud newly switched on, move local docs to iCloud
-    if (Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
-        [Alerts twoOptions:self
-                     title:NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available")
-                   message:NSLocalizedString(@"safesvc_question_migrate_local_to_icloud", @"Would you like to migrate your current local device databases to iCloud?")
-         defaultButtonText:NSLocalizedString(@"safesvc_option_migrate_to_icloud", @"Migrate to iCloud")
-          secondButtonText:NSLocalizedString(@"safesvc_option_keep_local", @"Keep Local")
-                    action:^(BOOL response) {
-                        if(response) {
-                            [[iCloudSafesCoordinator sharedInstance] migrateLocalToiCloud:^(BOOL show) {
-                                [self showiCloudMigrationUi:show];
-                            }];
-                        }
-                    }];
-    }
-    
-    // If iCloud newly switched off, move iCloud docs to local
-    if (!Settings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
-        [Alerts threeOptions:self
-                       title:NSLocalizedString(@"safesvc_icloud_unavailable_title", @"iCloud Unavailable")
-                     message:NSLocalizedString(@"safesvc_icloud_unavailable_question", @"What would you like to do with the databases currently on this device?")
-           defaultButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_remove", @"Remove them, Keep on iCloud Only")
-            secondButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_make_local", @"Make Local Copies")
-             thirdButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_icloud_on", @"Switch iCloud Back On")
-                      action:^(int response) {
-                          if(response == 2) {           // @"Switch iCloud Back On"
-                              [Settings sharedInstance].iCloudOn = YES;
-                              [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
-                          }
-                          else if(response == 1) {      // @"Keep a Local Copy"
-                              [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
-                                  [self showiCloudMigrationUi:show];
-                              }];
-                          }
-                          else if(response == 0) {
-                              [self removeAllICloudSafes];
-                          }
-                      }];
-    }
-    
-    Settings.sharedInstance.iCloudWasOn = Settings.sharedInstance.iCloudOn;
-    [[iCloudSafesCoordinator sharedInstance] startQuery];
-}
-
 - (void)showiCloudMigrationUi:(BOOL)show {
     if(show) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1505,8 +1519,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 // Importation
 
 - (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
+    
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     [document openWithCompletionHandler:^(BOOL success) {
+        [SVProgressHUD dismiss];
+        
         NSData* data = document.data;
         
         [document closeWithCompletionHandler:nil];

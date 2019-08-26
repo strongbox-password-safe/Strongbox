@@ -207,7 +207,11 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 }
 
 - (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom {
-    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom modified:nil];
+    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom rationalize:YES];
+}
+
+- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom  rationalize:(BOOL)rationalize {
+    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom modified:nil rationalize:rationalize];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -380,7 +384,12 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     });
 }
 
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom modified:(NSDate*)modified {
+- (void)setItemIcon:(Node *)item
+              index:(NSNumber*)index
+     existingCustom:(NSUUID*)existingCustom
+             custom:(NSData*)custom
+           modified:(NSDate*)modified
+        rationalize:(BOOL)rationalize  {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -413,14 +422,14 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         item.customIconUuid = existingCustom;
     }
     else {
-        [self.passwordDatabase setNodeCustomIcon:item data:custom];
+        [self.passwordDatabase setNodeCustomIcon:item data:custom rationalize:rationalize];
     }
     
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
     // Save data rather than existing custom icon here, as custom icon could be rationalized away, holding data guarantees we can undo...
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex existingCustom:nil custom:oldCustom modified:oldModified];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex existingCustom:nil custom:oldCustom modified:oldModified rationalize:NO];
     [self.document.undoManager setActionName:@"Icon Change"];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -536,6 +545,14 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 }
 
 - (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment modified:(NSDate*)modified {
+    [self addItemAttachment:item attachment:attachment rationalize:YES modified:modified];
+}
+
+- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment rationalize:(BOOL)rationalize {
+    [self addItemAttachment:item attachment:attachment rationalize:rationalize modified:nil];
+}
+
+- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment rationalize:(BOOL)rationalize modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -550,7 +567,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     
     NSDate* oldModified = item.fields.modified;
 
-    [self.passwordDatabase addNodeAttachment:item attachment:attachment];
+    [self.passwordDatabase addNodeAttachment:item attachment:attachment rationalize:rationalize];
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
 
     // To Undo we need to find this attachment's index!
@@ -719,6 +736,25 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     });
 }
 
+- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
+    for (Node* child in children) {
+        if(![parent validateAddChild:child allowDuplicateGroupTitles:YES]) {
+            return NO;
+        }
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+    
+    for (Node* child in children) {
+        [self addItem:child parent:parent newItemCreated:NO];
+    }
+    
+    [self.document.undoManager setActionName:@"Add Items"];
+    [self.document.undoManager endUndoGrouping];
+
+    return YES;
+}
+
 - (BOOL)addNewRecord:(Node *_Nonnull)parentGroup {
     AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
     
@@ -765,7 +801,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         return NO;
     }
     
-    [self addItem:record parent:parentGroup newRecord:YES];
+    [self addItem:record parent:parentGroup newItemCreated:YES];
     
     return YES;
 }
@@ -781,10 +817,10 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         title = [NSString stringWithFormat:@"%@ %ld", title, i];
     } while (!success);
     
-    [self addItem:newGroup parent:parentGroup newRecord:NO];
+    [self addItem:newGroup parent:parentGroup newItemCreated:NO];
 }
 
-- (void)addItem:(Node*)item parent:(Node*)parent newRecord:(BOOL)newRecord {
+- (void)addItem:(Node*)item parent:(Node*)parent newItemCreated:(BOOL)newItemCreated {
     [parent addChild:item allowDuplicateGroupTitles:YES];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
@@ -793,7 +829,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onNewItemAdded(item, newRecord);
+        self.onNewItemAdded(item, newItemCreated);
     });
 }
 
@@ -809,7 +845,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     else {
         [child.parent removeChild:child];
         
-        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent newRecord:NO];
+        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent newItemCreated:NO];
         if(!self.document.undoManager.isUndoing) {
             [self.document.undoManager setActionName:@"Delete Item"];
         }
@@ -888,7 +924,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         record.fields.accessed = date;
         record.fields.modified = date;
         
-        [self addItem:record parent:self.passwordDatabase.rootGroup newRecord:NO];
+        [self addItem:record parent:self.passwordDatabase.rootGroup newItemCreated:NO];
     }
     
     [self.document.undoManager setActionName:@"Import Entries from CSV"];

@@ -45,7 +45,7 @@
 @property (nonatomic) DuressAction duressAction;
 @property (nonatomic) int failedPinAttempts;
 
-@property (nonatomic) BOOL offlineCacheEnabled;
+@property (nonatomic, readonly) BOOL offlineCacheEnabled; // This is always on - TODO: Remove soon - not configurable
 @property (nonatomic) BOOL offlineCacheAvailable;
 
 @property (nonatomic) BOOL autoFillEnabled;
@@ -91,6 +91,16 @@
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
 @property BOOL alwaysUseCacheForAutoFill; // Some users want this...
+
+/////
+
+@property NSNumber *autoLockTimeoutSeconds;
+
+@property BOOL showQuickViewFavourites;
+@property BOOL showQuickViewNearlyExpired;
+@property BOOL showQuickViewExpired;
+
+@property NSArray<NSString*>* favourites;
 
 @end
 

@@ -22,6 +22,10 @@
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
 
+NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
+NSString* const kDragAndDropInternalUti = @"com.markmcguill.strongbox.drag.and.drop.internal.uti";
+NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.drop.external.uti";
+
 @interface AppDelegate ()
 
 @property (strong) IBOutlet NSMenu *systemTraymenu;
@@ -162,8 +166,11 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
     if(Settings.sharedInstance.clearClipboardEnabled) {
-        [self clearClipboardIfChangeCountMatches];
+        [self clearClipboardWhereAppropriate];
     }
+    
+    // Clear Custom Clipboard no matter what
+    [self clearAppCustomClipboard];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
@@ -490,36 +497,54 @@
     if(self.currentClipboardVersion == -1) { // Initial Watch - Record the current count and watch for changes from this
         self.currentClipboardVersion = NSPasteboard.generalPasteboard.changeCount;
     }
-    
     if(self.currentClipboardVersion != NSPasteboard.generalPasteboard.changeCount) {
-        [self onApplicationDidChangeClipboard];
+        [self onStrongboxDidChangeClipboard];
         self.currentClipboardVersion = NSPasteboard.generalPasteboard.changeCount;
+    }
+    
+    NSPasteboard* appCustomPasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+    BOOL somethingOnAppCustomClipboard = [appCustomPasteboard dataForType:kDragAndDropExternalUti] != nil;
+    if(somethingOnAppCustomClipboard && Settings.sharedInstance.clearClipboardEnabled) {
+        [self scheduleClipboardClearTask];
     }
 }
 
 static NSInteger clipboardChangeCount;
-
-- (void)clearClipboardIfChangeCountMatches {
-    if(clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount) {
-        NSLog(@"Clipboard change count matches after time delay... Clearing Clipboard");
-        [NSPasteboard.generalPasteboard clearContents];
-    }
-    else {
-        NSLog(@"Clipboard change count DOES NOT matches after time delay... NOP");
-    }
-}
-
-- (void)onApplicationDidChangeClipboard {
+- (void)onStrongboxDidChangeClipboard {
     NSLog(@"onApplicationDidChangeClipboard...");
     
     if(Settings.sharedInstance.clearClipboardEnabled) {
         clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
         NSLog(@"Clipboard Changed and Clear Clipboard Enabled... Recording Change Count as [%ld]", (long)clipboardChangeCount);
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
-           dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-               [self clearClipboardIfChangeCountMatches];
-           });
+        [self scheduleClipboardClearTask];
+    }
+}
+
+- (void)scheduleClipboardClearTask {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+                       [self clearClipboardWhereAppropriate];
+                   });
+}
+
+- (void)clearClipboardWhereAppropriate {
+    if(clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount) {
+        NSLog(@"General Clipboard change count matches after time delay... Clearing Clipboard");
+        [NSPasteboard.generalPasteboard clearContents];
+    }
+    else {
+        NSLog(@"General Clipboard change count DOES NOT matches after time delay... NOP");
+    }
+    
+    [self clearAppCustomClipboard];
+}
+
+- (void)clearAppCustomClipboard {
+    NSPasteboard* appCustomPasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+    BOOL somethingOnAppCustomClipboard = [appCustomPasteboard dataForType:kDragAndDropExternalUti] != nil;
+    if(somethingOnAppCustomClipboard) {
+        NSLog(@"Clearing Custom App Pasteboard!");
+        [appCustomPasteboard clearContents];
     }
 }
 

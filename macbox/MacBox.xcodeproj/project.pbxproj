@@ -36,6 +36,8 @@
 		4D29664121ADAC0B009B7936 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
 		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D44680C216CE08B00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
+		4D4A003A2312CC5400B69E09 /* SerializationPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4A00392312CC5400B69E09 /* SerializationPackage.m */; };
+		4D4A003D231317A900B69E09 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D4A003B231317A900B69E09 /* Localizable.strings */; };
 		4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
 		4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
@@ -262,6 +264,9 @@
 		4D446805216CDA4500F6358D /* NSArray+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "../model/NSArray+Extensions.m"; sourceTree = "<group>"; };
 		4D44680A216CE08A00F6358D /* Csv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = ../model/Csv.h; sourceTree = "<group>"; };
 		4D44680B216CE08A00F6358D /* Csv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = ../model/Csv.m; sourceTree = "<group>"; };
+		4D4A00382312CC5400B69E09 /* SerializationPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SerializationPackage.h; path = ../model/SerializationPackage.h; sourceTree = "<group>"; };
+		4D4A00392312CC5400B69E09 /* SerializationPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SerializationPackage.m; path = ../model/SerializationPackage.m; sourceTree = "<group>"; };
+		4D4A003C231317A900B69E09 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = ../StrongBox/Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4D4AD4F021A027E5002C33C6 /* AbstractDatabaseFormatAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractDatabaseFormatAdaptor.h; path = ../model/AbstractDatabaseFormatAdaptor.h; sourceTree = "<group>"; };
 		4D4AD4F721A02B0A002C33C6 /* KeePass2TagPackage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePass2TagPackage.h; path = ../model/keepass/KeePass2TagPackage.h; sourceTree = "<group>"; };
 		4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePass2TagPackage.m; path = ../model/keepass/KeePass2TagPackage.m; sourceTree = "<group>"; };
@@ -1146,6 +1151,8 @@
 				4DF347F02074FA6B00148741 /* Strongbox.h */,
 				4DF347F52074FA6C00148741 /* Utils.h */,
 				4DF347FB2074FA6C00148741 /* Utils.m */,
+				4D4A00382312CC5400B69E09 /* SerializationPackage.h */,
+				4D4A00392312CC5400B69E09 /* SerializationPackage.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -1153,6 +1160,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				4D75D08922CFED3000D704BF /* CheckboxCell.xib */,
 				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
 				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
@@ -1385,6 +1393,7 @@
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */,
+				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
@@ -1619,6 +1628,7 @@
 				4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4D524CA5219B458B00C22CB4 /* BiometricIdHelper.m in Sources */,
 				4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */,
+				4D4A003A2312CC5400B69E09 /* SerializationPackage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1633,6 +1643,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		4D4A003B231317A900B69E09 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D4A003C231317A900B69E09 /* Base */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		4DF59F621F30DB7A00D68BFE /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

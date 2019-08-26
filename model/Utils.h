@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 NSString* keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
 
++ (NSString*)formatTimeInterval:(NSInteger)seconds;
 NSString* friendlyFileSizeString(long long byteCount);
 NSString *friendlyDateString(NSDate *modDate);
 NSString *friendlyDateStringVeryShort(NSDate *modDate);
@@ -88,6 +89,8 @@ NSImage* scaleImage(NSImage* image, CGSize newSize);
 #if TARGET_OS_IPHONE
 + (nullable NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error;
 #endif
+
+NSString* localizedYesOrNoFromBool(BOOL george);
 
 NS_ASSUME_NONNULL_END
 

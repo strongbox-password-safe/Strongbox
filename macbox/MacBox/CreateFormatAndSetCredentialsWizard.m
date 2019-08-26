@@ -254,7 +254,7 @@
 - (IBAction)onChangeDatabaseFormat:(id)sender {
     [self setFormatFromUI];
     
-    NSLog(@"Format = %u", self.databaseFormat);
+    NSLog(@"Format = %ld", (long)self.databaseFormat);
     
     [self enableUiBasedOnSafeType];
     [self updateUi];

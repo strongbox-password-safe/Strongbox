@@ -84,7 +84,7 @@
 }
 
 - (void)testKdbx31 {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/yubi-31.kdbx"];
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/yubi-31.kdbx"];
     
     NSError* error;
     

@@ -579,7 +579,9 @@
             }
         }
         else {
-            if(self.isAutoFillOpen && !Settings.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseModel isAutoFillLikelyToCrash:data]) {
+            if(self.isAutoFillOpen &&
+               !Settings.sharedInstance.haveWarnedAboutAutoFillCrash &&
+               [DatabaseModel isAutoFillLikelyToCrash:data]) {
                 [Alerts warn:self.viewController
                        title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
                      message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
@@ -924,7 +926,7 @@
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }
 
-        NSLog(@"Setting likelyFormat to [%u]", openedSafe.format);
+        NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.format);
         self.safe.likelyFormat = openedSafe.format;
         [SafesList.sharedInstance update:self.safe];
     }

@@ -12,7 +12,6 @@
 #import "NSArray+Extensions.h"
 
 static NSString* const kLaunchCountKey = @"launchCount";
-static NSString* const kAutoLockTimeSeconds = @"autoLockTimeSeconds";
 static NSString* const kPromptedForReview = @"newPromptedForReview";
 static NSString* const kIsProKey = @"isPro";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
@@ -41,8 +40,8 @@ static const NSInteger kDefaultClearClipboardTimeout = 90;
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
 
-static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill";
-static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles";
+//static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill"; // DEAD
+//static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles"; // DEAD
 static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
 static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
 static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
@@ -58,7 +57,8 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
 //static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock"; // DEAD
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
-static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController";
+
+//static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController"; DEAD
 //static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword"; // DEAD
 static NSString* const kMigratedLocalDatabasesToNewSystem = @"migratedLocalDatabasesToNewSystem";
 
@@ -78,7 +78,7 @@ static NSString* cachedAppGroupName;
 
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
 static NSString* const kCoalesceAppLockAndQuickLaunchBiometricAuths = @"coalesceAppLockAndQuickLaunchBiometricAuths";
-static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage";
+//static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage"; // DEAD
 static NSString* const kQuickLaunchUuid = @"quickLaunchUuid";
 static NSString* const kMigratedToNewQuickLaunchSystem = @"migratedToNewQuickLaunchSystem";
 
@@ -174,15 +174,11 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 }
 
 - (BOOL)useLocalSharedStorage {
-    return [self getBool:kUseLocalSharedStorage fallback:YES];
-}
-
-- (void)setUseLocalSharedStorage:(BOOL)useLocalSharedStorage {
-    [self setBool:kUseLocalSharedStorage value:useLocalSharedStorage];
+    return YES; // [self getBool:kUseLocalSharedStorage fallback:YES];
 }
 
 - (BOOL)coalesceAppLockAndQuickLaunchBiometricAuths {
-    return [self getBool:kCoalesceAppLockAndQuickLaunchBiometricAuths fallback:NO]; // TODO: Might be nice to default on if works out
+    return [self getBool:kCoalesceAppLockAndQuickLaunchBiometricAuths fallback:YES];
 }
 
 - (void)setCoalesceAppLockAndQuickLaunchBiometricAuths:(BOOL)coalesceAppLockAndQuickLaunchBiometricAuths {
@@ -494,27 +490,6 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
     [userDefaults synchronize];
 }
 
--(NSNumber*)getAutoLockTimeoutSeconds
-{
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-
-    NSNumber *seconds = [userDefaults objectForKey:kAutoLockTimeSeconds];
-
-    if (seconds == nil) {
-        seconds = @60;
-    }
-    
-    return seconds;
-}
-
--(void)setAutoLockTimeoutSeconds:(NSNumber*)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setObject:value forKey:kAutoLockTimeSeconds];
-    
-    [userDefaults synchronize];
-}
-
 - (NSInteger)isUserHasBeenPromptedForReview {
     NSUserDefaults *userDefaults = [self getUserDefaults];
  
@@ -584,13 +559,12 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 //
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d%d%d%d[%ld][%@]%ld%d%d%d%d%d%d]",
+    return [NSString stringWithFormat:@"[%d%d%d%d[%ld]%ld%d%d%d%d%d%d]",
     self.isHavePromptedAboutFreeTrial,
     self.isProOrFreeTrial,
     self.isPro,
     self.isFreeTrial,
     (long)self.getLaunchCount,
-    self.getAutoLockTimeoutSeconds,
     (long)self.isUserHasBeenPromptedForReview,
     self.isHasPromptedForCopyPasswordGesture,
     self.neverShowForMacAppMessage,
@@ -806,24 +780,9 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
     return [self setInteger:kClearClipboardAfterSeconds value:clearClipboardAfterSeconds];
 }
 
-- (BOOL)hideTotpInAutoFill {
-    return [[self getUserDefaults] boolForKey:kHideTotpInAutoFill];
-}
-
-- (void)setHideTotpInAutoFill:(BOOL)hideTotpInAutoFill {
-    [[self getUserDefaults] setBool:hideTotpInAutoFill forKey:kHideTotpInAutoFill];
-    [[self getUserDefaults] synchronize];
-}
-
 - (BOOL)doNotAutoDetectKeyFiles {
-    return [[self getUserDefaults] boolForKey:kDoNotAutoDetectKeyFiles];
+    return NO; //[[self getUserDefaults] boolForKey:kDoNotAutoDetectKeyFiles];
 }
-
-- (void)setDoNotAutoDetectKeyFiles:(BOOL)doNotAutoDetectKeyFiles {
-    [[self getUserDefaults] setBool:doNotAutoDetectKeyFiles forKey:kDoNotAutoDetectKeyFiles];
-    [[self getUserDefaults] synchronize];
-}
-
 
 - (NSDate *)lastEntitlementCheckAttempt {
     NSUserDefaults *userDefaults = [self getUserDefaults];
@@ -950,14 +909,6 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 - (void)setHideKeyFileOnUnlock:(BOOL)hideKeyFileOnUnlock {
     [self setBool:kHideKeyFileOnUnlock value:hideKeyFileOnUnlock];
-}
-
-- (BOOL)doNotUseNewSplitViewController {
-    return [self getBool:kDoNotUseNewSplitViewController];
-}
-
-- (void)setDoNotUseNewSplitViewController:(BOOL)doNotUseNewSplitViewController {
-    return [self setBool:kDoNotUseNewSplitViewController value:doNotUseNewSplitViewController];
 }
 
 - (BOOL)allowEmptyOrNoPasswordEntry {

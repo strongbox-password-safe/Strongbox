@@ -43,13 +43,13 @@
 "safes_vc_database_actions_sheet_title" = "Database Actions";
 
 /* Button to Rename the Database */
-"safes_vc_action_rename_database" = "Rename Database...";
+"safes_vc_action_rename_database" = "Rename...";
 
 /* Button Title to Unset Quick Launch */
-"safes_vc_action_unset_as_quick_launch" = "Unset as Quick Launch DB...";
+"safes_vc_action_unset_as_quick_launch" = "Unset as Quick Launch...";
 
 /* Button Title to Set Quick Launch */
-"safes_vc_action_set_as_quick_launch" = "Set as Quick Launch DB...";
+"safes_vc_action_set_as_quick_launch" = "Set as Quick Launch...";
 
 /* Button Title to Show in Files */
 "safes_vc_show_in_files" = "Show in 'Files'...";
@@ -978,7 +978,7 @@
 "upgrade_vc_2monthly_subscription_title" = "3 Months";
 
 /* Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark */
-"upgrade_vc_developer_msg_free_trial_fmt" = "Hi! You are currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your support allows me to keep doing so.Thanks in advance!\n-Mark";
+"upgrade_vc_developer_msg_free_trial_fmt" = "Hi! You are currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your support allows me to keep doing so. Thanks in advance!\n-Mark";
 
 /* Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark */
 "upgrade_vc_developer_msg_trial_expired" = "Hi! You are currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance!\n-Mark";
@@ -1300,6 +1300,7 @@
 /* Old Passwords (%lu) */
 "pw_history_vc_previous_passwords_count_fmt" = "Old Passwords (%lu)";
 
+/* Old Passwords (None) */
 "pw_history_vc_previous_passwords_count_none" = "Old Passwords (None)";
 
 /* Could not create file */
@@ -1359,6 +1360,7 @@
 /* This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Would you like to rescale this image to one of the streamlined options below? */
 "add_attachment_vc_large_image_message_rescale" = "This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Would you like to rescale this image to one of the streamlined options below?";
 
+/* This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use? */
 "add_attachment_vc_large_image_message" = "This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use?";
 
 /* Rescale Large Image? */
@@ -1388,11 +1390,8 @@
 /* This filename is already in use. Please enter a different name. */
 "add_attachment_vc_warn_filename_used_message" = "This filename is already in use. Please enter a different name.";
 
-/* 🛑 URL Invalid */
-"webdav_vc_validation_url_invalid" = "🛑 URL Invalid";
-
-/* ✅ Looks Good */
-"webdav_vc_validation_ok" = "✅ Looks Good";
+/* URL Invalid */
+"webdav_vc_validation_url_invalid" = "URL Invalid";
 
 /* Select Icon Source */
 "set_icon_vc_select_icon_source_title" = "Select Icon Source";
@@ -1466,14 +1465,11 @@
 /* Could not create group with that title here. */
 "moveentry_vc_warn_creating_group_message" = "Could not create group with that title here.";
 
-/* 🛑 Please Enter a Host */
-"sftp_vc_label_validation_enter_host" = "🛑 Please Enter a Host";
+/* Please Enter a Host */
+"sftp_vc_label_validation_enter_host" = "Please Enter a Host";
 
-/* 🛑 Select a Private Key... */
-"sftp_vc_label_validation_select_private_key" = "🛑 Select a Private Key...";
-
-/* ✅ Looks Good */
-"sftp_vc_label_validation_ok" = "✅ Looks Good";
+/* Select a Private Key... */
+"sftp_vc_label_validation_select_private_key" = "Select a Private Key...";
 
 /* Invalid Key */
 "sftp_vc_warn_invalid_key_title" = "Invalid Key";
@@ -1616,7 +1612,7 @@
 "open_sequence_autofill_creash_likely_title" = "AutoFill Crash Likely";
 
 /* Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB). */
-"open_sequence_autofill_creash_likely_message" = "Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).";
+"open_sequence_autofill_creash_likely_message" = "Your database is quite large, or has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption.\nThis will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed system limitation.\nYou could consider reducing file size or changing the amount of resources consumed (Memory in particular with Argon2 to below 64MB).";
 
 /* Decrypting... */
 "open_sequence_progress_decrypting" = "Decrypting...";
@@ -1969,8 +1965,89 @@
 /* Suffix */
 "pwgen_salt_mode_suffix" = "Suffix";
 
-/* This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use? */
-"add_attachment_vc_large_image_message" = "This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use?";
+/* Button Title to start reordering */
+"safes_vc_action_reorder_database" = "Reorder...";
 
-/* Old Passwords (None) */
-"pw_history_vc_previous_passwords_count_none" = "Old Passwords (None)";
+/* Tip displayed at top of screen. Slide left on Database for options */
+"safes_vc_tip" = "Tip: Slide left on database for options";
+
+/* Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes */
+"item_details_tip" = "Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes";
+
+/* Tip: Slide Left for Options or Tap to View */
+"keepass_history_tip" = "Tip: Slide Left for Options or Tap to View";
+
+/* Pin */
+"browse_vc_action_pin" = "Pin";
+
+/* Unpin */
+"browse_vc_action_unpin" = "Unpin";
+
+/* Section Header Title for Expired Items */
+"browse_vc_section_title_expired" = "Expired";
+
+/* Section Header Title for Nearly Expired Items */
+"browse_vc_section_title_nearly_expired" = "Nearly Expired";
+
+/* Section Header Title for Pinned Items */
+"browse_vc_section_title_pinned" = "Pinned";
+
+/* Section Header Title for Recent Items */
+"browse_vc_section_title_recents" = "Recent Items";
+
+/* Standard View Sections Header */
+"browse_vc_section_title_standard_view" = "Items";
+
+/* Compressed */
+"database_metadata_field_compressed" = "Compressed";
+
+/* Database Format */
+"database_metadata_field_format" = "Database Format";
+
+/* Database Generator */
+"database_metadata_field_generator" = "Database Generator";
+
+/* Inner Encryption */
+"database_metadata_field_inner_encryption" = "Inner Encryption";
+
+/* KeePass File Version */
+"database_metadata_field_keepass_version" = "KeePass File Version";
+
+/* Key Derivation */
+"database_metadata_field_key_derivation" = "Key Derivation";
+
+/* Max History Items */
+"database_metadata_field_max_history_items" = "Max History Items";
+
+/* Max History Size */
+"database_metadata_field_max_history_size" = "Max History Size";
+
+/* Outer Encryption */
+"database_metadata_field_outer_encryption" = "Outer Encryption";
+
+/* Password Safe File Version */
+"database_metadata_field_password_safe_version" = "Password Safe File Version";
+
+/* Recycle Bin Enabled */
+"database_metadata_field_recycle_bin_enabled" = "Recycle Bin Enabled";
+
+/* Transform Rounds */
+"database_metadata_field_transform_rounds" = "Transform Rounds";
+
+/* Last Update App */
+"database_metadata_field_last_update_app" = "Last Update App";
+
+/* Last Update Host */
+"database_metadata_field_last_update_host" = "Last Update Host";
+
+/* Last Update Time */
+"database_metadata_field_last_update_time" = "Last Update Time";
+
+/* Last Update User */
+"database_metadata_field_last_update_user" = "Last Update User";
+
+/* Key Stretch Iterations */
+"database_metadata_field_password_key_stretch_iterations" = "Keystretch Iterations";
+
+/* Error message indicating that these item(s) cannot be deserialized to this database because they contain two groups with the same title. */
+"node_serialization_error_duplicate_group_title_fmt" = "Could not copy these items because they contain two groups with the same title '%@' which is unsupported by this database format.";

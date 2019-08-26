@@ -148,7 +148,7 @@ suggestedFilename:nil
         
         if (!success) {
             NSLog(@"Failed to open %@", fileUrl);
-            completion(nil, [Utils createNSError:@"Failed to open" errorCode:-6]);
+            completion(nil, [Utils createNSError:@"Could not read iCloud file. Try restarting your device." errorCode:-6]);
             return;
         }
 
@@ -158,7 +158,7 @@ suggestedFilename:nil
         
         [doc closeWithCompletionHandler:^(BOOL success) {
             if (!success) {
-                NSLog(@"Failed to open %@", fileUrl);
+                NSLog(@"Failed to close %@", fileUrl);
                 completion(nil, [Utils createNSError:@"Failed to close after reading" errorCode:-6]);
                 return;
             }

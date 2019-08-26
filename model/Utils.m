@@ -68,7 +68,6 @@ BOOL isValidUrl(NSString* urlString) {
     return fn;
 }
 
-
 + (NSString *)hostname {
 #if TARGET_OS_IPHONE
     char baseHostName[256];
@@ -135,6 +134,18 @@ NSString *iso8601DateString(NSDate *modDate) {
     return [dateFormatter stringFromDate:modDate];
 }
 
++ (NSString*)formatTimeInterval:(NSInteger)seconds {
+    if(seconds == 0) {
+        return NSLocalizedString(@"prefs_vc_time_interval_none", @"None");
+    }
+    
+    NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
+    
+    fmt.allowedUnits =  NSCalendarUnitMinute | NSCalendarUnitSecond;
+    fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
+    
+    return [fmt stringFromTimeInterval:seconds];
+}
 
 NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     // 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C => 46C9B1FFBD4ABC4BBB260C6190BAD20C
@@ -521,6 +532,12 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
 }
 
 #endif
+
+NSString* localizedYesOrNoFromBool(BOOL george) {
+    return george ?
+    NSLocalizedString(@"alerts_yes", @"Yes") :
+    NSLocalizedString(@"alerts_no", @"No"); // TODO: change to use generic_yes and generic_no?
+}
 
 //    [[Settings sharedInstance] setPro:NO];
 //    [[Settings sharedInstance] setEndFreeTrialDate:nil];

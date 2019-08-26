@@ -13,10 +13,14 @@
 #define kAutoLockTime @"autoLockTime"
 #define kPreferencesChangedNotification @"preferencesChangedNotification"
 
+extern NSString* const kStrongboxPasteboardName;
+extern NSString* const kDragAndDropInternalUti;
+extern NSString* const kDragAndDropExternalUti;
+
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 
 - (void)showUpgradeModal:(NSInteger)delay;
-- (void)clearClipboardIfChangeCountMatches;
+- (void)clearClipboardWhereAppropriate;
 
 @end
 

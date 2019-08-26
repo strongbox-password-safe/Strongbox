@@ -209,7 +209,12 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     [self rationalizeAttachments];
 }
 
+
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment *)attachment {
+    [self addNodeAttachment:node attachment:attachment rationalize:YES];
+}
+
+- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment *)attachment rationalize:(BOOL)rationalize {
     DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] init];
     dbAttachment.data = attachment.data;
     [_mutableAttachments addObject:dbAttachment];
@@ -219,7 +224,9 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     nodeAttachment.index = (uint32_t)_mutableAttachments.count - 1;
     [node.fields.attachments addObject:nodeAttachment];
 
-    [self rationalizeAttachments];
+    if(rationalize) {
+        [self rationalizeAttachments];
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +255,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     [self rationalizeAttachments];
 }
 
-- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data {
+- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize {
     if(data == nil) {
         node.customIconUuid = nil;
     }
@@ -258,7 +265,9 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         self.mutableCustomIcons[uuid] = data;
     }
     
-    [self rationalizeCustomIcons];
+    if(rationalize) {
+        [self rationalizeCustomIcons];
+    }
 }
 
 - (void)rationalizeCustomIcons {

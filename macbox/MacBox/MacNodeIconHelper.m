@@ -39,6 +39,7 @@ static NSImage* kSmallLockImage;
         else {
             ret = vm.isGroup ? kFolderImage : kSmallLockImage;
         }
+        return ret;
     }
     else {
         ret = vm.isGroup ? KeePassPredefinedIcons.icons[48] : KeePassPredefinedIcons.icons[0];

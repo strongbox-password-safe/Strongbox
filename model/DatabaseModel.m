@@ -81,7 +81,11 @@
     return ret;
 }
 
+const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 3 * 1024 * 1024;
+
 + (BOOL)isAutoFillLikelyToCrash:(NSData*)data {
+    // Argon 2 Memory Consumption
+    
     if([Kdbx4Database isAValidSafe:data error:nil]) {
         CryptoParameters* params = [Kdbx4Serialization getCryptoParams:data];
         
@@ -97,6 +101,12 @@
                 }
             }
         }
+    }
+    
+    // Very large DBs
+    
+    if (data.length > kProbablyTooLargeToOpenInAutoFillSizeBytes) {
+        return YES;
     }
 
     return NO;
@@ -357,7 +367,11 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 }
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment {
-    [self.theSafe addNodeAttachment:node attachment:attachment];
+    [self addNodeAttachment:node attachment:attachment rationalize:YES];
+}
+
+- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize {
+    [self.theSafe addNodeAttachment:node attachment:attachment rationalize:rationalize];
 }
 
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex {
@@ -368,8 +382,8 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     [self.theSafe setNodeAttachments:node attachments:attachments];
 }
 
-- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data {
-    [self.theSafe setNodeCustomIcon:node data:data];
+- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize {
+    [self.theSafe setNodeCustomIcon:node data:data rationalize:rationalize];
 }
 
 - (BOOL)recycleBinEnabled {
@@ -387,6 +401,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 - (Node *)keePass1BackupNode {
     return self.theSafe.keePass1BackupNode;
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience
 
@@ -412,14 +427,12 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     }
     else if(self.format == kKeePass1) {
         // Filter Backup Group
-        // TODO: Expired
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
             return node.isGroup && (self.keePass1BackupNode == nil || (node != self.keePass1BackupNode && ![self.keePass1BackupNode contains:node]));
         }];
     }
     else {
         // Filter Recycle Bin
-        // TODO: Expired
         Node* recycleBin = self.recycleBinNode;
         
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
@@ -434,14 +447,12 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     }
     else if(self.format == kKeePass1) {
         // Filter Backup Group
-        // TODO: Expired
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && (self.keePass1BackupNode == nil || ![self.keePass1BackupNode contains:node]);
         }];
     }
     else {
         // Filter Recycle Bin
-        // TODO: Expired
         Node* recycleBin = self.recycleBinNode;
         
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {

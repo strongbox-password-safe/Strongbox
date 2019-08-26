@@ -34,8 +34,6 @@
 #import "SearchScope.h"
 #import <WebKit/WebKit.h>
 
-#define kDragAndDropUti @"com.markmcguill.strongbox.drag.and.drop.internal.uti"
-
 const int kMaxRecommendCustomIconSize = 128*1024;
 const int kMaxCustomIconDimension = 256;
 
@@ -1391,7 +1389,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     if(Settings.sharedInstance.clearClipboardEnabled) {
         AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-        [appDelegate clearClipboardIfChangeCountMatches];
+        [appDelegate clearClipboardWhereAppropriate];
     }
 }
 
@@ -1669,68 +1667,578 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (void)enableDragDrop {
-    [self.outlineView registerForDraggedTypes:@[kDragAndDropUti]];
+    [self.outlineView registerForDraggedTypes:@[kDragAndDropInternalUti]];
+    [self.outlineView registerForDraggedTypes:@[kDragAndDropExternalUti]];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pasteboard {
-    [pasteboard declareTypes:@[kDragAndDropUti] owner:self];
-
-    NSArray<Node*> *nodes = items;
-    NSArray* serializationIds = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [obj getSerializationId:self.model.format != kPasswordSafe];
+- (NSArray<Node*>*)getSelectedItems {
+    NSIndexSet *rows = [self.outlineView selectedRowIndexes];
+    
+    NSMutableArray<Node*>* items = @[].mutableCopy;
+    [rows enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        Node* node = [self.outlineView itemAtRow:idx];
+        [items addObject:node];
     }];
     
-    [pasteboard setPropertyList:serializationIds forType:kDragAndDropUti];
+    return items;
+}
+
+- (id)copy:(id)sender {
+    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+    NSArray* selected = [self getSelectedItems];
+    
+    [self placeItemsOnPasteboard:pasteboard items:selected];
+    
+    return nil;
+}
+
+- (id)paste:(id)sender {
+    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+    
+    Node* selected = [self getCurrentSelectedItem];
+    Node* destinationItem = self.model.rootGroup;
+    if(selected) {
+        destinationItem = selected.isGroup ? selected : selected.parent;
+    }
+    
+    BOOL ret = [self pasteItemsFromPasteboard:pasteboard destinationItem:destinationItem source:nil clear:NO];
+    if(!ret) {
+        [Alerts info:@"Could not paste! Unknown Error." window:self.view.window];
+    }
+    
+    return nil;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+         writeItems:(NSArray *)items
+       toPasteboard:(NSPasteboard *)pasteboard {
+    return [self placeItemsOnPasteboard:pasteboard items:items];
+}
+
+- (BOOL)placeItemsOnPasteboard:(NSPasteboard*)pasteboard items:(NSArray<Node*>*)items {
+    [pasteboard declareTypes:@[kDragAndDropInternalUti,
+                               kDragAndDropExternalUti]
+                       owner:self];
+    
+    NSArray<Node*> *allSelected = items;
+    
+    // We need to filter out children that are already included because the group is included,
+    // so we're not copying/moving twice
+    
+    NSArray<Node*>* groups = [allSelected filter:^BOOL(Node * _Nonnull obj) {
+        return obj.isGroup;
+    }];
+    NSArray<Node*>* minimalNodeSet = [allSelected filter:^BOOL(Node * _Nonnull node) {
+        BOOL alreadyContained = [groups anyMatch:^BOOL(Node * _Nonnull group) {
+            return [group contains:node];
+        }];
+        return !alreadyContained;
+    }];
+    
+    
+    // Internal -> Moves
+    
+    NSArray<NSString*>* internalSerializationIds = [self getInternalSerializationIds:minimalNodeSet];
+    [pasteboard setPropertyList:internalSerializationIds forType:kDragAndDropInternalUti];
+    
+    // External -> Copies
+    
+    NSData* json = [self getJsonForNodes:minimalNodeSet];
+    [pasteboard setData:json forType:kDragAndDropExternalUti];
     
     return YES;
 }
 
-- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id<NSDraggingInfo>)info
-                  proposedItem:(id)item
-            proposedChildIndex:(NSInteger)index
-{
-    // Only support internal drags (i.e. moves) - TODO: Allow inter safe movement?
-    if ([info draggingSource] != self.outlineView) {
-        return NSDragOperationNone;
+- (NSArray<NSString*>*)getInternalSerializationIds:(NSArray<Node*>*)nodes {
+    return [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return [obj getSerializationId:self.model.format != kPasswordSafe];
+    }];
+}
+
+- (NSData*)getJsonForNodes:(NSArray<Node*>*)nodes {
+    SerializationPackage *serializationPackage = [[SerializationPackage alloc] init];
+    
+    // Node Hierarchy
+    
+    NSArray<NSDictionary*>* nodeDictionaries = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return [obj serialize:serializationPackage];
+    }];
+    
+    // Attachments
+    
+    NSMutableDictionary<NSString*, NSString*> *attachmentsMap = [NSMutableDictionary dictionaryWithCapacity:serializationPackage.usedAttachmentIndices.count];
+    
+    for (NSNumber* index in serializationPackage.usedAttachmentIndices) {
+        DatabaseAttachment* a = self.model.attachments[index.integerValue];
+        [attachmentsMap setValue:[a.data base64EncodedStringWithOptions:kNilOptions] forKey:index.stringValue];
     }
     
-    NSArray<NSString*>* serializationIds = [info.draggingPasteboard propertyListForType:kDragAndDropUti];
-    NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return [self.model getItemFromSerializationId:obj];
-    }];
+    // Custom Icons
     
+    NSMutableDictionary<NSString*, NSString*> *customIconsMap = [NSMutableDictionary dictionaryWithCapacity:serializationPackage.usedCustomIcons.count];
+    
+    for(NSUUID* icon in serializationPackage.usedCustomIcons) {
+        NSData* iconData = self.model.customIcons[icon];
+        NSString* iconB64 = [iconData base64EncodedStringWithOptions:kNilOptions];
+        [customIconsMap setValue:iconB64 forKey:icon.UUIDString];
+    }
+    
+    // Package
+    
+    NSDictionary *serialized = @{ @"sourceFormat" : @(self.model.format),
+                                  @"nodes" : nodeDictionaries,
+                                  @"attachmentsMap" : attachmentsMap,
+                                  @"customIconsMap" : customIconsMap };
+    
+    // JSON
+    
+    NSError* error;
+    NSData* data = [NSJSONSerialization dataWithJSONObject:serialized options:kNilOptions error:&error];
+
+    if(!data) {
+        [Alerts error:@"Could not serialize these items!" error:error window:self.view.window];
+    }
+    
+    return data;
+}
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id<NSDraggingInfo>)info
+                  proposedItem:(id)item
+            proposedChildIndex:(NSInteger)index {
     Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
 
-    BOOL notValid = [sourceItems anyMatch:^BOOL(Node * _Nonnull obj) {
-        BOOL valid = !destinationItem ||
-                    (destinationItem.isGroup && [self.model validateChangeParent:destinationItem node:obj]);
+    if ([info draggingSource] == self.outlineView) {
+        NSArray<NSString*>* serializationIds = [info.draggingPasteboard propertyListForType:kDragAndDropInternalUti];
+        NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [self.model getItemFromSerializationId:obj];
+        }];
+        
+        BOOL notValid = [sourceItems anyMatch:^BOOL(Node * _Nonnull obj) {
+            BOOL valid = !destinationItem ||
+                        (destinationItem.isGroup && [self.model validateChangeParent:destinationItem node:obj]);
 
-        return !valid;
-    }];
-    
-    //NSLog(@"%@ -> %d", item ? ((Node*)item).title : @"ROOT", !notValid);
+            return !valid;
+        }];
+        
+        //NSLog(@"%@ -> %d", item ? ((Node*)item).title : @"ROOT", !notValid);
 
-    return !notValid ? NSDragOperationMove : NSDragOperationNone;
+        return !notValid ? NSDragOperationMove : NSDragOperationNone;
+    }
+    else {
+        NSData* json = [info.draggingPasteboard dataForType:kDragAndDropExternalUti];
+        return json && destinationItem.isGroup ? NSDragOperationCopy : NSDragOperationNone;
+    }
 }
 
 -(BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id<NSDraggingInfo>)info
               item:(id)item
         childIndex:(NSInteger)index {
-    NSArray<NSString*>* serializationIds = [info.draggingPasteboard propertyListForType:kDragAndDropUti];
-    NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return [self.model getItemFromSerializationId:obj];
-    }];
     
     Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
 
-    for (Node* sourceItem in sourceItems) {
-        BOOL result = [self.model changeParent:destinationItem node:sourceItem];
-        NSLog(@"move: [%@] - success: [%d]", [sourceItem getSerializationId:self.model.format != kPasswordSafe], result);
+    return [self pasteItemsFromPasteboard:info.draggingPasteboard destinationItem:destinationItem source:info.draggingSource clear:YES];
+}
+
+- (BOOL)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
+                 destinationItem:(Node*)destinationItem
+                          source:(id)source
+                           clear:(BOOL)clear
+{
+    if(![pasteboard propertyListForType:kDragAndDropExternalUti] &&
+       ![pasteboard dataForType:kDragAndDropInternalUti]) {
+        return NO;
     }
+    
+    if (source == self.outlineView) {
+        NSArray<NSString*>* serializationIds = [pasteboard propertyListForType:kDragAndDropInternalUti];
+        NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [self.model getItemFromSerializationId:obj];
+        }];
+
+        for (Node* sourceItem in sourceItems) {
+            BOOL result = [self.model changeParent:destinationItem node:sourceItem];
+            NSLog(@"move: [%@] - success: [%d]", [sourceItem getSerializationId:self.model.format != kPasswordSafe], result);
+        }
+
+        if(clear) {
+            [pasteboard clearContents];
+        }
+        return YES;
+    }
+    else if(destinationItem.isGroup) {
+        NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
+        if(json && destinationItem.isGroup) {
+            NSLog(@"copy pasta!");
+
+            BOOL ret = [self pasteFromExternal:json destinationItem:destinationItem];
+            if(clear) {
+                [pasteboard clearContents];
+            }
+            return ret;
+        }
+    }
+    
+    if(clear) {
+        [pasteboard clearContents];
+    }
+    return NO;
+}
+
+- (BOOL)pasteFromExternal:(NSData*)json destinationItem:(Node*)destinationItem {
+    NSError* error;
+    NSDictionary* serialized = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
+
+    if(!serialized) {
+        [Alerts error:@"Could not deserialize!" error:error window:self.view.window];
+        return NO;
+    }
+    
+    NSNumber* sourceFormatNum = serialized[@"sourceFormat"];
+    DatabaseFormat sourceFormat = sourceFormatNum.integerValue;
+    NSArray<NSDictionary*>* serializedNodes = serialized[@"nodes"];
+    
+    BOOL allowDuplicateGroupTitles = self.model.format != kPasswordSafe;
+    
+    // Rebuild Node Hierarchy
+    
+    NSMutableArray<Node*>* nodes = @[].mutableCopy;
+    NSError* err;
+    for (NSDictionary* obj in serializedNodes) {
+        Node* n = [Node deserialize:obj parent:destinationItem allowDuplicateGroupTitles:allowDuplicateGroupTitles error:&err];
+        
+        if(!n) {
+            [Alerts error:err window:self.view.window];
+            return NO;
+        }
+        
+        [nodes addObject:n];
+    }
+    
+    [self processFormatIncompatibilities:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     
     return YES;
 }
+
+- (void)processPasswordSafeToKeePass2:(NSDictionary*)serialized
+                                nodes:(NSArray<Node*>*)nodes
+                      destinationItem:(Node*)destinationItem
+                         sourceFormat:(DatabaseFormat)sourceFormat {
+    // Password Safe -> KeePass 2 (Emails -> Custom Field)
+    
+    NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.allChildRecords;
+    }];
+    NSMutableArray<Node*>* all = allRecords.mutableCopy;
+    [all addObjectsFromArray:nodes];
+    NSArray<Node*>* nodesWithEmails = [all filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.email.length;
+    }];
+    
+    if(nodesWithEmails.count) {
+        [Alerts yesNo:@"KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue?"
+               window:self.view.window
+           completion:^(BOOL yesNo) {
+               if(yesNo) {
+                   for (Node* nodeWithEmail in nodesWithEmails) {
+                       [nodeWithEmail.fields setCustomField:@"Email" value:[StringValue valueWithString:nodeWithEmail.fields.email]];
+                   }
+                   
+                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+               }
+           }];
+    }
+    else {
+        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+}
+
+- (void)processPasswordSafeToKeePass1:(NSDictionary*)serialized
+                                nodes:(NSArray<Node*>*)nodes
+                      destinationItem:(Node*)destinationItem
+                         sourceFormat:(DatabaseFormat)sourceFormat {
+    // Password Safe -> KeePass 1 (Emails -> Appended To End of Notes, No Entries at Root)
+   
+    NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.allChildRecords;
+    }];
+    NSMutableArray<Node*>* all = allRecords.mutableCopy;
+    [all addObjectsFromArray:nodes];
+    NSArray<Node*>* nodesWithEmails = [all filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.email.length;
+    }];
+    
+    NSArray<Node*>* rootEntries = [nodes filter:^BOOL(Node * _Nonnull obj) {
+        return !obj.isGroup;
+    }];
+    
+    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.model.rootGroup) && rootEntries.count);
+    
+    if(nodesWithEmails.count || pastingEntriesToRoot) {
+        [Alerts yesNo:@"KeePass 1 does not support entries at the root level, these will be discarded. KeePass 1 also does not natively support the 'Email' field. Strongbox will append it instead to the end of the 'Notes' field.\nDo you want to continue?"
+               window:self.view.window
+           completion:^(BOOL yesNo) {
+               if(yesNo) {
+                   for (Node* nodeWithEmail in nodesWithEmails) {
+                       nodeWithEmail.fields.notes = [nodeWithEmail.fields.notes stringByAppendingFormat:@"%@Email: %@",
+                                                     nodeWithEmail.fields.notes.length ? @"\n\n" : @"",
+                                                     nodeWithEmail.fields.email];
+                   }
+                   
+                   NSArray* filtered = nodes;
+                   if(pastingEntriesToRoot) {
+                       filtered = [nodes filter:^BOOL(Node * _Nonnull obj) {
+                           return obj.isGroup;
+                       }];
+                   }
+                   
+                   [self continuePaste:serialized nodes:filtered destinationItem:destinationItem sourceFormat:sourceFormat];
+               }
+           }];
+    }
+    else {
+        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+}
+
+- (void)processKeePass2ToPasswordSafe:(NSDictionary*)serialized
+                                nodes:(NSArray<Node*>*)nodes
+                      destinationItem:(Node*)destinationItem
+                         sourceFormat:(DatabaseFormat)sourceFormat {
+    // KeePass 2 -> Password Safe (Loss of Icons, Attachments, Custom Fields?)
+    
+    NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.children;
+    }];
+    NSMutableArray<Node*>* all = allChildNodes.mutableCopy;
+    [all addObjectsFromArray:nodes];
+    
+    NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
+        BOOL customIcon = !obj.isUsingKeePassDefaultIcon;
+        BOOL attachments = obj.fields.attachments.count;
+        BOOL customFields = obj.fields.customFields.count;
+        
+        return customIcon || attachments || customFields;
+    }];
+
+    if(incompatibles.count) {
+        [Alerts yesNo:@"The Password Safe format does not support icons, attachments or custom fields. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?"
+               window:self.view.window
+           completion:^(BOOL yesNo) {
+               if(yesNo) {
+                   for (Node* incompatible in incompatibles) {
+                       incompatible.iconId = nil;
+                       incompatible.customIconUuid = nil;
+                       [incompatible.fields.attachments removeAllObjects];
+                       [incompatible.fields removeAllCustomFields];
+                   }
+                   
+                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+               }
+           }];
+    }
+    else {
+        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+}
+
+- (void)processKeePass2ToKeePass1:(NSDictionary*)serialized
+                                nodes:(NSArray<Node*>*)nodes
+                      destinationItem:(Node*)destinationItem
+                         sourceFormat:(DatabaseFormat)sourceFormat {
+    // KeePass 2 -> KeePass 1 (Only 1 Attachment! No Entries at Root!)
+    
+    NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.children;
+    }];
+    NSMutableArray<Node*>* all = allChildNodes.mutableCopy;
+    [all addObjectsFromArray:nodes];
+    
+    NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
+        BOOL customIcon = obj.customIconUuid != nil;
+        BOOL tooManyAttachments = obj.fields.attachments.count > 1;
+        BOOL customFields = obj.fields.customFields.count;
+        
+        return customIcon || tooManyAttachments || customFields;
+    }];
+    
+    NSArray<Node*>* rootEntries = [nodes filter:^BOOL(Node * _Nonnull obj) {
+        return !obj.isGroup;
+    }];
+    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.model.rootGroup) && rootEntries.count);
+
+    if(incompatibles.count || pastingEntriesToRoot) {
+        [Alerts yesNo:@"The KeePass 1 (KDB) does not support entries at the root level, these will be discarded.\n\nThe KeePass 1 (KDB) format also does not support multiple attachments, custom fields or custom icons. If you continue only the first attachment from each item will be copied to this database. Custom Fields and Icons will be discarded.\nDo you want to continue?"
+               window:self.view.window
+           completion:^(BOOL yesNo) {
+               if(yesNo) {
+                   for (Node* incompatible in incompatibles) {
+                       incompatible.customIconUuid = nil;
+                       NodeFileAttachment* firstAttachment = incompatible.fields.attachments.firstObject;
+                       [incompatible.fields.attachments removeAllObjects];
+                       if(firstAttachment) {
+                           [incompatible.fields.attachments addObject:firstAttachment];
+                       }
+                       [incompatible.fields removeAllCustomFields];
+                   }
+                   
+                   NSArray* filtered = nodes;
+                   if(pastingEntriesToRoot) {
+                       filtered = [nodes filter:^BOOL(Node * _Nonnull obj) {
+                           return obj.isGroup;
+                       }];
+                   }
+                   
+                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+               }
+           }];
+    }
+    else {
+        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+}
+
+- (void)processKeePass1ToPasswordSafe:(NSDictionary*)serialized
+                                nodes:(NSArray<Node*>*)nodes
+                      destinationItem:(Node*)destinationItem
+                         sourceFormat:(DatabaseFormat)sourceFormat {
+    // KeePass 1 -> Password Safe (Loss of Icons & Attachment)
+    
+    NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.children;
+    }];
+    NSMutableArray<Node*>* all = allChildNodes.mutableCopy;
+    [all addObjectsFromArray:nodes];
+    
+    NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
+        BOOL customIcon = !obj.isUsingKeePassDefaultIcon;
+        BOOL attachments = obj.fields.attachments.count;
+        
+        return customIcon || attachments;
+    }];
+    
+    if(incompatibles.count) {
+        [Alerts yesNo:@"The Password Safe format does not support attachments or icons. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?"
+               window:self.view.window
+           completion:^(BOOL yesNo) {
+               if(yesNo) {
+                   for (Node* incompatible in incompatibles) {
+                       incompatible.iconId = nil;
+                       incompatible.customIconUuid = nil;
+                       [incompatible.fields.attachments removeAllObjects];
+                       [incompatible.fields removeAllCustomFields];
+                   }
+                   
+                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+               }
+           }];
+    }
+    else {
+        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+}
+
+- (void)processFormatIncompatibilities:(NSDictionary*)serialized
+                                 nodes:(NSArray<Node*>*)nodes
+                       destinationItem:(Node*)destinationItem
+                          sourceFormat:(DatabaseFormat)sourceFormat {
+    if (sourceFormat == kPasswordSafe && (self.model.format == kKeePass || self.model.format == kKeePass4)) {
+        [self processPasswordSafeToKeePass2:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+    else if (sourceFormat == kPasswordSafe && self.model.format == kKeePass1) {
+        [self processPasswordSafeToKeePass1:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.model.format == kPasswordSafe) {
+        [self processKeePass2ToPasswordSafe:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.model.format == kKeePass1) {
+        [self processKeePass2ToKeePass1:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+    else if (sourceFormat == kKeePass1 && self.model.format == kPasswordSafe) {
+        [self processKeePass1ToPasswordSafe:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+    else {
+        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+    }
+}
+
+- (void)continuePaste:(NSDictionary*)serialized
+                nodes:(NSArray<Node*>*)nodes
+      destinationItem:(Node*)destinationItem
+         sourceFormat:(DatabaseFormat)sourceFormat {
+    NSDictionary<NSString*, NSString*>* attachmentsMap = serialized[@"attachmentsMap"];
+    NSMutableDictionary<NSString*, NSString*> *customIconsMap = serialized[@"customIconsMap"];
+    
+    [self rebuildAttachments:nodes attachmentsMap:attachmentsMap];
+    
+    // Rebuild Custom Icons
+
+    [self rebuildCustomIcons:nodes customIconsMap:customIconsMap];
+    
+    // Add Items to our Model...
+    
+    BOOL allowDuplicateGroupTitles = self.model.format != kPasswordSafe;
+    
+    BOOL success = [self.model addChildren:nodes parent:destinationItem allowDuplicateGroupTitles:allowDuplicateGroupTitles];
+    
+    if(!success) {
+        [Alerts info:@"Could Not Paste"
+     informativeText:@"Could not place these items here. Unknown error."
+              window:self.view.window
+          completion:nil];
+    }
+}
+
+- (void)rebuildCustomIcons:(NSArray<Node*>*)nodes customIconsMap:(NSDictionary<NSString*, NSString*>*)customIconsMap {
+    for (Node* node in nodes) {
+        [self rebuildCustomIconsForSerializedNode:node customIconsMap:customIconsMap];
+    }
+}
+
+- (void)rebuildCustomIconsForSerializedNode:(Node*)node customIconsMap:(NSDictionary<NSString*, NSString*>*)customIconsMap {
+    NSUUID* original = node.customIconUuid;
+    node.customIconUuid = nil;
+
+    if(original) {
+        NSString* b64Data = customIconsMap[original.UUIDString];
+        NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
+        
+        [self.model setItemIcon:node index:nil existingCustom:nil custom:data rationalize:NO]; // Make sure not to rationalize
+    }
+    
+    // Recurse into children
+    
+    [self rebuildCustomIcons:node.children customIconsMap:customIconsMap];
+}
+
+- (void)rebuildAttachments:(NSArray<Node*>*)nodes attachmentsMap:(NSDictionary<NSString*, NSString*>*)attachmentsMap {
+    for (Node* node in nodes) {
+        [self rebuildAttachmentsForSerializedNode:node attachmentsMap:attachmentsMap];
+    }
+}
+
+- (void)rebuildAttachmentsForSerializedNode:(Node*)node attachmentsMap:(NSDictionary<NSString*, NSString*>*)attachmentsMap {
+    // Make a copy and clear this items attachments - we will re-add below with the right indices etc
+    
+    NSArray* originalAttachments = node.fields.attachments.copy;
+    [node.fields.attachments removeAllObjects];
+    
+    for (NodeFileAttachment* attachment in originalAttachments) {
+        NSString* b64Data = attachmentsMap[@(attachment.index).stringValue];
+        NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
+        UiAttachment* uiAttachment = [UiAttachment attachmentWithFilename:attachment.filename data:data];
+    
+        [self.model addItemAttachment:node attachment:uiAttachment rationalize:NO]; // DO Not Rationalize since these attachments are not officially linked to the database yet!
+    }
+    
+    // Recurse into children
+    
+    [self rebuildAttachments:node.children attachmentsMap:attachmentsMap];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction)onCreateRecord:(id)sender {
     Node *item = [self getCurrentSelectedItem];
@@ -1836,6 +2344,15 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     if (theAction == @selector(onViewItemDetails:)) {
         return item != nil && !item.isGroup;
+    }
+    else if (theAction == @selector(copy:)) {
+        return item != nil;
+    }
+    else if (theAction == @selector(paste:)) {
+        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+        NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
+        NSLog(@"Validate Paste - %d", blah != nil);
+        return blah != nil;
     }
     else if (theAction == @selector(onDelete:)) {
         if(self.outlineView.selectedRowIndexes.count > 1) {

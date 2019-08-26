@@ -38,8 +38,8 @@
 
 - (void)updateOfflineCacheWithData:(NSData *_Nonnull)data;
 - (void)updateOfflineCache:(void (^_Nonnull)(void))handler;
-- (void)disableAndClearOfflineCache;
-- (void)enableOfflineCache;
+//- (void)disableAndClearOfflineCache;
+//- (void)enableOfflineCache;
 
 - (void)updateAutoFillCacheWithData:(NSData *_Nonnull)data;
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler;

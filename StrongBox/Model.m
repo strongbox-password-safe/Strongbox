@@ -170,22 +170,22 @@
       }];
 }
 
-- (void)disableAndClearOfflineCache {
-    [[CacheManager sharedInstance] deleteOfflineCachedSafe:_metadata
-                         completion:^(NSError *error) {
-                             self->_metadata.offlineCacheEnabled = NO;
-                             self->_metadata.offlineCacheAvailable = NO;
-
-                             [[SafesList sharedInstance] update:self.metadata];
-                         }];
-}
-
-- (void)enableOfflineCache {
-    _metadata.offlineCacheAvailable = NO;
-    _metadata.offlineCacheEnabled = YES;
-
-    [[SafesList sharedInstance] update:self.metadata];
-}
+//- (void)disableAndClearOfflineCache {
+//    [[CacheManager sharedInstance] deleteOfflineCachedSafe:_metadata
+//                         completion:^(NSError *error) {
+//                             self->_metadata.offlineCacheEnabled = NO;
+//                             self->_metadata.offlineCacheAvailable = NO;
+//
+//                             [[SafesList sharedInstance] update:self.metadata];
+//                         }];
+//}
+//
+//- (void)enableOfflineCache {
+//    _metadata.offlineCacheAvailable = NO;
+//    _metadata.offlineCacheEnabled = YES;
+//
+//    [[SafesList sharedInstance] update:self.metadata];
+//}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Operations

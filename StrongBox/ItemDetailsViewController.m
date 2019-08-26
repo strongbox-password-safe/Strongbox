@@ -22,7 +22,6 @@
 #import "NodeIconHelper.h"
 #import "IconTableCell.h"
 #import "TotpCell.h"
-//#import "OTPToken+Generation.h"
 #import "Alerts.h"
 #import "Settings.h"
 #import "NSDictionary+Extensions.h"
@@ -129,18 +128,24 @@ static NSString* const kEditDateCell = @"EditDateCell";
     [self.tableView endUpdates];
     
     [UIView setAnimationsEnabled:YES];
-    
-    // Do not do this - It's incorrect if we're editing... Shouldn't need to change this here anyway
-    //
-//    if(self.splitViewController) {
-//        self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-//    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
     [NSNotificationCenter.defaultCenter removeObserver:self name:CellHeightsChangedNotification object:nil];
+}
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    // Needs to be done here to avoid jumpy animation on load...
+    
+    if(Settings.sharedInstance.hideTips) {
+        self.navigationItem.prompt = nil;
+    }
+    else {
+        self.navigationItem.prompt = NSLocalizedString(@"item_details_tip", @"Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes");
+    }
 }
 
 - (void)viewDidLoad {
@@ -158,11 +163,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     self.navigationItem.rightBarButtonItems = rightBarButtons;
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
-    
-    self.navigationController.navigationBar.prefersLargeTitles = NO;
-    if(Settings.sharedInstance.hideTips) {
-        self.navigationItem.prompt = nil;
-    }
     
     [self setupTableview];
 
@@ -309,9 +309,13 @@ static NSString* const kEditDateCell = @"EditDateCell";
         self.editButtonItem.enabled = !self.readOnly;
         self.navigationItem.leftBarButtonItem = self.splitViewController ? self.splitViewController.displayModeButtonItem : nil;
         
-        self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
-                                     self.readOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
+        [self bindTitle];
     }
+}
+
+- (void)bindTitle {
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
+                                 self.readOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
 }
 
 - (void)prepareTableViewForEditing {
@@ -1121,7 +1125,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
         };
     }
     else if ([segue.identifier isEqualToString:@"toKeePassHistory"] && (self.item != nil)) {
-        KeePassHistoryController *vc = segue.destinationViewController;
+        UINavigationController* nav = segue.destinationViewController;
+        KeePassHistoryController *vc = (KeePassHistoryController *)nav.topViewController;
 
         vc.historicalItems = self.item.fields.keePassHistory;
         vc.viewModel = self.databaseModel;
@@ -1551,7 +1556,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)processIconBeforeSave:(void (^)(void))completion {
     if(self.model.icon.customImage) {
         NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
-        [self.databaseModel.database setNodeCustomIcon:self.item data:data];
+        [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
     }
     else if(self.model.icon.customUuid) {
         self.item.customIconUuid = self.model.icon.customUuid;
@@ -1580,7 +1585,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
                               completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
                                   if(goNoGo && userSelectedNewCustomIcon) {
                                       NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                                      [self.databaseModel.database setNodeCustomIcon:self.item data:data];
+                                      [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
                                   }
                                   
                                   completion();

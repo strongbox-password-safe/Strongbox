@@ -45,7 +45,7 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.labelBiometricIdFeature.text = [NSString stringWithFormat:@"🗝 %@", [[Settings sharedInstance] getBiometricIdName]];
+    self.labelBiometricIdFeature.text = [Settings.sharedInstance getBiometricIdName];
     
     [self initializeUi];
     [self updateUi];
@@ -55,6 +55,18 @@ static NSString* const kFontName =  @"Futura-Bold";
             [self updateUi];
         });
     };
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onProStatusChanged:)
+                                               name:kProStatusChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onProStatusChanged:(id)param {
+//    NSLog(@"Pro Status Changed! - Thanks!");
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    });
 }
 
 - (void)initializeUi {

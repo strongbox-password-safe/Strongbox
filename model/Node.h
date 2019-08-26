@@ -56,9 +56,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildRecords;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildGroups;
 
+@property (readonly) BOOL isUsingKeePassDefaultIcon;
 @property (readonly) BOOL expired;
+@property (readonly) BOOL nearlyExpired;
 
-- (NSString*)getSerializationId:(BOOL)groupCanUseUuid;
++ (Node *)deserialize:(NSDictionary *)dict
+               parent:(Node*)parent
+allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
+                error:(NSError**)error;
+
+- (NSDictionary *)serialize:(SerializationPackage*)serialization; // Serializes this node and all children (all fields) - This can be used interprocess - for duplications/copy/paste - drag & drop
+
+- (NSString*)getSerializationId:(BOOL)groupCanUseUuid; // This is an ID which should hopefully remain the same across saves
 
 - (BOOL)contains:(Node*)test;
 - (BOOL)setTitle:(NSString*_Nonnull)title allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;

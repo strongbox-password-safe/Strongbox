@@ -46,6 +46,10 @@
 @property (weak, nonatomic) IBOutlet UISwitch *swtichShowExpiredInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowExpiredInSearch;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowFavourites;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowNearlyExpired;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowSpecialExpired;
+
 @end
 
 @implementation BrowsePreferencesTableViewController
@@ -86,6 +90,10 @@
     self.databaseMetaData.showExpiredInBrowse = self.swtichShowExpiredInBrowse.on;
     self.databaseMetaData.showExpiredInSearch = self.switchShowExpiredInSearch.on;
     
+    self.databaseMetaData.showQuickViewNearlyExpired = self.switchShowNearlyExpired.on;
+    self.databaseMetaData.showQuickViewFavourites = self.switchShowFavourites.on;
+    self.databaseMetaData.showQuickViewExpired = self.switchShowSpecialExpired.on;
+    
     [SafesList.sharedInstance update:self.databaseMetaData];
     
     [self bindPreferences];
@@ -109,7 +117,7 @@
     self.switchShowTotpBrowseView.on = !self.databaseMetaData.hideTotpInBrowse;
     self.switchShowRecycleBinInBrowse.on = !self.databaseMetaData.doNotShowRecycleBinInBrowse;
 
-    self.labelViewAs.text = [self getBrowseViewTypeName:self.databaseMetaData.browseViewType];
+    self.labelViewAs.text = [BrowsePreferencesTableViewController getBrowseViewTypeName:self.databaseMetaData.browseViewType];
     
     // Expired
     
@@ -122,6 +130,12 @@
     self.labelDoubleTapAction.text = [self getTapActionString:(self.databaseMetaData.doubleTapAction)];
     self.labelTripleTapAction.text = [self getTapActionString:(self.databaseMetaData.tripleTapAction)];
     self.labelLongPressAction.text = [self getTapActionString:(self.databaseMetaData.longPressTapAction)];
+    
+    // Quick View Sections
+    
+    self.switchShowNearlyExpired.on = self.databaseMetaData.showQuickViewNearlyExpired;
+    self.switchShowFavourites.on = self.databaseMetaData.showQuickViewFavourites;
+    self.switchShowSpecialExpired.on = self.databaseMetaData.showQuickViewExpired;
 }
 
 - (NSString*)getTapActionString:(BrowseTapAction)action {
@@ -260,7 +274,7 @@
                                     @(kBrowseViewTypeTotpList)];
     
     NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [self getBrowseViewTypeName:(BrowseViewType)obj.integerValue];
+        return [BrowsePreferencesTableViewController getBrowseViewTypeName:(BrowseViewType)obj.integerValue];
     }];
     
     BrowseViewType current = self.databaseMetaData.browseViewType;
@@ -283,7 +297,7 @@
                }];
 }
 
-- (NSString*)getBrowseViewTypeName:(BrowseViewType)field {
++ (NSString*)getBrowseViewTypeName:(BrowseViewType)field {
     switch (field) {
         case kBrowseViewTypeHierarchy:
             return NSLocalizedString(@"browse_prefs_view_as_folders", @"Folder Hierarchy");

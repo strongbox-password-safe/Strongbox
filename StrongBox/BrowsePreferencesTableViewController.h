@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onPreferencesChanged)(void);
 
++ (NSString*)getBrowseViewTypeName:(BrowseViewType)field;
+
 @end
 
 NS_ASSUME_NONNULL_END

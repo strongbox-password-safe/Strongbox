@@ -63,9 +63,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeNodeAttachment:(Node*)node atIndex:(NSUInteger)atIndex;
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment;
+- (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
+
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 
-- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data;
+- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
 
 - (void)performPreSerializationTidy;
 

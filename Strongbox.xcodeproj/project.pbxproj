@@ -450,6 +450,7 @@
 		4D9597B922A28825008DB224 /* SelectedStorageParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597B822A28825008DB224 /* SelectedStorageParameters.m */; };
 		4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
 		4D9597BF22A2CB38008DB224 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
+		4D9677E723102BFB004AF091 /* Upgrade.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9677E923102BFB004AF091 /* Upgrade.storyboard */; };
 		4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
 		4D98343A21773B3300731FFC /* generic-keepass.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D98343921773B3300731FFC /* generic-keepass.xml */; };
 		4D983441217743F300731FFC /* generic.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D983440217743F200731FFC /* generic.kdbx */; };
@@ -1324,6 +1325,8 @@
 		4D9597B822A28825008DB224 /* SelectedStorageParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectedStorageParameters.m; path = StrongBox/SelectedStorageParameters.m; sourceTree = "<group>"; };
 		4D9597BC22A2CB38008DB224 /* CASGParams.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CASGParams.h; path = StrongBox/CASGParams.h; sourceTree = "<group>"; };
 		4D9597BD22A2CB38008DB224 /* CASGParams.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CASGParams.m; path = StrongBox/CASGParams.m; sourceTree = "<group>"; };
+		4D9677E823102BFB004AF091 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Upgrade.storyboard; sourceTree = "<group>"; };
+		4D9677EB23102C01004AF091 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Upgrade.strings; sourceTree = "<group>"; };
 		4D970DAC20F8BB3F00EBF6C0 /* SafesList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesList.h; path = model/SafesList.h; sourceTree = SOURCE_ROOT; };
 		4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesList.m; path = model/SafesList.m; sourceTree = SOURCE_ROOT; };
 		4D98343921773B3300731FFC /* generic-keepass.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "generic-keepass.xml"; sourceTree = "<group>"; };
@@ -1638,6 +1641,7 @@
 				4DC74104221066E1009C32F0 /* UpgradeTableViewController.m */,
 				4D06943722083E5200FB826C /* ProUpgradeIAPManager.h */,
 				4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */,
+				4D9677E923102BFB004AF091 /* Upgrade.storyboard */,
 			);
 			name = Upgrade;
 			sourceTree = "<group>";
@@ -3317,6 +3321,7 @@
 				4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4DE7F0CB22F89CE30095F51F /* MasterDetail.storyboard in Resources */,
+				4D9677E723102BFB004AF091 /* Upgrade.storyboard in Resources */,
 				4DE7F0D522F89D270095F51F /* Browse.storyboard in Resources */,
 				4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */,
 				4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */,
@@ -4164,6 +4169,16 @@
 				4D8A99AB230AF31700AB98DC /* de */,
 			);
 			name = InfoPlist.strings;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D9677E923102BFB004AF091 /* Upgrade.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D9677E823102BFB004AF091 /* Base */,
+				4D9677EB23102C01004AF091 /* de */,
+			);
+			name = Upgrade.storyboard;
 			path = StrongBox;
 			sourceTree = "<group>";
 		};

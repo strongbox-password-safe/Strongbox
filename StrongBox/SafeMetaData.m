@@ -65,7 +65,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     if (self) {
         self.uuid = [[NSUUID UUID] UUIDString];
         self.failedPinAttempts = 0;
-        self.offlineCacheEnabled = YES;
+//        self.offlineCacheEnabled = YES;
         self.autoFillEnabled = YES;
         self.likelyFormat = kFormatUnknown;
         self.browseViewType = kBrowseViewTypeHierarchy;
@@ -103,6 +103,11 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         
         self.showExpiredInBrowse = YES;
         self.showExpiredInSearch = YES;
+        
+        self.autoLockTimeoutSeconds = self.old_autoLockTimeoutSeconds;
+        self.showQuickViewFavourites = YES;
+        self.showQuickViewNearlyExpired = YES;
+        self.favourites = @[];
     }
     
     return self;
@@ -144,7 +149,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     
     [encoder encodeBool:self.isEnrolledForConvenience forKey:@"isEnrolledForTouchId"];
 
-    [encoder encodeBool:self.offlineCacheEnabled forKey:@"offlineCacheEnabled"];
+    //[encoder encodeBool:self.offlineCacheEnabled forKey:@"offlineCacheEnabled"];
     [encoder encodeBool:self.offlineCacheAvailable forKey:@"offlineCacheAvailable"];
     [encoder encodeBool:self.hasUnresolvedConflicts forKey:@"hasUnresolvedConflicts"];
     [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillCacheEnabled"];
@@ -200,6 +205,12 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     
     [encoder encodeBool:self.showExpiredInSearch forKey:@"showExpiredInSearch"];
     [encoder encodeBool:self.showExpiredInBrowse forKey:@"showExpiredInBrowse"];
+    
+    [encoder encodeObject:self.autoLockTimeoutSeconds forKey:@"autoLockTimeoutSeconds"];
+    
+    [encoder encodeBool:self.showQuickViewNearlyExpired forKey:@"showQuickViewNearlyExpired"];
+    [encoder encodeBool:self.showQuickViewFavourites forKey:@"showQuickViewFavourites"];
+    [encoder encodeBool:self.showQuickViewExpired forKey:@"showQuickViewExpired"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -213,7 +224,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
         self.isEnrolledForConvenience = [decoder decodeBoolForKey:@"isEnrolledForTouchId"];
         
-        self.offlineCacheEnabled = [decoder decodeBoolForKey:@"offlineCacheEnabled"];
+//        self.offlineCacheEnabled = [decoder decodeBoolForKey:@"offlineCacheEnabled"];
         self.offlineCacheAvailable = [decoder decodeBoolForKey:@"offlineCacheAvailable"];
         self.hasUnresolvedConflicts = [decoder decodeBoolForKey:@"hasUnresolvedConflicts"];
         
@@ -346,9 +357,44 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         if([decoder containsValueForKey:@"showExpiredInBrowse"]) {
             self.showExpiredInBrowse = [decoder decodeBoolForKey:@"showExpiredInBrowse"];
         }
+        
+        if([decoder containsValueForKey:@"autoLockTimeoutSeconds"]) {
+            self.autoLockTimeoutSeconds = [decoder decodeObjectForKey:@"autoLockTimeoutSeconds"];
+        }
+
+        if([decoder containsValueForKey:@"showQuickViewNearlyExpired"]) {
+            self.showQuickViewNearlyExpired = [decoder decodeBoolForKey:@"showQuickViewNearlyExpired"];
+        }
+        
+        if([decoder containsValueForKey:@"showQuickViewFavourites"]) {
+            self.showQuickViewFavourites = [decoder decodeBoolForKey:@"showQuickViewFavourites"];
+        }
+        
+        if([decoder containsValueForKey:@"showQuickViewExpired"]) {
+            self.showQuickViewExpired = [decoder decodeBoolForKey:@"showQuickViewExpired"];
+        }
     }
     
     return self;
+}
+
+- (NSArray<NSString *> *)favourites {
+    NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
+    
+    NSArray<NSString *>* ret = [JNKeychain loadValueForKey:key];
+    
+    return ret ? ret : @[];
+}
+
+- (void)setFavourites:(NSArray<NSString *> *)favourites {
+    NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
+    
+    if(favourites) {
+        [JNKeychain saveValue:favourites forKey:key];
+    }
+    else {
+        [JNKeychain deleteValueForKey:key];
+    }
 }
 
 - (NSString *)convenienceMasterPassword {
@@ -436,6 +482,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     self.convenenienceKeyFileDigest = nil;
     self.convenenienceYubikeySecret = nil;
     
+    self.favourites = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;
 }
@@ -549,6 +596,24 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 
 - (BOOL)old_showPasswordByDefaultOnEditScreen {
     return [self getBool:kShowPasswordByDefaultOnEditScreen];
+}
+
+-(NSNumber*)old_autoLockTimeoutSeconds
+{
+    static NSString* const kAutoLockTimeSeconds = @"autoLockTimeSeconds";
+    NSUserDefaults *userDefaults = [self getUserDefaults];
+    
+    NSNumber *seconds = [userDefaults objectForKey:kAutoLockTimeSeconds];
+    
+    if (seconds == nil) {
+        seconds = @60;
+    }
+    
+    return seconds;
+}
+
+- (BOOL)offlineCacheEnabled {
+    return YES;
 }
 
 @end

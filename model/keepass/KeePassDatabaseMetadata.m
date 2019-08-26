@@ -44,24 +44,20 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
 - (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
     BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
     
-    [kvps addKey:@"Database Format" andValue:@"KeePass 2"];
-    [kvps addKey:@"KeePass File Version"  andValue:self.version];
-    [kvps addKey:@"Database Generator" andValue:self.generator];
-    [kvps addKey:@"Compressed"  andValue:self.compressionFlags == kGzipCompressionFlag ? @"Yes (GZIP)" : @"No"];
-    [kvps addKey:@"Transform Rounds" andValue:[NSString stringWithFormat:@"%llu", self.transformRounds]];
-    [kvps addKey:@"Outer Encryption" andValue:outerEncryptionAlgorithmString(self.cipherUuid)];
-    [kvps addKey:@"Inner Encryption" andValue:innerEncryptionString(self.innerRandomStreamId)];
-    [kvps addKey:@"Max History Items" andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
-    
     NSString* size = friendlyFileSizeString(self.historyMaxSize);
     
-    [kvps addKey:@"Max History Size" andValue:size];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format") andValue:@"KeePass 2"];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_keepass_version", @"KeePass File Version")  andValue:self.version];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_generator", @"Database Generator") andValue:self.generator];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption") andValue:outerEncryptionAlgorithmString(self.cipherUuid)];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_compressed", @"Compressed")  andValue:localizedYesOrNoFromBool(self.compressionFlags == kGzipCompressionFlag)];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds") andValue:[NSString stringWithFormat:@"%llu", self.transformRounds]];
 
-    [kvps addKey:@"Recycle Bin Enabled" andValue:self.recycleBinEnabled ? @"Yes" : @"No"];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_inner_encryption", @"Inner Encryption") andValue:innerEncryptionString(self.innerRandomStreamId)];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_items", @"Max History Items") andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_size", @"Max History Size") andValue:size];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_recycle_bin_enabled", @"Recycle Bin Enabled") andValue:localizedYesOrNoFromBool(self.recycleBinEnabled)];
     
-//    [kvps addKey:@"Recycle Bin Group" andValue:[self.recycleBinGroup isEqual:NSUUID.zero] ? @"Created on Demand" : [NSString stringWithFormat:@"%@", self.recycleBinGroup]];
-//    [kvps addKey:@"Recycle Bin Changed" andValue:[NSString stringWithFormat:@"%@", self.recycleBinChanged]];
-
     return kvps;
 }
 

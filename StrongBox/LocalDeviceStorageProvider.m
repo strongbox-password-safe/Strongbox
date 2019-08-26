@@ -86,8 +86,6 @@
     identifier.sharedStorage = Settings.sharedInstance.useLocalSharedStorage;
     
     SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:identifier];
-    metadata.offlineCacheEnabled = NO;
-    
     completion(metadata, nil);
 }
 

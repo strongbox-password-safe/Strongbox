@@ -56,7 +56,6 @@
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName filename:(NSString*)filename fileIdentifier:(NSString*)fileIdentifier {
     SafeMetaData* meta = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:kDuressDummy fileName:filename fileIdentifier:fileIdentifier];
     
-    meta.offlineCacheEnabled = NO;
     meta.autoFillEnabled = NO;
     
     return meta;

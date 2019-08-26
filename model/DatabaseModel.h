@@ -34,9 +34,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment;
+- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
+
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
-- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data;
+- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;

@@ -15,15 +15,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *otpLabel;
 
-- (void)setGroup:(NSString *)title icon:(UIImage*)icon childCount:(NSString*)childCount italic:(BOOL)italic groupLocation:(NSString*)groupLocation;
+- (void)setGroup:(NSString *)title
+            icon:(UIImage*)icon
+      childCount:(NSString*)childCount
+          italic:(BOOL)italic
+   groupLocation:(NSString*)groupLocation
+          pinned:(BOOL)pinned;
 
-- (void)setGroup:(NSString *)title icon:(UIImage*)icon childCount:(NSString*)childCount italic:(BOOL)italic groupLocation:(NSString*)groupLocation tintColor:(UIColor* _Nullable )tintColor;
+- (void)setGroup:(NSString *)title
+            icon:(UIImage*)icon
+      childCount:(NSString*)childCount
+          italic:(BOOL)italic
+   groupLocation:(NSString*)groupLocation
+       tintColor:(UIColor* _Nullable )tintColor
+          pinned:(BOOL)pinned;
 
 - (void)setRecord:(NSString*)title
          subtitle:(NSString*)subtitle
              icon:(UIImage*)icon
     groupLocation:(NSString*)groupLocation
-            flags:(NSString*)flags
+           pinned:(BOOL)pinned
+   hasAttachments:(BOOL)hasAttachments
           expired:(BOOL)expired
          otpToken:(OTPToken*_Nullable)otpToken;
 

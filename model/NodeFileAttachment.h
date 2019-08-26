@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeFileAttachment : NSObject
 
-+ (instancetype)attachmentWithName:(NSString*)filename index:(uint32_t)index linkedObject:(NSObject*)linkedObject;
++ (instancetype)attachmentWithName:(NSString*)filename index:(uint32_t)index linkedObject:(NSObject*_Nullable)linkedObject;
 
 @property NSString* filename;
 @property uint32_t index;

@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/AppDelegate.m"
-            timestampString = "587922697.3751121"
+            filePath = "macbox/MacBox/NodeDetailsWindowController.m"
+            timestampString = "588474120.181915"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
-            landmarkName = "-migrateToNewPasswordGenerator"
+            startingLineNumber = "973"
+            endingLineNumber = "973"
+            landmarkName = "-onAddAttachment:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/OpenSafeSequenceHelper.m"
-            timestampString = "587434349.809886"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "588474120.182187"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "737"
-            endingLineNumber = "737"
-            landmarkName = "-openSafeWithDataDone:openedSafe:cacheMode:provider:data:"
+            startingLineNumber = "1707"
+            endingLineNumber = "1707"
+            landmarkName = "-paste:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -41,29 +41,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/OpenSafeSequenceHelper.m"
-            timestampString = "587434349.810293"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "588474120.182381"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "991"
-            endingLineNumber = "991"
-            landmarkName = "@implementation OpenSafeSequenceHelper"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "StrongBox/ItemDetailsViewController.m"
-            timestampString = "587333227.1776789"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "175"
-            endingLineNumber = "175"
-            landmarkName = "-viewDidLoad"
+            startingLineNumber = "1850"
+            endingLineNumber = "1850"
+            landmarkName = "-pasteItemsFromPasteboard:destinationItem:source:clear:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -73,13 +57,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/AppDelegate.m"
-            timestampString = "587922697.375525"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "588474120.182435"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "192"
-            endingLineNumber = "192"
-            landmarkName = "-getInitialViewController"
+            startingLineNumber = "1909"
+            endingLineNumber = "1909"
+            landmarkName = "-pasteFromExternal:destinationItem:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -89,46 +73,14 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/SafesViewController.m"
-            timestampString = "587434349.810626"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "588474120.182482"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1325"
-            endingLineNumber = "1325"
-            landmarkName = "-openQuickLaunchDatabase:"
+            startingLineNumber = "1920"
+            endingLineNumber = "1920"
+            landmarkName = "-pasteFromExternal:destinationItem:"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[SafesViewController openQuickLaunchDatabase:]"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
-                  timestampString = "587328304.826269"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1273"
-                  endingLineNumber = "1273"
-                  offsetFromSymbolStart = "44">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__47-[SafesViewController openQuickLaunchDatabase:]_block_invoke"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
-                  timestampString = "587328304.828071"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1273"
-                  endingLineNumber = "1273"
-                  offsetFromSymbolStart = "32">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -137,61 +89,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "StrongBox/SafesViewController.m"
-            timestampString = "587434349.810679"
+            filePath = "macbox/MacBox/ViewController.m"
+            timestampString = "588474120.1825269"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1326"
-            endingLineNumber = "1326"
-            landmarkName = "-openQuickLaunchDatabase:"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__33-[SafesViewController requestPin]_block_invoke"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
-                  timestampString = "587328305.51452"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1275"
-                  endingLineNumber = "1275"
-                  offsetFromSymbolStart = "1207">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__copy_helper_block_e8_32s40w"
-                  moduleName = "Strongbox"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/mark/dev/strongbox/StrongBox/SafesViewController.m"
-                  timestampString = "587328305.5162081"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1251"
-                  endingLineNumber = "1251"
-                  offsetFromSymbolStart = "16">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "StrongBox/BrowseItemCell.m"
-            timestampString = "587412386.5212131"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "101"
-            endingLineNumber = "101"
-            landmarkName = "-setRecord:subtitle:icon:groupLocation:flags:expired:otpToken:"
+            startingLineNumber = "1922"
+            endingLineNumber = "1922"
+            landmarkName = "-pasteFromExternal:destinationItem:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

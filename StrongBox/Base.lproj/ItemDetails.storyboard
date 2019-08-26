@@ -21,7 +21,7 @@
         <!--Item Details-->
         <scene sceneID="GPt-GZ-6qb">
             <objects>
-                <tableViewController storyboardIdentifier="ItemDetailsViewController" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="LUp-85-BZf" userLabel="Item Details" customClass="ItemDetailsViewController" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="ItemDetailsViewController" title="Item Details" extendedLayoutIncludesOpaqueBars="YES" hidesBottomBarWhenPushed="YES" id="LUp-85-BZf" userLabel="Item Details" customClass="ItemDetailsViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="DPp-c2-e6v">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -32,7 +32,7 @@
                             <outlet property="delegate" destination="LUp-85-BZf" id="glb-zL-jlf"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Acme Inc." prompt="Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes" id="Wu5-96-gRh">
+                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="Wu5-96-gRh">
                         <barButtonItem key="rightBarButtonItem" title="Details View Preferences" image="list" id="rL6-Dh-Vni">
                             <connections>
                                 <segue destination="EyE-JR-ywl" kind="popoverPresentation" identifier="segueToViewPreferences" popoverAnchorBarButtonItem="rL6-Dh-Vni" id="GFW-Mm-qNk">

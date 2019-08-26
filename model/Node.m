@@ -12,6 +12,7 @@
 #import "OTPToken+Generation.h"
 #import "NSURL+QueryItems.h"
 #import <Base32/MF_Base32Additions.h>
+#import "NSArray+Extensions.h"
 
 @interface Node ()
 
@@ -117,6 +118,72 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     return self;
 }
 
++ (Node *)deserialize:(NSDictionary *)dict
+               parent:(Node*)parent
+allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
+                error:(NSError**)error {
+    NSDictionary *nodeFieldsDict = dict[@"fields"];
+    NSString *title = dict[@"title"];
+    NSNumber *isGroup = dict[@"isGroup"];
+    NSNumber *iconId = dict[@"iconId"];
+    NSArray<NSDictionary*> *children = dict[@"children"];
+    NSString* customIconUuid = dict[@"customIconUuid"]; // Needs to be corrected in destination database pool
+    
+    NodeFields* nodeFields = [NodeFields deserialize:nodeFieldsDict];
+    
+    Node* ret;
+    if(isGroup.boolValue) {
+        ret = [[Node alloc] initAsGroup:title parent:parent allowDuplicateGroupTitles:allowDuplicateGroupTitle uuid:nil];
+        
+        if(!ret) {
+            NSString* errorFormat = NSLocalizedString(@"node_serialization_error_duplicate_group_title_fmt", @"Error message indicating that these item(s) cannot be deserialized to this database because they contain two groups with the same title.");
+            *error = [Utils createNSError:[NSString stringWithFormat:errorFormat, title] errorCode:-24122];
+            return nil;
+        }
+    }
+    else {
+        ret = [[Node alloc] initAsRecord:title parent:parent fields:nodeFields uuid:nil];
+    }
+    
+    
+    ret.iconId = iconId;
+    ret.customIconUuid = [[NSUUID alloc] initWithUUIDString:customIconUuid];
+    
+    for (NSDictionary* child in children) {
+        Node* childNode = [Node deserialize:child parent:ret allowDuplicateGroupTitles:allowDuplicateGroupTitle error:error];
+        if(!childNode) {
+            return nil;
+        }
+        
+        // Error Check not necessary as done in deserialization above
+        [ret addChild:childNode allowDuplicateGroupTitles:allowDuplicateGroupTitle];
+    }
+    
+    return ret;
+}
+
+- (NSDictionary *)serialize:(SerializationPackage*)serialization {
+    NSMutableDictionary* ret = [NSMutableDictionary dictionary];
+    
+    NSDictionary* fieldsDictionary = [self.fields serialize:serialization];
+    ret[@"fields"] = fieldsDictionary;
+    ret[@"title"] = self.title;
+    ret[@"isGroup"] = @(self.isGroup);
+    ret[@"iconId"] = self.iconId;
+    
+    NSArray<NSDictionary*>* childDictionaries = [self.children map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return [obj serialize:serialization];
+    }];
+    ret[@"children"] = childDictionaries;
+    
+    if(self.customIconUuid) {
+        ret[@"customIconUuid"] = self.customIconUuid.UUIDString;
+        [serialization.usedCustomIcons addObject:self.customIconUuid];
+    }
+    
+    return ret;
+}
+
 - (Node*)duplicate:(NSString*)newTitle {
     NodeFields* clonedFields = [self.fields duplicate];
     
@@ -151,10 +218,39 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     return ret;
 }
 
+- (BOOL)isUsingKeePassDefaultIcon {
+    if(self.customIconUuid) {
+        return NO;
+    }
+    
+    NSNumber* index = self.iconId;
+    if(!index) {
+        return YES;
+    }
+    
+    if(index.intValue == -1) {
+        return YES;
+    }
+    
+    if(self.isGroup && index.intValue == 48) {
+        return YES;
+    }
+    
+    if(!self.isGroup && index.intValue == 0) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 /////////////
 
 - (BOOL)expired {
     return self.fields.expired;
+}
+
+- (BOOL)nearlyExpired {
+    return self.fields.nearlyExpired;
 }
 
 - (NSArray<Node*>*)children {

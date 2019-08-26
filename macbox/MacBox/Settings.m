@@ -70,7 +70,7 @@ static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
 }
 
 - (BOOL)autoPromptForTouchIdOnActivate {
-    return [self getBool:kAutoPromptForTouchIdOnActivate fallback:NO]; // TODO: If this works well, default on
+    return [self getBool:kAutoPromptForTouchIdOnActivate fallback:YES];
 }
 
 - (void)setAutoPromptForTouchIdOnActivate:(BOOL)autoPromptForTouchIdOnActivate {
