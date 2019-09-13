@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "BaseXmlDomainObjectHandler.h"
-#import "GenericTextStringElementHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,8 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
-@property (nonatomic) GenericTextStringElementHandler *key;
-@property (nonatomic) GenericTextStringElementHandler *value;
+@property NSString* filename;
+@property uint32_t index;
 
 @end
 

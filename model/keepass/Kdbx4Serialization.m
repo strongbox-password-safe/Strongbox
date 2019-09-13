@@ -24,6 +24,7 @@
 #import "VariantDictionary.h"
 #import "Keys.h"
 #import "AesKdfCipher.h"
+#import "GZipInputStream.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
@@ -67,7 +68,10 @@ static const BOOL kLogVerbose = NO;
     return kdf.transformSeed;
 }
 
-+ (NSData *)serialize:(Kdbx4SerializationData *)serializationData compositeKey:(CompositeKeyFactors *)compositeKey ppError:(NSError * _Nullable __autoreleasing *)ppError {
++ (NSData *)serialize:(Kdbx4SerializationData *)serializationData
+                  xml:(NSString*)xml
+         compositeKey:(CompositeKeyFactors *)compositeKey
+              ppError:(NSError **)ppError {
     if(kLogVerbose) {
         NSLog(@"Serializing with [%@] and password [%@]", serializationData, compositeKey);
     }
@@ -150,7 +154,7 @@ static const BOOL kLogVerbose = NO;
     
     // 4.2 Append XML after the inner headers
     
-    [inner appendData:[serializationData.xml dataUsingEncoding:NSUTF8StringEncoding]];
+    [inner appendData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
     
     // 4.3 Optional Compression
     
@@ -175,7 +179,7 @@ static const BOOL kLogVerbose = NO;
     return [[CryptoParameters alloc] initFromHeaders:headerEntries];
 }
 
-+ (Kdbx4SerializationData *)deserialize:(NSData *)safeData compositeKey:(CompositeKeyFactors *)compositeKey ppError:(NSError * _Nullable __autoreleasing *)ppError  {
++ (Kdbx4SerializationData *)deserialize:(NSData*)safeData compositeKey:(CompositeKeyFactors*)compositeKey ppError:(NSError**)ppError  {
     size_t endOfHeadersOffset;
     NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);
     
@@ -233,16 +237,18 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    NSData* decompressed = cryptoParams.compressionFlags == 1 ? [decrypted gunzippedData] : decrypted;
-    
-    Kdbx4SerializationData* ret = readInnerSafeData(decompressed);
+    Kdbx4SerializationData* ret = readDecrypted(decrypted, cryptoParams.compressionFlags == 1, ppError);
+    if(ret == nil) {
+        NSLog(@"Could not read decrypted! [%@]", *ppError);
+        return nil;
+    }
     
     if(kLogVerbose) {
         NSLog(@"Got Inner Safe Serialization Data: [%@]", ret);
     }
-    
+
     // Misc Extra  Serialization Info
-    
+
     KeepassFileHeader keePassFileHeader = getKeePassFileHeader(safeData);
 
     ret.fileVersion = [NSString stringWithFormat:@"%hu.%hu", keePassFileHeader.major, keePassFileHeader.minor];
@@ -321,41 +327,62 @@ static void appendInnerHeader(NSMutableData* base, uint8_t type, NSData* data) {
     }
 }
 
-static Kdbx4SerializationData* readInnerSafeData(NSData* innerSafeData) {
-    InnerHeaderEntryHeader *innerHeader = (InnerHeaderEntryHeader*)innerSafeData.bytes;
-    uint8_t* eof = (uint8_t*) innerSafeData.bytes + innerSafeData.length;
+static Kdbx4SerializationData* readDecrypted(NSData* src, BOOL compressed, NSError** ppError) {
+    NSInputStream* stream = compressed ? [[GZipInputStream alloc] initWithData:src] : [NSInputStream inputStreamWithData:src];
+    [stream open];
     
-    if((uint8_t*)innerSafeData.bytes + SIZE_OF_INNER_HEADER_ENTRY_HEADER > eof) {
-        NSLog(@"Not enough data to read even initial inner header.");
+    Kdbx4SerializationData* ret = readInnerHeaders(stream);
+    
+    ret.rootXmlObject = parseXml(ret.innerRandomStreamId, ret.innerRandomStreamKey,
+                                 XmlProcessingContext.standardV4Context, stream, ppError);
+
+    [stream close];
+    
+    if(ret.rootXmlObject == nil) {
+        NSLog(@"Error parsing xml: %@", *ppError);
         return nil;
     }
     
-    NSData* innerRandomStreamId = nil;
-    NSData* innerRandomStreamKey = nil;
-    NSMutableArray *attachments = [NSMutableArray array];
+    return ret;
+}
+
+static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
+    NSMutableArray* attachments = [NSMutableArray array];
+    Kdbx4SerializationData* ret = [[Kdbx4SerializationData alloc] init];
     
-    while (innerHeader->type != kInnerHeaderTypeEnd) {
-        size_t headerLength = littleEndian4BytesToUInt32(innerHeader->lengthBytes);
-        
-        if (innerHeader->data + headerLength > eof) {
-            NSLog(@"Not enough data to read even inner header data.");
+    while(YES) {
+        uint8_t header[SIZE_OF_INNER_HEADER_ENTRY_HEADER];
+        NSInteger read = [stream read:header maxLength:SIZE_OF_INNER_HEADER_ENTRY_HEADER];
+        if(read < SIZE_OF_INNER_HEADER_ENTRY_HEADER) {
+            NSLog(@"Not enough data to read even initial inner header.");
+            [stream close];
             return nil;
         }
         
-        if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamId) { // Inner Random Stream Id
-            NSData* headerData = [NSData dataWithBytes:innerHeader->data length:headerLength];
-            innerRandomStreamId = headerData;
+        InnerHeaderEntryHeader *innerHeader = (InnerHeaderEntryHeader*)header;
+        if(innerHeader->type == kInnerHeaderTypeEnd) {
+            break;
+        }
+        
+        size_t headerLength = littleEndian4BytesToUInt32(innerHeader->lengthBytes);
+        
+        NSMutableData *headerBuffer = [NSMutableData dataWithLength:headerLength];
+        read = [stream read:headerBuffer.mutableBytes maxLength:headerLength];
+        if (read < headerLength) {
+            NSLog(@"Not enough data to read even inner header data.");
+            [stream close];
+            return nil;
+        }
+        
+        if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamId) {
+            ret.innerRandomStreamId = littleEndian4BytesToUInt32((uint8_t*)headerBuffer.bytes);
         }
         else if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamKey) { // Inner Random Stream Key
-            NSData* headerData = [NSData dataWithBytes:innerHeader->data length:headerLength];
-            innerRandomStreamKey = headerData;
+            ret.innerRandomStreamKey = headerBuffer;
         }
         else if(innerHeader->type == kInnerHeaderTypeBinary) { // Binary
-            if(kLogVerbose) {
-                NSLog(@"Found Binary %lu bytes", headerLength - 1);
-            }
-            BOOL protectedInMemory = innerHeader->data[0] == 1;
-            NSData* binary = [NSData dataWithBytes:&innerHeader->data[1] length:headerLength-1];
+            BOOL protectedInMemory = ((uint8_t*)headerBuffer.bytes)[0] == 1;
+            NSData* binary = [headerBuffer subdataWithRange:NSMakeRange(1, headerLength-1)];
             
             DatabaseAttachment *attachment = [[DatabaseAttachment alloc] init];
             attachment.compressed = YES;
@@ -367,33 +394,9 @@ static Kdbx4SerializationData* readInnerSafeData(NSData* innerSafeData) {
         else {
             NSLog(@"Unknown inner header type! [%d]", innerHeader->type);
         }
-        
-        innerHeader = (InnerHeaderEntryHeader*)(innerHeader->data + headerLength);
-        
-        if (innerHeader->data + SIZE_OF_INNER_HEADER_ENTRY_HEADER > eof) {
-            NSLog(@"Not enough data to read next inner header.");
-            return nil;
-        }
     }
     
-    size_t xmlLength = eof - innerHeader->data;
-    if (xmlLength < 0) {
-        NSLog(@"Negative data to read XML.");
-        return nil;
-    }
-    
-    NSString* xml = [[NSString alloc] initWithBytes:innerHeader->data length:xmlLength encoding:NSUTF8StringEncoding];
-
-    if(kLogVerbose) {
-        NSLog(@"\n\n%@\n\n", xml);
-    }
-    
-    Kdbx4SerializationData* ret = [[Kdbx4SerializationData alloc] init];
-    
-    ret.innerRandomStreamId = innerRandomStreamId ? littleEndian4BytesToUInt32((uint8_t*)innerRandomStreamId.bytes) : kInnerStreamPlainText;
-    ret.innerRandomStreamKey = innerRandomStreamKey;
     ret.attachments = attachments;
-    ret.xml = xml;
 
     return ret;
 }

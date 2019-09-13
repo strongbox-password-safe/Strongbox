@@ -29,7 +29,6 @@ abstract_target 'common-ios' do
 
     #pod 'NMSSH'
     pod 'GoogleAPIClientForREST/Drive'
-    pod 'GoogleSignIn'
     pod 'JNKeychain'
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
@@ -37,10 +36,11 @@ abstract_target 'common-ios' do
     pod 'libsodium'    
     pod 'KissXML'
     pod 'Base32'
-
+    pod 'GoogleSignIn', '4.4.0'
+    
     target 'Strongbox-iOS' do
 	use_frameworks!
-        
+      
         pod 'ISMessages'
         pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
@@ -64,3 +64,4 @@ post_install do |installer|
         end
     end
 end
+

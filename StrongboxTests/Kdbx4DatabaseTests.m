@@ -28,7 +28,6 @@
         NSError* error;
         NSString* password = [CommonTesting.testKdbx4FilesAndPasswords objectForKey:file];
         
-        //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:blob password:password error:&error];
         StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
         
         XCTAssertNotNil(db);
@@ -42,7 +41,6 @@
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database-Large-Uncompressed.kdbx"];
     
     NSError* error;
-    //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     NSLog(@"%@", db);
     
@@ -53,8 +51,9 @@
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database-Large.kdbx"];
     
     NSError* error;
-    //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
+
     StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
+    
     NSLog(@"%@ - [%@]", db, error);
     
     XCTAssertNotNil(db);

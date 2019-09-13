@@ -11,7 +11,7 @@
 #import "XmlStrongboxNodeModelAdaptor.h"
 #import "KdbxSerialization.h"
 #import "CommonTesting.h"
-#import "XmlTreeSerializer.h"
+#import "XmlSerializer.h"
 
 @interface KeePassXmlStrongboxNodeModelAdaptorTests : XCTestCase
 
@@ -45,7 +45,6 @@
     NSLog(@"%@", singleEntry);
 }
 
-
 - (void)test_two_entries_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"password-two-entries-ladder" b64Key:@"N0gYzFpyRtD8VC/FjMTUN/ehg8tDYydOMWcLWe3rdJI="];
 
@@ -73,7 +72,6 @@
     //XCTAssert([singleEntry.fields.password isEqualToString:@"ladder"]);
     //NSLog(@"%@", singleEntry);
 }
-
 
 - (void)test_five_entries_ladder_inner_Salsa20 {
     Node * ret = [self getModelFromXmlFile:@"password-five-entries-ladder" b64Key:@"VId5gvqpc1umKBTk16bND/3VGKotVVOTygiw6nGTBYI="];
@@ -133,19 +131,7 @@
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
     
-    // Compare Original and Regenerated
-    
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
-    NSLog(@"%@", originalXml);
-    
-    NSLog(@"============================================================================================================================");
-    
-    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
-    NSLog(@"%@", regeneratedXml);
-    
-    XCTAssertTrue([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+    XCTAssertTrue(compareOriginalAndRegenerated(origRootGroup, regeneratedRootGroup, NO));
 }
 
 - (void)broken_testToFromModelAndCompareXml {
@@ -164,22 +150,10 @@
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
 
-    // Compare Original and Regenerated
-
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
-    NSLog(@"%@", originalXml);
-
-    NSLog(@"============================================================================================================================");
-    
-    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
-    NSLog(@"%@", regeneratedXml);
-    
-    XCTAssertTrue([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+    XCTAssertTrue(compareOriginalAndRegenerated(origRootGroup, regeneratedRootGroup, NO));
 }
 
-- (void)broken_testToFromModelAndCompareXmlCustomIcon {
+- (void)testToFromModelAndCompareXmlCustomIcon {
     NSString * xml = [CommonTesting getXmlFromBundleFile:@"custom-icon"];
     RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXml:xml];
     
@@ -197,20 +171,10 @@
     
     // Compare Original and Regenerated
     
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
-    NSLog(@"%@", originalXml);
-    
-    NSLog(@"============================================================================================================================");
-    
-    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
-    NSLog(@"%@", regeneratedXml);
-    
-    XCTAssertTrue([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+    XCTAssertEqualObjects(origRootGroup, regeneratedRootGroup);
 }
 
-- (void)broken_testToFromModelAndCompareXmlLarge {
+- (void)testToFromModelAndCompareXmlLarge {
     NSString * xml = [CommonTesting getXmlFromBundleFile:@"keypass-database-with-binary"];
     RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"ztCAmxaRzv/Q/ws53V4wLACfqfJtDELuEa0lR0lK1UA="];
     
@@ -233,8 +197,8 @@
     
     // Compare Original and Regenerated
     
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
-    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
+    
+    NSString *originalXml = getXml(origRootGroup, NO);
     
     [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/orig.xml" contents:[originalXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
     //NSLog(@"%@", originalXml);
@@ -242,62 +206,54 @@
 
     NSLog(@"============================================================================================================================");
     
-    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
-    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
+    NSString *regeneratedXml = getXml(regeneratedRootGroup, NO);
     //NSLog(@"%@", regeneratedXml);
     [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regen.xml" contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 
-    XCTAssertTrue([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+    XCTAssertEqualObjects(origRootGroup, regeneratedRootGroup);
 }
-
 
 - (void)testSingleEntryModifyPasswordCompareXml {
     NSString * xml = [CommonTesting getXmlFromBundleFile:@"ladder-single-entry"];
     RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ="];
+   
+    RootXmlDomainObject *rootObjectCopy2 = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ="];
     
     // Xml Model to Strongbox Model...
     
     KeePassGroup *origRootGroup = rootObject.keePassFile.root.rootGroup;
+    KeePassGroup *origRootGroupCopy2 = rootObjectCopy2.keePassFile.root.rootGroup;
+
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     NSError *error;
-    Node* strongboxModel = [adaptor toModel:origRootGroup error:&error];
+    Node* strongboxModel = [adaptor toModel:origRootGroupCopy2 error:&error];
     
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
-    NSLog(@"%@", originalXml);
-
     Node* e = [[strongboxModel.children objectAtIndex:0].children objectAtIndex:0];
     [e setTitle:@"Changed!" allowDuplicateGroupTitles:YES];
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
-    
-    // Compare Original and Regenerated
-    
-    NSLog(@"============================================================================================================================");
-    
-    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:YES];
-    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
-    NSLog(@"%@", regeneratedXml);
-    
-    XCTAssertFalse([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+
+    XCTAssertFalse(compareOriginalAndRegenerated(origRootGroup, regeneratedRootGroup, NO));
 }
 
 - (void)testSingleEntryModifyWithApostrophe {
     NSString * xml = [CommonTesting getXmlFromBundleFile:@"ladder-single-entry"];
     RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ="];
     
+    RootXmlDomainObject *rootObjectCopy2 = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"wkt/eqeeT/Ov2p/DM2R16kiM9+Mye52sX5ykoxDMJKQ="];
+    
     // Xml Model to Strongbox Model...
     
     KeePassGroup *origRootGroup = rootObject.keePassFile.root.rootGroup;
+    KeePassGroup *origRootGroupCopy2 = rootObjectCopy2.keePassFile.root.rootGroup;
+
+    // Xml Model to Strongbox Model...
+    
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     NSError *error;
-    Node* strongboxModel = [adaptor toModel:origRootGroup error:&error];
-    
-    XmlTreeSerializer *s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
-    NSString *originalXml = [s serializeTree:[origRootGroup generateXmlTree]];
-    NSLog(@"%@", originalXml);
+    Node* strongboxModel = [adaptor toModel:origRootGroupCopy2 error:&error];
     
     Node* e = [[strongboxModel.children objectAtIndex:0].children objectAtIndex:0];
     [e setTitle:@"Mark's New Title" allowDuplicateGroupTitles:YES];
@@ -306,16 +262,8 @@
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     KeePassGroup* regeneratedRootGroup = [adaptor fromModel:strongboxModel context:[XmlProcessingContext standardV3Context] error:&error];
-    
-    // Compare Original and Regenerated
-    
-    NSLog(@"============================================================================================================================");
-    
-    s = [[XmlTreeSerializer alloc] initWithPrettyPrint:NO];
-    NSString* regeneratedXml = [s serializeTree:[regeneratedRootGroup generateXmlTree]];
-    NSLog(@"%@", regeneratedXml);
-    
-    XCTAssertFalse([[origRootGroup generateXmlTree] isXmlEquivalent_UnitTestOnly:[regeneratedRootGroup generateXmlTree]]);
+ 
+    XCTAssertFalse(compareOriginalAndRegenerated(origRootGroup, regeneratedRootGroup, NO));
 }
 
 @end

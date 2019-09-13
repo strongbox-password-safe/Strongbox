@@ -19,6 +19,9 @@ static NSString* const kCreationTimeElementName = @"CreationTime";
 static NSString* const kExpiryTimeElementName = @"ExpiryTime";
 static NSString* const kExpiresElementName = @"Expires";
 static NSString* const kLastAccessTimeElementName = @"LastAccessTime";
+static NSString* const kUsageCountElementName = @"UsageCount";
+static NSString* const kLocationChangedTimeElementName = @"LocationChanged";
+
 static NSString* const kMetaElementName = @"Meta";
 static NSString* const kRootElementName = @"Root";
 static NSString* const kGroupElementName = @"Group";

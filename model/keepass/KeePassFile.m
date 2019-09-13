@@ -37,7 +37,7 @@
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kMetaElementName]) {
         _meta = (Meta*)completedObject;
         return YES;
@@ -51,21 +51,32 @@
     }
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kKeePassFileElementName];
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
+    }
+    
+    if(self.meta) {
+        if(![self.meta writeXml:serializer]) {
+            return NO;
+        }
+    }
+    
+    if(self.root) {
+        if (![self.root writeXml:serializer]) {
+            return NO;
+        }
+    }
 
-    ret.node = self.nonCustomisedXmlTree.node;
-    
-    if(self.meta) [ret.children addObject:[self.meta generateXmlTree]];
-    if(self.root) [ret.children addObject:[self.root generateXmlTree]];
-    
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
-    
-    return ret;
-}
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
+    }
 
-- (NSString *)description {
-    return [NSString stringWithFormat:@"Meta = [%@]\nRoot = [%@]\nUnknown Children = [%@]", self.meta, self.root, self.nonCustomisedXmlTree.children];
+    [serializer endElement];
+
+    return YES;
 }
 
 @end

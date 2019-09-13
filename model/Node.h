@@ -95,6 +95,8 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
 
 - (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
 
+- (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
+
 ///////////////////////////////////////////////
 // For use by any Safe Format Provider
 //

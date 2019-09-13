@@ -42,7 +42,7 @@
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kGroupElementName] && self.rootGroup == nil) {
         _rootGroup = (KeePassGroup*)completedObject;
         return YES;
@@ -51,22 +51,24 @@
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kRootElementName];
-    
-    ret.node = self.nonCustomisedXmlTree.node;
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
+    }
 
     if(self.rootGroup) {
-        [ret.children addObject:[self.rootGroup generateXmlTree]];
+        [self.rootGroup writeXml:serializer];
+    }
+
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
     }
     
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
-
-    return ret;
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"Root Group = [%@]\nUnknown Children = [%@]", self.rootGroup, self.nonCustomisedXmlTree.children];
+    [serializer endElement];
+    
+    return YES;
 }
 
 @end

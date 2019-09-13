@@ -8,17 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import "BaseXmlDomainObjectHandler.h"
-#import "GenericTextStringElementHandler.h"
-#import "GenericTextUuidElementHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CustomIcon : BaseXmlDomainObjectHandler
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
-
-@property (nonatomic) GenericTextStringElementHandler* dataElement;
-@property (nonatomic) GenericTextUuidElementHandler* uuidElement;
 
 @property (nonatomic) NSUUID* uuid;
 @property (nonatomic) NSData* data;

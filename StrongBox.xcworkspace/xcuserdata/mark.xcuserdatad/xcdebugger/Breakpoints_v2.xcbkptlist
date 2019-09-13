@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/NodeDetailsWindowController.m"
-            timestampString = "588474120.181915"
+            filePath = "StrongBox/GoogleDriveManager.m"
+            timestampString = "589929060.5816751"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "973"
-            endingLineNumber = "973"
-            landmarkName = "-onAddAttachment:"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "-init"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "588474120.182187"
+            filePath = "StrongBox/OpenSafeSequenceHelper.m"
+            timestampString = "589936903.82708"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1707"
-            endingLineNumber = "1707"
-            landmarkName = "-paste:"
+            startingLineNumber = "1009"
+            endingLineNumber = "1009"
+            landmarkName = "-documentPickerWasCancelled:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -41,13 +41,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "588474120.182381"
+            filePath = "StrongBox Auto Fill/CredentialProviderViewController.m"
+            timestampString = "589936903.827139"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1850"
-            endingLineNumber = "1850"
-            landmarkName = "-pasteItemsFromPasteboard:destinationItem:source:clear:"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
+            landmarkName = "-prepareInterfaceToProvideCredentialForIdentity:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -57,13 +57,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "588474120.182435"
+            filePath = "StrongBox Auto Fill/CredentialProviderViewController.m"
+            timestampString = "589936903.82718"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1909"
-            endingLineNumber = "1909"
-            landmarkName = "-pasteFromExternal:destinationItem:"
+            startingLineNumber = "78"
+            endingLineNumber = "78"
+            landmarkName = "-prepareInterfaceToProvideCredentialForIdentity:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -73,13 +73,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "588474120.182482"
+            filePath = "StrongBox/AutoFillManager.m"
+            timestampString = "589931630.263013"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1920"
-            endingLineNumber = "1920"
-            landmarkName = "-pasteFromExternal:destinationItem:"
+            startingLineNumber = "146"
+            endingLineNumber = "146"
+            landmarkName = "-findUrlsInString:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -89,13 +89,45 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "macbox/MacBox/ViewController.m"
-            timestampString = "588474120.1825269"
+            filePath = "StrongBox/AutoFillManager.m"
+            timestampString = "589931630.263061"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1922"
-            endingLineNumber = "1922"
-            landmarkName = "-pasteFromExternal:destinationItem:"
+            startingLineNumber = "145"
+            endingLineNumber = "145"
+            landmarkName = "-findUrlsInString:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/AutoFillManager.m"
+            timestampString = "589931630.2631021"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "48"
+            endingLineNumber = "48"
+            landmarkName = "-updateAutoFillQuickTypeDatabase:databaseUuid:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "StrongBox/OpenSafeSequenceHelper.m"
+            timestampString = "589936903.827261"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "926"
+            endingLineNumber = "926"
+            landmarkName = "-onSuccessfulSafeOpen:provider:openedSafe:data:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -136,7 +136,7 @@
     NSError *error;
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
                                                          customIcons:[NSDictionary dictionary]
-                                             existingRootXmlDocument:nil
+                                                        originalMeta:nil
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -156,7 +156,7 @@
     NSError *error;
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
                                                          customIcons:[NSDictionary dictionary]
-                                             existingRootXmlDocument:nil
+                                                        originalMeta:nil
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -165,14 +165,14 @@
     XCTAssertNotNil(ret.keePassFile.meta);
     XCTAssertNotNil(ret.keePassFile.meta.generator);
 
-    XCTAssert([ret.keePassFile.meta.generator.text isEqualToString:@"Strongbox"]);
+    XCTAssert([ret.keePassFile.meta.generator isEqualToString:@"Strongbox"]);
     
     XCTAssertNotNil(ret);
     XCTAssertNotNil(ret.keePassFile);
     XCTAssertNotNil(ret.keePassFile.root);
     XCTAssertNotNil(ret.keePassFile.root.rootGroup);
     
-    XCTAssert([ret.keePassFile.root.rootGroup.name.text isEqualToString:kDefaultRootGroupName]);
+    XCTAssert([ret.keePassFile.root.rootGroup.name isEqualToString:kDefaultRootGroupName]);
     
     NSLog(@"%@", ret);
 }
@@ -194,7 +194,7 @@
     NSError *error;
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
                                                           customIcons:[NSDictionary dictionary]
-                                             existingRootXmlDocument:nil
+                                             originalMeta:nil
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -206,7 +206,7 @@
     XCTAssert(ret.keePassFile.root.rootGroup.groups.count == 1);
     XCTAssert(ret.keePassFile.root.rootGroup.entries.count == 1);
     
-    XCTAssert([[ret.keePassFile.root.rootGroup.groups objectAtIndex:0].name.text isEqualToString:@"Foo-Group"]);
+    XCTAssert([[ret.keePassFile.root.rootGroup.groups objectAtIndex:0].name isEqualToString:@"Foo-Group"]);
     XCTAssert([[ret.keePassFile.root.rootGroup.entries objectAtIndex:0].title isEqualToString:@"Bar-Entry"]);
 
     NSLog(@"%@", ret);
@@ -245,7 +245,7 @@
     NSError *error;
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
                                                          customIcons:[NSDictionary dictionary]
-                                             existingRootXmlDocument:nil
+                                             originalMeta:nil
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -254,14 +254,14 @@
     XCTAssertNotNil(ret.keePassFile.meta);
     XCTAssertNotNil(ret.keePassFile.meta.generator);
     
-    XCTAssert([ret.keePassFile.meta.generator.text isEqualToString:@"Strongbox"]);
+    XCTAssert([ret.keePassFile.meta.generator isEqualToString:@"Strongbox"]);
     
     XCTAssertNotNil(ret);
     XCTAssertNotNil(ret.keePassFile);
     XCTAssertNotNil(ret.keePassFile.root);
     XCTAssertNotNil(ret.keePassFile.root.rootGroup);
     
-    XCTAssert([ret.keePassFile.root.rootGroup.name.text isEqualToString:kDefaultRootGroupName]);
+    XCTAssert([ret.keePassFile.root.rootGroup.name isEqualToString:kDefaultRootGroupName]);
     
     NSLog(@"%@", ret);
 }

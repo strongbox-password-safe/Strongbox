@@ -46,7 +46,9 @@
 
     NSLog(@"%@", data);
     //NSLog(@"%@", data.xml);
-    XCTAssert([data.xml hasPrefix:@"<?xml"]);
+    
+    XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
+    XCTAssertEqualObjects(data.rootXmlObject.keePassFile.meta.generator, @"MacPass");
 }
 
 - (void)testDeserializeNonGzippedFile {
@@ -68,7 +70,7 @@
     
     NSLog(@"%@", data);
     //NSLog(@"%@", data.xml);
-    XCTAssert([data.xml hasPrefix:@"<?xml"]);
+    XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
 }
 //
 //- (void)testDeserializeDesktopFileToXml {
@@ -108,10 +110,6 @@
     XCTAssert(data != nil);
     
     NSLog(@"%@", data);
-    NSLog(@"%@", data.xml);
-    XCTAssert([data.xml hasPrefix:@"<?xml"]);
-    
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/Database.xml" contents:[data.xml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 }
 
 - (void)testDeserializeFileWithBinariesAndCustomFields {
@@ -133,9 +131,7 @@
     
     NSLog(@"%@", data);
     //NSLog(@"%@", data.xml);
-    XCTAssert([data.xml hasPrefix:@"<?xml"]);
-    
-    NSLog(@"%@", data.xml);
+    XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
 }
 
 @end

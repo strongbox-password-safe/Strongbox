@@ -562,7 +562,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }
     Node *item = arr[indexPath.row];
     if(item) {
-        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && item.fields.otpToken) {
+        if(item.fields.otpToken) {
             NSString* value = item.fields.otpToken.password;
             if (value.length) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];

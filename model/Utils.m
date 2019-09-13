@@ -175,16 +175,21 @@ NSString* trim(NSString* str) {
     return trim(string);
 }
 
+static NSString* const kXmlPrefix = @"<?xml";
+BOOL xmlNeedsCleanup(NSString* foo) {
+    return (![foo hasPrefix:kXmlPrefix]);
+}
+
 NSString* xmlCleanupAndTrim(NSString* foo) {
     // Some apps (KeeWeb) seem to prefix crap to the XML :( NSXMLParser is extremely strict about this, so if the XML
     // Doesn't being with <?xml we do a quick search for it a small prefix at the start and start there instead if it's
     // present
     
-    static NSString* const kXmlPrefix = @"<?xml";
-    if(![foo hasPrefix:kXmlPrefix]) {
+    if(xmlNeedsCleanup(foo)) {
         NSLog(@"WARNING: XML does not conform to XML Standard, does not being with \"<?xml\". Searching short initial prefix for this string for this prefix...");
         
-        NSRange foundPrefix = [[foo substringWithRange:NSMakeRange(0, 16)] rangeOfString:kXmlPrefix];
+        NSUInteger bounds = MIN(foo.length, 16);
+        NSRange foundPrefix = [[foo substringWithRange:NSMakeRange(0, bounds)] rangeOfString:kXmlPrefix];
         if(foundPrefix.location != NSNotFound) {
             NSLog(@"WARNING: Found prefix at %lu, starting from here instead...", (unsigned long)foundPrefix.location);
             return [foo substringFromIndex:foundPrefix.location];

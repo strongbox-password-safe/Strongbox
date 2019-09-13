@@ -31,7 +31,7 @@
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kBinaryElementName]) {
         [self.binaries addObject:(V3Binary*)completedObject];
         return YES;
@@ -40,18 +40,23 @@
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kV3BinariesListElementName];
-    
-    ret.node = self.nonCustomisedXmlTree.node;
-    
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
+    }
+
     for (V3Binary *binary in self.binaries) {
-        [ret.children addObject:[binary generateXmlTree]];
+        [binary writeXml:serializer];
+    }
+
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
     }
     
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
-    
-    return ret;
+    [serializer endElement];
+    return YES;
 }
 
 @end

@@ -87,7 +87,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property (nullable) NSDate* lastEntitlementCheckAttempt;
 @property NSUInteger numberOfEntitlementCheckFails;
-@property BOOL doNotCopyOtpCodeOnAutoFillSelect;
 
 @property BOOL instantPinUnlocking;
 @property BOOL haveWarnedAboutAutoFillCrash;
@@ -112,7 +111,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL suppressPrivacyScreen;
 
 @property BOOL showYubikeySecretWorkaroundField;
-@property BOOL coalesceAppLockAndQuickLaunchBiometricAuths;
 
 @property (nullable) NSString* quickLaunchUuid;
 @property BOOL migratedToNewQuickLaunchSystem;
@@ -126,6 +124,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property (readonly) BOOL useLocalSharedStorage; // TODO: Remove
 @property (readonly) BOOL doNotAutoDetectKeyFiles;  // TODO: Remove
+
+@property BOOL monitorInternetConnectivity;
 
 NS_ASSUME_NONNULL_END
 

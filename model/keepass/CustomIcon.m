@@ -8,73 +8,56 @@
 
 #import "CustomIcon.h"
 #import "KeePassConstants.h"
+#import "SimpleXmlValueExtractor.h"
 
 @implementation CustomIcon
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kCustomIconElementName context:context]) {
-        self.uuidElement = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:context];
-        self.dataElement = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kCustomIconDataElementName context:context];
+        self.uuid = [NSUUID UUID];
     }
     
     return self;
 }
 
-- (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
-    if([xmlElementName isEqualToString:kUuidElementName]) {
-        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kCustomIconDataElementName]) {
-        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kCustomIconDataElementName context:self.context];
-    }
-    
-    return [super getChildHandler:xmlElementName];
-}
-
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kUuidElementName]) {
-        self.uuidElement = (GenericTextUuidElementHandler*)completedObject;
+        self.uuid = [SimpleXmlValueExtractor getUuid:completedObject];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kCustomIconDataElementName]) {
-        self.dataElement = (GenericTextStringElementHandler*)completedObject;
+        NSString* b64 = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        self.data = [[NSData alloc] initWithBase64EncodedString:b64 options:kNilOptions];
         return YES;
     }
     
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kCustomIconElementName];
-    
-    ret.node = self.nonCustomisedXmlTree.node;
-    
-    [ret.children addObject:[self.uuidElement generateXmlTree]];
-    [ret.children addObject:[self.dataElement generateXmlTree]];
-    
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
-    
-    return ret;
-}
-
-- (NSUUID *)uuid {
-    return self.uuidElement.uuid;
-}
-
-- (void)setUuid:(NSUUID *)uuid {
-    if(uuid) {
-        self.uuidElement.uuid = uuid;
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(!self.uuid) {
+        return YES;
     }
-}
 
-- (NSData *)data {
-    return [[NSData alloc] initWithBase64EncodedString:self.dataElement.text options:kNilOptions];
-}
-
--(void)setData:(NSData *)data {
-    if(data) {
-        self.dataElement.text = [data base64EncodedStringWithOptions:kNilOptions];
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
     }
+
+    self.data = self.data ? self.data : [NSData data];
+    NSString *b64 = [self.data base64EncodedStringWithOptions:kNilOptions];
+    
+    [serializer writeElement:kUuidElementName uuid:self.uuid];
+    [serializer writeElement:kCustomIconDataElementName text:b64];
+
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
+    }
+    
+    [serializer endElement];
+
+    return YES;
 }
 
 @end

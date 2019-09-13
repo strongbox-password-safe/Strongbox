@@ -51,7 +51,13 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
 NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);
 
-RootXmlDomainObject*__nullable parseKeePassXml(uint32_t innerRandomStreamId, NSData* innerRandomStreamKey, XmlProcessingContext* context, NSString* xml, NSError** error);
+void dumpXml(NSInputStream* lib);
+
+RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
+                              NSData*_Nullable innerRandomStreamKey,
+                              XmlProcessingContext* context,
+                              NSInputStream* lib,
+                              NSError** error);
 
 @end
 

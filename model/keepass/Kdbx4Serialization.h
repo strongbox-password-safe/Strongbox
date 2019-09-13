@@ -21,7 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable Kdbx4SerializationData*)deserialize:(NSData*)safeData compositeKey:(CompositeKeyFactors*)compositeKey ppError:(NSError**)ppError;
 
-+ (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData compositeKey:(CompositeKeyFactors*)compositeKey ppError:(NSError**)ppError;
++ (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData
+                          xml:(NSString*)xml
+                 compositeKey:(CompositeKeyFactors*)compositeKey
+                      ppError:(NSError**)ppError;
 
 @end
 

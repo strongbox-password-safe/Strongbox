@@ -30,8 +30,8 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
         self.transformRounds = kDefaultTransformRounds;
         self.innerRandomStreamId = kDefaultInnerRandomStreamId;
         self.cipherUuid = aesCipherUuid();
-        self.historyMaxItems = kDefaultHistoryMaxItems;
-        self.historyMaxSize = kDefaultHistoryMaxSize;
+        self.historyMaxItems = @(kDefaultHistoryMaxItems);
+        self.historyMaxSize = @(kDefaultHistoryMaxSize);
         
         self.recycleBinEnabled = YES;
         self.recycleBinGroup = NSUUID.zero;
@@ -44,8 +44,6 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
 - (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
     BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
     
-    NSString* size = friendlyFileSizeString(self.historyMaxSize);
-    
     [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format") andValue:@"KeePass 2"];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_keepass_version", @"KeePass File Version")  andValue:self.version];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_generator", @"Database Generator") andValue:self.generator];
@@ -54,8 +52,16 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
     [kvps addKey:NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds") andValue:[NSString stringWithFormat:@"%llu", self.transformRounds]];
 
     [kvps addKey:NSLocalizedString(@"database_metadata_field_inner_encryption", @"Inner Encryption") andValue:innerEncryptionString(self.innerRandomStreamId)];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_items", @"Max History Items") andValue:[NSString stringWithFormat:@"%ld", (long)self.historyMaxItems]];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_size", @"Max History Size") andValue:size];
+
+    if(self.historyMaxItems) {
+        [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_items", @"Max History Items") andValue:[NSString stringWithFormat:@"%ld", self.historyMaxItems.longValue]];
+    }
+    
+    if(self.historyMaxSize) {
+        NSString* size = friendlyFileSizeString(self.historyMaxSize.integerValue);
+        [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_size", @"Max History Size") andValue:size];
+    }
+    
     [kvps addKey:NSLocalizedString(@"database_metadata_field_recycle_bin_enabled", @"Recycle Bin Enabled") andValue:localizedYesOrNoFromBool(self.recycleBinEnabled)];
     
     return kvps;

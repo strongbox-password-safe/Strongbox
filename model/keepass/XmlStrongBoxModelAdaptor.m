@@ -14,7 +14,7 @@
 @implementation XmlStrongBoxModelAdaptor
 
 - (Node*)fromXmlModelToStrongboxModel:(RootXmlDomainObject*)existingRootXmlDocument
-                                                       error:(NSError**)error {
+                                error:(NSError**)error {
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     
     KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(existingRootXmlDocument);
@@ -36,15 +36,16 @@
 
 - (RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
                                          customIcons:(NSDictionary<NSUUID*, NSData*> *)customIcons
-                             existingRootXmlDocument:(RootXmlDomainObject *)existingRootXmlDocument
+                                        originalMeta:(Meta*)originalMeta
                                              context:(XmlProcessingContext*)context
                                                error:(NSError **)error {
-    RootXmlDomainObject *ret = existingRootXmlDocument;
-    
-    if(!ret) {
-        ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
+    RootXmlDomainObject *ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
+    if(originalMeta && originalMeta.unmanagedChildren) {
+        for (id<XmlParsingDomainObject> child in originalMeta.unmanagedChildren) {
+            [ret.keePassFile.meta addUnknownChildObject:child];
+        }
     }
-
+    
     // 2. Convert from Strongbox Node Model back to Keepass Xml model respecting any existing tags/attributes etc
     
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
@@ -58,7 +59,7 @@
     // 3. Metadata
     
     ret.keePassFile.root.rootGroup = rootXmlGroup;
-    ret.keePassFile.meta.generator.text = kStrongboxGenerator;
+    ret.keePassFile.meta.generator = kStrongboxGenerator;
     
     // 4. Custom Icons
 
@@ -78,7 +79,6 @@
         
         [ret.keePassFile.meta.customIconList.icons addObject:icon];
     }
-
     
     return ret;
 }

@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "BaseXmlDomainObjectHandler.h"
-#import "GenericTextStringElementHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface String : BaseXmlDomainObjectHandler
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
-- (instancetype)initWithKey:(NSString *)key value:(NSString *)value protected:(BOOL)protected context:(XmlProcessingContext*)context;
 
 @property NSString* key;
 @property NSString* value;

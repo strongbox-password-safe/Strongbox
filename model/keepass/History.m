@@ -25,9 +25,6 @@
 }
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
-//    if([xmlElementName isEqualToString:kEntryElementName]) {
-//        return [[Entry alloc] initWithXmlElementName:kEntryElementName context:self.context];
-//    }
     if([xmlElementName isEqualToString:kEntryElementName]) {
         return [[Entry alloc] initWithContext:self.context];
     }
@@ -35,7 +32,7 @@
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kEntryElementName]) {
         [self.entries addObject:(Entry*)completedObject];
         return YES;
@@ -44,18 +41,44 @@
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kHistoryElementName];
-    
-    ret.node = self.nonCustomisedXmlTree.node;
-    
-    for (Entry *entry in self.entries) {
-        [ret.children addObject:[entry generateXmlTree]];
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
     }
     
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
+    for (Entry *entry in self.entries) {
+        [entry writeXml:serializer];
+    }
     
-    return ret;
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
+    }
+    
+    [serializer endElement];
+    
+    return YES;
+}
+
+- (BOOL)isEqual:(id)object {
+    if (object == nil) {
+        return NO;
+    }
+    if (self == object) {
+        return YES;
+    }
+    if (![object isKindOfClass:[History class]]) {
+        return NO;
+    }
+    
+    History* other = (History*)object;
+
+    if(![self.entries isEqualToArray:other.entries]) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 @end

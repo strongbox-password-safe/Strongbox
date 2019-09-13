@@ -2051,3 +2051,6 @@
 
 /* Error message indicating that these item(s) cannot be deserialized to this database because they contain two groups with the same title. */
 "node_serialization_error_duplicate_group_title_fmt" = "Could not copy these items because they contain two groups with the same title '%@' which is unsupported by this database format.";
+
+/* Argon 2 Memory */
+"database_metadata_field_argon2_memory" = "Argon2 Memory";

@@ -20,8 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property uint32_t innerRandomStreamId;
 @property uint32_t compressionFlags;
 @property NSString* version;
-@property (nonatomic) NSInteger historyMaxItems;
-@property (nonatomic) NSInteger historyMaxSize;
+@property (nonatomic) NSNumber* historyMaxItems;
+@property (nonatomic) NSNumber* historyMaxSize;
 
 @property (nullable) NSDate* recycleBinChanged;
 @property (nullable) NSUUID* recycleBinGroup;

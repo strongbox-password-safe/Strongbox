@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "BaseXmlDomainObjectHandler.h"
-#import "GenericTextStringElementHandler.h"
-#import "GenericTextUuidElementHandler.h"
 #import "Times.h"
 #import "String.h"
 #import "Binary.h"
@@ -24,14 +22,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
-@property (nonatomic, nullable) GenericTextStringElementHandler* iconId;
-@property (nonatomic, nullable) GenericTextUuidElementHandler* customIconUuid;
-@property (nonatomic) GenericTextUuidElementHandler* uuid;
+@property (nonatomic) NSUUID* uuid;
 @property (nonatomic) Times* times;
 @property (nonatomic) NSMutableArray<Binary*> *binaries;
 @property (nonatomic) History* history;
 
-@property (nonatomic) NSNumber* icon;
+@property (nonatomic, nullable) NSNumber* icon;
 @property (nonatomic, nullable) NSUUID* customIcon;
 
 // Customized Getters/Setters for well-known fields - basically views on the strings collection
@@ -41,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString* password;
 @property (nonatomic) NSString* url;
 @property (nonatomic) NSString* notes;
+
+- (void)removeAllStrings;
 
 // Safe Custom String setter...
 

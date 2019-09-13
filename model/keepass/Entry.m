@@ -9,6 +9,7 @@
 #import "Entry.h"
 #import "KeePassDatabase.h"
 #import "History.h"
+#import "SimpleXmlValueExtractor.h"
 
 @interface Entry ()
 
@@ -42,23 +43,20 @@ const static NSSet<NSString*> *wellKnownKeys;
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kEntryElementName context:context]) {
-        self.uuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:context];
+        self.uuid = NSUUID.UUID;
         self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
         self.history = [[History alloc] initWithXmlElementName:kHistoryElementName context:context];
         self.strings = [NSMutableDictionary dictionary];
         self.binaries = [NSMutableArray array];
-        self.iconId = nil;
-        self.customIconUuid = nil;
+        self.icon = nil;
+        self.customIcon = nil;
     }
     
     return self;
 }
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
-    if([xmlElementName isEqualToString:kUuidElementName]) {
-        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kUuidElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kTimesElementName]) {
+    if([xmlElementName isEqualToString:kTimesElementName]) {
         return [[Times alloc] initWithContext:self.context];
     }
     else if([xmlElementName isEqualToString:kHistoryElementName]) {
@@ -70,19 +68,13 @@ const static NSSet<NSString*> *wellKnownKeys;
     else if([xmlElementName isEqualToString:kBinaryElementName]) {
         return [[Binary alloc] initWithContext:self.context];
     }
-    else if([xmlElementName isEqualToString:kIconIdElementName]) {
-        return [[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kCustomIconUuidElementName]) {
-        return [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kCustomIconUuidElementName context:self.context];
-    }
     
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kUuidElementName]) {
-        self.uuid = (GenericTextUuidElementHandler*)completedObject;
+        self.uuid = [SimpleXmlValueExtractor getUuid:completedObject];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kTimesElementName]) {
@@ -103,47 +95,74 @@ const static NSSet<NSString*> *wellKnownKeys;
         return YES;
     }
     else if([withXmlElementName isEqualToString:kIconIdElementName]) {
-        self.iconId = (GenericTextStringElementHandler*)completedObject;
+        self.icon = [SimpleXmlValueExtractor getNumber:completedObject];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kCustomIconUuidElementName]) {
-        self.customIconUuid = (GenericTextUuidElementHandler*)completedObject;
+        self.customIcon = [SimpleXmlValueExtractor getUuid:completedObject];
         return YES;
     }
-    
+
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kEntryElementName];
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
+    }
     
-    ret.node = self.nonCustomisedXmlTree.node;
-    
-    if(self.uuid) [ret.children addObject:[self.uuid generateXmlTree]];
-    if(self.times) [ret.children addObject:[self.times generateXmlTree]];
-    
-    if(self.iconId) [ret.children addObject:[self.iconId generateXmlTree]];
-    if(self.customIconUuid) [ret.children addObject:[self.customIconUuid generateXmlTree]];
+    if (![serializer writeElement:kUuidElementName uuid:self.uuid]) return NO;
+    if (self.icon && ![serializer writeElement:kIconIdElementName integer:self.icon.integerValue]) return NO;
+    if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
     
     for (NSString* key in self.strings.allKeys) {
         StringValue* value = self.strings[key];
-        String* strXml = [[String alloc] initWithKey:key value:value.value protected:value.protected context:self.context];
-        [ret.children addObject:[strXml generateXmlTree]];
-    }
+        // Strip Empty "Predefined or Well Known Fields"
+        // Verify it's ok to strip empty strings. Looks like it is:
+        // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
+        //
+        // MMcG: Don't strip custom emptys, it is useful to allow empty values in the custom fields
 
-    for (Binary *binary in self.binaries) {
-        [ret.children addObject:[binary generateXmlTree]];
+        if(value.protected == NO && value.value.length == 0 && [wellKnownKeys containsObject:key]) {
+            continue;
+        }
+
+        if(![serializer beginElement:kStringElementName]) {
+            return NO;
+        }
+        
+        if(![serializer writeElement:kKeyElementName text:key]) return NO;
+        
+        // Don't trim Values - Whitespace might be important...
+        
+        if(![serializer writeElement:kValueElementName text:value.value protected:value.protected trimWhitespace:NO]) {
+            return NO;
+        }
+        
+        [serializer endElement];
     }
     
-    // History...
+    if(self.binaries) {
+        for (Binary *binary in self.binaries) {
+            [binary writeXml:serializer];
+        }
+    }
+    
+    if(self.times && ![self.times writeXml:serializer]) return NO;
     
     if(self.history && self.history.entries && self.history.entries.count) {
-        [ret.children addObject:[self.history generateXmlTree]];
+        [self.history writeXml:serializer];
     }
-
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
     
-    return ret;
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
+    }
+    
+    [serializer endElement];
+    
+    return YES;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +200,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Well Known Strings
 
 - (NSString *)title {
@@ -224,8 +243,12 @@ const static NSSet<NSString*> *wellKnownKeys;
     [self setString:kNotesStringKey value:notes protected:NO];  // FUTURE: Default Protection can be specified in the header
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Custom Strings Readonly
+
+- (void)removeAllStrings {
+    [self.strings removeAllObjects];
+}
 
 - (NSDictionary<NSString *,StringValue *> *)allStrings {
     return self.strings;
@@ -244,38 +267,70 @@ const static NSSet<NSString*> *wellKnownKeys;
     return ret;
 }
 
-- (NSNumber *)icon {
-    return (self.iconId && self.iconId.text.length) ? @([self.iconId.text intValue]) : nil;
-}
-
-- (void)setIcon:(NSNumber *)icon {
-    if(icon != nil) {
-        if(!self.iconId) {
-            self.iconId = [[GenericTextStringElementHandler alloc] initWithXmlElementName:kIconIdElementName context:self.context];
-        }
-        
-        self.iconId.text = icon != nil ? icon.stringValue : nil;
+- (BOOL)isEqual:(id)object {
+    if (object == nil) {
+        return NO;
     }
-    else {
-        self.iconId = nil;
+    if (self == object) {
+        return YES;
     }
-}
-
--(NSUUID *)customIcon {
-    return self.customIconUuid ? self.customIconUuid.uuid : nil;
-}
-
--(void)setCustomIcon:(NSUUID *)customIcon {
-    if(!self.customIconUuid) {
-        self.customIconUuid = [[GenericTextUuidElementHandler alloc] initWithXmlElementName:kCustomIconUuidElementName context:self.context];
+    if (![object isKindOfClass:[Entry class]]) {
+        return NO;
     }
     
-    self.customIconUuid.uuid = customIcon;
+    Entry* other = (Entry*)object;
+    if (![self.uuid isEqual:other.uuid]) {
+        return NO;
+    }
+    if (![self.times isEqual:other.times]) {
+        return NO;
+    }
+    if (!(self.icon == nil && other.icon == nil) && ![self.icon isEqual:other.icon]) {
+        return NO;
+    }
+    if (!(self.customIcon == nil && other.customIcon == nil) && ![self.customIcon isEqual:other.customIcon]) {
+        return NO;
+    }
+    if (!(self.allStrings == nil && other.allStrings == nil) && !stringsAreEqual(self.allStrings, other.allStrings)) {
+        return NO;
+    }
+    if (![self.binaries isEqual:other.binaries]) {
+        return NO;
+    }
+    if (![self.history isEqual:other.history]) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+BOOL stringsAreEqual(NSDictionary<NSString *,StringValue *> * a, NSDictionary<NSString *,StringValue *> * b) {
+    return matchesSemantically(a, b) && matchesSemantically(b,a);
+}
+
+BOOL matchesSemantically(NSDictionary<NSString *,StringValue *> * a, NSDictionary<NSString *,StringValue *> * b) {
+    for(NSString* key in a.allKeys) {
+        StringValue *bVal = b[key];
+        if(bVal) {
+            StringValue *aVal = a[key];
+            if(![aVal isEqual:bVal]) {
+                return NO;
+            }
+        }
+        else {
+            StringValue *aVal = a[key];
+            if(aVal.value.length != 0) {
+                return NO;
+            }
+        }
+    }
+    
+    return YES;
 }
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"[%@]-[%@]-[%@]-[%@]-[%@]\nUUID = [%@]\nTimes = [%@], iconId = [%@]/[%@]\ncustomFields = [%@]",
-            self.title, self.username, self.password, self.url, self.notes, self.uuid, self.times, self.iconId, self.customIcon, self.customStrings];
+            self.title, self.username, self.password, self.url, self.notes, self.uuid, self.times, self.icon, self.customIcon, self.customStrings];
 }
 
 @end

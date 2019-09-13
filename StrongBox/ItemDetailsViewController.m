@@ -1031,6 +1031,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     v.dataSource = self;
     v.currentPreviewItemIndex = index;
     v.delegate = self;
+    
     v.modalPresentationStyle = UIModalPresentationFormSheet;
     
     [self presentViewController:v animated:YES completion:nil];
@@ -1049,12 +1050,13 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-    for (NSString *file in tmpDirectory) {
-        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-        
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
+        NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+        for (NSString *file in tmpDirectory) {
+            NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
+            [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+        }
+    });
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -1148,9 +1150,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
 }
 
-- (void)onDeleteHistoryItem:(Node*) historicalNode {
-    self.item.fields.accessed = [[NSDate alloc] init];
-    self.item.fields.modified = [[NSDate alloc] init];
+- (void)onDeleteHistoryItem:(Node*)historicalNode {
+    [self.item touch:YES touchParents:YES];
     [self.item.fields.keePassHistory removeObject:historicalNode];
     
     [self performFullReload];
@@ -1181,8 +1182,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     // Make Changes
     
-    self.item.fields.accessed = [[NSDate alloc] init];
-    self.item.fields.modified = [[NSDate alloc] init];
+    [self.item touch:YES touchParents:YES];
     
     [self.item restoreFromHistoricalNode:historicalNode];
     
@@ -1212,8 +1212,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
 - (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(NSError *))onDone {
     self.item.fields.passwordHistory = changed;
-    self.item.fields.accessed = [[NSDate alloc] init];
-    self.item.fields.modified = [[NSDate alloc] init];
+    [self.item touch:YES touchParents:YES];
     
     [self performFullReload];
     
@@ -1452,8 +1451,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
         [self addHistoricalNode:originalNodeForHistory];
     }
     
-    self.item.fields.accessed = [[NSDate alloc] init];
-    self.item.fields.modified = [[NSDate alloc] init];
+    [self.item touch:YES touchParents:YES];
+    
     [self.item setTitle:self.model.title allowDuplicateGroupTitles:NO];
     
     self.item.fields.username = self.model.username;

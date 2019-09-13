@@ -1,9 +1,9 @@
 //
-//  KeePassXmlParserDelegate.h
+//  KeePassXmlParser.h
 //  Strongbox
 //
-//  Created by Mark on 17/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Created by Mark on 11/09/2019.
+//  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface KeePassXmlParserDelegate : NSObject<NSXMLParserDelegate>
+@interface KeePassXmlParser : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -30,6 +30,13 @@ NS_ASSUME_NONNULL_BEGIN
                                   context:(XmlProcessingContext*)context;
 
 @property (nonatomic, readonly, nullable) RootXmlDomainObject* rootElement;
+
+- (void)didStartElement:(NSString *)elementName
+             attributes:(NSDictionary *_Nullable)attributeDict;
+
+-(void)foundCharacters:(NSString *)string;
+
+- (void)didEndElement:(NSString *)elementName;
 
 @end
 

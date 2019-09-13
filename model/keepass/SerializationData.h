@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "DecryptionParameters.h"
 #import "DatabaseAttachment.h"
+#import "RootXmlDomainObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,12 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) uint32_t compressionFlags;
 @property (nonatomic) uint32_t innerRandomStreamId;
 @property (nonatomic) uint64_t transformRounds;
-@property (nonatomic) NSString* xml;
 @property (nonatomic) NSData *protectedStreamKey;
 @property (nonatomic) NSString *fileVersion;
 @property (nonatomic) NSDictionary<NSNumber *,NSObject *>* extraUnknownHeaders;
 @property (nonatomic) NSString* headerHash;
 @property (nonatomic) NSUUID* cipherId;
+@property RootXmlDomainObject* rootXmlObject;
 
 @end
 

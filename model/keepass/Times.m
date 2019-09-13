@@ -8,6 +8,7 @@
 
 #import "Times.h"
 #import "KeePassDatabase.h"
+#import "SimpleXmlValueExtractor.h"
 
 // <Times>
 //    <LastModificationTime>2018-10-17T19:28:42Z</LastModificationTime>
@@ -27,86 +28,118 @@
 
 - (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kTimesElementName context:context]) {
-        self.lastAccessTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName context:context];
-        self.lastModificationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName context:context];
-        self.creationTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName context:context];
-        self.expiryTime = [[GenericTextDateElementHandler alloc] initWithXmlElementName:kExpiryTimeElementName context:context];
-        self.expires = [[GenericTextBooleanElementHandler alloc] initWithXmlElementName:kExpiresElementName context:context];
+        self.lastAccessTime = NSDate.date;
+        self.lastModificationTime = NSDate.date;
+        self.creationTime = NSDate.date;
+        self.expiryTime = nil;
+        self.expires = NO;
+        self.usageCount = nil;
+        self.locationChangedTime = nil;
     }
     
     return self;
 }
 
-- (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
-    if([xmlElementName isEqualToString:kLastModificationTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastModificationTimeElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kCreationTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kCreationTimeElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kLastAccessTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kLastAccessTimeElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kExpiryTimeElementName]) {
-        return [[GenericTextDateElementHandler alloc] initWithXmlElementName:kExpiryTimeElementName context:self.context];
-    }
-    else if([xmlElementName isEqualToString:kExpiresElementName]) {
-        return [[GenericTextBooleanElementHandler alloc] initWithXmlElementName:kExpiresElementName context:self.context];
-    }
-    
-    return [super getChildHandler:xmlElementName];
-}
-
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kLastModificationTimeElementName]) {
-        self.lastModificationTime = (GenericTextDateElementHandler*)completedObject;
+        self.lastModificationTime = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kCreationTimeElementName]) {
-        self.creationTime = (GenericTextDateElementHandler*)completedObject;
+        self.creationTime = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kLastAccessTimeElementName]) {
-        self.lastAccessTime = (GenericTextDateElementHandler*)completedObject;
+        self.lastAccessTime = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kExpiryTimeElementName]) {
-        self.expiryTime = (GenericTextDateElementHandler*)completedObject;
+        self.expiryTime = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kExpiresElementName]) {
-        self.expires = (GenericTextBooleanElementHandler*)completedObject;
+        self.expires = [SimpleXmlValueExtractor getBool:completedObject];
         return YES;
     }
-    
+    else if([withXmlElementName isEqualToString:kUsageCountElementName]) {
+        self.usageCount = [SimpleXmlValueExtractor getNumber:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kLocationChangedTimeElementName]) {
+        self.locationChangedTime = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kTimesElementName];
-    
-    ret.node = self.nonCustomisedXmlTree.node;
-    
-    [ret.children addObject:[self.lastModificationTime generateXmlTree]];
-    [ret.children addObject:[self.creationTime generateXmlTree]];
-    [ret.children addObject:[self.lastAccessTime generateXmlTree]];
-    
-    if(self.expiryTime.date) {
-        [ret.children addObject:[self.expiryTime generateXmlTree]];
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
     }
-    if(self.expires.booleanValue) {
-        [ret.children addObject:[self.expires generateXmlTree]];
+
+    if(self.lastModificationTime && ![serializer writeElement:kLastModificationTimeElementName date:self.lastModificationTime]) return NO;
+    if(self.creationTime && ![serializer writeElement:kCreationTimeElementName date:self.creationTime]) return NO;
+    if(self.lastAccessTime && ![serializer writeElement:kLastAccessTimeElementName date:self.lastAccessTime]) return NO;
+    if(self.expiryTime && ![serializer writeElement:kExpiryTimeElementName date:self.expiryTime]) return NO;
+    if(![serializer writeElement:kExpiresElementName boolean:self.expires]) return NO;
+    if(self.usageCount && ![serializer writeElement:kUsageCountElementName integer:self.usageCount.integerValue]) return NO;
+    if(self.locationChangedTime && ![serializer writeElement:kLocationChangedTimeElementName date:self.locationChangedTime]) return NO;
+    
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
     }
     
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
+    [serializer endElement];
     
-    return ret;
+    return YES;
+}
+
+- (BOOL)isEqual:(id)object {
+    if (object == nil) {
+        return NO;
+    }
+    
+    if (self == object) {
+        return YES;
+    }
+    
+    if (![object isKindOfClass:[Times class]]) {
+        return NO;
+    }
+    
+    Times* other = (Times*)object;
+    
+    if(![self.lastModificationTime isEqualToDate:other.lastModificationTime]) {
+        return NO;
+    }
+    if(![self.creationTime isEqualToDate:other.creationTime]) {
+        return NO;
+    }
+    if(![self.lastAccessTime isEqualToDate:other.lastAccessTime]) {
+        return NO;
+    }
+    if(self.expires && ![self.expiryTime isEqualToDate:other.expiryTime]) {
+        return NO;
+    }
+    if(![self.locationChangedTime isEqualToDate:other.locationChangedTime]) {
+        return NO;
+    }
+    if(![self.usageCount isEqual:other.usageCount]) {
+        return NO;
+    }
+    if(self.expires != other.expires) {
+        return NO;
+    }
+
+    return YES;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"LastModificationTime = [%@], CreationTime = [%@], LastAccessTime = [%@], expires=[%@], expiryTime=[%@]",
+    return [NSString stringWithFormat:@"LastModificationTime = [%@], CreationTime = [%@], LastAccessTime = [%@], expires=[%d], expiryTime=[%@]",
             self.lastModificationTime, self.creationTime, self.lastAccessTime, self.expires, self.expiryTime];
 }
-
 
 @end

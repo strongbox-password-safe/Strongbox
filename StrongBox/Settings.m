@@ -44,7 +44,7 @@ static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSecond
 //static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles"; // DEAD
 static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
 static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
-static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
+//static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
 //static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill"; // Dead
 static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene"; // DEAD
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
@@ -77,7 +77,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 static NSString* cachedAppGroupName;
 
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
-static NSString* const kCoalesceAppLockAndQuickLaunchBiometricAuths = @"coalesceAppLockAndQuickLaunchBiometricAuths";
 //static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage"; // DEAD
 static NSString* const kQuickLaunchUuid = @"quickLaunchUuid";
 static NSString* const kMigratedToNewQuickLaunchSystem = @"migratedToNewQuickLaunchSystem";
@@ -88,6 +87,7 @@ static NSString* const kDatabaseCellTopSubtitle = @"databaseCellTopSubtitle";
 static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
 static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
+static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
 
 @implementation Settings
 
@@ -106,6 +106,14 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)monitorInternetConnectivity {
+    return [self getBool:kMonitorInternetConnectivity fallback:YES];
+}
+
+- (void)setMonitorInternetConnectivity:(BOOL)monitorInternetConnectivity {
+    [self setBool:kMonitorInternetConnectivity value:monitorInternetConnectivity];
+}
 
 - (BOOL)showDatabasesSeparator {
     return [self getBool:kShowDatabasesSeparator];
@@ -175,14 +183,6 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 - (BOOL)useLocalSharedStorage {
     return YES; // [self getBool:kUseLocalSharedStorage fallback:YES];
-}
-
-- (BOOL)coalesceAppLockAndQuickLaunchBiometricAuths {
-    return [self getBool:kCoalesceAppLockAndQuickLaunchBiometricAuths fallback:YES];
-}
-
-- (void)setCoalesceAppLockAndQuickLaunchBiometricAuths:(BOOL)coalesceAppLockAndQuickLaunchBiometricAuths {
-    [self setBool:kCoalesceAppLockAndQuickLaunchBiometricAuths value:coalesceAppLockAndQuickLaunchBiometricAuths];
 }
 
 - (BOOL)showYubikeySecretWorkaroundField {
@@ -808,16 +808,6 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 - (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
     [[self getUserDefaults] setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)doNotCopyOtpCodeOnAutoFillSelect {
-
-    return [[self getUserDefaults] boolForKey:kCopyOtpCodeOnAutoFillSelect];
-}
-
-- (void)setDoNotCopyOtpCodeOnAutoFillSelect:(BOOL)copyOtpCodeOnAutoFillSelect {
-    [[self getUserDefaults] setBool:copyOtpCodeOnAutoFillSelect forKey:kCopyOtpCodeOnAutoFillSelect];
     [[self getUserDefaults] synchronize];
 }
 

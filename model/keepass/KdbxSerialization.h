@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init:(SerializationData*)serializationData;
 
 - (nullable NSString*)stage1Serialize:(CompositeKeyFactors*)compositeKeyFactors error:(NSError**)error;
-- (nullable NSData*)stage2Serialize:xml error:(NSError**)error;
+- (nullable NSData*)stage2Serialize:(NSString*)xml error:(NSError**)error;
 
 @end
 

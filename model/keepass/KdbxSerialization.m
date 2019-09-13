@@ -19,6 +19,7 @@
 #import "AesCipher.h"
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
+#import "GZipInputStream.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
@@ -146,7 +147,7 @@ static BOOL kLogVerbose = NO;
     return [hashData base64EncodedStringWithOptions:kNilOptions];
 }
 
-- (NSData*)stage2Serialize:xml error:(NSError**)error {
+- (NSData *)stage2Serialize:(NSString *)xml error:(NSError **)error {
     NSMutableData *ret = [[NSMutableData alloc] initWithData:self.headerData];
     
     // 4. Xml to Payload Data (optional GZIP compression)
@@ -260,16 +261,18 @@ static BOOL kLogVerbose = NO;
         return nil;
     }
     
-    NSData *xmlData;
-    if(decryptionParameters.compressionFlags == kGzipCompressionFlag) {
-        xmlData = [deblockified gunzippedData];
-    }
-    else {
-        xmlData = deblockified;
+    BOOL compressed = decryptionParameters.compressionFlags == kGzipCompressionFlag;
+    RootXmlDomainObject *rootXmlObject = [KdbxSerialization readXml:compressed
+                                                             source:deblockified
+                                                innerRandomStreamId:decryptionParameters.innerRandomStreamId
+                                                 protectedStreamKey:decryptionParameters.protectedStreamKey
+                                                              error:ppError];
+
+    if(rootXmlObject == nil) {
+        NSLog(@"Could not parse XML: [%@]", *ppError);
+        return nil;
     }
     
-    NSString* xml = [[NSString alloc] initWithData:xmlData encoding:NSUTF8StringEncoding];
-
     SerializationData* ret = [[SerializationData alloc] init];
     KeepassFileHeader keePassFileHeader = getKeePassFileHeader(safeData);
     
@@ -280,10 +283,27 @@ static BOOL kLogVerbose = NO;
     ret.protectedStreamKey = decryptionParameters.protectedStreamKey;
     ret.extraUnknownHeaders = getUnknownHeaders(headerEntries);
     ret.headerHash = [headerHash base64EncodedStringWithOptions:kNilOptions];
-    ret.xml = xml;
+    ret.rootXmlObject = rootXmlObject;
     ret.cipherId = decryptionParameters.cipherId;
     
     return ret;
+}
+
++ (RootXmlDomainObject*)readXml:(BOOL)compressed
+                         source:(NSData*)source
+            innerRandomStreamId:(uint32_t)innerRandomStreamId
+             protectedStreamKey:(NSData*)protectedStreamKey
+                          error:(NSError**)error {
+    
+    NSInputStream* stream = compressed ? [[GZipInputStream alloc] initWithData:source] : [NSInputStream inputStreamWithData:source];
+    [stream open];
+    
+    RootXmlDomainObject* rootXmlObject = parseXml(innerRandomStreamId, protectedStreamKey,
+                                                XmlProcessingContext.standardV3Context, stream, error);
+    
+    [stream close];
+    
+    return rootXmlObject;
 }
 
 +(NSData*)getHeadersData:(NSDictionary<NSNumber*, NSData*>*)headers {

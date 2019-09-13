@@ -33,10 +33,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
 @property (nonatomic, strong, nullable) NSDate *created;
-@property (nonatomic, strong, nullable) NSDate *modified;
-@property (nonatomic, strong, nullable) NSDate *accessed;
+@property (nonatomic, strong, nullable, readonly) NSDate *modified;
+@property (nonatomic, strong, nullable, readonly) NSDate *accessed;
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nullable) NSDate *expires;
+@property (nonatomic, strong, nullable) NSDate *locationChanged;
+@property (nonatomic, strong, nullable, readonly) NSNumber *usageCount;
+
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
@@ -56,6 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeAllCustomFields;
 - (void)removeCustomField:(NSString*)key;
 - (void)setCustomField:(NSString*)key value:(StringValue*)value;
+
+- (void)touch:(BOOL)modified;
+- (void)setTouchProperties:(NSDate*_Nullable)accessed modified:(NSDate*_Nullable)modified usageCount:(NSNumber*_Nullable)usageCount;
 
 ///////////////////////////////////////////////
 // TOTP

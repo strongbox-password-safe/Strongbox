@@ -34,7 +34,7 @@
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kKeePassFileElementName]) {
         _keePassFile = (KeePassFile*)completedObject;
         return YES;
@@ -44,20 +44,12 @@
     }
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:@"Dummy"];
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(self.keePassFile) {
+        [self.keePassFile writeXml:serializer];
+    }
     
-    ret.node = self.nonCustomisedXmlTree.node;
-   
-    if(self.keePassFile) [ret.children addObject:[self.keePassFile generateXmlTree]];
-    
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
-    
-    return ret;
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"KeePassFile = [%@]\nUnknown Children = [%@]", self.keePassFile, self.nonCustomisedXmlTree.children];
+    return [super writeUnmanagedChildren:serializer];
 }
 
 @end

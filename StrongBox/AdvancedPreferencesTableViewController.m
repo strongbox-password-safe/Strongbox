@@ -12,18 +12,18 @@
 #import "Alerts.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
+#import "OfflineDetector.h"
 
 @interface AdvancedPreferencesTableViewController ()
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchCopyTotpAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowYubikeySecretWorkaround;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAppLockBioForQuickLaunch;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDetectOffline;
 
 @end
 
@@ -58,22 +58,27 @@
     NSLog(@"Advanced Preference Changed: [%@]", sender);
     
     Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
-    Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect = !self.switchCopyTotpAutoFill.on;
     Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     Settings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
-    Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths = self.switchAppLockBioForQuickLaunch.on;
-
+    Settings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
+    
+    if(Settings.sharedInstance.monitorInternetConnectivity) {
+        [OfflineDetector.sharedInstance startMonitoringConnectivitity];
+    }
+    else {
+        [OfflineDetector.sharedInstance stopMonitoringConnectivitity];
+    }
+    
     [self bindPreferences];
 }
 
 - (void)bindPreferences {
     self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
-    self.switchCopyTotpAutoFill.on = !Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect;
     self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchShowYubikeySecretWorkaround.on = Settings.sharedInstance.showYubikeySecretWorkaroundField;
-    self.switchAppLockBioForQuickLaunch.on = Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths;
+    self.switchDetectOffline.on = Settings.sharedInstance.monitorInternetConnectivity;
 }
 
 - (void)bindAllowPinCodeOpen {

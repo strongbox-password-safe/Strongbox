@@ -128,7 +128,7 @@
         
         // Copy TOTP code if configured to do so...
         
-        if(!Settings.sharedInstance.doNotCopyOtpCodeOnAutoFillSelect && node.fields.otpToken) {
+        if(node.fields.otpToken) {
             NSString* value = node.fields.otpToken.password;
             if (value.length) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
@@ -243,13 +243,11 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
         
         // TODO: Localize
         
-        [Alerts info:vc title:@"Welcome to Strongbox Auto Fill"
+        [Alerts info:vc
+               title:@"Welcome"
              message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:" \
-         "\n\n- Dropbox"\
-         "\n- OneDrive"\
-         "\n- Google Drive"\
-         "\n- Non Auto-Fill Enabled Local Databases\n\n"\
-         "In these cases, Strongbox can use a cached local copy. Thus, there is a chance that this cache will be out of date. Please take this as a caveat. Hope you enjoy Auto Fill!\n-Mark"];
+         "\nDropbox, OneDrive & Google Drive\n"\
+         "In these cases, Strongbox can use a cache... Enjoy Strongbox Auto Fill!\n-Mark"];
     }
 }
 

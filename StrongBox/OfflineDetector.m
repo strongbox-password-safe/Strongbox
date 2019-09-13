@@ -8,6 +8,7 @@
 
 #import "OfflineDetector.h"
 #import "Reachability.h"
+#import "Settings.h"
 
 @interface OfflineDetector ()
 
@@ -30,6 +31,8 @@
 }
 
 - (void) stopMonitoringConnectivitity {
+    NSLog(@"STOP monitoring Internet Connectivity...");
+    
     [self.internetReachabilityDetector stopNotifier];
     self.internetReachabilityDetector = nil;
     self.offline = NO;
@@ -38,7 +41,12 @@
 - (void) startMonitoringConnectivitity {
     self.offline = NO;
 
-    self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"www.google.com"];
+    if (!Settings.sharedInstance.monitorInternetConnectivity) {
+        NSLog(@"Not monitoring connectivity as configured OFF");
+        return;
+    }
+    
+    self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"duckduckgo.com"];
     
     // Internet is reachable
     

@@ -14,7 +14,8 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import "KeePassConstants.h"
 #import "KeePassCiphers.h"
-#import "KeePassXmlParserDelegate.h"
+#import "KeePassXmlParser.h"
+#include <libxml/parser.h>
 
 static const BOOL kLogVerbose = NO;
 
@@ -293,28 +294,131 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey) {
     return [masterKey copy];
 }
 
-RootXmlDomainObject* parseKeePassXml(uint32_t innerRandomStreamId, NSData* innerRandomStreamKey, XmlProcessingContext* context, NSString* xml, NSError** error) {
-    KeePassXmlParserDelegate *parserDelegate = [[KeePassXmlParserDelegate alloc] initWithProtectedStreamId:innerRandomStreamId
-                                                                                                       key:innerRandomStreamKey
-                                                                                                   context:context];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void dumpXml(NSInputStream* lib) {
+    NSInteger read;
     
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
-    [parser setDelegate:parserDelegate];
-    [parser parse];
-    NSError* err = [parser parserError];
+    NSMutableData *d = [NSMutableData data];
+    const int kChunkSize = 32 * 1024;
+    uint8_t chunk[kChunkSize];
     
-    if(err)
-    {
-        NSLog(@"ERROR: %@", err);
-        if(error) {
-            *error = err;
+    while ((read = [lib read:chunk maxLength:kChunkSize])) {
+        [d appendBytes:chunk length:read];
+    }
+    
+    NSString* xml = [[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding];
+    NSError* error;
+    [xml writeToFile:@"/Users/mark/Desktop/dump.xml" atomically:YES encoding:NSUTF8StringEncoding error:&error];
+    NSLog(@"XML Dumped: [%@]", error);
+}
+
+RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
+                              NSData* innerRandomStreamKey,
+                              XmlProcessingContext* context,
+                              NSInputStream* stream,
+                              NSError** error) {
+    KeePassXmlParser *parser =
+        [[KeePassXmlParser alloc] initWithProtectedStreamId:innerRandomStreamId
+                                                        key:innerRandomStreamKey
+                                                    context:context];
+    
+    xmlSAXHandler *my_handler = malloc(sizeof(xmlSAXHandler));
+    memset(my_handler, 0, sizeof(xmlSAXHandler));
+    
+    my_handler->startElement = startElement;
+    my_handler->endElement = endElement;
+    my_handler->characters = characters;
+    
+    const int kChunkSize = 32 * 1024;
+    
+    uint8_t chnk[kChunkSize];
+    xmlParserCtxtPtr ctxt = nil;
+    int err = XML_ERR_OK;
+    
+    NSUInteger read = [stream read:chnk maxLength:kChunkSize];
+    NSString* foo = [[NSString alloc] initWithBytes:chnk length:read encoding:NSUTF8StringEncoding];
+
+    if(read > 0 && xmlNeedsCleanup(foo)) {
+        foo = xmlCleanupAndTrim(foo);
+        
+        if(![foo getBytes:chnk maxLength:kChunkSize usedLength:&read encoding:NSUTF8StringEncoding options:kNilOptions
+                    range:NSMakeRange(0, foo.length) remainingRange:nil]) {
+            NSLog(@"Error cleaning stream: %d", err);
+            *error = [Utils createNSError:@"Error cleaning stream" errorCode:-1];
         }
+    }
+    
+    do {
+        if(read == -1) {
+            NSLog(@"Error reading stream: %d", err);
+            *error = [Utils createNSError:@"Error reading XML Stream" errorCode:err];
+            return nil;
+        }
+        if(!ctxt) {
+            ctxt = xmlCreatePushParserCtxt(my_handler, (__bridge void *)(parser), (char*)chnk, (int)read, nil);
+        }
+        else {
+            err = xmlParseChunk(ctxt, (char*)chnk, (int)read, 0);
+            if (err != XML_ERR_OK) {
+                break;
+            }
+        }
+    } while((read = [stream read:chnk maxLength:kChunkSize]));
+    
+    if(err != XML_ERR_OK) {
+        NSLog(@"XML Error: %d", err);
+        *error = [Utils createNSError:@"Error reading XML" errorCode:err];
         return nil;
     }
     
-    RootXmlDomainObject* rootDocument = parserDelegate.rootElement;
+    err = xmlParseChunk(ctxt, NULL, 0, 1);
+    if(err != XML_ERR_OK) {
+        NSLog(@"XML Error: %d", err);
+        *error = [Utils createNSError:@"Error reading Final XML" errorCode:err];
+        return nil;
+    }
     
-    return rootDocument;
+    xmlFreeParserCtxt(ctxt);
+    free(my_handler);
+    
+    return parser.rootElement;
+}
+
+void startElement(void *ctx, const xmlChar *fullname, const xmlChar **atts) {
+    NSString* elementName = @((char*)fullname);
+
+    NSMutableDictionary* attributes;
+    if(atts) {
+        attributes = [NSMutableDictionary dictionaryWithCapacity:8];
+        int current = 0;
+        while (atts[current * 2] != NULL) {
+            const char* key = (char*)atts[(current * 2)];
+            const char* value = (char*)atts[(current * 2) + 1];
+            attributes[@(key)] = @(value);
+            current++;
+        }
+    }
+    
+    //NSLog(@"startElement: %s - %@", fullname, attributes);
+    KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
+    [parser didStartElement:elementName attributes:attributes];
+}
+
+void endElement(void *ctx, const xmlChar *name) {
+    NSString* elementName = @((char*)name);
+    //NSLog(@"endElement: [%@]", elementName);
+    
+    KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
+    [parser didEndElement:elementName];
+}
+
+void characters (void *ctx, const xmlChar *ch, int len) {
+    NSString* text = [[NSString alloc] initWithBytes:ch length:len encoding:NSUTF8StringEncoding];
+    //NSLog(@"characters: [%@]", text);
+
+    KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
+    [parser foundCharacters:text];
 }
 
 @end

@@ -19,8 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) KeePassFile* keePassFile;
 
-- (XmlTree *)generateXmlTree;
-
 @end
 
 NS_ASSUME_NONNULL_END

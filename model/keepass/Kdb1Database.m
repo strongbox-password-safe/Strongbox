@@ -302,8 +302,9 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
                                                         email:@""];
     
     fields.created = entry.creation;
-    fields.accessed = entry.accessed;
-    fields.modified = entry.modified;
+    
+    [fields setTouchProperties:entry.accessed modified:entry.modified usageCount:nil];
+
     fields.expires = entry.expired;
     
     if(entry.binaryFileName.length) {

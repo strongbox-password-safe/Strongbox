@@ -201,8 +201,8 @@
     fields.email = record.email;
     fields.expires = record.expires;
     
-    fields.accessed = record.accessed;
-    fields.modified = record.modified;
+    [fields setTouchProperties:record.accessed modified:record.modified usageCount:nil];
+    
     fields.created = record.created;
     fields.passwordModified = record.passwordModified;
     

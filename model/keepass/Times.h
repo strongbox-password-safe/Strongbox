@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "BaseXmlDomainObjectHandler.h"
-#import "GenericTextDateElementHandler.h"
-#import "GenericTextBooleanElementHandler.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,15 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
-@property GenericTextDateElementHandler* lastModificationTime;
-@property GenericTextDateElementHandler* creationTime;
-@property GenericTextDateElementHandler* lastAccessTime;
-@property GenericTextDateElementHandler* expiryTime;
-@property GenericTextBooleanElementHandler* expires;
-
-//@property (nonatomic) GenericTextElementHandler* locationChanged;   // FUTURE:
-// usageCount       // FUTURE:
-
+@property (nullable) NSDate* lastModificationTime;
+@property (nullable) NSDate* creationTime;
+@property (nullable) NSDate* lastAccessTime;
+@property (nullable) NSDate* expiryTime;
+@property BOOL expires;
+@property (nullable) NSNumber* usageCount;
+@property (nullable) NSDate* locationChangedTime;
 
 @end
 

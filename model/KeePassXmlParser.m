@@ -1,27 +1,29 @@
 //
-//  KeePassXmlParserDelegate.m
+//  KeePassXmlParser.m
 //  Strongbox
 //
-//  Created by Mark on 17/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Created by Mark on 11/09/2019.
+//  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
-#import "KeePassXmlParserDelegate.h"
-#import "XmlParsingDomainObject.h"
-#import "BaseXmlDomainObjectHandler.h"
-#import "KeePassDatabase.h"
+#import "KeePassXmlParser.h"
+#import "RootXmlDomainObject.h"
+#import "InnerRandomStream.h"
+#import "XmlProcessingContext.h"
+#import "KeePassConstants.h"
 #import "InnerRandomStreamFactory.h"
 
-@interface KeePassXmlParserDelegate ()
+@interface KeePassXmlParser ()
 
 @property NSMutableArray<id<XmlParsingDomainObject>> *handlerStack;
 @property (nonatomic) id<InnerRandomStream> innerRandomStream;
 @property (nonatomic) BOOL errorParsing;
 @property XmlProcessingContext* context;
+@property NSMutableString* mutableText;
 
 @end
 
-@implementation KeePassXmlParserDelegate
+@implementation KeePassXmlParser
 
 - (instancetype)initV3Plaintext  {
     return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:[XmlProcessingContext standardV3Context]];
@@ -36,7 +38,7 @@
 }
 
 - (instancetype)initV3WithProtectedStreamId:(uint32_t)innerRandomStreamId
-                                      key:(nullable NSData*)protectedStreamKey
+                                        key:(nullable NSData*)protectedStreamKey
 {
     return [self initWithProtectedStreamId:innerRandomStreamId key:protectedStreamKey context:[XmlProcessingContext standardV3Context]];
 }
@@ -55,8 +57,9 @@
         self.innerRandomStream = [InnerRandomStreamFactory getStream:innerRandomStreamId key:protectedStreamKey];
         self.handlerStack = [NSMutableArray array];
         [self.handlerStack addObject:[[RootXmlDomainObject alloc] initWithContext:context]];
+        self.mutableText = [[NSMutableString alloc] initWithCapacity:32 * 1024]; // Too High/Low?
     }
-
+    
     return self;
 }
 
@@ -66,7 +69,7 @@
     }
     
     id<XmlParsingDomainObject> rootHandler = [self.handlerStack firstObject];
-
+    
     if(![rootHandler isKindOfClass:[RootXmlDomainObject class]]) {
         return nil;
     }
@@ -74,7 +77,8 @@
     return (RootXmlDomainObject*)rootHandler;
 }
 
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
+- (void)didStartElement:(NSString *)elementName
+             attributes:(NSDictionary *)attributeDict {
     id<XmlParsingDomainObject> nextHandler = [[self.handlerStack lastObject] getChildHandler:elementName];
     
     if(!nextHandler) {
@@ -83,33 +87,42 @@
     
     [nextHandler setXmlInfo:elementName attributes:attributeDict];
     
+    if(self.mutableText.length) {
+        [self.mutableText setString:@""];
+    }
+    
     [self.handlerStack addObject:nextHandler];
 }
 
--(void) parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
-    id<XmlParsingDomainObject> handler = [self.handlerStack lastObject];
-    
-    [handler appendXmlText:string]; // Can be called multiple times
+-(void)foundCharacters:(NSString *)string {
+    [self.mutableText appendString:string];
 }
 
-- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
+- (void)didEndElement:(NSString *)elementName {
     id<XmlParsingDomainObject> completedObject = [self.handlerStack lastObject];
     [self.handlerStack removeLastObject];
-
-    NSDictionary *attributeDict = completedObject.nonCustomisedXmlTree.node.xmlAttributes;
-
+    
     // Decrypt Now that we have the full text if necessary
     
-    if([attributeDict objectForKey:kAttributeProtected] && ([[attributeDict objectForKey:kAttributeProtected] isEqualToString:kAttributeValueTrue])) {
-        NSString *string = [completedObject getXmlText];
+    if (self.mutableText.length) {
+        BOOL protected = completedObject.originalAttributes &&
+        (completedObject.originalAttributes[kAttributeProtected] &&
+         ([completedObject.originalAttributes[kAttributeProtected] isEqualToString:kAttributeValueTrue]));
         
-        NSString* decrypted = [self decryptProtected:string];
+        if(protected) {
+            NSString *string = self.mutableText;
+            NSString* decrypted = [self decryptProtected:string];
+            [completedObject setXmlText:decrypted];
+        }
+        else {
+            [completedObject setXmlText:self.mutableText.copy];
+        }
         
-        [completedObject setXmlText:decrypted];
+        [self.mutableText setString:@""];
     }
     
     [completedObject onCompleted];
-
+    
     id<XmlParsingDomainObject> parentObject = [self.handlerStack lastObject];
     
     if(parentObject) {
@@ -122,7 +135,7 @@
             }
             else {
                 BaseXmlDomainObjectHandler *bdh = completedObject;
-                [parentObject addUnknownChildObject:bdh.nonCustomisedXmlTree];
+                [parentObject addUnknownChildObject:bdh];
             }
         }
     }

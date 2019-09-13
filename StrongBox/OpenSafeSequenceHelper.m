@@ -312,7 +312,7 @@
 - (void)showBiometricAuthentication {
     //NSLog(@"REQUEST-BIOMETRIC: Open Safe");
     
-    if(self.biometricPreCleared && Settings.sharedInstance.coalesceAppLockAndQuickLaunchBiometricAuths) {
+    if(self.biometricPreCleared) {
         NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
         [self onBiometricAuthenticationDone:YES error:nil];
     }
@@ -921,7 +921,7 @@
             [viewModel updateOfflineCacheWithData:data];
         }
         
-        if(self.safe.autoFillEnabled) {
+        if(self.safe.autoFillEnabled && !self.isAutoFillOpen) { // This is memory heavy ... don't blow it in Auto Fill
             [viewModel updateAutoFillCacheWithData:data];
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }
@@ -1003,6 +1003,10 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
     sharedInstance = self;
     
     [self.viewController presentViewController:self.documentPicker animated:YES completion:nil];
+}
+
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    self.completion(nil, nil);
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {

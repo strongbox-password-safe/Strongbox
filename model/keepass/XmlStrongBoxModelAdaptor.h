@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
                                          customIcons:(NSDictionary<NSUUID*, NSData*> *)customIcons
-                             existingRootXmlDocument:(nullable RootXmlDomainObject *)existingRootXmlDocument
+                                        originalMeta:(Meta*_Nullable)originalMeta
                                              context:(XmlProcessingContext*)context
                                                error:(NSError **)error;
 

@@ -46,6 +46,12 @@
                   Identifier = "FavIconTests">
                </Test>
                <Test
+                  Identifier = "MemoryConsumptionTests">
+               </Test>
+               <Test
+                  Identifier = "MemoryPerformanceTests">
+               </Test>
+               <Test
                   Identifier = "SFTPTests">
                </Test>
             </SkippedTests>

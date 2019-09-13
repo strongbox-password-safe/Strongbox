@@ -7,8 +7,10 @@
 //
 
 #import "CommonTesting.h"
-#import "KeePassXmlParserDelegate.h"
 #import "KeePassDatabase.h"
+#import "XmlSerializer.h"
+#import "XmlToDictionaryParser.h"
+#import "KdbxSerializationCommon.h"
 
 @interface CommonTesting ()
 
@@ -18,6 +20,59 @@
 
 @implementation CommonTesting
 
+NSString* getXml(id<XmlParsingDomainObject> obj, BOOL v4) {
+    return getXml2(obj, v4, kInnerStreamPlainText, nil);
+}
+
+NSString* getXml2(id<XmlParsingDomainObject> obj, BOOL v4, uint32_t streamId, NSData* key) {
+    XmlSerializer *s = [[XmlSerializer alloc] initWithProtectedStreamId:streamId key:key v4Format:v4 prettyPrint:YES];
+    
+    [s beginDocument];
+    if([obj writeXml:s]) {
+        return s.xml;
+    }
+    [s endDocument];
+    
+    return nil;
+}
+
+BOOL compareOriginalAndRegenerated(id<XmlParsingDomainObject> origRootGroup, id<XmlParsingDomainObject> regeneratedRootGroup, BOOL v4) {
+    NSString *originalXml = getXml(origRootGroup, v4);
+    NSLog(@"%@", originalXml);
+    
+    NSLog(@"============================================================================================================================");
+    
+    NSString *regeneratedXml = getXml(regeneratedRootGroup, v4);
+    NSLog(@"%@", regeneratedXml);
+
+    return compareOriginalAndRegeneratedXml(originalXml, regeneratedXml);
+}
+
+BOOL compareOriginalAndRegeneratedXml(NSString* xml1, NSString* xml2) {
+    XmlComparisonElement* d1 = dictionaryFromXml(xml1);
+    XmlComparisonElement* d2 = dictionaryFromXml(xml2);
+
+    return [d1 isEqual:d2];
+}
+
+XmlComparisonElement* dictionaryFromXml(NSString* xml) {
+    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    XmlToDictionaryParser *parserDelegate = [[XmlToDictionaryParser alloc] init];
+
+    [parser setDelegate:parserDelegate];
+    [parser parse];
+    
+    NSError* err = [parser parserError];
+    
+    if(err)
+    {
+        NSLog(@"%@", err);
+        return nil;
+    }
+    
+    return parserDelegate.rootElement;
+}
 
 + (NSDictionary<NSString*, NSString*>*)testKdbFilesAndPasswords {
     static NSDictionary<NSString*, NSString*> *fooDict = nil;
@@ -116,28 +171,37 @@
 }
 
 + (RootXmlDomainObject*)parseKeePassXmlSalsa20:(NSString*)xml key:(NSData*)key {
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
-
-    KeePassXmlParserDelegate *parserDelegate;
+    NSData* d = [xml dataUsingEncoding:NSUTF8StringEncoding];
+    
+    RootXmlDomainObject* xmlObject;
     if(!key) {
-        parserDelegate = [[KeePassXmlParserDelegate alloc] initV3Plaintext];
+        xmlObject = [CommonTesting parseXml:kInnerStreamPlainText key:nil data:d context:XmlProcessingContext.standardV3Context];
     }
     else {
-        parserDelegate = [[KeePassXmlParserDelegate alloc] initV3WithProtectedStreamId:kInnerStreamSalsa20 key:key];
+        xmlObject = [CommonTesting parseXml:kInnerStreamSalsa20 key:key data:d context:XmlProcessingContext.standardV3Context];
     }
     
-    [parser setDelegate:parserDelegate];
-    [parser parse];
+    return xmlObject;
+}
+
++ (RootXmlDomainObject*)parseXml:(uint8_t)streamId
+                             key:(NSData*_Nullable)key
+                            data:(NSData*)data
+                         context:(XmlProcessingContext*)context {
+    NSInputStream* str1 = [NSInputStream inputStreamWithData:data];
+    [str1 open];
     
-    NSError* err = [parser parserError];
+    NSError* error;
+    RootXmlDomainObject* ret = parseXml(streamId, key, context, str1, &error);
     
-    if(err)
-    {
-        NSLog(@"%@", err);
+    [str1 close];
+    
+    if(error) {
+        NSLog(@"%@", error);
         return nil;
     }
     
-    return parserDelegate.rootElement;
+    return ret;
 }
 
 @end

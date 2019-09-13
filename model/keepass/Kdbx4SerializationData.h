@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "KdfParameters.h"
 #import "DatabaseAttachment.h"
+#import "RootXmlDomainObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,10 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property uint32_t innerRandomStreamId;
 @property (nullable) NSData* innerRandomStreamKey;
 @property NSDictionary<NSNumber*, NSObject*> *extraUnknownHeaders;
-@property NSString* xml;
 @property KdfParameters *kdfParameters;
 @property NSUUID* cipherUuid;
 @property NSArray<DatabaseAttachment*>* attachments;
+@property RootXmlDomainObject* rootXmlObject;
 
 @end
 

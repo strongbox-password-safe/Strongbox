@@ -29,10 +29,9 @@
 #import "OTPToken+Generation.h"
 
 const NSUInteger kSectionIdxPinned = 0;
-const NSUInteger kSectionIdxRecents = 1;
-const NSUInteger kSectionIdxNearlyExpired = 2;
-const NSUInteger kSectionIdxExpired = 3;
-const NSUInteger kSectionIdxLast = 4;
+const NSUInteger kSectionIdxNearlyExpired = 1;
+const NSUInteger kSectionIdxExpired = 2;
+const NSUInteger kSectionIdxLast = 3;
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
@@ -46,10 +45,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property (strong, nonatomic) NSArray<Node*> *pinnedItemsCache;
 @property (strong, nonatomic) NSArray<Node*> *expiredItemsCache;
 @property (strong, nonatomic) NSArray<Node*> *nearlyExpiredItemsCache;
-@property (strong, nonatomic) NSArray<Node*> *recentItemsCache;
 
 @property (strong, nonatomic) UISearchController *searchController;
-@property (strong, nonatomic) UIBarButtonItem *savedOriginalNavButton;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
 @property (nonatomic) NSInteger tapCount;
@@ -199,7 +196,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)setupNavBar {
     if(self.splitViewController) {
-        if(self.currentGroup != self.viewModel.database.rootGroup) {
+        if(![self isDisplayingRootGroup]) {
             self.closeBarButton.enabled = NO;
             [self.closeBarButton setTintColor:UIColor.clearColor];
         }
@@ -224,6 +221,59 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self.navigationController setNavigationBarHidden:NO];
     self.navigationController.navigationBar.hidden = NO;
     self.navigationController.navigationBarHidden = NO;
+}
+
+- (void)enableDisableToolbarButtons {
+    BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
+    
+    self.buttonAddRecord.enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
+    self.buttonSafeSettings.enabled = !self.isEditing;
+    self.buttonViewPreferences.enabled = !self.isEditing;
+    
+    self.buttonMove.enabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
+    self.buttonDelete.enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
+    
+    self.buttonSortItems.enabled = !self.isEditing ||
+    (!ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone);
+    
+    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
+    
+    [self.buttonSortItems setImage:sortImage];
+    
+    self.buttonAddGroup.enabled = !ro && !self.isEditing;
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animate {
+    [super setEditing:editing animated:animate];
+    
+    NSLog(@"setEditing: %d", editing);
+    
+    [self enableDisableToolbarButtons];
+    
+    if (!editing) {
+        if(self.reorderItemOperations) {
+            // Do the reordering
+            NSLog(@"Reordering");
+            
+            for (NSArray<NSNumber*>* moveOp in self.reorderItemOperations) {
+                NSUInteger src = moveOp[0].unsignedIntegerValue;
+                NSUInteger dest = moveOp[1].unsignedIntegerValue;
+                NSLog(@"Move: %lu -> %lu", (unsigned long)src, (unsigned long)dest);
+                [self.currentGroup moveChild:src to:dest];
+            }
+            
+            self.reorderItemOperations = nil;
+            [self saveChangesToSafeAndRefreshView];
+        }
+    }
+    else {
+        self.reorderItemOperations = nil;
+    }
+}
+
+- (void)cancelEditing {
+    self.reorderItemOperations = nil;
+    [self setEditing:NO];
 }
 
 - (void)setupSearchBar {
@@ -305,11 +355,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return !self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly;
+    return YES;
 }
 
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     return self.viewModel.database.format != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone;
 }
 
@@ -374,11 +423,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                    [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
                                }
                                
-                               item.fields.accessed = [NSDate date];
-                               item.fields.modified = [NSDate date];
-                               
                                [item setTitle:text allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe];
                                
+                               [item touch:YES touchParents:YES];
+
                                [self saveChangesToSafeAndRefreshView];
                            }
                        }];
@@ -438,9 +486,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
             }
             
-            item.fields.accessed = [NSDate date];
-            item.fields.modified = [NSDate date];
-            
+            [item touch:YES touchParents:YES];
+
             if(userSelectedNewCustomIcon) {
                 NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
                 [self.viewModel.database setNodeCustomIcon:item data:data rationalize:YES];
@@ -501,11 +548,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                                                                  }];
     pinAction.backgroundColor = UIColor.magentaColor;
     
-    if(item.isGroup) {
-        return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
+    if(!self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly) {
+        if(item.isGroup) {
+            return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
+        }
+        else {
+            return @[removeAction, renameAction, duplicateItemAction, pinAction];
+        }
     }
     else {
-        return @[removeAction, renameAction, duplicateItemAction, pinAction];
+        return @[pinAction];
     }
 }
 
@@ -545,7 +597,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 -(void)duplicateItem:(Node*)item {
     Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
     
-    item.fields.accessed = [NSDate date];
+    [item touch:NO touchParents:YES];
+
     [item.parent addChild:dupe allowDuplicateGroupTitles:NO];
 
     [self saveChangesToSafeAndRefreshView];
@@ -575,10 +628,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 ////////////////////////////////
 // Data Sources
-
-- (NSArray<Node*>*)loadRecentItems {
-    return @[]; // TODO: Recents! With a max count
-}
 
 - (NSArray<Node*>*)loadPinnedItems {
     if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.metadata.favourites.count) {
@@ -663,7 +712,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (NSUInteger)getQuickViewRowCount {
     return [self getDataSourceForSection:kSectionIdxPinned].count +
-    [self getDataSourceForSection:kSectionIdxRecents].count +
     [self getDataSourceForSection:kSectionIdxNearlyExpired].count +
     [self getDataSourceForSection:kSectionIdxExpired].count;
 }
@@ -671,9 +719,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (NSArray<Node*>*)getDataSourceForSection:(NSUInteger)section {
     if(section == kSectionIdxPinned) {
         return self.pinnedItemsCache;
-    }
-    else if (section == kSectionIdxRecents) {
-        return self.recentItemsCache;
     }
     else if (section == kSectionIdxNearlyExpired) {
         return self.nearlyExpiredItemsCache;
@@ -708,7 +753,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.pinnedItemsCache = [self isDisplayingRootGroup] ? [self loadPinnedItems] : @[];
     self.nearlyExpiredItemsCache = [self isDisplayingRootGroup] ? [self loadNearlyExpiredItems] : @[];
     self.expiredItemsCache = [self isDisplayingRootGroup] ? [self loadExpiredItems] : @[];
-    self.recentItemsCache = [self isDisplayingRootGroup] ? [self loadRecentItems] : @[];
     
     // Display
     
@@ -747,9 +791,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     if(section == kSectionIdxPinned && [self isDisplayingRootGroup] && [self getDataSourceForSection:section].count) {
         return NSLocalizedString(@"browse_vc_section_title_pinned", @"Section Header Title for Pinned Items");
-    }
-    if(section == kSectionIdxRecents && [self isDisplayingRootGroup] && [self getDataSourceForSection:section].count) {
-        return NSLocalizedString(@"browse_vc_section_title_recents", @"Section Header Title for Recent Items");
     }
     else if (section == kSectionIdxNearlyExpired && [self isDisplayingRootGroup] && [self getDataSourceForSection:section].count) {
         return NSLocalizedString(@"browse_vc_section_title_nearly_expired", @"Section Header Title for Nearly Expired Items");
@@ -871,26 +912,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.tapCount = 0;
     self.tappedIndexPath = nil;
     self.tapTimer = nil;
-}
-
-- (void)enableDisableToolbarButtons {
-    BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
-    
-    self.buttonAddRecord.enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
-    self.buttonSafeSettings.enabled = !self.isEditing;
-    self.buttonViewPreferences.enabled = !self.isEditing;
-    
-    self.buttonMove.enabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
-    self.buttonDelete.enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
-    
-    self.buttonSortItems.enabled = !self.isEditing ||
-        (!ro && self.isEditing && self.viewModel.database.format != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone);
-    
-    UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
-    
-    [self.buttonSortItems setImage:sortImage];
-        
-    self.buttonAddGroup.enabled = !ro && !self.isEditing;
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
@@ -1155,7 +1176,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     [self.viewModel update:NO handler:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self setEditing:NO animated:YES];
+            if(self.isEditing) {
+                [self setEditing:NO animated:YES];
+            }
             
             [self refreshItems];
             
@@ -1168,49 +1191,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             }
         });
     }];
-}
-
-- (void)setEditing:(BOOL)editing animated:(BOOL)animate {
-    [super setEditing:editing animated:animate];
-    
-    NSLog(@"setEditing: %d", editing);
-    
-    [self enableDisableToolbarButtons];
-    
-    //NSLog(@"setEditing: %hhd", editing);
-    
-    if (!editing) {
-        self.navigationItem.leftBarButtonItem = self.savedOriginalNavButton;
-        if(self.reorderItemOperations) {
-            // Do the reordering
-            NSLog(@"Reordering");
-            
-            for (NSArray<NSNumber*>* moveOp in self.reorderItemOperations) {
-                NSUInteger src = moveOp[0].unsignedIntegerValue;
-                NSUInteger dest = moveOp[1].unsignedIntegerValue;
-                NSLog(@"Move: %lu -> %lu", (unsigned long)src, (unsigned long)dest);
-                [self.currentGroup moveChild:src to:dest];
-            }
-            
-            self.reorderItemOperations = nil;
-            [self saveChangesToSafeAndRefreshView];
-        }
-    }
-    else {
-        self.reorderItemOperations = nil;
-        
-        UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                                                                      target:self
-                                                                                      action:@selector(cancelEditing)];
-        
-        self.savedOriginalNavButton = self.navigationItem.leftBarButtonItem;
-        self.navigationItem.leftBarButtonItem = cancelButton;
-    }
-}
-
-- (void)cancelEditing {
-    self.reorderItemOperations = nil;
-    [self setEditing:false];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -114,19 +114,16 @@
 		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
 		4D9E098321825108007BA1E7 /* Times.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095621825103007BA1E7 /* Times.m */; };
 		4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */; };
-		4D9E098521825108007BA1E7 /* XmlTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095B21825104007BA1E7 /* XmlTree.m */; };
 		4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */; };
 		4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095D21825104007BA1E7 /* KeePassFile.m */; };
 		4D9E098821825108007BA1E7 /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095F21825104007BA1E7 /* SerializationData.m */; };
 		4D9E098921825108007BA1E7 /* String.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096221825104007BA1E7 /* String.m */; };
 		4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096521825104007BA1E7 /* AesCipher.m */; };
-		4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096A21825105007BA1E7 /* XmlItem.m */; };
 		4D9E098D21825108007BA1E7 /* DecryptionParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096B21825105007BA1E7 /* DecryptionParameters.m */; };
 		4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */; };
 		4D9E098F21825108007BA1E7 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
 		4D9E099021825108007BA1E7 /* GenericTextStringElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */; };
 		4D9E099121825108007BA1E7 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
-		4D9E099221825108007BA1E7 /* KeePassXmlParserDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097221825106007BA1E7 /* KeePassXmlParserDelegate.m */; };
 		4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */; };
 		4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
 		4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
@@ -424,20 +421,16 @@
 		4D9E095821825103007BA1E7 /* KeePassConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassConstants.h; path = ../model/keepass/KeePassConstants.h; sourceTree = "<group>"; };
 		4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RootXmlDomainObject.m; path = ../model/keepass/RootXmlDomainObject.m; sourceTree = "<group>"; };
 		4D9E095A21825104007BA1E7 /* Meta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Meta.h; path = ../model/keepass/Meta.h; sourceTree = "<group>"; };
-		4D9E095B21825104007BA1E7 /* XmlTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlTree.m; path = ../model/keepass/XmlTree.m; sourceTree = "<group>"; };
 		4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseXmlDomainObjectHandler.m; path = ../model/keepass/BaseXmlDomainObjectHandler.m; sourceTree = "<group>"; };
 		4D9E095D21825104007BA1E7 /* KeePassFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassFile.m; path = ../model/keepass/KeePassFile.m; sourceTree = "<group>"; };
 		4D9E095F21825104007BA1E7 /* SerializationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SerializationData.m; path = ../model/keepass/SerializationData.m; sourceTree = "<group>"; };
 		4D9E096021825104007BA1E7 /* AesCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AesCipher.h; path = ../model/keepass/AesCipher.h; sourceTree = "<group>"; };
 		4D9E096121825104007BA1E7 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = String.h; path = ../model/keepass/String.h; sourceTree = "<group>"; };
 		4D9E096221825104007BA1E7 /* String.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = String.m; path = ../model/keepass/String.m; sourceTree = "<group>"; };
-		4D9E096321825104007BA1E7 /* XmlTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlTree.h; path = ../model/keepass/XmlTree.h; sourceTree = "<group>"; };
-		4D9E096421825104007BA1E7 /* KeePassXmlParserDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassXmlParserDelegate.h; path = ../model/keepass/KeePassXmlParserDelegate.h; sourceTree = "<group>"; };
 		4D9E096521825104007BA1E7 /* AesCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AesCipher.m; path = ../model/keepass/AesCipher.m; sourceTree = "<group>"; };
 		4D9E096721825105007BA1E7 /* XMLWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLWriter.h; path = ../model/keepass/XMLWriter.h; sourceTree = "<group>"; };
 		4D9E096821825105007BA1E7 /* XmlStrongboxNodeModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlStrongboxNodeModelAdaptor.h; path = ../model/keepass/XmlStrongboxNodeModelAdaptor.h; sourceTree = "<group>"; };
 		4D9E096921825105007BA1E7 /* Kdbx4Database.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kdbx4Database.h; path = ../model/keepass/Kdbx4Database.h; sourceTree = "<group>"; };
-		4D9E096A21825105007BA1E7 /* XmlItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlItem.m; path = ../model/keepass/XmlItem.m; sourceTree = "<group>"; };
 		4D9E096B21825105007BA1E7 /* DecryptionParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DecryptionParameters.m; path = ../model/keepass/DecryptionParameters.m; sourceTree = "<group>"; };
 		4D9E096C21825105007BA1E7 /* XmlTreeSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlTreeSerializer.h; path = ../model/keepass/XmlTreeSerializer.h; sourceTree = "<group>"; };
 		4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlTreeSerializer.m; path = ../model/keepass/XmlTreeSerializer.m; sourceTree = "<group>"; };
@@ -445,12 +438,10 @@
 		4D9E096F21825105007BA1E7 /* XmlParsingDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlParsingDomainObject.h; path = ../model/keepass/XmlParsingDomainObject.h; sourceTree = "<group>"; };
 		4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextStringElementHandler.m; path = ../model/keepass/GenericTextStringElementHandler.m; sourceTree = "<group>"; };
 		4D9E097121825106007BA1E7 /* Meta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Meta.m; path = ../model/keepass/Meta.m; sourceTree = "<group>"; };
-		4D9E097221825106007BA1E7 /* KeePassXmlParserDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlParserDelegate.m; path = ../model/keepass/KeePassXmlParserDelegate.m; sourceTree = "<group>"; };
 		4D9E097321825106007BA1E7 /* KeePassFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassFile.h; path = ../model/keepass/KeePassFile.h; sourceTree = "<group>"; };
 		4D9E097421825106007BA1E7 /* Entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entry.h; path = ../model/keepass/Entry.h; sourceTree = "<group>"; };
 		4D9E097521825106007BA1E7 /* KeePassDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseMetadata.h; path = ../model/keepass/KeePassDatabaseMetadata.h; sourceTree = "<group>"; };
 		4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextUuidElementHandler.m; path = ../model/keepass/GenericTextUuidElementHandler.m; sourceTree = "<group>"; };
-		4D9E097721825106007BA1E7 /* XmlItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlItem.h; path = ../model/keepass/XmlItem.h; sourceTree = "<group>"; };
 		4D9E097821825107007BA1E7 /* GenericTextStringElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextStringElementHandler.h; path = ../model/keepass/GenericTextStringElementHandler.h; sourceTree = "<group>"; };
 		4D9E097921825107007BA1E7 /* KeePassGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassGroup.m; path = ../model/keepass/KeePassGroup.m; sourceTree = "<group>"; };
 		4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongBoxModelAdaptor.m; path = ../model/keepass/XmlStrongBoxModelAdaptor.m; sourceTree = "<group>"; };
@@ -825,8 +816,6 @@
 				4D524CFD219B48D300C22CB4 /* CustomIcon.m */,
 				4D524CF8219B48D200C22CB4 /* CustomIconList.h */,
 				4D524CF4219B48D200C22CB4 /* CustomIconList.m */,
-				4D9E096321825104007BA1E7 /* XmlTree.h */,
-				4D9E095B21825104007BA1E7 /* XmlTree.m */,
 				4D9E096C21825105007BA1E7 /* XmlTreeSerializer.h */,
 				4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */,
 				4D9E096721825105007BA1E7 /* XMLWriter.h */,
@@ -837,15 +826,11 @@
 				4D9E096221825104007BA1E7 /* String.m */,
 				4D9E095421825103007BA1E7 /* Times.h */,
 				4D9E095621825103007BA1E7 /* Times.m */,
-				4D9E097721825106007BA1E7 /* XmlItem.h */,
-				4D9E096A21825105007BA1E7 /* XmlItem.m */,
 				4D9E096F21825105007BA1E7 /* XmlParsingDomainObject.h */,
 				4D9E097321825106007BA1E7 /* KeePassFile.h */,
 				4D9E095D21825104007BA1E7 /* KeePassFile.m */,
 				4D9E094A21825103007BA1E7 /* KeePassGroup.h */,
 				4D9E097921825107007BA1E7 /* KeePassGroup.m */,
-				4D9E096421825104007BA1E7 /* KeePassXmlParserDelegate.h */,
-				4D9E097221825106007BA1E7 /* KeePassXmlParserDelegate.m */,
 				4D9E095A21825104007BA1E7 /* Meta.h */,
 				4D9E097121825106007BA1E7 /* Meta.m */,
 				4D9E094F21825103007BA1E7 /* Root.h */,
@@ -1508,7 +1493,6 @@
 				4D524CBD219B479900C22CB4 /* KdbGroup.m in Sources */,
 				4D9E098D21825108007BA1E7 /* DecryptionParameters.m in Sources */,
 				4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */,
-				4D9E099221825108007BA1E7 /* KeePassXmlParserDelegate.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
 				4D524C9F219B44F300C22CB4 /* twofish.c in Sources */,
 				4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */,
@@ -1553,7 +1537,6 @@
 				4D524CC0219B479900C22CB4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */,
 				4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */,
-				4D9E098521825108007BA1E7 /* XmlTree.m in Sources */,
 				4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */,
 				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4D524CF0219B481200C22CB4 /* ChaCha20Stream.m in Sources */,
@@ -1573,7 +1556,6 @@
 				4D553B49219DB2E400AA4BAB /* CustomPasswordTextField.m in Sources */,
 				4D524CD9219B47DB00C22CB4 /* KdfParameters.m in Sources */,
 				4D524D04219B48D300C22CB4 /* AttachmentsRationalizer.m in Sources */,
-				4D9E098C21825108007BA1E7 /* XmlItem.m in Sources */,
 				4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,

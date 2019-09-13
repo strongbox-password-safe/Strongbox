@@ -7,7 +7,6 @@
 //
 
 #import "XmlStrongboxNodeModelAdaptor.h"
-#import "KeePassXmlParserDelegate.h"
 #import "Utils.h"
 #import "KeePassConstants.h"
 #import "DatabaseAttachment.h"
@@ -41,7 +40,6 @@
 
 - (Node*)toModel:(KeePassGroup*)existingXmlRoot error:(NSError**)error {
     Node* rootNode = [[Node alloc] initAsRoot:nil];
-    rootNode.linkedData = existingXmlRoot;
     
     if(existingXmlRoot) {
         if(![self buildGroup:existingXmlRoot parentNode:rootNode]) {
@@ -64,64 +62,60 @@
 
 - (KeePassGroup*)buildXmlGroup:(Node*)group {
     KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
-    KeePassGroup *previousXmlGroup = (KeePassGroup*)group.linkedData;
-    
-    if(group.iconId != nil) {
-        ret.icon = group.iconId;
+
+    NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)group.linkedData;
+    if(unmanagedChildren) {
+        for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
+            [ret addUnknownChildObject:unmanagedChild];
+        }
     }
-    if(group.customIconUuid){
-        ret.customIcon = group.customIconUuid;
-    }
+
+    ret.icon = group.iconId;
+    ret.customIcon = group.customIconUuid;
     
-    if(previousXmlGroup) { // Retain unknown attributes/text & child elements
-        ret.nonCustomisedXmlTree = previousXmlGroup.nonCustomisedXmlTree;
-    }
-    
+    [ret.groups removeAllObjects];
     for(Node* childGroup in group.childGroups) {
         [ret.groups addObject:[self buildXmlGroup:childGroup]];
     }
-    
+
+    [ret.entries removeAllObjects];
     for(Node* childEntry in group.childRecords) {
         [ret.entries addObject:[self buildXmlEntry:childEntry stripHistory:NO]];
     }
     
-    ret.name.text = group.title;
-    ret.uuid.uuid = group.uuid;
+    ret.name = group.title;
+    ret.uuid = group.uuid;
     
     return ret;
 }
 
 - (Entry*)buildXmlEntry:(Node*)entry stripHistory:(BOOL)stripHistory {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
-    Entry *previousXmlEntry = (Entry*)entry.linkedData;
-    
-    if(previousXmlEntry) { // Retain unknown attributes/text & child elements
-        ret.nonCustomisedXmlTree = previousXmlEntry.nonCustomisedXmlTree;
+  
+    NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)entry.linkedData;
+    if(unmanagedChildren) {
+        for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
+            [ret addUnknownChildObject:unmanagedChild];
+        }
     }
+    
+    ret.uuid = entry.uuid;
+    ret.icon = entry.iconId;
+    ret.customIcon = entry.customIconUuid;
 
-    ret.uuid.uuid = entry.uuid;
+    // Times
     
-    if(entry.iconId != nil) {
-        ret.icon = entry.iconId;
-    }
-    if(entry.customIconUuid){
-        ret.customIcon = entry.customIconUuid;
-    }
-    
-    // Times is only partially managed so need to add any customisation from original here.
-    
-    if(previousXmlEntry.times) {
-        ret.times.nonCustomisedXmlTree = previousXmlEntry.times.nonCustomisedXmlTree;
-    }
-    
-    ret.times.lastAccessTime.date = entry.fields.accessed;
-    ret.times.lastModificationTime.date = entry.fields.modified;
-    ret.times.creationTime.date = entry.fields.created;
-    ret.times.expiryTime.date = entry.fields.expires;
-    ret.times.expires.booleanValue = entry.fields.expires != nil;
+    ret.times.lastAccessTime = entry.fields.accessed;
+    ret.times.lastModificationTime = entry.fields.modified;
+    ret.times.creationTime = entry.fields.created;
+    ret.times.expiryTime = entry.fields.expires;
+    ret.times.expires = entry.fields.expires != nil;
+    ret.times.usageCount = entry.fields.usageCount;
+    ret.times.locationChangedTime = entry.fields.locationChanged;
     
     // Strings
     
+    [ret removeAllStrings];
     for (NSString* key in entry.fields.customFields.allKeys) {
         StringValue* value = entry.fields.customFields[key];
         [ret setString:key value:value.value protected:value.protected];
@@ -133,32 +127,21 @@
     ret.url = entry.fields.url;
     ret.notes = entry.fields.notes;
     
-    // Verify it's ok to strip empty strings. Looks like it is:
-    // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
-    // MMcG: Don't strip emptys, it seems to be useful to allow empty values in the custom fields, or at least the
-    // Windows app allows this
-
     // Binaries
     
+    [ret.binaries removeAllObjects];
     for (NodeFileAttachment *attachment in entry.fields.attachments) {
-        Binary *old = (Binary*)attachment.linkedObject;
-        
         Binary *xmlBinary = [[Binary alloc] initWithContext:self.xmlParsingContext];
         
-        if(old) { // Copy old attributes/text etc
-            [xmlBinary setXmlInfo:old.nonCustomisedXmlTree.node.xmlElementName attributes:old.nonCustomisedXmlTree.node.xmlAttributes text:old.nonCustomisedXmlTree.node.xmlText];
-            [xmlBinary.key setXmlInfo:old.key.nonCustomisedXmlTree.node.xmlElementName attributes:old.key.nonCustomisedXmlTree.node.xmlAttributes text:old.key.nonCustomisedXmlTree.node.xmlText];
-            [xmlBinary.value setXmlInfo:old.value.nonCustomisedXmlTree.node.xmlElementName attributes:old.value.nonCustomisedXmlTree.node.xmlAttributes text:old.value.nonCustomisedXmlTree.node.xmlText];
-        }
-        
-        xmlBinary.key.text = attachment.filename;
-        [xmlBinary.value setXmlAttribute:kBinaryValueAttributeRef value:[NSString stringWithFormat:@"%d", attachment.index]];
+        xmlBinary.filename = attachment.filename;
+        xmlBinary.index = attachment.index;
         
         [ret.binaries addObject:xmlBinary];
     }
     
     // History
-    
+ 
+    [ret.history.entries removeAllObjects];
     if(!stripHistory) {
         for(Node* historicalNode in entry.fields.keePassHistory) {
             Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES]; // Just in case we have accidentally left history on a historical entry itself...
@@ -170,8 +153,7 @@
 }
 
 - (BOOL)buildGroup:(KeePassGroup*)group parentNode:(Node*)parentNode {
-    Node* groupNode = [[Node alloc] initAsGroup:group.name.text parent:parentNode allowDuplicateGroupTitles:YES uuid:group.uuid.uuid];
-    groupNode.linkedData = group; // Original KeePass Document Group...
+    Node* groupNode = [[Node alloc] initAsGroup:group.name parent:parentNode allowDuplicateGroupTitles:YES uuid:group.uuid];
     
     if(group.customIcon) groupNode.customIconUuid = group.customIcon;
     if(group.icon != nil) groupNode.iconId = group.icon;
@@ -197,6 +179,8 @@
     
     [parentNode addChild:groupNode allowDuplicateGroupTitles:YES];
 
+    groupNode.linkedData = group.unmanagedChildren;
+
     return YES;
 }
 
@@ -207,27 +191,20 @@
                                                         notes:childEntry.notes
                                                         email:@""]; // Not an official Keepass Field!
     
-    fields.created = childEntry.times.creationTime.date;
-    fields.accessed = childEntry.times.lastAccessTime.date;
-    fields.modified = childEntry.times.lastModificationTime.date;
-    fields.expires = childEntry.times.expires.booleanValue ? childEntry.times.expiryTime.date : nil;
+    fields.created = childEntry.times.creationTime;
+
+    [fields setTouchProperties:childEntry.times.lastAccessTime modified:childEntry.times.lastModificationTime usageCount:childEntry.times.usageCount];
+
+    fields.expires = childEntry.times.expires ? childEntry.times.expiryTime : nil;
+    fields.locationChanged = childEntry.times.locationChangedTime;
     
     for (Binary* binary in childEntry.binaries) {
-        NSString* binaryRef = [binary.value.nonCustomisedXmlTree.node.xmlAttributes objectForKey:kBinaryValueAttributeRef];
+        NodeFileAttachment* attachment = [[NodeFileAttachment alloc] init];
         
-        if(binaryRef) {
-            int binaryIndex = [binaryRef intValue];
-            
-            NodeFileAttachment* attachment = [[NodeFileAttachment alloc] init];
-            
-            attachment.filename = binary.key.text;
-            attachment.index = binaryIndex;
-            attachment.linkedObject = binary;
-            
-//            NSLog(@"Found attachment for: %@", childEntry.title);
-            
-            [fields.attachments addObject:attachment];
-        }
+        attachment.filename = binary.filename;
+        attachment.index = binary.index;
+        
+        [fields.attachments addObject:attachment];
     }
     
     // Custom Fields
@@ -240,9 +217,7 @@
     Node* entryNode = [[Node alloc] initAsRecord:childEntry.title
                                           parent:groupNode
                                           fields:fields
-                                            uuid:childEntry.uuid.uuid]; 
-    
-    entryNode.linkedData = childEntry;
+                                            uuid:childEntry.uuid]; 
     
     if(childEntry.customIcon) entryNode.customIconUuid = childEntry.customIcon;
     if(childEntry.icon != nil) entryNode.iconId = childEntry.icon;
@@ -253,6 +228,8 @@
             [fields.keePassHistory addObject:historicalEntryNode];
         }
     }
+    
+    entryNode.linkedData = childEntry.unmanagedChildren;
     
     return entryNode;
 }

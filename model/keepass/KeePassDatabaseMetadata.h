@@ -13,8 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePassDatabaseMetadata : NSObject<AbstractDatabaseMetadata>
 
-@property (nonatomic) NSInteger historyMaxItems;
-@property (nonatomic) NSInteger historyMaxSize;
+@property (nonatomic, nullable) NSNumber* historyMaxItems;
+@property (nonatomic, nullable) NSNumber* historyMaxSize;
 @property (nonatomic) NSString* generator;
 @property (nonatomic) NSString* version;
 @property (nonatomic) uint32_t compressionFlags;

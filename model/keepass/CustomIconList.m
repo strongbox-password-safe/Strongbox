@@ -31,7 +31,7 @@
     return [super getChildHandler:xmlElementName];
 }
 
-- (BOOL)addKnownChildObject:(nonnull NSObject *)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kCustomIconElementName]) {
         [self.icons addObject:(CustomIcon*)completedObject];
         return YES;
@@ -40,18 +40,24 @@
     return NO;
 }
 
-- (XmlTree *)generateXmlTree {
-    XmlTree* ret = [[XmlTree alloc] initWithXmlElementName:kCustomIconListElementName];
-    
-    ret.node = self.nonCustomisedXmlTree.node;
-    
-    for (CustomIcon *icon in self.icons) {
-        [ret.children addObject:[icon generateXmlTree]];
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if(![serializer beginElement:self.originalElementName
+                            text:self.originalText
+                      attributes:self.originalAttributes]) {
+        return NO;
     }
     
-    [ret.children addObjectsFromArray:self.nonCustomisedXmlTree.children];
+    for (CustomIcon *icon in self.icons) {
+        [icon writeXml:serializer];
+    }
     
-    return ret;
+    if(![super writeUnmanagedChildren:serializer]) {
+        return NO;
+    }
+    
+    [serializer endElement];
+    return YES;
+
 }
 
 @end

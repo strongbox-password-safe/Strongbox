@@ -238,7 +238,13 @@
     XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
     
     NodeFields *fields = [[NodeFields alloc] init];
-    Node *childNode = [[Node alloc] initAsRecord:@"Title &<>'\\ Done" parent:[db.rootGroup.childGroups objectAtIndex:0] fields:fields uuid:nil];
+    NSString* const escape = @"Title &<>'\\ &amp; &lt; Done-<site url=\"http://example.com/?a=b&amp;b=c\"; />";
+    
+    Node *childNode = [[Node alloc] initAsRecord:escape
+                                          parent:[db.rootGroup.childGroups objectAtIndex:0]
+                                          fields:fields
+                                            uuid:nil];
+    
     [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
     
     NSError* error;
@@ -267,7 +273,7 @@
     XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
     XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
 
-    XCTAssert([[[[b.rootGroup.childGroups objectAtIndex:0] childRecords] objectAtIndex:0].title isEqualToString:@"Title &<>'\\ Done"]);
+    XCTAssertEqualObjects([[[b.rootGroup.childGroups objectAtIndex:0] childRecords] objectAtIndex:0].title, escape);
 }
 
 - (void)testSmallNewDbWithPasswordGetAsDataAndReOpenSafeIsTheSame {
@@ -428,7 +434,7 @@
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
-    NSData* b = [adaptor save:db error:&error]; // [db getAsData:&error];
+    NSData* b = [adaptor save:db error:&error];
 
     StrongboxDatabase *a = [adaptor open:b compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     

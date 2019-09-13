@@ -253,6 +253,14 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     return self.fields.nearlyExpired;
 }
 
+- (void)touch:(BOOL)modified touchParents:(BOOL)touchParents {
+    [self.fields touch:modified];
+    
+    if(touchParents && self.parent) {
+        [self.parent touch:modified touchParents:YES];
+    }
+}
+
 - (NSArray<Node*>*)children {
     return self.isGroup ? [self filterChildren:NO predicate:nil] : [NSArray array];
 }

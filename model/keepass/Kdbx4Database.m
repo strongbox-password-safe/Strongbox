@@ -12,10 +12,9 @@
 #import "Utils.h"
 #import "KdbxSerializationCommon.h"
 #import "Kdbx4Serialization.h"
-#import "KeePassXmlParserDelegate.h"
 #import "XmlStrongboxNodeModelAdaptor.h"
 #import "AttachmentsRationalizer.h"
-#import "XmlTreeSerializer.h"
+#import "XmlSerializer.h"
 #import "XmlStrongBoxModelAdaptor.h"
 #import "KeePass2TagPackage.h"
 
@@ -58,8 +57,6 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (StrongboxDatabase *)open:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)error {
-    // 1. First get XML out of the encrypted binary...
-    
     Kdbx4SerializationData *serializationData = [Kdbx4Serialization deserialize:data compositeKey:compositeKeyFactors ppError:error];
     
     if(serializationData == nil) {
@@ -67,33 +64,16 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-//    NSLog(@"XML: \n\n%@\n\n", serializationData.xml);
-//
-//    NSError *er;
-//    NSData *df = [serializationData.xml dataUsingEncoding:NSUTF8StringEncoding];
-//    NSString* loc = [NSTemporaryDirectory() stringByAppendingPathComponent:@"kp.xml"];
-//    [df writeToFile:loc options:kNilOptions error:&er];
-//    NSLog(@"%@ => %@", loc, er);
-//
-    // 2. Convert the Xml to a more usable Xml Model
-
-    serializationData.xml = xmlCleanupAndTrim(serializationData.xml);
-
-    RootXmlDomainObject* xmlDoc = parseKeePassXml(serializationData.innerRandomStreamId,
-                                                   serializationData.innerRandomStreamKey,
-                                                   XmlProcessingContext.standardV4Context,
-                                                   serializationData.xml,
-                                                   error);
-    
-    if(xmlDoc == nil) {
+    RootXmlDomainObject* xmlObject = serializationData.rootXmlObject;
+    if(xmlObject == nil) {
         NSLog(@"Error in parseKeePassXml: [%@]", *error);
         return nil;
     }
-
+    
     // 3. Convert the Xml Model to the Strongbox Model
     
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(xmlDoc);
+    KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(xmlObject);
     Node* rootGroup = [adaptor toModel:rootXmlGroup error:error];
     
     if(rootGroup == nil) {
@@ -101,37 +81,28 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-    NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlDoc);
+    Meta* xmlMeta = xmlObject.keePassFile ? xmlObject.keePassFile.meta : nil;
+    NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
     
     // Metadata
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
     
-    if(xmlDoc.keePassFile.meta.generator.text) {
-        metadata.generator = xmlDoc.keePassFile.meta.generator.text;
+    if(xmlMeta) {
+        metadata.generator = xmlMeta.generator ? xmlMeta.generator : @"<Unknown>";
+        
+        // History Settings
+        
+        metadata.historyMaxItems = xmlMeta.historyMaxItems;
+        metadata.historyMaxSize = xmlMeta.historyMaxSize;
+    
+        // Recycle Bin Settings
+        
+        metadata.recycleBinEnabled = xmlMeta.recycleBinEnabled;
+        metadata.recycleBinGroup = xmlMeta.recycleBinGroup;
+        metadata.recycleBinChanged = xmlMeta.recycleBinChanged;
     }
     
-    // History Settings
-    
-    if(xmlDoc.keePassFile.meta.historyMaxItems) {
-        metadata.historyMaxItems = xmlDoc.keePassFile.meta.historyMaxItems.integer;
-    }
-    if(xmlDoc.keePassFile.meta.historyMaxSize) {
-        metadata.historyMaxSize = xmlDoc.keePassFile.meta.historyMaxSize.integer;
-    }
-
-    // Recycle Bin Settings
-    
-    if(xmlDoc.keePassFile.meta.recycleBinEnabled) {
-        metadata.recycleBinEnabled = xmlDoc.keePassFile.meta.recycleBinEnabled.booleanValue;
-    }
-    if(xmlDoc.keePassFile.meta.recycleBinGroup) {
-        metadata.recycleBinGroup = xmlDoc.keePassFile.meta.recycleBinGroup.uuid;
-    }
-    if(xmlDoc.keePassFile.meta.recycleBinChanged) {
-        metadata.recycleBinChanged = xmlDoc.keePassFile.meta.recycleBinChanged.date;
-    }
-
     metadata.cipherUuid = serializationData.cipherUuid;
     metadata.kdfParameters = serializationData.kdfParameters;
     metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
@@ -146,7 +117,7 @@ static const BOOL kLogVerbose = NO;
 
     KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
     tag.unknownHeaders = serializationData.extraUnknownHeaders;
-    tag.xmlDocument = xmlDoc;
+    tag.originalMeta = xmlMeta;
     
     ret.adaptorTag = tag;
     
@@ -163,14 +134,14 @@ static const BOOL kLogVerbose = NO;
     }
 
     KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
-    RootXmlDomainObject* existingRootXmlDocument = tag ? tag.xmlDocument : nil;
+    Meta* originalMeta = tag ? tag.originalMeta : nil;
     
     // 1. From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
                                                                         customIcons:database.customIcons
-                                                            existingRootXmlDocument:existingRootXmlDocument
+                                                                       originalMeta:originalMeta
                                                                             context:[XmlProcessingContext standardV4Context]
                                                                               error:error];
     
@@ -191,21 +162,23 @@ static const BOOL kLogVerbose = NO;
     
     // 4. Write Back any changed Metadata
     
-    rootXmlDocument.keePassFile.meta.recycleBinEnabled.booleanValue = metadata.recycleBinEnabled;
-    rootXmlDocument.keePassFile.meta.recycleBinGroup.uuid = metadata.recycleBinGroup;
-    rootXmlDocument.keePassFile.meta.recycleBinChanged.date = metadata.recycleBinChanged;
+    rootXmlDocument.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
+    rootXmlDocument.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
+    rootXmlDocument.keePassFile.meta.recycleBinChanged = metadata.recycleBinChanged;
     
     // 5. From Xml Model to Xml String (including inner stream encryption)
     
-    XmlTreeSerializer *xmlSerializer = [[XmlTreeSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
-                                                                                        key:nil // Auto generated new key
-                                                                                prettyPrint:NO];
-
-    XmlTree* xmlTree = [rootXmlDocument generateXmlTree];
-    NSString *xml = [xmlSerializer serializeTrees:xmlTree.children];
+    id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
+                                                                                    key:nil // Auto generated new key
+                                                                               v4Format:YES
+                                                                            prettyPrint:NO];
     
-    if(!xml) {
-        NSLog(@"Could not serialize Xml to Document.");
+    [xmlSerializer beginDocument];
+    BOOL writeXmlOk = [rootXmlDocument writeXml:xmlSerializer];
+    [xmlSerializer endDocument];
+    NSString *xml = xmlSerializer.xml;
+    if(!xml || !writeXmlOk) {
+        NSLog(@"Could not serialize Xml to Document.:\n%@", xml);
         
         if(error) {
             *error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
@@ -229,12 +202,11 @@ static const BOOL kLogVerbose = NO;
     serializationData.innerRandomStreamId = metadata.innerRandomStreamId;
     serializationData.innerRandomStreamKey = xmlSerializer.protectedStreamKey;
     serializationData.extraUnknownHeaders = unknownHeaders;
-    serializationData.xml = xml;
     serializationData.kdfParameters = metadata.kdfParameters;
     serializationData.cipherUuid = metadata.cipherUuid;
     serializationData.attachments = database.attachments;
     
-    NSData *data = [Kdbx4Serialization serialize:serializationData compositeKey:database.compositeKeyFactors ppError:error];
+    NSData *data = [Kdbx4Serialization serialize:serializationData xml:xml compositeKey:database.compositeKeyFactors ppError:error];
     
     if(!data) {
         NSLog(@"Could not serialize Document to KDBX.");
@@ -259,10 +231,10 @@ static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull 
     return rootXmlGroup;
 }
 
-static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(RootXmlDomainObject* root) {
-    if(root && root.keePassFile && root.keePassFile.meta && root.keePassFile.meta.customIconList) {
-        if(root.keePassFile.meta.customIconList.icons) {
-            NSArray<CustomIcon*> *icons = root.keePassFile.meta.customIconList.icons;
+static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
+    if(meta.customIconList) {
+        if(meta.customIconList.icons) {
+            NSArray<CustomIcon*> *icons = meta.customIconList.icons;
             NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
             for (CustomIcon* icon in icons) {
                 [ret setObject:icon.data forKey:icon.uuid];

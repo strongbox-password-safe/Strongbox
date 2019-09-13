@@ -10,6 +10,7 @@
 #import "NSArray+Extensions.h"
 #import "KeePassDatabaseMetadata.h"
 #import "KeePass4DatabaseMetadata.h"
+#import "KeePassConstants.h"
 
 static NSString* const kKeePass1BackupGroupName = @"Backup";
 
@@ -90,14 +91,17 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     }
 }
 
-- (void)trimKeePassHistory:(NSInteger)maxItems maxSize:(NSInteger)maxSize {
+- (void)trimKeePassHistory:(NSNumber*)maxItems maxSize:(NSNumber*)maxSize {
     for(Node* record in self.rootGroup.allChildRecords) {
         [self trimNodeKeePassHistory:record maxItems:maxItems maxSize:maxSize];
     }
 }
 
-- (BOOL)trimNodeKeePassHistory:(Node*)node maxItems:(NSInteger)maxItems maxSize:(NSInteger)maxSize {
+- (BOOL)trimNodeKeePassHistory:(Node*)node maxItems:(NSNumber*)maxItemsNum maxSize:(NSNumber*)maxSizeNum {
     bool trimmed = false;
+    
+    NSInteger maxItems = maxItemsNum ? maxItemsNum.integerValue : kDefaultHistoryMaxItems;
+    NSInteger maxSize = maxSizeNum ? maxSizeNum.integerValue : kDefaultHistoryMaxSize;
     
     if(maxItems >= 0)
     {

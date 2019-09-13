@@ -893,9 +893,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 - (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(NSError *))onDone {
     self.record.fields.passwordHistory = changed;
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
-    
+    [self.record touch:YES touchParents:YES];
+
     [self sync:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(error);
@@ -909,8 +908,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Makes Changes
 
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
+    [self.record touch:YES touchParents:YES];
 
     [self.viewModel.database setNodeAttachments:node attachments:attachments];
     
@@ -934,8 +932,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Make Changes
     
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
+    [self.record touch:YES touchParents:YES];
     
     [node.fields removeAllCustomFields];
     
@@ -959,8 +956,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)onDeleteHistoryItem:(Node*) historicalNode {
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
+    [self.record touch:YES touchParents:YES];
     
     [self.record.fields.keePassHistory removeObject:historicalNode];
 
@@ -986,8 +982,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Make Changes
     
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
+    [self.record touch:YES touchParents:YES];
     
     [self.record restoreFromHistoricalNode:historicalNode];
     
@@ -1097,8 +1092,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 - (void)saveAfterTotpSet:(Node*)originalNodeForHistory {
     [self addHistoricalNode:originalNodeForHistory];
     
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
+    [self.record touch:YES touchParents:YES];
     
     [self sync:^(NSError *error) {
         if(error) {
@@ -1147,8 +1141,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)saveChanges:(Node*)originalNodeForHistory completion:(void (^)(NSError *))completion {
-    self.record.fields.accessed = [[NSDate alloc] init];
-    self.record.fields.modified = [[NSDate alloc] init];
+    [self.record touch:YES touchParents:YES];
+
     self.record.fields.notes = self.textViewNotes.text;
     self.record.fields.password = trim(self.textFieldPassword.text);
     [self.record setTitle:trim(self.textFieldTitle.text) allowDuplicateGroupTitles:NO];

@@ -16,49 +16,38 @@
     return [super initWithXmlElementName:kBinaryElementName context:context];
 }
 
-- (int)id {
-    NSString* identifier = [self.nonCustomisedXmlTree.node.xmlAttributes objectForKey:kBinaryIdAttribute];
-    return [identifier intValue];
-}
+- (void)onCompleted {
+    NSString* identifier = self.originalAttributes[kBinaryIdAttribute];
+    self.id = identifier.intValue;
+    
+    NSString* compressed = self.originalAttributes[kBinaryCompressedAttribute];
+    self.compressed = [compressed isEqualToString:kAttributeValueTrue];
 
-- (BOOL)compressed {
-    NSString* compressed = [self.nonCustomisedXmlTree.node.xmlAttributes objectForKey:kBinaryCompressedAttribute];
-
-    return [compressed isEqualToString:kAttributeValueTrue];
-}
-
-- (NSData *)data {
-    NSString *text = self.nonCustomisedXmlTree.node.xmlText;
+    NSString *text = self.originalText;
     NSData* raw = [[NSData alloc] initWithBase64EncodedString:text options:NSDataBase64DecodingIgnoreUnknownCharacters];
     
     if(self.compressed) {
         raw = [raw gunzippedData];
     }
     
-    return raw;
+    self.data = raw;
 }
 
-- (void)setData:(NSData *)data {
-    if(self.compressed) {
-        data = [data gzippedData];
-    }
+- (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    // There is possible a protected flag on this, so we need to merge with original attributes
+    self.data = self.data ? self.data : [NSData data];
+    NSString *b64 = [(self.compressed ? [self.data gzippedData] : self.data) base64EncodedStringWithOptions:kNilOptions];
     
-    NSString *b64 = [data base64EncodedStringWithOptions:kNilOptions];
-    self.nonCustomisedXmlTree.node.xmlText = b64;
-}
-
--(void)setCompressed:(BOOL)compressed {
-    if(compressed) {
-        [self.nonCustomisedXmlTree.node.xmlAttributes setObject:kAttributeValueTrue forKey:kBinaryCompressedAttribute];
+    NSMutableDictionary* attributes = self.originalAttributes ? self.originalAttributes.mutableCopy : @{}.mutableCopy;
+    attributes[kBinaryIdAttribute] = @(self.id).stringValue;
+    if(self.compressed) {
+        attributes[kBinaryCompressedAttribute] = kAttributeValueTrue;
     }
     else {
-        [self.nonCustomisedXmlTree.node.xmlAttributes removeObjectForKey:kBinaryCompressedAttribute];
+        [attributes removeObjectForKey:kBinaryCompressedAttribute];
     }
-}
-
-- (void)setId:(int)id {
-    NSString* str = [NSString stringWithFormat:@"%d", id];
-    [self.nonCustomisedXmlTree.node.xmlAttributes setObject:str forKey:kBinaryIdAttribute];
+    
+    return [serializer writeElement:self.originalElementName text:b64 attributes:attributes];
 }
 
 @end

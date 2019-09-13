@@ -58,10 +58,15 @@ static NSString* const kOtpAuthScheme = @"otpauth";
         self.notes = notes == nil ? @"" : notes;
         self.email = email == nil ? @"" : email;
         self.passwordHistory = [[PasswordHistory alloc] init];
-        self.created = [NSDate date];
-        self.modified = [NSDate date];
-        self.accessed = [NSDate date];
-        self.passwordModified = [NSDate date];
+        
+        NSDate* date = [NSDate date];
+        
+        _modified = date;
+        _accessed = date;
+        _usageCount = @(0);
+        
+        self.created = date;
+        self.passwordModified = date;
         self.attachments = [NSMutableArray array];
         self.mutableCustomFields = [NSMutableDictionary dictionary];
         self.keePassHistory = [NSMutableArray array];
@@ -95,6 +100,10 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     NSString* email = dict[@"email"];
     NSNumber* passwordModified = dict[@"passwordModified"];
     NSNumber* expires = dict[@"expires"];
+    
+//    NSNumber* usageCount = dict[@"usageCount"];
+//    NSNumber* locationChanged = dict[@"locationChanged"];
+    
     NSArray<NSDictionary*>* attachments = dict[@"attachments"];
     NSArray<NSDictionary*>* customFields = dict[@"customFields"];
 
@@ -106,6 +115,9 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 
     ret.passwordModified = passwordModified ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
+//    ret.locationChanged = locationChanged ? [NSDate dateWithTimeIntervalSince1970:locationChanged.unsignedIntegerValue] : nil;
+    
+    [ret setTouchProperties:NSDate.date modified:NSDate.date usageCount:@(0)];
     
     // Attachments... These need to be fixed up to fit into destination
     
@@ -144,6 +156,12 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     if(self.expires) {
         ret[@"expires"] = @((NSUInteger)[self.expires timeIntervalSince1970]);
     }
+//    if(self.usageCount) {
+//        ret[@"usageCount"] = self.usageCount;
+//    }
+//    if(self.locationChanged) {
+//        ret[@"locationChanged"] = self.locationChanged;
+//    }
     
     NSArray<NSDictionary*>* attachments = [self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
         [serialization.usedAttachmentIndices addObject:@(obj.index)];
@@ -170,6 +188,11 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     
     ret.passwordModified = self.passwordModified;
     ret.expires = self.expires;
+
+    // TODO: Copy Dates?
+    [ret setTouchProperties:NSDate.date modified:NSDate.date usageCount:@(0)];
+
+    ret.locationChanged = self.locationChanged;
     ret.attachments = [self cloneAttachments];
     ret.mutableCustomFields = [self cloneCustomFields];
     
@@ -180,10 +203,13 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username url:self.url password:self.password notes:self.notes email:self.email];
 
     ret.created = self.created;
-    ret.modified = self.modified;
-    ret.accessed = self.accessed;
     ret.passwordModified = self.passwordModified;
     ret.expires = self.expires;
+
+    [ret setTouchProperties:self.accessed modified:self.modified usageCount:self.usageCount];
+    
+    ret.locationChanged = self.locationChanged;
+    
     ret.attachments = [self cloneAttachments];
     ret.mutableCustomFields = [self cloneCustomFields];
     
@@ -248,6 +274,20 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 - (void)setCustomField:(NSString*)key value:(StringValue*)value {
     self.mutableCustomFields[key] = value;
     self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+}
+
+- (void)touch:(BOOL)modified {
+    _usageCount = self.usageCount ? @(self.usageCount.integerValue + 1) : @(1);
+    _accessed = NSDate.date;
+    if(modified) {
+        _modified = NSDate.date;
+    }
+}
+
+- (void)setTouchProperties:(NSDate*)accessed modified:(NSDate*)modified usageCount:(NSNumber*)usageCount {
+    _accessed = accessed;
+    _modified = modified;
+    _usageCount = usageCount;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

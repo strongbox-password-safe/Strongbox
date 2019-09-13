@@ -112,8 +112,9 @@
             return;
         }
         
-        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName,
-                                    ([self.viewModel.metadata.fileName hasSuffix:@".dat"] || [self.viewModel.metadata.fileName hasSuffix:@"psafe3"]) ? @"" : @".dat"];
+        NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.viewModel.database.format];
+        NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
+        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName, appendExtension];
         
         [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:safeData];
     }];

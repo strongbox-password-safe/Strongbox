@@ -156,6 +156,23 @@ const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 3 * 1024 * 1024;
     return @"dat";
 }
 
++ (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format {
+    if(format == kPasswordSafe) {
+        return [PwSafeDatabase fileExtension];
+    }
+    else if (format == kKeePass) {
+        return [KeePassDatabase fileExtension];
+    }
+    else if(format == kKeePass4) {
+        return [Kdbx4Database fileExtension];
+    }
+    else if(format == kKeePass1) {
+        return [Kdb1Database fileExtension];
+    }
+    
+    return @"dat";
+}
+
 + (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format {
     if(format == kPasswordSafe) {
         return [[PwSafeDatabase alloc] init];
@@ -253,11 +270,6 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                      password:password
                                                         notes:@""
                                                         email:@"user@gmail.com"];
-
-    NSDate* date = [NSDate date];
-    fields.created = date;
-    fields.accessed = date;
-    fields.modified = date;
 
     [sampleFolder addChild:[[Node alloc]    initAsRecord:NSLocalizedString(@"model_sample_entry_title", @"Sample")
                                                   parent:sampleFolder

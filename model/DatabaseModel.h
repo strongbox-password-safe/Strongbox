@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
 + (BOOL)isAutoFillLikelyToCrash:(NSData*)data;
 + (DatabaseFormat)getLikelyDatabaseFormat:(NSData *)candidate;
++ (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format;
 
 + (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
 
