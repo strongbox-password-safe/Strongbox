@@ -79,6 +79,26 @@
 - (void)appBecameActive {
     NSLog(@"appBecameActive");
     
+    [self appLoadedOrBecameActive];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationItem.hidesBackButton = YES;
+    [self.navigationController setNavigationBarHidden:NO];
+    
+    [self setupTips];
+    
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+    
+    [self bindProOrFreeTrialUi];
+}
+
+- (void)appLoadedOrBecameActive {
     if(self.privacyScreenSuppressedForBiometricAuth) {
         NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
         self.privacyScreenSuppressedForBiometricAuth = NO;
@@ -115,28 +135,10 @@
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationItem.hidesBackButton = YES;
-    [self.navigationController setNavigationBarHidden:NO];
-    
-    [self setupTips];
-    
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-    
-    [self bindProOrFreeTrialUi];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.collection = [NSArray array];
-    
-    // [self insertEditButtonInLeftBar]; Causes Truncation in German - Not a lot of real estate and isn't necessary
     
     [self setupTableview];
     
@@ -146,6 +148,9 @@
     
     if([Settings.sharedInstance getLaunchCount] == 1) {
         [self startOnboarding];
+    }
+    else {
+        [self appLoadedOrBecameActive];
     }
 }
 
@@ -182,6 +187,7 @@
     __weak SafesViewController* weakSelf = self;
     self.privacyAndLockVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
     self.privacyAndLockVc.onUnlockDone = ^(BOOL userJustCompletedBiometricAuthentication) {
+        NSLog(@"YOOOOOOOO!");
         [weakSelf hidePrivacyScreen:userJustCompletedBiometricAuthentication];
     };
     
@@ -390,6 +396,8 @@
 }
 
 - (void)continueAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
+    NSLog(@"continueAppActivationTasks...");
+
     if(![[Settings sharedInstance] isPro]) {
         if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
             if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 2) {

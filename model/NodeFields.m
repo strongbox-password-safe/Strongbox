@@ -113,8 +113,8 @@ static NSString* const kOtpAuthScheme = @"otpauth";
                                                      notes:notes
                                                      email:email];
 
-    ret.passwordModified = passwordModified ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
-    ret.expires = expires ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
+    ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
+    ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
 //    ret.locationChanged = locationChanged ? [NSDate dateWithTimeIntervalSince1970:locationChanged.unsignedIntegerValue] : nil;
     
     [ret setTouchProperties:NSDate.date modified:NSDate.date usageCount:@(0)];
@@ -277,7 +277,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
 }
 
 - (void)touch:(BOOL)modified {
-    _usageCount = self.usageCount ? @(self.usageCount.integerValue + 1) : @(1);
+    _usageCount = self.usageCount != nil ? @(self.usageCount.integerValue + 1) : @(1);
     _accessed = NSDate.date;
     if(modified) {
         _modified = NSDate.date;

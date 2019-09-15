@@ -53,7 +53,7 @@ NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed
 
 void dumpXml(NSInputStream* lib);
 
-RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
+RootXmlDomainObject*_Nullable parseXml(uint32_t innerRandomStreamId,
                               NSData*_Nullable innerRandomStreamKey,
                               XmlProcessingContext* context,
                               NSInputStream* lib,

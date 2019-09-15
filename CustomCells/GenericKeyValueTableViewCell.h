@@ -14,11 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface GenericKeyValueTableViewCell : UITableViewCell
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont;
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont;
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont;
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont;
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont;
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit useEasyReadFont:(BOOL)useEasyReadFont;
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing keyColor:(UIColor*_Nullable)keyColor useEasyReadFont:(BOOL)useEasyReadFont;
 
 @property (nonatomic, copy, nullable) void (^onEdited)(NSString* text);
 @property (nonatomic, copy, nullable) SuggestionProvider suggestionProvider;

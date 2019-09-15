@@ -105,10 +105,19 @@
     button.clipsToBounds = YES;
     button.layer.cornerRadius = ROUND_BUTTON_WIDTH_HEIGHT/2.0f;
     button.layer.borderWidth = 1.0f;
-    button.layer.borderColor = UIColor.darkGrayColor.CGColor;
+    if (@available(iOS 13.0, *)) {
+        button.layer.borderColor = UIColor.systemGrayColor.CGColor;
+    } else {
+        button.layer.borderColor = UIColor.darkGrayColor.CGColor;
+    }
     
-    [button setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
-    [button setTitleColor:UIColor.whiteColor forState:UIControlStateHighlighted];
+    if (@available(iOS 13.0, *)) {
+        [button setTitleColor:UIColor.labelColor forState:UIControlStateNormal];
+        [button setTitleColor:UIColor.labelColor forState:UIControlStateHighlighted];
+    } else {
+        [button setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
+        [button setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
+    }
 }
 
 - (void)validateButtonsUi {
@@ -168,11 +177,22 @@
         NSString *masked = [@"" stringByPaddingToLength:self.enteredText.length withString:@"●" startingAtIndex:0];
         
         self.labelEnteredText.text = masked;
-        self.labelEnteredText.textColor = UIColor.darkTextColor;
+
+        if (@available(iOS 13.0, *)) {
+            self.labelEnteredText.textColor = UIColor.labelColor;
+        }
+        else {
+            self.labelEnteredText.textColor = nil;
+        }
     }
     else {
         self.labelEnteredText.text = self.info.length ? self.info : @"PIN";
-        self.labelEnteredText.textColor = UIColor.lightGrayColor;
+        if (@available(iOS 13.0, *)) {
+            self.labelEnteredText.textColor = UIColor.systemGrayColor;
+        }
+        else {
+            self.labelEnteredText.textColor = UIColor.lightGrayColor;
+        }
     }
 }
 

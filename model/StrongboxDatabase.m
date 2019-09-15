@@ -100,8 +100,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 - (BOOL)trimNodeKeePassHistory:(Node*)node maxItems:(NSNumber*)maxItemsNum maxSize:(NSNumber*)maxSizeNum {
     bool trimmed = false;
     
-    NSInteger maxItems = maxItemsNum ? maxItemsNum.integerValue : kDefaultHistoryMaxItems;
-    NSInteger maxSize = maxSizeNum ? maxSizeNum.integerValue : kDefaultHistoryMaxSize;
+    NSInteger maxItems = maxItemsNum != nil ? maxItemsNum.integerValue : kDefaultHistoryMaxItems;
+    NSInteger maxSize = maxSizeNum != nil ? maxSizeNum.integerValue : kDefaultHistoryMaxSize;
     
     if(maxItems >= 0)
     {

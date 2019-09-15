@@ -73,20 +73,28 @@
 
 - (void)bindUiToSettings {
     self.keyLabel.text = self._key;
-    self.keyLabel.textColor = UIColor.darkGrayColor;
+    if (@available(iOS 13.0, *)) {
+        self.keyLabel.textColor = UIColor.labelColor;
+    } else {
+        self.keyLabel.textColor = nil;
+    }
     self.valueLabel.text = self._value;
     self.buttonRevealConceal.hidden = !self._isConfidential || self._isEditable;
     
     if(self._concealed) {
         [self.buttonRevealConceal setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
         self.valueLabel.text = @"*****************";
-        self.valueLabel.textColor = [UIColor lightGrayColor];
+        self.valueLabel.textColor = UIColor.systemGrayColor;
         self.valueLabel.font = self.configuredValueFont;
     }
     else {
         [self.buttonRevealConceal setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateNormal];
         
-        self.valueLabel.textColor = [UIColor darkTextColor];
+        if (@available(iOS 13.0, *)) {
+            self.valueLabel.textColor = UIColor.labelColor;
+        } else {
+            self.valueLabel.textColor = UIColor.darkTextColor;
+        }
         self.valueLabel.font = self._isConfidential ? FontManager.sharedInstance.easyReadFont : self.configuredValueFont;
     }
 

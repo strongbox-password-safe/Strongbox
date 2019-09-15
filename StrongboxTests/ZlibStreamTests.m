@@ -24,20 +24,21 @@
     
     [stream open];
     
-    const NSUInteger kSize = 8096;
+    const NSUInteger kSize = 8192;
     uint8_t buf[kSize];
     
-    NSInteger bytesRead;
-    NSInteger totalRead;
+    NSInteger bytesRead = 0;
+    NSInteger totalRead = 0;
 
-    while((bytesRead = [stream read:buf maxLength:kSize]) != 0) {
+    while((bytesRead = [stream read:buf maxLength:kSize]) > 0) {
         totalRead += bytesRead;
         //NSLog(@"Read: %ld", (long)bytesRead);
+        NSLog(@"%ld => %ld", totalRead, (long)bytesRead);
     }
     
     [stream close];
     
-    XCTAssertEqual(totalRead, 73853434);
+    XCTAssertEqual(totalRead, 73853418);
 }
 
 @end

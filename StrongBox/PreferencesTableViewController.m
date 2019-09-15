@@ -416,11 +416,9 @@
     
     if(!enabled) {
         self.labelClearClipboardDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-        self.labelClearClipboardDelay.textColor = UIColor.darkGrayColor;
     }
     else {
         self.labelClearClipboardDelay.text = [Utils formatTimeInterval:seconds];
-        self.labelClearClipboardDelay.textColor = UIColor.darkTextColor;
     }
 }
 

@@ -22,7 +22,7 @@
 #import "AutoFillManager.h"
 #import "LocalDeviceStorageProvider.h"
 
-@interface CredentialProviderViewController ()
+@interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
 @property (nonatomic, strong) UINavigationController* safesList;
 @property (nonatomic, strong) NSArray<ASCredentialServiceIdentifier *> * serviceIdentifiers;
@@ -179,8 +179,14 @@
         }];
     }
     else {
+        self.safesList.presentationController.delegate = self;
         [self presentViewController:self.safesList animated:NO completion:nil];
     }
+}
+
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+    NSLog(@"presentationControllerDidDismiss");
+    [self cancel:nil];
 }
 
 - (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider {

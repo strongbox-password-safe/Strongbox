@@ -345,14 +345,19 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         if(![foo getBytes:chnk maxLength:kChunkSize usedLength:&read encoding:NSUTF8StringEncoding options:kNilOptions
                     range:NSMakeRange(0, foo.length) remainingRange:nil]) {
             NSLog(@"Error cleaning stream: %d", err);
-            *error = [Utils createNSError:@"Error cleaning stream" errorCode:-1];
+            if(error) {
+                *error = [Utils createNSError:@"Error cleaning stream" errorCode:-1];
+            }
+            return nil;
         }
     }
     
     do {
         if(read == -1) {
             NSLog(@"Error reading stream: %d", err);
-            *error = [Utils createNSError:@"Error reading XML Stream" errorCode:err];
+            if (error) {
+                *error = [Utils createNSError:@"Error reading XML Stream" errorCode:err];
+            }
             return nil;
         }
         if(!ctxt) {
@@ -368,14 +373,18 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     if(err != XML_ERR_OK) {
         NSLog(@"XML Error: %d", err);
-        *error = [Utils createNSError:@"Error reading XML" errorCode:err];
+        if (error) {
+            *error = [Utils createNSError:@"Error reading XML" errorCode:err];
+        }
         return nil;
     }
     
     err = xmlParseChunk(ctxt, NULL, 0, 1);
     if(err != XML_ERR_OK) {
         NSLog(@"XML Error: %d", err);
-        *error = [Utils createNSError:@"Error reading Final XML" errorCode:err];
+        if (error) {
+            *error = [Utils createNSError:@"Error reading Final XML" errorCode:err];
+        }
         return nil;
     }
     

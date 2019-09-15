@@ -60,10 +60,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL expired;
 @property (readonly) BOOL nearlyExpired;
 
-+ (Node *)deserialize:(NSDictionary *)dict
-               parent:(Node*)parent
-allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
-                error:(NSError**)error;
++ (Node *_Nullable)deserialize:(NSDictionary *)dict
+                        parent:(Node*)parent
+     allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
+                         error:(NSError**)error;
 
 - (NSDictionary *)serialize:(SerializationPackage*)serialization; // Serializes this node and all children (all fields) - This can be used interprocess - for duplications/copy/paste - drag & drop
 

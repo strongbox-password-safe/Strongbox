@@ -53,11 +53,11 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
 
     [kvps addKey:NSLocalizedString(@"database_metadata_field_inner_encryption", @"Inner Encryption") andValue:innerEncryptionString(self.innerRandomStreamId)];
 
-    if(self.historyMaxItems) {
+    if(self.historyMaxItems != nil) {
         [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_items", @"Max History Items") andValue:[NSString stringWithFormat:@"%ld", self.historyMaxItems.longValue]];
     }
     
-    if(self.historyMaxSize) {
+    if(self.historyMaxSize != nil) {
         NSString* size = friendlyFileSizeString(self.historyMaxSize.integerValue);
         [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_size", @"Max History Size") andValue:size];
     }

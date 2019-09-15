@@ -66,7 +66,12 @@
 - (void)bindSettings {
     NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
     self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock"), biometricIdName];
-    self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.darkTextColor : UIColor.lightGrayColor;
+
+    if (@available(iOS 13.0, *)) {
+        self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.labelColor : UIColor.secondaryLabelColor;
+    } else {
+        self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.darkGrayColor : UIColor.lightGrayColor;
+    }
     
     self.switchAllowBiometric.enabled = [self canToggleTouchId];
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
@@ -99,7 +104,13 @@
     [self bindSettings];
     
     self.cellChangeMasterCredentials.userInteractionEnabled = [self canSetCredentials];
-    self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
+    
+    if (@available(iOS 13.0, *)) {
+        self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.secondaryLabelColor;
+    } else {
+        self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
+    }
+    
     self.cellChangeMasterCredentials.textLabel.text = self.viewModel.database.format == kPasswordSafe ?
     NSLocalizedString(@"db_management_change_master_password", @"Change Master Password") :
     NSLocalizedString(@"db_management_change_master_credentials", @"Change Master Credentials");
@@ -381,13 +392,13 @@
     if(seconds.integerValue == -1) {
         self.switchDatabaseAutoLockEnabled.on = NO;
         self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
+//        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
         self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
     }
     else {
         self.switchDatabaseAutoLockEnabled.on = YES;
         self.labelDatabaseAutoLockDelay.text = [Utils formatTimeInterval:seconds.integerValue];
-        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkTextColor;
+//        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkTextColor;
         self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
     }
 }

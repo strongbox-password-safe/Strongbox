@@ -52,9 +52,14 @@ const static NSSet<NSString*> *keePassReservedNames;
                           action:@selector(textFieldDidChange:)
                 forControlEvents:UIControlEventEditingChanged];
     
-    UIColor *borderColor = [UIColor colorWithRed:204.0/255.0 green:204.0/255.0 blue:204.0/255.0 alpha:1.0];
+//    UIColor *borderColor = [UIColor colorWithRed:204.0/255.0 green:204.0/255.0 blue:204.0/255.0 alpha:1.0];
     
-    self.textView.layer.borderColor = borderColor.CGColor;
+    if (@available(iOS 13.0, *)) {
+        self.textView.layer.borderColor = UIColor.labelColor.CGColor;
+    } else {
+        UIColor *borderColor = [UIColor colorWithRed:204.0/255.0 green:204.0/255.0 blue:204.0/255.0 alpha:1.0];
+        self.textView.layer.borderColor = borderColor.CGColor;
+    }
     self.textView.layer.borderWidth = 0.5f;
     self.textView.layer.cornerRadius = 5.0f;
 
@@ -122,7 +127,7 @@ const static NSSet<NSString*> *keePassReservedNames;
     }
     
     if(!keyIsValid) {
-        self.keyTextField.layer.borderColor = UIColor.redColor.CGColor;
+        self.keyTextField.layer.borderColor = UIColor.systemRedColor.CGColor;
         self.keyTextField.layer.borderWidth = 0.5f;
         self.keyTextField.layer.cornerRadius = 5.0f;
         self.buttonDone.enabled = NO;
@@ -130,8 +135,14 @@ const static NSSet<NSString*> *keePassReservedNames;
         self.labelError.hidden = NO;
     }
     else {
-        self.keyTextField.layer.borderColor = UIColor.redColor.CGColor;
-        self.keyTextField.layer.borderWidth = 0.0;
+        if (@available(iOS 13.0, *)) {
+            self.keyTextField.layer.borderColor = UIColor.labelColor.CGColor;
+            self.keyTextField.layer.borderWidth = 0.5;
+        } else {
+            self.keyTextField.layer.borderColor = UIColor.systemRedColor.CGColor;
+            self.keyTextField.layer.borderWidth = 0.0;
+        }
+        
         self.keyTextField.layer.cornerRadius = 5.0f;
         self.buttonDone.enabled = YES;
         self.labelError.text = @"";

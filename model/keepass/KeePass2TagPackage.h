@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePass2TagPackage : NSObject
 
-@property (nonatomic) Meta* originalMeta;
+@property (nonatomic, nullable) Meta* originalMeta;
 @property (nonatomic) NSDictionary<NSNumber *,NSObject *>* unknownHeaders;
 
 @end

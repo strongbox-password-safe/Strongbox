@@ -25,7 +25,11 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
 
-    self.horizontalLine.backgroundColor = UIColor.blueColor;
+    if (@available(iOS 13.0, *)) {
+        self.horizontalLine.backgroundColor = UIColor.labelColor;
+    } else {
+        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
+    }
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     self.keyLabel.font = FontManager.sharedInstance.regularFont;
@@ -64,8 +68,12 @@
     self.valueText.placeholder = @"";
     self.valueText.font = self.configuredValueFont;
     
-    self.horizontalLine.backgroundColor = UIColor.blueColor;
-    
+    if (@available(iOS 13.0, *)) {
+        self.horizontalLine.backgroundColor = UIColor.labelColor;
+    } else {
+        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
+    }
+
     self.onEdited = nil;
     self.showUiValidationOnEmpty = NO;
     self.suggestionProvider = nil;
@@ -76,43 +84,44 @@
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing keyColor:nil useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing suggestionProvider:nil useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:nil formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
 }
 
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing keyColor:(UIColor *)keyColor useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:keyColor formatAsUrl:NO useEasyReadFont:useEasyReadFont];
-}
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit keyColor:nil formatAsUrl:NO useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit formatAsUrl:NO useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO keyColor:nil formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString*)key
          value:(NSString*)value
        editing:(BOOL)editing
 selectAllOnEdit:(BOOL)selectAllOnEdit
-      keyColor:(UIColor *)keyColor
    formatAsUrl:(BOOL)formatAsUrl useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit keyColor:keyColor formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString*)key
          value:(NSString*)value
        editing:(BOOL)editing
 selectAllOnEdit:(BOOL)selectAllOnEdit
-      keyColor:(UIColor *)keyColor
    formatAsUrl:(BOOL)formatAsUrl
-suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
+suggestionProvider:(SuggestionProvider)suggestionProvider
+useEasyReadFont:(BOOL)useEasyReadFont {
     self.keyLabel.text = key;
-    self.keyLabel.textColor = keyColor == nil ? UIColor.darkGrayColor : keyColor;
+    if (@available(iOS 13.0, *)) {
+        self.keyLabel.textColor = UIColor.labelColor;
+    }
+    else {
+        self.keyLabel.textColor = nil;
+    }
     self.keyLabel.accessibilityLabel = key;
     
     self.valueText.text = value;
@@ -120,7 +129,20 @@ suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)
     self.valueText.suggestionProvider = suggestionProvider;
     self.valueText.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
     
-    self.valueText.textColor = formatAsUrl ? UIColor.blueColor : UIColor.darkTextColor;
+    if(formatAsUrl) {
+        if (@available(iOS 13.0, *)) {
+            self.valueText.textColor = UIColor.linkColor;
+        } else {
+            self.valueText.textColor = UIColor.blueColor;
+        }
+    }
+    else {
+        if (@available(iOS 13.0, *)) {
+            self.valueText.textColor = UIColor.labelColor;
+        } else {
+            self.valueText.textColor = UIColor.darkTextColor;
+        }
+    }
     
     self.selectAllOnEdit = selectAllOnEdit;
     
@@ -156,7 +178,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)
             self.valueText.placeholder = [NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"), self.keyLabel.text];
         }
         else {
-            self.horizontalLine.backgroundColor = UIColor.blueColor;
+            self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
         }
     }
 }

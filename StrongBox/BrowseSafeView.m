@@ -124,6 +124,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     [self setupNavBar];
     [self setupSearchBar];
+
+    if (@available(iOS 13.0, *)) { // iOS 13 Appears to require this to show search bad - Doing so from ViewDidAppear doesn't work?
+        [self addSearchBarToNav];
+    }
     
     if(self.currentGroup == self.viewModel.database.rootGroup) {
         // Only do this for the root group - We should delay adding this because we get a weird

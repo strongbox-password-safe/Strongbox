@@ -377,7 +377,11 @@ static NSString* const kEditDateCell = @"EditDateCell";
             
 #ifndef IS_APP_EXTENSION
             if(self.isEditing) {
-                cell.iconImage.layer.borderColor = UIColor.blueColor.CGColor;
+                if (@available(iOS 13.0, *)) {
+                    cell.iconImage.layer.borderColor = UIColor.labelColor.CGColor;
+                } else {
+                    cell.iconImage.layer.borderColor = UIColor.blueColor.CGColor;
+                }
                 cell.iconImage.layer.borderWidth = 0.5;
                 cell.iconImage.layer.cornerRadius = 5;
                 cell.onIconTapped = ^{
@@ -453,6 +457,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
                 return cell;
             }
             else {
+                // TODO: Crash here? When going back to view mode from edit?
                 ConfidentialTableCell* cell = [tableView dequeueReusableCellWithIdentifier:kConfidentialCellId forIndexPath:indexPath];
                 
                 [cell setKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
@@ -476,7 +481,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
             if(self.editing && !self.model.totp) {
                 GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
                 cell.labelText.text = NSLocalizedString(@"item_details_setup_totp", @"Setup TOTP...");
-                cell.labelText.textColor = UIColor.blueColor;
                 cell.accessoryType = UITableViewCellAccessoryNone;
                 cell.editingAccessoryType = UITableViewCellAccessoryNone;
                 
@@ -495,7 +499,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
             [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
                    value:[self maybeDereference:self.model.url]
                  editing:self.editing
-             formatAsUrl:isValidUrl(self.model.url)
+             formatAsUrl:isValidUrl(self.model.url) && !self.editing
       suggestionProvider:^NSString*(NSString *text) {
                 NSArray* matches = [[[self.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
                       return [obj hasPrefix:text];
@@ -596,7 +600,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
             GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
             
             cell.labelText.text = NSLocalizedString(@"item_details_new_custom_field_button", @"New Custom Field...");
-            cell.labelText.textColor = UIColor.blueColor;
             cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
             
             return cell;
@@ -627,7 +630,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         if(self.editing && indexPath.row == 0) {
             GenericBasicCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
             cell.labelText.text = NSLocalizedString(@"item_details_add_attachment_button", @"Add Attachment...");
-            cell.labelText.textColor = UIColor.blueColor;
+//            cell.labelText.textColor = UIColor.blueColor;
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.editingAccessoryType = UITableViewCellAccessoryNone;
             
@@ -703,7 +706,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
             cell.labelText.text = self.databaseModel.database.format == kPasswordSafe ?
             NSLocalizedString(@"item_details_password_history", @"Password History") :
             NSLocalizedString(@"item_details_item_history", @"Item History");
-            cell.labelText.textColor = UIColor.blueColor;
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             return cell;
         }

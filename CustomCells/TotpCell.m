@@ -61,7 +61,13 @@
         uint64_t remainingSeconds = self.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.otpToken.period);
         self.labelTotp.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
         
-        UIColor *color = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+        UIColor *color;
+        if (@available(iOS 13.0, *)) {
+            color = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : UIColor.labelColor;
+        }
+        else {
+            color = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+        }
         
         self.labelTotp.textColor = color;
         self.labelTotp.alpha = 1;
@@ -73,8 +79,8 @@
         }
         
         CGFloat blah = remainingSeconds / self.otpToken.period;
-//        NSLog(@"%llu/%f = %f", remainingSeconds, self.otpToken.period, blah);
-
+        //        NSLog(@"%llu/%f = %f", remainingSeconds, self.otpToken.period, blah);
+        
         [UIView animateWithDuration:1.3 delay:0.0 options:UIViewAnimationOptionRepeat animations:^{
             [self.progressView setProgress:blah animated:YES];
         } completion:nil];

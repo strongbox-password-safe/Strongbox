@@ -137,7 +137,9 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
         
         if(!ret) {
             NSString* errorFormat = NSLocalizedString(@"node_serialization_error_duplicate_group_title_fmt", @"Error message indicating that these item(s) cannot be deserialized to this database because they contain two groups with the same title.");
-            *error = [Utils createNSError:[NSString stringWithFormat:errorFormat, title] errorCode:-24122];
+            if (error) {
+                *error = [Utils createNSError:[NSString stringWithFormat:errorFormat, title] errorCode:-24122];
+            }
             return nil;
         }
     }
@@ -224,7 +226,7 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     }
     
     NSNumber* index = self.iconId;
-    if(!index) {
+    if(index == nil) {
         return YES;
     }
     

@@ -77,6 +77,7 @@
 
 - (void)onAppBecameActive {
     if(self.startupLockMode) {
+        NSLog(@"Ignore App Active events for startup lock screen...");
         return; // Ignore App Active events for startup lock screen
     }
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -91,6 +92,8 @@
 }
 
 - (void)beginUnlockSequence {
+    NSLog(@"beginUnlockSequence....");
+    
     if (Settings.sharedInstance.appLockMode == kNoLock || ![self shouldLock]) {
         Settings.sharedInstance.failedUnlockAttempts = 0;
         self.onUnlockDone(NO);

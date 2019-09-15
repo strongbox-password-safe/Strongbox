@@ -12,7 +12,7 @@
 #import "CASGParams.h"
 
 typedef NS_ENUM (unsigned int, CASGMode) {
-    kCASGModeCreate,
+    kCASGModeCreate ,
     kCASGModeCreateExpress,
     kCASGModeAddExisting,
     kCASGModeSetCredentials,

@@ -27,7 +27,12 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.textView.delegate = self;
-    self.horizontalLine.backgroundColor = UIColor.blueColor;
+    if (@available(iOS 13.0, *)) {
+        self.horizontalLine.backgroundColor = UIColor.labelColor;
+    } else {
+        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
+    }
+    
     self.textView.font = self.configuredValueFont;
     self.textView.adjustsFontForContentSizeCategory = YES;
     self.textView.userInteractionEnabled = YES; 

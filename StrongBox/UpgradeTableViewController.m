@@ -74,7 +74,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     
     self.titleAttributes = [self getAttributedTextDictionaryWithFontSize:20.0f foregroundColor:[UIColor whiteColor]];
     self.subtitleAttributes = [self getAttributedTextDictionaryWithFontSize:16.0f foregroundColor:lemonColor bold:NO];
-    self.bonusTextAttributes = [self getAttributedTextDictionaryWithFontSize:14.0f foregroundColor:[UIColor greenColor] bold:NO];
+    self.bonusTextAttributes = [self getAttributedTextDictionaryWithFontSize:14.0f foregroundColor:[UIColor whiteColor] bold:NO];
     
     self.button1Month.layer.cornerRadius = 25;
     self.button3Months.layer.cornerRadius = 25;
