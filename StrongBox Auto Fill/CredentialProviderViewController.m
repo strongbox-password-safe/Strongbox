@@ -21,6 +21,7 @@
 #import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
 #import "LocalDeviceStorageProvider.h"
+#import "ClipboardManager.h"
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
@@ -131,8 +132,7 @@
         if(node.fields.otpToken) {
             NSString* value = node.fields.otpToken.password;
             if (value.length) {
-                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                pasteboard.string = value;
+                [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
                 NSLog(@"Copied TOTP to Pasteboard...");
             }
         }

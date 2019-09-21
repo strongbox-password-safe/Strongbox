@@ -1,0 +1,45 @@
+
+/* Class = "UIButton"; normalTitle = "Connect"; ObjectID = "11X-xX-xu7"; */
+"11X-xX-xu7.normalTitle" = "Verbinden";
+
+/* Class = "UIButton"; normalTitle = "Locate Key..."; ObjectID = "AxY-pJ-ZNV"; */
+"AxY-pJ-ZNV.normalTitle" = "Schlüssel ausfindig machen ...";
+
+/* Class = "UITextField"; placeholder = "my.server.com<:port>"; ObjectID = "dV8-cu-oRH"; */
+"dV8-cu-oRH.placeholder" = "my.server.com<:port>";
+
+/* Class = "UISwitch"; accessibilityLabel = "Use a Private Key"; ObjectID = "eQL-vF-B3E"; */
+"eQL-vF-B3E.accessibilityLabel" = "Privaten Schlüssel verwenden";
+
+/* Class = "UILabel"; text = "Please enter your SFTP server connection details"; ObjectID = "hU4-lh-1da"; */
+"hU4-lh-1da.text" = "Bitte geben Sie Ihre SFTP-Serververbindungsdetails ein";
+
+/* Class = "UITextField"; placeholder = "user"; ObjectID = "jit-Ab-6Nm"; */
+"jit-Ab-6Nm.placeholder" = "Benutzern";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "Kmh-LV-4mK"; */
+"Kmh-LV-4mK.normalTitle" = "Abbrechen";
+
+/* Class = "UILabel"; text = "Private Key"; ObjectID = "kNQ-pK-abf"; */
+"kNQ-pK-abf.text" = "Privater Schlüssel";
+
+/* Class = "UILabel"; text = "Host"; ObjectID = "KNv-3o-k10"; */
+"KNv-3o-k10.text" = "Host";
+
+/* Class = "UILabel"; text = "Password"; ObjectID = "NPs-uO-anO"; */
+"NPs-uO-anO.text" = "Passwort";
+
+/* Class = "UITextField"; placeholder = "password"; ObjectID = "rJP-WK-lnM"; */
+"rJP-WK-lnM.placeholder" = "Passwort";
+
+/* Class = "UILabel"; text = "SFTP Configuration"; ObjectID = "RRv-kS-ANe"; */
+"RRv-kS-ANe.text" = "SFTP-Konfiguration";
+
+/* Class = "UILabel"; text = "*Password & Private Key are stored securely in the iOS Keychain"; ObjectID = "VVO-9R-aMu"; */
+"VVO-9R-aMu.text" = "*Passwort und privater Schlüssel werden sicher in der iOS-Keychain gespeichert";
+
+/* Class = "UILabel"; text = "Username"; ObjectID = "Vvv-oe-eLD"; */
+"Vvv-oe-eLD.text" = "Benutzername";
+
+/* Class = "UILabel"; text = "* Validation"; ObjectID = "yxL-Cj-OvI"; */
+"yxL-Cj-OvI.text" = "* Verifizierung";

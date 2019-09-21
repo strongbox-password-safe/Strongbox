@@ -1,0 +1,297 @@
+
+/* Class = "UITableViewController"; title = "Attachments Pool"; ObjectID = "0lS-7B-veY"; */
+"0lS-7B-veY.title" = "Anhänge-Pool";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "0uj-9f-YzH"; */
+"0uj-9f-YzH.text" = "Untertitel";
+
+/* Class = "UILabel"; text = "Export anywhere in iOS Files"; ObjectID = "3TO-HG-fBa"; */
+"3TO-HG-fBa.text" = "Irgendwo in iOS-Dateien exportieren";
+
+/* Class = "UILabel"; text = "Encrypted Database Attachment"; ObjectID = "4gH-9g-QNW"; */
+"4gH-9g-QNW.text" = "Verschlüsselter Datenbank-Anhang";
+
+/* Class = "UILabel"; text = "Records"; ObjectID = "5gZ-i5-1Iq"; */
+"5gZ-i5-1Iq.text" = "Datensätze";
+
+/* Class = "UILabel"; text = "<Biometric ID> Unlock"; ObjectID = "5Ui-WV-Edi"; */
+"5Ui-WV-Edi.text" = "<Biometrische ID> freischalten";
+
+/* Class = "UIButton"; normalTitle = "Change Convenience PIN..."; ObjectID = "6LL-o6-fLP"; */
+"6LL-o6-fLP.normalTitle" = "Komfort-PIN ändern ...";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "7wl-Po-6rv"; */
+"7wl-Po-6rv.text" = "Untertitel";
+
+/* Class = "UILabel"; text = "Export Database..."; ObjectID = "8t7-OA-fuK"; */
+"8t7-OA-fuK.text" = "Datenbank exportieren ...";
+
+/* Class = "UITableViewSection"; headerTitle = "When Duress PIN Entered"; ObjectID = "39l-qS-91B"; */
+"39l-qS-91B.headerTitle" = "Wenn Zwangs-PIN eingegeben wird";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "72E-qf-FcW"; */
+"72E-qf-FcW.text" = "Untertitel";
+
+/* Class = "UITableViewController"; title = "PIN Codes"; ObjectID = "aJP-12-BTT"; */
+"aJP-12-BTT.title" = "PIN-Codes";
+
+/* Class = "UILabel"; text = "Open a Dummy Database"; ObjectID = "alj-hg-cxp"; */
+"alj-hg-cxp.text" = "Scheindatenbank öffnen";
+
+/* Class = "UILabel"; text = "Unique Usernames"; ObjectID = "aSa-hW-dss"; */
+"aSa-hW-dss.text" = "Einmalige Benutzernamen";
+
+/* Class = "UILabel"; text = "Copy"; ObjectID = "AV5-zd-5GG"; */
+"AV5-zd-5GG.text" = "Kopieren";
+
+/* Class = "UILabel"; text = "PIN Codes"; ObjectID = "avJ-of-dsf"; */
+"avJ-of-dsf.text" = "PIN-Codes";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "bG1-bd-bVM"; */
+"bG1-bd-bVM.text" = "Untertitel";
+
+/* Class = "UILabel"; text = "Print Database..."; ObjectID = "CCi-ZI-4Gk"; */
+"CCi-ZI-4Gk.text" = "Datenbank drucken ...";
+
+/* Class = "UILabel"; text = "By Email (CSV)"; ObjectID = "cU9-qG-5F5"; */
+"cU9-qG-5F5.text" = "Per E-Mail (CSV)";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "dqx-dU-chI"; */
+"dqx-dU-chI.text" = "Titel";
+
+/* Class = "UILabel"; text = "Open as Read-Only"; ObjectID = "dYn-dT-eVK"; */
+"dYn-dT-eVK.text" = "Schreibgeschützt öffnen";
+
+/* Class = "UITableViewSection"; footerTitle = "If you use a convenience PIN then you can also use a Duress PIN. The Duress PIN indicates to Strongbox that you are opening the database under duress. Strongbox can perform a number of actions in this situation.\nNB: It is important to note that in some jurisdictions this action in itself can be seen as deceptive and/or illegal, and you may want to consider preparing yourself in other ways so that you don't need to rely on this feature."; ObjectID = "e3m-4j-ELm"; */
+"e3m-4j-ELm.footerTitle" = "Falls Sie eine Komfort-PIN verwenden, können Sie auch eine Zwangs-PIN verwenden. Die Zwangs-PIN zeigt Strongbox an, dass Sie eine Datenbank unter Zwang öffnen. Strongbox kann eine Reihe von Aktionen in so einer Situation ausführen.\nBitte beachten: Es ist wichtig darauf hinzuweisen, dass diese Aktion in einigen Jurisdiktionen als trügerisch und/oder illegal angesehen werden kann und Sie sollten sich vielleicht auf andere Weise darauf vorbereiten, damit Sie sich nicht auf dieses Funktion verlassen müssen.";
+
+/* Class = "UITableViewSection"; headerTitle = "Duress PIN"; ObjectID = "e3m-4j-ELm"; */
+"e3m-4j-ELm.headerTitle" = "Zwangs-PIN";
+
+/* Class = "UILabel"; text = "Plaintext CSV"; ObjectID = "ekA-J8-Dri"; */
+"ekA-J8-Dri.text" = "Klartext-CSV";
+
+/* Class = "UILabel"; text = "Change Master Password"; ObjectID = "gqm-VJ-fD5"; */
+"gqm-VJ-fD5.text" = "Master-Passwort ändern";
+
+/* Class = "UITableViewSection"; footerTitle = "Some simple statistics about the contents of your database"; ObjectID = "HNl-Z8-XsQ"; */
+"HNl-Z8-XsQ.footerTitle" = "Ein paar einfache Statistiken zum Inhalt Ihrer Datenbank.";
+
+/* Class = "UITableViewSection"; headerTitle = "Statistics"; ObjectID = "HNl-Z8-XsQ"; */
+"HNl-Z8-XsQ.headerTitle" = "Statistiken";
+
+/* Class = "UITableViewController"; title = "Export Database"; ObjectID = "IUA-PD-VTb"; */
+"IUA-PD-VTb.title" = "Datenbank exportieren";
+
+/* Class = "UILabel"; text = "NB: Local Device database are permanently deleted"; ObjectID = "JIi-2p-HGt"; */
+"JIi-2p-HGt.text" = "Bitte beachten: Datenbanken von lokalen Geräten werden dauerhaft gelöscht";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "K12-HX-nbI"; */
+"K12-HX-nbI.text" = "Wenn Zwangs-PIN eingegeben wird";
+
+/* Class = "UITableViewSection"; headerTitle = "Export Options"; ObjectID = "Ltj-NU-Uru"; */
+"Ltj-NU-Uru.headerTitle" = "Export-Optionen";
+
+/* Class = "UILabel"; text = "Groups"; ObjectID = "lxb-5g-eft"; */
+"lxb-5g-eft.text" = "Gruppen";
+
+/* Class = "UILabel"; text = "Copy Plaintext CSV to Pasteboard"; ObjectID = "MNT-9Y-DFQ"; */
+"MNT-9Y-DFQ.text" = "CSV-Datei im Klartext in die Zwischenablage kopieren";
+
+/* Class = "UILabel"; text = "Auto Fill: Always Use Cache"; ObjectID = "MWr-Bb-LQV"; */
+"MWr-Bb-LQV.text" = "Autom. Ausfüllen: Immer Cache verwenden";
+
+/* Class = "UILabel"; text = "Auto Fill"; ObjectID = "MyM-Gm-9ER"; */
+"MyM-Gm-9ER.text" = "Autom. Ausfüllen";
+
+/* Class = "UILabel"; text = "To Files"; ObjectID = "otC-rk-95J"; */
+"otC-rk-95J.text" = "An Dateien";
+
+/* Class = "UITableViewSection"; footerTitle = "Some attributes of your database (format specific) including cryptography settings, file format and metadata properties"; ObjectID = "prc-T9-fhq"; */
+"prc-T9-fhq.footerTitle" = "Einige Attribute Ihrer Datenbank (formatspezifisch) beinhalten Kryptografie-Einstellungen, Dateiformat und Metadaten-Eigenschaften";
+
+/* Class = "UITableViewSection"; headerTitle = "Database Properties"; ObjectID = "prc-T9-fhq"; */
+"prc-T9-fhq.headerTitle" = "Datenbank-Eigenschaften";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "qUM-G0-tWN"; */
+"qUM-G0-tWN.text" = "Untertitel";
+
+/* Class = "UILabel"; text = "View Attachments Pool"; ObjectID = "qXR-Ed-fpb"; */
+"qXR-Ed-fpb.text" = "Anhänge-Pool ansehen";
+
+/* Class = "UIButton"; normalTitle = "Change Duress PIN..."; ObjectID = "rHx-1W-ieK"; */
+"rHx-1W-ieK.normalTitle" = "Zwangs-PIN ändern ...";
+
+/* Class = "UIButton"; normalTitle = "Turn Duress PIN On"; ObjectID = "RZ6-5I-P7D"; */
+"RZ6-5I-P7D.normalTitle" = "Zwangs-PIN einschalten";
+
+/* Class = "UITableViewSection"; footerTitle = "You can use a PIN Code to open your password database. While this is handy, it will likely be less secure than using your master password. The PIN will only work on this device."; ObjectID = "TUP-XN-gQC"; */
+"TUP-XN-gQC.footerTitle" = "Sie können den PIN-Code verwenden, um Ihre Passwort-Datenbank zu öffnen. Auch wenn das praktisch ist, ist es wahrscheinlich unsicherer als Ihr Master-Passwort. Der PIN wird nur auf diesem Gerät funktionieren.";
+
+/* Class = "UITableViewSection"; headerTitle = "Convenience PIN"; ObjectID = "TUP-XN-gQC"; */
+"TUP-XN-gQC.headerTitle" = "Komfort-PIN";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "u12-Jd-EK6"; */
+"u12-Jd-EK6.text" = "Untertitel";
+
+/* Class = "UIButton"; normalTitle = "Turn Convenience PIN On"; ObjectID = "ucD-9D-yuG"; */
+"ucD-9D-yuG.normalTitle" = "Komfort-PIN einschalten";
+
+/* Class = "UILabel"; text = "Remove Database"; ObjectID = "uKQ-Nd-Sst"; */
+"uKQ-Nd-Sst.text" = "Datenbank entfernen";
+
+/* Class = "UILabel"; text = "Most Used Username"; ObjectID = "VH1-Qr-usY"; */
+"VH1-Qr-usY.text" = "Häufigster Benutzername";
+
+/* Class = "UILabel"; text = "By Email"; ObjectID = "vk1-O2-wkx"; */
+"vk1-O2-wkx.text" = "Per E-Mail";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "W9N-V7-F3d"; */
+"W9N-V7-F3d.headerTitle" = "Allgemein";
+
+/* Class = "UILabel"; text = "By Email (HTML)"; ObjectID = "WsN-Wh-Thq"; */
+"WsN-Wh-Thq.text" = "Per E-Mail (HTML)";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Z35-lH-bXP"; */
+"Z35-lH-bXP.text" = "Titel";
+
+/* Class = "UINavigationItem"; title = "Database Management"; ObjectID = "ZFb-uk-qf5"; */
+"ZFb-uk-qf5.title" = "Datenbank-Management";
+
+/* Class = "UILabel"; text = "Present a Technical Error"; ObjectID = "zOJ-be-bYv"; */
+"zOJ-be-bYv.text" = "Einen technischen Fehler präsentieren";
+
+/* Class = "UILabel"; text = "Unique Passwords"; ObjectID = "zPs-Rc-Zqh"; */
+"zPs-Rc-Zqh.text" = "Einmalige Passwörter";
+
+/* Class = "UILabel"; text = "Plaintext HTML"; ObjectID = "zUZ-2L-HBa"; */
+"zUZ-2L-HBa.text" = "Klartext-HTML";
+
+/* Class = "UILabel"; text = "Enabled"; ObjectID = "7KJ-Gr-2Uo"; */
+"7KJ-Gr-2Uo.text" = "Aktiviert";
+
+/* Class = "UILabel"; text = "Delay"; ObjectID = "ZTp-CH-xlq"; */
+"ZTp-CH-xlq.text" = "Verzögerung";
+
+/* Class = "UILabel"; text = "30 Seconds"; ObjectID = "uRf-cw-GuR"; */
+"uRf-cw-GuR.text" = "30 Sekunden";
+
+/* Class = "UITableViewSection"; footerTitle = "Automatically lock your database (with an optional delay) when you switch away from Strongbox"; ObjectID = "wg6-2k-ifx"; */
+"wg6-2k-ifx.footerTitle" = "Datenbank beim verlassen von Strongbox (mit einer optionalen verzögerung) sperren";
+
+/* Class = "UITableViewSection"; headerTitle = "Database Automatic Locking"; ObjectID = "wg6-2k-ifx"; */
+"wg6-2k-ifx.headerTitle" = "Datenbank wird automatisch gesperrt";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "0Fb-Fx-hZJ"; */
+"0Fb-Fx-hZJ.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "1dL-OC-meo"; */
+"1dL-OC-meo.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "4Ad-2R-HW5"; */
+"4Ad-2R-HW5.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "4c7-5o-EAj"; */
+"4c7-5o-EAj.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "8hg-uk-XC5"; */
+"8hg-uk-XC5.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "8kG-Kv-HOh"; */
+"8kG-Kv-HOh.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "AfG-c4-0Ha"; */
+"AfG-c4-0Ha.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "D6Q-pQ-Ucq"; */
+"D6Q-pQ-Ucq.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "DX3-oQ-Fc5"; */
+"DX3-oQ-Fc5.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Ek6-s2-KIp"; */
+"Ek6-s2-KIp.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "F86-LL-J3C"; */
+"F86-LL-J3C.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "HYd-WR-PKK"; */
+"HYd-WR-PKK.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "KgU-mP-gQP"; */
+"KgU-mP-gQP.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "LCq-qQ-gB7"; */
+"LCq-qQ-gB7.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "P1u-rs-FPg"; */
+"P1u-rs-FPg.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "PLR-MY-CSZ"; */
+"PLR-MY-CSZ.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "Q9X-rX-brC"; */
+"Q9X-rX-brC.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "QVx-4L-ReR"; */
+"QVx-4L-ReR.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "TI3-cd-WUT"; */
+"TI3-cd-WUT.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "UPp-t1-gvM"; */
+"UPp-t1-gvM.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Vb8-y6-maC"; */
+"Vb8-y6-maC.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "XMH-Dn-dQw"; */
+"XMH-Dn-dQw.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "XTM-Cc-xb5"; */
+"XTM-Cc-xb5.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "cLl-ZM-WvH"; */
+"cLl-ZM-WvH.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "e3i-Qt-AgZ"; */
+"e3i-Qt-AgZ.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "grT-ES-vLR"; */
+"grT-ES-vLR.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "gw3-ED-R71"; */
+"gw3-ED-R71.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "h1v-hF-TTl"; */
+"h1v-hF-TTl.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "hK9-qw-2cS"; */
+"hK9-qw-2cS.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "iJO-BK-2tv"; */
+"iJO-BK-2tv.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "kzk-lv-s0d"; */
+"kzk-lv-s0d.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "lgg-P6-xOt"; */
+"lgg-P6-xOt.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "nl7-AP-WoI"; */
+"nl7-AP-WoI.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "qng-AI-MBd"; */
+"qng-AI-MBd.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "vhA-Wx-txC"; */
+"vhA-Wx-txC.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "w5C-5m-jFe"; */
+"w5C-5m-jFe.text" = "";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "xeg-Yd-lnZ"; */
+"xeg-Yd-lnZ.text" = "";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "z6B-qs-rCY"; */
+"z6B-qs-rCY.text" = "";

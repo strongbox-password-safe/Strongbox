@@ -1,0 +1,9 @@
+
+/* Class = "UIButton"; normalTitle = "Use Default"; ObjectID = "6fG-XC-Kw4"; */
+"6fG-XC-Kw4.normalTitle" = "Standard verwenden";
+
+/* Class = "UILabel"; text = "Please select the icon you would like to use"; ObjectID = "Auy-hb-ZOc"; */
+"Auy-hb-ZOc.text" = "Bitte wählen Sie das Symbol aus, das Sie verwenden möchten";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "kCY-nc-B0L"; */
+"kCY-nc-B0L.normalTitle" = "Abbrechen";

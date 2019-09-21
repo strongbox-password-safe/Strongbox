@@ -1,0 +1,6 @@
+
+/* Class = "UIButton"; normalTitle = "Unlock"; ObjectID = "Fap-Qc-ou6"; */
+"Fap-Qc-ou6.normalTitle" = "Freischalten";
+
+/* Class = "UILabel"; text = "Unlock Attempts Remaining: 2"; ObjectID = "J0z-Pz-6EH"; */
+"J0z-Pz-6EH.text" = "Verbleibende Freischalten-Versuche: 2";

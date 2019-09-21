@@ -12,6 +12,7 @@
 #import "NSArray+Extensions.h"
 #import "Entry.h"
 #import "CustomFieldTableCell.h"
+#import "ClipboardManager.h"
 
 @interface CustomFieldsViewController ()
 
@@ -309,8 +310,7 @@
         return;
     }
     
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = field.value;
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:field.value];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:@"'%@' Value Copied to Clipboard", field.key]
                                message:nil

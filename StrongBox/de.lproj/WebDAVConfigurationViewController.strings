@@ -1,0 +1,45 @@
+
+/* Class = "UITextField"; placeholder = "https://my.server.com/folder"; ObjectID = "1X2-Ze-i4c"; */
+"1X2-Ze-i4c.placeholder" = "https://my.server.com/folder";
+
+/* Class = "UILabel"; text = "*Password is stored securely in the iOS Keychain"; ObjectID = "3iH-c3-9iv"; */
+"3iH-c3-9iv.text" = "*Passwort wird sicher in der iOS-Keychain gespeichert";
+
+/* Class = "UITextField"; placeholder = "password"; ObjectID = "89o-XP-mDN"; */
+"89o-XP-mDN.placeholder" = "Passwort";
+
+/* Class = "UISwitch"; accessibilityLabel = "Allow Untrusted Certificate"; ObjectID = "aDW-Ay-EYK"; */
+"aDW-Ay-EYK.accessibilityLabel" = "Nicht vertrauenswürdiges Zertifikat zulassen";
+
+/* Class = "UILabel"; text = "* Validation"; ObjectID = "bbf-Kb-K6e"; */
+"bbf-Kb-K6e.text" = "* Verifizierung";
+
+/* Class = "UILabel"; text = "NB: URL for folder not specific database file"; ObjectID = "C27-hh-Ir4"; */
+"C27-hh-Ir4.text" = "Bitte beachten: URL für Ordner ist keine spezifische Datenbank-Datei";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "FEy-UQ-2WD"; */
+"FEy-UQ-2WD.normalTitle" = "Abbrechen";
+
+/* Class = "UILabel"; text = "Root URL"; ObjectID = "gag-LL-zkW"; */
+"gag-LL-zkW.text" = "Root-URL";
+
+/* Class = "UILabel"; text = "Allow Untrusted Certificate"; ObjectID = "GnF-Py-IGa"; */
+"GnF-Py-IGa.text" = "Nicht vertrauenswürdiges Zertifikat zulassen";
+
+/* Class = "UITextField"; placeholder = "user"; ObjectID = "hMv-mK-ZXD"; */
+"hMv-mK-ZXD.placeholder" = "Benutzern";
+
+/* Class = "UIButton"; normalTitle = "Connect"; ObjectID = "MEL-r7-125"; */
+"MEL-r7-125.normalTitle" = "Verbinden";
+
+/* Class = "UILabel"; text = "Please enter your WebDAV connection details"; ObjectID = "PTi-pD-Alf"; */
+"PTi-pD-Alf.text" = "Bitte geben Sie Ihre WebDAV-Verbindungsdetails ein";
+
+/* Class = "UILabel"; text = "WebDAV Configuration"; ObjectID = "uqe-yX-hwB"; */
+"uqe-yX-hwB.text" = "WebDAV-Konfiguration";
+
+/* Class = "UILabel"; text = "Password"; ObjectID = "WIe-1y-pp1"; */
+"WIe-1y-pp1.text" = "Passwort";
+
+/* Class = "UILabel"; text = "Username"; ObjectID = "Xpd-ho-bG5"; */
+"Xpd-ho-bG5.text" = "Benutzername";

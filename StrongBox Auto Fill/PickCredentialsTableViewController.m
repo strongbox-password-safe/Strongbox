@@ -17,6 +17,7 @@
 #import "ItemDetailsViewController.h"
 #import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
+#import "ClipboardManager.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -513,10 +514,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     
     NSLog(@"Fast Password Copy on %@", item.title);
 
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
     BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
-    pasteboard.string = copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -565,8 +564,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         if(item.fields.otpToken) {
             NSString* value = item.fields.otpToken.password;
             if (value.length) {
-                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-                pasteboard.string = value;
+                [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
                 NSLog(@"Copied TOTP to Pasteboard...");
             }
         }
@@ -590,8 +588,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }
     Node *item = arr[indexPath.row];
 
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = [self dereference:item.fields.username node:item];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
     
     NSLog(@"Fast Username Copy on %@", item.title);
     

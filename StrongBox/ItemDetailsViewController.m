@@ -34,6 +34,7 @@
 #import "EditDateCell.h"
 #import "PasswordGenerationViewController.h"
 #import "OTPToken+Generation.h"
+#import "ClipboardManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -1337,8 +1338,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return;
     }
     
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = value;
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
 
 #ifndef IS_APP_EXTENSION
     [ISMessages showCardAlertWithTitle:message

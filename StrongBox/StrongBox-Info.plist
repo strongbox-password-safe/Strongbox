@@ -130,7 +130,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Can Strongbox use the camera to take photos and scan QR codes?</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Strongbox can use Face ID to open your databases and lock the application. Would you like to allow Strongbox to do this?</string>
+	<string>Strongbox can use Face ID to open your databases and unlock the application. Would you like to allow Strongbox to do this?</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Required to Save Attachments</string>
 	<key>NSPhotoLibraryUsageDescription</key>

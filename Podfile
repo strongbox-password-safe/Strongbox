@@ -37,7 +37,8 @@ abstract_target 'common-ios' do
     pod 'KissXML'
     pod 'Base32'
     pod 'GoogleSignIn', '4.4.0'
-    
+#    pod 'SWTableViewCell'
+
     target 'Strongbox-iOS' do
 	use_frameworks!
       

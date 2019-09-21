@@ -1,0 +1,117 @@
+
+/* Class = "UIButton"; normalTitle = "Print Emergency Password Sheet"; ObjectID = "4av-wA-ATn"; */
+"4av-wA-ATn.normalTitle" = "Notfall-Passwort-Blatt drucken";
+
+/* Class = "UILabel"; text = "Your Database is now ready to go"; ObjectID = "5KW-aF-8Kx"; */
+"5KW-aF-8Kx.text" = "Ihre Datenbank ist jetzt fertig";
+
+/* Class = "UILabel"; text = "Database Name"; ObjectID = "5Sc-Ok-s6h"; */
+"5Sc-Ok-s6h.text" = "Datenbank-Name";
+
+/* Class = "UIButton"; normalTitle = "Create"; ObjectID = "CeT-uY-c3o"; */
+"CeT-uY-c3o.normalTitle" = "Erstellen";
+
+/* Class = "UIButton"; normalTitle = "Add Existing Database"; ObjectID = "Cff-Dr-iGY"; */
+"Cff-Dr-iGY.normalTitle" = "Existierende Datenbank";
+
+/* Class = "UIViewController"; title = "Set Master Password"; ObjectID = "CjD-Y4-RJY"; */
+"CjD-Y4-RJY.title" = "Master-Passwort festlegen";
+
+/* Class = "UINavigationItem"; title = "Master Password"; ObjectID = "d1O-oj-C5A"; */
+"d1O-oj-C5A.title" = "Master-Passwort";
+
+/* Class = "UINavigationItem"; title = "Create Database"; ObjectID = "d33-lQ-wrZ"; */
+"d33-lQ-wrZ.title" = "Datenbank erstellen";
+
+/* Class = "UILabel"; text = "iCloud is available on this device, would you like to enable it for Strongbox?"; ObjectID = "dBe-kT-Zyp"; */
+"dBe-kT-Zyp.text" = "iCloud ist auf diesem Gerät verfügbar. Möchten Sie es für Strongbox aktivieren?";
+
+/* Class = "UIButton"; normalTitle = "Do Not Use iCloud"; ObjectID = "dbL-uP-DgX"; */
+"dbL-uP-DgX.normalTitle" = "iCloud nicht verwenden";
+
+/* Class = "UIButton"; normalTitle = "Next"; ObjectID = "Emm-l7-8le"; */
+"Emm-l7-8le.normalTitle" = "Weiter";
+
+/* Class = "UIViewController"; title = "Use iCloud?"; ObjectID = "eS1-EV-xF2"; */
+"eS1-EV-xF2.title" = "iCloud verwenden?";
+
+/* Class = "UILabel"; text = "Master Password"; ObjectID = "HFu-c5-YPy"; */
+"HFu-c5-YPy.text" = "Master-Passwort";
+
+/* Class = "UILabel"; text = "Great! Now we need a strong master password to protect all your secrets.   You must always remember this, it is the only way to unlock your database.\n\nYou will have the chance to print this password out on the next screen for emergencies."; ObjectID = "Ibj-Uq-3zn"; */
+"Ibj-Uq-3zn.text" = "Toll! Jetzt brauchen wir ein starkes Master-Passwort, um alle Ihre Geheimnisse zu schützen.   Sie müssen sich immer daran erinnern, es ist die einzige Möglichkeit, um Ihre Datenbank freizuschalten.\n\nSie werden die Chance erhalten, um dieses Passwort auf der nächsten Seite für Notfälle auszudrucken.";
+
+/* Class = "UIButton"; normalTitle = "Open Database Now"; ObjectID = "Ich-NG-HwE"; */
+"Ich-NG-HwE.normalTitle" = "Datenbank jetzt öffnen";
+
+/* Class = "UITextField"; placeholder = "Database Name (Required)"; ObjectID = "icq-UO-xAd"; */
+"icq-UO-xAd.placeholder" = "Datenbankname (Erforderlich)";
+
+/* Class = "UILabel"; text = "You can use iCloud to make your databases available across all your devices seamlessly."; ObjectID = "IR2-ja-Yf3"; */
+"IR2-ja-Yf3.text" = "Sie können iCloud verwenden, um Ihre Datenbaken auf allen Geräten reibungslose verfügbar zu machen.";
+
+/* Class = "UIBarButtonItem"; title = "Create"; ObjectID = "jCg-Ev-nsF"; */
+"jCg-Ev-nsF.title" = "Erstellen";
+
+/* Class = "UIViewController"; title = "Create Database"; ObjectID = "JIT-YM-MTv"; */
+"JIT-YM-MTv.title" = "Datenbank erstellen";
+
+/* Class = "UILabel"; text = "Use iCloud?"; ObjectID = "jZz-Dg-Hqg"; */
+"jZz-Dg-Hqg.text" = "iCloud verwenden?";
+
+/* Class = "UILabel"; text = "or"; ObjectID = "lad-AY-Nvo"; */
+"lad-AY-Nvo.text" = "oder";
+
+/* Class = "UILabel"; text = "Welcome"; ObjectID = "maz-SI-Mfw"; */
+"maz-SI-Mfw.text" = "Willkommen";
+
+/* Class = "UILabel"; text = "Note: Your new database was created and stored locally on this device because iCloud was not enabled.   You may want to enable iCloud in Preferences to migrate this database to the cloud to avoid data loss and have this database available on your other devices"; ObjectID = "Myl-Pj-5zc"; */
+"Myl-Pj-5zc.text" = "Hinweis: Ihre neue Datenbank wurde erstellt und lokal auf diesem Gerät gespeichert, weil iCloud nicht aktiviert ist.   Sie möchten eventuell iCloud in den Präferenzen aktiviert, um diese Datenbank in die Cloud zu migrieren, um Datenverluste zu vermeiden und um diese Datenbank auf anderen Geräten nutzen zu können.";
+
+/* Class = "UIViewController"; title = "Welcome"; ObjectID = "n1n-7g-yga"; */
+"n1n-7g-yga.title" = "Willkommen";
+
+/* Class = "UITextField"; placeholder = "Password (Required)"; ObjectID = "nhg-yK-eKQ"; */
+"nhg-yK-eKQ.placeholder" = "Passwort (Erforderlich)";
+
+/* Class = "UIButton"; normalTitle = "Dismiss"; ObjectID = "NM1-ie-t5q"; */
+"NM1-ie-t5q.normalTitle" = "Verwerfen";
+
+/* Class = "UIButton"; normalTitle = "Create New Database"; ObjectID = "nuz-n2-EMf"; */
+"nuz-n2-EMf.normalTitle" = "Neue Datenbank erstellen";
+
+/* Class = "UILabel"; text = "Strongbox stores all your secrets and passwords inside an encrypted database"; ObjectID = "NwP-5P-0Bq"; */
+"NwP-5P-0Bq.text" = "Strongbox speichert alle Ihre Geheimnisse und Passwörter in verschlüsselten Datenbanken";
+
+/* Class = "UILabel"; text = "You're All Set!"; ObjectID = "ocd-gC-bRp"; */
+"ocd-gC-bRp.text" = "Sie sind fertig!";
+
+/* Class = "UILabel"; text = "Let's get you started with your first database"; ObjectID = "oK0-Zj-23i"; */
+"oK0-Zj-23i.text" = "Lassen Sie uns mit Ihrer ersten Datenbank beginnen";
+
+/* Class = "UIBarButtonItem"; title = "Open"; ObjectID = "p3d-sF-2RM"; */
+"p3d-sF-2RM.title" = "Öffnen";
+
+/* Class = "UILabel"; text = "or"; ObjectID = "puR-8j-GRT"; */
+"puR-8j-GRT.text" = "oder";
+
+/* Class = "UIButton"; normalTitle = "Dismiss"; ObjectID = "qLz-La-osG"; */
+"qLz-La-osG.normalTitle" = "Verwerfen";
+
+/* Class = "UIButton"; normalTitle = "View All Databases"; ObjectID = "Rc5-qF-ste"; */
+"Rc5-qF-ste.normalTitle" = "Alle Datenbanken ansehen";
+
+/* Class = "UIButton"; normalTitle = "Dismiss"; ObjectID = "RUg-zZ-USW"; */
+"RUg-zZ-USW.normalTitle" = "Verwerfen";
+
+/* Class = "UIBarButtonItem"; title = "Next"; ObjectID = "UBl-Ap-chh"; */
+"UBl-Ap-chh.title" = "Weiter";
+
+/* Class = "UIButton"; normalTitle = "Dismiss"; ObjectID = "wBK-OF-IEY"; */
+"wBK-OF-IEY.normalTitle" = "Verwerfen";
+
+/* Class = "UIButton"; normalTitle = "Use iCloud"; ObjectID = "WTP-2R-oTB"; */
+"WTP-2R-oTB.normalTitle" = "iCloud verwenden";
+
+/* Class = "UILabel"; text = "OK, let's create your new database. First, let's give it a name. Something simple and friendly will do."; ObjectID = "YKw-3t-93B"; */
+"YKw-3t-93B.text" = "OK, lassen Sie uns eine neue Datenbank erstellen. Suchen Sie als Erstes einen Namen aus. Etwas Einfaches und Freundliches reicht aus.";

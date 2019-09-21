@@ -1,0 +1,6 @@
+
+/* Class = "UILabel"; text = "Scan QR Code"; ObjectID = "Nj9-TG-Nhb"; */
+"Nj9-TG-Nhb.text" = "QR-Code scannen";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "TAN-U9-inD"; */
+"TAN-U9-inD.normalTitle" = "Abbrechen";

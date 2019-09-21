@@ -204,7 +204,7 @@
 
     if (!field) {
         field = [[Field alloc] initWithData:data type:type];
-        _fields[[NSNumber numberWithInt:type]] = field;
+        _fields[[NSNumber numberWithUnsignedInteger:type]] = field;
     }
     else {
         [field setDataWithData:data];

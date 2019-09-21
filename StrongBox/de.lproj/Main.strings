@@ -1,0 +1,90 @@
+
+/* Class = "UIBarButtonItem"; title = "Preferences"; ObjectID = "1nK-Pq-30i"; */
+"1nK-Pq-30i.title" = "Einstellungen";
+
+/* Class = "UITextView"; text = "Strongbox is an application for keeping all your passwords safely stored and protected by one master password. Supporting the open source Password Safe and KeePass formats. Strongbox is a Freemium application offering enhanced Premium options as well as a super functional basic feature set.\n\nFace ID & Touch ID capability or PIN Codes, for the ultimate in convenience and speed. \n\nCloud Support, so you can access your cloud safes using iCloud, Dropbox, OneDrive, Google Drive, WebDAV or SFTP even when offline. Use the built in Files app for many other storage options,  or store them securely only on your local device. You choose your storage.\n\nSecure, protected by time tested industrial strength cryptography.\n\nSearch your entire set of passwords and secrets instantly and powerfully, with deep search. Autocomplete new entries, and auto generate secure passwords. \n\nTimed Auto Clear Clipboard, Entry History, Field References, Place Holders, KeePass Custom & FavIcon Icon support & Two Factor Authentication codes (TOTP)\n\nStandards compliant, using the time tested Password Safe and KeePass formats so you can import any existing password safe you have.\n\nImport/Export by Files app, Email, CSV, iTunes File Sharing or use cloud storage.\n---------------------------------------------------------------------\n• Strongbox Password Safe provides In-App Purchases (both auto renewable subscriptions and one-off non consumable) for Pro versions of the App\n• Subscriptions are auto renewable with recurring billing. Cancel anytime.\n• The time period of the subscriptions are monthly, 3-monthly or yearly at users discretion\n• The user can also choose to purchase a 'Lifetime' one-off Pro version of the App\n• Payment will be charged to iTunes Account at confirmation of purchase\n• Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period\n• Account will be charged for renewal within 24-hours prior to the end of the current period, and identify the cost of the renewal\n• Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase\n• Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription to that publication, where applicable\n• Strongbox Privacy Policy may be found here: https://strongboxsafe.com/privacy-policy/\n• Strongbox Terms of Use may be found here: https://strongboxsafe.com/terms/"; ObjectID = "6tI-B2-q0P"; */
+"6tI-B2-q0P.text" = "Strongbox ist eine Anwendung, die alle Ihre Passwörter mit einem Master-Passwort sicher speichert und schützt. Das Strongbox unterstützt die Open-Source-Formate Password Safe und KeePass. Es handelt sich um eine Freemium-Anwendung, die verbesserte Premium-Optionen sowie ein super-funktionales einfaches Funktionenset anbietet.\n\nFace-ID- und Touch-ID-Fähigkeit oder PIN-Codes für das Nonplusultra bei  Komfort und Geschwindigkeit. \n\nCloud-Support, damit Sie auf Ihre Cloud-Speicherdateien mit iCloud, Dropbox, OneDrive, Google Drive, WebDAV oder SFTP zugreifen können, selbst wenn Sie offline sind. Nutzen Sie die eingebaute Dateien-App für viele andere Speicheroptionen  oder speichern Sie diese sicher nur auf Ihrem lokalen Gerät. Sie wählen Ihren Speicher aus.\n\nSicher, von lange erprobter branchenüblicher Kryptografie geschützt.\n\nDurchsuchen Sie Ihren gesamten Satz an Passwörtern und Geheimnissen, sofort und leistungsstark mit einer tiefgehenden Suche. Vervollständigen Sie automatisch neue Einträge und generieren Sie automatisch sichere Passwörter. \n\nZeitlich festgelegtes automatisches Löschen der Zwischenablagen, des Eintragsverlaufs, der Feldreferenzen, Platzhalter, KeePass Custom und FavIcon-Symbol-Support sowie Zwei-Faktor-Authentifizierungscodes (TOTP)\n\nNormengerecht werden die lange erprobten Formate Password Safe und KeePass verwendet, damit Sie alle existierenden Password-Safes importieren können. die Sie haben.\n\nImportieren/Exportieren per Dateien-App, E-Mail, CSV, iTunes-Datei-Sharing oder mit Cloud-Speicher.\n---------------------------------------------------------------------\n• Der Passwort-Safe von Strongbox stellt In-App-Käufe zur Verfügung (sowohl sich automatisch erneuernde Abonnements sowie einmalige Käufe) für die Pro-Versionen der App\n• Abonnements werden mit wiederkehrender Abrechnung automatisch erneuert. Kann jederzeit gekündigt werden.\n• Die Zeiträume für Abonnements sind 1 Monat, 3 Monate oder 1 Jahr, nach Ermessen des Benutzers\n• Der Benutzer kann außerdem auswählen, eine 'lebenslange' einmalige Pro-Version der App zu kaufen\n• Zahlungen werden Ihrem iTunes-Konto bei Bestätigung des Kaufs belastet\n• Abonnements werden automatisch erneuert, außer dies wird mindestens 24 Stunden vor Ende des aktuellen Zeitraums ausgeschaltet\n• Das Konto wird für die Erneuerung innerhalb von 24 Stunden vor Ende des aktuellen Zeitraums belastet und identifiziert die Kosten der Erneuerung\n• Abonnements können von dem Benutzer verwaltet werden und die automatische Erneuerung kann in den Kontoeinstellungen des Benutzers nach dem Kauf ausgeschaltet werden\n• Nicht genutzte Teile eines kostenloses Testzeitraums, falls dies angeboten wurde, verfallen, wenn der Benutzer ein Abonnement für diese Publikation kauft\n• Die Strongbox-Datenschutzrichtlinie finden Sie hier: https://strongboxsafe.com/privacy-policy/\n• Die Strongbox-Nutzungsbedingungen finden Sie hier: https://strongboxsafe.com/terms/";
+
+/* Class = "UINavigationItem"; prompt = "Please select the correct version to use for this Database"; ObjectID = "byK-cW-Vhn"; */
+"byK-cW-Vhn.prompt" = "Bitte wählen Sie die richtige Version aus, die für diese Datenbank verwendet wird ";
+
+/* Class = "UINavigationItem"; title = "Version Conflicts"; ObjectID = "byK-cW-Vhn"; */
+"byK-cW-Vhn.title" = "Versionskonflikte";
+
+/* Class = "UIBarButtonItem"; title = "Back"; ObjectID = "DbD-WB-KbL"; */
+"DbD-WB-KbL.title" = "Zurück";
+
+/* Class = "UILabel"; text = "Flags (Read-Only, Quick Launch...)"; ObjectID = "DQn-qm-ozr"; */
+"DQn-qm-ozr.text" = "Flaggen (Schreibgeschützt, Schnellstart...)";
+
+/* Class = "UIBarButtonItem"; title = "View Preferences"; ObjectID = "dSc-vA-VSJ"; */
+"dSc-vA-VSJ.title" = "Anzeigeeinstellungen";
+
+/* Class = "UINavigationItem"; title = "Databases"; ObjectID = "g1g-nh-a5L"; */
+"g1g-nh-a5L.title" = "Datenbanken";
+
+/* Class = "UIViewController"; title = "App Store Description Dummy"; ObjectID = "glp-Ie-yhx"; */
+"glp-Ie-yhx.title" = "Beschreibungsplatzhalter für App Store";
+
+/* Class = "UILabel"; text = "Filename"; ObjectID = "J1f-Hw-xlG"; */
+"J1f-Hw-xlG.text" = "Dateiname";
+
+/* Class = "UITableViewController"; title = "Conflicting Versions"; ObjectID = "J3T-cl-XIs"; */
+"J3T-cl-XIs.title" = "Kollidierende Versionen";
+
+/* Class = "UILabel"; text = "Pro Tier Trial Note"; ObjectID = "Jcl-ka-nP2"; */
+"Jcl-ka-nP2.text" = "Pro-Stufe Testhinweis";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "L81-CV-oTk"; */
+"L81-CV-oTk.text" = "Untertitel";
+
+/* Class = "UILabel"; text = "Thank you for trying out Strongbox"; ObjectID = "lB8-77-60X"; */
+"lB8-77-60X.text" = "Danke, dass Sie Strongbox ausprobieren";
+
+/* Class = "UILabel"; text = "Storage Icon"; ObjectID = "LWG-mi-sle"; */
+"LWG-mi-sle.text" = "Speichersymbol";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "N33-Id-p5j"; */
+"N33-Id-p5j.text" = "Titel";
+
+/* Class = "UILabel"; text = "Thank You"; ObjectID = "NCd-Wh-dQk"; */
+"NCd-Wh-dQk.text" = "Danke";
+
+/* Class = "UILabel"; text = "You are currently using Strongbox on the Pro tier with all the bells and whistles. You can evaluate this Pro tier for free over the next three months.\n\nAfter this I'd love if you chose to contribute to its development. If you choose not to support the app you will be transitioned to the free tier of Strongbox which is pretty great too!   Don't worry, you'll never lose any of your databases, secrets or passwords. Most of the features will still be available, however you might see an annoying upgrade message every now and then...\n\nYou can find out more about the differences between Free and Pro tiers by tapping the Upgrade bar at anytime. \n\nI really hope you enjoy the app, find it useful, and choose to support it!\n\nCheers,\n-Mark (Strongbox Developer)"; ObjectID = "NFt-Mf-4lm"; */
+"NFt-Mf-4lm.text" = "Sie nutzen im Moment Strongbox mit der Pro-Stufe mit allem Schnickschnack. Sie können diese Pro-Stufe in den nächsten drei Monaten kostenlos evaluieren.\n\nDanach wäre es toll, falls Sie sich dazu entscheiden worden, zur Entwicklung der App beizutragen. Falls Sie sich dazu entscheiden, die App nicht zu unterstützten, werden Sie die kostenlose Stufe von Strongbox nutzen, die auch ziemlich toll ist!   Keine Sorge, Sie werden niemals eine Ihrer Datenbanken, Geheimnisse oder Passwörter verlieren. Die meisten Funktionen sind immer noch verfügbar, Sie werden jedoch ab und zu eine dieser nervigen Upgrade-Nachrichten sehen..\n\nSie können mehr über die Unterschiede der kostenlosen und Premium-Stufen herausfinden, indem Sie auf die Upgrade-Leiste tippen. \n\nIch hoffe wirklich, dass Sie die App genießen, nützlich finden und sich dazu entscheiden, sie zu unterstützen!\n\nDanke!\n-Mark (Entwickler von Strongbox)";
+
+/* Class = "UILabel"; text = "Last Cached Date"; ObjectID = "O5J-1b-Zbl"; */
+"O5J-1b-Zbl.text" = "Letztes gespeichertes Datum";
+
+/* Class = "UILabel"; text = "Separator"; ObjectID = "pUm-hy-yKh"; */
+"pUm-hy-yKh.text" = "Trennzeichen";
+
+/* Class = "UITabBarItem"; title = "Databases"; ObjectID = "qEb-5H-93x"; */
+"qEb-5H-93x.title" = "Datenbanken";
+
+/* Class = "UIButton"; normalTitle = "Got It!"; ObjectID = "Qeh-Q2-E7Z"; */
+"Qeh-Q2-E7Z.normalTitle" = "Verstanden!";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "QgX-Yi-gxf"; */
+"QgX-Yi-gxf.headerTitle" = "Allgemein";
+
+/* Class = "UILabel"; text = "Subtitle 1"; ObjectID = "qTF-1a-gbp"; */
+"qTF-1a-gbp.text" = "Untertitel 1";
+
+/* Class = "UINavigationItem"; title = "View Preferences"; ObjectID = "raT-Zl-aJk"; */
+"raT-Zl-aJk.title" = "Anzeigeeinstellungen";
+
+/* Class = "UIBarButtonItem"; title = "Upgrade Info..."; ObjectID = "tmo-77-bgs"; */
+"tmo-77-bgs.title" = "Upgrade-Info ...";
+
+/* Class = "UILabel"; text = "Subtitle 2"; ObjectID = "tV1-x8-Tcd"; */
+"tV1-x8-Tcd.text" = "Untertitel 2";
+
+/* Class = "UILabel"; text = "Top Right Field"; ObjectID = "twk-09-o4B"; */
+"twk-09-o4B.text" = "Oberes rechtes Feld";
+
+/* Class = "UILabel"; text = "Storage"; ObjectID = "Yfh-Hh-J6T"; */
+"Yfh-Hh-J6T.text" = "Speicher";
+
+/* Class = "UIButton"; normalTitle = "Got it!"; ObjectID = "zdO-Eb-bpA"; */
+"zdO-Eb-bpA.normalTitle" = "Verstanden";

@@ -13,6 +13,7 @@
 #import "CHCSVParser.h"
 #import "Csv.h"
 #import "ISMessages.h"
+#import "ClipboardManager.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -76,9 +77,8 @@
 - (void)copyCsv {
     NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database.rootGroup] encoding:NSUTF8StringEncoding];
 
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = newStr;
-
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:newStr];
+    
     [ISMessages showCardAlertWithTitle:NSLocalizedString(@"export_vc_message_csv_copied", @"Database CSV Copied to Clipboard")
                                message:nil
                               duration:3.f

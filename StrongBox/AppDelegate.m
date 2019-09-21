@@ -23,14 +23,11 @@
 #import "ProUpgradeIAPManager.h"
 #import "FileManager.h"
 #import "LocalDeviceStorageProvider.h"
+#import "ClipboardManager.h"
 
 @interface AppDelegate ()
 
 @property NSDate* appLaunchTime;
-
-@property dispatch_block_t clearClipboardTask;
-@property UIBackgroundTaskIdentifier clearClipboardAppBackgroundTask;
-@property NSObject* clipboardNotificationIdentifier;
 
 @end
 
@@ -49,13 +46,13 @@
     
     [self cleanupInbox:launchOptions];
     
-    [self observeClipboardChangeNotifications];
+    [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
     
     [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
-    
-    // NSLog(@"Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
+        
+    // NSLog(@"XXXXX - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
     // NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
@@ -224,94 +221,6 @@
 
 - (void)initializeDropbox {
     [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
-}
-
-- (void)onClipboardChangedNotification:(NSNotification*)note {
-    NSLog(@"onClipboardChangedNotification: [%@]", note);
-    
-    if(![UIPasteboard.generalPasteboard hasStrings] &&
-       ![UIPasteboard.generalPasteboard hasImages] &&
-       ![UIPasteboard.generalPasteboard hasURLs]) {
-        return;
-    }
-
-    UIApplication* app = [UIApplication sharedApplication];
-    if(self.clearClipboardTask) {
-        NSLog(@"Clearing existing clear clipboard tasks");
-        dispatch_block_cancel(self.clearClipboardTask);
-        self.clearClipboardTask = nil;
-        if(self.clearClipboardAppBackgroundTask != UIBackgroundTaskInvalid) {
-            [app endBackgroundTask:self.clearClipboardAppBackgroundTask];
-            self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
-        }
-    }
-
-    self.clearClipboardAppBackgroundTask = [app beginBackgroundTaskWithExpirationHandler:^{
-        [app endBackgroundTask:self.clearClipboardAppBackgroundTask];
-        self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
-    }];
-    
-    NSLog(@"Creating New Clear Clipboard Background Task... with timeout = [%ld]", (long)Settings.sharedInstance.clearClipboardAfterSeconds);
-
-    NSInteger clipboardChangeCount = UIPasteboard.generalPasteboard.changeCount;
-    self.clearClipboardTask = dispatch_block_create(0, ^{
-        [self clearClipboardDelayedTask:clipboardChangeCount];
-    });
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
-                                 (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
-                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), self.clearClipboardTask);
-}
-
-- (void)clearClipboardDelayedTask:(NSInteger)clipboardChangeCount {
-    if(!Settings.sharedInstance.clearClipboardEnabled) {
-        [self unobserveClipboardChangeNotifications];
-        return; // In case a setting change has be made
-    }
-    
-    if(clipboardChangeCount == UIPasteboard.generalPasteboard.changeCount) {
-        NSLog(@"Clearing Clipboard...");
-        
-        [self unobserveClipboardChangeNotifications];
-        
-        [UIPasteboard.generalPasteboard setStrings:@[]];
-        [UIPasteboard.generalPasteboard setImages:@[]];
-        [UIPasteboard.generalPasteboard setURLs:@[]];
-        
-        [self observeClipboardChangeNotifications];
-    }
-    else {
-        NSLog(@"Not clearing clipboard as change count does not match.");
-    }
-    
-    UIApplication* app = [UIApplication sharedApplication];
-    [app endBackgroundTask:self.clearClipboardAppBackgroundTask];
-    self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
-    self.clearClipboardTask = nil;
-}
-
-- (void)observeClipboardChangeNotifications {
-    if(Settings.sharedInstance.clearClipboardEnabled) {
-        if(!self.clipboardNotificationIdentifier) {
-            // Delay by a small bit because we're definitely getting an odd crash or two somehow due to infinite loop now
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                self.clipboardNotificationIdentifier =
-                [NSNotificationCenter.defaultCenter addObserverForName:UIPasteboardChangedNotification
-                                                                object:nil
-                                                                 queue:nil
-                                                            usingBlock:^(NSNotification * _Nonnull note) {
-                                                                [self onClipboardChangedNotification:note];
-                                                            }];
-            });
-        }
-    }
-}
-
-- (void)unobserveClipboardChangeNotifications {
-    if(self.clipboardNotificationIdentifier) {
-        [NSNotificationCenter.defaultCenter removeObserver:self.clipboardNotificationIdentifier];
-        self.clipboardNotificationIdentifier = nil;
-    }
 }
 
 @end

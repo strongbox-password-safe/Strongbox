@@ -8,7 +8,7 @@ https://apps.apple.com/app/strongbox-password-safe/id897283731
 Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes.
 
 # Help & Support
-If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter/com/StrongboxSafe "@StrongboxSafe") or email [support@strongboxsafe.com](mailto:support@strongboxsafe.com).
+If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") or email [support@strongboxsafe.com](mailto:support@strongboxsafe.com).
 
 # Supporting Development through Patreon
 If you like the app and are feeling generous you can help by contributing financially on Patreon here:

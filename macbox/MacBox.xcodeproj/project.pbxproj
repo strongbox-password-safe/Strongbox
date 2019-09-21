@@ -34,6 +34,11 @@
 		4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF3216136D10054C8D0 /* formatV4.txt */; };
 		4D29663821AD7318009B7936 /* MB1Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29663721AD7318009B7936 /* MB1Tests.m */; };
 		4D29664121ADAC0B009B7936 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
+		4D2CB4952332D7C400C2E084 /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */; };
+		4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4972332D80A00C2E084 /* GZipInputStream.m */; };
+		4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
+		4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
+		4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
 		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D44680C216CE08B00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
 		4D4A003A2312CC5400B69E09 /* SerializationPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4A00392312CC5400B69E09 /* SerializationPackage.m */; };
@@ -120,16 +125,12 @@
 		4D9E098921825108007BA1E7 /* String.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096221825104007BA1E7 /* String.m */; };
 		4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096521825104007BA1E7 /* AesCipher.m */; };
 		4D9E098D21825108007BA1E7 /* DecryptionParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096B21825105007BA1E7 /* DecryptionParameters.m */; };
-		4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */; };
 		4D9E098F21825108007BA1E7 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
-		4D9E099021825108007BA1E7 /* GenericTextStringElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */; };
 		4D9E099121825108007BA1E7 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
-		4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */; };
 		4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
 		4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
 		4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
 		4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097C21825107007BA1E7 /* Kdbx4Database.m */; };
-		4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */; };
 		4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097E21825107007BA1E7 /* XMLWriter.m */; };
 		4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099B21825134007BA1E7 /* KdbxSerialization.m */; };
 		4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
@@ -163,10 +164,8 @@
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
 		4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
 		4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
-		4DDA015D2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */; };
 		4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
 		4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */; };
-		4DE0CB6E2232C0D400E109F9 /* GenericTextIntegerElementHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */; };
 		4DE0CB712232C0F200E109F9 /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB702232C0F200E109F9 /* History.m */; };
 		4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */; };
 		4DEA5897224BFA7300013808 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5895224BFA7200013808 /* StringValue.m */; };
@@ -257,6 +256,15 @@
 		4D29663921AD7318009B7936 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D29663F21ADAC0B009B7936 /* CustomField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomField.h; path = ../StrongBox/CustomField.h; sourceTree = "<group>"; };
 		4D29664021ADAC0B009B7936 /* CustomField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomField.m; path = ../StrongBox/CustomField.m; sourceTree = "<group>"; };
+		4D2CB4932332D7C400C2E084 /* SimpleXmlValueExtractor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleXmlValueExtractor.h; path = ../model/SimpleXmlValueExtractor.h; sourceTree = "<group>"; };
+		4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleXmlValueExtractor.m; path = ../model/SimpleXmlValueExtractor.m; sourceTree = "<group>"; };
+		4D2CB4962332D80900C2E084 /* GZipInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GZipInputStream.h; path = ../model/GZipInputStream.h; sourceTree = "<group>"; };
+		4D2CB4972332D80A00C2E084 /* GZipInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GZipInputStream.m; path = ../model/GZipInputStream.m; sourceTree = "<group>"; };
+		4D2CB4992332D82D00C2E084 /* KeePassXmlParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassXmlParser.h; path = ../model/KeePassXmlParser.h; sourceTree = "<group>"; };
+		4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlParser.m; path = ../model/KeePassXmlParser.m; sourceTree = "<group>"; };
+		4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = ../../../../../usr/lib/libxml2.2.dylib; sourceTree = "<group>"; };
+		4D2CB4A22332D92900C2E084 /* XmlSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlSerializer.h; path = ../model/keepass/XmlSerializer.h; sourceTree = "<group>"; };
+		4D2CB4A32332D92900C2E084 /* XmlSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlSerializer.m; path = ../model/keepass/XmlSerializer.m; sourceTree = "<group>"; };
 		4D446804216CDA4400F6358D /* NSArray+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "../model/NSArray+Extensions.h"; sourceTree = "<group>"; };
 		4D446805216CDA4500F6358D /* NSArray+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "../model/NSArray+Extensions.m"; sourceTree = "<group>"; };
 		4D44680A216CE08A00F6358D /* Csv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = ../model/Csv.h; sourceTree = "<group>"; };
@@ -410,12 +418,10 @@
 		4D9E094B21825103007BA1E7 /* RootXmlDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootXmlDomainObject.h; path = ../model/keepass/RootXmlDomainObject.h; sourceTree = "<group>"; };
 		4D9E094C21825103007BA1E7 /* SerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializationData.h; path = ../model/keepass/SerializationData.h; sourceTree = "<group>"; };
 		4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlStrongBoxModelAdaptor.h; path = ../model/keepass/XmlStrongBoxModelAdaptor.h; sourceTree = "<group>"; };
-		4D9E094E21825103007BA1E7 /* GenericTextDateElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextDateElementHandler.h; path = ../model/keepass/GenericTextDateElementHandler.h; sourceTree = "<group>"; };
 		4D9E094F21825103007BA1E7 /* Root.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Root.h; path = ../model/keepass/Root.h; sourceTree = "<group>"; };
 		4D9E095021825103007BA1E7 /* DecryptionParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DecryptionParameters.h; path = ../model/keepass/DecryptionParameters.h; sourceTree = "<group>"; };
 		4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongboxNodeModelAdaptor.m; path = ../model/keepass/XmlStrongboxNodeModelAdaptor.m; sourceTree = "<group>"; };
 		4D9E095221825103007BA1E7 /* Entry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Entry.m; path = ../model/keepass/Entry.m; sourceTree = "<group>"; };
-		4D9E095321825103007BA1E7 /* GenericTextUuidElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextUuidElementHandler.h; path = ../model/keepass/GenericTextUuidElementHandler.h; sourceTree = "<group>"; };
 		4D9E095421825103007BA1E7 /* Times.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Times.h; path = ../model/keepass/Times.h; sourceTree = "<group>"; };
 		4D9E095621825103007BA1E7 /* Times.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Times.m; path = ../model/keepass/Times.m; sourceTree = "<group>"; };
 		4D9E095821825103007BA1E7 /* KeePassConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassConstants.h; path = ../model/keepass/KeePassConstants.h; sourceTree = "<group>"; };
@@ -432,22 +438,16 @@
 		4D9E096821825105007BA1E7 /* XmlStrongboxNodeModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlStrongboxNodeModelAdaptor.h; path = ../model/keepass/XmlStrongboxNodeModelAdaptor.h; sourceTree = "<group>"; };
 		4D9E096921825105007BA1E7 /* Kdbx4Database.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kdbx4Database.h; path = ../model/keepass/Kdbx4Database.h; sourceTree = "<group>"; };
 		4D9E096B21825105007BA1E7 /* DecryptionParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DecryptionParameters.m; path = ../model/keepass/DecryptionParameters.m; sourceTree = "<group>"; };
-		4D9E096C21825105007BA1E7 /* XmlTreeSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlTreeSerializer.h; path = ../model/keepass/XmlTreeSerializer.h; sourceTree = "<group>"; };
-		4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlTreeSerializer.m; path = ../model/keepass/XmlTreeSerializer.m; sourceTree = "<group>"; };
 		4D9E096E21825105007BA1E7 /* Root.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Root.m; path = ../model/keepass/Root.m; sourceTree = "<group>"; };
 		4D9E096F21825105007BA1E7 /* XmlParsingDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlParsingDomainObject.h; path = ../model/keepass/XmlParsingDomainObject.h; sourceTree = "<group>"; };
-		4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextStringElementHandler.m; path = ../model/keepass/GenericTextStringElementHandler.m; sourceTree = "<group>"; };
 		4D9E097121825106007BA1E7 /* Meta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Meta.m; path = ../model/keepass/Meta.m; sourceTree = "<group>"; };
 		4D9E097321825106007BA1E7 /* KeePassFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassFile.h; path = ../model/keepass/KeePassFile.h; sourceTree = "<group>"; };
 		4D9E097421825106007BA1E7 /* Entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entry.h; path = ../model/keepass/Entry.h; sourceTree = "<group>"; };
 		4D9E097521825106007BA1E7 /* KeePassDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseMetadata.h; path = ../model/keepass/KeePassDatabaseMetadata.h; sourceTree = "<group>"; };
-		4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextUuidElementHandler.m; path = ../model/keepass/GenericTextUuidElementHandler.m; sourceTree = "<group>"; };
-		4D9E097821825107007BA1E7 /* GenericTextStringElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextStringElementHandler.h; path = ../model/keepass/GenericTextStringElementHandler.h; sourceTree = "<group>"; };
 		4D9E097921825107007BA1E7 /* KeePassGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassGroup.m; path = ../model/keepass/KeePassGroup.m; sourceTree = "<group>"; };
 		4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongBoxModelAdaptor.m; path = ../model/keepass/XmlStrongBoxModelAdaptor.m; sourceTree = "<group>"; };
 		4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseMetadata.m; path = ../model/keepass/KeePassDatabaseMetadata.m; sourceTree = "<group>"; };
 		4D9E097C21825107007BA1E7 /* Kdbx4Database.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kdbx4Database.m; path = ../model/keepass/Kdbx4Database.m; sourceTree = "<group>"; };
-		4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextDateElementHandler.m; path = ../model/keepass/GenericTextDateElementHandler.m; sourceTree = "<group>"; };
 		4D9E097E21825107007BA1E7 /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLWriter.m; path = ../model/keepass/XMLWriter.m; sourceTree = "<group>"; };
 		4D9E097F21825107007BA1E7 /* InnerRandomStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InnerRandomStream.h; path = ../model/keepass/InnerRandomStream.h; sourceTree = "<group>"; };
 		4D9E099A21825134007BA1E7 /* KdbxSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbxSerialization.h; path = ../model/keepass/KdbxSerialization.h; sourceTree = "<group>"; };
@@ -514,13 +514,9 @@
 		4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSCheckboxTableCellView.m; path = MacBox/NSCheckboxTableCellView.m; sourceTree = "<group>"; };
 		4DDA01582242A1B300C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "../StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
 		4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "../StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
-		4DDA015B2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextBooleanElementHandler.h; path = ../model/keepass/GenericTextBooleanElementHandler.h; sourceTree = "<group>"; };
-		4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextBooleanElementHandler.m; path = ../model/keepass/GenericTextBooleanElementHandler.m; sourceTree = "<group>"; };
 		4DDCE1C821BBFF7800D1DE09 /* ProgressWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProgressWindow.h; path = MacBox/ProgressWindow.h; sourceTree = "<group>"; };
 		4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ProgressWindow.m; path = MacBox/ProgressWindow.m; sourceTree = "<group>"; };
 		4DDCE1CA21BBFF7800D1DE09 /* ProgressWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ProgressWindow.xib; path = MacBox/ProgressWindow.xib; sourceTree = "<group>"; };
-		4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTextIntegerElementHandler.m; path = ../model/keepass/GenericTextIntegerElementHandler.m; sourceTree = "<group>"; };
-		4DE0CB6D2232C0D400E109F9 /* GenericTextIntegerElementHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTextIntegerElementHandler.h; path = ../model/keepass/GenericTextIntegerElementHandler.h; sourceTree = "<group>"; };
 		4DE0CB6F2232C0F200E109F9 /* History.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = History.h; path = ../model/keepass/History.h; sourceTree = "<group>"; };
 		4DE0CB702232C0F200E109F9 /* History.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = History.m; path = ../model/keepass/History.m; sourceTree = "<group>"; };
 		4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CompositeKeyFactors.m; path = ../StrongBox/CompositeKeyFactors.m; sourceTree = "<group>"; };
@@ -601,6 +597,7 @@
 			files = (
 				4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */,
 				059A8E323BB4461DEF4E6FAB /* Pods_Strongbox.framework in Frameworks */,
+				4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,6 +625,7 @@
 		4D1D6F3A1F386CB700D2B8EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */,
 				4D29662D21AD72AA009B7936 /* SAMKeychain.framework */,
 				4DC46D0D219EE52A00D6C462 /* Quartz.framework */,
 				4DA203911F7662D000113A6B /* StoreKit.framework */,
@@ -804,8 +802,6 @@
 		4D524CF2219B481A00C22CB4 /* Xml */ = {
 			isa = PBXGroup;
 			children = (
-				4DDA015B2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.h */,
-				4DDA015C2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m */,
 				4D524CF7219B48D200C22CB4 /* XmlProcessingContext.h */,
 				4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */,
 				4D524CFA219B48D200C22CB4 /* CustomIcon.h */,
@@ -816,8 +812,6 @@
 				4D524CFD219B48D300C22CB4 /* CustomIcon.m */,
 				4D524CF8219B48D200C22CB4 /* CustomIconList.h */,
 				4D524CF4219B48D200C22CB4 /* CustomIconList.m */,
-				4D9E096C21825105007BA1E7 /* XmlTreeSerializer.h */,
-				4D9E096D21825105007BA1E7 /* XmlTreeSerializer.m */,
 				4D9E096721825105007BA1E7 /* XMLWriter.h */,
 				4D9E097E21825107007BA1E7 /* XMLWriter.m */,
 				4D9E096121825104007BA1E7 /* String.h */,
@@ -839,14 +833,6 @@
 				4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */,
 				4D9E097421825106007BA1E7 /* Entry.h */,
 				4D9E095221825103007BA1E7 /* Entry.m */,
-				4D9E094E21825103007BA1E7 /* GenericTextDateElementHandler.h */,
-				4DE0CB6D2232C0D400E109F9 /* GenericTextIntegerElementHandler.h */,
-				4DE0CB6C2232C0D300E109F9 /* GenericTextIntegerElementHandler.m */,
-				4D9E097D21825107007BA1E7 /* GenericTextDateElementHandler.m */,
-				4D9E097821825107007BA1E7 /* GenericTextStringElementHandler.h */,
-				4D9E097021825106007BA1E7 /* GenericTextStringElementHandler.m */,
-				4D9E095321825103007BA1E7 /* GenericTextUuidElementHandler.h */,
-				4D9E097621825106007BA1E7 /* GenericTextUuidElementHandler.m */,
 				4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */,
 				4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */,
 			);
@@ -1087,6 +1073,12 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
+				4D2CB4A32332D92900C2E084 /* XmlSerializer.m */,
+				4D2CB4992332D82D00C2E084 /* KeePassXmlParser.h */,
+				4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */,
+				4D2CB4962332D80900C2E084 /* GZipInputStream.h */,
+				4D2CB4972332D80A00C2E084 /* GZipInputStream.m */,
 				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
 				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
@@ -1096,6 +1088,8 @@
 				4D0835A5228472D200CA7405 /* UiAttachment.m */,
 				4DBFD385225CFE2F00290488 /* NSDictionary+Extensions.h */,
 				4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */,
+				4D2CB4932332D7C400C2E084 /* SimpleXmlValueExtractor.h */,
+				4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */,
 				4DBFD382225CFE2F00290488 /* SprCompilation.h */,
 				4DBFD383225CFE2F00290488 /* SprCompilation.m */,
 				4DC8D9BA21B6F391004F1812 /* KeyFileParser.h */,
@@ -1458,13 +1452,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D2CB4952332D7C400C2E084 /* SimpleXmlValueExtractor.m in Sources */,
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
 				4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */,
-				4D9E099821825108007BA1E7 /* GenericTextDateElementHandler.m in Sources */,
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
 				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
 				4D524CDA219B47DB00C22CB4 /* VariantDictionary.m in Sources */,
-				4DE0CB6E2232C0D400E109F9 /* GenericTextIntegerElementHandler.m in Sources */,
 				4D524CAB219B45F700C22CB4 /* DatabaseAttachment.m in Sources */,
 				4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
@@ -1508,6 +1501,7 @@
 				4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */,
 				4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */,
 				4D524D0A219B490100C22CB4 /* NodeFileAttachment.m in Sources */,
+				4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */,
 				4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */,
 				4D29664121ADAC0B009B7936 /* CustomField.m in Sources */,
 				4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */,
@@ -1520,7 +1514,6 @@
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
 				4D524CF1219B481200C22CB4 /* CryptoParameters.m in Sources */,
-				4D9E099321825108007BA1E7 /* GenericTextUuidElementHandler.m in Sources */,
 				4D524D05219B48D300C22CB4 /* CustomIcon.m in Sources */,
 				4D9903C82237BFDA002C10EE /* MacNodeIconHelper.m in Sources */,
 				4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */,
@@ -1568,9 +1561,9 @@
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
 				4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */,
 				4D524D01219B48D300C22CB4 /* CustomIconList.m in Sources */,
-				4D9E098E21825108007BA1E7 /* XmlTreeSerializer.m in Sources */,
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
+				4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */,
 				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4DBF494022232A3200F48182 /* DAVRequest.m in Sources */,
 				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
@@ -1595,17 +1588,16 @@
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
-				4D9E099021825108007BA1E7 /* GenericTextStringElementHandler.m in Sources */,
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
 				4D524CA4219B458B00C22CB4 /* SafesList.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
 				4D524CD4219B47DB00C22CB4 /* Kdbx4Serialization.m in Sources */,
 				4D9E098821825108007BA1E7 /* SerializationData.m in Sources */,
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
+				4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */,
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
 				4DBF493D22232A3200F48182 /* DAVRequestGroup.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
-				4DDA015D2242A1E200C7F0E2 /* GenericTextBooleanElementHandler.m in Sources */,
 				4D8DE9BD21F898470043DDC0 /* OTPTokenType.m in Sources */,
 				4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4D524CA5219B458B00C22CB4 /* BiometricIdHelper.m in Sources */,
@@ -1805,10 +1797,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2655;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1824,10 +1818,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2655;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

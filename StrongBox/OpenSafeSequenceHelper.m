@@ -512,6 +512,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)openSafe {
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [SVProgressHUD show];
+//    });
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
         
@@ -561,6 +565,8 @@
                      error:(NSError *)error
                  cacheMode:(BOOL)cacheMode {
     dispatch_async(dispatch_get_main_queue(), ^{
+//        [SVProgressHUD dismiss];
+        
         if (error != nil || data == nil) {
             NSLog(@"Error: %@", error);
             if(providerCanFallbackToOfflineCache(provider, self.safe)) {

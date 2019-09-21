@@ -147,7 +147,9 @@
     self.ckfForRevertWithUnlock = nil;
     self.selectedItemForUnlock = nil;
     
-    [self setWindowModel:self.model];
+    dispatch_async(dispatch_get_main_queue(),  ^{
+        [self setWindowModel:self.model];
+    });
     
     return YES;
 }

@@ -1,0 +1,15 @@
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "0rV-bt-L62"; */
+"0rV-bt-L62.text" = "Untertitel";
+
+/* Class = "UINavigationItem"; prompt = "Tap '+' to import or slide left on key file for options"; ObjectID = "bb1-nc-a4E"; */
+"bb1-nc-a4E.prompt" = "Tippen Sie auf '+' zum Importieren oder wischen Sie auf der Schlüsseldatei nach links, um Optionen zu erhalten";
+
+/* Class = "UINavigationItem"; title = "Select Key File"; ObjectID = "bb1-nc-a4E"; */
+"bb1-nc-a4E.title" = "Schlüsseldatei auswählen";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "cci-aM-JVu"; */
+"cci-aM-JVu.text" = "Titel";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "THU-GC-G5O"; */
+"THU-GC-G5O.title" = "Element";

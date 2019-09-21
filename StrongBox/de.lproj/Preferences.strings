@@ -1,0 +1,234 @@
+
+/* Class = "UILabel"; text = "Use iCloud"; ObjectID = "2eC-UV-Ohi"; */
+"2eC-UV-Ohi.text" = "iCloud verwenden";
+
+/* Class = "UILabel"; text = "Change..."; ObjectID = "2Vj-YI-TME"; */
+"2Vj-YI-TME.text" = "Ändern ...";
+
+/* Class = "UITableViewSection"; headerTitle = "General"; ObjectID = "4Ci-Jw-CSP"; */
+"4Ci-Jw-CSP.headerTitle" = "Allgemein";
+
+/* Class = "UITableViewSection"; headerTitle = "Notes"; ObjectID = "5WF-MV-iBA"; */
+"5WF-MV-iBA.headerTitle" = "Anmerkungen";
+
+/* Class = "UILabel"; text = "Allow <Biometric>"; ObjectID = "8as-hW-KMW"; */
+"8as-hW-KMW.text" = "Zulassen <Biometrik>";
+
+/* Class = "UITableViewController"; title = "Cloud Sessions"; ObjectID = "8T5-OF-MF5"; */
+"8T5-OF-MF5.title" = "Cloud-Sitzungen";
+
+/* Class = "UILabel"; text = "Key File Management"; ObjectID = "8yZ-ks-9kS"; */
+"8yZ-ks-9kS.text" = "Schlüsseldatei (Keyfile) verwalten";
+
+/* Class = "UILabel"; text = "Password Generation"; ObjectID = "79U-VX-cnC"; */
+"79U-VX-cnC.text" = "Passwort Generator";
+
+/* Class = "UITableViewSection"; headerTitle = "Title"; ObjectID = "AfU-lk-wHh"; */
+"AfU-lk-wHh.headerTitle" = "Titel";
+
+/* Class = "UILabel"; text = "Show All Files in Key Files"; ObjectID = "AjN-nK-BUo"; */
+"AjN-nK-BUo.text" = "Alle Dateien in Schlüsseldateien anzeigen";
+
+/* Class = "UISegmentedControl"; bqb-zZ-QG6.segmentTitles[0] = "None"; ObjectID = "bqb-zZ-QG6"; */
+"bqb-zZ-QG6.segmentTitles[0]" = "Keine";
+
+/* Class = "UISegmentedControl"; bqb-zZ-QG6.segmentTitles[1] = "Custom..."; ObjectID = "bqb-zZ-QG6"; */
+"bqb-zZ-QG6.segmentTitles[1]" = "Benutzerdefiniert ...";
+
+/* Class = "UILabel"; text = "3"; ObjectID = "BTc-Sr-gAI"; */
+"BTc-Sr-gAI.text" = "3";
+
+/* Class = "UIBarButtonItem"; title = "Back"; ObjectID = "cCM-jR-7zz"; */
+"cCM-jR-7zz.title" = "Zurück";
+
+/* Class = "UILabel"; text = "Change..."; ObjectID = "cWJ-43-jhK"; */
+"cWJ-43-jhK.text" = "Ändern ...";
+
+/* Class = "UILabel"; text = "Advanced"; ObjectID = "DFg-Z8-4Um"; */
+"DFg-Z8-4Um.text" = "Erweiterte Einstellungen";
+
+/* Class = "UILabel"; text = "Tweet @StrongboxSafe"; ObjectID = "Dnm-Y5-zQw"; */
+"Dnm-Y5-zQw.text" = "Tweet @StrongboxSafe";
+
+/* Class = "UITableViewSection"; footerTitle = "Deletes All Databases, Local Files, Caches, Key Files, Preferences and Keychain Entries after too many failed unlock attempts"; ObjectID = "dT5-0S-5Fy"; */
+"dT5-0S-5Fy.footerTitle" = "Alle Datenbanken, lokale Dateien, Caches, Schlüsseldateien, Einstellungen und Keychain Einträge nach zu vielen fehlgeschlagenen Entsperrversuchen löschen";
+
+/* Class = "UITableViewSection"; headerTitle = "Delete All Data on App Unlock Failure"; ObjectID = "dT5-0S-5Fy"; */
+"dT5-0S-5Fy.headerTitle" = "Alle Daten beim Fehlschlagen der App-Freischaltung löschen";
+
+/* Class = "UILabel"; text = "Enabled"; ObjectID = "e6I-50-gCI"; */
+"e6I-50-gCI.text" = "Aktiviert";
+
+/* Class = "UINavigationItem"; title = "Preferences"; ObjectID = "eGr-ae-0cG"; */
+"eGr-ae-0cG.title" = "Einstellungen";
+
+/* Class = "UILabel"; text = "Change..."; ObjectID = "EWH-9d-dSV"; */
+"EWH-9d-dSV.text" = "Ändern ...";
+
+/* Class = "UILabel"; text = "30 Seconds"; ObjectID = "fRK-F4-grc"; */
+"fRK-F4-grc.text" = "30 Sekunden";
+
+/* Class = "UILabel"; text = "30 Seconds"; ObjectID = "FSQ-VQ-s4g"; */
+"FSQ-VQ-s4g.text" = "30 Sekunden";
+
+/* Class = "UILabel"; text = "Delay"; ObjectID = "G3D-mW-lFG"; */
+"G3D-mW-lFG.text" = "Verzögerung";
+
+/* Class = "UITableViewSection"; footerTitle = "Strongbox will make a best effort attempt to clear the clipboard after the designated delay (subject to iOS system background process constraints)"; ObjectID = "GCi-AW-D9w"; */
+"GCi-AW-D9w.footerTitle" = "Strongbox wird versuchen die Zwischenablage nach der festgelegten Verzögerung zu löschen (je nach Einschränkungen der Hintergrundprozesse des iOS-Systems)";
+
+/* Class = "UITableViewSection"; headerTitle = "Auto Clear Clipboard After Delay"; ObjectID = "GCi-AW-D9w"; */
+"GCi-AW-D9w.headerTitle" = "Die Zwischenablage automatisch nach einer Verzögerung löschen";
+
+/* Class = "UILabel"; text = "Change..."; ObjectID = "Geq-G0-6G5"; */
+"Geq-G0-6G5.text" = "Ändern ...";
+
+/* Class = "UILabel"; text = "Enabled"; ObjectID = "hDt-Fd-64Z"; */
+"hDt-Fd-64Z.text" = "Aktiviert";
+
+/* Class = "UILabel"; text = "Hide Key File Name on Unlock Screen"; ObjectID = "hLc-Hn-3pY"; */
+"hLc-Hn-3pY.text" = "Schlüsseldateiname auf dem Freischalten-Bildschirm ausblenden";
+
+/* Class = "UITableViewController"; title = "Advanced Preferences"; ObjectID = "hwI-HO-qLt"; */
+"hwI-HO-qLt.title" = "Erweiterte Einstellungen";
+
+/* Class = "UILabel"; text = "Change..."; ObjectID = "IbA-Qf-Abq"; */
+"IbA-Qf-Abq.text" = "Ändern ...";
+
+/* Class = "UILabel"; text = "Email Support"; ObjectID = "iCk-Uo-CIK"; */
+"iCk-Uo-CIK.text" = "E-Mail-Support";
+
+/* Class = "UILabel"; text = "Show Yubikey Secret Workaround Field"; ObjectID = "iX3-kB-Et9"; */
+"iX3-kB-Et9.text" = "Feld für Umgehung des Yubikey-Geheimnisses anzeigen";
+
+/* Class = "UITableViewSection"; footerTitle = "Strongbox maintain sessions where possible if you use native cloud providers. You can manually clear these sessions here."; ObjectID = "jH9-W5-piz"; */
+"jH9-W5-piz.footerTitle" = "Strongbox speichert Sitzungen bei Verwendung von nativen Cloud-Anbietern, sofern dies möglich ist. Sie können diese Sitzungen hier manuell löschen";
+
+/* Class = "UITableViewSection"; headerTitle = "Cloud"; ObjectID = "jH9-W5-piz"; */
+"jH9-W5-piz.headerTitle" = "Cloud";
+
+/* Class = "UITableViewSection"; headerTitle = "URL"; ObjectID = "kyK-00-zw0"; */
+"kyK-00-zw0.headerTitle" = "URL";
+
+/* Class = "UILabel"; text = "New Entry Defaults"; ObjectID = "Lc4-V2-ayy"; */
+"Lc4-V2-ayy.text" = "Standard für neue Einträge";
+
+/* Class = "UILabel"; text = "Sessions (1)"; ObjectID = "MBh-Og-B73"; */
+"MBh-Og-B73.text" = "Sitzungen (1)";
+
+/* Class = "UISegmentedControl"; Mpw-yW-Qyq.segmentTitles[0] = "Default"; ObjectID = "Mpw-yW-Qyq"; */
+"Mpw-yW-Qyq.segmentTitles[0]" = "Standard";
+
+/* Class = "UISegmentedControl"; Mpw-yW-Qyq.segmentTitles[1] = "Custom..."; ObjectID = "Mpw-yW-Qyq"; */
+"Mpw-yW-Qyq.segmentTitles[1]" = "Benutzerdefiniert ...";
+
+/* Class = "UISegmentedControl"; mVt-rZ-QN9.segmentTitles[0] = "No Lock"; ObjectID = "mVt-rZ-QN9"; */
+"mVt-rZ-QN9.segmentTitles[0]" = "Keine Sperre";
+
+/* Class = "UISegmentedControl"; mVt-rZ-QN9.segmentTitles[1] = "PIN Code"; ObjectID = "mVt-rZ-QN9"; */
+"mVt-rZ-QN9.segmentTitles[1]" = "PIN-Code";
+
+/* Class = "UISegmentedControl"; mVt-rZ-QN9.segmentTitles[2] = "Biometric"; ObjectID = "mVt-rZ-QN9"; */
+"mVt-rZ-QN9.segmentTitles[2]" = "Biometrik";
+
+/* Class = "UISegmentedControl"; mVt-rZ-QN9.segmentTitles[3] = "Both"; ObjectID = "mVt-rZ-QN9"; */
+"mVt-rZ-QN9.segmentTitles[3]" = "Beides";
+
+/* Class = "UILabel"; text = "Attempts"; ObjectID = "NUR-SR-xbU"; */
+"NUR-SR-xbU.text" = "Versuche";
+
+/* Class = "UITableViewSection"; headerTitle = "Convenience Unlocking"; ObjectID = "o6m-Uq-NQN"; */
+"o6m-Uq-NQN.headerTitle" = "Komfort-Freischalten";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "p04-FH-J6b"; */
+"p04-FH-J6b.title" = "Element";
+
+/* Class = "UISegmentedControl"; Qdz-C4-wBV.segmentTitles[0] = "None"; ObjectID = "Qdz-C4-wBV"; */
+"Qdz-C4-wBV.segmentTitles[0]" = "Keine";
+
+/* Class = "UISegmentedControl"; Qdz-C4-wBV.segmentTitles[1] = "Custom..."; ObjectID = "Qdz-C4-wBV"; */
+"Qdz-C4-wBV.segmentTitles[1]" = "Benutzerdefiniert ...";
+
+/* Class = "UILabel"; text = "Allow PIN Code"; ObjectID = "qGu-QL-oXY"; */
+"qGu-QL-oXY.text" = "PIN-Code zulassen";
+
+/* Class = "UILabel"; text = "Show Tips"; ObjectID = "R9S-IH-dDH"; */
+"R9S-IH-dDH.text" = "Tipps anzeigen";
+
+/* Class = "UISegmentedControl"; rC5-aN-yQt.segmentTitles[0] = "None"; ObjectID = "rC5-aN-yQt"; */
+"rC5-aN-yQt.segmentTitles[0]" = "Keine";
+
+/* Class = "UISegmentedControl"; rC5-aN-yQt.segmentTitles[1] = "Generated"; ObjectID = "rC5-aN-yQt"; */
+"rC5-aN-yQt.segmentTitles[1]" = "Generiert";
+
+/* Class = "UISegmentedControl"; rC5-aN-yQt.segmentTitles[2] = "Custom..."; ObjectID = "rC5-aN-yQt"; */
+"rC5-aN-yQt.segmentTitles[2]" = "Benutzerdefiniert ...";
+
+/* Class = "UITableViewController"; title = "New Entry Defaults"; ObjectID = "rF2-GZ-Oaf"; */
+"rF2-GZ-Oaf.title" = "Neue Eintragstandards";
+
+/* Class = "UILabel"; text = "Help"; ObjectID = "S3p-VK-22L"; */
+"S3p-VK-22L.text" = "Hilfe";
+
+/* Class = "UITableViewSection"; headerTitle = "Help & Feedback"; ObjectID = "Shc-Ok-sVd"; */
+"Shc-Ok-sVd.headerTitle" = "Hilfe und Feedback";
+
+/* Class = "UITableViewSection"; headerTitle = "Email (Password Safe Only)"; ObjectID = "tcl-VU-pw6"; */
+"tcl-VU-pw6.headerTitle" = "E-Mail (Nur Passwort-Safe)";
+
+/* Class = "UITableViewSection"; headerTitle = "Password"; ObjectID = "tya-uA-hmX"; */
+"tya-uA-hmX.headerTitle" = "Passwort";
+
+/* Class = "UILabel"; text = "Version 1.28.3"; ObjectID = "udH-4V-s04"; */
+"udH-4V-s04.text" = "Version 1.28.3";
+
+/* Class = "UISegmentedControl"; vjo-hV-bFw.segmentTitles[0] = "None"; ObjectID = "vjo-hV-bFw"; */
+"vjo-hV-bFw.segmentTitles[0]" = "Keine";
+
+/* Class = "UISegmentedControl"; vjo-hV-bFw.segmentTitles[1] = "Most Used"; ObjectID = "vjo-hV-bFw"; */
+"vjo-hV-bFw.segmentTitles[1]" = "Am meisten verwendet";
+
+/* Class = "UISegmentedControl"; vjo-hV-bFw.segmentTitles[2] = "Custom..."; ObjectID = "vjo-hV-bFw"; */
+"vjo-hV-bFw.segmentTitles[2]" = "Benutzerdefiniert ...";
+
+/* Class = "UILabel"; text = "Change..."; ObjectID = "VNN-0D-WS5"; */
+"VNN-0D-WS5.text" = "Ändern ...";
+
+/* Class = "UITableViewSection"; headerTitle = "Username"; ObjectID = "wAF-xI-JSd"; */
+"wAF-xI-JSd.headerTitle" = "Benutzername";
+
+/* Class = "UILabel"; text = "Review Strongbox on the App Store"; ObjectID = "X1D-tE-8NC"; */
+"X1D-tE-8NC.text" = "Strongbox im App Store bewerten";
+
+/* Class = "UITableViewSection"; footerTitle = "Require a PIN code and/or Biometric authentication before opening Strongbox. If enabled, this will happen immediately on startup, and subsequently (after an optional delay) on switching away from Strongbox. "; ObjectID = "Xea-R2-BE7"; */
+"Xea-R2-BE7.footerTitle" = "Sobald aktiviert, wird die Eingabe eines PIN-Codes und/oder eine biometrische Authentifizierung (Touch ID/Face ID) erforderlich, um Zugriff auf Strongbox zu erhalten. Die entsprechende Abfrage erfolgt unmittelbar mit dem Öffnen von Strongbox. Wurde die Einstellung „Verzögerung“ aktiviert, so erfolgt die Abfrage zur Authentifizierung zusätzlich nach Ablauf einer von Ihnen festgelegten Zeitspanne (Timeout).";
+
+/* Class = "UITableViewSection"; headerTitle = "Application Lock"; ObjectID = "Xea-R2-BE7"; */
+"Xea-R2-BE7.headerTitle" = "Anwendungssperre";
+
+/* Class = "UISegmentedControl"; yCr-uz-Wo7.segmentTitles[0] = "None"; ObjectID = "yCr-uz-Wo7"; */
+"yCr-uz-Wo7.segmentTitles[0]" = "Nichts";
+
+/* Class = "UISegmentedControl"; yCr-uz-Wo7.segmentTitles[1] = "Most Used"; ObjectID = "yCr-uz-Wo7"; */
+"yCr-uz-Wo7.segmentTitles[1]" = "Am meisten verwendet";
+
+/* Class = "UISegmentedControl"; yCr-uz-Wo7.segmentTitles[2] = "Custom..."; ObjectID = "yCr-uz-Wo7"; */
+"yCr-uz-Wo7.segmentTitles[2]" = "Benutzerdefiniert ...";
+
+/* Class = "UINavigationItem"; title = "About"; ObjectID = "ydo-Zd-WnF"; */
+"ydo-Zd-WnF.title" = "Über";
+
+/* Class = "UILabel"; text = "Also Lock Preferences"; ObjectID = "YVy-zW-ddw"; */
+"YVy-zW-ddw.text" = "Einstellungen sperren";
+
+/* Class = "UILabel"; text = "Instant PIN Unlock (No need for OK)"; ObjectID = "zDz-3b-4Pj"; */
+"zDz-3b-4Pj.text" = "Sofortiges Freischalten mit PIN (Kein Bedarf für OK)";
+
+/* Class = "UILabel"; text = "Delay"; ObjectID = "zI9-IO-Tz3"; */
+"zI9-IO-Tz3.text" = "Verzögerung";
+
+/* Class = "UITableViewSection"; headerTitle = "Miscellaneous"; ObjectID = "l7v-m5-yUl"; */
+"l7v-m5-yUl.headerTitle" = "";
+
+/* Class = "UILabel"; text = "Detect if Offline (to offer Offline Cache)"; ObjectID = "v7x-7f-dfb"; */
+"v7x-7f-dfb.text" = "Ermitteln, ob offline (um Offline-Cache anzubieten)";

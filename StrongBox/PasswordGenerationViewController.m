@@ -14,6 +14,7 @@
 #import "Utils.h"
 #import "Alerts.h"
 #import "FontManager.h"
+#import "ClipboardManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -103,8 +104,7 @@
         return;
     }
     
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = value;
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
     
 #ifndef IS_APP_EXTENSION
     [ISMessages showCardAlertWithTitle:message

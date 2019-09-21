@@ -78,8 +78,14 @@
 
 - (void)appBecameActive {
     NSLog(@"appBecameActive");
-    
-    [self appLoadedOrBecameActive];
+
+//    if (@available(iOS 13.0, *)) {
+//        // Different Order of events in iOS 13 this is done in viewDidLoad but that causes problems in <iOS13
+//        // Touch ID/Face ID Failure
+//    }
+//    else {C
+        [self appLoadedOrBecameActive];
+//    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -129,7 +135,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+        
     if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
         self.tableView.contentOffset = CGPointZero;
     }
@@ -150,7 +156,12 @@
         [self startOnboarding];
     }
     else {
-        [self appLoadedOrBecameActive];
+//        if (@available(iOS 13.0, *)) {
+//            [self appLoadedOrBecameActive];
+//        }
+//        else {
+//            // Different Order of events in iOS 13 this is done in viewDidLoad
+//        }
     }
 }
 
@@ -164,15 +175,7 @@
     self.collection = SafesList.sharedInstance.snapshot;
     
     self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
-    
-//    if (self.collection.count > 0) {
-////        [self removeEditButtonInLeftBar];
-////        [self insertEditButtonInLeftBar];
-//    }
-//    else {
-////        [self removeEditButtonInLeftBar];
-//    }
-    
+
     [self.tableView reloadData];
 }
 
@@ -187,7 +190,6 @@
     __weak SafesViewController* weakSelf = self;
     self.privacyAndLockVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
     self.privacyAndLockVc.onUnlockDone = ^(BOOL userJustCompletedBiometricAuthentication) {
-        NSLog(@"YOOOOOOOO!");
         [weakSelf hidePrivacyScreen:userJustCompletedBiometricAuthentication];
     };
     

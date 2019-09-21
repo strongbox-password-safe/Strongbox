@@ -1,0 +1,12 @@
+/* Error description */
+"Download canceled" = "Download abgebrochen";
+
+/* No comment provided by engineer. */
+"The app receipt does not contain the given product" = "Der App-Beleg beinhaltet nicht das angegebene Produkt";
+
+/* No comment provided by engineer. */
+"The app receipt failed verification" = "Der App-Beleg konnte nicht verifiziert werden";
+
+/* Error description */
+"Unknown product identifier" = "Unbekannte Produktkennung";
+

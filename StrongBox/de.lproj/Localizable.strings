@@ -1,0 +1,2056 @@
+
+/* Could not read the data for this item. */
+"add_attachment_vc_error_reading_message" = "Die Daten für dieses Element konnten nicht gelesen werden.";
+
+/* Error Reading */
+"add_attachment_vc_error_reading_title" = "Fehler beim Lesen";
+
+/* Strongbox could not access the camera. Does it have permission? */
+"add_attachment_vc_error_source_unavailable_camera" = "Strongbox konnte nicht auf die Kamera zugreifen. Wurde eine Berechtigung erteilt?";
+
+/* Strongbox could not access photos. Does it have permission? */
+"add_attachment_vc_error_source_unavailable_photos" = "Strongbox konnte nicht auf die Fotos zugreifen. Wurde eine Berechtigung erteilt?";
+
+/* Source Unavailable */
+"add_attachment_vc_error_source_unavailable_title" = "Quelle nicht verfügbar";
+
+/* Analyzing Image... */
+"add_attachment_vc_large_file_analyzing_progress_title" = "Bild wird analysiert ...";
+
+/* This is quite a large file (%@), and could significantly affect the performance of Strongbox and slow down syncs across networks. Is there a smaller version you could use?\n\nContinue adding this attachment anyway? */
+"add_attachment_vc_large_file_message_fmt" = "Das ist eine ziemlich große Datei (%@) und könnte die Performance von Strongbox deutlich beeinflussen und die Synchronisation im Netzwerk verlangsamen. Gibt es eine kleinere Version, die Sie verwenden könnten?\n\nTrotzdem fortfahren diesen Anhang hinzuzufügen?";
+
+/* Large Attachment */
+"add_attachment_vc_large_file_title" = "Großer Anhang";
+
+/* This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Is there a smaller version you could use? */
+"add_attachment_vc_large_image_message" = "Das ist ein eher großes Bild, das die Performance von Strongbox negativ beeinflussen könnten und die Synchronisationsanzahl im Netzwerk deutlich verlangsamen kann. Gibt es eine kleinere Version, die Sie verwenden könnten?";
+
+/* This is a rather large image which could negatively affect the performance of Strongbox, and significantly slow down network synchronisation times. Would you like to rescale this image to one of the streamlined options below? */
+"add_attachment_vc_large_image_message_rescale" = "Das ist ein eher großes Bild, das die Performance von Strongbox negativ beeinflussen könnten und die Synchronisationsanzahl im Netzwerk deutlich verlangsamen kann. Möchten Sie die Dimensionen des Bildes ändern, um eine der unten stehenden vereinfachten Versionen zu erhalten?";
+
+/* Cancel */
+"add_attachment_vc_large_image_prompt_option_cancel" = "Abbrechen";
+
+/* Original (%d x %d) %@ */
+"add_attachment_vc_large_image_prompt_option_original_size_fmt" = "Original (%d x %d) %@";
+
+/* Use Anyway (%d x %d) %@ */
+"add_attachment_vc_large_image_prompt_option_use_anyway_size_fmt" = "Trotzdem verwenden (%d x %d) %@";
+
+/* Rescale Large Image? */
+"add_attachment_vc_large_image_prompt_rescale_title" = "Dimensionen des großen Bildes ändern?";
+
+/* Use Large Image? */
+"add_attachment_vc_large_image_prompt_use" = "Großes Bild verwenden?";
+
+/* Enter a filename for this item */
+"add_attachment_vc_prompt_filename_message" = "Dateinamen für dieses Element eingeben";
+
+/* Filename */
+"add_attachment_vc_prompt_filename_title" = "Dateiname";
+
+/* Camera */
+"add_attachment_vc_prompt_source_option_camera" = "Kamera";
+
+/* Cancel */
+"add_attachment_vc_prompt_source_option_cancel" = "Abbrechen";
+
+/* Files */
+"add_attachment_vc_prompt_source_option_files" = "Dateien";
+
+/* Photos */
+"add_attachment_vc_prompt_source_option_photos" = "Fotos";
+
+/* Attachment Location */
+"add_attachment_vc_prompt_title" = "Anhang-Speicherort";
+
+/* This filename is already in use. Please enter a different name. */
+"add_attachment_vc_warn_filename_used_message" = "Der Dateinamen wird bereits verwendet. Bitte geben Sie einen anderen Namen ein.";
+
+/* Filename in Use */
+"add_attachment_vc_warn_filename_used_title" = "Dateiname wird verwendet";
+
+/* Cancel */
+"alerts_cancel" = "Abbrechen";
+
+/* Confirm Password */
+"alerts_confirm_password" = "Passwort bestätigen";
+
+/* No */
+"alerts_no" = "Nein";
+
+/* Not Empty! */
+"alerts_not_empty" = "Nicht leer!";
+
+/* OK */
+"alerts_ok" = "OK";
+
+/* Password */
+"alerts_password" = "Passwort";
+
+/* Unknown Error */
+"alerts_unknown_error" = "Unbekannter Fehler";
+
+/* Yes */
+"alerts_yes" = "Ja";
+
+/* %@ (Historical) */
+"attachment_pool_vc_filename_historical_fmt" = "%@ (Historisch)";
+
+/* <Orphan Attachment> [%lu] */
+"attachment_pool_vc_filename_orphan_fmt" = "<Verwaiste Anhänge> [%lu]";
+
+/* Cached%@: %@ */
+"autofill_safes_vc_cache_date_fmt" = "Zwischengespeichert%@: %@";
+
+/* (Forced) */
+"autofill_safes_vc_cache_is_forced_fmt" = " (Erzwungen)";
+
+/* To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App. */
+"autofill_safes_vc_empty_subtitle" = "Um Strongbox für das automatische Ausfüllen zu verwenden, müssen Sie eine Datenbank hinzufügen. Das ist in der Strongbox-App möglich.";
+
+/* You Have No Databases Yet :( */
+"autofill_safes_vc_empty_title" = "Sie haben noch keine Datenbanken :(";
+
+/* [Auto Fill Disabled] */
+"autofill_safes_vc_item_subtitle_cache_disabled" = "[Autom. Ausfüllen deaktiviert]";
+
+/* [No Auto Fill Cache File Yet] */
+"autofill_safes_vc_item_subtitle_no_cache_yet" = "[Noch keine zwischengespeicherte Datei für autom. Ausfüllen]";
+
+/* Local (Documents) */
+"autofill_safes_vc_storage_local_docs_name" = "Lokal (Dokumente)";
+
+/* Local */
+"autofill_safes_vc_storage_local_name" = "Lokal";
+
+/* Double Tap Action */
+"browse_prefs_double_tap_action" = "Doppelt-Tippen-Aktion";
+
+/* Item Subtitle */
+"browse_prefs_item_subtitle" = "Element-Untertitel";
+
+/* Date Created */
+"browse_prefs_item_subtitle_date_created" = "Erstellungsdatum";
+
+/* Date Modified */
+"browse_prefs_item_subtitle_date_modified" = "Änderungsdatum";
+
+/* Email */
+"browse_prefs_item_subtitle_email" = "E-Mail";
+
+/* None */
+"browse_prefs_item_subtitle_none" = "Keine";
+
+/* Notes */
+"browse_prefs_item_subtitle_notes" = "Anmerkungen";
+
+/* Password */
+"browse_prefs_item_subtitle_password" = "Passwort";
+
+/* URL */
+"browse_prefs_item_subtitle_url" = "URL";
+
+/* Username */
+"browse_prefs_item_subtitle_username" = "Benutzername";
+
+/* Long Press Action */
+"browse_prefs_long_press_action" = "Lange-Drücken-Aktion";
+
+/* Single Tap Action */
+"browse_prefs_single_tap_action" = "Einfach-Tippen-Aktion";
+
+/* Copy Email */
+"browse_prefs_tap_action_copy_copy_email" = "E-Mail kopieren";
+
+/* Copy Notes */
+"browse_prefs_tap_action_copy_copy_notes" = "Anmerkungen kopieren";
+
+/* Copy Password */
+"browse_prefs_tap_action_copy_copy_password" = "Passwort kopieren";
+
+/* Copy TOTP */
+"browse_prefs_tap_action_copy_copy_totp" = "TOTP kopieren";
+
+/* Copy URL */
+"browse_prefs_tap_action_copy_copy_url" = "URL kopieren";
+
+/* Copy Title */
+"browse_prefs_tap_action_copy_title" = "Titel kopieren";
+
+/* Copy Username */
+"browse_prefs_tap_action_copy_username" = "Benutzername kopieren";
+
+/* Edit Item */
+"browse_prefs_tap_action_edit" = "Element bearbeiten";
+
+/* No Action */
+"browse_prefs_tap_action_none" = "Keine Aktion";
+
+/* View Item */
+"browse_prefs_tap_action_view_item" = "Element ansehen";
+
+/* Triple Tap Action */
+"browse_prefs_triple_tap_action" = "Dreifach-Tippen-Aktion";
+
+/* View As */
+"browse_prefs_view_as" = "Anzeigen als";
+
+/* Flat List */
+"browse_prefs_view_as_flat_list" = "Flache Liste";
+
+/* Folder Hierarchy */
+"browse_prefs_view_as_folders" = "Gruppenhierarchie";
+
+/* TOTP List */
+"browse_prefs_view_as_totp_list" = "TOTP-Liste";
+
+/* Delete */
+"browse_vc_action_delete" = "Löschen";
+
+/* Duplicate */
+"browse_vc_action_duplicate" = "Duplizieren";
+
+/* Edit */
+"browse_vc_action_edit" = "Bearbeiten";
+
+/* Rename */
+"browse_vc_action_rename" = "Umbenennen";
+
+/* Set Icon */
+"browse_vc_action_set_icon" = "Symbol festlegen";
+
+/* Are you sure? */
+"browse_vc_are_you_sure" = "Sind Sie sicher?";
+
+/* Are you sure you want to permanently delete these item(s)? */
+"browse_vc_are_you_sure_delete" = "Sind Sie sicher, dass Sie diese(s) Element(e) dauerhaft löschen möchten?";
+
+/* Are you sure you want to permanently delete '%@'? */
+"browse_vc_are_you_sure_delete_fmt" = "Sind Sie sicher, dass Sie '%@' dauerhaft löschen möchten?";
+
+/* Are you sure you want to send these item(s) to the Recycle Bin? */
+"browse_vc_are_you_sure_recycle" = "Sind Sie sicher, dass Sie diese(s) Element(e) in den Papierkorb verschieben möchten?";
+
+/* Are you sure you want to send '%@' to the Recycle Bin? */
+"browse_vc_are_you_sure_recycle_fmt" = "Sind Sie sicher, dass Sie '%@' in den Papierkorb verschieben möchten?";
+
+/* Cannot create group */
+"browse_vc_cannot_create_group" = "Gruppe kann nicht erstellt werden";
+
+/* Could not create a group with this name here, possibly because one with this name already exists. */
+"browse_vc_cannot_create_group_message" = "Gruppe konnte mit diesem Namen hier nicht erstellt werden, weil wahrscheinlich schon eine Gruppe mit diesem Namen existiert.";
+
+/* There was an error trying to delete this item. */
+"browse_vc_delete_error_message" = "Beim Löschen dieses Element ist ein Fehler aufgetreten.";
+
+/* Delete Failed */
+"browse_vc_delete_failed" = "Löschen fehlgeschlagen";
+
+/* Copy */
+"browse_vc_duplicate_title_suffix" = "Kopieren";
+
+/* '%@' Email Copied */
+"browse_vc_email_copied_fmt" = "'%@'-E-Mail kopiert";
+
+/* Enter Group Name */
+"browse_vc_enter_group_name" = "Gruppennamen eingeben";
+
+/* Please Enter the New Group Name: */
+"browse_vc_enter_group_name_message" = "Bitte geben Sie den neuen Gruppennamen ein:";
+
+/* Error Deleting */
+"browse_vc_error_deleting" = "Fehler beim Löschen";
+
+/* There was a problem deleting a least one of these items. */
+"browse_vc_error_deleting_message" = "Beim Löschen von mindestens einem dieser Elemente ist ein Fehler aufgetreten.";
+
+/* Error Saving */
+"browse_vc_error_saving" = "Fehler beim Speichern";
+
+/* Group Name */
+"browse_vc_group_name" = "Gruppenname";
+
+/* (in %@) */
+"browse_vc_group_path_string_fmt" = "(in %@)";
+
+/* '%@': No TOTP setup to Copy! */
+"browse_vc_no_totp_to_copy_fmt" = "'%@': Keine TOTP-Konfiguration zum Kopieren!";
+
+/* '%@' Notes Copied */
+"browse_vc_notes_copied_fmt" = "'%@'-Anmerkungen kopiert";
+
+/* (Offline) */
+"browse_vc_offline_suffix" = " (Offline)";
+
+/* '%@' Password Copied */
+"browse_vc_password_copied_fmt" = "'%@'-Passwort kopiert";
+
+/* (Read Only) */
+"browse_vc_read_only_suffix" = " (Schreibgeschützt)";
+
+/* Rename Item */
+"browse_vc_rename_item" = "Element umbenennen";
+
+/* Please enter a new title for this item */
+"browse_vc_rename_item_enter_title" = "Bitte geben sie einen neuen Titel für dieses Element ein";
+
+/* All Fields */
+"browse_vc_search_scope_all" = "Alle Felder";
+
+/* Password */
+"browse_vc_search_scope_password" = "Passwort";
+
+/* Title */
+"browse_vc_search_scope_title" = "Titel";
+
+/* URL */
+"browse_vc_search_scope_url" = "URL";
+
+/* Username */
+"browse_vc_search_scope_username" = "Benutzername";
+
+/* Sort Items By Title? */
+"browse_vc_sort_by_title" = "Element nach Titel sortieren?";
+
+/* Do you want to sort all the items in this folder by Title? This will set the order in which they are stored in your database. */
+"browse_vc_sort_by_title_message" = "Möchten Sie alle Elemente in dieser Gruppe nach Titel sortieren? Das wird die Reihenfolge festlegen, in der sie in Ihrer Datenbank gespeichert werden.";
+
+/* You can long press, or double/triple tap to quickly copy fields... Give it a try! */
+"browse_vc_tip_fast_tap_message" = "Sie können lange drücken oder doppelt/dreifach tippen, um die Felder schnell zu kopieren ... Versuchen Sie es!";
+
+/* Fast Tap Actions */
+"browse_vc_tip_fast_tap_title" = "Schnell-Tippen-Aktionen";
+
+/* '%@' Title Copied */
+"browse_vc_title_copied_fmt" = "'%@'-Titel kopiert";
+
+/* '%@' OTP Code Copied
+   '%@' TOTP Copied */
+"browse_vc_totp_copied_fmt" = "'%@'-OTP-Code kopiert";
+
+/* '%@' URL Copied */
+"browse_vc_url_copied_fmt" = "'%@'-URL kopiert";
+
+/* '%@' Username Copied */
+"browse_vc_username_copied_fmt" = "'%@'-Benutzername kopiert";
+
+/* No Entries */
+"browse_vc_view_as_database_empty" = "Keine Einträge";
+
+/* View As: TOTP List (No TOTP Entries) */
+"browse_vc_view_as_totp_no_totps" = "Anzeigen als: TOTP-Liste (Keine TOTP-Einträge)";
+
+/* No matching entries found */
+"browse_vc_view_search_no_matches" = "Keine passenden Einträge gefunden";
+
+/* Show/Hide Password */
+"casg_accessibility_label_show_hide_pw" = "Passwort anzeigen/ausblenden";
+
+/* Add */
+"casg_add_action" = "Hinzufügen";
+
+/* Add Existing Database */
+"casg_add_existing_database_action" = "Existierende Datenbank";
+
+/* Create */
+"casg_create_action" = "Erstellen";
+
+/* Create Database */
+"casg_create_database_action" = "Datenbank erstellen";
+
+/* KDB, AES (Supports Icons & Attachments) */
+"casg_database_format_information_kp1" = "KDB, AES (unterstützt Symbole und Anhänge)";
+
+/* KDBX 4.0, ChaCha20, Argon2D (GPU Brute Force Resistant) */
+"casg_database_format_information_kp4" = "KDBX 4.0, ChaCha20, Argon2D (GPU Brute Force Resistant)";
+
+/* KDBX 3.1, Salsa20 and AES (Most Compatible) */
+"casg_database_format_information_kp31" = "KDBX 3.1, Salsa20 und AES (am kompatibelsten)";
+
+/* PSAFE3 version 3.x, TwoFish, SHA256 */
+"casg_database_format_information_pwsafe" = "PSAFE3 Version 3.x, TwoFish, SHA256";
+
+/* One Off */
+"casg_detail_label_one_off_key_file_selected" = "Einmalig";
+
+/* Auto-Detected */
+"casg_key_file_auto_detected" = "Autom. entdeckt";
+
+/* Configured */
+"casg_key_file_configured" = "Konfiguriert";
+
+/* Configured Key File Not Found */
+"casg_key_file_configured_but_not_found" = "Konfigurierter Schlüssel wurde nicht gefunden";
+
+/* Select... */
+"casg_key_file_select_action" = "Auswählen ...";
+
+/* You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want. */
+"casg_question_message_empty_password" = "Sie haben das Passwort-Feld nicht ausgefüllt. Das kann auf zwei Arten interpretiert werden. Wählen Sie die gewünschte Interpretation aus.";
+
+/* Empty Password */
+"casg_question_option_empty" = "Leeres Passwort";
+
+/* No Password */
+"casg_question_option_none" = "Kein Passwort";
+
+/* Empty Password or None? */
+"casg_question_title_empty_password" = "Leeres oder kein Passwort?";
+
+/* Rename */
+"casg_rename_action" = "Umbenennen";
+
+/* Rename Database */
+"casg_rename_database_action" = "Datenbank umbenennen";
+
+/* Set */
+"casg_set_action" = "Festlegen";
+
+/* Set Master Credentials */
+"casg_set_master_credentials" = "Master-Anmeldedaten festlegen";
+
+/* Set Master Password */
+"casg_set_master_password" = "Master-Passwort festlegen";
+
+/* My Database */
+"casg_suggested_database_name_default" = "Meine Datenbank";
+
+/* %@'s Database */
+"casg_suggested_database_name_users_database_fmt" = "%@'s-Datenbank";
+
+/* %@'s Database %d */
+"casg_suggested_database_name_users_database_number_suffix_fmt" = "%@'s-Datenbank %d";
+
+/* Password */
+"casg_text_field_placeholder_password" = "Passwort";
+
+/* Password (Required) */
+"casg_text_field_placeholder_password_required" = "Passwort (Erforderlich)";
+
+/* Selected Key File */
+"casg_text_label_key_selected_key_file" = "Ausgewählte Schlüsseldatei";
+
+/* Unlock */
+"casg_unlock_action" = "Freischalten";
+
+/* Clear Google Drive Session */
+"cloud_sessions_clear_google" = "Google-Drive-Sitzung löschen";
+
+/* Clear OneDrive Session */
+"cloud_sessions_clear_onedrive" = "OneDrive-Sitzung löschen";
+
+/* You have successfully unlinked Strongbox from Dropbox. */
+"cloud_sessions_prompt_dropbox_unlink_success_message" = "Sie haben Strongbox erfolgreich von Dropbox getrennt.";
+
+/* Unlink Successful */
+"cloud_sessions_prompt_dropbox_unlink_success_title" = "Trennen erfolgreich";
+
+/* You have been successfully been signed out of Google Drive. */
+"cloud_sessions_prompt_google_signout_success_message" = "Sie haben sich erfolgreich von Google Drive abgemeldet.";
+
+/* Sign Out Successful */
+"cloud_sessions_prompt_google_signout_success_title" = "Abmeldung erfolgreich";
+
+/* Error Signing out of OneDrive */
+"cloud_sessions_prompt_onedrive_signout_error" = "Fehler beim Abmelden von OneDrive";
+
+/* You have successfully signed out of OneDrive. */
+"cloud_sessions_prompt_onedrive_signout_success_message" = "Sie haben sich erfolgreich von OneDrive abgemeldet.";
+
+/* Signout Successful */
+"cloud_sessions_prompt_onedrive_signout_success_title" = "Abmeldung erfolgreich";
+
+/* Are you sure you want to sign out of Google Drive? */
+"cloud_sessions_prompt_signout_google_message" = "Sind Sie sicher, dass Sie sich von Google Drive abmelden möchten?";
+
+/* Sign Out of Google Drive? */
+"cloud_sessions_prompt_signout_google_title" = "Von Google Drive abmelden?";
+
+/* Are you sure you want to sign out of OneDrive? */
+"cloud_sessions_prompt_signout_onedrive_message" = "Sind Sie sicher, dass Sie sich von OneDrive abmelden möchten?";
+
+/* Sign out of OneDrive? */
+"cloud_sessions_prompt_signout_onedrive_title" = "Von OneDrive abmelden?";
+
+/* Are you sure you want to unlink Strongbox from Dropbox? */
+"cloud_sessions_prompt_unlink_dropbox_message" = "Sind Sie sicher, dass Sie Strongbox von Dropbox trennen möchten?";
+
+/* Unlink Dropbox? */
+"cloud_sessions_prompt_unlink_dropbox_title" = "Dropbox trennen?";
+
+/* Unlink Dropbox */
+"cloud_sessions_unlink_dropbox" = "Dropbox trennen";
+
+/* Strongbox: Error Opening Database */
+"cred_vc_error_opening_title" = "Strongbox: Fehler beim Öffnen der Datenbank";
+
+/* Custom Field Name */
+"custom_field_vc_accessibility_label_name" = "Benutzerdefinierter Feldname";
+
+/* Custom Field Protected */
+"custom_field_vc_accessibility_label_protected" = "Benutzerdefiniertes Feld geschützt";
+
+/* Custom Field Value */
+"custom_field_vc_accessibility_label_value" = "Benutzerdefinierter Feldwert";
+
+/* This key is already in use by another custom field. */
+"custom_field_vc_validation_name_already_in_use_error" = "Dieser Schlüssel wird bereits in einem anderen benutzerdefinierten Feld verwendet.";
+
+/* Name cannot be empty */
+"custom_field_vc_validation_name_not_empty_error" = "Name kann nicht leer sein";
+
+/* Name cannot be one of the reserved KeePass Field names */
+"custom_field_vc_validation_name_not_reserved_error" = "Name kann nicht einer der KeePass-Feldnamen sein";
+
+/* Select Subtitle 1 Field */
+"databases_preferences_select_subtitle1_field" = "Feld für Untertitel 1 auswählen";
+
+/* Select Subtitle 2 Field */
+"databases_preferences_select_subtitle2_field" = "Feld für Untertitel 2 auswählen";
+
+/* Select Top Right Field */
+"databases_preferences_select_top_right_field" = "Oberes rechtes Feld auswählen";
+
+/* Database Storage */
+"databases_preferences_subtitle_field_name_database_storage" = "Speicher";
+
+/* Filename */
+"databases_preferences_subtitle_field_name_filename" = "Dateiname";
+
+/* Last Cached Date */
+"databases_preferences_subtitle_field_name_last_cached_data" = "Letzter Speicherzeitpunkt";
+
+/* None */
+"databases_preferences_subtitle_field_name_none" = "Keins";
+
+/* %@ Unlock */
+"db_management_biometric_unlock_fmt" = "Mit %@ entsperren";
+
+/* Change Master Credentials */
+"db_management_change_master_credentials" = "Master-Anmeldedaten ändern";
+
+/* Change Master Password */
+"db_management_change_master_password" = "Master-Passwort ändern";
+
+/* Could not change credentials */
+"db_management_couldnt_change_credentials" = "Anmeldedaten konnten nicht geändert werden";
+
+/* Master Credentials Changed */
+"db_management_credentials_changed" = "Master-Anmeldedaten geändert";
+
+/* Are you sure you want to do this? */
+"db_management_disable_autofill_yesno_message" = "Sind Sie sicher, dass Sie das machen möchten?";
+
+/* Disable AutoFill? */
+"db_management_disable_autofill_yesno_title" = "Autom. Ausfüllen deaktivieren?";
+
+/* %@ for this database has been disabled. */
+"db_management_disable_biometric_notify_message_fmt" = "%@ wurde für diese Datenbank deaktiviert.";
+
+/* %@ Disabled */
+"db_management_disable_biometric_notify_title_fmt" = "%@ deaktiviert";
+
+/* Disable %@? */
+"db_management_disable_biometric_question_fmt" = "%@ deaktivieren?";
+
+/* Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this? */
+"db_management_disable_biometric_warning_fmt" = "Das Deaktivieren von %@ für diese Datenbank wird das sicher gespeicherte Passwort entfernen und Sie müssen es erneut eingeben. Sind Sie sicher, dass Sie das machen möchten?";
+
+/* Are you sure you want to disable %@ for this database? */
+"db_management_disable_biomtric_simple_fmt" = "Sind Sie sicher, dass Sie %@ für diese Datenbank deaktivieren möchten?";
+
+/* AutoFill Disabled */
+"db_management_disable_done" = "Autom. Ausfüllen deaktiviert";
+
+/* Offline Disabled */
+"db_management_disable_offline_done" = "Offline deaktiviert";
+
+/* Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this? */
+"db_management_disable_offline_yesno_message" = "Das Deaktivieren des Offline-Zugriffs für diese Datenbank wird den Offline-Cache entfernen und Sie können nicht auf die Datenbank zugreifen, wenn Sie offline sind. Sind Sie sicher, dass Sie das machen möchten?";
+
+/* Disable Offline Access? */
+"db_management_disable_offline_yesno_title" = "Offline-Zugriff deaktivieren?";
+
+/* %@ has been enabled for this database. */
+"db_management_enable_biometric_notify_message_fmt" = "%@ wurde für diese Datenbank deaktiviert.";
+
+/* %@ Enabled */
+"db_management_enable_biometric_notify_title_fmt" = "%@ aktiviert";
+
+/* AutoFill Enabled */
+"db_management_enable_done" = "Autom. Ausfüllen aktiviert";
+
+/* Offline Enabled */
+"db_management_enable_offline_done" = "Offline aktiviert";
+
+/* Could not change credentials */
+"db_management_error_title_couldnt_change_credentials" = "Anmeldedaten konnten nicht geändert werden";
+
+/* Master Password Changed */
+"db_management_password_changed" = "Master-Passwort geändert";
+
+/* You must close and reopen this database for Read-Only changes to take effect. */
+"db_management_reopen_required_message" = "Sie müssen diese Datenbank schließen und erneut öffnen, damit die schreibgeschützten Änderungen wirksam werden.";
+
+/* Re-Open Required */
+"db_management_reopen_required_title" = "Erneutes Öffnen erforderlich";
+
+/* <None> */
+"db_management_statistics_none" = "<Nichts>";
+
+/* Custom Email Default Text */
+"defaults_model_custom_email_default" = "Benutzerdefinierter E-Mail-Standardtext";
+
+/* Custom Notes Default Text */
+"defaults_model_custom_notes_default" = "Benutzerdefinierter Anmerkungen-Standardtext";
+
+/* Custom Password Default Text */
+"defaults_model_custom_password_default" = "Benutzerdefinierter Passwort-Standardtext";
+
+/* Custom Title Default Text */
+"defaults_model_custom_title_default" = "Benutzerdefinierter Titel-Standardtext";
+
+/* Custom URL Default Text */
+"defaults_model_custom_url_default" = "Benutzerdefinierter URL-Standardtext";
+
+/* Custom Username Default Text */
+"defaults_model_custom_username_default" = "Benutzerdefinierter Benutzername-Standardtext";
+
+/* Date Text Field */
+"edit_date_cell_date_field_accessibility_label" = "Datum-Textfeld";
+
+/* Date */
+"edit_date_cell_date_field_placeholder" = "Datum";
+
+/* Time Text Field */
+"edit_date_cell_time_field_accessibility_label" = "Zeit-Textfeld";
+
+/* Time */
+"edit_date_cell_time_field_placeholder" = "Zeit";
+
+/* Password Text Field */
+"edit_password_cell_value_textfield_accessibility_label" = "Passwort-Textfeld";
+
+/* Please enter a new custom default for this field */
+"entry_defaults_vc_prompt_custom_message" = "Bitte geben Sie einen neuen benutzerdefinierten Standard für dieses Feld ein";
+
+/* Custom Default */
+"entry_defaults_vc_prompt_custom_title" = "Benutzerdefinierter Standard";
+
+/* Error Sending */
+"export_vc_email_error_sending" = "Fehler beim Senden";
+
+/* Here's a copy of my '%@' Strongbox Database. */
+"export_vc_email_message_body_fmt" = "Hier ist eine Kopie meiner '%@'-Strongbox-Datenbank.";
+
+/* Strongbox Database: '%@' */
+"export_vc_email_subject" = "Strongbox-Datenbank: '%@'";
+
+/* It looks like email is not setup on this device and so the database cannot be exported by email. */
+"export_vc_email_unavailable_message" = "Es sieht so aus, als ob kein E-Mail-Konto auf diesem Gerät eingerichtet wurde und deshalb kann die Datenbank nicht per E-Mail exportiert werden.";
+
+/* Email Not Available */
+"export_vc_email_unavailable_title" = "E-Mail nicht verfügbar";
+
+/* Could not get database data
+   Error Encrypting */
+"export_vc_error_encrypting" = "Fehler beim Verschlüsseln";
+
+/* Error Exporting */
+"export_vc_error_exporting" = "Fehler beim Exportieren";
+
+/* Error Writing Database */
+"export_vc_error_writing" = " Fehler beim Schreiben der Datenbank";
+
+/* Your database was successfully exported. */
+"export_vc_export_successful_message" = "Ihre Datenbank wurde erfolgreich exportiert.";
+
+/* Export Successful */
+"export_vc_export_successful_title" = "Exportieren erfolgreich";
+
+/* Database CSV Copied to Clipboard */
+"export_vc_message_csv_copied" = "Datenbank-CSV wurde in die Zwischenablage kopiert";
+
+/* Problem Saving to External File */
+"files_provider_problem_saving" = "Problem beim Speichern der externen Datei";
+
+/* Strongbox's reference to this external file is stale. Please remove and re-add this database. */
+"files_provider_stale_reference" = "Die Referenz von Strongbox zu dieser Datei ist alt. Bitte entfernen und diese Datenbank erneut hinzufügen.";
+
+/* %@ (Required) */
+"generic_kv_cell_value_empty_value_validation_fmt" = "%@ (Erforderlich)";
+
+/* Text Field */
+"generic_kv_cell_value_text_accessibility label_fmt" = " Textfeld";
+
+/* Database Icons */
+"icons_vc_header_database_icons_title" = "Datenbank-Symbole";
+
+/* KeePass Icons */
+"icons_vc_header_keepass_icons_title" = "KeePass-Symbole";
+
+/* Add Attachment... */
+"item_details_add_attachment_button" = "Anhang hinzufügen ...";
+
+/* Email Copied */
+"item_details_email_copied" = "E-Mail kopiert";
+
+/* Email */
+"item_details_email_field_title" = "E-Mail";
+
+/* Expires */
+"item_details_expires_field_title" = "Läuft ab";
+
+/* Never */
+"item_details_expiry_never" = "Niemals";
+
+/* Item History */
+"item_details_item_history" = "Elementverlauf";
+
+/* Created */
+"item_details_metadata_created_field_title" = "Erstellt";
+
+/* Modified */
+"item_details_metadata_modified_field_title" = "Modifiziert";
+
+/* New Custom Field... */
+"item_details_new_custom_field_button" = "Neues benutzerdefiniertes Feld ...";
+
+/* Notes Copied */
+"item_details_notes_copied" = "Anmerkungen kopiert";
+
+/* Password Copied */
+"item_details_password_copied" = "Passwort kopiert";
+
+/* Password Copied. Launching URL... */
+"item_details_password_copied_and_launching" = "Passwort kopiert. URL wird geöffnet ...";
+
+/* Password */
+"item_details_password_field_title" = "Passwort";
+
+/* Password History */
+"item_details_password_history" = "Passwort-Verlauf";
+
+/* Problem Saving */
+"item_details_problem_saving" = "Problem beim Speichern";
+
+/* (Read Only) */
+"item_details_read_only_suffix" = "(Schreibgeschützt)";
+
+/* Attachments */
+"item_details_section_header_attachments" = "Anhänge";
+
+/* Custom Fields */
+"item_details_section_header_custom_fields" = "Benutzerdefinierte Felder";
+
+/* History */
+"item_details_section_header_history" = "Verlauf";
+
+/* Metadata */
+"item_details_section_header_metadata" = "Metadaten";
+
+/* Notes */
+"item_details_section_header_notes" = "Anmerkungen";
+
+/* Setup TOTP... */
+"item_details_setup_totp" = "TOTP festlegen ...";
+
+/* Could not set TOTP because it could not be initialized. */
+"item_details_setup_totp_failed_message" = "TOTP konnte nicht festgelegt werden, weil es nicht initialisiert werden konnte.";
+
+/* Failed to Set TOTP */
+"item_details_setup_totp_failed_title" = "Festlegen von TOTP fehlgeschlagen";
+
+/* You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL */
+"item_details_setup_totp_how_message" = "Sie können TOTP festlegen, indem Sie einen QR-Code verwenden oder manuell, indem Sie das Geheimnis oder eine OTPAuth-URL eingeben";
+
+/* How would you like to setup TOTP? */
+"item_details_setup_totp_how_title" = "Wie möchten Sie TOTP einrichten?";
+
+/* Manual (Standard/RFC 6238)... */
+"item_details_setup_totp_manual_rfc" = "Manuell (Standard/RFC 6238) ...";
+
+/* Manual (Steam Token)... */
+"item_details_setup_totp_manual_steam" = "Manuell (Steam-Token) ...";
+
+/* QR Code... */
+"item_details_setup_totp_qr_code" = "QR-Code ...";
+
+/* Please enter the secret or an OTPAuth URL */
+"item_details_setup_totp_secret_message" = "Bitte geben Sie das Geheimnis oder eine OTPAuth-URL ein";
+
+/* Secret or OTPAuth URL */
+"item_details_setup_totp_secret_title" = "Geheimnis oder OTPAuth-URL";
+
+/* '%@' Copied */
+"item_details_something_copied_fmt" = "'%@' kopiert";
+
+/* Title Copied */
+"item_details_title_copied" = "Titel kopiert";
+
+/* Title */
+"item_details_title_field_name" = "Titel";
+
+/* One Time Password Copied */
+"item_details_totp_copied" = "Einmaliges Passwort kopiert";
+
+/* URL Copied */
+"item_details_url_copied" = "URL kopiert";
+
+/* URL */
+"item_details_url_field_title" = "URL";
+
+/* Username Copied */
+"item_details_username_copied" = "Benutzername kopiert";
+
+/* Username */
+"item_details_username_field_title" = "Benutzername";
+
+/* Are you sure you want to discard all your changes? */
+"item_details_vc_are_you_sure_discard_changes" = "Sind Sie sicher, dass Sie alle Änderungen verwerfen möchten?";
+
+/* Discard Changes? */
+"item_details_vc_discard_changes" = "Änderungen verwerfen?";
+
+/* Untitled */
+"item_details_vc_new_item_title" = "Unbenannt";
+
+/* Restore */
+"keepass_history_action_restore" = "Wiederherstellen";
+
+/* Are you sure? */
+"keepass_history_are_you_sure" = "Sind Sie sicher?";
+
+/* Are you sure you want to delete this historical item? */
+"keepass_history_are_you_sure_delete_message" = "Sind Sie sicher, dass Sie dieses historische Element löschen möchten?";
+
+/* Are you sure you want to restore this entry to this historical state? */
+"keepass_history_are_you_sure_restore_message" = "Sind Sie sicher, dass Sie diesen Eintrag in seinem historischen Zustand wiederherstellen möchten?";
+
+/* No Key Files Found. Tap '+' to import one. */
+"key_files_vc_empty_key_files_title" = "Keine Schlüsseldateien gefunden. Tippen Sie auf '+', um eine zu importieren.";
+
+/* A file with this name already exists in the Key Files directory. */
+"key_files_vc_error_file_already_exists_message" = "Es existiert bereits eine Datei mit diesem Namen im Schlüsseldateien-Verzeichnis.";
+
+/* File Already Exists */
+"key_files_vc_error_file_already_exists_title" = "Datei existiert bereits";
+
+/* File not removed */
+"key_files_vc_error_file_not_removed" = "Datei nicht entfernt";
+
+/* There was an importing the Key File (does it already exist?) */
+"key_files_vc_error_importing" = "Beim Importieren der Schlüsseldatei ist ein Fehler aufgetreten (Existiert sie bereits?)";
+
+/* Could not access Photo Library. Does Strongbox have Permission? */
+"key_files_vc_error_photos_unavailable_message" = "Auf die Fotobibliothek konnte nicht zugegriffen werden. Hat Strongbox eine Berechtigung?";
+
+/* Photo Library Unavailable */
+"key_files_vc_error_photos_unavailable_title" = "Fotobibliothek nicht verfügbar";
+
+/* Error Reading
+   There was an error reading the Key File */
+"key_files_vc_error_reading" = "Fehler beim Lesen";
+
+/* File could not be Imported */
+"key_files_vc_import_error_title" = "Datei konnte nicht importiert werden";
+
+/* Used by %@ */
+"key_files_vc_key_file_used_by_fmt" = "Verwendet von %@";
+
+/* multiple databases */
+"key_files_vc_key_file_used_by_multiple" = "mehrere Datenbanken";
+
+/* No Known Database Associations */
+"key_files_vc_key_file_used_by_none" = "Keine bekannten Datenbank-Zuordnungen";
+
+/* Manage Key Files */
+"key_files_vc_manage_title" = "Schlüsseldateien verwalten";
+
+/* No Key File */
+"key_files_vc_no_key_file" = "Keine Schlüsseldatei";
+
+/* Select where you would like to choose your Key File from. This file will not be stored locally or remembered. */
+"key_files_vc_one_time_key_file_source_message" = "Wählen Sie aus, wo Sie Ihre Schlüsseldatei aussuchen möchten. Diese Datei wird nicht lokal gespeichert oder vermerkt.";
+
+/* Files... */
+"key_files_vc_one_time_key_file_source_option_files" = "Dateien ...";
+
+/* Photo Library... */
+"key_files_vc_one_time_key_file_source_option_photos" = "Fotobibliothek ...";
+
+/* One Time Key File Source */
+"key_files_vc_one_time_key_file_source_title" = "Einmalige Schlüsseldatei-Quelle";
+
+/* Cancel */
+"key_files_vc_option_cancel" = "Abbrechen";
+
+/* Import */
+"key_files_vc_option_import" = "Importieren";
+
+/* Remove */
+"key_files_vc_option_remove" = "Entfernen";
+
+/* Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing? */
+"key_files_vc_remove_after_import_message" = "Möchten Sie die Schlüsseldatei von dem lokalen Dokumentenordner nach dem Importieren entfernen? D. h., dass sie in Ihren iOS-Dateien nicht sichtbar ist und über iTunes-Datei-Sharing nicht zugegriffen werden kann.";
+
+/* No, Keep Local Copy */
+"key_files_vc_remove_after_import_option_no" = "Nein, lokale Kopie behalten";
+
+/* Yes, Remove Local Copy */
+"key_files_vc_remove_after_import_option_yes" = "Ja, lokale Kopie entfernen";
+
+/* Remove After Import */
+"key_files_vc_remove_after_import_title" = "Nach Importieren entfernen";
+
+/* Imported Key Files (Auto-Fill Enabled) */
+"key_files_vc_section_header_imported" = "Importierte Schlüsseldateien (Autom. Ausfüllen aktiviert)";
+
+/* Application Local Files */
+"key_files_vc_section_header_local" = "Lokale Dateien der Anwendung";
+
+/* Select Key File */
+"key_files_vc_select_title" = "Schlüsseldatei auswählen";
+
+/* You are currently in offline mode. The database cannot be modified. */
+"model_error_offline_cannot_write" = "Sie befinden sich derzeit im Offline-Modus. Die Datenbank kann nicht modifiziert werden.";
+
+/* You are in read-only mode. Cannot Write! */
+"model_error_readonly_cannot_write" = "Sie befinden sich im schreibgeschützten Modus. Sie könne nicht schreiben!";
+
+/* Sample */
+"model_sample_entry_title" = "Beispiel";
+
+/* username */
+"model_sample_entry_username" = "Benutzername";
+
+/* Sample Group */
+"model_sample_group_title" = "Beispielgruppe";
+
+/* Please Enter the New Group Name */
+"moveentry_vc_add_group_prompt_message" = "Bitte geben Sie den neuen Gruppennamen ein";
+
+/* Group Name */
+"moveentry_vc_add_group_prompt_placeholder" = "Gruppenname";
+
+/* Enter Group Name */
+"moveentry_vc_add_group_prompt_title" = "Gruppennamen eingeben";
+
+/* Error Moving */
+"moveentry_vc_error_moving" = "Fehler beim Verschieben";
+
+/* Error Saving */
+"moveentry_vc_error_saving" = "Fehler beim Speichern";
+
+/* Could not create group with that title here. */
+"moveentry_vc_warn_creating_group_message" = "Gruppe konnte hier mit diesem Titel nicht erstellt werden.";
+
+/* Could not create group */
+"moveentry_vc_warn_creating_group_title" = "Gruppe konnte nicht erstellt werden";
+
+/* Notes Text View */
+"notes_cell_textview_accessibility_label" = "Anmerkungstext-Ansicht";
+
+/* \n\nNB: Convenience Unlock is a Pro feature */
+"open_sequence_append_convenience_pro_warning" = "\n\nBitte beachten: Komfort-Schloss ist eine Pro-Funktion";
+
+/* Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB). */
+"open_sequence_autofill_creash_likely_message" = "Ihre Datenbank hat Verschlüsselungseinstellungen, die verursachen können, dass die Erweiterungen zum automatischen Ausfüllen von iOS-Passwörtern wegen übermäßigen Ressourcenverbrauch beendet werden. D. h., dass das automatische Ausfüllen nicht zu funktionieren scheint. Leider ist das ein Limit, das von Apple auferlegt wird. Sie könnten in Betracht ziehen, die verbrauchte Ressourcenmenge durch Ihre Verschlüsselungseinstellungen (insbesondere Speicher mit Argon2 auf unter 64 MB) zu reduzieren.";
+
+/* AutoFill Crash Likely */
+"open_sequence_autofill_creash_likely_title" = "Absturz des autom. Ausfüllens wahrscheinlich";
+
+/* Unlock Manually... */
+"open_sequence_biometric_unlock_fallback" = "Manuell freischalten ...";
+
+/* Identify to Unlock Database */
+"open_sequence_biometric_unlock_prompt_title" = "Identifizieren, um die Datenbank freizuschalten";
+
+/* %@ Authentication Failed. You must now enter your password manually to open the database. */
+"open_sequence_biometric_unlock_warn_failed_message_fmt" = "%@ Authentifizierung fehlgeschlagen. Sie müssen jetzt ihr Passwort manuell eingeben, um die Datenbank zu öffnen.";
+
+/* %@ Failed */
+"open_sequence_biometric_unlock_warn_failed_title_fmt" = "%@ fehlgeschlagen";
+
+/* %@ has not been setup or system has cancelled. You must now enter your password manually to open the database. */
+"open_sequence_biometric_unlock_warn_not_configured_fmt" = "%@ wurde nicht eingerichtet oder das System hat es abgebrochen. Sie müssen jetzt Ihr Passwort manuell eingeben, um die Datenbank zu öffnen.";
+
+/* Could not open this database in offline mode. Does the Offline Cache exist? */
+"open_sequence_couldnt_open_offline_message" = "Diese Datenbank konnte im Offline-Modus nicht geöffnet werden. Existiert der Offline-Cache?";
+
+/* Could Not Open Offline */
+"open_sequence_couldnt_open_offline_title" = "Konnte offline nicht geöffnet werden";
+
+/* This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue? */
+"open_sequence_database_different_filename_message" = "Das sieht nicht wie die richtige Datei aus, weil der Dateiname anders aussieht, als der, den Sie ursprünglich hinzugefügt haben. Möchten Sie fortfahren?";
+
+/* Different Filename */
+"open_sequence_database_different_filename_title" = "Anderer Dateiname";
+
+/* There was a technical error opening the database. */
+"open_sequence_duress_technical_error_message" = "Beim Öffnen der Datenbank ist ein technischer Fehler aufgetreten.";
+
+/* Technical Issue */
+"open_sequence_duress_technical_error_title" = "Technisches Problem";
+
+/* Could not bookmark this file */
+"open_sequence_error_could_not_bookmark_file" = "Diese Datei konnte nicht markiert werden";
+
+/* Error Reading Key File */
+"open_sequence_error_reading_key_file" = "Fehler beim Lesen der Schlüsseldatei";
+
+/* Invalid Database - [%@] */
+"open_sequence_invalid_database_filename_fmt" = "Ungültige Datenbank - [%@]";
+
+/* %d attempts remaining */
+"open_sequence_pin_attempts_remaining_fmt" = "%d Versuche übrig";
+
+/* The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled. */
+"open_sequence_problem_opening_convenience_incorrect_message" = "Das Komfort-Passwort oder die Schlüsseldatei waren für diese Datenbank falsch. Komfort-Schloss deaktiviert.";
+
+/* The credentials were incorrect for this database. */
+"open_sequence_problem_opening_incorrect_credentials_message" = "Die Anmeldedaten für diese Datenbank waren falsch+.";
+
+/* Incorrect Credentials */
+"open_sequence_problem_opening_incorrect_credentials_title" = "Falsche Anmeldedaten";
+
+/* Could not open database
+   There was a problem opening the database. */
+"open_sequence_problem_opening_title" = "Beim Öffnen der Datenbank ist ein Problem aufgetreten.";
+
+/* Decrypting... */
+"open_sequence_progress_decrypting" = "Wird verschlüsselt ...";
+
+/* For technical reasons, you need to re-select your database file to enable Auto Fill. You will only need to do this once.\n\nThanks!\n-Mark */
+"open_sequence_prompt_database_reselect_required_message" = "Aus technischen Gründen müssen Sie Ihre Datenbank-Datei erneut auswählen, um das autom. Ausfüllen zu aktivieren. Sie müssen das nur einmal machen.\n\nDanke!\n-Mark";
+
+/* Database File Select Required */
+"open_sequence_prompt_database_reselect_required_title" = "Auswahl der Datenbank-Datei erforderlich";
+
+/* No */
+"open_sequence_prompt_option_no" = "Nein";
+
+/* You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this database. */
+"open_sequence_prompt_too_many_incorrect_pins_message" = "Sie haben die falsche PIN zu oft eingegeben. Freischalten mit PIN ist jetzt gesperrt und Sie müssen das Master-Passwort eingeben, um diese Datenbank freizuschalten .";
+
+/* Too Many Incorrect PINs */
+"open_sequence_prompt_too_many_incorrect_pins_title" = "Zu viele falsche PINs";
+
+/* You can use %@ to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password */
+"open_sequence_prompt_use_convenience_bio_message_fmt" = "Sie können %@ zum Freischalten dieser Datenbank verwenden. Auch wenn das bequem ist, kann es die Sicherheit der Datenbank auf diesem Gerät reduzieren. Falls Sie das verwenden möchten, wählen Sie es bitte unten aus oder wählen Sie Nein aus, um mit Ihrem Master-Passwort fortzufahren.\n\n*Wichtig: Sie müssen sich IMMER an Ihr Master-Passwort erinnern";
+
+/* Convenience Unlock: Use %@ to Unlock in Future? */
+"open_sequence_prompt_use_convenience_bio_title_fmt" = "Komfort-Schloss: %@ in Zukunft zum Freischalten verwenden?";
+
+/* You can use either %@ or a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password */
+"open_sequence_prompt_use_convenience_both_message_fmt" = "Sie können entweder %@ oder einen Komfort-PIN-Code zum Freischalten dieser Datenbank verwenden. Auch wenn das bequem ist, kann es die Sicherheit der Datenbank auf diesem Gerät reduzieren. Falls Sie das verwenden möchten, wählen Sie es bitte unten aus oder wählen Sie Nein aus, um mit Ihrem Master-Passwort fortzufahren.\n\n*Wichtig: Sie müssen sich IMMER an Ihr Master-Passwort erinnern";
+
+/* Convenience Unlock: Use %@ or PIN Code in Future? */
+"open_sequence_prompt_use_convenience_both_title_fmt" = "Komfort-Schloss: %@ oder PIN-Code in Zukunft verwenden?";
+
+/* You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password */
+"open_sequence_prompt_use_convenience_pin_message" = "Sie können einen Komfort-PIN-Code verwenden, um diese Datenbank freizuschalten. Auch wenn das bequem ist, kann es die Sicherheit der Datenbank auf diesem Gerät reduzieren. Falls Sie das verwenden möchten, wählen Sie es bitte unten aus oder wählen Sie Nein aus, um mit Ihrem Master-Passwort fortzufahren.\n\n*Wichtig: Sie müssen sich IMMER an Ihr Master-Passwort erinnern";
+
+/* Convenience Unlock: Use a PIN Code to Unlock in Future? */
+"open_sequence_prompt_use_convenience_pin_title" = "Komfort-Schloss: PIN-Code in Zukunft zum Freischalten verwenden?";
+
+/* Use %@ */
+"open_sequence_prompt_use_convenience_use_bio_fmt" = "%@ verwenden";
+
+/* Use a PIN Code... */
+"open_sequence_prompt_use_convenience_use_pin" = "PIN-Code verwenden ...";
+
+/* Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@
+   There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ */
+"open_sequence_storage_unreachable_open_offline_instead_fmt" = "%@ konnte nicht erreicht werden. Es sieht so aus, als ob Sie offline sind. Möchten Sie die schreibgeschützte Offline-Cache-Version stattdessen verwenden?\n\nZuletzt zwischengespeichert: %@";
+
+/* Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings */
+"open_sequence_warn_pin_conflict_message" = "Ihre Komfort-PIN steht in Konflikt mit Ihrer Zwangs-PIN- Bitte in den Datenbank-Einstellungen konfigurieren";
+
+/* PIN Conflict */
+"open_sequence_warn_pin_conflict_title" = "PIN-Konflikt";
+
+/* Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious click. */
+"open_sequence_yesno_set_quick_launch_message" = "Möchten Sie dies als Ihre Schnellstart-Datenbank verwenden? Schnellstart bedeutet, dass Sie sofort zum Freischalten aufgefordert werden, wenn Sie Strongbox öffnen, was Ihnen einen wertvollen Klick spart.";
+
+/* Set Quick Launch? */
+"open_sequence_yesno_set_quick_launch_title" = "Schnellstart einrichten?";
+
+/* Use Offline Cache? */
+"open_sequence_yesno_use_offline_cache_title" = "Offline-Cache verwenden?";
+
+/* <Generation Failed> */
+"password_gen_vc_generation_failed" = "<Generierung fehlgeschlagen>";
+
+/* Basic */
+"password_gen_vc_mode_basic_title" = "Einfach";
+
+/* Word Separator */
+"password_gen_vc_prompt_word_separator" = "Worttrennzeichen";
+
+/* Sample Password Copied */
+"password_gen_vc_sample_password_copied" = "Beispiel-Passwort kopiert";
+
+/* Select Word Casing */
+"password_gen_vc_select_casing_type" = "Groß-/Kleinschreibung auswählen";
+
+/* Select Character Groups */
+"password_gen_vc_select_character_groups" = "Zeichengruppen auswählen";
+
+/* Select l33t Level */
+"password_gen_vc_select_hacker_level" = "l33t-Level auswählen";
+
+/* Select Algorithm */
+"password_gen_vc_select_mode" = "Algorithmus auswählen";
+
+/* Select Salt Type */
+"password_gen_vc_select_salt_type" = "Salztyp auswählen";
+
+/* Select Word Lists */
+"password_gen_vc_select_wordlists" = "Wortliste auswählen";
+
+/* Using: %@ */
+"password_gen_vc_using_character_groups_fmt" = "Verwendet: %@";
+
+/* Using: %@ */
+"password_gen_vc_using_wordlists_fmt" = "Verwendet: %@";
+
+/* Separator */
+"password_gen_vc_word_separator_placeholder" = "Trennzeichen";
+
+/* This database is stored on a Storage Provider that does not support Live editing in App Extensions. Cannot Create New Record. */
+"pick_creds_vc_cannot_create_new_unsupported_storage_type_message" = "Diese Datenbank wird bei eine Speicheranbieter gespeichert, der keine Live-Bearbeitung in App-Erweiterungen unterstützt. Neuer Eintrag kann nicht erstellt werden.";
+
+/* Unsupported Storage */
+"pick_creds_vc_cannot_create_new_unsupported_storage_type_title" = "Nicht unterstützter Speicher";
+
+/* Create New Record... */
+"pick_creds_vc_create_new_button_title" = "Neuen Eintrag erstellen ...";
+
+/* It appears your database is empty */
+"pick_creds_vc_empty_dataset_subtitle" = "Ihre Datenbank scheint leer zu sein";
+
+/* Empty Database */
+"pick_creds_vc_empty_dataset_title" = "Leere Datenbank";
+
+/* Could not find any matching records */
+"pick_creds_vc_empty_search_dataset_subtitle" = "Es konnten keine passenden Einträge gefunden werden";
+
+/* No Matching Records */
+"pick_creds_vc_empty_search_dataset_title" = "Keine passenden Einträge";
+
+/* (in /%@) */
+"pick_creds_vc_group_path_display_string_fmt" = "(in /%@)";
+
+/* (in /) */
+"pick_creds_vc_group_path_display_string_root" = "(in /)";
+
+/* All Fields */
+"pick_creds_vc_search_scope_all_fields" = "Alle Felder";
+
+/* Password */
+"pick_creds_vc_search_scope_password" = "Passwort";
+
+/* Title */
+"pick_creds_vc_search_scope_title" = "Titel";
+
+/* URL */
+"pick_creds_vc_search_scope_url" = "URL";
+
+/* Username */
+"pick_creds_vc_search_scope_username" = "Benutzername";
+
+/* Turn Convenience PIN Off */
+"pins_config_vc_button_title_turn_convenience_pin_off" = "Komfort-PIN ausschalten";
+
+/* Turn Convenience PIN On */
+"pins_config_vc_button_title_turn_convenience_pin_on" = "Komfort-PIN einschalten";
+
+/* Turn Duress PIN Off */
+"pins_config_vc_button_title_turn_duress_pin_off" = "Zwangs-PIN ausschalten";
+
+/* Turn Duress PIN On */
+"pins_config_vc_button_title_turn_duress_pin_on" = "Zwangs-PIN einschalten";
+
+/* Enter Duress PIN */
+"pins_config_vc_enter_duress_pin" = "Zwangs-PIN eingeben";
+
+/* Your Convenience PIN conflicts with your Duress PIN. Please select another. */
+"pins_config_vc_error_pin_conflict_message" = "Ihre Komfort-PIN steht mit Ihrer Zwangs-PIN in Konflikt. Bitte eine andere auswählen.";
+
+/* PIN Conflict */
+"pins_config_vc_error_pin_conflict_title" = "PIN-Konflikt";
+
+/* Delete Database */
+"pins_config_vc_label_delete_database" = "Datenbank löschen";
+
+/* iCloud database will be permanently deleted from iCloud. */
+"pins_config_vc_label_delete_database_icloud_permanent" = "iCloud-Datenbank wird dauerhaft von iCloud gelöscht.";
+
+/* Local Device database will be permanently deleted. */
+"pins_config_vc_label_delete_database_local_permanent" = "Lokale Gerätedatenbank wird dauerhaft gelöscht.";
+
+/* Remove Database from Strongbox */
+"pins_config_vc_label_remove_database" = "Datenbank von Strongbox entfernen";
+
+/* NB: Database file will remain on remote storage. */
+"pins_config_vc_label_remove_database_warning" = "Bitte beachten: Datenbank-Datei wird im Remote-Speicher verbleiben.";
+
+/* PIN Codes (Pro Feature Only) */
+"pins_config_vc_title_pro_only" = "PIN-Codes (Nur Pro-Funktion)";
+
+/* Are you sure you want to turn off the PIN for this database? */
+"pins_config_vc_turn_pin_off_confirm" = "Sind Sie sicher, dass Sie die PIN für diese Datenbank freischalten möchten?";
+
+/* Turn off PIN? */
+"pins_config_vc_turn_pin_off_prompt_title" = "PIN ausschalten?";
+
+/* Turning the PIN Off for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this? */
+"pins_config_vc_turn_pin_off_warning" = "Das Ausschalten der PIN für diese Datenbank wird das sicher gespeicherte Passwort entfernen und Sie müssen es erneut eingeben. Sind Sie sicher, dass Sie das machen möchten?";
+
+/* This will permanently delete the database file. */
+"pins_config_vc_warn_remove_database_delete_message" = "Diese wird die Datenbank-Datei dauerhaft löschen.";
+
+/* This will remove the database from Strongbox but the underlying file will remain on cloud storage */
+"pins_config_vc_warn_remove_database_remove_message" = "Dies wird die Datenbank von Strongbox entfernen, aber die zugrunde liegende Datei wird im Cloud-Speicher bleiben ";
+
+/* Warning */
+"pins_config_vc_warn_remove_database_title" = "Warnung";
+
+/* App Lock Delay */
+"prefs_vc_app_lock_delay" = "App-Sperre-Verzögerung";
+
+/* Lite Version %@ (Please Upgrade) */
+"prefs_vc_app_version_info_free_fmt" = "Lite Version %@ (Bitte aktualisieren)";
+
+/* Pro Version %@ */
+"prefs_vc_app_version_info_pro_fmt" = "Pro Version %@";
+
+/* Pro Version %@ (Trial - %ld days left) */
+"prefs_vc_app_version_info_pro_trial_fmt" = "Pro Version %@ (Testversion - %ld Tage übrig)";
+
+/* Auto Lock Database Delay */
+"prefs_vc_auto_lock_database_delay" = "Verzögerung für autom. Sperre";
+
+/* This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure? */
+"prefs_vc_clear_biometrics_yesno_message" = "Dies wird alle existierenden Datenbanken mit gespeicherten Master-Anmeldedaten löschen, die mit Biometric Open gesichert werden. Sind Sie sicher?";
+
+/* Clear Biometrics */
+"prefs_vc_clear_biometrics_yesno_title" = "Biometriken löschen";
+
+/* Clear Clipboard Delay */
+"prefs_vc_clear_clipboard_delay" = "Zwischenablageverzögerung löschen";
+
+/* This will clear any existing databases with stored Master Credentials that are backed by PIN Codes */
+"prefs_vc_clear_pin_codes_yesno_message" = "Dies wird alle existierenden Datenbanken mit gespeicherten Master-Anmeldedaten löschen, die mit PIN-Codes gesichert werden";
+
+/* Clear PIN Codes */
+"prefs_vc_clear_pin_codes_yesno_title" = "PIN-Codes löschen";
+
+/* Sessions (%d) */
+"prefs_vc_cloud_sessions_count_fmt" = "Sitzungen (%d)";
+
+/* No Sessions */
+"prefs_vc_cloud_sessions_count_none" = "Keine Sitzungen";
+
+/* Confirm PIN */
+"prefs_vc_confirm_pin" = "PIN bestätigen";
+
+/* Delete Data Failed Attempt Count */
+"prefs_vc_delete_data_attempt_count" = "Anzahl fehlgeschlagener Versuche bis zum löschen der daten";
+
+/* Enable %@ */
+"prefs_vc_enable_biometric_fmt" = "%@ aktivieren";
+
+/* Please find Strongbox in the App Store and you can write a review there. Much appreciated!\n-Mark */
+"prefs_vc_info_cannot_open_app_store_message" = "Bitte suchen Sie Strongbox im App Store und Sie können dort Ihre Bewertung hinterlassen. Vielen Dank!\n-Mark";
+
+/* Cannot open App Store */
+"prefs_vc_info_cannot_open_app_store_title" = "App Store kann nicht geöffnet werden";
+
+/* Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences. */
+"prefs_vc_info_data_deletion_care_required_message" = "Bitte seien Sie mit diesen Einstellungen besonders vorsichtig, wenn Sie eine biometrische ID für die Anwendungssperre verwenden. Dies wird dauerhaft alle lokalen Geräte-Datenbanken und alle Präferenzen löschen.";
+
+/* DATA DELETION: Care Required */
+"prefs_vc_info_data_deletion_care_required_title" = "DATENLÖSCHUNG: Sorgfalt erforderlich";
+
+/* It looks like email is not setup on this device.\n\nContact support@strongboxsafe.com for help. */
+"prefs_vc_info_email_not_available_message" = "Es sieht so aus, als ob auf diesem Gerät kein E-Mail-Konto eingerichtet wurde.\n\nBitte kontaktieren Sie support@strongboxsafe.com, um Hilfe zu erhalten.";
+
+/* Email Not Available */
+"prefs_vc_info_email_not_available_title" = "E-Mail nicht verfügbar";
+
+/* It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings? */
+"prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt" = "Es ist sehr wichtig, dass Sie Ihr Master-Passwort für Ihre Datenbanken kennen und dass Sie sich nicht vollständig auf %@ verlassen.\nDer Migrations- und Import-Prozess unternehmen alles Mögliche, um die %@-Daten zu erhalten, aber es ist nicht garantiert. Es ist auf jeden Fall wichtig, dass Sie Ihre Master-Passwörter immer kennen.\n\nMöchten Sie mit dem Ändern der iCloud-Nutzungseinstellungen fortfahren?";
+
+/* Master Password Warning */
+"prefs_vc_master_password_icloud_migration_yesno_warning_title" = "Master-Passwort-Warnung";
+
+/* Your PINs do not match. */
+"prefs_vc_pins_dont_match_warning_message" = "Ihre PINs stimmen nicht überein.";
+
+/* PINs do not match */
+"prefs_vc_pins_dont_match_warning_title" = "PINs stimmen nicht überein";
+
+/* Disabled */
+"prefs_vc_setting_disabled" = "Deaktiviert";
+
+/* None */
+"prefs_vc_time_interval_none" = "Keine";
+
+/* Use iCloud */
+"prefs_vc_use_icloud_action" = "iCloud verwenden";
+
+/* Use iCloud (Unavailable) */
+"prefs_vc_use_icloud_disabled" = "iCloud verwenden (Nicht verfügbar)";
+
+/* Unlock Attempts Exceeded */
+"privacy_vc_label_unlock_attempts_exceeded" = "Freischalten-Versuche überschritten";
+
+/* Unlock Attempts Remaining: %ld */
+"privacy_vc_label_unlock_attempts_fmt" = "Verbleibende Freischalten-Versuche: %ld";
+
+/* This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application. */
+"privacy_vc_prompt_biometrics_unavailable_message" = "Diese Anwendung erfordert ein biometrisches Freischalten, aber Biometriken sind auf diesem Gerät nicht verfügbar. Sie müssen Biometriken erneut aktivieren, um mit dem Freischalten dieser Anwendung fortzufahren.";
+
+/* Biometrics Unavailable */
+"privacy_vc_prompt_biometrics_unavailable_title" = "Biometriken nicht verfügbar";
+
+/* Identify to Open Strongbox */
+"privacy_vc_prompt_identify_to_open" = "Identifizieren, um Strongbox zu öffnen";
+
+/* %ld Attempts Remaining */
+"privacy_vc_prompt_pin_attempts_remaining_fmt" = "%ld Versuche verbleibend";
+
+/* Problem Saving Database */
+"pw_history_vc_error_problem_saving" = "Problem beim Speichern der Datenbank";
+
+/* Old Passwords (%lu) */
+"pw_history_vc_previous_passwords_count_fmt" = "Alte Passwörter (%lu)";
+
+/* Old Passwords (None) */
+"pw_history_vc_previous_passwords_count_none" = "Alte Passwörter (Keine)";
+
+/* Are you sure you want to disable history? This will clear previous passwords. */
+"pw_history_vc_prompt_disable_history_message" = "Sind Sie sicher, dass Sie den Verlauf löschen möchten? Dies wird die vorherigen Passwörter löschen.";
+
+/* Disable History? */
+"pw_history_vc_prompt_disable_history_title" = "Verlauf deaktivieren?";
+
+/* Do Not Change */
+"pwgen_casing_do_not_change" = "Nicht ändern";
+
+/* Lowercase */
+"pwgen_casing_lowercase" = "Kleinbuchstaben";
+
+/* Numeric */
+"pwgen_casing_numeric" = "Numerisch";
+
+/* Random */
+"pwgen_casing_random" = "Zufällig";
+
+/* Symbols */
+"pwgen_casing_symbols" = "Sonderzeichen";
+
+/* Title Case */
+"pwgen_casing_title_case" = "Titelschreibung";
+
+/* Uppercase */
+"pwgen_casing_uppercase" = "Großbuchstaben";
+
+/* Basic (All Words) */
+"pwgen_hacker_level_basic_all" = "Einfach (Alle Wörter)";
+
+/* Basic (Some Words) */
+"pwgen_hacker_level_basic_some" = "Einfach (Einige Wörter)";
+
+/* None */
+"pwgen_hacker_level_none" = "Keine";
+
+/* Pro (All Words) */
+"pwgen_hacker_level_pro_all" = "Pro (Alle Wörter)";
+
+/* Pro (Some Words) */
+"pwgen_hacker_level_pro_some" = "Pro (Einige Wörter)";
+
+/* None */
+"pwgen_salt_mode_none" = "Keine";
+
+/* Prefix */
+"pwgen_salt_mode_prefix" = "Vorsilbe";
+
+/* Sprinkle */
+"pwgen_salt_mode_sprinkle" = "Bestreuen";
+
+/* Suffix */
+"pwgen_salt_mode_suffix" = "Nachsilbe";
+
+/* Beale */
+"pwgen_wordlist_beale" = "Beale";
+
+/* Catalan */
+"pwgen_wordlist_catalan" = "Katalanisch";
+
+/* Diceware (Arnold G. Reinhold's Original) */
+"pwgen_wordlist_diceware" = "Diceware (Arnold G. Reinholds Original)";
+
+/* Dutch */
+"pwgen_wordlist_dutch" = "Niederländisch";
+
+/* EFF Large */
+"pwgen_wordlist_eff_large" = "EFF groß";
+
+/* EFF Short (v1.0) */
+"pwgen_wordlist_eff_short_1" = "EFF kurz (v1.0)";
+
+/* EFF Short (v2.0 - More memorable, unique prefix) */
+"pwgen_wordlist_eff_short_2" = "EFF kurz (v2.0 - Denkwürdiger, einmalige Vorsilbe)";
+
+/* French */
+"pwgen_wordlist_french" = "Französisch";
+
+/* German */
+"pwgen_wordlist_german" = "Deutsch";
+
+/* Google (U.S. English, No Swears) */
+"pwgen_wordlist_google" = "Google (US-Englisch, kein Fluchen)";
+
+/* Italian */
+"pwgen_wordlist_italian" = "Italienisch";
+
+/* Japanese */
+"pwgen_wordlist_japanese" = "Japanisch";
+
+/* Polish */
+"pwgen_wordlist_polish" = "Polnisch";
+
+/* SecureDrop */
+"pwgen_wordlist_securedrop" = "SecureDrop";
+
+/* Swedish */
+"pwgen_wordlist_swedish" = "Schwedisch";
+
+/* Error while scanning */
+"qr_code_vc_error_scanning_title" = "Fehler beim Scannen";
+
+/* Strongbox could not access the camera on this device. Does it have permission? */
+"qr_code_vc_warn_problem_accessing_camera_message" = "Strongbox konnte nicht auf die Kamera auf diesem Gerät zugreifen. Wurde eine Berechtigung erteilt?";
+
+/* Could not access camera */
+"qr_code_vc_warn_problem_accessing_camera_title" = "Konnte nicht auf die Kamera zugreifen";
+
+/* Title of Prompt about setting Quick Launch */
+"safes_vc_about_quick_launch_title" = "Über Schnellstart";
+
+/* Message about quick launch feature and asking to confirm yes or no */
+"safes_vc_about_setting_quick_launch_and_confirm" = "Wenn Sie diese Datenbank als Ihre Schnellstart-Datenbank festlegen, werden Sie automatisch aufgefordert diese Datenbank freizuschalten, sobald Sie Strongbox starten oder erneut aktivieren. Dies kann Ihnen ein wertvolles Tippen sparen!\n\nAls Schnellstart-Datenbank festlegen?";
+
+/* Button to Rename the Database */
+"safes_vc_action_rename_database" = "Umbenennen ...";
+
+/* Button Title to Set Quick Launch */
+"safes_vc_action_set_as_quick_launch" = "Als Schnellstart festlegen ...";
+
+/* Button Title to Unset Quick Launch */
+"safes_vc_action_unset_as_quick_launch" = "Nicht mehr als Schnellstart verwenden ...";
+
+/* Second option - Select another database */
+"safes_vc_add_another" = "Ich möchte eine andere Datenbank hinzufügen";
+
+/* No comment provided by engineer. */
+"safes_vc_add_existing_database" = "Existierende Datenbank hinzufügen ...";
+
+/* are you sure you want to remove database prompt with format string on end */
+"safes_vc_are_you_sure_remove_database_fmt" = "Sind Sie sicher, dass Sie diese Datenbank von Strongbox entfernen möchten?%@";
+
+/* Date and Time last cache was taken */
+"safes_vc_cached_date_time_fmt" = "Zwischengespeichert: %@";
+
+/* Cancel Button
+   Cancel Option Button Title */
+"safes_vc_cancel" = "Abbrechen";
+
+/* OK/Cancel prompt title for changing local storage mode */
+"safes_vc_change_local_device_storage_mode_title" = "Lokalen Gerätespeicher-Modus ändern";
+
+/* Question Title: Copy to icloud or to local */
+"safes_vc_copy_icloud_or_local" = "Zu iCloud oder lokal speichern?";
+
+/* Question message: copy to iCloud or to Local */
+"safes_vc_copy_local_to_icloud" = "iCloud ist derzeit aktiviert. Möchten Sie diese Datenbank jetzt zu iCloud kopieren oder möchten Sie diese lieber auf Ihrem lokalen Gerät behalten?";
+
+/* Second Button: Copy to iCLoud */
+"safes_vc_copy_to_icloud" = "Zu iCloud kopieren";
+
+/* Default button: Copy to Local */
+"safes_vc_copy_to_local" = "Nur auf das lokale Gerät kopieren";
+
+/* error message could not change local storage */
+"safes_vc_could_not_change_storage_location_error" = "Speicherort konnte nicht geändert werden";
+
+/* Title of the 'More Actions' alert/action sheet */
+"safes_vc_database_actions_sheet_title" = "Datenbank-Aktionen";
+
+/* informational message - made the database fully autofillable */
+"safes_vc_database_made_fully_autofillable" = "Diese Datenbank kann vollständige autom. Ausfüllen";
+
+/* informational message - made the file visible in iOS Files */
+"safes_vc_database_made_visible_in_files" = "Diese Datenbank wurde in 'Dateien' sichtbar gemacht";
+
+/* Subtitle displayed in tableview when there are no databases setup */
+"safes_vc_empty_databases_list_get_started_button_title" = "Anfangen ...";
+
+/* Subtitle displayed in tableview when there are no databases setup */
+"safes_vc_empty_databases_list_tableview_subtitle" = "Unten tippen, um anzufangen";
+
+/* Title displayed in tableview when there are no databases setup */
+"safes_vc_empty_databases_list_tableview_title" = "Keine Datenbanken";
+
+/* Error title: error adding database */
+"safes_vc_error_adding_database" = "Fehler beim Hinzufügen";
+
+/* Error Title: Error creating database
+   Error Title: Error while creating database */
+"safes_vc_error_creating_database" = "Fehler beim Erstellen der Datenbank";
+
+/* Error message - could not delete iCloud database */
+"safes_vc_error_delete_icloud_database" = "Fehler beim Löschen der iCloud-Datenbank";
+
+/* Error Title Error Importing Datavase */
+"safes_vc_error_importing_database" = "Fehler beim Importieren der Datenbank";
+
+/* No comment provided by engineer. */
+"safes_vc_error_pin_incorrect_message" = "Das ist nicht der richtige PIN-Code.";
+
+/* No comment provided by engineer. */
+"safes_vc_error_pin_incorrect_title" = "PIN falsch";
+
+/* Error title - error selecting storage location */
+"safes_vc_error_selecting_storage_location" = "Fehler beim Auswählen des Speicherorts";
+
+/* extra info appended to string about the underlying storage type */
+"safes_vc_extra_info_underlying_database" = " (Bitte beachten: Die zugrunde liegende Datenbank-Datei wird nicht gelöscht)";
+
+/* Informational message title - found an iCloud Database */
+"safes_vc_found_icloud_database" = "iCloud-Datenbank gefunden";
+
+/* information message = title changed storage mode */
+"safes_vc_local_storage_mode_changed" = "Lokaler Speichermodus geändert";
+
+/* Button Title to Make AutoFillable */
+"safes_vc_make_autofillable" = "Autom. Ausfüllen ermöglichen ...";
+
+/* Button tutle to make database Auto Fill-able */
+"safes_vc_make_database_auto_fill_info" = "Wenn mit dieser Datenbank das autom. Ausfüllen möglich ist, kann auf Sie in allen Kontexten mit autom. Ausfüllen zugegriffen werden (nicht nur ein schreibgeschützter Cache). Sie wird jedoch nicht länger im iTunes-Datei-Sharing oder über die Dateien-App gesehen werden. Dies liegt am iOS-System-Design.\n\nBitte beachten: Sie können diese Aktion immer rückgängig machen";
+
+/* No comment provided by engineer. */
+"safes_vc_new_database_advanced" = "Neue Datenbank (Erweitert) ...";
+
+/* No comment provided by engineer. */
+"safes_vc_new_database_express" = "Neue Datenbank (Express)";
+
+/* Are you sure? Title */
+"safes_vc_question_confirm_are_you_sure" = "Sind Sie sicher?";
+
+/* warning message about removing database from icloud */
+"safes_vc_remove_icloud_databases_warning" = "Dies wird die Datenbank von allen Ihre iCloud-aktivierten Geräten entfernen.\n\nSind Sie sicher, dass Sie diese Datenbank von Strongbox und iCloud entfernen möchten?";
+
+/* Button title to Show Database in iOS Files App */
+"safes_vc_show_database_in_files_info" = "Das Anzeigen dieser Datenbank in 'Dateien' macht die Datenbank für den Zugriff über 'Dateien' und iTunes-Dateien-Sharing verfügbar. Die Datenbank wird jedoch nicht mehr länger für das autom. Ausfüllen zugänglich sein. Dies liegt an dem iOS-System-Design.\n\nBitte beachten: Sie können diese Aktion immer rückgängig machen";
+
+/* Button Title to Show in Files */
+"safes_vc_show_in_files" = "In 'Dateien' anzeigen ...";
+
+/* View more actions table action */
+"safes_vc_slide_left_more_actions" = "Mehr ...";
+
+/* Open ths database offline table action */
+"safes_vc_slide_left_open_offline_action" = "Offline öffnen";
+
+/* Remove this database table action */
+"safes_vc_slide_left_remove_database_action" = "Entfernen ...";
+
+/* Error Message- unknown error while adding */
+"safes_vc_unknown_error_while_adding_database" = "Beim Hinzufügen dieser Datenbank ist ein unbekannter Fehler aufgetreten";
+
+/* Upgrade Button Title - Upgrade Info */
+"safes_vc_upgrade_info_button_title" = "Upgrade-Info";
+
+/* Upgrade Button Title with Days remaining of pro trial version */
+"safes_vc_upgrade_info_button_title_days_remaining" = "Upgrade-Info - (%ld Pro-Tage übrig)";
+
+/* Upgrade Button Title asking to Please Upgrade */
+"safes_vc_upgrade_info_button_title_please_upgrade" = "Bitte upgraden ...";
+
+/* question message, use iCloud database or select a different one */
+"safes_vc_use_icloud_or_continue" = "Es sieht so aus, als ob Sie bereits eine iCloud-Datenbank haben. Möchten Sie diese verwenden oder möchten Sie mit dem Hinzufügen einer anderen fortfahren?";
+
+/* One of the options in response to prompt - Use this iCloud database */
+"safes_vc_use_this_icloud_database" = "Diese iCloud-Datenbank verwenden";
+
+/* Options Title - What would like to do? Options are to Add a Database or Create New etc */
+"safes_vc_what_would_you_like_to_do" = "Was möchten Sie tun?";
+
+/* Copy to iCloud */
+"safesvc_copy_database_option_to_icloud" = "In iCloud kopieren";
+
+/* Copy to Local Device Only */
+"safesvc_copy_database_option_to_local" = "Nur auf das lokale Gerät kopieren";
+
+/* iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only? */
+"safesvc_copy_database_to_location_message" = "iCloud ist derzeit aktiviert. Möchten Sie diese Datenbank jetzt in iCloud kopieren oder möchten Sie diese lieber auf Ihrem lokalen Gerät behalten?";
+
+/* Copy to iCloud or Local? */
+"safesvc_copy_database_to_location_title" = "In iCloud oder lokal speichern?";
+
+/* Error Importing Database */
+"safesvc_error_importing_title" = "Fehler beim Importieren der Datenbank";
+
+/* Could not access this file. */
+"safesvc_error_message_import_file_error_opening" = "Auf diese Datei konnte nicht zugegriffen werden.";
+
+/* Could not bookmark this file */
+"safesvc_error_title_could_not_bookmark" = "Diese Datei konnte nicht markiert werden";
+
+/* Problem Importing Key File */
+"safesvc_error_title_error_importing_key_file" = "Problem beim Importieren der Schlüsseldatei";
+
+/* Invalid Database - [%@] */
+"safesvc_error_title_import_database_fmt" = "Ungültige Datenbank - [%@]";
+
+/* Error Opening */
+"safesvc_error_title_import_file_error_opening" = "Fehler beim Öffnen";
+
+/* Could not update local file. */
+"safesvc_error_updating_message" = "Lokale Datei konnte nicht aktualisiert werden.";
+
+/* Error updating file. */
+"safesvc_error_updating_title" = "Fehler beim Aktualisieren der Datei.";
+
+/* iCloud Available */
+"safesvc_icloud_available_title" = "iCloud verfügbar";
+
+/* Migrating... */
+"safesvc_icloud_migration_progress_title_migrating" = "Migriert ...";
+
+/* Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud. */
+"safesvc_icloud_no_longer_available_message" = "Einige Datenbanken wurden von diesem Gerät entfernt, weil iCloud nicht mehr verfügbar ist, aber sie bleiben in iCloud gespeichert.";
+
+/* iCloud no longer available */
+"safesvc_icloud_no_longer_available_title" = "iCloud nicht mehr verfügbar";
+
+/* iCloud is Now Available */
+"safesvc_icloud_now_available_title" = "iCloud ist jetzt verfügbar";
+
+/* Switch iCloud Back On */
+"safesvc_icloud_unavailable_option_icloud_on" = "iCloud wieder einschalten";
+
+/* Make Local Copies */
+"safesvc_icloud_unavailable_option_make_local" = "Lokale Kopien erstellen";
+
+/* Remove them, Keep on iCloud Only */
+"safesvc_icloud_unavailable_option_remove" = "Entfernen, nur in iCloud behalten";
+
+/* What would you like to do with the databases currently on this device? */
+"safesvc_icloud_unavailable_question" = "Was möchten Sie mit den Datenbanken machen, die sich derzeit auf diesem Gerät befinden?";
+
+/* iCloud Unavailable */
+"safesvc_icloud_unavailable_title" = "iCloud nicht verfügbar";
+
+/* Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like? */
+"safesvc_import_database_prompt_message" = "Strongbox kann versuchen dieses Dokument an seinem aktuellen Ort zu bearbeiten und behält eine Referenz oder, falls Sie das bevorzugen, kann Strongbox eine Kopie dieser Datei erstellen.\n\nWelche Option möchten Sie?";
+
+/* Edit or Copy? */
+"safesvc_import_database_prompt_title_edit_copy" = "Bearbeiten oder kopieren?";
+
+/* Invalid Database */
+"safesvc_import_manual_url_invalid" = "Ungültige Datenbank";
+
+/* This key file has been imported successfully. */
+"safesvc_info_message_key_file_imported" = "Diese Schlüsseldatei wurde erfolgreich importiert";
+
+/* Key File Imported */
+"safesvc_info_title_key_file_imported" = "Schlüsseldatei importiert";
+
+/* You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected) */
+"safesvc_migrate_local_existing" = "Sie können jetzt iCloud mit Strongbox verwenden. Sollen Ihre lokalen Datenbanken zu iCloud migriert und auf allen Ihren Geräten verfügbar gemacht werden? (Bitte beachten: Ihre existierenden iCloud-Datenbanken werden davon nicht beeinflusst)";
+
+/* You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? */
+"safesvc_migrate_local_no_existing" = "Sie können jetzt iCloud mit Strongbox verwenden. Sollen Ihre lokalen Datenbanken zu iCloud migriert und auf allen Ihren Geräten verfügbar gemacht werden?";
+
+/* Edit in Place */
+"safesvc_option_edit_in_place" = "Am Ort bearbeiten";
+
+/* Keep Local */
+"safesvc_option_keep_local" = "Lokal behalten";
+
+/* Local Only */
+"safesvc_option_local_only" = "Nur lokal";
+
+/* Make a Copy */
+"safesvc_option_make_a_copy" = "Kopie erstellen";
+
+/* Migrate to iCloud */
+"safesvc_option_migrate_to_icloud" = "Zu iCloud migrieren";
+
+/* Use iCloud */
+"safesvc_option_use_icloud" = "iCloud verwenden";
+
+/* Would you like to migrate your current local device databases to iCloud? */
+"safesvc_question_migrate_local_to_icloud" = "Möchten Sie Ihre aktuelle lokale Geräte-Datenbank zu iCloud migrieren?";
+
+/* Update Existing Database? */
+"safesvc_update_existing_database_title" = "Existierende Datenbank aktualisieren?";
+
+/* Create a New Database */
+"safesvc_update_existing_option_create" = "Neue Datenbank erstellen";
+
+/* Update Existing Database */
+"safesvc_update_existing_option_update" = "Existierende Datenbank aktualisieren";
+
+/* A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file? */
+"safesvc_update_existing_question" = "Eine Datenbank, die diesen Dateinamen verwendet, wurde in Strongbox gefunden. Soll Strongbox diese Datenbank aktualisieren, indem diese Datei verwendet wird oder möchten Sie eine neue Datenbank mit dieser Datei erstellen?";
+
+/* Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected) */
+"safesvc_use_icloud_question_existing" = "Möchten Sie die Option, iCloud mit Strongbox zu verwenden? (Bitte beachten: Ihre existierende Cloud-Datenbanken werden nicht beeinflusst)";
+
+/* You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices? */
+"safesvc_use_icloud_question_no_existing" = "Sie können jetzt iCloud mit Strongbox verwenden. Möchten Sie, dass Ihre Datenbanken auf allen Ihren Geräten verfügbar sind?";
+
+/* Loading... */
+"sbtvc_empty_table_loading" = "Lädt ...";
+
+/* No Files or Folders Found */
+"sbtvc_empty_table_no_files_found" = "Keine Dateien oder Ordner gefunden";
+
+/* Error Reading Database File */
+"sbtvc_error_reading_database" = "Fehler beim Lesen der Datenbank-Datei";
+
+/* Invalid Database File */
+"sbtvc_invalid_database_file" = "Ungültige Datenbank-Datei";
+
+/* You can only have databases in the Root folder for this storage type. */
+"sbtvc_root_folder_only_message" = "Sie können für diesen Speichertyp nur Datenbanken im Root-Ordner haben.";
+
+/* Root Folder Only */
+"sbtvc_root_folder_only_title" = "Nur Root-Ordner";
+
+/* Please Select Database File */
+"sbtvc_select_database_file" = "Bitte Datenbank-Datei auswählen";
+
+/* Select Folder For New Database */
+"sbtvc_select_new_database_location" = "Ordner für neue Datenbank auswählen";
+
+/* You must select at least one item */
+"select_item_vc_message_select_one" = "Sie müssen mindestens ein Element auswählen";
+
+/* Select One */
+"select_item_vc_title_select_one" = "Eins auswählen";
+
+/* Could not download favicon for this item */
+"set_icon_vc_error_downloading_favicon_message" = "Favicon für dieses Element konnte nicht heruntergeladen werden";
+
+/* FavIcon Problem */
+"set_icon_vc_error_downloading_favicon_title" = "Favicon-Problem";
+
+/* Error Reading Image */
+"set_icon_vc_error_reading_image" = "Fehler beim Lesen des Bildes";
+
+/* Download FavIcon */
+"set_icon_vc_icon_source_download_favicon" = "Favicon herunterladen";
+
+/* Download FavIcon (Pro Only) */
+"set_icon_vc_icon_source_download_favicon_pro_only" = "Favicon herunterladen (Nur Pro)";
+
+/* KeePass & Database Icon Set */
+"set_icon_vc_icon_source_keepass_set" = "KeePass- und Datenbank-Symbolset";
+
+/* Media Library */
+"set_icon_vc_icon_source_media_libary" = "Medienbibliothek";
+
+/* Could not access photos source. */
+"set_icon_vc_image_src_photos_unavailable_message" = "Auf die Fotoquelle konnte nicht zugegriffen werden.";
+
+/* Image Source Unavailable */
+"set_icon_vc_image_src_unavailable_title" = "Bildquelle nicht verfügbar";
+
+/* Cancel */
+"set_icon_vc_option_cancel" = "Abbrechen";
+
+/* Analyzing Image... */
+"set_icon_vc_progress_analyzing_image" = "Bild wird analysiert ...";
+
+/* Downloading FavIcon */
+"set_icon_vc_progress_downloading_favicon" = "Favicon wird heruntergeladen";
+
+/* Reading Data... */
+"set_icon_vc_progress_reading_data" = "Daten werden gelesen ...";
+
+/* This is a rather large image (%dx%d), would you like to rescale it to a maximum dimension of %d pixels for a file size saving of roughly %@ */
+"set_icon_vc_prompt_rescale_image_message_fmt" = "Das ist ein eher großes Bild (%dx%d). Möchten Sie die Dimensionen auf ein Maximum von %d Pixel ändern, damit eine Dateigröße von ca. %@ gespart wird.";
+
+/* Large Custom Icon Image, Rescale? */
+"set_icon_vc_prompt_rescale_image_title" = "Großes benutzerdefiniertes Symbolbild. Dimensionen ändern?";
+
+/* Select the source of the icon you would like to use for this entry */
+"set_icon_vc_select_icon_source_message" = "Wählen Sie die Quelle für das Symbol aus, das Sie für diesen Eintrag verwenden möchten ";
+
+/* Select Icon Source */
+"set_icon_vc_select_icon_source_title" = "Symbolquelle auswählen";
+
+/* Face ID */
+"settings_face_id_name" = "Face-ID";
+
+/* Touch ID */
+"settings_touch_id_name" = "Touch-ID";
+
+/* Authentication Failed for [user: %@] */
+"sftp_provider_auth_failed_fmt" = "Authentifizierung fehlgeschlagen für [Benutzer: %@]";
+
+/* Could not connect to host: %@ [user: %@] */
+"sftp_provider_connect_failed_fmt" = "Verbindung mit Host konnte nicht hergestellt werden: %@ [Benutzer: %@]";
+
+/* Could not create file */
+"sftp_provider_could_not_create" = "Datei konnte nicht erstellt werden";
+
+/* Could not read file */
+"sftp_provider_could_not_read" = "Datei konnte nicht gelesen werden";
+
+/* Could not update file */
+"sftp_provider_could_not_update" = "Datei konnte nicht aktualisiert werden";
+
+/* This does not look like a valid private key */
+"sftp_vc_warn_invalid_key_message" = "Das sieht nicht wie ein gültiger privater Schlüssel aus";
+
+/* Invalid Key */
+"sftp_vc_warn_invalid_key_title" = "Ungültiger Schlüssel";
+
+/* Copy from URL... */
+"sspc_copy_from_url_action" = "Von URL kopieren ...";
+
+/* Invalid Database */
+"sspc_error_invalid_database" = "Ungültige Datenbank";
+
+/* Files... */
+"sspc_ios_files_storage_location" = "Dateien ...";
+
+/* Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database? */
+"sspc_local_device_storage_warning_message" = "Da eine lokale Datenbank nur auf diesem Gerät gespeichert wird, führt ein Verlust des Gerätes zum Verlust aller Passwörter, die in der Datenbank gespeichert sind. Um einen Datenverlust zu verhindern, sollten Sie in Betracht ziehen, einen der von Strongbox unterstützten Cloudspeicher-Anbieter zu verwenden.\n\nMöchten Sie dennoch mit dem Erstellen einer lokalen Gerätedatenbank fortfahren?";
+
+/* Local Device Database Caveat */
+"sspc_local_device_storage_warning_title" = "Warnung";
+
+/* Please Enter the URL of the Database File. */
+"sspc_manual_import_enter_url_message" = "Bitte geben Sie die URL der Datenbank-Datei ein.";
+
+/* Enter URL */
+"sspc_manual_import_enter_url_title" = "URL eingeben";
+
+/* Error Reading from URL */
+"sspc_manual_import_error_title" = "Fehler beim Lesen von der URL";
+
+/* URL */
+"sspc_manual_import_placeholder_url" = "URL";
+
+/* Select where your existing database is stored */
+"sspc_select_where_existing_stored" = "Wählen Sie aus, wo Ihre existierende Datenbank gespeichert ist";
+
+/* Select where you would like to store your new database */
+"sspc_select_where_store_new" = "Wählen Sie aus, wo Sie Ihre neue Datenbank speichern möchten";
+
+/* No TOTP Setup */
+"totp_cell_no_totp_has_been_setup" = "Keine TOTP-Einrichtung";
+
+/* It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt. */
+"upgrade_mgr_downgrade_message" = "Es sieht so aus, als ob die App nicht mehr Anspruch auf alle Pro-Funktionen hat. Diese werden jetzt eingeschränkt. Falls Sie der Meinung sind, dass das nicht richtig ist, kontaktieren Sie bitte support@strongboxsafe.com, um Hilfe dabei zu erhalten. Bitte hängen Sie einen Kaufbeleg an.";
+
+/* Strongbox Downgrade */
+"upgrade_mgr_downgrade_title" = "Strongbox-Downgrade";
+
+/* Strongbox is having trouble verifying its App Store entitlements. This could lead to a future App downgrade. Please contact support@strongboxsafe.com to get some help with this. */
+"upgrade_mgr_entitlements_error_message" = "Strongbox hat Probleme beim Verifizieren seiner App-Store-Berechtigungen. Dies könnten zu einem künftigen App-Downgrade führen. Bitte kontaktieren Sie support@strongboxsafe.com, um Hilfe dabei zu erhalten.";
+
+/* Strongbox Entitlements Error */
+"upgrade_mgr_entitlements_error_title" = "Strongbox-Berechtigungsfehler";
+
+/* Purchases are disabled on your device. */
+"upgrade_mgr_purchases_are_disabled" = "Käufe sind auf diesem Gerät deaktiviert.";
+
+/* 3 Months */
+"upgrade_vc_2monthly_subscription_title" = "3 Monate";
+
+/* Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark */
+"upgrade_vc_developer_msg_free_trial_fmt" = "Hi! Sie probieren gerade die Pro-Version von Strongbox aus. Ich hoffe, dass es Ihnen gefällt und dass Sie es nützlich finden! Ihr Test für diese Pro-Version endet in %ld Tagen und Sie werden die kostenlose Version nutzen, der ein paar schicke Funktionen fehlen. Unten können Sie mehr herausfinden.\nIch frage mich, ob Sie ein Upgrade in Betracht ziehen würden? Wenn Sie das machen, unterstützen Sie einen unabhängigen App-Entwickler. Ich liebe es, an dieser App zu arbeiten und Ihre Unterstützung erlaubt mir, das weiterhin zu tun. Danke im Voraus!\n-Mark";
+
+/* Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark */
+"upgrade_vc_developer_msg_trial_expired" = "Hi! Sie probieren gerade die kostenlose Version von Strongbox aus. Ich frage mich, ob Sie ein Upgrade in Betracht ziehen würden? Wenn Sie das machen, unterstützen Sie einen unabhängigen App-Entwickler und Sie erhalten außerdem die unten stehenden Pro-Funktionen. Ein zusätzlicher Bonus ist, dass Sie nie wieder diesen nervigen Upgrade-Bildschirm sehen werden! Ich liebe es, an dieser App zu arbeiten und Ihre Unterstützung erlaubt mir, das weiterhin zu tun. Danke im Voraus!\n-Mark";
+
+/* Problem Purchasing */
+"upgrade_vc_error_purchasing" = "Probleme beim Kaufen";
+
+/* Lifetime */
+"upgrade_vc_lifetime_purchase_title" = "Lebenszeit";
+
+/* (No Subscription) */
+"upgrade_vc_lifetime_subtitle_no_sub" = "(Kein Abonnement)";
+
+/* Monthly */
+"upgrade_vc_monthly_subscription_title" = "Monatlich";
+
+/* Please Try Again Later */
+"upgrade_vc_price_not_available_try_later" = "Bitte später erneut versuchen";
+
+/* Momentarily Unavailable */
+"upgrade_vc_price_not_currently_available" = "Im Moment nicht verfügbar";
+
+/* %@/month */
+"upgrade_vc_price_per_month_fmt" = "%@/Monat";
+
+/* %@/month (Save %d%%) */
+"upgrade_vc_price_per_month_with_percentage_saving_fmt" = "%@/Monat (Sie sparen %d%%)";
+
+/* Issue Restoring Purchase */
+"upgrade_vc_problem_restoring" = "Problem beim Wiederherstellen des Kaufs";
+
+/* Could not access Upgrade Products on App Store. Please try again later. */
+"upgrade_vc_product_error_message" = "Auf die Upgrade-Produkte im App Store konnte nicht zugegriffen werden. Bitte später erneut versuchen.";
+
+/* Product Error */
+"upgrade_vc_product_error_title" = "Produktfehler";
+
+/* Purchasing... */
+"upgrade_vc_progress_purchasing" = "Wird gekauft ...";
+
+/* Restoring... */
+"upgrade_vc_progress_restoring" = "Wird wiederhergestellt ...";
+
+/* Upgrade could not be restored from previous purchase. Are you sure you have purchased this item? */
+"upgrade_vc_restore_unsuccessful_message" = "Upgrade konnte vom vorherigen Kauf nicht wiederhergestellt werden. Sind Sie sicher, dass Sie dieses Element gekauft haben?";
+
+/* Restoration Unsuccessful */
+"upgrade_vc_restore_unsuccessful_title" = "Wiederherstellung nicht erfolgreich";
+
+/* Loading... */
+"upgrade_vc_subtitle_loading_price" = "Lädt ...";
+
+/* Yearly */
+"upgrade_vc_yearly_subscription_title" = "Jährlich";
+
+/* Could not connect to server. */
+"webdav_storage_could_not_connect" = "Verbindung mit dem Server konnte nicht hergestellt werden.";
+
+/* Show/Hide Password */
+"welcome_vc_accessibility_show_hide_password" = "Passwort anzeigen/ausblenden";
+
+/* Add Existing Database */
+"welcome_vc_add_existing_database" = "Existierende Datenbank";
+
+/* Error Creating Database */
+"welcome_vc_error_creating" = "Fehler beim Erstellen der Datenbank";
+
+/* View Your Database */
+"welcome_vc_view_database" = "Ihre Datenbank ansehen";
+
+/* View Your Databases */
+"welcome_vc_view_databases" = "Ihre Datenbanken ansehen";
+
+/* Button Title to start reordering */
+"safes_vc_action_reorder_database" = "Neu ordnen ...";
+
+/* Please Enter a Host */
+"sftp_vc_label_validation_enter_host" = "Bitte geben Sie einen Host ein";
+
+/* Select a Private Key... */
+"sftp_vc_label_validation_select_private_key" = "Wählen Sie einen privaten Schlüssel ...";
+
+/* URL Invalid */
+"webdav_vc_validation_url_invalid" = "URL ungültig";
+
+/* Tip displayed at top of screen. Slide left on Database for options */
+"safes_vc_tip" = "Tipp: Streichen Sie in der Datenbank nach links, um Optionen anzuzeigen";
+
+/* Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes */
+"item_details_tip" = "Tipp: Tippen, um zu kopieren. Doppelt tippen, um URL zu öffnen oder Anmerkungen zu notieren";
+
+/* Tip: Slide Left for Options or Tap to View */
+"keepass_history_tip" = "Tipp: Streichen Sie für Optionen nach links oder tippen Sie zum Anzeigen auf";
+
+/* Pin */
+"browse_vc_action_pin" = "Anheften";
+
+/* Unpin */
+"browse_vc_action_unpin" = "Lösen";
+
+/* Section Header Title for Expired Items */
+"browse_vc_section_title_expired" = "Abgelaufen";
+
+/* Section Header Title for Nearly Expired Items */
+"browse_vc_section_title_nearly_expired" = "Fast Abgelaufen";
+
+/* Section Header Title for Pinned Items */
+"browse_vc_section_title_pinned" = "Gepinnt";
+
+/* Section Header Title for Recent Items */
+"browse_vc_section_title_recents" = "Letzte Artikel";
+
+/* Section Header Title for Standard View Items */
+"browse_vc_section_title_standard_view" = "Artikel";
+
+/* Compressed */
+"database_metadata_field_compressed" = "Kompression";
+
+/* Database Format */
+"database_metadata_field_format" = "Datenbankformat";
+
+/* Database Generator */
+"database_metadata_field_generator" = "Datenbank-Generator";
+
+/* Inner Encryption */
+"database_metadata_field_inner_encryption" = "Innere Verschlüsselung";
+
+/* KeePass File Version */
+"database_metadata_field_keepass_version" = "KeePass-Dateiversion";
+
+/* Key Derivation */
+"database_metadata_field_key_derivation" = "Schlüsselableitung";
+
+/* Max History Items */
+"database_metadata_field_max_history_items" = "Max. Einträge im Verlauf";
+
+/* Max History Size */
+"database_metadata_field_max_history_size" = "Max. Größe Verlauf";
+
+/* Outer Encryption */
+"database_metadata_field_outer_encryption" = "Äußere Verschlüsselung";
+
+/* Password Safe File Version */
+"database_metadata_field_password_safe_version" = "Password-Safe-Dateiversion";
+
+/* Recycle Bin Enabled */
+"database_metadata_field_recycle_bin_enabled" = "Papierkorb aktiviert";
+
+/* Transform Rounds */
+"database_metadata_field_transform_rounds" = "Iterationen";
+
+/* Last Update App */
+"database_metadata_field_last_update_app" = "Letzte Aktualisierung App";
+
+/* Last Update Host */
+"database_metadata_field_last_update_host" = "Letzter Update-Host";
+
+/* Last Update Time */
+"database_metadata_field_last_update_time" = "Letzte Aktualisierung";
+
+/* Last Update User */
+"database_metadata_field_last_update_user" = "Letzter Update-Benutzer";
+
+/* Key Stretch Iterations */
+"database_metadata_field_password_key_stretch_iterations" = "Keystretch-Iterationen";
+
+/* Error message indicating that these item(s) cannot be deserialized to this database because they contain two groups with the same title. */
+"node_serialization_error_duplicate_group_title_fmt" = "Diese Elemente konnten nicht kopiert werden, da sie zwei Gruppen mit demselben Titel '%@' enthalten, der von diesem Datenbankformat nicht unterstützt wird.";
+
+/* Argon 2 Memory */
+"database_metadata_field_argon2_memory" = "Argon2-Speicher";

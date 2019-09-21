@@ -265,7 +265,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     }
     
     item.fields.email = email;
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    item.fields.modified = modified ? modified : [[NSDate alloc] init]; // TODO: Use Touch() when we can make it undo-able
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemEmail:item email:old modified:oldModified];
     [self.document.undoManager setActionName:@"Email Change"];

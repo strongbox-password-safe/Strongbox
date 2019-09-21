@@ -27,6 +27,7 @@
 #import "KeePassHistoryController.h"
 #import "ItemDetailsPreferencesViewController.h"
 #import "PasswordGenerationViewController.h"
+#import "ClipboardManager.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -632,8 +633,7 @@ static const int kMinNotesCellHeight = 160;
         return;
     }
     
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    pasteboard.string = value;
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
     
     [ISMessages showCardAlertWithTitle:message
                                message:nil

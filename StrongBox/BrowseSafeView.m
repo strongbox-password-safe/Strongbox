@@ -27,6 +27,7 @@
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
+#import "ClipboardManager.h"
 
 const NSUInteger kSectionIdxPinned = 0;
 const NSUInteger kSectionIdxNearlyExpired = 1;
@@ -1318,9 +1319,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)copyTitle:(Node*)item {
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    pasteboard.string = [self dereference:item.title node:item];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.title node:item]];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_title_copied_fmt", @"'%@' Title Copied"), [self dereference:item.title node:item]]
                                message:nil
@@ -1333,10 +1332,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)copyUrl:(Node*)item {
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    pasteboard.string = [self dereference:item.fields.url node:item];
-    
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.url node:item]];
+
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_url_copied_fmt", @"'%@' URL Copied"),
                                         [self dereference:item.title node:item]]
                                message:nil
@@ -1349,9 +1346,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)copyEmail:(Node*)item {
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    pasteboard.string = [self dereference:item.fields.email node:item];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.email node:item]];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_email_copied_fmt", @"'%@' Email Copied"),
                                         [self dereference:item.title node:item]]
@@ -1365,9 +1360,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)copyNotes:(Node*)item {
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    pasteboard.string = [self dereference:item.fields.notes node:item];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.notes node:item]];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_notes_copied_fmt", @"'%@' Notes Copied"),
                                         [self dereference:item.title node:item]]
@@ -1381,9 +1374,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)copyUsername:(Node*)item {
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    pasteboard.string = [self dereference:item.fields.username node:item];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_username_copied_fmt", @"'%@' Username Copied"),
                                         [self dereference:item.title node:item]]
@@ -1413,9 +1404,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         return;
     }
     
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    pasteboard.string = item.fields.otpToken.password;
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:item.fields.otpToken.password];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_totp_copied_fmt", @"'%@' TOTP Copied"),
                                         [self dereference:item.title node:item]]
@@ -1432,10 +1421,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)copyPassword:(Node *)item {
-    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
     BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
-    pasteboard.string = copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item];
+    
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
     
     [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ?
                                         NSLocalizedString(@"browse_vc_totp_copied_fmt", @"'%@' OTP Code Copied") :
