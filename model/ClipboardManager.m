@@ -32,6 +32,15 @@
     return sharedInstance;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
+    }
+    return self;
+}
+
 - (void)copyStringWithDefaultExpiration:(NSString *)value {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     

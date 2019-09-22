@@ -62,30 +62,20 @@
 
 @implementation SafesViewController
 
-- (void)appResignActive {
-    NSLog(@"appResignActive");
+- (void)viewDidLoad {
+    [super viewDidLoad];
     
-    self.privacyScreenSuppressedForBiometricAuth = NO;
-    if(Settings.sharedInstance.suppressPrivacyScreen)
-    {
-        NSLog(@"appResignActive suppressPrivacyScreen... suppressing privacy and lock screen");
-        self.privacyScreenSuppressedForBiometricAuth = YES;
-        return;
+    self.collection = [NSArray array];
+    
+    [self setupTableview];
+    
+    [self internalRefresh];
+    
+    [self listenToNotifications];
+    
+    if([Settings.sharedInstance getLaunchCount] == 1) {
+        [self startOnboarding];
     }
-    
-    [self showPrivacyScreen:NO];
-}
-
-- (void)appBecameActive {
-    NSLog(@"appBecameActive");
-
-//    if (@available(iOS 13.0, *)) {
-//        // Different Order of events in iOS 13 this is done in viewDidLoad but that causes problems in <iOS13
-//        // Touch ID/Face ID Failure
-//    }
-//    else {C
-        [self appLoadedOrBecameActive];
-//    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -104,64 +94,11 @@
     [self bindProOrFreeTrialUi];
 }
 
-- (void)appLoadedOrBecameActive {
-    if(self.privacyScreenSuppressedForBiometricAuth) {
-        NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
-        self.privacyScreenSuppressedForBiometricAuth = NO;
-        return;
-    }
-    
-    if(!self.hasAppearedOnce) {
-        if (Settings.sharedInstance.appLockMode != kNoLock) {
-            [self showPrivacyScreen:YES];
-            self.hasAppearedOnce = YES;
-        }
-        else {
-            self.hasAppearedOnce = YES;
-            [self doAppActivationTasks:NO];
-        }
-    }
-    else {
-        if(self.privacyAndLockVc) {
-            [self.privacyAndLockVc onAppBecameActive];
-        }
-        else {
-            // I don't think this is possible but would like to know about it if it ever somehow could occur
-            NSLog(@"XXXXX - Interesting Situation - App became active but no Privacy Screen was up? - XXXX");
-            [self doAppActivationTasks:NO];
-        }
-    }
-}
-
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-        
+
     if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
         self.tableView.contentOffset = CGPointZero;
-    }
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    self.collection = [NSArray array];
-    
-    [self setupTableview];
-    
-    [self internalRefresh];
-    
-    [self listenToNotifications];
-    
-    if([Settings.sharedInstance getLaunchCount] == 1) {
-        [self startOnboarding];
-    }
-    else {
-//        if (@available(iOS 13.0, *)) {
-//            [self appLoadedOrBecameActive];
-//        }
-//        else {
-//            // Different Order of events in iOS 13 this is done in viewDidLoad
-//        }
     }
 }
 
@@ -177,6 +114,51 @@
     self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
     [self.tableView reloadData];
+}
+
+#pragma mark Startup Lock and Quick Launch Activation
+
+- (void)appResignActive {
+    NSLog(@"appResignActive");
+    
+    self.privacyScreenSuppressedForBiometricAuth = NO;
+    if(Settings.sharedInstance.suppressPrivacyScreen) {
+        NSLog(@"appResignActive suppressPrivacyScreen... suppressing privacy and lock screen");
+        self.privacyScreenSuppressedForBiometricAuth = YES;
+        return;
+    }
+    
+    [self showPrivacyScreen:NO];
+}
+
+- (void)appBecameActive {
+    NSLog(@"appBecameActive");
+    
+    if(self.privacyScreenSuppressedForBiometricAuth) {
+        NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
+        self.privacyScreenSuppressedForBiometricAuth = NO;
+        return;
+    }
+    
+    if(!self.hasAppearedOnce) {
+        self.hasAppearedOnce = YES;
+        if (Settings.sharedInstance.appLockMode != kNoLock) {
+            [self showPrivacyScreen:YES];
+        }
+        else {
+            [self doAppActivationTasks:NO];
+        }
+    }
+    else {
+        if(self.privacyAndLockVc) {
+            [self.privacyAndLockVc onAppBecameActive];
+        }
+        else {
+            // I don't think this is possible but would like to know about it if it ever somehow could occur
+            NSLog(@"XXXXX - Interesting Situation - App became active but no Privacy Screen was up? - XXXX");
+            [self doAppActivationTasks:NO];
+        }
+    }
 }
 
 - (void)showPrivacyScreen:(BOOL)startupLockMode {
@@ -227,6 +209,10 @@
         
         self.enterBackgroundTime = nil;
     }
+    else {
+        // I don't think this is possible but would like to know about it if it ever somehow could occur
+        NSLog(@"XXXXX - Interesting Situation - hidePrivacyScreen but no Privacy Screen was up? - XXXX");
+    }
 }
 
 - (BOOL)shouldLockOpenDatabase {
@@ -252,13 +238,13 @@
 - (void)onPrivacyScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
     self.privacyAndLockVc = nil;
     
-    NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
+    //NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
 
     [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
 }
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
-    NSLog(@"doAppActivationTasks");
+    //NSLog(@"doAppActivationTasks");
 
     if(!self.enqueuedImportUrl) {
         [self checkICloudAvailabilityAndPerformAppActivationTasks:userJustCompletedBiometricAuthentication];
@@ -273,7 +259,7 @@
 }
 
 - (void)checkICloudAvailability:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
-    NSLog(@"checkICloudAvailability...");
+//    NSLog(@"checkICloudAvailability...");
     [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
         Settings.sharedInstance.iCloudAvailable = available;
         
@@ -418,9 +404,11 @@
 //////
 
 - (BOOL)isVisibleViewController {
-    NSLog(@"isVisibleViewController == (%@ == %@)", self.navigationController.visibleViewController, self);
+    BOOL ret = self.navigationController.visibleViewController == self;
+
+    NSLog(@"isVisibleViewController: %d", ret);
     
-    return self.navigationController.visibleViewController == self;
+    return ret;
 }
 
 - (void)processEnqueuedImport {
@@ -533,7 +521,7 @@
 - (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
     NSDictionary *attributes = @{
                                     NSFontAttributeName : FontManager.sharedInstance.regularFont,
-                                    NSForegroundColorAttributeName : UIColor.blueColor
+                                    NSForegroundColorAttributeName : UIColor.systemBlueColor,
                                     };
     
     return [[NSAttributedString alloc] initWithString:NSLocalizedString(@"safes_vc_empty_databases_list_get_started_button_title", @"Subtitle displayed in tableview when there are no databases setup") attributes:attributes];
@@ -956,8 +944,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         vc.existing = existing;
         
         vc.onDone = ^(SelectedStorageParameters *params) {
-            params.createMode = !existing;
-            [self onSelectedStorageLocation:params];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                params.createMode = !existing;
+                [self onSelectedStorageLocation:params];
+            });
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToVersionConflictResolution"]) {

@@ -4539,7 +4539,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2705;
+				CURRENT_PROJECT_VERSION = 2707;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -4557,7 +4557,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.42.1;
+				MARKETING_VERSION = 1.42.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4628,7 +4628,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2705;
+				CURRENT_PROJECT_VERSION = 2707;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -4646,7 +4646,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.42.1;
+				MARKETING_VERSION = 1.42.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -4722,7 +4722,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2705;
+				CURRENT_PROJECT_VERSION = 2707;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -4741,7 +4741,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.42.1;
+				MARKETING_VERSION = 1.42.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -4809,7 +4809,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2705;
+				CURRENT_PROJECT_VERSION = 2707;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -4828,7 +4828,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.42.1;
+				MARKETING_VERSION = 1.42.2;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
