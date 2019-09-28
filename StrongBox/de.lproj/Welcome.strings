@@ -48,7 +48,7 @@
 "icq-UO-xAd.placeholder" = "Datenbankname (Erforderlich)";
 
 /* Class = "UILabel"; text = "You can use iCloud to make your databases available across all your devices seamlessly."; ObjectID = "IR2-ja-Yf3"; */
-"IR2-ja-Yf3.text" = "Sie können iCloud verwenden, um Ihre Datenbaken auf allen Geräten reibungslose verfügbar zu machen.";
+"IR2-ja-Yf3.text" = "Sie können iCloud verwenden, um Ihre Datenbanken auf allen Geräten reibungslos verfügbar zu machen.";
 
 /* Class = "UIBarButtonItem"; title = "Create"; ObjectID = "jCg-Ev-nsF"; */
 "jCg-Ev-nsF.title" = "Erstellen";
