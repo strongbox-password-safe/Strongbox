@@ -254,7 +254,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="30 Seconds" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fRK-F4-grc">
-                                                    <rect key="frame" x="290.5" y="12" width="92" height="20.5"/>
+                                                    <rect key="frame" x="282.5" y="12" width="92" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -266,7 +266,7 @@
                                                 <constraint firstItem="G3D-mW-lFG" firstAttribute="bottom" secondItem="A4c-lt-ywA" secondAttribute="bottomMargin" id="EAN-Lw-PiZ"/>
                                                 <constraint firstItem="G3D-mW-lFG" firstAttribute="leading" secondItem="A4c-lt-ywA" secondAttribute="leading" constant="20" id="eKK-dr-HDo"/>
                                                 <constraint firstItem="fRK-F4-grc" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="G3D-mW-lFG" secondAttribute="trailing" constant="8" symbolic="YES" id="fAS-GF-HPA"/>
-                                                <constraint firstAttribute="trailing" secondItem="fRK-F4-grc" secondAttribute="trailing" id="pK4-ub-4pW"/>
+                                                <constraint firstAttribute="trailing" secondItem="fRK-F4-grc" secondAttribute="trailing" constant="8" id="pK4-ub-4pW"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -348,7 +348,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="3" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BTc-Sr-gAI">
-                                                    <rect key="frame" x="372" y="12" width="10.5" height="20.5"/>
+                                                    <rect key="frame" x="364" y="12" width="10.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -358,7 +358,7 @@
                                                 <constraint firstItem="NUR-SR-xbU" firstAttribute="top" secondItem="TaW-7y-tRq" secondAttribute="topMargin" id="9PL-zS-kuE"/>
                                                 <constraint firstItem="NUR-SR-xbU" firstAttribute="leading" secondItem="TaW-7y-tRq" secondAttribute="leading" constant="20" id="Sks-TI-w3g"/>
                                                 <constraint firstItem="BTc-Sr-gAI" firstAttribute="centerY" secondItem="TaW-7y-tRq" secondAttribute="centerY" id="TG0-60-kOj"/>
-                                                <constraint firstAttribute="trailing" secondItem="BTc-Sr-gAI" secondAttribute="trailing" id="iN0-7n-ggR"/>
+                                                <constraint firstAttribute="trailing" secondItem="BTc-Sr-gAI" secondAttribute="trailing" constant="8" id="iN0-7n-ggR"/>
                                                 <constraint firstItem="BTc-Sr-gAI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NUR-SR-xbU" secondAttribute="trailing" constant="8" symbolic="YES" id="ir0-F5-wwM"/>
                                                 <constraint firstItem="NUR-SR-xbU" firstAttribute="bottom" secondItem="TaW-7y-tRq" secondAttribute="bottomMargin" id="u7s-tA-SwI"/>
                                             </constraints>
@@ -761,12 +761,21 @@ limitations under the License.</string>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cloudSessionsCellIdentifier" id="G9B-WQ-FtT">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cloudSessionsCellIdentifier" textLabel="Kun-Us-o6J" style="IBUITableViewCellStyleDefault" id="G9B-WQ-FtT">
                                 <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="G9B-WQ-FtT" id="PcS-M2-6Bv">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Kun-Us-o6J">
+                                            <rect key="frame" x="20" y="0.0" width="374" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
                         </prototypes>

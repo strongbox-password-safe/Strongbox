@@ -9,6 +9,7 @@
 #import "SafeMetaData.h"
 #import "JNKeychain.h"
 #import "Settings.h"
+#import "FileManager.h"
 
 static NSString* const kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
 static NSString* const kHideTotp = @"hideTotp";
@@ -108,6 +109,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.showQuickViewFavourites = YES;
         self.showQuickViewNearlyExpired = YES;
         self.favourites = @[];
+        self.makeBackups = YES;
+        self.maxBackupKeepCount = 10;
     }
     
     return self;
@@ -211,6 +214,9 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     [encoder encodeBool:self.showQuickViewNearlyExpired forKey:@"showQuickViewNearlyExpired"];
     [encoder encodeBool:self.showQuickViewFavourites forKey:@"showQuickViewFavourites"];
     [encoder encodeBool:self.showQuickViewExpired forKey:@"showQuickViewExpired"];
+    
+    [encoder encodeBool:self.makeBackups forKey:@"makeBackups"];
+    [encoder encodeInteger:self.maxBackupKeepCount forKey:@"maxBackupKeepCount"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -373,6 +379,13 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         if([decoder containsValueForKey:@"showQuickViewExpired"]) {
             self.showQuickViewExpired = [decoder decodeBoolForKey:@"showQuickViewExpired"];
         }
+
+        if([decoder containsValueForKey:@"makeBackups"]) {
+            self.makeBackups = [decoder decodeBoolForKey:@"makeBackups"];
+        }
+        if([decoder containsValueForKey:@"maxBackupKeepCount"]) {
+            self.maxBackupKeepCount = [decoder decodeIntegerForKey:@"maxBackupKeepCount"];
+        }
     }
     
     return self;
@@ -410,9 +423,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     }
 }
 
+// TODO: Remove
 - (NSData *)convenenienceKeyFileDigest {
     NSString *key = [NSString stringWithFormat:@"%@-keyFileDigest", self.uuid];
-    
+
     NSData* ret = [JNKeychain loadValueForKey:key];
 
     return ret;
@@ -420,7 +434,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 
 - (void)setConvenenienceKeyFileDigest:(NSData *)convenenienceKeyFileDigest {
     NSString *key = [NSString stringWithFormat:@"%@-keyFileDigest", self.uuid];
-    
+
     if(convenenienceKeyFileDigest) {
         [JNKeychain saveValue:convenenienceKeyFileDigest forKey:key];
     }
@@ -614,6 +628,14 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 
 - (BOOL)offlineCacheEnabled {
     return YES;
+}
+
+- (NSURL *)backupsDirectory {
+    NSURL* url = [FileManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
+    
+    [FileManager.sharedInstance createIfNecessary:url];
+    
+    return url;
 }
 
 @end

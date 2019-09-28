@@ -378,6 +378,13 @@
     
     NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
         self.labelDeleteDataAttemptCount.text = enabled ? str : NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
+    
+    if (@available(iOS 13.0, *)) {
+        self.labelDeleteDataAttemptCount.textColor = !enabled ? UIColor.tertiaryLabelColor : UIColor.labelColor;
+    }
+    else {
+        self.labelDeleteDataAttemptCount.textColor = !enabled ? UIColor.lightGrayColor : UIColor.darkTextColor;
+    }
 }
 
 - (IBAction)onDeleteDataChanged:(id)sender {
@@ -386,7 +393,7 @@
         
         [Alerts info:self
                title:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_title", @"DATA DELETION: Care Required")
-             message:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_message", @"Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences.")];
+             message:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_message", @"Please be extremely careful as this will delete permanently any local device databases and all preferences.")];
     }
     else {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; // Off
@@ -440,7 +447,14 @@
     
     self.labelAppLockDelay.text = effectiveMode == kNoLock ?
     NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled") : [Utils formatTimeInterval:seconds.integerValue];
-    self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.lightGrayColor : UIColor.darkTextColor;
+    
+    if (@available(iOS 13.0, *)) {
+        self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.tertiaryLabelColor : UIColor.labelColor;
+    }
+    else {
+        self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.lightGrayColor : UIColor.darkTextColor;
+    }
+    
     self.cellAppLockDelay.userInteractionEnabled = effectiveMode != kNoLock;
     
     self.appLockOnPreferences.enabled = effectiveMode != kNoLock;

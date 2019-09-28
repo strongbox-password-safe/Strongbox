@@ -35,7 +35,7 @@
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong) NSString* convenienceMasterPassword;
-@property (nonatomic, strong) NSData* convenenienceKeyFileDigest;
+@property (nonatomic, strong) NSData* convenenienceKeyFileDigest; // TODO: Remove - using URL instead - here for emergencies (26-Sept-2019)
 @property (nonatomic, strong) NSString* convenenienceYubikeySecret;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
@@ -101,6 +101,10 @@
 @property BOOL showQuickViewExpired;
 
 @property NSArray<NSString*>* favourites;
+
+@property (readonly) NSURL* backupsDirectory;
+@property NSUInteger maxBackupKeepCount;
+@property BOOL makeBackups;
 
 @end
 

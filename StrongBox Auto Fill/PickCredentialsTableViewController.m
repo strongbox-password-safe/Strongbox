@@ -68,7 +68,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
     self.searchController.searchResultsUpdater = self;
-    self.searchController.dimsBackgroundDuringPresentation = NO;
+    self.searchController.obscuresBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
     self.searchController.searchBar.scopeButtonTitles =
         @[NSLocalizedString(@"pick_creds_vc_search_scope_title", @"Title"),

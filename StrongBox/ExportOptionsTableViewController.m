@@ -14,6 +14,7 @@
 #import "Csv.h"
 #import "ISMessages.h"
 #import "ClipboardManager.h"
+#import "Utils.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate>
 
@@ -41,6 +42,14 @@
     self.clearsSelectionOnViewWillAppear = NO;
     
     self.tableView.tableFooterView = [UIView new];
+    
+    if (self.backupMode) {
+        [self cell:self.cellEmailCsv setHidden:YES];
+        [self cell:self.cellCopy setHidden:YES];
+        [self cell:self.cellHtml setHidden:YES];
+
+        [self reloadDataAnimated:YES];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -92,7 +101,7 @@
 - (void)exportCsvByEmail {
     NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
     NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
-    [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr];
+    [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr nickname:self.viewModel.metadata.nickName];
 }
 
 - (void)exportHtmlByEmail {
@@ -100,27 +109,36 @@
     
     NSString* attachmentName = [NSString stringWithFormat:@"%@.html", self.viewModel.metadata.nickName];
     
-    [self composeEmail:attachmentName mimeType:@"text/html" data:[html dataUsingEncoding:NSUTF8StringEncoding]];
+    [self composeEmail:attachmentName mimeType:@"text/html" data:[html dataUsingEncoding:NSUTF8StringEncoding] nickname:self.viewModel.metadata.nickName];
 }
 
 - (void)exportEncryptedSafeByEmail {
-    [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
-        if(!safeData) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
-                    error:error];
-            return;
-        }
-        
-        NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.viewModel.database.format];
-        NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
-        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName, appendExtension];
-        
-        [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:safeData];
-    }];
+    if(!self.backupMode) {
+        [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
+            if(!safeData) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
+                        error:error];
+                return;
+            }
+            
+            NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.viewModel.database.format];
+            NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
+            NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName, appendExtension];
+            
+            [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:safeData nickname:self.viewModel.metadata.nickName];
+        }];
+    }
+    else {
+        NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.metadata.likelyFormat];
+        NSString* appendExtension = self.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
+        NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, iso8601DateString(self.backupItem.date), appendExtension];
+
+        [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:self.encrypted nickname:self.metadata.nickName];
+    }
 }
 
-- (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data {
+- (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data nickname:(NSString*)nickname {
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
                title:NSLocalizedString(@"export_vc_email_unavailable_title", @"Email Not Available")
@@ -130,12 +148,12 @@
     
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     
-    [picker setSubject:[NSString stringWithFormat:NSLocalizedString(@"export_vc_email_subject", @"Strongbox Database: '%@'"), self.viewModel.metadata.nickName]];
+    [picker setSubject:[NSString stringWithFormat:NSLocalizedString(@"export_vc_email_subject", @"Strongbox Database: '%@'"), nickname]];
     
     [picker addAttachmentData:data mimeType:mimeType fileName:attachmentName];
     
     [picker setToRecipients:[NSArray array]];
-    [picker setMessageBody:[NSString stringWithFormat:NSLocalizedString(@"export_vc_email_message_body_fmt", @"Here's a copy of my '%@' Strongbox Database."), self.viewModel.metadata.nickName] isHTML:NO];
+    [picker setMessageBody:[NSString stringWithFormat:NSLocalizedString(@"export_vc_email_message_body_fmt", @"Here's a copy of my '%@' Strongbox Database."), nickname] isHTML:NO];
     picker.mailComposeDelegate = self;
     
     [self presentViewController:picker animated:YES completion:^{ }];
@@ -162,33 +180,42 @@
 }
 
 - (void)onFiles {
-    [self.viewModel encrypt:^(NSData * _Nullable data, NSError * _Nullable err) {
-        if(!data) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
-                    error:err];
-            return;
-        }
-        
-        self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:self.viewModel.metadata.fileName];
-        
-        NSError* error;
-        [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
-        if(error) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_writing", @"Error Writing Database")
-                    error:error];
-            NSLog(@"error: %@", error);
-            return;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
-            vc.delegate = self;
+    if(self.backupMode) {
+        [self onFilesGotData:self.encrypted  metadata:self.metadata];
+    }
+    else {
+        [self.viewModel encrypt:^(NSData * _Nullable data, NSError * _Nullable err) {
+            if(!data) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
+                        error:err];
+                return;
+            }
             
-            [self presentViewController:vc animated:YES completion:nil];
-        });
-    }];
+            [self onFilesGotData:data metadata:self.viewModel.metadata];
+        }];
+    }
+}
+
+- (void)onFilesGotData:(NSData*)data metadata:(SafeMetaData*)metadata {
+    self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:metadata.fileName];
+    
+    NSError* error;
+    [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
+    if(error) {
+        [Alerts error:self
+                title:NSLocalizedString(@"export_vc_error_writing", @"Error Writing Database")
+                error:error];
+        NSLog(@"error: %@", error);
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
+        vc.delegate = self;
+        
+        [self presentViewController:vc animated:YES completion:nil];
+    });
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {

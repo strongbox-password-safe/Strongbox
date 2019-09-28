@@ -27,10 +27,11 @@
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (instancetype _Nullable )initWithSafeDatabase:(DatabaseModel *_Nonnull)passwordDatabase
-                            metaData:(SafeMetaData *_Nonnull)metaData
-                     storageProvider:(id <SafeStorageProvider>_Nonnull)provider
-                   cacheMode:(BOOL)usingOfflineCache
-                          isReadOnly:(BOOL)isReadOnly NS_DESIGNATED_INITIALIZER;
+                          originalDataForBackup:(NSData*_Nullable)originalDataForBackup // Can be null in case of Duress Dummy
+                                       metaData:(SafeMetaData *_Nonnull)metaData
+                                storageProvider:(id <SafeStorageProvider>_Nonnull)provider
+                                      cacheMode:(BOOL)usingOfflineCache
+                                     isReadOnly:(BOOL)isReadOnly NS_DESIGNATED_INITIALIZER;
 
 - (void)update:(BOOL)isAutoFill handler:(void (^_Nonnull)(NSError * _Nullable error))handler;
 
@@ -38,8 +39,6 @@
 
 - (void)updateOfflineCacheWithData:(NSData *_Nonnull)data;
 - (void)updateOfflineCache:(void (^_Nonnull)(void))handler;
-//- (void)disableAndClearOfflineCache;
-//- (void)enableOfflineCache;
 
 - (void)updateAutoFillCacheWithData:(NSData *_Nonnull)data;
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler;

@@ -10,6 +10,7 @@
 #import "CommonTesting.h"
 #import "KeePassDatabase.h"
 #import "tomcrypt.h"
+#import "Kdbx4Database.h"
 
 @interface KeePassDatabaseTests : XCTestCase
 
@@ -439,6 +440,88 @@
     StrongboxDatabase *a = [adaptor open:b compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
     XCTAssertNotNil(a);
+}
+
+- (void)testDbMaxHistorySettings {
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
+    StrongboxDatabase* db = [adaptor create:[CompositeKeyFactors password:@"password"]];
+    
+    NSLog(@"%@", db);
+    
+    XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
+    
+    KeePassDatabaseMetadata* metadata = db.metadata;
+    XCTAssert(metadata.historyMaxItems.intValue == 10);
+    
+    metadata.historyMaxItems = @(2412);
+    
+    //
+    
+    
+    NSError* error;
+    NSData* data = [adaptor save:db error:&error];
+    
+    if(error) {
+        NSLog(@"%@", error);
+    }
+    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+    
+    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
+    
+    if(error) {
+        NSLog(@"%@", error);
+    }
+    
+    XCTAssertNotNil(b);
+    
+    NSLog(@"%@", b);
+
+    
+    metadata = b.metadata;
+    XCTAssert(metadata.historyMaxItems.intValue == 2412);
+}
+
+- (void)testDbMaxHistorySettings4 {
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
+    StrongboxDatabase* db = [adaptor create:[CompositeKeyFactors password:@"password"]];
+    
+    NSLog(@"%@", db);
+    
+    XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
+    
+    KeePassDatabaseMetadata* metadata = db.metadata;
+    XCTAssert(metadata.historyMaxItems.intValue == 10);
+    
+    metadata.historyMaxItems = @(2412);
+    
+    //
+    
+    
+    NSError* error;
+    NSData* data = [adaptor save:db error:&error];
+    
+    if(error) {
+        NSLog(@"%@", error);
+    }
+    
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+    
+    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
+    
+    if(error) {
+        NSLog(@"%@", error);
+    }
+    
+    XCTAssertNotNil(b);
+    
+    NSLog(@"%@", b);
+
+    
+    metadata = b.metadata;
+    XCTAssert(metadata.historyMaxItems.intValue == 2412);
 }
 
 @end

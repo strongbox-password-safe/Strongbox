@@ -232,7 +232,7 @@
 
     if (!field) {
         field = [[Field alloc] initEmptyWithType:type];
-        _fields[[NSNumber numberWithInt:type]] = field;
+        _fields[[NSNumber numberWithUnsignedInteger:type]] = field;
     }
 
     [field setDataWithString:string];
@@ -279,7 +279,7 @@
 }
 
 - (Field *)getFieldForType:(FieldType)type {
-    NSNumber *groupType = [NSNumber numberWithInt:type];
+    NSNumber *groupType = [NSNumber numberWithUnsignedInteger:type];
 
     Field *field = _fields[groupType];
 

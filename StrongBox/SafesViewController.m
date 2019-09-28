@@ -37,6 +37,8 @@
 #import "PrivacyViewController.h"
 #import "iCloudSafesCoordinator.h"
 #import "FilesAppUrlBookmarkProvider.h"
+#import "BackupsManager.h"
+#import "BackupsTableViewController.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -142,6 +144,8 @@
     
     if(!self.hasAppearedOnce) {
         self.hasAppearedOnce = YES;
+        NSLog(@"self.hasAppearedOnce = YES");
+
         if (Settings.sharedInstance.appLockMode != kNoLock) {
             [self showPrivacyScreen:YES];
         }
@@ -202,7 +206,9 @@
             }];
         }
         else {
+            NSLog(@"Dismissing Privacy Screen");
             [self.privacyAndLockVc.presentingViewController dismissViewControllerAnimated:NO completion:^{
+                NSLog(@"Dismissing Privacy Screen Done!");
                 [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
             }];
         }
@@ -406,7 +412,7 @@
 - (BOOL)isVisibleViewController {
     BOOL ret = self.navigationController.visibleViewController == self;
 
-    NSLog(@"isVisibleViewController: %d", ret);
+    NSLog(@"isVisibleViewController: %d [Actual Visible: [%@]]", ret, self.navigationController.visibleViewController);
     
     return ret;
 }
@@ -771,6 +777,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [alertController addAction:secondAction];
     }
     
+    // Backups
+    
+    UIAlertAction *viewBackupsOption = [UIAlertAction actionWithTitle:
+            NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+            [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
+        }];
+    
+    [alertController addAction:viewBackupsOption];
+
     // Cancel
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_cancel", @"Cancel Button")
@@ -912,6 +929,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     if([Settings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
         Settings.sharedInstance.quickLaunchUuid = nil;
     }
+    
+    // Delete all backups...
+    
+    [BackupsManager.sharedInstance deleteAllBackups:safe];
     
     [[SafesList sharedInstance] remove:safe.uuid];
 }
@@ -1082,6 +1103,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             [self.tableView beginUpdates];
             [self.tableView endUpdates];
         };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToBackups"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        BackupsTableViewController* vc = (BackupsTableViewController*)nav.topViewController;
+        vc.metadata = (SafeMetaData*)sender;
     }
 }
 

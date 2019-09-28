@@ -201,15 +201,16 @@
             if(response == kOk) {
                 if([pin isEqualToString:self.safe.conveniencePin]) {
                     self.isConvenienceUnlock = YES;
-                    self.masterPassword = self.safe.convenienceMasterPassword;
-                    self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
-                    self.yubikeySecret = self.safe.convenenienceYubikeySecret;
-                    
                     self.safe.failedPinAttempts = 0;
                     
                     [SafesList.sharedInstance update:self.safe];
                     
-                    [self openSafe];
+                    [self onGotCredentials:self.safe.convenienceMasterPassword
+                                keyFileUrl:self.safe.keyFileUrl
+                        oneTimeKeyFileData:nil
+                                  readOnly:self.safe.readOnly
+                         manualOpenOffline:NO
+                             yubikeySecret:self.safe.convenenienceYubikeySecret];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
                     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
@@ -230,7 +231,6 @@
                         self.safe.conveniencePin = nil;
                         self.safe.isEnrolledForConvenience = NO;
                         self.safe.convenienceMasterPassword = nil;
-                        self.safe.convenenienceKeyFileDigest = nil;
                         self.safe.convenenienceYubikeySecret = nil;
                         
                         [SafesList.sharedInstance update:self.safe];
@@ -264,6 +264,7 @@
         SafeMetaData* metadata = [DuressDummyStorageProvider.sharedInstance getSafeMetaData:self.safe.nickName filename:self.safe.fileName fileIdentifier:self.safe.fileIdentifier];
         
         Model *viewModel = [[Model alloc] initWithSafeDatabase:DuressDummyStorageProvider.sharedInstance.database
+                                         originalDataForBackup:nil
                                                       metaData:metadata
                                                storageProvider:DuressDummyStorageProvider.sharedInstance
                                                      cacheMode:NO
@@ -338,10 +339,12 @@
             });
         }
         else {
-            self.masterPassword = self.safe.convenienceMasterPassword;
-            self.keyFileDigest = self.safe.convenenienceKeyFileDigest;
-            self.yubikeySecret = self.safe.convenenienceYubikeySecret;
-            [self openSafe];
+            [self onGotCredentials:self.safe.convenienceMasterPassword
+                        keyFileUrl:self.safe.keyFileUrl
+                oneTimeKeyFileData:nil
+                          readOnly:self.safe.readOnly
+                 manualOpenOffline:NO
+                     yubikeySecret:self.safe.convenenienceYubikeySecret];
         }
     }
     else {
@@ -451,12 +454,12 @@
     scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(success) {
-                [self onGotManualCredentials:creds.password
-                                  keyFileUrl:creds.keyFileUrl
-                          oneTimeKeyFileData:creds.oneTimeKeyFileData
-                                    readOnly:creds.readOnly
-                                 openOffline:creds.offlineCache
-                               yubikeySecret:creds.yubiKeySecret];
+                [self onGotCredentials:creds.password
+                            keyFileUrl:creds.keyFileUrl
+                    oneTimeKeyFileData:creds.oneTimeKeyFileData
+                              readOnly:creds.readOnly
+                     manualOpenOffline:creds.offlineCache
+                         yubikeySecret:creds.yubiKeySecret];
             }
             else {
                 self.completion(nil, nil);
@@ -467,12 +470,14 @@
     [self.viewController presentViewController:nav animated:YES completion:nil];
 }
 
-- (void)onGotManualCredentials:(NSString*)password
-                    keyFileUrl:(NSURL*)keyFileUrl
-            oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-                      readOnly:(BOOL)readOnly
-                   openOffline:(BOOL)openOffline
-                 yubikeySecret:(NSString*)yubikeySecret {
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)onGotCredentials:(NSString*)password
+              keyFileUrl:(NSURL*)keyFileUrl
+      oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+                readOnly:(BOOL)readOnly
+       manualOpenOffline:(BOOL)manualOpenOffline
+           yubikeySecret:(NSString*)yubikeySecret {
     if(keyFileUrl || oneTimeKeyFileData) {
         NSError *error;
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
@@ -502,16 +507,15 @@
         [SafesList.sharedInstance update:self.safe];
     }
     
-    
-    self.manualOpenOfflineCache = openOffline;
+    self.manualOpenOfflineCache = manualOpenOffline;
     self.masterPassword = password;
     
-    [self openSafe];
+    [self openSafe22];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)openSafe {
+- (void)openSafe22 {
 //    dispatch_async(dispatch_get_main_queue(), ^{
 //        [SVProgressHUD show];
 //    });
@@ -708,7 +712,7 @@
             if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
-                self.safe.convenenienceKeyFileDigest = nil;
+//                self.safe.convenenienceKeyFileDigest = nil; // TODO: Restore
                 self.safe.convenenienceYubikeySecret = nil;
                 self.safe.conveniencePin = nil;
                 self.safe.isTouchIdEnabled = NO;
@@ -818,7 +822,7 @@
                                                                 self.safe.isTouchIdEnabled = YES;
                                                                 self.safe.isEnrolledForConvenience = YES;
                                                                 self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
-                                                                self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
+                                                                //self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
                                                                 
                                                                 self.safe.convenenienceYubikeySecret = self.yubikeySecret;
                                                                 
@@ -848,7 +852,6 @@
                                                          self.safe.conveniencePin = nil;
                                                          
                                                          self.safe.convenienceMasterPassword = nil;
-                                                         self.safe.convenenienceKeyFileDigest = nil;
                                                          self.safe.convenenienceYubikeySecret = nil;
                                                          
                                                          self.safe.isEnrolledForConvenience = NO;
@@ -880,7 +883,7 @@
                     self.safe.isEnrolledForConvenience = YES;
                     
                     self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
-                    self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
+//                    self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
                     self.safe.convenenienceYubikeySecret = self.yubikeySecret;
                     
                     self.safe.hasBeenPromptedForConvenience = YES;
@@ -915,6 +918,7 @@
     [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
 
     Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
+                                     originalDataForBackup:data
                                                   metaData:self.safe
                                            storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
                                                  cacheMode:cacheMode

@@ -42,9 +42,6 @@ NSString *friendlyDateString(NSDate *modDate);
 NSString *friendlyDateStringVeryShort(NSDate *modDate);
 NSString *iso8601DateString(NSDate *modDate);
 
-BOOL xmlNeedsCleanup(NSString* foo);
-NSString* xmlCleanupAndTrim(NSString* foo);
-
 BOOL isValidUrl(NSString* urlString);
 NSString* trim(NSString* str);
 + (NSString *)trim:(NSString*)string;

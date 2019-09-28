@@ -8,12 +8,24 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
+#import "StaticDataTableViewController.h"
+#import "BackupItem.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ExportOptionsTableViewController : UITableViewController
+@interface ExportOptionsTableViewController : StaticDataTableViewController
 
-@property Model *viewModel;
+@property BOOL backupMode;
+
+// Open / Unlocked Database Export Mode
+
+@property (nullable) Model *viewModel; // TODO: Eventually remove and sweitch to below
+
+// Backup Export mode
+
+@property (nullable) NSData *encrypted;
+@property (nullable) SafeMetaData* metadata;
+@property (nullable) BackupItem* backupItem;
 
 @end
 

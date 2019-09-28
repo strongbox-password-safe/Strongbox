@@ -1108,9 +1108,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (IBAction)onMove:(id)sender {
     if(self.editing) {
-        NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
+        NSArray<NSIndexPath*> *selectedRows = self.tableView.indexPathsForSelectedRows;
         
-        if (selectedRows.count > 0) {
+        if (selectedRows && selectedRows.count > 0) {
             NSArray<Node *> *itemsToMove = [self getSelectedItems:selectedRows];
             
             [self performSegueWithIdentifier:@"segueToSelectDestination" sender:itemsToMove];

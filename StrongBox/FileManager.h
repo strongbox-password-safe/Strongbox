@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonnull) NSURL* autoFillCacheDirectory;
 @property (readonly, nullable) NSURL* sharedAppGroupDirectory;
 @property (readonly, nullable) NSURL* keyFilesDirectory;
+@property (readonly, nullable) NSURL* backupFilesDirectory;
+
+- (void)createIfNecessary:(NSURL*)url;
 
 - (void)excludeDirectoriesFromBackup;
 - (void)deleteAllLocalAndAppGroupFiles;

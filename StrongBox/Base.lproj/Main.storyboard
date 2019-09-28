@@ -79,6 +79,7 @@
                         <segue destination="sl8-tU-MbC" kind="presentation" identifier="segueFromInitialToAddDatabase" id="1mX-Fy-JBZ"/>
                         <segue destination="Qjo-2b-n6U" kind="presentation" identifier="segueToProExplanation" id="xeA-8L-Kqa"/>
                         <segue destination="fDl-Y5-dwj" kind="presentation" identifier="segueToUpgrade" modalPresentationStyle="fullScreen" id="WUH-fF-5NO"/>
+                        <segue destination="PQt-fh-3rR" kind="presentation" identifier="segueToBackups" id="i03-mI-FZ7"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aFA-j3-EVC" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -173,13 +174,21 @@ Import/Export by Files app, Email, CSV, iTunes File Sharing or use cloud storage
             </objects>
             <point key="canvasLocation" x="-2986" y="384"/>
         </scene>
+        <!--Backups-->
+        <scene sceneID="Ek8-P1-ha9">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Backups" id="PQt-fh-3rR" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qTG-7D-SKo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2622" y="955"/>
+        </scene>
         <!--CreateDatabaseOrSetCredentials-->
         <scene sceneID="IZq-qB-8dq">
             <objects>
                 <viewControllerPlaceholder storyboardName="CreateDatabaseOrSetCredentials" id="sl8-tU-MbC" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M0S-K2-ck3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3116" y="860"/>
+            <point key="canvasLocation" x="-2734" y="863"/>
         </scene>
         <!--CreateDone-->
         <scene sceneID="ulL-q1-rbu">
@@ -249,7 +258,7 @@ Import/Export by Files app, Email, CSV, iTunes File Sharing or use cloud storage
                 <viewControllerPlaceholder storyboardName="Upgrade" id="fDl-Y5-dwj" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="h0N-G7-B62" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3307" y="1308"/>
+            <point key="canvasLocation" x="-2704" y="1439"/>
         </scene>
         <!--Databases Navigation Controller-->
         <scene sceneID="1kV-wb-Lxz">

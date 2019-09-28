@@ -69,6 +69,20 @@
     return ret;
 }
 
+- (NSURL *)backupFilesDirectory {
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
+    if(!url) {
+        NSLog(@"Could not get container URL for App Group: [%@]", Settings.sharedInstance.appGroupName);
+        return nil;
+    }
+    
+    NSURL* ret = [url URLByAppendingPathComponent:@"backups"];
+    
+    [self createIfNecessary:ret];
+    
+    return ret;
+}
+
 - (NSURL *)sharedAppGroupDirectory {
     NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
     if(!url) {
@@ -91,6 +105,10 @@
 - (void)excludeDirectoriesFromBackup {
     [self excludeFromBackup:self.documentsDirectory];
     [self excludeFromBackup:self.offlineCacheDirectory];
+    [self excludeFromBackup:self.sharedAppGroupDirectory];
+    [self excludeFromBackup:self.keyFilesDirectory];
+    [self excludeFromBackup:self.autoFillCacheDirectory];
+    [self excludeFromBackup:self.backupFilesDirectory];
 }
 
 - (void)excludeFromBackup:(NSURL*)URL {
@@ -108,6 +126,9 @@
     [self deleteAllInDirectory:self.documentsDirectory];
     [self deleteAllInDirectory:self.offlineCacheDirectory];
     [self deleteAllInDirectory:self.sharedAppGroupDirectory];
+    [self deleteAllInDirectory:self.keyFilesDirectory];
+    [self deleteAllInDirectory:self.autoFillCacheDirectory];
+    [self deleteAllInDirectory:self.backupFilesDirectory];
 }
 
 - (void)deleteAllInDirectory:(NSURL*)url {

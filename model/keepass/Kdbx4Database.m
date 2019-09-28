@@ -165,6 +165,8 @@ static const BOOL kLogVerbose = NO;
     rootXmlDocument.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
     rootXmlDocument.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
     rootXmlDocument.keePassFile.meta.recycleBinChanged = metadata.recycleBinChanged;
+    rootXmlDocument.keePassFile.meta.historyMaxItems = metadata.historyMaxItems;
+    rootXmlDocument.keePassFile.meta.historyMaxSize = metadata.historyMaxSize;
     
     // 5. From Xml Model to Xml String (including inner stream encryption)
     

@@ -333,25 +333,43 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     const int kChunkSize = 32 * 1024;
     
     uint8_t chnk[kChunkSize];
-    xmlParserCtxtPtr ctxt = nil;
-    int err = XML_ERR_OK;
     
     NSUInteger read = [stream read:chnk maxLength:kChunkSize];
-    NSString* foo = [[NSString alloc] initWithBytes:chnk length:read encoding:NSUTF8StringEncoding];
-
-    if(read > 0 && xmlNeedsCleanup(foo)) {
-        foo = xmlCleanupAndTrim(foo);
-        
-        if(![foo getBytes:chnk maxLength:kChunkSize usedLength:&read encoding:NSUTF8StringEncoding options:kNilOptions
-                    range:NSMakeRange(0, foo.length) remainingRange:nil]) {
-            NSLog(@"Error cleaning stream: %d", err);
-            if(error) {
-                *error = [Utils createNSError:@"Error cleaning stream" errorCode:-1];
-            }
-            return nil;
+    if(read <= 0) {
+        NSLog(@"Could not read stream");
+        if (error) {
+           *error = [Utils createNSError:@"Could not read stream" errorCode:-1];
         }
+        return nil;
     }
     
+    // Find Start of XML
+    
+    NSInteger xmlMarker = findXmlMarker(chnk, read);
+    
+    NSLog(@"Found XML marker starting at offset: %ld", (long)xmlMarker);
+    
+    if(xmlMarker > 0) {
+        read -= xmlMarker;
+
+        uint8_t tmp[kChunkSize];
+        memset(tmp, 0, kChunkSize);
+        memcpy(tmp, &chnk[xmlMarker], read);
+        memset(chnk, 0, kChunkSize);
+        memcpy(chnk, tmp, read);
+    }
+    else if (xmlMarker < 0) {
+        NSLog(@"Could not find start of XML");
+        if (error) {
+           *error = [Utils createNSError:@"Could not find start of XML" errorCode:-1];
+        }
+        return nil;
+    }
+    
+    // Parse XML
+    
+    xmlParserCtxtPtr ctxt = nil;
+    int err = XML_ERR_OK;
     do {
         if(read == -1) {
             NSLog(@"Error reading stream: %d", err);
@@ -429,5 +447,47 @@ void characters (void *ctx, const xmlChar *ch, int len) {
     KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
     [parser foundCharacters:text];
 }
+
+//
+
+static char* const marker = "<?xml";
+static NSUInteger const kMarkerSize = 5;
+static NSUInteger const kScanLengthForXmlMarker = 64;
+
+NSInteger findXmlMarker(uint8_t* chars, NSUInteger length) {
+    NSInteger offset = 0;
+    
+    while(offset < length && offset < kScanLengthForXmlMarker) {
+        if(memcmp(&chars[offset], marker, kMarkerSize) == 0) {
+            return offset;
+        }
+        offset++;
+    }
+    
+    return -1;
+}
+
+//BOOL xmlNeedsCleanup(NSString* foo) {
+//    return (![foo hasPrefix:kXmlPrefix]);
+//}
+//
+//NSString* xmlCleanupAndTrim(NSString* foo) {
+//    // Some apps (KeeWeb) seem to prefix crap to the XML :( NSXMLParser is extremely strict about this, so if the XML
+//    // Doesn't being with <?xml we do a quick search for it a small prefix at the start and start there instead if it's
+//    // present
+//
+//    if(xmlNeedsCleanup(foo)) {
+//        NSLog(@"WARNING: XML does not conform to XML Standard, does not being with \"<?xml\". Searching short initial prefix for this string for this prefix...");
+//
+//        NSUInteger bounds = MIN(foo.length, 16);
+//        NSRange foundPrefix = [[foo substringWithRange:NSMakeRange(0, bounds)] rangeOfString:kXmlPrefix];
+//        if(foundPrefix.location != NSNotFound) {
+//            NSLog(@"WARNING: Found prefix at %lu, starting from here instead...", (unsigned long)foundPrefix.location);
+//            return [foo substringFromIndex:foundPrefix.location];
+//        }
+//    }
+//
+//    return foo;
+//}
 
 @end

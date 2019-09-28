@@ -231,6 +231,8 @@
     xmlDoc.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
     xmlDoc.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
     xmlDoc.keePassFile.meta.recycleBinChanged = metadata.recycleBinChanged;
+    xmlDoc.keePassFile.meta.historyMaxItems = metadata.historyMaxItems;
+    xmlDoc.keePassFile.meta.historyMaxSize = metadata.historyMaxSize;
     
     // 3. From Xml Model to Xml String (including inner stream encryption)
    

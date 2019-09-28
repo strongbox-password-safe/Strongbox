@@ -29,8 +29,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
-//@property (weak, nonatomic) IBOutlet UISwitch *switchAllowOfflineCache;
-//@property (weak, nonatomic) IBOutlet UILabel *labelAllowOfflineCahce;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeMasterCredentials;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
@@ -203,11 +201,18 @@
     [self.viewModel update:NO handler:^(NSError *error) {
         if (error == nil) {
             if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-                self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-                self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
-                self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
-                
-                NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
+                if(!oneTimeKeyFileData) {
+                    self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
+                    self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
+                    NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
+                }
+                else {
+                    // We can't support Convenience unlock with a one time key file...
+                    
+                    self.viewModel.metadata.convenienceMasterPassword = nil;
+                    self.viewModel.metadata.convenenienceYubikeySecret = nil;
+                    self.viewModel.metadata.isEnrolledForConvenience = NO;
+                }
             }
             
             self.viewModel.metadata.keyFileUrl = keyFileUrl; 
@@ -252,7 +257,6 @@
                        if(self.viewModel.metadata.conveniencePin == nil) {
                            self.viewModel.metadata.isEnrolledForConvenience = NO;
                            self.viewModel.metadata.convenienceMasterPassword = nil;
-                           self.viewModel.metadata.convenenienceKeyFileDigest = nil;
                            self.viewModel.metadata.convenenienceYubikeySecret = nil;
                        }
                        
@@ -275,10 +279,17 @@
                }];
     }
     else {
+        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileUrl) {
+            [Alerts warn:self
+                   title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
+                 message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
+            
+            return;
+        }
+
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForConvenience = YES;
         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
         self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];
@@ -483,45 +494,3 @@
 }
 
 @end
-
-
-
-//- (IBAction)onSwitchAllowOfflineCache:(id)sender {
-//    if (!self.switchAllowOfflineCache.on) {
-//        [Alerts yesNo:self
-//                title:NSLocalizedString(@"db_management_disable_offline_yesno_title", @"Disable Offline Access?")
-//              message:NSLocalizedString(@"db_management_disable_offline_yesno_message", @"Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?")
-//               action:^(BOOL response) {
-//                   if (response) {
-//                       [self.viewModel disableAndClearOfflineCache];
-//                       [self bindSettings];
-//                       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_offline_done", @"Offline Disabled")
-//                                                  message:nil
-//                                                 duration:3.f
-//                                              hideOnSwipe:YES
-//                                                hideOnTap:YES
-//                                                alertType:ISAlertTypeSuccess
-//                                            alertPosition:ISAlertPositionTop
-//                                                  didHide:nil];
-//                   }
-//                   else {
-//                      [self bindSettings];
-//                   }
-//               }];
-//    }
-//    else {
-//        [self.viewModel enableOfflineCache];
-//        [self.viewModel updateOfflineCache:^{
-//            [self bindSettings];
-//
-//            [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_offline_done", @"Offline Enabled")
-//                                                       message:nil
-//                                                      duration:3.f
-//                                                   hideOnSwipe:YES
-//                                                     hideOnTap:YES
-//                                                     alertType:ISAlertTypeSuccess
-//                                                 alertPosition:ISAlertPositionTop
-//                                                       didHide:nil];
-//        }];
-//    }
-//}

@@ -128,7 +128,7 @@
 "safes_vc_copy_local_to_icloud" = "iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?";
 
 /* Default button: Copy to Local */
-"safes_vc_copy_to_local" = "Copy to Local Device Only";
+"safes_vc_copy_to_local" = "Keep on Local Device Only";
 
 /* Second Button: Copy to iCLoud */
 "safes_vc_copy_to_icloud" = "Copy to iCloud";
@@ -266,7 +266,7 @@
 "safesvc_copy_database_to_location_message" = "iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?";
 
 /* Copy to Local Device Only */
-"safesvc_copy_database_option_to_local" = "Copy to Local Device Only";
+"safesvc_copy_database_option_to_local" = "Keep on Local Device Only";
 
 /* Copy to iCloud */
 "safesvc_copy_database_option_to_icloud" = "Copy to iCloud";
@@ -876,7 +876,7 @@
 "prefs_vc_info_cannot_open_app_store_title" = "Cannot open App Store";
 
 /* Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences. */
-"prefs_vc_info_data_deletion_care_required_message" = "Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences.";
+"prefs_vc_info_data_deletion_care_required_message" = "Please be extremely careful as this will delete permanently any local device databases and all preferences.";
 
 /* DATA DELETION: Care Required */
 "prefs_vc_info_data_deletion_care_required_title" = "DATA DELETION: Care Required";
@@ -2054,3 +2054,42 @@
 
 /* Argon 2 Memory */
 "database_metadata_field_argon2_memory" = "Argon2 Memory";
+
+/* Are you sure you want to Remove this backup? */
+"backup_vc_are_you_sure_remove" = "Are you sure you want to Remove this backup?";
+
+/* This backup has been added to your databases */
+"backup_vc_backup_added_to_databases" = "This backup has been added to your databases";
+
+/* Add as Local Database */
+"backups_add_local" = "Add to Databases";
+
+/* Are you sure you want to delete all backups? */
+"backups_vc_delete_all_backups_prompt_message" = "Are you sure you want to delete all backups?";
+
+/* Set Maximum Backup Keep Count */
+"backups_vc_set_max_keep_count_title" = "Set Maximum Backup Keep Count";
+
+/* You cannot use convenience unlock with a one time key file. */
+"config_error_one_time_key_file_convenience_message" = "You cannot use convenience unlock with a one time key file.";
+
+/* One Time Key File Problem */
+"config_error_one_time_key_file_convenience_title" = "One Time Key File Problem";
+
+/* Done */
+"generic_done" = "Done";
+
+/* Error */
+"generic_error" = "Error";
+
+/* Export */
+"generic_export" = "Export";
+
+/* Remove */
+"generic_remove" = "Remove";
+
+/* Could not write backup, will not proceed with write of database! */
+"model_error_cannot_write_backup" = "Could not write backup, will not proceed with write of database!";
+
+/* Button Title to view backup settings of this database */
+"safes_vc_action_backups" = "Backups...";

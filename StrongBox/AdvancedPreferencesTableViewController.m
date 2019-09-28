@@ -113,7 +113,6 @@
                            safe.isEnrolledForConvenience = NO;
                            safe.isTouchIdEnabled = NO;
                            safe.convenienceMasterPassword = nil;
-                           safe.convenenienceKeyFileDigest = nil;
                            safe.convenenienceYubikeySecret = nil;
                            safe.conveniencePin = nil;
                            safe.duressPin = nil;
@@ -155,7 +154,6 @@
                        for (SafeMetaData* safe in clear) {
                            safe.isEnrolledForConvenience = NO;
                            safe.convenienceMasterPassword = nil;
-                           safe.convenenienceKeyFileDigest = nil;
                            safe.convenenienceYubikeySecret = nil;
                            safe.conveniencePin = nil;
                            safe.isTouchIdEnabled = NO;

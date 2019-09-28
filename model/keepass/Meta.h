@@ -13,7 +13,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Meta : BaseXmlDomainObjectHandler
-
+ 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 - (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context;
 

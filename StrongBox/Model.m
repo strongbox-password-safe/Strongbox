@@ -13,6 +13,13 @@
 #import "AutoFillManager.h"
 #import "CacheManager.h"
 #import "PasswordMaker.h"
+#import "BackupsManager.h"
+
+@interface Model ()
+
+@property (nonnull) NSData* lastSnapshot;
+
+@end
 
 @implementation Model {
     id <SafeStorageProvider> _storageProvider;
@@ -21,12 +28,14 @@
 }
 
 - (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
+               originalDataForBackup:(NSData*)originalDataForBackup
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                            cacheMode:(BOOL)cacheMode
                           isReadOnly:(BOOL)isReadOnly {
     if (self = [super init]) {
         _database = passwordDatabase;
+        _lastSnapshot = originalDataForBackup;
         _metadata = metaData;
         _storageProvider = provider;
         _cacheMode = cacheMode;
@@ -59,6 +68,14 @@
                 return;
             }
 
+            if(self.lastSnapshot) { // Dummy Database => will be nil
+                if(![BackupsManager.sharedInstance writeBackup:self.lastSnapshot metadata:self.metadata]) {
+                    handler([Utils createNSError:NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!") errorCode:-1]);
+                    return;
+                }
+                self.lastSnapshot = updatedSafeData;
+            }
+                        
             [self->_storageProvider update:self.metadata
                                       data:updatedSafeData
                                 isAutoFill:isAutoFill

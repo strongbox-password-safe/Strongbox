@@ -140,7 +140,6 @@
                        if(!self.viewModel.metadata.isTouchIdEnabled) {
                            self.viewModel.metadata.isEnrolledForConvenience = NO;
                            self.viewModel.metadata.convenienceMasterPassword = nil;
-                           self.viewModel.metadata.convenenienceKeyFileDigest = nil;
                            self.viewModel.metadata.convenenienceYubikeySecret = nil;
                        }
                        
@@ -186,10 +185,18 @@
                 if(!(otherPin != nil && [pin isEqualToString:otherPin])) {
                     if(duressPin) {
                         self.viewModel.metadata.duressPin = pin;
-                    } else {
+                    }
+                    else {
+                        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileUrl) {
+                            [Alerts warn:self
+                                   title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
+                                 message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
+                            
+                            return;
+                        }
+
                         self.viewModel.metadata.conveniencePin = pin;
                         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-                        self.viewModel.metadata.convenenienceKeyFileDigest = self.viewModel.database.compositeKeyFactors.keyFileDigest;
                         self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
                         
                         self.viewModel.metadata.isEnrolledForConvenience = YES;
