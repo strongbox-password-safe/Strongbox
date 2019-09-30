@@ -972,8 +972,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         vc.currentGroup = (Node *)sender;
         vc.viewModel = self.viewModel;
     }
-    else if ([segue.identifier isEqualToString:@"segueToSelectDestination"])
-    {
+    else if ([segue.identifier isEqualToString:@"segueToSelectDestination"]) {
         NSArray *itemsToMove = (NSArray *)sender;
         
         UINavigationController *nav = segue.destinationViewController;

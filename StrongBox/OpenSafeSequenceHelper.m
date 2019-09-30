@@ -510,16 +510,12 @@
     self.manualOpenOfflineCache = manualOpenOffline;
     self.masterPassword = password;
     
-    [self openSafe22];
+    [self openSafe];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)openSafe22 {
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [SVProgressHUD show];
-//    });
-    
+- (void)openSafe {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:self.safe.storageProvider];
         
@@ -712,7 +708,7 @@
             if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
-//                self.safe.convenenienceKeyFileDigest = nil; // TODO: Restore
+                self.safe.convenenienceKeyFileDigest = nil;
                 self.safe.convenenienceYubikeySecret = nil;
                 self.safe.conveniencePin = nil;
                 self.safe.isTouchIdEnabled = NO;

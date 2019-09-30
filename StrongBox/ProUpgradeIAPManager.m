@@ -76,7 +76,7 @@
         
         // Last check was successful and was less than a week ago... no need to check again so soon
         
-        if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 3) {
+        if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 5) {
             NSLog(@"We had a successful check recently, not rechecking...");
             return;
         }
@@ -87,17 +87,16 @@
 
     NSLog(@"Performing Scheduled Check of Entitlements...");
     
-    if(Settings.sharedInstance.numberOfEntitlementCheckFails < 8) {
+    if(Settings.sharedInstance.numberOfEntitlementCheckFails < 10) {
         [self checkReceiptAndProEntitlements:vc];
     }
     else {
-        // TODO: We should probably downgrade now... Something very funny is up
         // For now - we will warn and ask to message support so we can handle this gracefully if someone is struggling...
         [Alerts info:vc
                title:NSLocalizedString(@"upgrade_mgr_entitlements_error_title", @"Strongbox Entitlements Error")
-             message:NSLocalizedString(@"upgrade_mgr_entitlements_error_message", @"Strongbox is having trouble verifying its App Store entitlements. This could lead to a future App downgrade. Please contact support@strongboxsafe.com to get some help with this.")];
+             message:NSLocalizedString(@"upgrade_mgr_entitlements_error_message", @"Strongbox is having trouble verifying its App Store entitlements. This means the App must be downgraded to the Free version. Please contact support@strongboxsafe.com if you think this is in error.")];
     
-        [self checkReceiptAndProEntitlements:vc];
+        [Settings.sharedInstance setPro:NO];
     }
 }
 
@@ -153,6 +152,7 @@
 }
 
 - (BOOL)receiptHasProEntitlements {
+//    BOOL proTeamEdition = [RMAppReceipt bundleReceipt] 
     BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; // TODO: What about cancellation?
     
     NSDate* now = [NSDate date];

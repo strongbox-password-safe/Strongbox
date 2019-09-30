@@ -7,8 +7,19 @@ https://apps.apple.com/app/strongbox-password-safe/id897283731
 
 Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes.
 
-# Help & Support
+# Support
 If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") or email [support@strongboxsafe.com](mailto:support@strongboxsafe.com).
+
+# Localization (Help Wanted)
+Localization and translation is managed through the Parallel Babel project here:
+
+https://github.com/strongbox-password-safe/babel
+
+This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch with me (mark@strongboxsafe.com) and we'll try to set you up. Currently we are using Git Localize (which is less than ideal but the price is right and it's functional). You can find that project (which sits on top of the Babel repository) here:
+
+https://gitlocalize.com/repo/3101
+
+You can submit Pull Requests any way you choose, and it will be much appreciated, but please get in touch first so I can make sure the Repo is setup correctly for your language.
 
 # Supporting Development through Patreon
 If you like the app and are feeling generous you can help by contributing financially on Patreon here:
@@ -26,7 +37,7 @@ I cannot accept outside pull requests from the community for licensing reasons. 
 Sorry. :(
 
 # Licence Notes
-This software is licensed under the GNU AGPL by default. If you are interested in using the code in some other fashion, or require an alternative licence then please contact me directly: mark.mcguill@gmail.com.
+This software is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project. If you are interested in using the code in some other fashion, or require an alternative licence then please contact me directly: mark@strongboxsafe.com.
 
 # Acknowledgements
 The crypto is mostly from TomCrypt and libsodium. PasswordSafe & KeePass DB parsing/navigation/UI/Cloud interaction is my own work. 

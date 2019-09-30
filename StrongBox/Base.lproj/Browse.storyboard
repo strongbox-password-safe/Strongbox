@@ -263,7 +263,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SCB-rR-RcD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1284" y="1319"/>
+            <point key="canvasLocation" x="-1241" y="709"/>
         </scene>
         <!--Browse-->
         <scene sceneID="not-Ng-p9u">
@@ -367,7 +367,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aJp-lr-fNs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-396" y="813"/>
+            <point key="canvasLocation" x="-451" y="751"/>
         </scene>
         <!--RecordView-->
         <scene sceneID="Tir-qu-JI5">
@@ -401,7 +401,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bdo-Vo-vAl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1215.9420289855072" y="2176.3392857142858"/>
+            <point key="canvasLocation" x="351" y="2482"/>
         </scene>
         <!--Select Move To Destination-->
         <scene sceneID="R9j-0v-k55">
@@ -465,16 +465,8 @@
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="etQ-EU-4Sg" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <searchDisplayController searchResultsTitle="" id="OQI-p7-dqJ">
-                    <connections>
-                        <outlet property="delegate" destination="yN7-Xg-vQi" id="bvE-tQ-szT"/>
-                        <outlet property="searchContentsController" destination="yN7-Xg-vQi" id="Gyn-qt-qiy"/>
-                        <outlet property="searchResultsDataSource" destination="yN7-Xg-vQi" id="Pe3-Np-yWk"/>
-                        <outlet property="searchResultsDelegate" destination="yN7-Xg-vQi" id="BR5-Yz-2hz"/>
-                    </connections>
-                </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="1302.8985507246377" y="1082.8125"/>
+            <point key="canvasLocation" x="1536" y="1083"/>
         </scene>
         <!--DatabaseOperations-->
         <scene sceneID="onQ-WH-fXo">
@@ -512,7 +504,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ruj-sg-6pp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="597.10144927536237" y="1083.4821428571429"/>
+            <point key="canvasLocation" x="728" y="1083"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="MZq-Cv-J9e">
@@ -1013,7 +1005,7 @@
                                         <rect key="frame" x="0.0" y="945" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0ad-FM-L2V" id="Af5-7o-Qiz">
-                                            <rect key="frame" x="0.0" y="0.0" width="394.5" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="382.5" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Double Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5HW-17-RA2">
@@ -1043,7 +1035,7 @@
                                         <rect key="frame" x="0.0" y="989" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Tyx-JQ-GAP" id="KaQ-X8-7ea">
-                                            <rect key="frame" x="0.0" y="0.0" width="394.5" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="382.5" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Triple Tap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zPh-T1-OfL">

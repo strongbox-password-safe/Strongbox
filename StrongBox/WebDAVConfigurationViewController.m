@@ -26,6 +26,8 @@
     [super viewDidLoad];
 
     [self validateConnect];
+    
+    [self.textFieldRootUrl becomeFirstResponder];
 }
 
 - (IBAction)onConnect:(id)sender {

@@ -33,32 +33,34 @@
                           completion:(void (^) (NSString *password, BOOL response))completion {
     __weak typeof(self) weakSelf = self;
     
-    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-        textField.secureTextEntry = YES;
-        [textField addTarget:weakSelf
-                      action:@selector(validateNoneEmpty:)
-            forControlEvents:UIControlEventEditingChanged];
-    }];
-    
-    self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction *a) {
-                                                    completion((self.alertController.textFields[0]).text, true);
-                                                }];
-    
-    
-    self.defaultAction.enabled = NO;
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(nil, false);
-                                                         }];
-    
-    [self.alertController addAction:self.defaultAction];
-    [self.alertController addAction:cancelAction];
-    
-    [viewController presentViewController:self.alertController animated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+            textField.secureTextEntry = YES;
+            [textField addTarget:weakSelf
+                          action:@selector(validateNoneEmpty:)
+                forControlEvents:UIControlEventEditingChanged];
+        }];
+        
+        self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                      style:UIAlertActionStyleDefault
+                                                    handler:^(UIAlertAction *a) {
+                                                        completion((self.alertController.textFields[0]).text, true);
+                                                    }];
+        
+        
+        self.defaultAction.enabled = NO;
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+                                                                 completion(nil, false);
+                                                             }];
+        
+        [self.alertController addAction:self.defaultAction];
+        [self.alertController addAction:cancelAction];
+
+        [viewController presentViewController:self.alertController animated:YES completion:nil];
+    });
 }
 
 - (void)OkCancelWithPasswordAndConfirm:(UIViewController *)viewController
@@ -66,42 +68,44 @@
                             completion:(void (^) (NSString *password, BOOL response))completion {
     __weak typeof(self) weakSelf = self;
 
-    SEL validation = allowEmpty ? @selector(validatePasswordAndConfirmPassword:) : @selector(validatePasswordAndConfirmPasswordNotEmpty:);
-    
-    [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField addTarget:weakSelf
-                                        action:validation
-                              forControlEvents:UIControlEventEditingChanged];
-                          textField.placeholder = NSLocalizedString(@"alerts_password", @"Password");
-                          textField.secureTextEntry = YES;
-                      }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        SEL validation = allowEmpty ? @selector(validatePasswordAndConfirmPassword:) : @selector(validatePasswordAndConfirmPasswordNotEmpty:);
+        
+        [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+                              [textField addTarget:weakSelf
+                                            action:validation
+                                  forControlEvents:UIControlEventEditingChanged];
+                              textField.placeholder = NSLocalizedString(@"alerts_password", @"Password");
+                              textField.secureTextEntry = YES;
+                          }];
 
-    [_alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                          [textField addTarget:weakSelf
-                                        action:validation
-                              forControlEvents:UIControlEventEditingChanged];
-                          textField.placeholder = NSLocalizedString(@"alerts_confirm_password", @"Confirm Password");
-                          textField.secureTextEntry = YES;
-                      }];
+        [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+                              [textField addTarget:weakSelf
+                                            action:validation
+                                  forControlEvents:UIControlEventEditingChanged];
+                              textField.placeholder = NSLocalizedString(@"alerts_confirm_password", @"Confirm Password");
+                              textField.secureTextEntry = YES;
+                          }];
 
-    self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction *a) {
-                                                    completion(((self.alertController).textFields[0]).text, true);
-                                                }];
-    
-    self.defaultAction.enabled = allowEmpty;
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(nil, false);
-                                                         }];
+        self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                      style:UIAlertActionStyleDefault
+                                                    handler:^(UIAlertAction *a) {
+                                                        completion(((self.alertController).textFields[0]).text, true);
+                                                    }];
+        
+        self.defaultAction.enabled = allowEmpty;
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+                                                                 completion(nil, false);
+                                                             }];
 
-    [self.alertController addAction:self.defaultAction];
-    [self.alertController addAction:cancelAction];
+        [self.alertController addAction:self.defaultAction];
+        [self.alertController addAction:cancelAction];
 
-    [viewController presentViewController:self.alertController animated:YES completion:nil];
+        [viewController presentViewController:self.alertController animated:YES completion:nil];
+    });
 }
 
 - (void)validatePasswordAndConfirmPassword:(UITextField *)sender {
@@ -148,23 +152,25 @@
     defaultButtonText:(NSString *)defaultButtonText
      secondButtonText:(NSString *)secondButtonText
                action:(void (^) (BOOL response))action {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
 
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { action(YES); }];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(YES); }];
 
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:secondButtonText
-                                                       style:UIAlertActionStyleCancel
-                                                     handler:^(UIAlertAction *a) { action(NO); }];
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:secondButtonText
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) { action(NO); }];
 
-    [alertController addAction:defaultAction];
-    [alertController addAction:noAction];
+        [alertController addAction:defaultAction];
+        [alertController addAction:noAction];
 
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 + (void)error:(UIViewController *)viewController
@@ -178,19 +184,21 @@
         error:(NSError *)error
    completion:(void (^)(void))completion
 {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:error ? error.localizedDescription :
-                                          NSLocalizedString(@"alerts_unknown_error", @"Unknown Error")
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:error ? error.localizedDescription :
+                                              NSLocalizedString(@"alerts_unknown_error", @"Unknown Error")
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:
-                                    NSLocalizedString(@"alerts_ok", @"OK")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { if(completion) { completion(); } }];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:
+                                        NSLocalizedString(@"alerts_ok", @"OK")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { if(completion) { completion(); } }];
 
-    [alertController addAction:defaultAction];
+        [alertController addAction:defaultAction];
 
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 + (void)warn:(UIViewController *)viewController
@@ -223,21 +231,24 @@
              title:(NSString *)title
            message:(NSString *)message
         completion:(void (^) (void))completion {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { if (completion) {
-                                                                                            completion();
-                                                                                        }
-                                                          }];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { if (completion) {
+                                                                                                completion();
+                                                                                            }
+                                                              }];
 
-    [alertController addAction:defaultAction];
+        [alertController addAction:defaultAction];
 
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
+                   
 
 + (void) threeOptions:(UIViewController *)viewController
                 title:(NSString *)title
@@ -246,31 +257,34 @@
      secondButtonText:(NSString *)secondButtonText
       thirdButtonText:(NSString *)thirdButtonText
                action:(void (^) (int response))action {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
 
-    // this is the center of the screen currently but it can be any point in the view
+        // this is the center of the screen currently but it can be any point in the view
+        
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(0); }];
+
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) { action(1); }];
+
+        UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:thirdButtonText
+                                                              style:UIAlertActionStyleCancel
+                                                            handler:^(UIAlertAction *a) { action(2); }];
+
+        [alertController addAction:defaultAction];
+        [alertController addAction:secondAction];
+        [alertController addAction:thirdAction];
     
-    
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { action(0); }];
-
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *a) { action(1); }];
-
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:thirdButtonText
-                                                          style:UIAlertActionStyleCancel
-                                                        handler:^(UIAlertAction *a) { action(2); }];
-
-    [alertController addAction:defaultAction];
-    [alertController addAction:secondAction];
-    [alertController addAction:thirdAction];
-
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
+    
 
 + (void) twoOptionsWithCancel:(UIViewController *)viewController
                         title:(NSString *)title
@@ -278,30 +292,32 @@
             defaultButtonText:(NSString *)defaultButtonText
                secondButtonText:(NSString *)secondButtonText
                          action:(void (^) (int response))action {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        // this is the center of the screen currently but it can be any point in the view
+        
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(0); }];
+        
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) { action(1); }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) { action(3); }];
+        
+        [alertController addAction:defaultAction];
+        [alertController addAction:secondAction];
+        [alertController addAction:cancelAction];
     
-    // this is the center of the screen currently but it can be any point in the view
-    
-    
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { action(0); }];
-    
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *a) { action(1); }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) { action(3); }];
-    
-    [alertController addAction:defaultAction];
-    [alertController addAction:secondAction];
-    [alertController addAction:cancelAction];
-    
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 + (void) threeOptionsWithCancel:(UIViewController *)viewController
@@ -311,35 +327,37 @@
                secondButtonText:(NSString *)secondButtonText
                 thirdButtonText:(NSString *)thirdButtonText
                          action:(void (^) (int response))action {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        // this is the center of the screen currently but it can be any point in the view
+        
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(0); }];
+        
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) { action(1); }];
+        
+        UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:thirdButtonText
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) { action(2); }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) { action(3); }];
+        
+        [alertController addAction:defaultAction];
+        [alertController addAction:secondAction];
+        [alertController addAction:thirdAction];
+        [alertController addAction:cancelAction];
     
-    // this is the center of the screen currently but it can be any point in the view
-    
-    
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) { action(0); }];
-    
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *a) { action(1); }];
-    
-    UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:thirdButtonText
-                                                          style:UIAlertActionStyleDefault
-                                                        handler:^(UIAlertAction *a) { action(2); }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) { action(3); }];
-    
-    [alertController addAction:defaultAction];
-    [alertController addAction:secondAction];
-    [alertController addAction:thirdAction];
-    [alertController addAction:cancelAction];
-    
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 + (void)OkCancelWithPassword:(UIViewController *)viewController
@@ -359,68 +377,72 @@
                         title:(NSString *)title
                       message:(NSString *)message
                    completion:(void (^) (NSString *text, BOOL response))completion {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-        textField.text = textFieldText;
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+            textField.text = textFieldText;
+        }];
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                      style:UIAlertActionStyleDefault
+                                                    handler:^(UIAlertAction *a) {
+                                                        completion((alertController.textFields[0]).text, true);
+                                                    }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+                                                                 completion(nil, false);
+                                                             }];
+        
+        [alertController addAction:defaultAction];
+        [alertController addAction:cancelAction];
     
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                  style:UIAlertActionStyleDefault
-                                                handler:^(UIAlertAction *a) {
-                                                    completion((alertController.textFields[0]).text, true);
-                                                }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(nil, false);
-                                                         }];
-    
-    [alertController addAction:defaultAction];
-    [alertController addAction:cancelAction];
-    
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
-
+                   
 - (void)OkCancelWithTextFieldNotEmpty:(UIViewController *)viewController
                 textFieldText:(NSString *)textFieldText
                    completion:(void (^) (NSString *text, BOOL response))completion {
     __weak typeof(self) weakSelf = self;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+            [textField addTarget:weakSelf
+                          action:@selector(validateNoneEmpty:)
+                forControlEvents:UIControlEventEditingChanged];
+        
+            textField.text = [textFieldText length] ? textFieldText : NSLocalizedString(@"alerts_not_empty", @"Not Empty!");
+       
+            int extensionLength = textFieldText.pathExtension ? (int)textFieldText.pathExtension.length : 0;
 
-    [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-        [textField addTarget:weakSelf
-                      action:@selector(validateNoneEmpty:)
-            forControlEvents:UIControlEventEditingChanged];
-    
-        textField.text = [textFieldText length] ? textFieldText : NSLocalizedString(@"alerts_not_empty", @"Not Empty!");
-   
-        int extensionLength = textFieldText.pathExtension ? (int)textFieldText.pathExtension.length : 0;
+            UITextPosition *startPosition = [textField positionFromPosition:textField.beginningOfDocument offset:0];
+            UITextPosition *endPosition = [textField positionFromPosition:textField.endOfDocument offset:-extensionLength];
+            UITextRange *selection = [textField textRangeFromPosition:startPosition toPosition:endPosition];
 
-        UITextPosition *startPosition = [textField positionFromPosition:textField.beginningOfDocument offset:0];
-        UITextPosition *endPosition = [textField positionFromPosition:textField.endOfDocument offset:-extensionLength];
-        UITextRange *selection = [textField textRangeFromPosition:startPosition toPosition:endPosition];
-
-        [textField setSelectedTextRange:selection];
-    }];
+            [textField setSelectedTextRange:selection];
+        }];
+        
+        self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) {
+                                                                  completion((self.alertController.textFields[0]).text, true);
+                                                              }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+                                                                 completion(nil, false);
+                                                             }];
+        
+        [self.alertController addAction:self.defaultAction];
+        [self.alertController addAction:cancelAction];
     
-    self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-                                                              completion((self.alertController.textFields[0]).text, true);
-                                                          }];
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(nil, false);
-                                                         }];
-    
-    [self.alertController addAction:self.defaultAction];
-    [self.alertController addAction:cancelAction];
-    
-    [viewController presentViewController:self.alertController animated:YES completion:nil];
+        [viewController presentViewController:self.alertController animated:YES completion:nil];
+    });
 }
 
 - (void)validateNoneEmpty:(UITextField *)sender {
@@ -446,33 +468,35 @@
                         title:(NSString *)title
                       message:(NSString *)message
                    completion:(void (^) (NSString *password, BOOL response))completion {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:message
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
 
-    [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-                         textField.placeholder = textFieldPlaceHolder;
-                         textField.secureTextEntry = secureTextField;
-                     }];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+                             textField.placeholder = textFieldPlaceHolder;
+                             textField.secureTextEntry = secureTextField;
+                         }];
 
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-                                                              completion((alertController.textFields[0]).text, true);
-                                                          }];
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) {
+                                                                  completion((alertController.textFields[0]).text, true);
+                                                              }];
 
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(nil, false);
-                                                         }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+                                                                 completion(nil, false);
+                                                             }];
 
-    [alertController addAction:defaultAction];
-    [alertController addAction:cancelAction];
+        [alertController addAction:defaultAction];
+        [alertController addAction:cancelAction];
 
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
-
+                   
 + (void)actionSheet:(UIViewController *)viewController
           barButton:(UIBarButtonItem *)barButton
               title:(NSString *)title
@@ -499,40 +523,42 @@
          completion:(void (^)(int response))completion;
 
 {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                             message:nil
-                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:nil
+                                                                          preferredStyle:UIAlertControllerStyleActionSheet];
 
-    int index = 1;
+        int index = 1;
 
-    for (NSString *title in buttonTitles) {
-        UIAlertAction *action = [UIAlertAction actionWithTitle:title
-                                                         style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction *a) {
-                                                           completion(index);
-                                                       }];
+        for (NSString *title in buttonTitles) {
+            UIAlertAction *action = [UIAlertAction actionWithTitle:title
+                                                             style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction *a) {
+                                                               completion(index);
+                                                           }];
 
-        [alertController addAction:action];
-        index++;
-    }
+            [alertController addAction:action];
+            index++;
+        }
 
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) {
-                                                             completion(0);
-                                                         }];
-    [alertController addAction:cancelAction];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+                                                                 completion(0);
+                                                             }];
+        [alertController addAction:cancelAction];
 
+        
+        if(barButton) {
+            alertController.popoverPresentationController.barButtonItem = barButton;
+        }
+        else {
+            alertController.popoverPresentationController.sourceView = viewController.view;
+            alertController.popoverPresentationController.sourceRect = rect;
+        }
     
-    if(barButton) {
-        alertController.popoverPresentationController.barButtonItem = barButton;
-    }
-    else {
-        alertController.popoverPresentationController.sourceView = viewController.view;
-        alertController.popoverPresentationController.sourceRect = rect;
-    }
-    
-    [viewController presentViewController:alertController animated:YES completion:nil];
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 @end
