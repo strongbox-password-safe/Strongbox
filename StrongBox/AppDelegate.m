@@ -38,6 +38,8 @@
 
     [self initializeInstallSettingsAndLaunchCount];   
     
+    [self initializeProTeamEdition];
+    
     [self performMigrations];
     
     // Do not backup local safes, caches or key files
@@ -56,6 +58,13 @@
     // NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
+}
+
+- (void)initializeProTeamEdition {
+    if([Settings.sharedInstance getLaunchCount] == 1 && [ProUpgradeIAPManager isProTeamEdition]) {
+        NSLog(@"Initial launch of Pro Team Edition... setting Pro");
+        [Settings.sharedInstance setPro:YES];
+    }
 }
 
 - (void)performMigrations {

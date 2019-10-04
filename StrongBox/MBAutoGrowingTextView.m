@@ -14,6 +14,8 @@
 @property (nonatomic, weak) NSLayoutConstraint *minHeightConstraint;
 @property (nonatomic, weak) NSLayoutConstraint *maxHeightConstraint;
 
+@property (nonatomic) BOOL layoutSubviewsCrashAvoidanceHack;
+
 @end
 
 @implementation MBAutoGrowingTextView
@@ -64,6 +66,15 @@
 
 - (void) layoutSubviews
 {
+    // Attempting simplest solution from below first here with a lock var. This crash only occurs every now and then :(
+    //
+    // https://github.com/MatejBalantic/MBAutoGrowingTextView/issues/4
+    
+    if(self.layoutSubviewsCrashAvoidanceHack){
+           return;
+    }
+    self.layoutSubviewsCrashAvoidanceHack = YES;
+    
     [super layoutSubviews];
     
     
@@ -87,6 +98,8 @@
     
     // update the height constraint
     self.heightConstraint.constant = newHeight;
+    
+    self.layoutSubviewsCrashAvoidanceHack = NO;
 }
 
 @end

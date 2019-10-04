@@ -48,7 +48,7 @@
         RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
         if ([verificator verifyAppReceipt]) {
             NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-            [self checkProEntitlements:nil];
+            [self checkVerifiedReceiptIsEntitledToPro:nil];
         }
         else {
             NSLog(@"Startup receipt check failed...");
@@ -106,7 +106,7 @@
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
     if ([verificator verifyAppReceipt]) {
         NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-        [self checkProEntitlements:vc];
+        [self checkVerifiedReceiptIsEntitledToPro:vc];
     }
     else {
         NSLog(@"Receipt Not Good... Refreshing...");
@@ -114,7 +114,7 @@
         [[RMStore defaultStore] refreshReceiptOnSuccess:^{
             if ([verificator verifyAppReceipt]) {
                 NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-                [self checkProEntitlements:vc];
+                [self checkVerifiedReceiptIsEntitledToPro:vc];
             }
             else {
                 NSLog(@"Receipt not good even after refresh");
@@ -127,10 +127,14 @@
     }
 }
 
-- (void)checkProEntitlements:(UIViewController*)vc {
+- (void)checkVerifiedReceiptIsEntitledToPro:(UIViewController*)vc {
     Settings.sharedInstance.numberOfEntitlementCheckFails = 0;
     
-    if([self receiptHasProEntitlements]) {
+    if ([ProUpgradeIAPManager isProTeamEdition]) {
+        NSLog(@"Upgrading App to Pro as Receipt is Good and this is the Pro Team edition...");
+        [Settings.sharedInstance setPro:YES];
+    }
+    else if([self receiptHasProEntitlements]) {
         NSLog(@"Upgrading App to Pro as Entitlement found in Receipt...");
         [Settings.sharedInstance setPro:YES];
     }
@@ -152,7 +156,6 @@
 }
 
 - (BOOL)receiptHasProEntitlements {
-//    BOOL proTeamEdition = [RMAppReceipt bundleReceipt] 
     BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; // TODO: What about cancellation?
     
     NSDate* now = [NSDate date];
@@ -222,6 +225,12 @@
         NSLog(@"Something went wrong: [%@] error = [%@]", transaction, error);
         completion(error);
     }];
+}
+
+static NSString * const kProTeamEditionBundleId = @"com.markmcguill.strongbox.pro";
++ (BOOL)isProTeamEdition {
+    NSString* bundleId = [Utils getAppBundleId];
+    return [bundleId isEqualToString:kProTeamEditionBundleId];
 }
 
 @end

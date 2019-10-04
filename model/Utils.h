@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSError *)createNSError:(NSString *)description errorCode:(NSInteger)errorCode;
 + (NSString *)getAppName;
 + (NSString *)getAppVersion;
++ (NSString *)getAppBundleId;
 + (NSString *)insertTimestampInFilename:(NSString *)title;
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;

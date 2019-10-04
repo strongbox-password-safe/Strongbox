@@ -65,6 +65,8 @@
 }
 
 - (void)setPassword:(NSString *)password {
+    NSLog(@"EditPasswordCell: setPassword");
+    
     self.valueTextView.text = password;
 
     if(self.onPasswordEdited) {
@@ -76,6 +78,8 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
+    NSLog(@"EditPasswordCell: textViewDidChange");
+    
     if(self.onPasswordEdited) {
         self.onPasswordEdited(self.password);
     }

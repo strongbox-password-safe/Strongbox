@@ -15,11 +15,15 @@ Localization and translation is managed through the Parallel Babel project here:
 
 https://github.com/strongbox-password-safe/babel
 
-This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch with me (mark@strongboxsafe.com) and we'll try to set you up. Currently we are using Git Localize (which is less than ideal but the price is right and it's functional). You can find that project (which sits on top of the Babel repository) here:
-
-https://gitlocalize.com/repo/3101
+This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch with me (mark@strongboxsafe.com) and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
 
 You can submit Pull Requests any way you choose, and it will be much appreciated, but please get in touch first so I can make sure the Repo is setup correctly for your language.
+
+Big thank you to all the localization contributors
+
+Russian - wishes to remain anonymous!
+German - @Slummi
+Ukrainian - Artem Polivanchuk
 
 # Supporting Development through Patreon
 If you like the app and are feeling generous you can help by contributing financially on Patreon here:
@@ -57,6 +61,11 @@ Kudos to Dominik Reichl and all the KeePass team for their incredible technical 
 Hats off to the KeePassXC team for their fantastic cross platform apps. 
 
 https://keepassxc.org/
+
+Another great project is KeeWeb, a fully javascript based client which works cross-platform basically everywhere! Major props to @antelle
+
+https://github.com/keeweb/keeweb
+https://keeweb.info/
 
 I use many different libraries in the app here are just a few:
 

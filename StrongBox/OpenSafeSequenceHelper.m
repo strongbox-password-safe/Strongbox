@@ -483,14 +483,26 @@
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
 
         if(self.undigestedKeyFileData == nil) {
-            // TODO: Move error messaging out of here
-            [Alerts error:self.viewController
-                    title:NSLocalizedString(@"open_sequence_error_reading_key_file", @"Error Reading Key File")
-                    error:error
-               completion:^{
-                self.completion(nil, error);
-            }];
-            return;
+            if(keyFileUrl && self.isAutoFillOpen) {
+                    // TODO: Move error messaging out of here
+                    [Alerts error:self.viewController
+                            title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences")
+                            error:error
+                       completion:^{
+                        self.completion(nil, error);
+                    }];
+                    return;
+            }
+            else {
+                // TODO: Move error messaging out of here
+                [Alerts error:self.viewController
+                        title:NSLocalizedString(@"open_sequence_error_reading_key_file", @"Error Reading Key File")
+                        error:error
+                   completion:^{
+                    self.completion(nil, error);
+                }];
+                return;
+            }
         }
     }
 

@@ -875,7 +875,7 @@
 /* Cannot open App Store */
 "prefs_vc_info_cannot_open_app_store_title" = "Cannot open App Store";
 
-/* Please be extremely careful with this setting particularly if you are using Biometric ID for application lock. This will delete permanently any local device databases and all preferences. */
+/* Please be extremely careful as this will delete permanently any local device databases and all preferences */
 "prefs_vc_info_data_deletion_care_required_message" = "Please be extremely careful as this will delete permanently any local device databases and all preferences.";
 
 /* DATA DELETION: Care Required */
@@ -1250,7 +1250,7 @@
 "key_files_vc_section_header_imported" = "Imported Key Files (Auto-Fill Enabled)";
 
 /* Application Local Files */
-"key_files_vc_section_header_local" = "Application Local Files";
+"key_files_vc_section_header_local" = "Documents Folder (Auto-Fill not supported)";
 
 /* No Key File */
 "key_files_vc_no_key_file" = "No Key File";
@@ -1592,7 +1592,7 @@
 "open_sequence_biometric_unlock_warn_not_configured_fmt" = "%@ has not been setup or system has cancelled. You must now enter your password manually to open the database.";
 
 /* Error Reading Key File */
-"open_sequence_error_reading_key_file" = "Error Reading Key File";
+"open_sequence_error_reading_key_file" = "Could not read Key File. Has it been moved or deleted? Check Key Files Management in Preferences";
 
 /* Could Not Open Offline */
 "open_sequence_couldnt_open_offline_title" = "Could Not Open Offline";
@@ -2093,3 +2093,6 @@
 
 /* Button Title to view backup settings of this database */
 "safes_vc_action_backups" = "Backups...";
+
+/* Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences */
+"open_sequence_error_reading_key_file_autofill_context" = "Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences";

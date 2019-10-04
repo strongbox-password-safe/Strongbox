@@ -626,118 +626,66 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" fixedFrame="YES" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y8A-xb-KEy">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <string key="text">Disclaimer
-Strongbox is provided as is with no guarantees or warrantees. It may contain bugs and defects, though every effort has been made to ensure correct functionality. No liability can accepted for loss or damage caused by the use of this product. You use it at your own risk. 
-
-Touch ID &amp; Face ID Security - A Caveat
-While these biometric options are very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device and your fingerprint, can produce a good enough fake fingerprint to fool Apple’s systems. Therefore you should be aware that a strong passphrase held only in your mind provides the most secure experience with Strongbox. 
-
-Please Enjoy! 
--Mark 
-
-Third Party Kudos
-
-Strongbox uses a number of third party libraries, resources and components. 
-
-Google Drive - http://www.google.com 
-Google Drive is a trademark of Google Inc. Use of this trademark is subject to Google Permissions. 
-© 2012 Google Inc. All rights reserved. Google and the Google logo are registered trademarks of Google Inc. 
-
-Dropbox - http://www.dropbox.com 
-Dropbox and the Dropbox logo are trademarks of Dropbox, Inc. 
-
-OneDriveSDK 
-Microsoft OneDrive SDK
-
-TWG Retina Icons - http://blog.twg.ca/2010/11/retina-display-icon-set/ 
-TWG Retina Icons are provided under the Creative Commons Attribution and Share Alike License 
-http://creativecommons.org/licenses/by-sa/3.0/legalcode
-
-Glyphish Icons - http://gylphish.com 
-Some Icons by Glyphish 
-
-LibTomCrypt - http://libtom.org/ 
-LibTomCrypt is used for its TwoFish implementation.  
-
-JNKeychain - https://github.com/jeremangnr/JNKeychain 
-Copyright (c) 2013 Jeremias Nunez &lt;jeremias.nunez@globant.com&gt; 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
-
-Reachability - https://github.com/tonymillion/Reachability 
-Copyright (c) 2011-2013, Tony Million. 
-All rights reserved. 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation 
-and/or other materials provided with the distribution. 
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
-
-ISMessages
-https://github.com/ilyainyushin/ISMessages
-
-SVProgressHUD
-https://github.com/SVProgressHUD/SVProgressHUD
-
-libsodium
-Argon2, ChaCha20, and Salsa20 Crypto under the ISC licence:
-
-/*
- * ISC License
- *
- * Copyright (c) 2013-2018
- * Frank Denis &lt;j at pureftpd dot org&gt;
- *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
-
-DZNEmptyDataSet
-Slick Empty Dataset for UITableView
-
-KeePass Icon Set 
-From the Original Windows KeePass application
-
-XWSI
-Lightweight XML Writer
-
-Icons8
-https://icons8.com/license
-
-FavIcon
-Copyright (C) 2018 Leon Breedt
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.</string>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Debug Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-rT-Mfx">
+                                <rect key="frame" x="20" y="108" width="88" height="21"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" editable="NO" text="Debug Info" translatesAutoresizingMaskIntoConstraints="NO" id="JkH-Oi-xgJ" userLabel="Debug">
+                                <rect key="frame" x="20" y="137" width="374" height="341"/>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YSc-AW-zP2">
+                                <rect key="frame" x="20" y="493.5" width="49" height="20.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8A-xb-KEy" userLabel="About">
+                                <rect key="frame" x="20" y="522" width="374" height="340"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="Testing">
+                                        <attributes>
+                                            <font key="NSFont" metaFont="smallSystem"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aid-15-B7W">
+                                <rect key="frame" x="356" y="102.5" width="38" height="32"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                <state key="normal" title="Copy"/>
+                                <connections>
+                                    <action selector="onCopy:" destination="Rqc-tQ-fje" eventType="touchUpInside" id="WD3-rv-Zvg"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="bottom" secondItem="Y8A-xb-KEy" secondAttribute="bottom" id="1bz-Kw-hrj"/>
+                            <constraint firstItem="YSc-AW-zP2" firstAttribute="top" secondItem="JkH-Oi-xgJ" secondAttribute="bottom" constant="16" id="1dy-hH-iF1"/>
+                            <constraint firstItem="Y8A-xb-KEy" firstAttribute="top" secondItem="YSc-AW-zP2" secondAttribute="bottom" constant="8" id="30j-l2-jFa"/>
+                            <constraint firstItem="Y8A-xb-KEy" firstAttribute="height" secondItem="JkH-Oi-xgJ" secondAttribute="height" id="41X-Ap-k9G"/>
+                            <constraint firstItem="Y8A-xb-KEy" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="9Hk-iS-6zE"/>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="JkH-Oi-xgJ" secondAttribute="trailing" constant="20" id="ABo-0H-DhR"/>
+                            <constraint firstItem="JkH-Oi-xgJ" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="AOA-3D-WbP"/>
+                            <constraint firstItem="8qK-rT-Mfx" firstAttribute="top" secondItem="feb-qC-Hxq" secondAttribute="top" constant="20" id="Al5-Da-k2c"/>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="YSc-AW-zP2" secondAttribute="trailing" symbolic="YES" id="HKN-Z0-Rkr"/>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8qK-rT-Mfx" secondAttribute="trailing" symbolic="YES" id="QSw-gn-TDf"/>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="aid-15-B7W" secondAttribute="trailing" constant="20" id="R8L-Gt-bhh"/>
+                            <constraint firstItem="YSc-AW-zP2" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="UcA-a1-OTl"/>
+                            <constraint firstItem="JkH-Oi-xgJ" firstAttribute="top" secondItem="8qK-rT-Mfx" secondAttribute="bottom" constant="8" id="dlZ-L9-f4s"/>
+                            <constraint firstItem="8qK-rT-Mfx" firstAttribute="centerY" secondItem="aid-15-B7W" secondAttribute="centerY" id="jWo-HI-QVF"/>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="Y8A-xb-KEy" secondAttribute="trailing" constant="20" id="qrB-OY-C3q"/>
+                            <constraint firstItem="8qK-rT-Mfx" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="s1E-7X-VIw"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="feb-qC-Hxq"/>
                     </view>
                     <navigationItem key="navigationItem" title="About" id="ydo-Zd-WnF">
@@ -747,10 +695,14 @@ limitations under the License.</string>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="aboutTextView" destination="Y8A-xb-KEy" id="ZFc-JK-4tr"/>
+                        <outlet property="debugTextView" destination="JkH-Oi-xgJ" id="zYw-kU-FyU"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Dh6-0J-oXp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1136" y="4519"/>
+            <point key="canvasLocation" x="-1136.231884057971" y="4518.75"/>
         </scene>
         <!--Cloud Sessions-->
         <scene sceneID="e7j-ln-97B">

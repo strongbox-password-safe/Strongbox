@@ -39,6 +39,7 @@
 #import "FilesAppUrlBookmarkProvider.h"
 #import "BackupsManager.h"
 #import "BackupsTableViewController.h"
+#import "ProUpgradeIAPManager.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -77,6 +78,11 @@
     
     if([Settings.sharedInstance getLaunchCount] == 1) {
         [self startOnboarding];
+    }
+    else {
+        if (@available(iOS 13.0, *)) { // It looks like we miss the App Active notification now on iOS 13 so we do it here also
+            [self doAppFirstActivationProcess];
+        }
     }
 }
 
@@ -143,15 +149,7 @@
     }
     
     if(!self.hasAppearedOnce) {
-        self.hasAppearedOnce = YES;
-        NSLog(@"self.hasAppearedOnce = YES");
-
-        if (Settings.sharedInstance.appLockMode != kNoLock) {
-            [self showPrivacyScreen:YES];
-        }
-        else {
-            [self doAppActivationTasks:NO];
-        }
+        [self doAppFirstActivationProcess];
     }
     else {
         if(self.privacyAndLockVc) {
@@ -160,6 +158,20 @@
         else {
             // I don't think this is possible but would like to know about it if it ever somehow could occur
             NSLog(@"XXXXX - Interesting Situation - App became active but no Privacy Screen was up? - XXXX");
+            [self doAppActivationTasks:NO];
+        }
+    }
+}
+
+- (void)doAppFirstActivationProcess {
+    if(!self.hasAppearedOnce) {
+        self.hasAppearedOnce = YES;
+        NSLog(@"self.hasAppearedOnce = YES");
+
+        if (Settings.sharedInstance.appLockMode != kNoLock) {
+            [self showPrivacyScreen:YES];
+        }
+        else {
             [self doAppActivationTasks:NO];
         }
     }
@@ -244,9 +256,11 @@
 - (void)onPrivacyScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
     self.privacyAndLockVc = nil;
     
-    //NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
+    NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
 
-    [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
+    });
 }
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
@@ -265,7 +279,7 @@
 }
 
 - (void)checkICloudAvailability:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
-//    NSLog(@"checkICloudAvailability...");
+    NSLog(@"checkICloudAvailability... App Activate: [%d]", isAppActivation);
     [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
         Settings.sharedInstance.iCloudAvailable = available;
         

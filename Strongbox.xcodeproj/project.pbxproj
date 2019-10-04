@@ -363,6 +363,8 @@
 		4D5F5B93218B6C9D00A0739A /* NodeFileAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */; };
 		4D5F5B94218B6C9D00A0739A /* NodeFileAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */; };
 		4D5F5B96218B828600A0739A /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D5F5B95218B828500A0739A /* QuickLook.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		4D62E26623437F8200119604 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D62E26523437F8200119604 /* DebugHelper.m */; };
+		4D62E268234386FF00119604 /* About.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4D62E267234386FF00119604 /* About.rtf */; };
 		4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
 		4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
@@ -1106,6 +1108,9 @@
 		4D5F5B91218B6C9D00A0739A /* NodeFileAttachment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeFileAttachment.h; path = model/NodeFileAttachment.h; sourceTree = "<group>"; };
 		4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeFileAttachment.m; path = model/NodeFileAttachment.m; sourceTree = "<group>"; };
 		4D5F5B95218B828500A0739A /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
+		4D62E26423437F8200119604 /* DebugHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugHelper.h; path = StrongBox/DebugHelper.h; sourceTree = "<group>"; };
+		4D62E26523437F8200119604 /* DebugHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugHelper.m; path = StrongBox/DebugHelper.m; sourceTree = "<group>"; };
+		4D62E267234386FF00119604 /* About.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = About.rtf; path = StrongBox/About.rtf; sourceTree = SOURCE_ROOT; };
 		4D632E1C1F79631100C31279 /* iCloudSafesCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = iCloudSafesCoordinator.h; path = StrongBox/iCloudSafesCoordinator.h; sourceTree = "<group>"; };
 		4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = iCloudSafesCoordinator.m; path = StrongBox/iCloudSafesCoordinator.m; sourceTree = "<group>"; };
 		4D646A1E22D2A42C00C5D2FE /* UIImage+FixOrientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIImage+FixOrientation.h"; path = "StrongBox/UIImage+FixOrientation.h"; sourceTree = "<group>"; };
@@ -1172,8 +1177,8 @@
 		4D7D2191229FD15800C1C925 /* BrowseItemSubtitleField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseItemSubtitleField.h; path = StrongBox/BrowseItemSubtitleField.h; sourceTree = "<group>"; };
 		4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectItemTableViewController.h; path = StrongBox/SelectItemTableViewController.h; sourceTree = "<group>"; };
 		4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectItemTableViewController.m; path = StrongBox/SelectItemTableViewController.m; sourceTree = "<group>"; };
-		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
-		4D7D219822A02CBC00C1C925 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
+		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutViewController.h; path = ../StrongBox/About/AboutViewController.h; sourceTree = "<group>"; };
+		4D7D219822A02CBC00C1C925 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutViewController.m; path = ../StrongBox/About/AboutViewController.m; sourceTree = "<group>"; };
 		4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+Extensions.h"; path = "model/NSMutableArray+Extensions.h"; sourceTree = "<group>"; };
 		4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+Extensions.m"; path = "model/NSMutableArray+Extensions.m"; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
@@ -1753,6 +1758,7 @@
 		4D0835DF2284773C00CA7405 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				4D48C6EB22AD0DE9002B502E /* About */,
 				4DE7F0F422F89D820095F51F /* Preferences.storyboard */,
 				4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */,
 				4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */,
@@ -2172,11 +2178,11 @@
 		4D48C6EB22AD0DE9002B502E /* About */ = {
 			isa = PBXGroup;
 			children = (
+				4D62E267234386FF00119604 /* About.rtf */,
 				4D7D219722A02CBC00C1C925 /* AboutViewController.h */,
 				4D7D219822A02CBC00C1C925 /* AboutViewController.m */,
 			);
-			name = About;
-			path = StrongBox/About;
+			path = About;
 			sourceTree = "<group>";
 		};
 		4D4D6AF4222EF3D80056514E /* RMStore */ = {
@@ -2278,7 +2284,6 @@
 				4D20E7A72299593E00ABFC89 /* PIN Code */,
 				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DBA028022A3EECA00BAC858 /* Database Management */,
-				4D48C6EB22AD0DE9002B502E /* About */,
 				4D0835DF2284773C00CA7405 /* Preferences */,
 				4DE2688E22A65C8B00A1D158 /* Password Generation */,
 				4D06943622083E2000FB826C /* Upgrade */,
@@ -2875,11 +2880,13 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
+				4D62E26423437F8200119604 /* DebugHelper.h */,
+				4D62E26523437F8200119604 /* DebugHelper.m */,
 				4D2561AD233FEAEA00179B84 /* YubiManager.h */,
 				4D2561AE233FEAEA00179B84 /* YubiManager.m */,
 				4D2CB48F2332CBE400C2E084 /* ClipboardManager.h */,
 				4D2CB4902332CBE400C2E084 /* ClipboardManager.m */,
-				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
@@ -3406,6 +3413,7 @@
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
 				4DE7F0DE22F89D510095F51F /* KeePassHistory.storyboard in Resources */,
 				4DE7F11422F8A16A0095F51F /* Localizable.strings in Resources */,
+				4D62E268234386FF00119604 /* About.rtf in Resources */,
 				4D770F9B230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4D770F8E2303262400CBE244 /* QRCodeScannerViewController.xib in Resources */,
@@ -3911,6 +3919,7 @@
 				4D446809216CE02C00F6358D /* Csv.m in Sources */,
 				4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */,
 				4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */,
+				4D62E26623437F8200119604 /* DebugHelper.m in Sources */,
 				4D4ACAE622A1275700D486B0 /* CASGTableViewController.m in Sources */,
 				4D876B4321AC36F800805DED /* CustomField.m in Sources */,
 				4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
@@ -4671,7 +4680,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2710;
+				CURRENT_PROJECT_VERSION = 2715;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -4741,7 +4750,7 @@
 					"-framework",
 					"\"libsodium\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4762,7 +4771,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2710;
+				CURRENT_PROJECT_VERSION = 2715;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -4832,7 +4841,7 @@
 					"-framework",
 					"\"libsodium\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4858,7 +4867,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2710;
+				CURRENT_PROJECT_VERSION = 2715;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -4921,7 +4930,7 @@
 					"-framework",
 					"\"libsodium\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.autofill;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro.autofill;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -4945,7 +4954,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2710;
+				CURRENT_PROJECT_VERSION = 2715;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5006,7 +5015,7 @@
 					"-framework",
 					"\"libsodium\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.autofill;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro.autofill;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;

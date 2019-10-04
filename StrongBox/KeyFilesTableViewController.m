@@ -301,7 +301,7 @@
         return self.keyFiles.count == 0 ? nil : NSLocalizedString(@"key_files_vc_section_header_imported", @"Imported Key Files (Auto-Fill Enabled)");
     }
     else if (section == 2) {
-        return self.otherFiles.count == 0 ? nil : NSLocalizedString(@"key_files_vc_section_header_local", @"Application Local Files");
+        return self.otherFiles.count == 0 ? nil : NSLocalizedString(@"key_files_vc_section_header_local", @"Documents Folder (Auto-Fill not supported)");
     }
 
     return nil;

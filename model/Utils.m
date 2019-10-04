@@ -41,9 +41,16 @@ BOOL isValidUrl(NSString* urlString) {
     return error;
 }
 
-+ (NSString *)getAppVersion {
++ (NSString *)getAppBundleId {
     NSDictionary *info = [NSBundle mainBundle].infoDictionary;
     
+    NSString* bundleId = info[@"CFBundleIdentifier"];
+
+    return bundleId ? bundleId : @"";
+}
+
++ (NSString *)getAppVersion {
+    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
     return [NSString stringWithFormat:@"%@", info[@"CFBundleShortVersionString"]];
 }
 
