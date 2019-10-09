@@ -423,26 +423,6 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     }
 }
 
-// TODO: Remove
-- (NSData *)convenenienceKeyFileDigest {
-    NSString *key = [NSString stringWithFormat:@"%@-keyFileDigest", self.uuid];
-
-    NSData* ret = [JNKeychain loadValueForKey:key];
-
-    return ret;
-}
-
-- (void)setConvenenienceKeyFileDigest:(NSData *)convenenienceKeyFileDigest {
-    NSString *key = [NSString stringWithFormat:@"%@-keyFileDigest", self.uuid];
-
-    if(convenenienceKeyFileDigest) {
-        [JNKeychain saveValue:convenenienceKeyFileDigest forKey:key];
-    }
-    else {
-        [JNKeychain deleteValueForKey:key];
-    }
-}
-
 - (NSString *)convenenienceYubikeySecret {
     NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
     return [JNKeychain loadValueForKey:key];
@@ -493,7 +473,6 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
-    self.convenenienceKeyFileDigest = nil;
     self.convenenienceYubikeySecret = nil;
     
     self.favourites = nil;

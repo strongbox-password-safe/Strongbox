@@ -35,7 +35,6 @@
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong) NSString* convenienceMasterPassword;
-@property (nonatomic, strong) NSData* convenenienceKeyFileDigest; // TODO: Remove - using URL instead - here for emergencies (26-Sept-2019)
 @property (nonatomic, strong) NSString* convenenienceYubikeySecret;
 
 @property (nonatomic) BOOL isTouchIdEnabled;

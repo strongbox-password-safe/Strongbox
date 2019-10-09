@@ -42,8 +42,10 @@
                                             <constraints>
                                                 <constraint firstItem="O7d-q6-vEz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="R9S-IH-dDH" secondAttribute="trailing" constant="8" symbolic="YES" id="7h6-SF-Up2"/>
                                                 <constraint firstItem="O7d-q6-vEz" firstAttribute="trailing" secondItem="YYM-Do-fJt" secondAttribute="trailing" constant="-20" id="CTc-jU-2Z9"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="O7d-q6-vEz" secondAttribute="bottom" constant="4" id="DbB-F0-Y7G"/>
                                                 <constraint firstItem="R9S-IH-dDH" firstAttribute="bottom" secondItem="YYM-Do-fJt" secondAttribute="bottomMargin" id="O8m-QA-NeP"/>
                                                 <constraint firstItem="R9S-IH-dDH" firstAttribute="leading" secondItem="YYM-Do-fJt" secondAttribute="leading" constant="20" id="hEK-An-H46"/>
+                                                <constraint firstItem="O7d-q6-vEz" firstAttribute="top" relation="greaterThanOrEqual" secondItem="YYM-Do-fJt" secondAttribute="top" constant="4" id="kLe-vJ-jZh"/>
                                                 <constraint firstItem="R9S-IH-dDH" firstAttribute="centerY" secondItem="O7d-q6-vEz" secondAttribute="centerY" id="nd6-mF-iDY"/>
                                                 <constraint firstItem="R9S-IH-dDH" firstAttribute="top" secondItem="YYM-Do-fJt" secondAttribute="topMargin" id="oFU-9J-ptM"/>
                                             </constraints>
@@ -175,6 +177,8 @@
                                                 <constraint firstItem="e6I-50-gCI" firstAttribute="bottom" secondItem="LeX-ba-WuA" secondAttribute="bottomMargin" id="X17-38-YQ7"/>
                                                 <constraint firstItem="e6I-50-gCI" firstAttribute="leading" secondItem="LeX-ba-WuA" secondAttribute="leading" constant="20" id="ZeZ-Gk-sBh"/>
                                                 <constraint firstItem="e6I-50-gCI" firstAttribute="top" secondItem="LeX-ba-WuA" secondAttribute="topMargin" id="aaL-g4-8eQ"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="ig0-eg-IBX" secondAttribute="bottom" constant="4" id="hAL-93-q2c"/>
+                                                <constraint firstItem="ig0-eg-IBX" firstAttribute="top" relation="greaterThanOrEqual" secondItem="LeX-ba-WuA" secondAttribute="top" constant="4" id="xN4-vM-9EI"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -325,12 +329,14 @@
                                                 </switch>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="xn1-Yl-9it" firstAttribute="top" relation="greaterThanOrEqual" secondItem="s6i-C5-e97" secondAttribute="top" constant="4" id="17J-bA-aBK"/>
                                                 <constraint firstItem="hDt-Fd-64Z" firstAttribute="centerY" secondItem="xn1-Yl-9it" secondAttribute="centerY" id="7kZ-f7-Btt"/>
                                                 <constraint firstItem="hDt-Fd-64Z" firstAttribute="leading" secondItem="s6i-C5-e97" secondAttribute="leading" constant="20" id="EaP-5v-3e9"/>
                                                 <constraint firstItem="hDt-Fd-64Z" firstAttribute="top" secondItem="s6i-C5-e97" secondAttribute="topMargin" id="F9t-cL-xvs"/>
                                                 <constraint firstItem="hDt-Fd-64Z" firstAttribute="bottom" secondItem="s6i-C5-e97" secondAttribute="bottomMargin" id="MZP-Xd-ERA"/>
                                                 <constraint firstAttribute="trailing" secondItem="xn1-Yl-9it" secondAttribute="trailing" constant="20" id="SUV-Qd-I1u"/>
                                                 <constraint firstItem="xn1-Yl-9it" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hDt-Fd-64Z" secondAttribute="trailing" constant="8" symbolic="YES" id="Un5-nV-5JD"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="xn1-Yl-9it" secondAttribute="bottom" constant="4" id="yfN-2c-vVR"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -389,10 +395,12 @@
                                                 </switch>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="qF5-6H-kgl" secondAttribute="bottom" constant="4" id="7qa-l4-zjd"/>
                                                 <constraint firstItem="qF5-6H-kgl" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2eC-UV-Ohi" secondAttribute="trailing" constant="8" symbolic="YES" id="AVh-V2-hMp"/>
                                                 <constraint firstItem="qF5-6H-kgl" firstAttribute="trailing" secondItem="M85-85-ZT4" secondAttribute="trailing" constant="-20" id="Jww-01-ufM"/>
                                                 <constraint firstItem="2eC-UV-Ohi" firstAttribute="top" secondItem="M85-85-ZT4" secondAttribute="topMargin" id="Mva-Ou-8C0"/>
                                                 <constraint firstItem="2eC-UV-Ohi" firstAttribute="centerY" secondItem="qF5-6H-kgl" secondAttribute="centerY" id="SUg-Za-tsp"/>
+                                                <constraint firstItem="qF5-6H-kgl" firstAttribute="top" relation="greaterThanOrEqual" secondItem="M85-85-ZT4" secondAttribute="top" constant="4" id="WKq-hr-9B6"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="2eC-UV-Ohi" secondAttribute="bottom" id="a7I-do-Pag"/>
                                                 <constraint firstItem="2eC-UV-Ohi" firstAttribute="leading" secondItem="M85-85-ZT4" secondAttribute="leading" constant="20" id="uRa-hS-0bW"/>
                                             </constraints>
@@ -633,7 +641,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" editable="NO" text="Debug Info" translatesAutoresizingMaskIntoConstraints="NO" id="JkH-Oi-xgJ" userLabel="Debug">
-                                <rect key="frame" x="20" y="137" width="374" height="341"/>
+                                <rect key="frame" x="20" y="137" width="374" height="340.5"/>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>

@@ -483,6 +483,19 @@
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
 
         if(self.undigestedKeyFileData == nil) {
+            // Clear convenience unlock settings if we fail to read Key File - Force manual reselection.
+            
+            if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
+                self.safe.isEnrolledForConvenience = NO;
+                self.safe.convenienceMasterPassword = nil;
+                self.safe.convenenienceYubikeySecret = nil;
+                self.safe.conveniencePin = nil;
+                self.safe.isTouchIdEnabled = NO;
+                self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
+                
+                [SafesList.sharedInstance update:self.safe];
+            }
+
             if(keyFileUrl && self.isAutoFillOpen) {
                     // TODO: Move error messaging out of here
                     [Alerts error:self.viewController
@@ -720,7 +733,6 @@
             if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
-                self.safe.convenenienceKeyFileDigest = nil;
                 self.safe.convenenienceYubikeySecret = nil;
                 self.safe.conveniencePin = nil;
                 self.safe.isTouchIdEnabled = NO;

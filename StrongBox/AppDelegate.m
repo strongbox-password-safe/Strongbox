@@ -38,7 +38,7 @@
 
     [self initializeInstallSettingsAndLaunchCount];   
     
-    [self initializeProTeamEdition];
+    [self initializeProFamilyEdition];
     
     [self performMigrations];
     
@@ -60,9 +60,10 @@
     return YES;
 }
 
-- (void)initializeProTeamEdition {
-    if([Settings.sharedInstance getLaunchCount] == 1 && [ProUpgradeIAPManager isProTeamEdition]) {
-        NSLog(@"Initial launch of Pro Team Edition... setting Pro");
+- (void)initializeProFamilyEdition {
+    if(!Settings.sharedInstance.hasDoneProFamilyCheck && [ProUpgradeIAPManager isProFamilyEdition]) {
+        NSLog(@"Initial launch of Pro Family Edition... setting Pro");
+        Settings.sharedInstance.hasDoneProFamilyCheck = YES;
         [Settings.sharedInstance setPro:YES];
     }
 }

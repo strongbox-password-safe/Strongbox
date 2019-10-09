@@ -16,7 +16,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
-                            <tableViewSection headerTitle="Settings" footerTitle="The oldest backups will be deleted when maximum keep count is exceeded" id="3pa-Ua-OFq">
+                            <tableViewSection headerTitle="Settings" footerTitle="The oldest backups will be deleted when maximum keep count is exceeded. Backups are taken before each sync." id="3pa-Ua-OFq">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="pXK-ZJ-X47" userLabel="Show Tips">
                                         <rect key="frame" x="0.0" y="55.5" width="414" height="44"/>

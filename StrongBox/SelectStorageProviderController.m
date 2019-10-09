@@ -87,7 +87,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.providers.count + (self.existing ? 2 : 0);
+    return self.providers.count + (self.existing ? 3 : 0);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -100,6 +100,10 @@
     else if(indexPath.row == self.providers.count + 1) {
         cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files...");
         cell.image.image =  [UIImage imageNamed:@"ios11-files-app-icon"];
+    }
+    else if(indexPath.row == self.providers.count + 2) {
+        cell.text.text = NSLocalizedString(@"sspc_local_network_storage_location", @"Transfer Over Local Network");
+        cell.image.image =  [UIImage imageNamed:@"wifi"];
     }
     else {
         id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
@@ -117,6 +121,9 @@
     }
     else if(indexPath.row == self.providers.count + 1) {
         [self onAddThroughFilesApp];
+    }
+    else if(indexPath.row == self.providers.count + 2) {
+        [self onAddThroughLocalNetworkServer];
     }
     else {
         id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
@@ -137,6 +144,10 @@
             [self segueToBrowserOrAdd:provider];
         }
     }
+}
+
+- (void)onAddThroughLocalNetworkServer {
+    [self performSegueWithIdentifier:@"segueToLocalHttpServer" sender:nil];
 }
 
 - (void)initiateManualImportFromUrl {

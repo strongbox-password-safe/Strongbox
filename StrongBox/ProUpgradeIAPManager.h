@@ -41,7 +41,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 - (void)purchase:(NSString*)productId completion:(PurchaseCompletionBlock)completion;
 - (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc;
 
-+ (BOOL)isProTeamEdition;
++ (BOOL)isProFamilyEdition;
 
 @end
 

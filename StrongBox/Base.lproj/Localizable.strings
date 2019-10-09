@@ -2096,3 +2096,6 @@
 
 /* Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences */
 "open_sequence_error_reading_key_file_autofill_context" = "Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences";
+
+/* Local Network (Built In Http Server for Upload) with a Wifi Icon... */
+"sspc_local_network_storage_location" = "Transfer Over Local Network";

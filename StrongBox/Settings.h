@@ -127,6 +127,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property BOOL monitorInternetConnectivity;
 
+@property BOOL hasDoneProFamilyCheck;
+
 NS_ASSUME_NONNULL_END
 
 @end

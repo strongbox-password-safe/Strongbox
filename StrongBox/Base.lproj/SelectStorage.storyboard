@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ndq-FV-qPb">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -66,6 +67,7 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics"/>
                     <connections>
                         <segue destination="WCV-cO-CwF" kind="show" identifier="SegueToBrowser" id="Hko-nO-Jgc"/>
+                        <segue destination="rGj-xq-ijC" kind="show" identifier="segueToLocalHttpServer" id="xib-ic-UWb"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pyy-HJ-1be" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -143,8 +145,61 @@
             </objects>
             <point key="canvasLocation" x="-1362.3188405797102" y="292.63392857142856"/>
         </scene>
+        <!--Local Network Server-->
+        <scene sceneID="cQB-UA-4hN">
+            <objects>
+                <viewController id="rGj-xq-ijC" customClass="LocalHttpServerViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Izw-bM-vhq">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="35" translatesAutoresizingMaskIntoConstraints="NO" id="ieB-qt-nUH">
+                                <rect key="frame" x="20" y="277" width="374" height="342.5"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AppIcon-2019-1024" translatesAutoresizingMaskIntoConstraints="NO" id="uSC-9Z-tBL">
+                                        <rect key="frame" x="123" y="0.0" width="128" height="128"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="128" id="B0j-dk-DIb"/>
+                                            <constraint firstAttribute="width" constant="128" id="yqz-Z8-fic"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="http://192.168.241.228" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eo1-GG-bDg">
+                                        <rect key="frame" x="36" y="163" width="302.5" height="36"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I8u-fe-paW" userLabel="Informational Message">
+                                        <rect key="frame" x="8" y="234" width="358" height="108.5"/>
+                                        <string key="text">Strongbox is now available at the above URL  You can visit this URL from another device on your network and upload or manage your local databases.</string>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="ieB-qt-nUH" firstAttribute="centerX" secondItem="Izw-bM-vhq" secondAttribute="centerX" id="5aJ-ET-ffw"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ieB-qt-nUH" secondAttribute="trailing" id="KMj-ZU-DzR"/>
+                            <constraint firstItem="ieB-qt-nUH" firstAttribute="centerY" secondItem="Izw-bM-vhq" secondAttribute="centerY" id="ZT2-qi-UwQ"/>
+                            <constraint firstItem="ieB-qt-nUH" firstAttribute="leading" secondItem="Izw-bM-vhq" secondAttribute="leadingMargin" id="yd0-ni-bFW"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Jdc-cL-lKe"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Local Network Server" id="VRi-vY-WGx"/>
+                    <connections>
+                        <outlet property="serverUrl" destination="Eo1-GG-bDg" id="pWp-Mu-7mJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TQn-qZ-uw2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1180" y="293"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="AppIcon-2019-1024" width="512" height="512"/>
         <image name="product32" width="32" height="32"/>
     </resources>
 </document>

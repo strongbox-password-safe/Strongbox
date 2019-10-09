@@ -130,8 +130,8 @@
 - (void)checkVerifiedReceiptIsEntitledToPro:(UIViewController*)vc {
     Settings.sharedInstance.numberOfEntitlementCheckFails = 0;
     
-    if ([ProUpgradeIAPManager isProTeamEdition]) {
-        NSLog(@"Upgrading App to Pro as Receipt is Good and this is the Pro Team edition...");
+    if ([ProUpgradeIAPManager isProFamilyEdition]) {
+        NSLog(@"Upgrading App to Pro as Receipt is Good and this is the Pro Family edition...");
         [Settings.sharedInstance setPro:YES];
     }
     else if([self receiptHasProEntitlements]) {
@@ -227,10 +227,10 @@
     }];
 }
 
-static NSString * const kProTeamEditionBundleId = @"com.markmcguill.strongbox.pro";
-+ (BOOL)isProTeamEdition {
+static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.pro";
++ (BOOL)isProFamilyEdition {
     NSString* bundleId = [Utils getAppBundleId];
-    return [bundleId isEqualToString:kProTeamEditionBundleId];
+    return [bundleId isEqualToString:kProFamilyEditionBundleId];
 }
 
 @end

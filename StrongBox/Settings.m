@@ -88,6 +88,7 @@ static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
 static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
+static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 
 @implementation Settings
 
@@ -106,6 +107,14 @@ static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectiv
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)hasDoneProFamilyCheck {
+    return [self getBool:kHasDoneProFamilyCheck];
+}
+
+- (void)setHasDoneProFamilyCheck:(BOOL)hasDoneProFamilyCheck {
+    [self setBool:kHasDoneProFamilyCheck value:hasDoneProFamilyCheck];
+}
 
 - (BOOL)monitorInternetConnectivity {
     return [self getBool:kMonitorInternetConnectivity fallback:YES];
@@ -606,7 +615,7 @@ static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectiv
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
     
-    //NSLog(@"REQUEST-BIOMETRIC: %d", self.suppressPrivacyScreen);
+    NSLog(@"REQUEST-BIOMETRIC: %d", self.suppressPrivacyScreen);
     
     self.suppressPrivacyScreen = YES;
     
