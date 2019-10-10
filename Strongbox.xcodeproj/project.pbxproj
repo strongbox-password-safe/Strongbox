@@ -1787,6 +1787,33 @@
 		4D5F5B91218B6C9D00A0739A /* NodeFileAttachment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeFileAttachment.h; path = model/NodeFileAttachment.h; sourceTree = "<group>"; };
 		4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeFileAttachment.m; path = model/NodeFileAttachment.m; sourceTree = "<group>"; };
 		4D5F5B95218B828500A0739A /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
+		4D604FE2234DE04400135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Backups.strings"; sourceTree = "<group>"; };
+		4D604FE3234DE04400135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/MasterDetail.strings"; sourceTree = "<group>"; };
+		4D604FE4234DE04400135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "StrongBox/en-US.lproj/Main.strings"; sourceTree = "<group>"; };
+		4D604FE5234DE04400135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		4D604FE6234DE04500135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Welcome.strings"; sourceTree = "<group>"; };
+		4D604FE7234DE04500135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Browse.strings"; sourceTree = "<group>"; };
+		4D604FE8234DE04900135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/ItemDetails.strings"; sourceTree = "<group>"; };
+		4D604FE9234DE04900135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/EditPasswordCell.strings"; sourceTree = "<group>"; };
+		4D604FEA234DE04900135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/IconTableCell.strings"; sourceTree = "<group>"; };
+		4D604FEB234DE04900135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/QRCodeScannerViewController.strings"; sourceTree = "<group>"; };
+		4D604FEC234DE04900135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/ItemDetailsPreferences.strings"; sourceTree = "<group>"; };
+		4D604FED234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/KeePassHistory.strings"; sourceTree = "<group>"; };
+		4D604FEE234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/PasswordSafeHistory.strings"; sourceTree = "<group>"; };
+		4D604FEF234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/CreateDatabaseOrSetCredentials.strings"; sourceTree = "<group>"; };
+		4D604FF0234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/SelectKeyFile.strings"; sourceTree = "<group>"; };
+		4D604FF1234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/SelectStorage.strings"; sourceTree = "<group>"; };
+		4D604FF2234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/PinEntry.strings"; sourceTree = "<group>"; };
+		4D604FF3234DE04A00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/PrivacyViewController.strings"; sourceTree = "<group>"; };
+		4D604FF4234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/DatabaseOperations.strings"; sourceTree = "<group>"; };
+		4D604FF5234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Preferences.strings"; sourceTree = "<group>"; };
+		4D604FF6234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/SelectItem.strings"; sourceTree = "<group>"; };
+		4D604FF7234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/PasswordGenerationPreferences.strings"; sourceTree = "<group>"; };
+		4D604FF8234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/Upgrade.strings"; sourceTree = "<group>"; };
+		4D604FF9234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/IconsCollectionViewController.strings"; sourceTree = "<group>"; };
+		4D604FFA234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "StrongBox Auto Fill/en-US.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		4D604FFB234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/WebDAVConfigurationViewController.strings"; sourceTree = "<group>"; };
+		4D604FFC234DE04B00135CE2 /* en-US */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en-US"; path = "en-US.lproj/SFTPSessionConfigurationViewController.strings"; sourceTree = "<group>"; };
 		4D62E26423437F8200119604 /* DebugHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugHelper.h; path = StrongBox/DebugHelper.h; sourceTree = "<group>"; };
 		4D62E26523437F8200119604 /* DebugHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugHelper.m; path = StrongBox/DebugHelper.m; sourceTree = "<group>"; };
 		4D62E267234386FF00119604 /* About.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = About.rtf; path = StrongBox/About.rtf; sourceTree = SOURCE_ROOT; };
@@ -3689,6 +3716,8 @@
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4D1757B51C8361D300E6356F /* StrongBox-Info.plist */,
+				4DC4E16F23488BAB000743C4 /* Strongbox-iOS copy-Info.plist */,
+				4DC4E27723488BAF000743C4 /* Strongbox Auto Fill copy-Info.plist */,
 				4D8A99AA230AF31700AB98DC /* InfoPlist.strings */,
 				4D8A99A7230AF31700AB98DC /* RMStore.strings */,
 				4D62D6941C85F2B50051E13B /* UI */,
@@ -3704,8 +3733,6 @@
 				4DBE5B321C8356C700C310BC /* Products */,
 				278AD75AE9346420015475D7 /* Pods */,
 				C28E68E855D68D8BECCE3B5B /* Frameworks */,
-				4DC4E16F23488BAB000743C4 /* Strongbox-iOS copy-Info.plist */,
-				4DC4E27723488BAF000743C4 /* Strongbox Auto Fill copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -4162,6 +4189,7 @@
 				Base,
 				de,
 				ru,
+				"en-US",
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
@@ -5808,6 +5836,7 @@
 				4D5F5B81218B4C9300A0739A /* Base */,
 				4D8A99BE230AF31700AB98DC /* de */,
 				4D51F0C4233BE5DA00F5BB3D /* ru */,
+				4D604FFA234DE04B00135CE2 /* en-US */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -5818,6 +5847,7 @@
 				4D5F5B85218B4CCB00A0739A /* Base */,
 				4D8A99C0230AF31700AB98DC /* de */,
 				4D51F0B0233BE5D600F5BB3D /* ru */,
+				4D604FE4234DE04400135CE2 /* en-US */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -5828,6 +5858,7 @@
 				4D770F882303249D00CBE244 /* Base */,
 				4D8A99B9230AF31700AB98DC /* de */,
 				4D51F0CB233BE5DB00F5BB3D /* ru */,
+				4D604FE9234DE04900135CE2 /* en-US */,
 			);
 			name = EditPasswordCell.xib;
 			sourceTree = "<group>";
@@ -5838,6 +5869,7 @@
 				4D770F8C230324A800CBE244 /* Base */,
 				4D8A99BA230AF31700AB98DC /* de */,
 				4D51F0CC233BE5DB00F5BB3D /* ru */,
+				4D604FEA234DE04900135CE2 /* en-US */,
 			);
 			name = IconTableCell.xib;
 			sourceTree = "<group>";
@@ -5848,6 +5880,7 @@
 				4D770F8F2303262400CBE244 /* Base */,
 				4D8A99AF230AF31700AB98DC /* de */,
 				4D51F0B5233BE5D700F5BB3D /* ru */,
+				4D604FEB234DE04900135CE2 /* en-US */,
 			);
 			name = QRCodeScannerViewController.xib;
 			path = StrongBox;
@@ -5859,6 +5892,7 @@
 				4D770F922303263100CBE244 /* Base */,
 				4D8A99BC230AF31700AB98DC /* de */,
 				4D51F0BD233BE5D900F5BB3D /* ru */,
+				4D604FF3234DE04A00135CE2 /* en-US */,
 			);
 			name = PrivacyViewController.xib;
 			path = StrongBox;
@@ -5870,6 +5904,7 @@
 				4D770F99230326A200CBE244 /* Base */,
 				4D8A99B6230AF31700AB98DC /* de */,
 				4D51F0C3233BE5DA00F5BB3D /* ru */,
+				4D604FF9234DE04B00135CE2 /* en-US */,
 			);
 			name = IconsCollectionViewController.xib;
 			path = StrongBox;
@@ -5881,6 +5916,7 @@
 				4D770F9D230326B900CBE244 /* Base */,
 				4D8A99C1230AF31700AB98DC /* de */,
 				4D51F0C6233BE5DA00F5BB3D /* ru */,
+				4D604FFC234DE04B00135CE2 /* en-US */,
 			);
 			name = SFTPSessionConfigurationViewController.xib;
 			path = StrongBox;
@@ -5892,6 +5928,7 @@
 				4D770FA1230326BE00CBE244 /* Base */,
 				4D8A99B2230AF31700AB98DC /* de */,
 				4D51F0C5233BE5DA00F5BB3D /* ru */,
+				4D604FFB234DE04B00135CE2 /* en-US */,
 			);
 			name = WebDAVConfigurationViewController.xib;
 			path = StrongBox;
@@ -5903,6 +5940,7 @@
 				4D7C2661233EA14800412AA5 /* Base */,
 				4D7C2664233EA16B00412AA5 /* de */,
 				4D7C2666233EA16D00412AA5 /* ru */,
+				4D604FE2234DE04400135CE2 /* en-US */,
 			);
 			name = Backups.storyboard;
 			path = StrongBox;
@@ -5944,6 +5982,7 @@
 				4D9677E823102BFB004AF091 /* Base */,
 				4D9677EB23102C01004AF091 /* de */,
 				4D51F0C2233BE5DA00F5BB3D /* ru */,
+				4D604FF8234DE04B00135CE2 /* en-US */,
 			);
 			name = Upgrade.storyboard;
 			path = StrongBox;
@@ -5955,6 +5994,7 @@
 				4DE7F0C922F89BDD0095F51F /* Base */,
 				4D8A99B7230AF31700AB98DC /* de */,
 				4D51F0B9233BE5D800F5BB3D /* ru */,
+				4D604FEF234DE04A00135CE2 /* en-US */,
 			);
 			name = CreateDatabaseOrSetCredentials.storyboard;
 			path = StrongBox;
@@ -5966,6 +6006,7 @@
 				4DE7F0CC22F89CE30095F51F /* Base */,
 				4D8A99B5230AF31700AB98DC /* de */,
 				4D51F0AF233BE5D600F5BB3D /* ru */,
+				4D604FE3234DE04400135CE2 /* en-US */,
 			);
 			name = MasterDetail.storyboard;
 			path = StrongBox;
@@ -5976,6 +6017,7 @@
 			children = (
 				4DE7F0D022F89D120095F51F /* Base */,
 				4D51F0B1233BE5D700F5BB3D /* ru */,
+				4D604FE5234DE04400135CE2 /* en-US */,
 			);
 			name = LaunchScreen.storyboard;
 			path = StrongBox;
@@ -5987,6 +6029,7 @@
 				4DE7F0D322F89D1D0095F51F /* Base */,
 				4D8A99B4230AF31700AB98DC /* de */,
 				4D51F0B2233BE5D700F5BB3D /* ru */,
+				4D604FE6234DE04500135CE2 /* en-US */,
 			);
 			name = Welcome.storyboard;
 			path = StrongBox;
@@ -5998,6 +6041,7 @@
 				4DE7F0D622F89D270095F51F /* Base */,
 				4D8A99B8230AF31700AB98DC /* de */,
 				4D51F0B3233BE5D700F5BB3D /* ru */,
+				4D604FE7234DE04500135CE2 /* en-US */,
 			);
 			name = Browse.storyboard;
 			path = StrongBox;
@@ -6009,6 +6053,7 @@
 				4DE7F0D922F89D3E0095F51F /* Base */,
 				4D8A99B0230AF31700AB98DC /* de */,
 				4D51F0B4233BE5D700F5BB3D /* ru */,
+				4D604FE8234DE04900135CE2 /* en-US */,
 			);
 			name = ItemDetails.storyboard;
 			path = StrongBox;
@@ -6020,6 +6065,7 @@
 				4DE7F0DC22F89D480095F51F /* Base */,
 				4D8A99BB230AF31700AB98DC /* de */,
 				4D51F0B6233BE5D700F5BB3D /* ru */,
+				4D604FEC234DE04900135CE2 /* en-US */,
 			);
 			name = ItemDetailsPreferences.storyboard;
 			path = StrongBox;
@@ -6031,6 +6077,7 @@
 				4DE7F0DF22F89D510095F51F /* Base */,
 				4D8A99B3230AF31700AB98DC /* de */,
 				4D51F0B7233BE5D800F5BB3D /* ru */,
+				4D604FED234DE04A00135CE2 /* en-US */,
 			);
 			name = KeePassHistory.storyboard;
 			path = StrongBox;
@@ -6042,6 +6089,7 @@
 				4DE7F0E222F89D550095F51F /* Base */,
 				4D8A99C3230AF31700AB98DC /* de */,
 				4D51F0B8233BE5D800F5BB3D /* ru */,
+				4D604FEE234DE04A00135CE2 /* en-US */,
 			);
 			name = PasswordSafeHistory.storyboard;
 			path = StrongBox;
@@ -6053,6 +6101,7 @@
 				4DE7F0E622F89D610095F51F /* Base */,
 				4D8A99BF230AF31700AB98DC /* de */,
 				4D51F0BA233BE5D800F5BB3D /* ru */,
+				4D604FF0234DE04A00135CE2 /* en-US */,
 			);
 			name = SelectKeyFile.storyboard;
 			path = StrongBox;
@@ -6064,6 +6113,7 @@
 				4DE7F0E922F89D680095F51F /* Base */,
 				4D8A99B1230AF31700AB98DC /* de */,
 				4D51F0BB233BE5D800F5BB3D /* ru */,
+				4D604FF1234DE04A00135CE2 /* en-US */,
 			);
 			name = SelectStorage.storyboard;
 			path = StrongBox;
@@ -6075,6 +6125,7 @@
 				4DE7F0ED22F89D6F0095F51F /* Base */,
 				4D8A99AE230AF31700AB98DC /* de */,
 				4D51F0BC233BE5D800F5BB3D /* ru */,
+				4D604FF2234DE04A00135CE2 /* en-US */,
 			);
 			name = PinEntry.storyboard;
 			path = StrongBox;
@@ -6086,6 +6137,7 @@
 				4DE7F0F022F89D790095F51F /* Base */,
 				4D8A99C2230AF31700AB98DC /* de */,
 				4D51F0BE233BE5D900F5BB3D /* ru */,
+				4D604FF4234DE04B00135CE2 /* en-US */,
 			);
 			name = DatabaseOperations.storyboard;
 			path = StrongBox;
@@ -6097,6 +6149,7 @@
 				4DE7F0F322F89D820095F51F /* Base */,
 				4D8A99BD230AF31700AB98DC /* de */,
 				4D51F0BF233BE5D900F5BB3D /* ru */,
+				4D604FF5234DE04B00135CE2 /* en-US */,
 			);
 			name = Preferences.storyboard;
 			path = StrongBox;
@@ -6107,6 +6160,7 @@
 			children = (
 				4DE7F0F622F89D870095F51F /* Base */,
 				4D51F0C0233BE5D900F5BB3D /* ru */,
+				4D604FF6234DE04B00135CE2 /* en-US */,
 			);
 			name = SelectItem.storyboard;
 			path = StrongBox;
@@ -6118,6 +6172,7 @@
 				4DE7F0FA22F89D8D0095F51F /* Base */,
 				4D8A99C4230AF31700AB98DC /* de */,
 				4D51F0C1233BE5D900F5BB3D /* ru */,
+				4D604FF7234DE04B00135CE2 /* en-US */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -6309,7 +6364,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2718;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6329,7 +6384,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6400,7 +6455,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2718;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6420,7 +6475,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6485,12 +6540,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2721;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6510,7 +6565,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6575,12 +6630,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2721;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6600,7 +6655,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6676,7 +6731,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2721;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6695,7 +6750,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6763,7 +6818,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2721;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6782,7 +6837,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6848,7 +6903,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2718;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6867,7 +6922,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6935,7 +6990,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2718;
+				CURRENT_PROJECT_VERSION = 2724;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6954,7 +7009,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.2;
+				MARKETING_VERSION = 1.43.3;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

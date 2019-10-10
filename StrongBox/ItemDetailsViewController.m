@@ -83,6 +83,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 @property UIBarButtonItem* cancelOrDiscardBarButton;
 @property UIView* coverView;
 @property BOOL isAutoFillContext;
+@property BOOL inCellHeightsChangedProcess;
 
 #ifndef IS_APP_EXTENSION
 @property SetNodeIconUiHelper* sni;
@@ -95,12 +96,20 @@ static NSString* const kEditDateCell = @"EditDateCell";
 @implementation ItemDetailsViewController
 
 - (void)onCellHeightChangedNotification {
-//    [UIView setAnimationsEnabled:NO];
+    // MMcG: Sort of a not so great way around this infinite loop/stack overflow bug
+    // when dealing with resizing cells... just guarantee this happens only once and stops.
+    // Because this is always done on the UI Thread we don't need a more sophisticated mutex
+    
+    if (!self.inCellHeightsChangedProcess) {
+        self.inCellHeightsChangedProcess = YES;
+        //    [UIView setAnimationsEnabled:NO];
 
-    [self.tableView beginUpdates];
-    [self.tableView endUpdates];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
 
-//    [UIView setAnimationsEnabled:YES];
+        //    [UIView setAnimationsEnabled:YES];
+        self.inCellHeightsChangedProcess = NO;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {

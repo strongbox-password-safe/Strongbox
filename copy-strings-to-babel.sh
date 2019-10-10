@@ -2,6 +2,9 @@
 
 # Base Localizable.strings
 
+cp StrongBox/en-US.lproj/*.strings ../strongbox-babel/StrongBox/
+cp StrongBox\ Auto\ Fill/en-US.lproj/*.strings ../strongbox-babel/StrongBox\ Auto\ Fill/
+
 cp StrongBox/Base.lproj/Localizable.strings ../strongbox-babel/StrongBox/
 
 # German
