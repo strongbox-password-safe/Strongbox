@@ -117,7 +117,7 @@ static NSArray<UIImage*>* getKeePassIconSet() {
     UIImage* ret;
     
     if(database.format == kPasswordSafe) {
-        ret = isGroup ? kDefaultFolderImage : kDefaultRecordImage;
+        return isGroup ? kDefaultFolderImage : kDefaultRecordImage;
     }
     else {
         ret = isGroup ? kKeePassIconSet[48] : kKeePassIconSet[0];

@@ -44,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
 
++ (BOOL)isTotpCustomFieldKey:(NSString*)key;
+
 + (NodeFields *)deserialize:(NSDictionary *)dict;
 - (NSDictionary*)serialize:(SerializationPackage*)serialization;
 

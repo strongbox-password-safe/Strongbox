@@ -12,8 +12,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface IconTableCell : UITableViewCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *iconImage;
 @property (nonatomic, copy, nullable) void (^onIconTapped)(void);
+@property (nonatomic, copy, nullable) void (^onCellTapped)(void);
+
+- (void)setModel:(NSString*)value
+            icon:(UIImage*)icon
+         editing:(BOOL)editing
+ selectAllOnEdit:(BOOL)selectAllOnEdit
+ useEasyReadFont:(BOOL)useEasyReadFont;
+
+
+@property (nonatomic, copy, nullable) void (^onTitleEdited)(NSString* text);
 
 @end
 

@@ -153,7 +153,7 @@
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
                   completion:(void (^)(NSData *data, NSError *error))completion {
-    [SVProgressHUD showWithStatus:@"Reading..."];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
 
     GTLRDrive_File *file = (GTLRDrive_File *)providerData;
 

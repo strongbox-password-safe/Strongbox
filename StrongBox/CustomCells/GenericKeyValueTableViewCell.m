@@ -8,15 +8,23 @@
 
 #import "GenericKeyValueTableViewCell.h"
 #import "FontManager.h"
+#import "ItemDetailsViewController.h"
 
 @interface GenericKeyValueTableViewCell ()
 
 @property (weak, nonatomic) IBOutlet UIView *horizontalLine;
 @property (weak, nonatomic) IBOutlet UILabel *keyLabel;
-@property (weak, nonatomic) IBOutlet AutoCompleteTextField *valueText;
+@property (weak, nonatomic) IBOutlet AutoCompleteTextField *valueText; // allows for inline editing
+@property (weak, nonatomic) IBOutlet UILabel *valueLabel; // Allows for multiline display in non edit mode
+@property (weak, nonatomic) IBOutlet UIButton *buttonRightButton;
 
 @property BOOL selectAllOnEdit;
 @property BOOL useEasyReadFont;
+@property BOOL concealed;
+
+@property NSString* value;
+@property UIImage* rightButtonImage;
+@property BOOL showGenerateButton;
 
 @end
 
@@ -26,13 +34,14 @@
     [super awakeFromNib];
 
     if (@available(iOS 13.0, *)) {
-        self.horizontalLine.backgroundColor = UIColor.labelColor;
-    } else {
+        self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
+    }
+    else {
         self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
     }
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
-    self.keyLabel.font = FontManager.sharedInstance.regularFont;
+    self.keyLabel.font = FontManager.sharedInstance.caption1Font;
     self.keyLabel.adjustsFontForContentSizeCategory = YES;
     
     self.valueText.adjustsFontForContentSizeCategory = YES;
@@ -41,6 +50,8 @@
     };
     self.valueText.font = self.configuredValueFont;
 
+    self.valueLabel.adjustsFontForContentSizeCategory = YES;
+    
     self.selectAllOnEdit = NO;
     
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
@@ -68,8 +79,13 @@
     self.valueText.placeholder = @"";
     self.valueText.font = self.configuredValueFont;
     
+    self.valueLabel.text = @"";
+    
+    self.valueLabel.hidden = YES;
+    self.valueText.hidden = NO;
+    
     if (@available(iOS 13.0, *)) {
-        self.horizontalLine.backgroundColor = UIColor.labelColor;
+        self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
     } else {
         self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
     }
@@ -78,17 +94,25 @@
     self.showUiValidationOnEmpty = NO;
     self.suggestionProvider = nil;
     
+    self.onTap = nil;
+    self.onDoubleTap = nil;
+    
     self.accessoryType = UITableViewCellAccessoryNone;
     self.editingAccessoryType = UITableViewCellAccessoryNone;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
+    
+    self.buttonRightButton.hidden = YES;
+    
+    self.rightButtonImage = nil;
+    self.showGenerateButton = NO;
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing suggestionProvider:nil useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing suggestionProvider:nil useEasyReadFont:useEasyReadFont showGenerateButton:NO];
 }
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont showGenerateButton:(BOOL)showGenerateButton {
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:showGenerateButton];
 }
 
 
@@ -97,15 +121,7 @@
 }
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont];
-}
-
-- (void)setKey:(NSString*)key
-         value:(NSString*)value
-       editing:(BOOL)editing
-selectAllOnEdit:(BOOL)selectAllOnEdit
-   formatAsUrl:(BOOL)formatAsUrl useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont];
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:NO];
 }
 
 - (void)setKey:(NSString*)key
@@ -113,44 +129,132 @@ selectAllOnEdit:(BOOL)selectAllOnEdit
        editing:(BOOL)editing
 selectAllOnEdit:(BOOL)selectAllOnEdit
    formatAsUrl:(BOOL)formatAsUrl
-suggestionProvider:(SuggestionProvider)suggestionProvider
 useEasyReadFont:(BOOL)useEasyReadFont {
-    self.keyLabel.text = key;
-    if (@available(iOS 13.0, *)) {
-        self.keyLabel.textColor = UIColor.labelColor;
-    }
-    else {
-        self.keyLabel.textColor = nil;
-    }
-    self.keyLabel.accessibilityLabel = key;
-    
-    self.valueText.text = value;
-    self.valueText.enabled = editing;
-    self.valueText.suggestionProvider = suggestionProvider;
-    self.valueText.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
-    
-    if(formatAsUrl) {
-        if (@available(iOS 13.0, *)) {
-            self.valueText.textColor = UIColor.linkColor;
-        } else {
-            self.valueText.textColor = UIColor.blueColor;
-        }
-    }
-    else {
-        if (@available(iOS 13.0, *)) {
-            self.valueText.textColor = UIColor.labelColor;
-        } else {
-            self.valueText.textColor = UIColor.darkTextColor;
-        }
-    }
-    
+    [self setKey:key
+           value:value
+         editing:editing
+ selectAllOnEdit:selectAllOnEdit
+     formatAsUrl:formatAsUrl
+suggestionProvider:nil
+ useEasyReadFont:useEasyReadFont
+rightButtonImage:nil
+       concealed:NO
+showGenerateButton:NO];
+}
+
+- (void)setConfidentialKey:(NSString *)key value:(NSString *)value concealed:(BOOL)concealed {
+    // Only for viewing - special cells required for edit...
+        
+    UIImage* image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
+
+    [self setKey:key
+           value:value
+         editing:NO
+ selectAllOnEdit:NO
+     formatAsUrl:NO
+suggestionProvider:nil
+    useEasyReadFont:YES
+    rightButtonImage:image
+       concealed:concealed
+showGenerateButton:NO];
+}
+
+- (void)setKey:(NSString*)key
+         value:(NSString*)value
+       editing:(BOOL)editing
+    selectAllOnEdit:(BOOL)selectAllOnEdit
+    formatAsUrl:(BOOL)formatAsUrl
+    suggestionProvider:(SuggestionProvider)suggestionProvider
+    useEasyReadFont:(BOOL)useEasyReadFont
+ rightButtonImage:(UIImage*)rightButtonImage
+     concealed:(BOOL)concealed
+showGenerateButton:(BOOL)showGenerateButton {
+    [self bindKey:key];
+        
     self.selectAllOnEdit = selectAllOnEdit;
     
     self.horizontalLine.hidden = !editing;
     self.selectionStyle = editing ? UITableViewCellSelectionStyleNone : UITableViewCellSelectionStyleDefault;
     self.useEasyReadFont = useEasyReadFont;
-    self.valueText.font = self.configuredValueFont;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
+    
+    self.rightButtonImage = rightButtonImage;
+    self.showGenerateButton = showGenerateButton;
+    
+    [self bindRightButton];
+
+    self.concealed = concealed;
+    self.value = value;
+    [self bindValue:formatAsUrl suggestionProvider:suggestionProvider editing:editing key:key];
+    
+    self.valueLabel.hidden = self.editing;
+    self.valueText.hidden = !self.editing;
+}
+
+- (void)bindKey:(NSString*)key {
+    self.keyLabel.text = key;
+    if (@available(iOS 13.0, *)) {
+        self.keyLabel.textColor = UIColor.secondaryLabelColor;
+    }
+    else {
+        self.keyLabel.textColor = nil;
+    }
+    self.keyLabel.accessibilityLabel = key;
+}
+
+- (void)bindValue:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider editing:(BOOL)editing key:(NSString*)key {
+    self.valueText.enabled = editing;
+    self.valueText.suggestionProvider = suggestionProvider;
+    self.valueText.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
+
+    self.valueLabel.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
+
+    [self bindValueText];
+
+    if(formatAsUrl) {
+        if (@available(iOS 13.0, *)) {
+            self.valueText.textColor = UIColor.linkColor;
+            self.valueLabel.textColor = UIColor.linkColor;
+        } else {
+            self.valueText.textColor = UIColor.blueColor;
+            self.valueLabel.textColor = UIColor.blueColor;
+        }
+    }
+}
+
+- (void)bindValueText {
+    if(self.concealed) {
+        self.valueText.text = @"*****************";
+        self.valueLabel.text = @"*****************";
+        
+        if (@available(iOS 13.0, *)) {
+            self.valueText.textColor = UIColor.secondaryLabelColor;
+            self.valueLabel.textColor = UIColor.secondaryLabelColor;
+        }
+        else {
+            self.valueText.textColor = UIColor.darkGrayColor;
+            self.valueLabel.textColor = UIColor.darkGrayColor;
+        }
+
+        self.valueText.font = FontManager.sharedInstance.caption1Font;
+        self.valueLabel.font = FontManager.sharedInstance.caption1Font;
+    }
+    else {
+        self.valueText.text = self.value;
+        self.valueLabel.text = self.value;
+        
+        if (@available(iOS 13.0, *)) {
+            self.valueText.textColor = UIColor.labelColor;
+            self.valueLabel.textColor = UIColor.labelColor;
+        }
+        else {
+            self.valueText.textColor = UIColor.darkTextColor;
+            self.valueLabel.textColor = UIColor.darkTextColor;
+        }
+        
+        self.valueText.font = self.configuredValueFont;
+        self.valueLabel.font = self.configuredValueFont;
+    }
 }
 
 - (BOOL)canBecomeFirstResponder {
@@ -178,7 +282,12 @@ useEasyReadFont:(BOOL)useEasyReadFont {
             self.valueText.placeholder = [NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"), self.keyLabel.text];
         }
         else {
-            self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
+            if (@available(iOS 13.0, *)) {
+                self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
+            }
+            else {
+                self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
+            }
         }
     }
 }
@@ -197,6 +306,67 @@ useEasyReadFont:(BOOL)useEasyReadFont {
 
 - (UIFont*)configuredValueFont {
     return self.useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;
+}
+
+- (BOOL)isConcealed {
+    return self.concealed;
+}
+
+- (void)setIsConcealed:(BOOL)isConcealed {
+    self.concealed = isConcealed;
+    
+    self.rightButtonImage = [UIImage imageNamed:self.concealed ? @"visible" : @"invisible"];
+
+    [self bindRightButton];
+    [self bindValueText];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:CellHeightsChangedNotification object:self];
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+   
+    self.valueLabel.hidden = self.editing;
+    self.valueText.hidden = !self.editing;
+    
+    [self bindRightButton];
+}
+
+- (IBAction)onRightButton:(id)sender {
+    if(self.editing) {
+        if(self.onGenerate) {
+            self.onGenerate();
+        }
+    }
+    else {
+        if(self.onRightButton) {
+            self.onRightButton();
+        }
+    }
+}
+
+- (void)bindRightButton {
+    if(!self.editing) {
+        if(self.rightButtonImage) {
+            self.buttonRightButton.hidden = NO;
+            [self.buttonRightButton setImage:self.rightButtonImage forState:UIControlStateNormal];
+        }
+        else {
+            self.buttonRightButton.hidden = YES;
+        }
+    }
+    else {
+        if(self.showGenerateButton) {
+            self.buttonRightButton.hidden = NO;
+            [self.buttonRightButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
+        }
+    }
+}
+
+- (void)pokeValue:(NSString *)value {
+    self.value = value;
+    [self bindValueText];
+    [self onValueEdited];
 }
 
 @end

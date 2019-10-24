@@ -331,8 +331,6 @@
     if (success) {
         self.isConvenienceUnlock = YES;
         
-        // Do we also have a PIN?
-        
         if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self promptForConveniencePin];
@@ -369,7 +367,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts   warn:self.viewController
                          title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), self.biometricIdName]
-                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has not been setup or system has cancelled. You must now enter your password manually to open the database."), self.biometricIdName]
+                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), self.biometricIdName, error]
                     completion:^{
                         [self promptForManualCredentials];
                     }];

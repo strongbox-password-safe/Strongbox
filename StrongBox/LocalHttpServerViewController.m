@@ -15,6 +15,7 @@
 @property GCDWebUploader* webUploader;
 
 @property (weak, nonatomic) IBOutlet UILabel *serverUrl;
+@property (weak, nonatomic) IBOutlet UILabel *helpfulInfo;
 
 @end
 
@@ -26,11 +27,18 @@
 
         NSLog(@"Visit %@ in your web browser", self.webUploader.serverURL);
 
-        self.serverUrl.text = self.webUploader.serverURL.absoluteString;
+        if(self.webUploader.serverURL) {
+            self.helpfulInfo.hidden = NO;
+            self.serverUrl.text = self.webUploader.serverURL.absoluteString;
+        }
+        else {
+            self.helpfulInfo.hidden = YES;
+            self.serverUrl.text = NSLocalizedString(@"transfer_local_network_network_unavailable_message", @"Message to display when device is offline and has no IP address in Local HTTP Transfer - Select Storage -> Transfer over Local Network");
+        }
     }
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
+- (void)viewDidDisappear:(BOOL)animated {   
     if (self.webUploader.isRunning) {
         [self.webUploader stop];
     }

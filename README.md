@@ -88,3 +88,4 @@ I use many different libraries in the app here are just a few:
 - StaticDataTableViewController (https://github.com/peterpaulis/StaticDataTableViewController)
 - Diceware Wordlists: (https://github.com/micahflee/passphrases)
 - GCDWebServer (https://github.com/swisspol/GCDWebServer)
+- NameDatabases (https://github.com/smashew/NameDatabases)

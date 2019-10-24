@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="ysh-SZ-9tl">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="ysh-SZ-9tl">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -18,7 +18,7 @@
                         <sections>
                             <tableViewSection headerTitle="General" id="QHE-JP-2G6">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="eyL-1o-i0J" userLabel="Hide Empty Fields">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="eyL-1o-i0J" userLabel="Show Empty Fields">
                                         <rect key="frame" x="0.0" y="55.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eyL-1o-i0J" id="5z3-gC-fhe">
@@ -48,8 +48,38 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="FoW-MD-eky" userLabel="Easy-Read Font Everywhere">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="oo3-ss-KsY" userLabel="Show TOTP Custom Fields">
                                         <rect key="frame" x="0.0" y="99.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="oo3-ss-KsY" id="kg8-a1-bCI">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show TOTP Custom Fields" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="um3-nQ-OxQ">
+                                                    <rect key="frame" x="20" y="11" width="203" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gSu-Jg-lfQ">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="DJ8-O7-3po" eventType="valueChanged" id="EBd-Hg-ZwJ"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="um3-nQ-OxQ" firstAttribute="top" secondItem="kg8-a1-bCI" secondAttribute="topMargin" id="3tc-s9-XJ9"/>
+                                                <constraint firstItem="gSu-Jg-lfQ" firstAttribute="trailing" secondItem="kg8-a1-bCI" secondAttribute="trailing" constant="-20" id="EdB-oZ-Nkb"/>
+                                                <constraint firstItem="gSu-Jg-lfQ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="um3-nQ-OxQ" secondAttribute="trailing" constant="8" symbolic="YES" id="Hek-Z8-KLc"/>
+                                                <constraint firstItem="um3-nQ-OxQ" firstAttribute="bottom" secondItem="kg8-a1-bCI" secondAttribute="bottomMargin" id="P42-v8-CNP"/>
+                                                <constraint firstItem="um3-nQ-OxQ" firstAttribute="leading" secondItem="kg8-a1-bCI" secondAttribute="leading" constant="20" id="hvP-vo-kF9"/>
+                                                <constraint firstItem="um3-nQ-OxQ" firstAttribute="centerY" secondItem="gSu-Jg-lfQ" secondAttribute="centerY" id="wdq-jB-XVC"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="FoW-MD-eky" userLabel="Easy-Read Font Everywhere">
+                                        <rect key="frame" x="0.0" y="143.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FoW-MD-eky" id="VcZ-39-KaI">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -79,7 +109,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="O46-y1-YFB" userLabel="Hide TOTP in Details">
-                                        <rect key="frame" x="0.0" y="143.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="187.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="O46-y1-YFB" id="Xw6-Z4-4Ij">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -109,7 +139,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="QGN-yc-Q1c" userLabel="Auto FavIcon for New Entries (KDB 3+)">
-                                        <rect key="frame" x="0.0" y="187.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="231.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="QGN-yc-Q1c" id="7NZ-xG-svU">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -139,7 +169,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="RQd-0u-JFJ" userLabel="Reveal Password Immediately">
-                                        <rect key="frame" x="0.0" y="231.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="275.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RQd-0u-JFJ" id="MRl-ae-yig">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -192,6 +222,7 @@
                         <outlet property="switchShowEmptyFields" destination="cmx-oa-XeX" id="cFa-iE-fP1"/>
                         <outlet property="switchShowPasswordOnDetails" destination="ZHj-Ne-ygS" id="FC4-r4-g0h"/>
                         <outlet property="switchShowTotp" destination="TgX-ee-k53" id="4kY-Yq-azM"/>
+                        <outlet property="switchShowTotpCustom" destination="gSu-Jg-lfQ" id="WK1-ht-I5M"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oYT-1h-rQc" userLabel="First Responder" sceneMemberID="firstResponder"/>

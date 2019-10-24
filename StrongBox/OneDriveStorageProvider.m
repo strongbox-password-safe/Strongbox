@@ -187,7 +187,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         request = [[[self.odClient drives:item.parentReference.driveId] items:item.id] contentRequest];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:@"Reading..."];
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
         });
         
         [request downloadWithCompletion:^(NSURL *filePath, NSURLResponse *urlResponse, NSError *error){

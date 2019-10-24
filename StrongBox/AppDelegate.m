@@ -202,11 +202,11 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    [OfflineDetector.sharedInstance stopMonitoringConnectivitity];
+    //    [OfflineDetector.sharedInstance stopMonitoringConnectivitity]; // Don't stop monitoring here as it will reset when Touch/Face ID happens :(
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [OfflineDetector.sharedInstance startMonitoringConnectivitity];    
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; // Restart/Refresh our monitor
     [self performedScheduledEntitlementsCheck];
 }
 

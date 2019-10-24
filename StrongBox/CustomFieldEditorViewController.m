@@ -10,6 +10,9 @@
 #import "Utils.h"
 #import "Entry.h"
 #import "NSArray+Extensions.h"
+#import "PasswordMaker.h"
+#import "Settings.h"
+#import "Alerts.h"
 
 @interface CustomFieldEditorViewController () <UITextFieldDelegate, UITextViewDelegate>
 
@@ -181,23 +184,23 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    NSLog(@"textFieldDidBeginEditing");
+    //NSLog(@"textFieldDidBeginEditing");
     self.activeField = textField;
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    NSLog(@"textFieldDidEndEditing");
+//    NSLog(@"textFieldDidEndEditing");
     self.activeField = nil;
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    NSLog(@"textViewDidBeginEditing");
+//    NSLog(@"textViewDidBeginEditing");
     self.activeField = textView;
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
-    NSLog(@"textViewDidEndEditing");
+//    NSLog(@"textViewDidEndEditing");
     self.activeField = nil;
 }
 
@@ -221,6 +224,12 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 - (void)textFieldDidChange:(id)sender {
     [self validateUi];
+}
+
+- (IBAction)onGenerate:(id)sender {
+    [PasswordMaker.sharedInstance promptWithSuggestions:self usernames:NO action:^(NSString * _Nonnull response) {
+        self.textView.text = response;
+    }];
 }
 
 @end

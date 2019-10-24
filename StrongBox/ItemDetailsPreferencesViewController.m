@@ -7,7 +7,6 @@
 //
 
 #import "ItemDetailsPreferencesViewController.h"
-//#import "Settings.h"
 #import "SafesList.h"
 
 @interface ItemDetailsPreferencesViewController ()
@@ -17,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowPasswordOnDetails;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowEmptyFields;
 @property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpCustom;
 
 @end
 
@@ -40,7 +40,8 @@
     self.database.hideTotp = !self.switchShowTotp.on;
     self.database.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
     self.database.easyReadFontForAll = self.easyReadFontForAll.on;
-
+    self.database.hideTotpCustomFieldsInViewMode = !self.switchShowTotpCustom.on;
+    
     NSLog(@"easyReadFontForAll: %d", self.database.easyReadFontForAll);
     
     [SafesList.sharedInstance update:self.database];
@@ -55,6 +56,7 @@
     self.switchShowTotp.on = !self.database.hideTotp;
     self.switchShowEmptyFields.on = self.database.showEmptyFieldsInDetailsView;
     self.easyReadFontForAll.on = self.database.easyReadFontForAll;
+    self.switchShowTotpCustom.on = !self.database.hideTotpCustomFieldsInViewMode;
 
     NSLog(@"easyReadFontForAll: %d", self.database.easyReadFontForAll);
 }

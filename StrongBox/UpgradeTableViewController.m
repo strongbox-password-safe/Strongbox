@@ -15,7 +15,8 @@
 static NSString* const kFontNameNoneBold =  @"Futura";
 static NSString* const kFontName =  @"Futura-Bold";
 
-@interface UpgradeTableViewController ()
+@interface UpgradeTableViewController () <SKStoreProductViewControllerDelegate>
+
 
 @property (nonatomic, strong) NSDictionary* titleAttributes;
 @property (nonatomic, strong) NSDictionary* subtitleAttributes;
@@ -29,6 +30,7 @@ static NSString* const kFontName =  @"Futura-Bold";
 @property (weak, nonatomic) IBOutlet UIButton *buttonRestorePrevious;
 @property (weak, nonatomic) IBOutlet UILabel *labelBiometricIdFeature;
 @property (weak, nonatomic) IBOutlet UILabel *labelDevMessage;
+@property (weak, nonatomic) IBOutlet UIButton *buttonFamilySharing;
 
 @end
 
@@ -80,7 +82,8 @@ static NSString* const kFontName =  @"Futura-Bold";
     self.button3Months.layer.cornerRadius = 25;
     self.buttonYearly.layer.cornerRadius = 25;
     self.buttonLifetime.layer.cornerRadius = 25;
-
+    self.buttonFamilySharing.layer.cornerRadius = 25;
+    
     [self.buttonNope setEnabled:YES];
     
     NSString* devMessage;
@@ -109,6 +112,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     [self update3MonthsButton];
     [self update1YearButton];
     [self updateLifeTimeButton];
+    [self updateFamilySharingButton];
     
     [self.tableView reloadData];
 }
@@ -119,7 +123,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     NSAttributedString *attString = [self get2LineAttributedString:
                                      NSLocalizedString(@"upgrade_vc_monthly_subscription_title", @"Monthly")
                                                           subtitle:
-                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")];
+                                     NSLocalizedString(@"generic_loading", @"Loading...")];
     [self.button1Month setEnabled:NO];
     
     SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kMonthly];
@@ -147,7 +151,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     NSAttributedString *attString = [self get3LineAttributedString:
                                      NSLocalizedString(@"upgrade_vc_2monthly_subscription_title", @"3 Months")
                                                           subtitle:
-                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")
+                                     NSLocalizedString(@"generic_loading", @"Loading...")
                                                          bonusText:@""];
     [self.button3Months setEnabled:NO];
     
@@ -185,7 +189,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     NSAttributedString *attString = [self get3LineAttributedString:
                                      NSLocalizedString(@"upgrade_vc_yearly_subscription_title", @"Yearly")
                                                           subtitle:
-                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")
+                                     NSLocalizedString(@"generic_loading", @"Loading...")
                                                          bonusText:@""];
     [self.buttonYearly setEnabled:NO];
     
@@ -223,7 +227,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     NSAttributedString *attString = [self get3LineAttributedString:
                                      NSLocalizedString(@"upgrade_vc_lifetime_purchase_title", @"Lifetime")
                                                           subtitle:
-                                     NSLocalizedString(@"upgrade_vc_subtitle_loading_price", @"Loading...")
+                                     NSLocalizedString(@"generic_loading", @"Loading...")
                                                          bonusText:@""];
     [self.buttonLifetime setEnabled:NO];
 
@@ -245,6 +249,17 @@ static NSString* const kFontName =  @"Futura-Bold";
     [[self.buttonLifetime titleLabel] setNumberOfLines:3];
     [[self.buttonLifetime titleLabel] setLineBreakMode:NSLineBreakByWordWrapping];
     [self.buttonLifetime setAttributedTitle:attString forState:UIControlStateNormal];
+}
+
+- (void)updateFamilySharingButton {
+    NSAttributedString *attString = [self get2LineAttributedString:
+                                     NSLocalizedString(@"upgrade_family_sharing_button_title", @"Need Family Sharing?")
+                                                          subtitle:
+                                     NSLocalizedString(@"upgrade_family_sharing_button_subtitle", @"Tap for more info...")];
+    
+    [[self.buttonFamilySharing titleLabel] setNumberOfLines:2];
+    [[self.buttonFamilySharing titleLabel] setLineBreakMode:NSLineBreakByWordWrapping];
+    [self.buttonFamilySharing setAttributedTitle:attString forState:UIControlStateNormal];
 }
 
 - (NSAttributedString*)get2LineAttributedString:(NSString*)title subtitle:(NSString*)subtitle {
@@ -423,6 +438,44 @@ int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyP
 - (IBAction)onNoThanks:(id)sender {
     [SVProgressHUD dismiss];
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+const static NSUInteger kFamilySharingProductId = 1481853033;
+
+- (IBAction)onFamilySharing:(id)sender {
+    self.buttonFamilySharing.enabled = NO;
+
+    [Alerts info:self
+           title:NSLocalizedString(@"upgrade_family_sharing_info_title", @"Title of info dialog about Family Sharing upgrade")
+         message:NSLocalizedString(@"upgrade_family_sharing_info_message", @"A message about how you will need to download/purchase a separate App for Family Sharing to work")
+      completion:^{
+        [self showFamilySharingAppInAppStore];
+    }];
+}
+
+- (void)showFamilySharingAppInAppStore {
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"")];
+    
+    SKStoreProductViewController* vc = [[SKStoreProductViewController alloc] init];
+    vc.delegate = self;
+    
+    [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(kFamilySharingProductId) }
+                  completionBlock:^(BOOL result, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.buttonFamilySharing.enabled = YES;
+            [SVProgressHUD dismiss];
+            
+            if(result) {
+                [self presentViewController:vc animated:YES completion:nil];
+            }
+            else {
+                [Alerts error:self title:NSLocalizedString(@"generic_error", @"") error:error];
+            }});
+    }];
+}
+
+- (void)productViewControllerDidFinish:(SKStoreProductViewController *)viewController {
+    [viewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

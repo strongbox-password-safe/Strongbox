@@ -611,6 +611,7 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
              fallbackTitle:(NSString*)fallbackTitle // Setting this means you handle the case of error == LAErrorUserFallback
                 completion:(void(^)(BOOL success, NSError * __nullable error))completion {
     LAContext *localAuthContext = [[LAContext alloc] init];
+    
     if(fallbackTitle) {
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }

@@ -105,5 +105,7 @@
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
 
+@property BOOL hideTotpCustomFieldsInViewMode;
+
 @end
 

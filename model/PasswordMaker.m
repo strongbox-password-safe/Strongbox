@@ -9,6 +9,7 @@
 #import "PasswordMaker.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
+#import "Settings.h"
 
 static NSString* const kAllSymbols = @"+-=_@#$%^&;:,.<>/~\\[](){}?!|*'\"";
 static NSString* const kAllUppercase = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -25,6 +26,9 @@ static NSString* const kAmbiguous = @"{}[]()/\\'\"`~,;:.<>";
 @property NSMutableDictionary<NSString*, NSArray<NSString*>*> *wordListsCache;
 @property NSSet<NSString*>* allWordsCacheKey;
 @property NSArray<NSString*>* allWordsCache;
+
+@property NSArray<NSString*> *firstNamesCache;
+@property NSArray<NSString*> *surnamesCache;
 
 @end
 
@@ -104,6 +108,68 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
 //    uint32_t bytes = htonl(character); // Convert the character to a known ordering
 //    return [[NSString alloc] initWithBytes:&bytes length:sizeof(uint32_t) encoding:NSUTF32StringEncoding];
 //}
+
+- (void)promptWithSuggestions:(UIViewController *)viewController usernames:(BOOL)usernames action:(void (^)(NSString * _Nonnull))action {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString* title = NSLocalizedString(@"select_generated_field_title", @"Select your preferred generated field title.");
+        NSString* message = NSLocalizedString(@"select_generated_field_message", @"Select your preferred generated field message.");
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+
+        
+        PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+        NSMutableArray* suggestions = [NSMutableArray arrayWithCapacity:3];
+        
+        if(usernames) {
+            [suggestions addObject:[self generateUsername]];
+            [suggestions addObject:[self generateUsername]];
+            [suggestions addObject:[self generateUsername]];
+        }
+        else {
+            [suggestions addObject:[self generateForConfigOrDefault:config]];
+            [suggestions addObject:[self generateForConfigOrDefault:config]];
+            config.algorithm = config.algorithm == kBasic ? kXkcd : kBasic; // Alternate method
+            [suggestions addObject:[self generateForConfigOrDefault:config]];
+        }
+        
+        UIAlertAction *firstSuggestion = [UIAlertAction actionWithTitle:suggestions[0]
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(suggestions[0]); }];
+
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:suggestions[1]
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) { action(suggestions[1]); }];
+
+        UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:suggestions[2]
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) { action(suggestions[2]); }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+                                                                   style:UIAlertActionStyleCancel
+                                                                 handler:^(UIAlertAction *a) { }];
+            
+        [alertController addAction:firstSuggestion];
+        [alertController addAction:secondAction];
+        [alertController addAction:thirdAction];
+        [alertController addAction:cancelAction];
+            
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
+
+- (NSString*)generateUsername {
+    if(!self.firstNamesCache) {
+        self.firstNamesCache = [self loadWordsForList:@"first.names.us"];
+        self.surnamesCache = [self loadWordsForList:@"surnames.us"];
+    }
+    
+    NSInteger findex = arc4random_uniform((u_int32_t)self.firstNamesCache.count);
+    NSInteger sindex = arc4random_uniform((u_int32_t)self.surnamesCache.count);
+    
+    return [NSString stringWithFormat:@"%@.%@", self.firstNamesCache[findex], self.surnamesCache[sindex]];
+}
 
 - (NSString *)generateForConfigOrDefault:(PasswordGenerationConfig *)config {
     NSString* pw = [self generateForConfig:config];

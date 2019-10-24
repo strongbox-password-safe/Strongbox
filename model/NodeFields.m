@@ -15,6 +15,9 @@
 #import <Base32/MF_Base32Additions.h>
 
 static NSString* const kOtpAuthScheme = @"otpauth";
+static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
+static NSString* const kKeePassXcTotpSettingsKey = @"TOTP Settings";
+static NSString* const kKeeOtpPluginKey = @"otp";
 
 @interface NodeFields ()
 
@@ -36,6 +39,10 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     });
     
     return _regex;
+}
+
++ (BOOL)isTotpCustomFieldKey:(NSString*)key {
+    return [key isEqualToString:kKeeOtpPluginKey] || [key isEqualToString:kKeePassXcTotpSeedKey] || [key isEqualToString:kKeePassXcTotpSettingsKey];
 }
 
 - (instancetype _Nullable)init {
@@ -346,15 +353,15 @@ static NSString* const kOtpAuthScheme = @"otpauth";
         // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
         // KeePassXC Otp
         
-        self.mutableCustomFields[@"TOTP Seed"] = [StringValue valueWithString:[token.secret base32String] protected:YES];
+        self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:[token.secret base32String] protected:YES];
         
         if(token.algorithm == OTPAlgorithmSteam) {
             NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
-            self.mutableCustomFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
+            self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
         }
         else {
             NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
-            self.mutableCustomFields[@"TOTP Settings"] = [StringValue valueWithString:valueString protected:YES];
+            self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
         }
         
         // KeeOtp Plugin
@@ -371,7 +378,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
         else {
             components.queryItems = @[key];
         }
-        self.mutableCustomFields[@"otp"] = [StringValue valueWithString:components.query protected:YES];
+        self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
     }
     
     self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
@@ -382,13 +389,13 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     
     // KeePassXC Otp
     
-    self.mutableCustomFields[@"TOTP Seed"] = nil;
-    self.mutableCustomFields[@"TOTP Settings"] = nil;
+    self.mutableCustomFields[kKeePassXcTotpSeedKey] = nil;
+    self.mutableCustomFields[kKeePassXcTotpSettingsKey] = nil;
     
     // KeeOtp Plugin
     // * otp="key=2GQFLXXUBJQELC&step=31"
     
-    self.mutableCustomFields[@"otp"] = nil;
+    self.mutableCustomFields[kKeeOtpPluginKey] = nil;
     
     // Notes Field if it's a Password Safe database
     
@@ -444,14 +451,14 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     // * []TOTP Seed=<seed>
     // * []TOTP Settings=30;6 - time and digits - can be 30;S for “Steam”
     
-    StringValue* keePassXcOtpSecretEntry = fields[@"TOTP Seed"];
+    StringValue* keePassXcOtpSecretEntry = fields[kKeePassXcTotpSeedKey];
     
     if(keePassXcOtpSecretEntry) {
         NSString* keePassXcOtpSecret = keePassXcOtpSecretEntry.value;
         if(keePassXcOtpSecret) {
             OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:keePassXcOtpSecret] name:@"<Unknown>" issuer:@"<Unknown>"];
             
-            StringValue* keePassXcOtpParamsEntry = fields[@"TOTP Settings"];
+            StringValue* keePassXcOtpParamsEntry = fields[kKeePassXcTotpSettingsKey];
             
             if(keePassXcOtpParamsEntry) {
                 NSString* keePassXcOtpParams = keePassXcOtpParamsEntry.value;
@@ -483,7 +490,7 @@ static NSString* const kOtpAuthScheme = @"otpauth";
     // * otp="key=2GQFLXXUBJQELC&step=31"
     // * otp="key=2GQFLXXUBJQELC&size=8"
     
-    StringValue* keeOtpSecretEntry = fields[@"otp"];
+    StringValue* keeOtpSecretEntry = fields[kKeeOtpPluginKey];
     
     if(keeOtpSecretEntry) {
         NSString* keeOtpSecret = keeOtpSecretEntry.value;

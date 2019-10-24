@@ -156,8 +156,6 @@
             [self.privacyAndLockVc onAppBecameActive];
         }
         else {
-            // I don't think this is possible but would like to know about it if it ever somehow could occur
-            NSLog(@"XXXXX - Interesting Situation - App became active but no Privacy Screen was up? - XXXX");
             [self doAppActivationTasks:NO];
         }
     }
@@ -1439,7 +1437,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)requestBiometricBeforeOpeningPreferences {
-    [Settings.sharedInstance requestBiometricId:@"Identify to Open Preferences"
+    [Settings.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_preferences_message", @"Identify to Open Preferences")
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{

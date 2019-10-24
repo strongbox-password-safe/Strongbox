@@ -122,7 +122,7 @@
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text =  self.listDone ?
     NSLocalizedString(@"sbtvc_empty_table_no_files_found", @"No Files or Folders Found") :
-        NSLocalizedString(@"sbtvc_empty_table_loading", @"Loading...");
+        NSLocalizedString(@"generic_loading", @"Loading...");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:17.0f] };
     

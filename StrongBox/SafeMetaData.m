@@ -111,6 +111,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.favourites = @[];
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
+        
+        self.hideTotpCustomFieldsInViewMode = YES;
     }
     
     return self;
@@ -217,6 +219,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     
     [encoder encodeBool:self.makeBackups forKey:@"makeBackups"];
     [encoder encodeInteger:self.maxBackupKeepCount forKey:@"maxBackupKeepCount"];
+    
+    [encoder encodeBool:self.hideTotpCustomFieldsInViewMode forKey:@"hideTotpCustomFieldsInViewMode"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -385,6 +389,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         }
         if([decoder containsValueForKey:@"maxBackupKeepCount"]) {
             self.maxBackupKeepCount = [decoder decodeIntegerForKey:@"maxBackupKeepCount"];
+        }
+
+        if([decoder containsValueForKey:@"hideTotpCustomFieldsInViewMode"]) {
+            self.hideTotpCustomFieldsInViewMode = [decoder decodeBoolForKey:@"hideTotpCustomFieldsInViewMode"];
         }
     }
     

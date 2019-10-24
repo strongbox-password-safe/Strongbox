@@ -45,7 +45,7 @@
                          @"System Version: %@\n"
                          @"Ep: %ld\n"
                          @"Flags: %@%@%@\n"
-                         @"Bundle: %@",
+                         @"Bundle: %@ - (%@)",
                          safesMessage,
                          model,
                          systemName,
@@ -54,7 +54,8 @@
                          pro,
                          isFreeTrial,
                          [Settings.sharedInstance getFlagsStringForDiagnostics],
-                         [Utils getAppBundleId]];
+                         [Utils getAppBundleId],
+                         [Utils getAppVersion]];
     
     return message;
 }
@@ -92,8 +93,17 @@
                          @"System Name: %@<br />"
                          @"System Version: %@<br />"
                          @"Ep: %ld<br />"
-                         @"Bundle: %@<br />"
-                         @"Flags: %@%@%@", safesMessage, model, systemName, systemVersion, epoch, [Utils getAppBundleId], pro, isFreeTrial,
+                         @"Bundle: %@ - (%@)<br />"
+                         @"Flags: %@%@%@",
+                         safesMessage,
+                         model,
+                         systemName,
+                         systemVersion,
+                         epoch,
+                         [Utils getAppBundleId],
+                         [Utils getAppVersion],
+                         pro,
+                         isFreeTrial,
                          [Settings.sharedInstance getFlagsStringForDiagnostics]];
     
     return message;

@@ -42,6 +42,16 @@
     return [self firstOrDefault:block] != nil;
 }
 
+- (BOOL)allMatch:(BOOL (^)(id obj))block {
+    for(id obj in self) {
+        if(!block(obj)) {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
 - (id)firstOrDefault:(BOOL (^)(id obj))block {
     for(id obj in self) {
         if(block(obj)) {

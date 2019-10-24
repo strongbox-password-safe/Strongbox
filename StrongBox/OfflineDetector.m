@@ -39,11 +39,13 @@
 }
     
 - (void) startMonitoringConnectivitity {
-    self.offline = NO;
-
     if (!Settings.sharedInstance.monitorInternetConnectivity) {
         NSLog(@"Not monitoring connectivity as configured OFF");
         return;
+    }
+   
+    if(!self.internetReachabilityDetector) { // Do not reset if we already have a monitor
+        self.offline = NO;
     }
     
     self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"duckduckgo.com"];

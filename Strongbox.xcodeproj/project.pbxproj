@@ -245,7 +245,6 @@
 		4D33FA3F22872324006C31B2 /* IconTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498BC2271E911007EF98C /* IconTableCell.m */; };
 		4D33FA402287232B006C31B2 /* EditPasswordTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */; };
 		4D33FA412287232E006C31B2 /* CustomFieldTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835DA2284765D00CA7405 /* CustomFieldTableCell.m */; };
-		4D33FA4222872331006C31B2 /* ConfidentialTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */; };
 		4D33FA432287233C006C31B2 /* NotesTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */; };
 		4D33FA4422872384006C31B2 /* AutoCompleteTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */; };
 		4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE498BF2271F746007EF98C /* TotpCell.xib */; };
@@ -448,9 +447,32 @@
 		4D7C21D22180EAC200458A5B /* funky.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C21D12180EAC200458A5B /* funky.xml */; };
 		4D7C2660233EA14800412AA5 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C2662233EA14800412AA5 /* Backups.storyboard */; };
 		4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
-		4D7D219922A02CBC00C1C925 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D219822A02CBC00C1C925 /* AboutViewController.m */; };
 		4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
 		4D7E39DC22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
+		4D7F5A3B236013D2003ED785 /* LargeTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */; };
+		4D7F5A3C236013D2003ED785 /* LargeTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */; };
+		4D7F5A3D236013D2003ED785 /* LargeTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */; };
+		4D7F5A3E236013D2003ED785 /* LargeTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */; };
+		4D7F5A3F23601FFF003ED785 /* ItemDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0DA22F89D3E0095F51F /* ItemDetails.storyboard */; };
+		4D7F5A4023602000003ED785 /* ItemDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0DA22F89D3E0095F51F /* ItemDetails.storyboard */; };
+		4D7F5A412360202A003ED785 /* ItemDetailsPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0DD22F89D480095F51F /* ItemDetailsPreferences.storyboard */; };
+		4D7F5A422360202B003ED785 /* ItemDetailsPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0DD22F89D480095F51F /* ItemDetailsPreferences.storyboard */; };
+		4D7F5A432360204B003ED785 /* PasswordSafeHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0E322F89D550095F51F /* PasswordSafeHistory.storyboard */; };
+		4D7F5A442360204C003ED785 /* PasswordSafeHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0E322F89D550095F51F /* PasswordSafeHistory.storyboard */; };
+		4D7F5A4523602072003ED785 /* KeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0E022F89D510095F51F /* KeePassHistory.storyboard */; };
+		4D7F5A4623602073003ED785 /* KeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0E022F89D510095F51F /* KeePassHistory.storyboard */; };
+		4D7F5A472360210E003ED785 /* MasterDetail.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */; };
+		4D7F5A482360210F003ED785 /* MasterDetail.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */; };
+		4D7F5A492360212E003ED785 /* RecordView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE2689622A665A400A1D158 /* RecordView.storyboard */; };
+		4D7F5A4A2360212F003ED785 /* RecordView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE2689622A665A400A1D158 /* RecordView.storyboard */; };
+		4D7F5A4B23602142003ED785 /* Browse.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0D722F89D270095F51F /* Browse.storyboard */; };
+		4D7F5A4C23602143003ED785 /* Browse.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0D722F89D270095F51F /* Browse.storyboard */; };
+		4D7F5A4D2360219D003ED785 /* Upgrade.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9677E923102BFB004AF091 /* Upgrade.storyboard */; };
+		4D7F5A4E2360219E003ED785 /* Upgrade.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D9677E923102BFB004AF091 /* Upgrade.storyboard */; };
+		4D7F5A4F236021B5003ED785 /* DatabaseOperations.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0F122F89D790095F51F /* DatabaseOperations.storyboard */; };
+		4D7F5A50236021B6003ED785 /* DatabaseOperations.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0F122F89D790095F51F /* DatabaseOperations.storyboard */; };
+		4D7F5A51236021C4003ED785 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C2662233EA14800412AA5 /* Backups.storyboard */; };
+		4D7F5A52236021C5003ED785 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C2662233EA14800412AA5 /* Backups.storyboard */; };
 		4D8144B42199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B62199B7790044E617 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
@@ -487,6 +509,14 @@
 		4D8FBEED21A9A70F004797FA /* kp1-keyfile.kdb in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FBEEA21A9A70F004797FA /* kp1-keyfile.kdb */; };
 		4D8FBEF121A9D9C5004797FA /* kp2-keyfile-only.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FBEEF21A9D9C4004797FA /* kp2-keyfile-only.kdbx */; };
 		4D8FBEF221A9D9C5004797FA /* kp1-keyfile-only.kdb in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FBEF021A9D9C5004797FA /* kp1-keyfile-only.kdb */; };
+		4D8FCEA423606D6F001F2172 /* surnames.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA323606D6F001F2172 /* surnames.us.txt */; };
+		4D8FCEA523606D6F001F2172 /* surnames.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA323606D6F001F2172 /* surnames.us.txt */; };
+		4D8FCEA623606D6F001F2172 /* surnames.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA323606D6F001F2172 /* surnames.us.txt */; };
+		4D8FCEA723606D6F001F2172 /* surnames.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA323606D6F001F2172 /* surnames.us.txt */; };
+		4D8FCEA923606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
+		4D8FCEAA23606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
+		4D8FCEAB23606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
+		4D8FCEAC23606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -528,7 +558,6 @@
 		4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */; };
 		4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */; };
 		4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */; };
-		4DAE98AA2270B4E200A811C4 /* ConfidentialTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */; };
 		4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */; };
 		4DAE98AD2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */; };
 		4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */; };
@@ -539,8 +568,6 @@
 		4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE988B2270B4E200A811C4 /* NotesTableViewCell.xib */; };
 		4DAE98B42270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */; };
 		4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */; };
-		4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
-		4DAE98B72270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
 		4DAE98BA2270B4E200A811C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
 		4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
 		4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */; };
@@ -761,7 +788,6 @@
 		4DC4E0DC23488BAA000743C4 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
 		4DC4E0DD23488BAA000743C4 /* CloudSessionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D036E492298443100AC892B /* CloudSessionsTableViewController.m */; };
 		4DC4E0DE23488BAA000743C4 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
-		4DC4E0DF23488BAA000743C4 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D219822A02CBC00C1C925 /* AboutViewController.m */; };
 		4DC4E0E023488BAA000743C4 /* ref.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14A021832D5500A41CA0 /* ref.c */; };
 		4DC4E0E123488BAA000743C4 /* BrowseSafeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757901C8361D200E6356F /* BrowseSafeView.m */; };
 		4DC4E0E223488BAA000743C4 /* RootXmlDomainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4767062179013900C4358F /* RootXmlDomainObject.m */; };
@@ -809,7 +835,6 @@
 		4DC4E10C23488BAA000743C4 /* CustomFieldViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE989E2270B4E200A811C4 /* CustomFieldViewModel.m */; };
 		4DC4E10D23488BAA000743C4 /* ItemDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835D72284759E00CA7405 /* ItemDetailsViewController.m */; };
 		4DC4E10E23488BAA000743C4 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D305765224B4F8F00C36287 /* StringValue.m */; };
-		4DC4E10F23488BAA000743C4 /* ConfidentialTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */; };
 		4DC4E11023488BAA000743C4 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
 		4DC4E11123488BAA000743C4 /* NotesTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */; };
 		4DC4E11223488BAA000743C4 /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
@@ -886,7 +911,6 @@
 		4DC4E15C23488BAA000743C4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D31925E1ECF528B00DF6ED0 /* GoogleService-Info.plist */; };
 		4DC4E15D23488BAA000743C4 /* ItemDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0DA22F89D3E0095F51F /* ItemDetails.storyboard */; };
 		4DC4E15E23488BAA000743C4 /* PrivacyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D770F932303263100CBE244 /* PrivacyViewController.xib */; };
-		4DC4E15F23488BAA000743C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
 		4DC4E16023488BAA000743C4 /* ItemDetailsPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0DD22F89D480095F51F /* ItemDetailsPreferences.storyboard */; };
 		4DC4E16123488BAA000743C4 /* CreateDatabaseOrSetCredentials.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0CA22F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard */; };
 		4DC4E16223488BAA000743C4 /* LICENSE.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DA2A7DB219C31B0006689E6 /* LICENSE.md */; };
@@ -1000,7 +1024,6 @@
 		4DC4E1DC23488BAE000743C4 /* SetIconModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498B82271E2C4007EF98C /* SetIconModel.m */; };
 		4DC4E1DD23488BAE000743C4 /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE46658233D2BBD00398A65 /* BackupItem.m */; };
 		4DC4E1DE23488BAE000743C4 /* Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B8E218B66C500A0739A /* Binary.m */; };
-		4DC4E1DF23488BAE000743C4 /* ConfidentialTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */; };
 		4DC4E1E023488BAE000743C4 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
 		4DC4E1E123488BAE000743C4 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14822074F5F700CE9CAE /* PasswordHistoryEntry.m */; };
 		4DC4E1E223488BAE000743C4 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF176F123293D1500255CD6 /* KeePassXmlParser.m */; };
@@ -1114,7 +1137,6 @@
 		4DC4E25023488BAE000743C4 /* DatabaseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE18BB522F09976007D902D /* DatabaseCell.xib */; };
 		4DC4E25123488BAE000743C4 /* EditDateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D2259F422C6C28A005547EA /* EditDateCell.xib */; };
 		4DC4E25223488BAE000743C4 /* apple.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4DF544FA2231627A00DDEECE /* apple.cer */; };
-		4DC4E25323488BAE000743C4 /* ConfidentialTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */; };
 		4DC4E25423488BAE000743C4 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0AB22C9473F003E9B68 /* google-10000-english-usa-no-swears-medium.txt */; };
 		4DC4E25523488BAE000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0B022C94740003E9B68 /* italian-diceware.wordlist.utf8.txt */; };
 		4DC4E25623488BAE000743C4 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A322C9473F003E9B68 /* securedrop.wordlist.utf8.txt */; };
@@ -1187,6 +1209,8 @@
 		4DDB4AAA2177A72B00A06A73 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4DDF7C9D225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */; };
 		4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */; };
+		4DE0DA872351E7A500B4319F /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0DA852351E7A500B4319F /* AboutViewController.m */; };
+		4DE0DA882351E7A500B4319F /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0DA852351E7A500B4319F /* AboutViewController.m */; };
 		4DE18BB622F09976007D902D /* DatabaseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE18BB522F09976007D902D /* DatabaseCell.xib */; };
 		4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE18BB522F09976007D902D /* DatabaseCell.xib */; };
 		4DE18BBA22F09A3F007D902D /* DatabaseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE18BB922F09A3F007D902D /* DatabaseCell.m */; };
@@ -1883,10 +1907,10 @@
 		4D7D2191229FD15800C1C925 /* BrowseItemSubtitleField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseItemSubtitleField.h; path = StrongBox/BrowseItemSubtitleField.h; sourceTree = "<group>"; };
 		4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectItemTableViewController.h; path = StrongBox/SelectItemTableViewController.h; sourceTree = "<group>"; };
 		4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectItemTableViewController.m; path = StrongBox/SelectItemTableViewController.m; sourceTree = "<group>"; };
-		4D7D219722A02CBC00C1C925 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutViewController.h; path = ../StrongBox/About/AboutViewController.h; sourceTree = "<group>"; };
-		4D7D219822A02CBC00C1C925 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutViewController.m; path = ../StrongBox/About/AboutViewController.m; sourceTree = "<group>"; };
 		4D7E39D922675AC000EC940E /* NSMutableArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSMutableArray+Extensions.h"; path = "model/NSMutableArray+Extensions.h"; sourceTree = "<group>"; };
 		4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSMutableArray+Extensions.m"; path = "model/NSMutableArray+Extensions.m"; sourceTree = "<group>"; };
+		4D7F5A39236013D2003ED785 /* LargeTextViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LargeTextViewController.h; path = StrongBox/LargeTextViewController.h; sourceTree = "<group>"; };
+		4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LargeTextViewController.m; path = StrongBox/LargeTextViewController.m; sourceTree = "<group>"; };
 		4D8144B22199B4A80044E617 /* NodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIconHelper.h; path = StrongBox/NodeIconHelper.h; sourceTree = "<group>"; };
 		4D8144B32199B4A80044E617 /* NodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
 		4D82332922B01BE200A37BAC /* SortOrderTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SortOrderTableViewController.h; path = StrongBox/SortOrderTableViewController.h; sourceTree = "<group>"; };
@@ -2074,6 +2098,8 @@
 		4D8FBEEE21A9CA0F004797FA /* KdbxSerializationCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbxSerializationCommon.h; path = model/keepass/KdbxSerializationCommon.h; sourceTree = "<group>"; };
 		4D8FBEEF21A9D9C4004797FA /* kp2-keyfile-only.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "kp2-keyfile-only.kdbx"; sourceTree = "<group>"; };
 		4D8FBEF021A9D9C5004797FA /* kp1-keyfile-only.kdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "kp1-keyfile-only.kdb"; sourceTree = "<group>"; };
+		4D8FCEA323606D6F001F2172 /* surnames.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = surnames.us.txt; path = resources/names/surnames/surnames.us.txt; sourceTree = "<group>"; };
+		4D8FCEA823606D78001F2172 /* first.names.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = first.names.us.txt; path = resources/names/first/first.names.us.txt; sourceTree = "<group>"; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryViewController.h; path = StrongBox/PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryViewController.m; path = StrongBox/PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreviousPasswordsTableViewController.h; path = StrongBox/PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
@@ -2124,7 +2150,6 @@
 		4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomStorageProviderTableViewCell.m; path = StrongBox/CustomStorageProviderTableViewCell.m; sourceTree = "<group>"; };
 		4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenericBasicCell.xib; sourceTree = "<group>"; };
 		4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewCell.m; sourceTree = "<group>"; };
-		4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConfidentialTableCell.m; sourceTree = "<group>"; };
 		4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericKeyValueTableViewCell.m; sourceTree = "<group>"; };
 		4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EditAttachmentCell.xib; sourceTree = "<group>"; };
 		4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewAttachmentCell.xib; sourceTree = "<group>"; };
@@ -2132,11 +2157,9 @@
 		4DAE988B2270B4E200A811C4 /* NotesTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotesTableViewCell.xib; sourceTree = "<group>"; };
 		4DAE988C2270B4E200A811C4 /* GenericBasicCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericBasicCell.h; sourceTree = "<group>"; };
 		4DAE988D2270B4E200A811C4 /* EditPasswordTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditPasswordTableViewCell.h; sourceTree = "<group>"; };
-		4DAE988E2270B4E200A811C4 /* ConfidentialTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfidentialTableCell.h; sourceTree = "<group>"; };
 		4DAE988F2270B4E200A811C4 /* NotesTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotesTableViewCell.h; sourceTree = "<group>"; };
 		4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenericKeyValueTableViewCell.xib; sourceTree = "<group>"; };
 		4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericKeyValueTableViewCell.h; sourceTree = "<group>"; };
-		4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConfidentialTableCell.xib; sourceTree = "<group>"; };
 		4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditAttachmentCell.m; sourceTree = "<group>"; };
 		4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditPasswordTableViewCell.m; sourceTree = "<group>"; };
 		4DAE98962270B4E200A811C4 /* GenericBasicCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenericBasicCell.m; sourceTree = "<group>"; };
@@ -2222,6 +2245,8 @@
 		4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
 		4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+Extensions.h"; path = "model/NSDictionary+Extensions.h"; sourceTree = "<group>"; };
 		4DDF7C9C225B7D2C000B0114 /* NSDictionary+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+Extensions.m"; path = "model/NSDictionary+Extensions.m"; sourceTree = "<group>"; };
+		4DE0DA852351E7A500B4319F /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
+		4DE0DA862351E7A500B4319F /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
 		4DE18BB522F09976007D902D /* DatabaseCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = DatabaseCell.xib; path = StrongBox/DatabaseCell.xib; sourceTree = "<group>"; };
 		4DE18BB822F09A3F007D902D /* DatabaseCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseCell.h; path = StrongBox/DatabaseCell.h; sourceTree = "<group>"; };
 		4DE18BB922F09A3F007D902D /* DatabaseCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseCell.m; path = StrongBox/DatabaseCell.m; sourceTree = "<group>"; };
@@ -3000,11 +3025,12 @@
 		4D48C6EB22AD0DE9002B502E /* About */ = {
 			isa = PBXGroup;
 			children = (
+				4DE0DA862351E7A500B4319F /* AboutViewController.h */,
+				4DE0DA852351E7A500B4319F /* AboutViewController.m */,
 				4D62E267234386FF00119604 /* About.rtf */,
-				4D7D219722A02CBC00C1C925 /* AboutViewController.h */,
-				4D7D219822A02CBC00C1C925 /* AboutViewController.m */,
 			);
-			path = About;
+			name = About;
+			path = StrongBox/About;
 			sourceTree = "<group>";
 		};
 		4D4D6AF4222EF3D80056514E /* RMStore */ = {
@@ -3509,6 +3535,15 @@
 			name = KeyFile;
 			sourceTree = "<group>";
 		};
+		4D8FCEA223606D45001F2172 /* Names */ = {
+			isa = PBXGroup;
+			children = (
+				4D8FCEA323606D6F001F2172 /* surnames.us.txt */,
+				4D8FCEA823606D78001F2172 /* first.names.us.txt */,
+			);
+			name = Names;
+			sourceTree = "<group>";
+		};
 		4D98344621775F3800731FFC /* test-files */ = {
 			isa = PBXGroup;
 			children = (
@@ -3627,6 +3662,8 @@
 				4DE7F0DD22F89D480095F51F /* ItemDetailsPreferences.storyboard */,
 				4D48C6EE22AD186D002B502E /* ItemDetailsPreferencesViewController.h */,
 				4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */,
+				4D7F5A39236013D2003ED785 /* LargeTextViewController.h */,
+				4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */,
 			);
 			name = "Item Details";
 			sourceTree = "<group>";
@@ -3636,9 +3673,6 @@
 			children = (
 				4D0835DB2284765D00CA7405 /* CustomFieldTableCell.h */,
 				4D0835DA2284765D00CA7405 /* CustomFieldTableCell.m */,
-				4DAE98922270B4E200A811C4 /* ConfidentialTableCell.xib */,
-				4DAE988E2270B4E200A811C4 /* ConfidentialTableCell.h */,
-				4DAE98862270B4E200A811C4 /* ConfidentialTableCell.m */,
 				4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */,
 				4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */,
 				4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */,
@@ -3863,6 +3897,7 @@
 		4DE2688E22A65C8B00A1D158 /* Password Generation */ = {
 			isa = PBXGroup;
 			children = (
+				4D8FCEA223606D45001F2172 /* Names */,
 				4D0835E522847BAF00CA7405 /* Word Lists */,
 				4DE7F0FB22F89D8D0095F51F /* PasswordGenerationPreferences.storyboard */,
 				4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */,
@@ -4308,11 +4343,13 @@
 				4D36B0BA22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
+				4D8FCEA423606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4DE7F0CB22F89CE30095F51F /* MasterDetail.storyboard in Resources */,
 				4D9677E723102BFB004AF091 /* Upgrade.storyboard in Resources */,
 				4DE7F0D522F89D270095F51F /* Browse.storyboard in Resources */,
 				4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */,
+				4D8FCEA923606D78001F2172 /* first.names.us.txt in Resources */,
 				4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */,
 				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4DE7F0F522F89D870095F51F /* SelectItem.storyboard in Resources */,
@@ -4322,7 +4359,6 @@
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 				4DE7F0D822F89D3E0095F51F /* ItemDetails.storyboard in Resources */,
 				4D770F912303263100CBE244 /* PrivacyViewController.xib in Resources */,
-				4DAE98B62270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
 				4DE7F0DB22F89D480095F51F /* ItemDetailsPreferences.storyboard in Resources */,
 				4DE7F0C722F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
@@ -4381,11 +4417,13 @@
 				4DC4E14E23488BAA000743C4 /* diceware.wordlist.utf8.txt in Resources */,
 				4DC4E14F23488BAA000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E15023488BAA000743C4 /* beale.wordlist.utf8.txt in Resources */,
+				4D8FCEA623606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DC4E15123488BAA000743C4 /* IconsSectionHeaderReusableView.xib in Resources */,
 				4DC4E15223488BAA000743C4 /* MasterDetail.storyboard in Resources */,
 				4DC4E15323488BAA000743C4 /* Upgrade.storyboard in Resources */,
 				4DC4E15423488BAA000743C4 /* Browse.storyboard in Resources */,
 				4DC4E15523488BAA000743C4 /* EditDateCell.xib in Resources */,
+				4D8FCEAB23606D78001F2172 /* first.names.us.txt in Resources */,
 				4DC4E15623488BAA000743C4 /* EditPasswordCell.xib in Resources */,
 				4DC4E15723488BAA000743C4 /* GenericBasicCell.xib in Resources */,
 				4DC4E15823488BAA000743C4 /* SelectItem.storyboard in Resources */,
@@ -4395,7 +4433,6 @@
 				4DC4E15C23488BAA000743C4 /* GoogleService-Info.plist in Resources */,
 				4DC4E15D23488BAA000743C4 /* ItemDetails.storyboard in Resources */,
 				4DC4E15E23488BAA000743C4 /* PrivacyViewController.xib in Resources */,
-				4DC4E15F23488BAA000743C4 /* ConfidentialTableCell.xib in Resources */,
 				4DC4E16023488BAA000743C4 /* ItemDetailsPreferences.storyboard in Resources */,
 				4DC4E16123488BAA000743C4 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4DC4E16223488BAA000743C4 /* LICENSE.md in Resources */,
@@ -4416,15 +4453,21 @@
 				4DC4E24C23488BAE000743C4 /* Images.xcassets in Resources */,
 				4DC4E24D23488BAE000743C4 /* LaunchScreen.storyboard in Resources */,
 				4DC4E24E23488BAE000743C4 /* Localizable.strings in Resources */,
+				4D7F5A50236021B6003ED785 /* DatabaseOperations.storyboard in Resources */,
 				4DC4E24F23488BAE000743C4 /* InfoPlist.strings in Resources */,
+				4D8FCEA723606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DC4E25023488BAE000743C4 /* DatabaseCell.xib in Resources */,
 				4DC4E25123488BAE000743C4 /* EditDateCell.xib in Resources */,
 				4DC4E25223488BAE000743C4 /* apple.cer in Resources */,
-				4DC4E25323488BAE000743C4 /* ConfidentialTableCell.xib in Resources */,
+				4D7F5A482360210F003ED785 /* MasterDetail.storyboard in Resources */,
 				4DC4E25423488BAE000743C4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DC4E25523488BAE000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D8FCEAC23606D78001F2172 /* first.names.us.txt in Resources */,
 				4DC4E25623488BAE000743C4 /* securedrop.wordlist.utf8.txt in Resources */,
 				4DC4E25723488BAE000743C4 /* EditPasswordCell.xib in Resources */,
+				4D7F5A52236021C5003ED785 /* Backups.storyboard in Resources */,
+				4D7F5A442360204C003ED785 /* PasswordSafeHistory.storyboard in Resources */,
+				4D7F5A4E2360219E003ED785 /* Upgrade.storyboard in Resources */,
 				4DC4E25823488BAE000743C4 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E25923488BAE000743C4 /* GenericBasicCell.xib in Resources */,
 				4DC4E25A23488BAE000743C4 /* eff_large_wordlist.utf8.txt in Resources */,
@@ -4433,8 +4476,11 @@
 				4DC4E25D23488BAE000743C4 /* TotpCell.xib in Resources */,
 				4DC4E25E23488BAE000743C4 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4DC4E25F23488BAE000743C4 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				4D7F5A4A2360212F003ED785 /* RecordView.storyboard in Resources */,
 				4DC4E26023488BAE000743C4 /* IconsCollectionViewController.xib in Resources */,
 				4DC4E26123488BAE000743C4 /* BrowseItemCell.xib in Resources */,
+				4D7F5A422360202B003ED785 /* ItemDetailsPreferences.storyboard in Resources */,
+				4D7F5A4623602073003ED785 /* KeePassHistory.storyboard in Resources */,
 				4DC4E26223488BAE000743C4 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4DC4E26323488BAE000743C4 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26423488BAE000743C4 /* GoogleService-Info.plist in Resources */,
@@ -4446,8 +4492,10 @@
 				4DC4E26A23488BAE000743C4 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26B23488BAE000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E26C23488BAE000743C4 /* IconCellView.xib in Resources */,
+				4D7F5A4023602000003ED785 /* ItemDetails.storyboard in Resources */,
 				4DC4E26D23488BAE000743C4 /* ViewAttachmentCell.xib in Resources */,
 				4DC4E26E23488BAE000743C4 /* WebDAVConfigurationViewController.xib in Resources */,
+				4D7F5A4C23602143003ED785 /* Browse.storyboard in Resources */,
 				4DC4E26F23488BAE000743C4 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E27023488BAE000743C4 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E27123488BAE000743C4 /* diceware.wordlist.utf8.txt in Resources */,
@@ -4467,15 +4515,21 @@
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
 				4DE7F0CF22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
 				4D12E59122FB866F00CBFECC /* Localizable.strings in Resources */,
+				4D7F5A4F236021B5003ED785 /* DatabaseOperations.storyboard in Resources */,
 				4D8A99A6230AF31700AB98DC /* InfoPlist.strings in Resources */,
+				4D8FCEA523606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,
-				4DAE98B72270B4E200A811C4 /* ConfidentialTableCell.xib in Resources */,
+				4D7F5A472360210E003ED785 /* MasterDetail.storyboard in Resources */,
 				4D36B0C522C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D8FCEAA23606D78001F2172 /* first.names.us.txt in Resources */,
 				4D36B0B522C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
 				4D770F872303249D00CBE244 /* EditPasswordCell.xib in Resources */,
+				4D7F5A51236021C4003ED785 /* Backups.storyboard in Resources */,
+				4D7F5A432360204B003ED785 /* PasswordSafeHistory.storyboard in Resources */,
+				4D7F5A4D2360219D003ED785 /* Upgrade.storyboard in Resources */,
 				4D36B0C122C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98A52270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4D36B0B922C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */,
@@ -4484,8 +4538,11 @@
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
 				4DE7F0C822F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4D36B0B722C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				4D7F5A492360212E003ED785 /* RecordView.storyboard in Resources */,
 				4D770F98230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */,
+				4D7F5A412360202A003ED785 /* ItemDetailsPreferences.storyboard in Resources */,
+				4D7F5A4523602072003ED785 /* KeePassHistory.storyboard in Resources */,
 				4D36B0B322C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D36B0D122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
@@ -4497,8 +4554,10 @@
 				4D36B0C322C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
+				4D7F5A3F23601FFF003ED785 /* ItemDetails.storyboard in Resources */,
 				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4D770FA0230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */,
+				4D7F5A4B23602142003ED785 /* Browse.storyboard in Resources */,
 				4D36B0BF22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0CD22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0BB22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
@@ -4921,6 +4980,7 @@
 				4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
 				4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */,
 				4D4D6B57222EF3E80056514E /* RMStore.m in Sources */,
+				4D7F5A3B236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4D3E149521832C1500A41CA0 /* core.c in Sources */,
 				4D2561AF233FEAEA00179B84 /* YubiManager.m in Sources */,
 				4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -5054,7 +5114,6 @@
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */,
 				4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
-				4D7D219922A02CBC00C1C925 /* AboutViewController.m in Sources */,
 				4D3E14A121832D5500A41CA0 /* ref.c in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4767072179013900C4358F /* RootXmlDomainObject.m in Sources */,
@@ -5071,6 +5130,7 @@
 				4DB1B7C82188972600CF1663 /* CryptoParameters.m in Sources */,
 				4DA12F06219837D10000CEBB /* CustomIcon.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
+				4DE0DA872351E7A500B4319F /* AboutViewController.m in Sources */,
 				4DF97F2421BF101B0090A55E /* DAVRequests.m in Sources */,
 				4DAE98BE2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
 				4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */,
@@ -5107,7 +5167,6 @@
 				4DAE98C62270B4E200A811C4 /* CustomFieldViewModel.m in Sources */,
 				4D0835D92284759F00CA7405 /* ItemDetailsViewController.m in Sources */,
 				4D305766224B4F8F00C36287 /* StringValue.m in Sources */,
-				4DAE98AA2270B4E200A811C4 /* ConfidentialTableCell.m in Sources */,
 				4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
 				4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
@@ -5197,6 +5256,7 @@
 				4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */,
 				4DC4E05F23488BAA000743C4 /* FileManager.m in Sources */,
 				4DC4E06023488BAA000743C4 /* RMStore.m in Sources */,
+				4D7F5A3D236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DC4E06123488BAA000743C4 /* core.c in Sources */,
 				4DC4E06223488BAA000743C4 /* YubiManager.m in Sources */,
 				4DC4E06323488BAA000743C4 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -5330,7 +5390,6 @@
 				4DC4E0DC23488BAA000743C4 /* DatabaseModel.m in Sources */,
 				4DC4E0DD23488BAA000743C4 /* CloudSessionsTableViewController.m in Sources */,
 				4DC4E0DE23488BAA000743C4 /* NSUUID+Zero.m in Sources */,
-				4DC4E0DF23488BAA000743C4 /* AboutViewController.m in Sources */,
 				4DC4E0E023488BAA000743C4 /* ref.c in Sources */,
 				4DC4E0E123488BAA000743C4 /* BrowseSafeView.m in Sources */,
 				4DC4E0E223488BAA000743C4 /* RootXmlDomainObject.m in Sources */,
@@ -5347,6 +5406,7 @@
 				4DC4E0EC23488BAA000743C4 /* CryptoParameters.m in Sources */,
 				4DC4E0ED23488BAA000743C4 /* CustomIcon.m in Sources */,
 				4DC4E0EE23488BAA000743C4 /* PreviousPasswordsTableViewController.m in Sources */,
+				4DE0DA882351E7A500B4319F /* AboutViewController.m in Sources */,
 				4DC4E0EF23488BAA000743C4 /* DAVRequests.m in Sources */,
 				4DC4E0F023488BAA000743C4 /* GenericBasicCell.m in Sources */,
 				4DC4E0F123488BAA000743C4 /* EditPasswordTableViewCell.m in Sources */,
@@ -5383,7 +5443,6 @@
 				4DC4E10C23488BAA000743C4 /* CustomFieldViewModel.m in Sources */,
 				4DC4E10D23488BAA000743C4 /* ItemDetailsViewController.m in Sources */,
 				4DC4E10E23488BAA000743C4 /* StringValue.m in Sources */,
-				4DC4E10F23488BAA000743C4 /* ConfidentialTableCell.m in Sources */,
 				4DC4E11023488BAA000743C4 /* SafeStorageProviderFactory.m in Sources */,
 				4DC4E11123488BAA000743C4 /* NotesTableViewCell.m in Sources */,
 				4DC4E11223488BAA000743C4 /* LocalDeviceStorageProvider.m in Sources */,
@@ -5448,6 +5507,7 @@
 				4DC4E1A323488BAE000743C4 /* StrongboxDatabase.m in Sources */,
 				4DC4E1A423488BAE000743C4 /* SimpleXmlValueExtractor.m in Sources */,
 				4DC4E1A523488BAE000743C4 /* SprCompilation.m in Sources */,
+				4D7F5A3E236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DC4E1A623488BAE000743C4 /* AddNewSafeHelper.m in Sources */,
 				4DC4E1A723488BAE000743C4 /* NMSSHChannel.m in Sources */,
 				4DC4E1A823488BAE000743C4 /* ISO8601DateFormatter.m in Sources */,
@@ -5505,7 +5565,6 @@
 				4DC4E1DC23488BAE000743C4 /* SetIconModel.m in Sources */,
 				4DC4E1DD23488BAE000743C4 /* BackupItem.m in Sources */,
 				4DC4E1DE23488BAE000743C4 /* Binary.m in Sources */,
-				4DC4E1DF23488BAE000743C4 /* ConfidentialTableCell.m in Sources */,
 				4DC4E1E023488BAE000743C4 /* CASGParams.m in Sources */,
 				4DC4E1E123488BAE000743C4 /* PasswordHistoryEntry.m in Sources */,
 				4DC4E1E223488BAE000743C4 /* KeePassXmlParser.m in Sources */,
@@ -5656,6 +5715,7 @@
 				4D0835D62284750900CA7405 /* StrongboxDatabase.m in Sources */,
 				4DC3F83423215A58002BDEF7 /* SimpleXmlValueExtractor.m in Sources */,
 				4D18F2372257987F00768E18 /* SprCompilation.m in Sources */,
+				4D7F5A3C236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4D56D91421B837A20030E13A /* AddNewSafeHelper.m in Sources */,
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
@@ -5713,7 +5773,6 @@
 				4DE498BA2271E5C7007EF98C /* SetIconModel.m in Sources */,
 				4DE4665A233D2E8C00398A65 /* BackupItem.m in Sources */,
 				4D5F5B90218B66C500A0739A /* Binary.m in Sources */,
-				4D33FA4222872331006C31B2 /* ConfidentialTableCell.m in Sources */,
 				4D9597BF22A2CB38008DB224 /* CASGParams.m in Sources */,
 				4D1884D621709E1F001AE6B0 /* PasswordHistoryEntry.m in Sources */,
 				4DF176F323293D1500255CD6 /* KeePassXmlParser.m in Sources */,
@@ -6364,7 +6423,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6384,7 +6443,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6455,7 +6514,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6475,7 +6534,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6545,7 +6604,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6565,7 +6624,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6635,7 +6694,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6655,7 +6714,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6731,7 +6790,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6750,7 +6809,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6818,7 +6877,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6837,7 +6896,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6903,7 +6962,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6922,7 +6981,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6990,7 +7049,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2724;
+				CURRENT_PROJECT_VERSION = 2725;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7009,7 +7068,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.43.3;
+				MARKETING_VERSION = 1.44.0;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
