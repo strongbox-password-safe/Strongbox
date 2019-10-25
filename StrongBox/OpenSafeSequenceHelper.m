@@ -210,7 +210,7 @@
                                 keyFileUrl:self.safe.keyFileUrl
                         oneTimeKeyFileData:nil
                                   readOnly:self.safe.readOnly
-                         manualOpenOffline:NO
+                         manualOpenOffline:self.manualOpenOfflineCache
                              yubikeySecret:self.safe.convenenienceYubikeySecret];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
@@ -350,7 +350,7 @@
                         keyFileUrl:self.safe.keyFileUrl
                 oneTimeKeyFileData:nil
                           readOnly:self.safe.readOnly
-                 manualOpenOffline:NO
+                 manualOpenOffline:self.manualOpenOfflineCache
                      yubikeySecret:self.safe.convenenienceYubikeySecret];
         }
     }

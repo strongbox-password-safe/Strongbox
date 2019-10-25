@@ -1567,6 +1567,7 @@
 		4D25E8EF2175F4CE00ACF108 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = StrongboxTests/Info.plist; sourceTree = "<group>"; };
 		4D27D74A21A00AB900CA7B06 /* KeePass2TagPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePass2TagPackage.h; path = model/keepass/KeePass2TagPackage.h; sourceTree = "<group>"; };
 		4D27D74B21A00AB900CA7B06 /* KeePass2TagPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePass2TagPackage.m; path = model/keepass/KeePass2TagPackage.m; sourceTree = "<group>"; };
+		4D2854762362FF9800DC3664 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
 		4D2962B1223173FC0082897D /* History.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = History.h; path = model/keepass/History.h; sourceTree = "<group>"; };
 		4D2962B2223173FC0082897D /* History.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = History.m; path = model/keepass/History.m; sourceTree = "<group>"; };
 		4D29E46A206D328900AD537E /* PasswordGenerationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationParameters.h; path = model/PasswordGenerationParameters.h; sourceTree = SOURCE_ROOT; };
@@ -1762,7 +1763,6 @@
 		4D51F0BE233BE5D900F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DatabaseOperations.strings; sourceTree = "<group>"; };
 		4D51F0BF233BE5D900F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Preferences.strings; sourceTree = "<group>"; };
 		4D51F0C0233BE5D900F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SelectItem.strings; sourceTree = "<group>"; };
-		4D51F0C1233BE5D900F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
 		4D51F0C2233BE5DA00F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Upgrade.strings; sourceTree = "<group>"; };
 		4D51F0C3233BE5DA00F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/IconsCollectionViewController.strings; sourceTree = "<group>"; };
 		4D51F0C4233BE5DA00F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "StrongBox Auto Fill/ru.lproj/MainInterface.strings"; sourceTree = "<group>"; };
@@ -6188,7 +6188,7 @@
 			children = (
 				4DE7F0FA22F89D8D0095F51F /* Base */,
 				4D8A99C4230AF31700AB98DC /* de */,
-				4D51F0C1233BE5D900F5BB3D /* ru */,
+				4D2854762362FF9800DC3664 /* ru */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -6380,7 +6380,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6400,7 +6400,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6471,7 +6471,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6491,7 +6491,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6561,7 +6561,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6581,7 +6581,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6651,7 +6651,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6671,7 +6671,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6747,7 +6747,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6766,7 +6766,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6834,7 +6834,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6853,7 +6853,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6919,7 +6919,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6938,7 +6938,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -7006,7 +7006,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2726;
+				CURRENT_PROJECT_VERSION = 2727;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7025,7 +7025,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.1;
+				MARKETING_VERSION = 1.44.2;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

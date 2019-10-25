@@ -109,7 +109,8 @@ NS_ASSUME_NONNULL_END
                    }
                    NSString* prologue = server.prologue;
                    if (prologue == nil) {
-                     prologue = [siteBundle localizedStringForKey:@"PROLOGUE" value:@"" table:nil];
+                       prologue = NSLocalizedString(@"transfer_over_local_network_website_prologue", @""); // Strongbox customised
+                       //prologue = [siteBundle localizedStringForKey:@"PROLOGUE" value:@"" table:nil];
                    }
                    NSString* epilogue = server.epilogue;
                    if (epilogue == nil) {
