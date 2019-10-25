@@ -41,7 +41,7 @@
     [self initializeProFamilyEdition];
     
     [self performMigrations];
-    
+        
     // Do not backup local safes, caches or key files
 
     [FileManager.sharedInstance excludeDirectoriesFromBackup];

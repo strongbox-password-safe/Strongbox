@@ -92,7 +92,9 @@
                     error:error];
         }
 
-        self.onDone();
+        dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will crash BrowseSafeView dismiss.
+            self.onDone();
+        });
     }];
 }
 

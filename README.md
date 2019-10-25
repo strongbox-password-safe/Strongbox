@@ -7,8 +7,13 @@ https://apps.apple.com/app/strongbox-password-safe/id897283731
 
 Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes.
 
+# Licence Notes
+This software is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project.
+
+If you are interested in using the code in some other fashion, or require an alternative licence then please contact me directly: [mark@strongboxsafe.com](mailto:mark@strongboxsafe.com).
+
 # Support
-If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") or email [support@strongboxsafe.com](mailto:support@strongboxsafe.com).
+If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") or [Reddit r/strongbox](https://www.reddit.com/r/strongbox/ "r/strongbox"). Lastly if all of the above don't help you can email (in English only) [support@strongboxsafe.com](mailto:support@strongboxsafe.com). It is important to only email after checking the above avenues as more time spent on support means less time spent on development.
 
 # Localization (Help Wanted)
 Localization and translation is managed through the Parallel Babel project here:
@@ -39,9 +44,6 @@ The code is provided here for reasons of security, transparency and openness. An
 I cannot accept outside pull requests from the community for licensing reasons. To release to Apple's App Store I have to manage Strongbox under a dual licence. The code here is under the GPL which Apple will not allow in the App Store. As mentioned above the code is provided here for transparency and openness, something I consider a prerequisite for a Password Manager. I need to maintain full ownership of the code so that I can licence to Apple separately, and also any outside/other licencing that might come along, commercial or otherwise. Accepting contributions (no matter how awesome) would involve the contributer signing their life and probably first born child away... There is probably a way to do this but I believe it will involve legally binding documents and other bureaucracies so to keep things simple I'm just going to manage the development myself. Other people's code sucks anyway, right? 
 
 Sorry. :(
-
-# Licence Notes
-This software is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project. If you are interested in using the code in some other fashion, or require an alternative licence then please contact me directly: mark@strongboxsafe.com.
 
 # Acknowledgements
 The crypto is mostly from TomCrypt and libsodium. PasswordSafe & KeePass DB parsing/navigation/UI/Cloud interaction is my own work. 

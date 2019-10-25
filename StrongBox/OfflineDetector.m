@@ -33,6 +33,11 @@
 - (void) stopMonitoringConnectivitity {
     NSLog(@"STOP monitoring Internet Connectivity...");
     
+    // TODO: dispatch_async() - There are some crashes here apparently, duspatch this to main queue
+    // but not yet... Similarly Start below should be on main thread.
+    //
+    // https://stackoverflow.com/questions/15554135/reachability-classes-crashing-program-not-sure-why
+    
     [self.internetReachabilityDetector stopNotifier];
     self.internetReachabilityDetector = nil;
     self.offline = NO;

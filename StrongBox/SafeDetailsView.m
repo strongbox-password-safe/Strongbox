@@ -22,6 +22,7 @@
 #import "AttachmentsPoolViewController.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
+#import "BiometricsManager.h"
 
 @interface SafeDetailsView ()
 
@@ -62,9 +63,15 @@
 }
 
 - (void)bindSettings {
-    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
-    self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock"), biometricIdName];
+    NSString *biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
 
+    if (![Settings.sharedInstance isProOrFreeTrial]) {
+        self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt_pro_only", @"%@ Unlock"), biometricIdName];
+    }
+    else {
+        self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock"), biometricIdName];
+    }
+    
     if (@available(iOS 13.0, *)) {
         self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.labelColor : UIColor.secondaryLabelColor;
     } else {
@@ -238,7 +245,7 @@
 }
 
 - (IBAction)onSwitchBiometricUnlock:(id)sender {
-    NSString* bIdName = [[Settings sharedInstance] getBiometricIdName];
+    NSString* bIdName = [BiometricsManager.sharedInstance getBiometricIdName];
     
     if (!self.switchAllowBiometric.on) {
         NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
@@ -460,7 +467,7 @@
 }
 
 - (BOOL)canToggleTouchId {
-    return Settings.isBiometricIdAvailable;
+    return BiometricsManager.isBiometricIdAvailable && [Settings.sharedInstance isProOrFreeTrial];
 }
 
 - (BOOL)canToggleOfflineCache {

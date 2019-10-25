@@ -22,6 +22,8 @@
 @implementation LocalHttpServerViewController
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
     if(!self.webUploader.isRunning) {
         [self.webUploader startWithPort:80 bonjourName:nil];
 
@@ -38,7 +40,9 @@
     }
 }
 
-- (void)viewDidDisappear:(BOOL)animated {   
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
     if (self.webUploader.isRunning) {
         [self.webUploader stop];
     }

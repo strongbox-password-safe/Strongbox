@@ -29,15 +29,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 - (NSUserDefaults*_Nullable)getUserDefaults;
 
-- (void)requestBiometricId:(NSString*)reason
-                completion:(void(^)(BOOL success, NSError * __nullable error))completion;
-
-- (void)requestBiometricId:(NSString *)reason
-             fallbackTitle:(NSString*_Nullable)fallbackTitle
-                completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
-
-+ (BOOL)isBiometricIdAvailable;
-
 - (void)setHavePromptedAboutFreeTrial:(BOOL)value;
 - (BOOL)isHavePromptedAboutFreeTrial;
 - (BOOL)isProOrFreeTrial;
@@ -56,7 +47,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 - (void)incrementLaunchCount;
 
 - (NSString*)getFlagsStringForDiagnostics;
-- (NSString*)getBiometricIdName;
 
 @property (nonatomic) BOOL neverShowForMacAppMessage;
 
@@ -68,7 +58,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property (nonatomic) NSDate* installDate;
 @property (nonatomic, readonly) NSInteger daysInstalled;
-
 
 - (void)clearInstallDate;
 
@@ -108,7 +97,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 
 @property (readonly) NSString* appGroupName;
-@property BOOL suppressPrivacyScreen;
 
 @property BOOL showYubikeySecretWorkaroundField;
 
@@ -128,6 +116,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL monitorInternetConnectivity;
 
 @property BOOL hasDoneProFamilyCheck;
+
+@property BOOL suppressPrivacyScreen; // Used by Biometric Auth and Google Drive to suppress privacy screen which interferes with their operation
 
 NS_ASSUME_NONNULL_END
 

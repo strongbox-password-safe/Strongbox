@@ -13,6 +13,7 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "OfflineDetector.h"
+#import "BiometricsManager.h"
 
 @interface AdvancedPreferencesTableViewController ()
 
@@ -86,7 +87,7 @@
 }
 
 - (void)bindAllowBiometric {
-    self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Enable %@"), [Settings.sharedInstance getBiometricIdName]];
+    self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Enable %@"), [BiometricsManager.sharedInstance getBiometricIdName]];
     self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;
 }
 

@@ -11,6 +11,7 @@
 #import "SVProgressHUD.h"
 #import "Alerts.h"
 #import "Settings.h"
+#import "BiometricsManager.h"
 
 static NSString* const kFontNameNoneBold =  @"Futura";
 static NSString* const kFontName =  @"Futura-Bold";
@@ -47,7 +48,7 @@ static NSString* const kFontName =  @"Futura-Bold";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.labelBiometricIdFeature.text = [Settings.sharedInstance getBiometricIdName];
+    self.labelBiometricIdFeature.text = [BiometricsManager.sharedInstance getBiometricIdName];
     
     [self initializeUi];
     [self updateUi];

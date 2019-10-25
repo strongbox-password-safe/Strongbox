@@ -26,6 +26,7 @@
 #import "KeyFilesTableViewController.h"
 #import "PasswordGenerationViewController.h"
 #import "DebugHelper.h"
+#import "BiometricsManager.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -110,7 +111,7 @@
         // Auto Segue
     }
     else if(cell == self.tweetStrongbox) {
-        [self launchTwitter];
+        [self launchStrongboxSafeTwitter];
     }
     else if(cell == self.cellAboutHelp) {
         [self onFaq];
@@ -153,7 +154,7 @@
     }
 }
 
--(void)launchTwitter {
+-(void)launchTweetAtStrongboxSafe {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"twitter://post?message=@StrongboxSafe%20Hi!"] options:@{} completionHandler:^(BOOL success) {
         if(!success) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/intent/tweet?text=@StrongboxSafe%20Hi!"]];
@@ -161,10 +162,14 @@
     }];
 }
 
+- (void)launchStrongboxSafeTwitter {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/strongboxsafe"]];
+}
+
 - (void)customizeAppLockSectionFooter {
-    [self.segmentAppLock setEnabled:[Settings isBiometricIdAvailable] forSegmentAtIndex:2];
-    [self.segmentAppLock setTitle:[Settings.sharedInstance getBiometricIdName] forSegmentAtIndex:2];
-    [self.segmentAppLock setEnabled:[Settings isBiometricIdAvailable] forSegmentAtIndex:3]; // Both
+    [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:2];
+    [self.segmentAppLock setTitle:[BiometricsManager.sharedInstance getBiometricIdName] forSegmentAtIndex:2];
+    [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:3]; // Both
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -287,7 +292,7 @@
 - (IBAction)onUseICloud:(id)sender {
     NSLog(@"Setting iCloudOn to %d", self.switchUseICloud.on);
     
-    NSString *biometricIdName = [[Settings sharedInstance] getBiometricIdName];
+    NSString *biometricIdName = [[BiometricsManager sharedInstance] getBiometricIdName];
     if([self hasLocalOrICloudSafes]) {
         [Alerts yesNo:self
                 title:NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_title", @"Master Password Warning")
@@ -312,6 +317,26 @@
 }
 
 - (void)onContactSupport {
+    [Alerts threeOptionsWithCancel:self
+                             title:NSLocalizedString(@"prefs_vc_info_email_support_options_title", @"Support Options")
+                           message:NSLocalizedString(@"prefs_vc_info_email_support_options_message", @"Please make sure you check Twitter, Reddit and the FAQ before you email support to save development resources for improving Strongbox.")
+               defaultButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_faq", @"Check FAQ")
+                  secondButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_twitter", @"Check Twitter")
+                   thirdButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_mail_support", @"Mail Support (English Only)")
+                            action:^(int response) {
+        if(response == 0) {
+            [self onFaq];
+        }
+        else if (response == 1) {
+            [self launchStrongboxSafeTwitter];
+        }
+        else if (response == 2) {
+            [self mailSupport];
+        }
+    }];
+}
+ 
+- (void)mailSupport {
     if(![MFMailComposeViewController canSendMail]) {
         [Alerts info:self
                title:NSLocalizedString(@"prefs_vc_info_email_not_available_title", @"Email Not Available")
@@ -332,7 +357,7 @@
     
     [self presentViewController:picker animated:YES completion:nil];
 }
-
+     
 - (void)mailComposeController:(MFMailComposeViewController *)controller
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError *)error {
@@ -405,10 +430,10 @@
     NSNumber* seconds = @(Settings.sharedInstance.appLockDelay);
 
     NSInteger effectiveMode = mode;
-    if (mode == kBiometric && !Settings.isBiometricIdAvailable) {
+    if (mode == kBiometric && !BiometricsManager.isBiometricIdAvailable) {
         effectiveMode = kNoLock;
     }
-    else if(mode == kBoth && !Settings.isBiometricIdAvailable) {
+    else if(mode == kBoth && !BiometricsManager.isBiometricIdAvailable) {
         effectiveMode = kPinCode;
     }
 

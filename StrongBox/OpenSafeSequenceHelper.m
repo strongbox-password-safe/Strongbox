@@ -28,6 +28,7 @@
 #import "FilesAppUrlBookmarkProvider.h"
 #import "StrongboxUIDocument.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "BiometricsManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -121,7 +122,7 @@
                             completion:(CompletionBlock)completion {
     self = [super init];
     if (self) {
-        self.biometricIdName = [[Settings sharedInstance] getBiometricIdName];
+        self.biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
         self.viewController = viewController;
         self.safe = safe;
         self.canConvenienceEnrol = canConvenienceEnrol;
@@ -160,7 +161,7 @@
 
 - (void)beginSeq {
     if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
-        BOOL biometricPossible = self.safe.isTouchIdEnabled && Settings.isBiometricIdAvailable;
+        BOOL biometricPossible = self.safe.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
         BOOL biometricAllowed = !Settings.sharedInstance.disallowAllBiometricId;
         
         NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
@@ -318,11 +319,19 @@
         [self onBiometricAuthenticationDone:YES error:nil];
     }
     else {
-        [Settings.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
-                                      fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
-                                         completion:^(BOOL success, NSError * _Nullable error) {
+        BOOL ret = [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
+                                      
+                                               fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
+                                        
+                                                  completion:^(BOOL success, NSError * _Nullable error) {
             [self onBiometricAuthenticationDone:success error:error];
         }];
+        
+        if(!ret) {
+            [Alerts info:self.viewController
+                   title:@"iOS13 Biometric Bug"
+                 message:@"Please try shaking your device to make the Biometric dialog appear. This is expected to be fixed in iOS13.2. Tap OK now and then shake.\nThanks,\n-Mark"];
+        }
     }
 }
 
@@ -761,7 +770,7 @@
         
         openedSafe.compositeKeyFactors.yubiKeyResponse = nil; // TODO: Eventually allow this when we allow writeable yubikey dbs
 
-        BOOL biometricPossible = Settings.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
+        BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
         BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
 
         BOOL conveniencePossible = self.canConvenienceEnrol && !cacheMode && [Settings.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);

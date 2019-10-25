@@ -40,6 +40,7 @@
 #import "BackupsManager.h"
 #import "BackupsTableViewController.h"
 #import "ProUpgradeIAPManager.h"
+#import "BiometricsManager.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -78,11 +79,6 @@
     
     if([Settings.sharedInstance getLaunchCount] == 1) {
         [self startOnboarding];
-    }
-    else {
-        if (@available(iOS 13.0, *)) { // It looks like we miss the App Active notification now on iOS 13 so we do it here also
-            [self doAppFirstActivationProcess];
-        }
     }
 }
 
@@ -682,6 +678,8 @@
 - (void)openDatabase:(SafeMetaData*)safe
              offline:(BOOL)offline
 userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
+    NSLog(@"======================== OPEN DATABASE: %@ ============================", safe);
+    
     if(safe.hasUnresolvedConflicts) {
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
@@ -1428,7 +1426,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         return;
     }
     
-    if((Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) && Settings.isBiometricIdAvailable) {
+    if((Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) && BiometricsManager.isBiometricIdAvailable) {
         [self requestBiometricBeforeOpeningPreferences];
     }
     else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
@@ -1437,7 +1435,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)requestBiometricBeforeOpeningPreferences {
-    [Settings.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_preferences_message", @"Identify to Open Preferences")
+    [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_preferences_message", @"Identify to Open Preferences")
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -1489,7 +1487,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self internalOpenQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
     });
 }

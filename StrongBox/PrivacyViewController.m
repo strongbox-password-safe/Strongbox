@@ -14,6 +14,7 @@
 #import "AutoFillManager.h"
 #import "FileManager.h"
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "BiometricsManager.h"
 
 @interface PrivacyViewController ()
 
@@ -101,7 +102,7 @@
     }
 
     if(Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) {
-        if(Settings.isBiometricIdAvailable) {
+        if(BiometricsManager.isBiometricIdAvailable) {
             [self requestBiometric];
         }
         else {
@@ -121,7 +122,7 @@
 
 - (void)requestBiometric {
     //NSLog(@"REQUEST-BIOMETRIC: Privacy Screen");
-    [Settings.sharedInstance requestBiometricId:NSLocalizedString(@"privacy_vc_prompt_identify_to_open", @"Identify to Open Strongbox")
+    [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"privacy_vc_prompt_identify_to_open", @"Identify to Open Strongbox")
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{

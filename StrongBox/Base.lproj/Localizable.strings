@@ -613,6 +613,9 @@
 /* %@ Unlock */
 "db_management_biometric_unlock_fmt" = "%@ Unlock";
 
+/* %@ Unlock (Pro Only) */
+"db_management_biometric_unlock_fmt_pro_only" = "%@ Unlock (Pro Only)";
+
 /* Change Master Credentials */
 "db_management_change_master_credentials" = "Change Master Credentials";
 
@@ -2116,12 +2119,27 @@
 "upgrade_family_sharing_button_subtitle" = "Tap for more info...";
 
 "generic_fieldname_title" = "Title";
+
 "generic_fieldname_username" = "Username";
+
 "generic_fieldname_password" = "Password";
+
 "generic_fieldname_email" = "Email";
+
 "generic_fieldname_url" = "URL";
+
 "generic_fieldname_notes" = "Notes";
 
 "select_generated_field_title" = "Generated Strings";
+
 "select_generated_field_message" = "Please choose your preferred string";
 
+"prefs_vc_info_email_support_options_title" = "Support Options";
+
+"prefs_vc_info_email_support_options_message" = "Please make sure you check Twitter, Reddit and the FAQ before you email support to save development resources for improving Strongbox.";
+
+"prefs_vc_info_email_support_options_check_faq" = "Check FAQ";
+
+"prefs_vc_info_email_support_options_check_twitter" = "Check Twitter";
+
+"prefs_vc_info_email_support_options_mail_support" = "Mail Support (English Only)";

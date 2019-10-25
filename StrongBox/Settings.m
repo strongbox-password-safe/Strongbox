@@ -7,7 +7,6 @@
 //
 
 #import "Settings.h"
-#import <LocalAuthentication/LocalAuthentication.h>
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 
@@ -100,6 +99,17 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 
         cachedAppGroupName = kDefaultAppGroupName;
     }
+}
+
++ (instancetype)sharedInstance {
+    static Settings *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[Settings alloc] init];
+    });
+    
+    return sharedInstance;
 }
 
 - (NSString *)appGroupName {
@@ -261,17 +271,6 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 
 - (void)setMigratedLocalDatabasesToNewSystem:(BOOL)migratedLocalDatabasesToNewSystem {
     [self setBool:kMigratedLocalDatabasesToNewSystem value:migratedLocalDatabasesToNewSystem];
-}
-
-+ (instancetype)sharedInstance {
-    static Settings *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[Settings alloc] init];
-    });
-    
-    return sharedInstance;
 }
 
 - (NSUserDefaults*)getUserDefaults {
@@ -581,110 +580,6 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
     self.iCloudWasOn,
     self.iCloudPrompted,
     self.iCloudAvailable];
-}
-
-+ (BOOL)isBiometricIdAvailable {
-    LAContext *localAuthContext = [[LAContext alloc] init];
-    
-    if (localAuthContext == nil) {
-        return NO;
-    }
-    
-    NSError *error;
-    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
-    
-    if (error) {
-        NSLog(@"isBiometricIdAvailable: NO -> ");
-        [Settings logBiometricError:error];
-        return NO;
-    }
-    
-    return YES;
-}
-
-- (void)requestBiometricId:(NSString*)reason
-                completion:(void(^)(BOOL success, NSError * __nullable error))completion {
-    [self requestBiometricId:reason fallbackTitle:nil completion:completion];
-}
-
-- (void)requestBiometricId:(NSString*)reason
-             fallbackTitle:(NSString*)fallbackTitle // Setting this means you handle the case of error == LAErrorUserFallback
-                completion:(void(^)(BOOL success, NSError * __nullable error))completion {
-    LAContext *localAuthContext = [[LAContext alloc] init];
-    
-    if(fallbackTitle) {
-        localAuthContext.localizedFallbackTitle = fallbackTitle;
-    }
-    
-    NSLog(@"REQUEST-BIOMETRIC: %d", self.suppressPrivacyScreen);
-    
-    self.suppressPrivacyScreen = YES;
-    
-    // MMcG: NB
-    //
-    // LAPolicyDeviceOwnerAuthentication -> This allows user to enter Device Passcode - which is normally what we want
-    // LAPolicyDeviceOwnerAuthenticationWithBiometrics -> Does not auto fall back to device passcode but allows for custom fallback mechanism
-    
-    [localAuthContext evaluatePolicy:fallbackTitle ? LAPolicyDeviceOwnerAuthenticationWithBiometrics : LAPolicyDeviceOwnerAuthentication
-                     localizedReason:reason
-                               reply:^(BOOL success, NSError *error) {
-                                   self.suppressPrivacyScreen = NO;
-
-                                   if(!success) {
-                                       NSLog(@"requestBiometricId: NO -> ");
-                                       [Settings logBiometricError:error];
-                                   }
-                                   else {
-                                       NSLog(@"REQUEST-BIOMETRIC DONE SUCCESS");
-                                   }
-                                   completion(success, error);
-                               }];
-}
-
-+ (void)logBiometricError:(NSError*)error {
-    if (error.code == LAErrorAuthenticationFailed) {
-        NSLog(@"BIOMETRIC: Auth Failed");
-    }
-    else if (error.code == LAErrorUserFallback) {
-        NSLog(@"BIOMETRIC: User Choose Fallback");
-    }
-    else if (error.code == LAErrorUserCancel) {
-        NSLog(@"BIOMETRIC: User Cancelled");
-    }
-    else if (@available(iOS 11.0, *)) {
-        if (error.code == LAErrorBiometryNotAvailable) {
-            NSLog(@"BIOMETRIC: LAErrorBiometryNotAvailable");
-        }
-        else if (error.code == LAErrorSystemCancel) {
-            NSLog(@"BIOMETRIC: LAErrorSystemCancel");
-        }
-        else if (error.code == LAErrorBiometryNotEnrolled) {
-            NSLog(@"BIOMETRIC: LAErrorBiometryNotEnrolled");
-        }
-        else if (error.code == LAErrorBiometryLockout) {
-            NSLog(@"BIOMETRIC: LAErrorBiometryLockout");
-        }
-    }
-    else {
-        NSLog(@"BIOMETRIC: Unknown Error: [%@]", error);
-    }
-}
-
-- (NSString*)getBiometricIdName {
-    NSString* biometricIdName = NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
-    
-    if (@available(iOS 11.0, *)) {
-        NSError* error;
-        LAContext *localAuthContext = [[LAContext alloc] init];
-        
-        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
-            if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
-                biometricIdName = NSLocalizedString(@"settings_face_id_name", @"Face ID");
-            }
-        }
-    }
-    
-    return biometricIdName;
 }
 
 - (BOOL)safesMigratedToNewSystem {
