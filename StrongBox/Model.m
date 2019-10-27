@@ -247,7 +247,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -(void)encrypt:(void (^)(NSData* data, NSError* error))completion {
-    [SVProgressHUD showWithStatus:@"Encrypting"];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSError* error;

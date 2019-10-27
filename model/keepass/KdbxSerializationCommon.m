@@ -71,7 +71,7 @@ BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, 
         return NO;
     }
     
-    if(header.major != majorVersion || header.minor != minorVersion) {
+    if(header.major != majorVersion || header.minor > minorVersion) {
         if(error) {
             *error = [Utils createNSError:@"KeePass Version MisMatch" errorCode:-1];
         }
