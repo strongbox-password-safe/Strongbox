@@ -1,8 +1,3 @@
-
-/* Cancel Button
-   Cancel Option Button Title */
-"safes_vc_cancel" = "Cancel";
-
 /* Options Title - What would like to do? Options are to Add a Database or Create New etc */
 "safes_vc_what_would_you_like_to_do" = "What would you like to do?";
 
@@ -52,10 +47,10 @@
 "safes_vc_action_set_as_quick_launch" = "Set as Quick Launch...";
 
 /* Button Title to Show in Files */
-"safes_vc_show_in_files" = "Show in 'Files'...";
+"safes_vc_show_in_files" = "Make Visible in Files...";
 
-/* Button Title to Make AutoFillable */
-"safes_vc_make_autofillable" = "Make Auto Fill-able...";
+/* Button Title to Hide from Files */
+"safes_vc_make_autofillable" = "Hide from Files...";
 
 /* Title of Prompt about setting Quick Launch */
 "safes_vc_about_quick_launch_title" = "About Quick Launch";
@@ -64,25 +59,25 @@
 "safes_vc_about_setting_quick_launch_and_confirm" = "Setting this database as your Quick Launch database means you will be automatically prompted to unlock this database as soon as you launch or re-activate Strongbox. This can save you one precious tap!\n\nSet as Quick Launch Database?";
 
 /* Button title to Show Database in iOS Files App */
-"safes_vc_show_database_in_files_info" = "Showing this database in 'Files' will make the database available for access via 'Files' and iTunes File Sharing. However the database will no longer be fully accessible in Auto Fill contexts. This is due to iOS system design.\n\nNB: You can always reverse this action";
+"safes_vc_show_database_in_files_info" = "Making this database visible in the Files App will also make the database available for access via Finder on your Mac. However the database will no longer be write-able in Auto Fill mode. This is due to iOS system design.\n\nNB: You can always reverse this action";
 
-/* Button tutle to make database Auto Fill-able */
-"safes_vc_make_database_auto_fill_info" = "Making this database Auto Fill-able will allow the database to be fully accessible in Auto Fill contexts (not just a read-only cache). However it will no longer be visible to iTunes File Sharing or via the Files app. This is due to iOS system design.\n\nNB: You can always reverse this action";
+/* Button title to Hide Database from the iOS Files App */
+"safes_vc_make_database_auto_fill_info" = "Hiding this database from the Files App also means it will no longer be visible via Finder on your Mac. As a side-effect, this also means you get full (read/write) Auto Fill functionality (not just a read-only cache).\n\nNB: You can always reverse this action";
 
 /* OK/Cancel prompt title for changing local storage mode */
-"safes_vc_change_local_device_storage_mode_title" = "Change Local Device Storage Mode";
+"safes_vc_change_local_device_storage_mode_title" = "Change Files Visibility";
 
 /* error message could not change local storage */
-"safes_vc_could_not_change_storage_location_error" = "Could not change storage location";
+"safes_vc_could_not_change_storage_location_error" = "Could not change Files visibility";
 
 /* informational message - made the file visible in iOS Files */
-"safes_vc_database_made_visible_in_files" = "This database has been made visible in 'Files'";
+"safes_vc_database_made_visible_in_files" = "This database has been made visible in the Files App";
 
 /* informational message - made the database fully autofillable */
-"safes_vc_database_made_fully_autofillable" = "This database has been made fully Auto Fill-able";
+"safes_vc_database_made_fully_autofillable" = "This database has been hidden from the Files App";
 
 /* information message = title changed storage mode */
-"safes_vc_local_storage_mode_changed" = "Local Storage Mode Changed";
+"safes_vc_local_storage_mode_changed" = "Files Visibility Changed";
 
 /* warning message about removing database from icloud */
 "safes_vc_remove_icloud_databases_warning" = "This will remove the database from all your iCloud enabled devices.\n\nAre you sure you want to remove this database from Strongbox and iCloud?";
@@ -276,9 +271,6 @@
 
 /* Could not bookmark this file */
 "safesvc_error_title_could_not_bookmark" = "Could not bookmark this file";
-
-/* Cancel */
-"alerts_cancel" = "Cancel";
 
 /* Confirm Password */
 "alerts_confirm_password" = "Confirm Password";
@@ -580,9 +572,6 @@
 
 /* Rename Database */
 "casg_rename_database_action" = "Rename Database";
-
-/* Set */
-"casg_set_action" = "Set";
 
 /* Set Master Password */
 "casg_set_master_password" = "Set Master Password";
@@ -1221,9 +1210,6 @@
 /* Photo Library... */
 "key_files_vc_one_time_key_file_source_option_photos" = "Photo Library...";
 
-/* Cancel */
-"key_files_vc_option_cancel" = "Cancel";
-
 /* Photo Library Unavailable */
 "key_files_vc_error_photos_unavailable_title" = "Photo Library Unavailable";
 
@@ -1327,9 +1313,6 @@
 /* Files */
 "add_attachment_vc_prompt_source_option_files" = "Files";
 
-/* Cancel */
-"add_attachment_vc_prompt_source_option_cancel" = "Cancel";
-
 /* Source Unavailable */
 "add_attachment_vc_error_source_unavailable_title" = "Source Unavailable";
 
@@ -1372,9 +1355,6 @@
 /* Use Anyway (%d x %d) %@ */
 "add_attachment_vc_large_image_prompt_option_use_anyway_size_fmt" = "Use Anyway (%d x %d) %@";
 
-/* Cancel */
-"add_attachment_vc_large_image_prompt_option_cancel" = "Cancel";
-
 /* Filename */
 "add_attachment_vc_prompt_filename_title" = "Filename";
 
@@ -1407,9 +1387,6 @@
 
 /* Download FavIcon (Pro Only) */
 "set_icon_vc_icon_source_download_favicon_pro_only" = "Download FavIcon (Pro Only)";
-
-/* Cancel */
-"set_icon_vc_option_cancel" = "Cancel";
 
 /* Downloading FavIcon */
 "set_icon_vc_progress_downloading_favicon" = "Downloading FavIcon";
@@ -2094,21 +2071,6 @@
 /* Message to display when device is offline and has no IP address in Local HTTP Transfer - Select Storage -> Transfer over Local Network */
 "transfer_local_network_network_unavailable_message" = "It seem's like you're offline?";
 
-/* Loading... */
-"generic_loading" = "Loading...";
-
-/* Done */
-"generic_done" = "Done";
-
-/* Error */
-"generic_error" = "Error";
-
-/* Export */
-"generic_export" = "Export";
-
-/* Remove */
-"generic_remove" = "Remove";
-
 /* Title of info dialog about Family Sharing upgrade */
 "upgrade_family_sharing_info_title" = "Family Sharing";
 
@@ -2120,19 +2082,6 @@
 
 /* Need Family Sharing? */
 "upgrade_family_sharing_button_subtitle" = "Tap for more info...";
-
-/* Title */
-"generic_fieldname_title" = "Title";
-
-"generic_fieldname_username" = "Username";
-
-"generic_fieldname_password" = "Password";
-
-"generic_fieldname_email" = "Email";
-
-"generic_fieldname_url" = "URL";
-
-"generic_fieldname_notes" = "Notes";
 
 /* Select your preferred generated field title. */
 "select_generated_field_title" = "Generated Strings";
@@ -2158,6 +2107,50 @@
 /* No comment provided by engineer. */
 "transfer_over_local_network_website_prologue" = "<p>Drag &amp; drop files on this window or use the \"Upload Files&hellip;\" button to upload new files. If these files are valid KeePass or Password Safe databases they will be automatically be added to your Databases collection.</p><p>NB: If you want these files to work with iOS AutoFill you should slide left on the database in app, and choose 'Make Auto-Fillable'.</p>";
 
+/* Title */
+"generic_fieldname_title" = "Title";
+
+/* Username */
+"generic_fieldname_username" = "Username";
+
+/* Password */
+"generic_fieldname_password" = "Password";
+
+/* Email */
+"generic_fieldname_email" = "Email";
+
+/* URL */
+"generic_fieldname_url" = "URL";
+
+/* Notes */
+"generic_fieldname_notes" = "Notes";
+
+/* Decrypting */
 "generic_decrypting" = "Decrypting";
 
+/* Encrypting */
 "generic_encrypting" = "Encrypting";
+
+/* Loading... */
+"generic_loading" = "Loading...";
+
+/* Done */
+"generic_done" = "Done";
+
+/* Error */
+"generic_error" = "Error";
+
+/* Export */
+"generic_export" = "Export";
+
+/* Remove */
+"generic_remove" = "Remove";
+
+/* Set */
+"generic_set" = "Set";
+
+/* Cancel */
+"generic_cancel" = "Cancel";
+
+/* Clear */
+"generic_clear" = "Clear";

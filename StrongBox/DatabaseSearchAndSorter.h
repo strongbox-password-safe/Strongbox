@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
               dereference:(BOOL)dereference
     includeKeePass1Backup:(BOOL)includeKeePass1Backup
         includeRecycleBin:(BOOL)includeRecycleBin
-           includeExpired:(BOOL)includeExpired;
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups;
 
 - (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
                     searchText:(NSString *)searchText
@@ -32,12 +33,14 @@ NS_ASSUME_NONNULL_BEGIN
                    dereference:(BOOL)dereference
          includeKeePass1Backup:(BOOL)includeKeePass1Backup
              includeRecycleBin:(BOOL)includeRecycleBin
-                includeExpired:(BOOL)includeExpired;
+                includeExpired:(BOOL)includeExpired
+                 includeGroups:(BOOL)includeGroups;
 
 - (NSArray<Node*>*)filterAndSortForBrowse:(NSMutableArray<Node*>*)nodes
                     includeKeePass1Backup:(BOOL)includeKeePass1Backup
                         includeRecycleBin:(BOOL)includeRecycleBin
-                           includeExpired:(BOOL)includeExpired;
+                           includeExpired:(BOOL)includeExpired
+                            includeGroups:(BOOL)includeGroups;
 
 - (NSString*)getBrowseItemSubtitle:(Node*)node;
 

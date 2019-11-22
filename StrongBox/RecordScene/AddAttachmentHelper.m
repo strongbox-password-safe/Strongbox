@@ -63,7 +63,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
         index++;
     }
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"add_attachment_vc_prompt_source_option_cancel", @"Cancel")
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) {
                                                              [self onAddAttachmentLocationResponse:0];
@@ -279,7 +279,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     [alertController addAction:originalAction];
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:
-                                   NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_cancel", @"Cancel")
+                                   NSLocalizedString(@"generic_cancel", @"Cancel")
                                                            style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) { }];
     [alertController addAction:cancelAction];

@@ -72,8 +72,8 @@
     }
     else if(self.mode == kCASGModeSetCredentials) {
         [self setTitle:self.initialFormat == kPasswordSafe ? NSLocalizedString(@"casg_set_master_password", @"Set Master Password") : NSLocalizedString(@"casg_set_master_credentials", @"Set Master Credentials")];
-        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_set_action", @"Set")];
-        [self.buttonDone setTitle:NSLocalizedString(@"casg_set_action", @"Set")];
+        [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"generic_set", @"Set")];
+        [self.buttonDone setTitle:NSLocalizedString(@"generic_set", @"Set")];
     }
     else if(self.mode == kCASGModeAddExisting) {
         [self setTitle:NSLocalizedString(@"casg_add_existing_database_action", @"Add Existing Database")];

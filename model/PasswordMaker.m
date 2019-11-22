@@ -146,7 +146,7 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) { action(suggestions[2]); }];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { }];
             

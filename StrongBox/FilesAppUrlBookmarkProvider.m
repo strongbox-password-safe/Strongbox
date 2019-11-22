@@ -105,9 +105,17 @@ viewController:(UIViewController *)viewController
     NSError *error;
     NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:isAutoFill ppError:&error];
     
-    if(error || !url) {
+    if(error) {
         NSLog(@"Error or nil URL in Files App provider: [%@]", error);
         completion(error);
+        return;
+    }
+    
+    if(!url || url.absoluteString.length == 0) {
+        NSLog(@"nil or empty URL in Files App provider");
+        error = [Utils createNSError:[NSString stringWithFormat:@"Invalid URL in Files App Provider: %@", url] errorCode:-1];
+        completion(error);
+        return;
     }
     
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];

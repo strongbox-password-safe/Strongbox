@@ -18,7 +18,9 @@
 @implementation OtpTests
 
 - (void)testSteamTotpKeePassXCSteamEncoderOTPAuthUrl {
-    OTPToken* token = [NodeFields getOtpTokenFromRecord:@"otpauth://totp/Steam:mark@gmail.com?secret=63BEDWCQZKTQWPESARIERL5DTTQFCJTK&issuer=Steam&encoder=steam" fields:@{} notes:@""];
+    OTPToken* token = [NodeFields getOtpTokenFromRecord:@"otpauth://totp/Steam:mark@gmail.com?secret=63BEDWCQZKTQWPESARIERL5DTTQFCJTK&issuer=Steam&encoder=steam"
+                                                 fields:@{}
+                                                  notes:@""];
     
     XCTAssertNotNil(token);
     

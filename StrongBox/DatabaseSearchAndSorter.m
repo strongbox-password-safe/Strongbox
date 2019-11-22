@@ -59,14 +59,16 @@
               dereference:(BOOL)dereference
     includeKeePass1Backup:(BOOL)includeKeePass1Backup
         includeRecycleBin:(BOOL)includeRecycleBin
-           includeExpired:(BOOL)includeExpired {
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups {
     return [self searchNodes:self.database.allNodes
                   searchText:searchText
                        scope:scope
                  dereference:dereference
        includeKeePass1Backup:includeKeePass1Backup
            includeRecycleBin:includeRecycleBin
-              includeExpired:includeExpired];
+              includeExpired:includeExpired
+               includeGroups:includeGroups];
 }
 
 - (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
@@ -76,7 +78,7 @@
          includeKeePass1Backup:(BOOL)includeKeePass1Backup
              includeRecycleBin:(BOOL)includeRecycleBin
                 includeExpired:(BOOL)includeExpired
-{
+                 includeGroups:(BOOL)includeGroups {
     NSMutableArray* results = [nodes mutableCopy]; // Mutable for memory/perf reasons
     
     NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
@@ -91,17 +93,20 @@
     return [self filterAndSortForBrowse:results
                   includeKeePass1Backup:includeKeePass1Backup
                       includeRecycleBin:includeRecycleBin
-                         includeExpired:includeExpired];
+                         includeExpired:includeExpired
+                          includeGroups:includeGroups];
 }
 
 - (NSArray<Node*>*)filterAndSortForBrowse:(NSMutableArray<Node*>*)nodes
                     includeKeePass1Backup:(BOOL)includeKeePass1Backup
                         includeRecycleBin:(BOOL)includeRecycleBin
-                           includeExpired:(BOOL)includeExpired {
+                           includeExpired:(BOOL)includeExpired
+                            includeGroups:(BOOL)includeGroups {
     [self filterExcluded:nodes
    includeKeePass1Backup:includeKeePass1Backup
        includeRecycleBin:includeRecycleBin
-          includeExpired:includeExpired];
+          includeExpired:includeExpired
+           includeGroups:includeGroups];
     
     return [self sortItemsForBrowse:nodes];
 }
@@ -160,7 +165,8 @@
 - (void)filterExcluded:(NSMutableArray<Node*>*)matches
  includeKeePass1Backup:(BOOL)includeKeePass1Backup
      includeRecycleBin:(BOOL)includeRecycleBin
-        includeExpired:(BOOL)includeExpired {
+        includeExpired:(BOOL)includeExpired
+         includeGroups:(BOOL)includeGroups {
     if(!includeKeePass1Backup) {
         if (self.database.format == kKeePass1) {
             Node* backupGroup = self.database.keePass1BackupNode;
@@ -182,6 +188,12 @@
     if(!includeExpired) {
         [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
             return !obj.expired;
+        }];
+    }
+    
+    if(!includeGroups) {
+        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return !obj.isGroup;
         }];
     }
 }

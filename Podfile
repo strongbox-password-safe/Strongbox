@@ -48,7 +48,20 @@ abstract_target 'common-ios' do
         pod 'MTBBarcodeScanner'
     end
 
+    target 'Strongbox-iOS Family' do
+        use_frameworks!
+
+        pod 'ISMessages'
+        pod 'SVProgressHUD'
+        pod 'OneDriveSDK'
+        pod 'MTBBarcodeScanner'
+    end
+
    target 'Strongbox Auto Fill' do
+       pod 'SVProgressHUD'
+   end
+
+   target 'Strongbox Auto Fill Family' do
        pod 'SVProgressHUD'
    end
 end
@@ -58,6 +71,16 @@ post_install do |installer|
         #puts "#{target.name}"
         if target.name == "SVProgressHUD-Pods-common-ios-Strongbox Auto Fill"
             puts "Adding SV_APP_EXTENSIONS"    
+            target.build_configurations.each do |config|
+                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SV_APP_EXTENSIONS'
+            end
+        end
+
+        # God Help Me...
+        
+        if target.name == "SVProgressHUD-Pods-common-ios-Strongbox Auto Fill Family"
+            puts "Adding SV_APP_EXTENSIONS"
             target.build_configurations.each do |config|
                 config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
                 config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SV_APP_EXTENSIONS'

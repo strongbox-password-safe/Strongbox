@@ -24,6 +24,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 @property BOOL hasCachedOtpToken;
 @property OTPToken* cachedOtpToken;
 @property NSMutableDictionary<NSString*, StringValue*> *mutableCustomFields;
+@property BOOL usingLegacyKeeOtpStyle;
 
 @end
 
@@ -302,7 +303,9 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
 - (OTPToken *)otpToken {
     if(!self.hasCachedOtpToken) {
-        self.cachedOtpToken = [NodeFields getOtpTokenFromRecord:self.password fields:self.customFields notes:self.notes];
+        BOOL usingLegacyKeeOtpStyle = NO;
+        self.cachedOtpToken = [NodeFields getOtpTokenFromRecord:self.password fields:self.customFields notes:self.notes usingLegacyKeeOtpStyle:&usingLegacyKeeOtpStyle];
+        self.usingLegacyKeeOtpStyle = usingLegacyKeeOtpStyle;
         self.hasCachedOtpToken = YES;
     }
     
@@ -350,8 +353,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         self.notes = [self.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", [token url:YES]];
     }
     else {
-        // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
-        // KeePassXC Otp
+        // Set Common TOTP Fields..
+        // KeePassXC Legacy...
         
         self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:[token.secret base32String] protected:YES];
         
@@ -364,21 +367,32 @@ static NSString* const kKeeOtpPluginKey = @"otp";
             self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
         }
         
-        // KeeOtp Plugin
+        // KeeOtp Plugin (And now new KeePassXC Style)...
+        //
+        // MMcG: 22-Nov-2019 - KeePassXC now uses this key and stores an OTPAUTH URL in there...
+        // If the style is old KeeOTP then keep it like that, otherwise if it's new/empty or using
+        // and OTPAuth then use that new style... hopefully KeeOTP guys will move to new OTP System...
+        //
         // * otp="key=2GQFLXXUBJQELC&step=31"
         
-        NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
-        NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
-        
-        if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-            NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
-            NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
-            components.queryItems = @[key, step, size];
+        if(self.usingLegacyKeeOtpStyle) {
+            NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
+            NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
+            
+            if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
+                NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
+                NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
+                components.queryItems = @[key, step, size];
+            }
+            else {
+                components.queryItems = @[key];
+            }
+            self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
         }
         else {
-            components.queryItems = @[key];
+            NSURL* otpauthUrl = [token url:YES];
+            self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:otpauthUrl.absoluteString protected:YES];
         }
-        self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
     }
     
     self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
@@ -424,7 +438,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 + (OTPToken*)getOtpTokenFromUrl:(NSURL*)url {
     if(url && url.scheme && [url.scheme isEqualToString:kOtpAuthScheme]) {
         OTPToken* ret = [OTPToken tokenWithURL:url];
-        NSDictionary *params = [self getQueryParams:url.query];
+        NSDictionary *params = [NodeFields getQueryParams:url.query];
         if(params[@"encoder"] && [params[@"encoder"] isEqualToString:@"steam"]) {
             //            NSLog(@"Steam Encoder on OTPAuth URL Found");
             ret.algorithm = OTPAlgorithmSteam;
@@ -437,17 +451,39 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return nil;
 }
 
-+ (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary<NSString*, StringValue*>*)fields notes:(NSString*)notes {
-    // KyPass - OTPAuth url in the Password field…
++ (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary<NSString*, StringValue*>*)fields notes:(NSString*)notes usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
+    // KyPass and others... - OTPAuth url in the Password field…
     
     NSURL *otpUrl = [NSURL URLWithString:password];
-    
-    OTPToken* ret = [self getOtpTokenFromUrl:otpUrl];
+    OTPToken* ret = [NodeFields getOtpTokenFromUrl:otpUrl];
     if(ret) {
         return ret;
     }
+
+    // KeeOtp Plugin and new KeePassXC system...
     
-    // KeePassXC
+    ret = [NodeFields getKeeOtpAndNewKeePassXCToken:fields usingLegacyKeeOtpStyle:usingLegacyKeeOtpStyle];
+    if(ret) {
+        return ret;
+    }
+
+    // KeePassXC Legacy
+    
+    ret = [NodeFields getKeePassXCLegacyOTPToken:fields];
+    if(ret) {
+        return ret;
+    }
+
+    // Lastly... See if we can find an OTPAuth URL in the Notes field...
+    
+    NSURL *url = [NodeFields findOtpUrlInString:notes];
+    
+    return [NodeFields getOtpTokenFromUrl:url];
+}
+
++ (OTPToken*)getKeePassXCLegacyOTPToken:(NSDictionary<NSString*, StringValue*>*)fields {
+    // KeePassXC - MMcG 22-Nov-2019 - This seems to have become legacy and the KeePassXC Crew have moved to using the "OTP" (formerly KeeOTP owned) field to store an OTPAUTH URL...
+    //
     // * []TOTP Seed=<seed>
     // * []TOTP Settings=30;6 - time and digits - can be 30;S for “Steam”
     
@@ -485,20 +521,46 @@ static NSString* const kKeeOtpPluginKey = @"otp";
             }
         }
     }
-    
+
+    return nil;
+}
+
++ (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes {
+    BOOL usingLegacyKeeOtpStyle;
+    return [NodeFields getOtpTokenFromRecord:password fields:fields notes:notes usingLegacyKeeOtpStyle:&usingLegacyKeeOtpStyle];
+}
+
++ (OTPToken*)getKeeOtpAndNewKeePassXCToken:(NSDictionary<NSString*, StringValue*>*)fields usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
     // KeeOtp Plugin
     // * otp="key=2GQFLXXUBJQELC&step=31"
     // * otp="key=2GQFLXXUBJQELC&size=8"
+    //
+    // MMcG: 22-Nov-2019 - Unfortunately this field has now been overloaded so that it can contain either the above style
+    // query params or, as of KeePassXC 2.5 (ish) it can contain an OTPAUTH URL...
+    // We need to check which it is here... we also need to remember the style used so we don't break KeeOTP users :(
     
     StringValue* keeOtpSecretEntry = fields[kKeeOtpPluginKey];
     
     if(keeOtpSecretEntry) {
+        // New KeePassXC Style...
+        
+        NSURL *url = [NSURL URLWithString:keeOtpSecretEntry.value];
+        OTPToken* t = [NodeFields getOtpTokenFromUrl:url];
+        if(t) {
+            *usingLegacyKeeOtpStyle = NO;
+            return t;
+        }
+
+        // Old KeeOTP Plugin Style...
+        
         NSString* keeOtpSecret = keeOtpSecretEntry.value;
         if(keeOtpSecret) {
-            NSDictionary *params = [self getQueryParams:keeOtpSecret];
+            NSDictionary *params = [NodeFields getQueryParams:keeOtpSecret];
             NSString* secret = params[@"key"];
             
             if(secret.length) {
+                *usingLegacyKeeOtpStyle = YES; // We need to keep this crappy state around so we can save in legacy style if necessary... :(
+                
                 // KeeOTP sometimes URL escapes '+' in this base32 encoded string, check for that and decode
                 
                 if([secret containsString:@"%3d"]) {
@@ -523,11 +585,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         }
     }
     
-    // See if you can find an OTPAuth URL in the Notes field...
-    
-    NSURL *url = [self findOtpUrlInString:notes];
-    
-    return [self getOtpTokenFromUrl:url];
+    return nil;
 }
 
 + (NSURL*)findOtpUrlInString:(NSString*)notes {
@@ -583,7 +641,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return days < 14;
 }
 
--(NSString *)description {
+- (NSString *)description {
     return [NSString stringWithFormat:@"{\n    password = [%@]\n    username = [%@]\n    email = [%@]\n    url = [%@]\n}",
             self.password,
             self.username,

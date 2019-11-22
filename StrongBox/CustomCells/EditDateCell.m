@@ -15,6 +15,9 @@
 @property (weak, nonatomic) IBOutlet UITextField *dateTextField;
 @property (weak, nonatomic) IBOutlet UITextField *timeTextField;
 
+@property UIBarButtonItem* clearButton;
+@property UIBarButtonItem* clearButton2;
+
 @end
 
 @implementation EditDateCell
@@ -24,19 +27,104 @@
 
     self.datePicker = [[UIDatePicker alloc] init];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
-    [self.datePicker addTarget:self action:@selector(onDateChanged:) forControlEvents:UIControlEventValueChanged];
 
     self.timePicker = [[UIDatePicker alloc] init];
     self.timePicker.datePickerMode = UIDatePickerModeTime;
-    [self.timePicker addTarget:self action:@selector(onDateChanged:) forControlEvents:UIControlEventValueChanged];
 
+    // Toolbar with done/cancel buttons
+    
+    UIToolbar* toolbarDate = [[UIToolbar alloc] init];
+    UIToolbar* toolbarTime = [[UIToolbar alloc] init];
+
+    toolbarDate.barStyle = UIBarStyleDefault;
+    toolbarTime.barStyle = UIBarStyleDefault;
+
+    [toolbarDate setTranslucent:YES];
+    [toolbarTime setTranslucent:YES];
+
+    [toolbarDate sizeToFit];
+    [toolbarTime sizeToFit];
+
+    UIBarButtonItem* setDateButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_set", @"Set")
+                                                                      style:UIBarButtonItemStyleDone
+                                                                     target:self
+                                                                     action:@selector(onDoneDateToolbarButton)];
+
+    UIBarButtonItem* setTimeButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_set", @"Set")
+                                                                      style:UIBarButtonItemStyleDone
+                                                                     target:self
+                                                                     action:@selector(onDoneTimeToolbarButton)];
+
+    UIBarButtonItem* spaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                 target:nil
+                                                                                 action:nil];
+
+    UIBarButtonItem* spaceButton2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                 target:nil
+                                                                                 action:nil];
+
+    self.clearButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_clear", @"Clear")
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
+                                                                   action:@selector(clearDate:)];
+
+    self.clearButton2 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_clear", @"Clear")
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
+                                                                   action:@selector(clearDate:)];
+
+    UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                                     style:UIBarButtonItemStylePlain
+                                                                    target:self
+                                                                    action:@selector(onCancelToolbarButton)];
+    
+    UIBarButtonItem* cancelButton2 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                                     style:UIBarButtonItemStylePlain
+                                                                    target:self
+                                                                    action:@selector(onCancelToolbarButton)];
+
+    [toolbarDate setItems:@[cancelButton, self.clearButton, spaceButton, setDateButton] animated:NO];
+    [toolbarTime setItems:@[cancelButton2, self.clearButton2, spaceButton2, setTimeButton] animated:NO];
+
+    toolbarDate.userInteractionEnabled = YES;
+    toolbarTime.userInteractionEnabled = YES;
+    
+    // Add to Text Fields...
+    
     self.dateTextField.inputView = self.datePicker;
     self.dateTextField.placeholder = NSLocalizedString(@"edit_date_cell_date_field_placeholder", @"Date");
     self.dateTextField.accessibilityLabel = NSLocalizedString(@"edit_date_cell_date_field_accessibility_label", @"Date Text Field");
+    self.dateTextField.inputAccessoryView = toolbarDate;
     
     self.timeTextField.inputView = self.timePicker;
     self.timeTextField.placeholder = NSLocalizedString(@"edit_date_cell_time_field_placeholder", @"Time");
     self.timeTextField.accessibilityLabel = NSLocalizedString(@"edit_date_cell_time_field_accessibility_label", @"Time Text Field");
+    self.timeTextField.inputAccessoryView = toolbarTime;
+}
+
+- (void)onDoneDateToolbarButton {
+    [self setDate:self.datePicker.date];
+
+    if(self.onDateChanged) {
+        self.onDateChanged(self.datePicker.date);
+    }
+    
+    [self.dateTextField resignFirstResponder];
+}
+
+- (void)onDoneTimeToolbarButton {
+    [self setDate:self.timePicker.date];
+
+    if(self.onDateChanged) {
+        self.onDateChanged(self.timePicker.date);
+    }
+    
+    [self.timeTextField resignFirstResponder];
+}
+
+- (void)onCancelToolbarButton {
+    [self.dateTextField resignFirstResponder];
+    [self.timeTextField resignFirstResponder];
 }
 
 - (IBAction)clearDate:(id)sender {
@@ -58,43 +146,10 @@
         self.datePicker.date = date;
         self.timePicker.date = date;
     }
-}
-
-- (void)onDateChanged:(id)sender {
-    UIDatePicker* picker = (UIDatePicker*)sender;
-    [self setDate:picker.date];
     
-    if(self.onDateChanged) {
-        self.onDateChanged(picker.date);
-    }
+    self.clearButton.enabled = date != nil;
+    self.clearButton2.enabled = date != nil;
 }
-
-//- (void)onTextFieldChanged:(id)sender {
-//    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-//
-//    df.timeStyle = kCFDateFormatterShortStyle;
-//    df.dateStyle = NSDateFormatterShortStyle;
-//
-//    df.locale = NSLocale.currentLocale;
-//
-//    NSDate* date = [df dateFromString:self.dateTextField.text];
-//
-//    self.dateTextField.textColor = date ? nil : UIColor.redColor;
-//
-//    if(date) {
-//        if(self.onDateChanged) {
-//            self.onDateChanged(date);
-//        }
-//    }
-//    else if(self.dateTextField.text.length == 0) {
-//        if(self.onDateChanged) {
-//            self.onDateChanged(nil);
-//        }
-//    }
-//    else {
-//        NSLog(@"Cannot parse, not changing...");
-//    }
-//}
 
 static NSString *timeString(NSDate *modDate) {
     if(!modDate) {

@@ -95,12 +95,7 @@
         self.onDone([SelectedStorageParameters error:error withProvider:self.safeStorageProvider]); 
     }
     else {
-        NSArray *tmp = [items filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (id object, NSDictionary *bindings)
-        {
-            return self.existing || ((StorageBrowserItem *)object).folder;
-        }]];
-        
-        _items = [[tmp sortedArrayUsingComparator:^NSComparisonResult(StorageBrowserItem*  _Nonnull obj1, StorageBrowserItem*  _Nonnull obj2) {
+        _items = [[items sortedArrayUsingComparator:^NSComparisonResult(StorageBrowserItem*  _Nonnull obj1, StorageBrowserItem*  _Nonnull obj2) {
             if(obj1.folder && !obj2.folder) {
                 return NSOrderedAscending;
             }
@@ -143,7 +138,9 @@
     StorageBrowserItem *file = _items[indexPath.row];
 
     cell.textLabel.text = file.name;
-
+    cell.userInteractionEnabled = self.existing || file.folder;
+    cell.textLabel.enabled = self.existing || file.folder;
+    
     if (_safeStorageProvider.providesIcons) {
         NSValue *myKey = [NSValue valueWithNonretainedObject:file];
         cell.imageView.tintColor = nil;

@@ -777,7 +777,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
     if(localDeviceOption) {
         BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
-        NSString* localDeviceActionTitle = shared ? NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in Files") : NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Make AutoFillable");
+        NSString* localDeviceActionTitle = shared ? NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in iOS Files Browser") : NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Hide from iOS Files Browser");
 
         UIAlertAction *secondAction = [UIAlertAction actionWithTitle:localDeviceActionTitle
                                                                style:UIAlertActionStyleDefault
@@ -800,7 +800,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     // Cancel
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_cancel", @"Cancel Button")
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel Button")
                                                            style:UIAlertActionStyleCancel
                                                          handler:nil];
     
@@ -833,7 +833,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)promptAboutToggleLocalStorage:(NSIndexPath*)indexPath shared:(BOOL)shared {
     NSString* message = shared ?
         NSLocalizedString(@"safes_vc_show_database_in_files_info", @"Button title to Show Database in iOS Files App") :
-        NSLocalizedString(@"safes_vc_make_database_auto_fill_info", @"Button tutle to make database Auto Fill-able");
+        NSLocalizedString(@"safes_vc_make_database_auto_fill_info", @"Button title to Hide Database from the iOS Files App");
     
     [Alerts okCancel:self
                title:NSLocalizedString(@"safes_vc_change_local_device_storage_mode_title", @"OK/Cancel prompt title for changing local storage mode")
@@ -1335,7 +1335,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     // Cancel
     
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_cancel", @"")
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"")
                                                            style:UIAlertActionStyleCancel
                                                          handler:nil];
     [alertController addAction:cancelAction];
@@ -1557,6 +1557,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
     
+    if(!url || url.absoluteString.length == 0) {
+        NSLog(@"nil or empty URL in Files App provider");
+        [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO];
+        return;
+    }
+
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     [document openWithCompletionHandler:^(BOOL success) {
         [SVProgressHUD dismiss];
@@ -1628,7 +1634,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                          message:NSLocalizedString(@"safesvc_import_database_prompt_message", @"Strongbox can attempt to edit this document in its current location and keep a reference or, if you'd prefer, Strongbox can just make a copy of this file for itself.\n\nWhich option would you like?")
                defaultButtonText:NSLocalizedString(@"safesvc_option_edit_in_place", @"Edit in Place")
                 secondButtonText:NSLocalizedString(@"safesvc_option_make_a_copy", @"Make a Copy")
-                 thirdButtonText:NSLocalizedString(@"safes_vc_cancel", @"Cancel Option Button Title")
+                 thirdButtonText:NSLocalizedString(@"generic_cancel", @"Cancel Option Button Title")
                           action:^(int response) {
                               if(response != 2) {
                                   [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0];

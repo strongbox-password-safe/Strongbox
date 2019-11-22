@@ -50,7 +50,7 @@
         
         self.defaultAction.enabled = NO;
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) {
                                                                  completion(nil, false);
@@ -95,7 +95,7 @@
         
         self.defaultAction.enabled = allowEmpty;
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) {
                                                                  completion(nil, false);
@@ -130,7 +130,7 @@
                     title:title
                   message:message
         defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
-         secondButtonText:NSLocalizedString(@"alerts_cancel", @"Cancel")
+         secondButtonText:NSLocalizedString(@"generic_cancel", @"Cancel")
                    action:action];
 }
 
@@ -308,7 +308,7 @@
                                                                style:UIAlertActionStyleDefault
                                                              handler:^(UIAlertAction *a) { action(1); }];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) { action(3); }];
         
@@ -347,7 +347,7 @@
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) { action(2); }];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) { action(3); }];
         
@@ -391,7 +391,7 @@
                                                         completion((alertController.textFields[0]).text, true);
                                                     }];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) {
                                                                  completion(nil, false);
@@ -432,7 +432,7 @@
                                                                   completion((self.alertController.textFields[0]).text, true);
                                                               }];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) {
                                                                  completion(nil, false);
@@ -484,7 +484,7 @@
                                                                   completion((alertController.textFields[0]).text, true);
                                                               }];
 
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) {
                                                                  completion(nil, false);
@@ -541,7 +541,7 @@
             index++;
         }
 
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_cancel", @"Cancel")
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
                                                              handler:^(UIAlertAction *a) {
                                                                  completion(0);

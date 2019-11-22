@@ -74,7 +74,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
                 completion(goNoGo, nil, nil, userSelectedNewCustomIcon);
             }]; }];
             
-            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"set_icon_vc_option_cancel", @"Cancel")
+            UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, nil); }];
             
@@ -93,7 +93,7 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
                          message:NSLocalizedString(@"set_icon_vc_select_icon_source_message", @"Select the source of the icon you would like to use for this entry")
                defaultButtonText:NSLocalizedString(@"set_icon_vc_icon_source_keepass_set", @"KeePass & Database Icon Set")
                 secondButtonText:NSLocalizedString(@"set_icon_vc_icon_source_media_libary", @"Media Library")
-                 thirdButtonText:NSLocalizedString(@"set_icon_vc_option_cancel", @"Cancel")
+                 thirdButtonText:NSLocalizedString(@"generic_cancel", @"Cancel")
                           action:^(int response) {
                    if(response == 0) {
                        [self presentKeePassAndDatabaseIconSets];

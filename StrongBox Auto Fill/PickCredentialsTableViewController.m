@@ -266,7 +266,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                 dereference:self.model.metadata.searchDereferencedFields
       includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
           includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
-             includeExpired:self.model.metadata.showExpiredInSearch];
+             includeExpired:self.model.metadata.showExpiredInSearch
+              includeGroups:NO];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {

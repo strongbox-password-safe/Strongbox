@@ -147,7 +147,7 @@
                  message:NSLocalizedString(@"key_files_vc_one_time_key_file_source_message", @"Select where you would like to choose your Key File from. This file will not be stored locally or remembered.")
        defaultButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_files", @"Files...")
         secondButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_photos", @"Photo Library...")
-         thirdButtonText:NSLocalizedString(@"key_files_vc_option_cancel", @"Cancel")
+         thirdButtonText:NSLocalizedString(@"generic_cancel", @"Cancel")
                   action:^(int response) {
                       if(response == 0) {
                           UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];

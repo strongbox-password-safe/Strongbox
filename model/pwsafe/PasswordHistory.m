@@ -109,7 +109,14 @@
     for (int i = 0; i < (self.entries).count; i++) {
         PasswordHistoryEntry *entry = (self.entries)[i];
         entriesSize += SIZE_OF_ENTRY_HEADER;
-        entriesSize += strlen((entry.password).UTF8String);
+        
+        if(entry.password) {
+            NSData* encoded = [entry.password dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+            
+            if(encoded) {
+                entriesSize += encoded.length;
+            }
+        }
     }
 
     int bufSize = SIZE_OF_HEADER + entriesSize;
@@ -126,11 +133,25 @@
 
         sprintf(entryStart, "%08lx", (unsigned long)[entry.timestamp timeIntervalSince1970]);
 
-        const char *password = (entry.password).UTF8String;
-        sprintf(entryStart + 8, "%04lx", strlen(password));
-        sprintf(entryStart + 12, "%s", password);
-
-        entryStart += 8 + 4 + strlen(password);
+        if(entry.password) {
+            NSData* encoded = [entry.password dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+            
+            if(encoded) {
+                sprintf(entryStart + 8, "%04lx", (unsigned long)encoded.length);
+                if(encoded.length) {
+                    memcpy(entryStart + 12, encoded.bytes, encoded.length);
+                }
+                entryStart += SIZE_OF_ENTRY_HEADER + encoded.length;
+            }
+            else {
+                sprintf(entryStart + 8, "%04lx", (unsigned long)0);
+                entryStart += SIZE_OF_ENTRY_HEADER;
+            }
+        }
+        else {
+            sprintf(entryStart + 8, "%04lx", (unsigned long)0);
+            entryStart += SIZE_OF_ENTRY_HEADER;
+        }
     }
 
     return [[NSData alloc] initWithBytes:buf length:bufSize];

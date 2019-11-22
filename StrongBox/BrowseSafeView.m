@@ -622,7 +622,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                               dereference:self.viewModel.metadata.searchDereferencedFields
                     includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
                         includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults
-                           includeExpired:self.viewModel.metadata.showExpiredInSearch];
+                           includeExpired:self.viewModel.metadata.showExpiredInSearch
+                            includeGroups:YES];
     
     [self.tableView reloadData];
 }
@@ -651,7 +652,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     return [searcher filterAndSortForBrowse:pinned.mutableCopy
                       includeKeePass1Backup:YES
                           includeRecycleBin:YES
-                             includeExpired:YES];
+                             includeExpired:YES
+                              includeGroups:YES];
 }
 
 - (NSArray<Node*>*)loadNearlyExpiredItems {
@@ -668,7 +670,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     return [searcher filterAndSortForBrowse:ne.mutableCopy
                       includeKeePass1Backup:NO
                           includeRecycleBin:NO
-                             includeExpired:NO];
+                             includeExpired:NO
+                              includeGroups:YES];
 }
 
 - (NSArray<Node*>*)loadExpiredItems {
@@ -685,7 +688,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     return [searcher filterAndSortForBrowse:exp.mutableCopy
                       includeKeePass1Backup:NO
                           includeRecycleBin:NO
-                             includeExpired:YES];
+                             includeExpired:YES
+                              includeGroups:YES];
 }
 
 - (NSArray<Node*>*)loadStandardItems {
@@ -712,7 +716,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     return [searcher filterAndSortForBrowse:ret.mutableCopy
                       includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
                           includeRecycleBin:!self.viewModel.metadata.doNotShowRecycleBinInBrowse
-                             includeExpired:self.viewModel.metadata.showExpiredInBrowse];
+                             includeExpired:self.viewModel.metadata.showExpiredInBrowse
+                              includeGroups:YES];
 }
 
 - (NSUInteger)getQuickViewRowCount {

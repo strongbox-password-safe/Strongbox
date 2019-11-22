@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3B5DC529C2F2DD9D3EEA12BB /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */; };
+		4BAE12962D343F874D3840E0 /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 		4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
 		4D004CDA21F4C26700E2B194 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCC21F4C26600E2B194 /* OTPToken+Serialization.m */; };
 		4D004CDB21F4C26700E2B194 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
@@ -854,7 +856,6 @@
 		4DC4E11D23488BAA000743C4 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8EC3AE22302649008EE004 /* libssl.a */; };
 		4DC4E11E23488BAA000743C4 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4DC4E11F23488BAA000743C4 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; };
-		4DC4E12123488BAA000743C4 /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 		4DC4E12323488BAA000743C4 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A522C9473F003E9B68 /* eff_large_wordlist.utf8.txt */; };
 		4DC4E12423488BAA000743C4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99AA230AF31700AB98DC /* InfoPlist.strings */; };
 		4DC4E12523488BAA000743C4 /* TotpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE498BF2271F746007EF98C /* TotpCell.xib */; };
@@ -1126,7 +1127,6 @@
 		4DC4E24023488BAE000743C4 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D5F5B95218B828500A0739A /* QuickLook.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4DC4E24123488BAE000743C4 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4DC4E24223488BAE000743C4 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8EC3AD22302649008EE004 /* libcrypto.a */; };
-		4DC4E24323488BAE000743C4 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		4DC4E24423488BAE000743C4 /* libssh2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D326E7F22302BED00DCD8C7 /* libssh2.a */; };
 		4DC4E24623488BAE000743C4 /* GenericKeyValueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */; };
 		4DC4E24723488BAE000743C4 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 4D8EC3B122302649008EE004 /* LICENSE */; };
@@ -1309,8 +1309,10 @@
 		4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */; };
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
+		589015F03BC8C62337589A4F /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
+		F8BC916E4E9421DA0B191040 /* Pods_common_ios_Strongbox_iOS_Family.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7523D7C245F96F478BCBC5E0 /* Pods_common_ios_Strongbox_iOS_Family.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1386,7 +1388,9 @@
 
 /* Begin PBXFileReference section */
 		0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		17BF2299E9A260609D8530EA /* Pods-common-ios-Strongbox Auto Fill Family.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill Family.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill Family/Pods-common-ios-Strongbox Auto Fill Family.debug.xcconfig"; sourceTree = "<group>"; };
 		1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2958F8474D6C3EE56FC20FA0 /* Pods-common-ios-Strongbox Auto Fill Family.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill Family.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill Family/Pods-common-ios-Strongbox Auto Fill Family.release.xcconfig"; sourceTree = "<group>"; };
 		4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox-iOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS.release.xcconfig"; sourceTree = "<group>"; };
 		4D004CC921F4C26600E2B194 /* OTPToken+Serialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Serialization.h"; path = "lib/OneTimePassword/OTPToken+Serialization.h"; sourceTree = "<group>"; };
 		4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+QueryItems.m"; path = "lib/OneTimePassword/NSURL+QueryItems.m"; sourceTree = "<group>"; };
@@ -1719,6 +1723,68 @@
 		4D4598CB2193048400792EF7 /* TwoFishCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TwoFishCipher.h; path = model/keepass/TwoFishCipher.h; sourceTree = "<group>"; };
 		4D4598CC2193048400792EF7 /* TwoFishCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TwoFishCipher.m; path = model/keepass/TwoFishCipher.m; sourceTree = "<group>"; };
 		4D4598D1219308B600792EF7 /* tomcrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt.h; path = model/pwsafe/twofish/tomcrypt.h; sourceTree = "<group>"; };
+		4D4695B223878E43009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Backups.strings; sourceTree = "<group>"; };
+		4D4695B323878E43009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/MasterDetail.strings; sourceTree = "<group>"; };
+		4D4695B423878E44009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/Main.strings; sourceTree = "<group>"; };
+		4D4695B523878E44009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		4D4695B623878E44009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Welcome.strings; sourceTree = "<group>"; };
+		4D4695B723878E45009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Browse.strings; sourceTree = "<group>"; };
+		4D4695B823878E4A009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ItemDetails.strings; sourceTree = "<group>"; };
+		4D4695B923878E4A009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/EditPasswordCell.strings; sourceTree = "<group>"; };
+		4D4695BA23878E4A009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/IconTableCell.strings; sourceTree = "<group>"; };
+		4D4695BB23878E4A009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/QRCodeScannerViewController.strings; sourceTree = "<group>"; };
+		4D4695BC23878E4A009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ItemDetailsPreferences.strings; sourceTree = "<group>"; };
+		4D4695BD23878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/KeePassHistory.strings; sourceTree = "<group>"; };
+		4D4695BE23878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PasswordSafeHistory.strings; sourceTree = "<group>"; };
+		4D4695BF23878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CreateDatabaseOrSetCredentials.strings; sourceTree = "<group>"; };
+		4D4695C023878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SelectKeyFile.strings; sourceTree = "<group>"; };
+		4D4695C123878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SelectStorage.strings; sourceTree = "<group>"; };
+		4D4695C223878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PinEntry.strings; sourceTree = "<group>"; };
+		4D4695C323878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
+		4D4695C423878E4B009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/DatabaseOperations.strings; sourceTree = "<group>"; };
+		4D4695C523878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Preferences.strings; sourceTree = "<group>"; };
+		4D4695C623878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SelectItem.strings; sourceTree = "<group>"; };
+		4D4695C723878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
+		4D4695C823878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Upgrade.strings; sourceTree = "<group>"; };
+		4D4695C923878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/IconsCollectionViewController.strings; sourceTree = "<group>"; };
+		4D4695CA23878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = "StrongBox Auto Fill/uk.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		4D4695CB23878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/WebDAVConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D4695CC23878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SFTPSessionConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D4695CD23878E4C009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4D4695CE23878E4D009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D4695CF23878E4D009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/RMStore.strings; sourceTree = "<group>"; };
+		4D4695D023878E4D009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D4695D123878E6C009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Backups.strings; sourceTree = "<group>"; };
+		4D4695D223878E6C009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/MasterDetail.strings; sourceTree = "<group>"; };
+		4D4695D323878E6C009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = StrongBox/fr.lproj/Main.strings; sourceTree = "<group>"; };
+		4D4695D423878E6D009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		4D4695D523878E6F009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Welcome.strings; sourceTree = "<group>"; };
+		4D4695D623878E6F009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Browse.strings; sourceTree = "<group>"; };
+		4D4695D723878E6F009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ItemDetails.strings; sourceTree = "<group>"; };
+		4D4695D823878E6F009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/EditPasswordCell.strings; sourceTree = "<group>"; };
+		4D4695D923878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/IconTableCell.strings; sourceTree = "<group>"; };
+		4D4695DA23878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/QRCodeScannerViewController.strings; sourceTree = "<group>"; };
+		4D4695DB23878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ItemDetailsPreferences.strings; sourceTree = "<group>"; };
+		4D4695DC23878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/KeePassHistory.strings; sourceTree = "<group>"; };
+		4D4695DD23878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PasswordSafeHistory.strings; sourceTree = "<group>"; };
+		4D4695DE23878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/CreateDatabaseOrSetCredentials.strings; sourceTree = "<group>"; };
+		4D4695DF23878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SelectKeyFile.strings; sourceTree = "<group>"; };
+		4D4695E023878E70009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SelectStorage.strings; sourceTree = "<group>"; };
+		4D4695E123878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PinEntry.strings; sourceTree = "<group>"; };
+		4D4695E223878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
+		4D4695E323878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DatabaseOperations.strings; sourceTree = "<group>"; };
+		4D4695E423878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Preferences.strings; sourceTree = "<group>"; };
+		4D4695E523878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SelectItem.strings; sourceTree = "<group>"; };
+		4D4695E623878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
+		4D4695E723878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Upgrade.strings; sourceTree = "<group>"; };
+		4D4695E823878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/IconsCollectionViewController.strings; sourceTree = "<group>"; };
+		4D4695E923878E71009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = "StrongBox Auto Fill/fr.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		4D4695EA23878E72009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WebDAVConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D4695EB23878E72009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SFTPSessionConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D4695EC23878E72009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = StrongBox/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4D4695ED23878E72009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D4695EE23878E72009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/RMStore.strings; sourceTree = "<group>"; };
+		4D4695EF23878E72009D3BC7 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D4766C52178C82900C4358F /* SerializationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SerializationData.m; path = model/keepass/SerializationData.m; sourceTree = SOURCE_ROOT; };
 		4D4766D42178C82A00C4358F /* SerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializationData.h; path = model/keepass/SerializationData.h; sourceTree = SOURCE_ROOT; };
 		4D4766D72178C82B00C4358F /* DecryptionParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DecryptionParameters.m; path = model/keepass/DecryptionParameters.m; sourceTree = SOURCE_ROOT; };
@@ -2324,13 +2390,17 @@
 		63E6A3E8562A4227FEF287BA /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox-iOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox-iOS/Pods-Strongbox-iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; sourceTree = "<group>"; };
+		7523D7C245F96F478BCBC5E0 /* Pods_common_ios_Strongbox_iOS_Family.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_iOS_Family.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		995318EF87E4F10707DD2E51 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS.debug.xcconfig"; sourceTree = "<group>"; };
+		999196594E8683BD59B4F185 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS.release.xcconfig"; sourceTree = "<group>"; };
 		A2AA2ED99F5E8C1F20B9D1E3 /* Pods_StrongBox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StrongBox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS.debug.xcconfig"; sourceTree = "<group>"; };
+		A68DD626305D5F20944A3A29 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.debug.xcconfig"; sourceTree = "<group>"; };
 		AD24D48D6698FAA7BD9D28F9 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS.release.xcconfig"; sourceTree = "<group>"; };
-		C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; sourceTree = "<group>"; };
+		CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill_Family.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
+		D487227EA46AE89313C27CCE /* Pods-common-ios-Strongbox-iOS Family.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS Family.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family.release.xcconfig"; sourceTree = "<group>"; };
+		DA33DC7FB4377A1F6D168891 /* Pods-common-ios-Strongbox-iOS Family.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS Family.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family.debug.xcconfig"; sourceTree = "<group>"; };
+		FF91E5B75A1A9424D1BF9ADD /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2356,6 +2426,7 @@
 				4D57606F232BFB09000818F5 /* FavIcon.framework in Frameworks */,
 				E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
 				4D33F60B23489E1800C48679 /* StoreKit.framework in Frameworks */,
+				4BAE12962D343F874D3840E0 /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2372,7 +2443,7 @@
 				4DC4E11D23488BAA000743C4 /* libssl.a in Frameworks */,
 				4DC4E11E23488BAA000743C4 /* AuthenticationServices.framework in Frameworks */,
 				4DC4E11F23488BAA000743C4 /* FavIcon.framework in Frameworks */,
-				4DC4E12123488BAA000743C4 /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
+				F8BC916E4E9421DA0B191040 /* Pods_common_ios_Strongbox_iOS_Family.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2386,8 +2457,8 @@
 				4DC4E24023488BAE000743C4 /* QuickLook.framework in Frameworks */,
 				4DC4E24123488BAE000743C4 /* AuthenticationServices.framework in Frameworks */,
 				4DC4E24223488BAE000743C4 /* libcrypto.a in Frameworks */,
-				4DC4E24323488BAE000743C4 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 				4DC4E24423488BAE000743C4 /* libssh2.a in Frameworks */,
+				3B5DC529C2F2DD9D3EEA12BB /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2403,6 +2474,7 @@
 				4D8EC42A22302649008EE004 /* libcrypto.a in Frameworks */,
 				9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 				4D326E9A22302BED00DCD8C7 /* libssh2.a in Frameworks */,
+				589015F03BC8C62337589A4F /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2416,10 +2488,14 @@
 				CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */,
 				69CB2C4A39AB57A64E7968B2 /* Pods-Strongbox-iOS.debug.xcconfig */,
 				4245920F162A9EC2E3488FA9 /* Pods-Strongbox-iOS.release.xcconfig */,
-				A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */,
-				AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */,
-				A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */,
-				C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */,
+				A68DD626305D5F20944A3A29 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */,
+				FF91E5B75A1A9424D1BF9ADD /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */,
+				995318EF87E4F10707DD2E51 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */,
+				999196594E8683BD59B4F185 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */,
+				17BF2299E9A260609D8530EA /* Pods-common-ios-Strongbox Auto Fill Family.debug.xcconfig */,
+				2958F8474D6C3EE56FC20FA0 /* Pods-common-ios-Strongbox Auto Fill Family.release.xcconfig */,
+				DA33DC7FB4377A1F6D168891 /* Pods-common-ios-Strongbox-iOS Family.debug.xcconfig */,
+				D487227EA46AE89313C27CCE /* Pods-common-ios-Strongbox-iOS Family.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -4017,6 +4093,8 @@
 				0495539ED0F8BD7031A0EAA4 /* Pods_Strongbox_iOS.framework */,
 				73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */,
 				1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */,
+				CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */,
+				7523D7C245F96F478BCBC5E0 /* Pods_common_ios_Strongbox_iOS_Family.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -4070,15 +4148,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DC4E16B23488BAA000743C4 /* Build configuration list for PBXNativeTarget "Strongbox-iOS Family" */;
 			buildPhases = (
-				4DC4E01623488BAA000743C4 /* [CP] Check Pods Manifest.lock */,
+				F663CF914C5F47C63EEFAE33 /* [CP] Check Pods Manifest.lock */,
 				4DC4E01723488BAA000743C4 /* Sources */,
 				4DC4E11623488BAA000743C4 /* Frameworks */,
 				4DC4E12223488BAA000743C4 /* Resources */,
-				4DC4E16423488BAA000743C4 /* [CP] Embed Pods Frameworks */,
-				4DC4E16523488BAA000743C4 /* [CP] Copy Pods Resources */,
 				4DC4E16623488BAA000743C4 /* ShellScript */,
 				4DC4E16923488BAA000743C4 /* Embed Frameworks */,
 				4D058EEB2348A79C00F8B536 /* Embed App Extensions */,
+				27770DC6BEA7CCCC65222D78 /* [CP] Embed Pods Frameworks */,
+				66E74F89A0154949DC4A06DE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -4094,11 +4172,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DC4E27323488BAE000743C4 /* Build configuration list for PBXNativeTarget "Strongbox Auto Fill Family" */;
 			buildPhases = (
-				4DC4E17123488BAE000743C4 /* [CP] Check Pods Manifest.lock */,
+				669D557B4789466E4BF62BB5 /* [CP] Check Pods Manifest.lock */,
 				4DC4E17223488BAE000743C4 /* Sources */,
 				4DC4E23C23488BAE000743C4 /* Frameworks */,
 				4DC4E24523488BAE000743C4 /* Resources */,
-				4DC4E27223488BAE000743C4 /* [CP] Copy Pods Resources */,
+				A0EF3F10D56D6EBC20A34926 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -4205,6 +4283,8 @@
 				Base,
 				de,
 				ru,
+				uk,
+				fr,
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
@@ -4547,6 +4627,56 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		27770DC6BEA7CCCC65222D78 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Base32-iOS/Base32.framework",
+				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
+				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
+				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
+				"${BUILT_PRODUCTS_DIR}/JNKeychain/JNKeychain.framework",
+				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
+				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
+				"${BUILT_PRODUCTS_DIR}/SVProgressHUD-Pods-common-ios-Strongbox-iOS Family/SVProgressHUD.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JNKeychain.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		38B2EE2731DB86953C435F18 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -4607,88 +4737,6 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n# /usr/local/bin/carthage copy-frameworks\n";
 		};
-		4DC4E01623488BAA000743C4 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-ios-Strongbox-iOS-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4DC4E16423488BAA000743C4 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Base32-iOS/Base32.framework",
-				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
-				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
-				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
-				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
-				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
-				"${BUILT_PRODUCTS_DIR}/JNKeychain/JNKeychain.framework",
-				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
-				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
-				"${BUILT_PRODUCTS_DIR}/SVProgressHUD-Pods-common-ios-Strongbox-iOS/SVProgressHUD.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JNKeychain.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4DC4E16523488BAA000743C4 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		4DC4E16623488BAA000743C4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -4709,7 +4757,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n# /usr/local/bin/carthage copy-frameworks\n";
 		};
-		4DC4E17123488BAE000743C4 /* [CP] Check Pods Manifest.lock */ = {
+		669D557B4789466E4BF62BB5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4724,14 +4772,14 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-ios-Strongbox Auto Fill-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-common-ios-Strongbox Auto Fill Family-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4DC4E27223488BAE000743C4 /* [CP] Copy Pods Resources */ = {
+		66E74F89A0154949DC4A06DE /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4739,7 +4787,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family-resources.sh",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -4750,7 +4798,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */ = {
@@ -4799,6 +4847,28 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		A0EF3F10D56D6EBC20A34926 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill Family/Pods-common-ios-Strongbox Auto Fill Family-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill Family/Pods-common-ios-Strongbox Auto Fill Family-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		C02A3952148B9EA3F8B5512D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -4837,6 +4907,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F663CF914C5F47C63EEFAE33 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-common-ios-Strongbox-iOS Family-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -5879,6 +5971,8 @@
 				4D5F5B81218B4C9300A0739A /* Base */,
 				4D8A99BE230AF31700AB98DC /* de */,
 				4D51F0C4233BE5DA00F5BB3D /* ru */,
+				4D4695CA23878E4C009D3BC7 /* uk */,
+				4D4695E923878E71009D3BC7 /* fr */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -5889,6 +5983,8 @@
 				4D5F5B85218B4CCB00A0739A /* Base */,
 				4D8A99C0230AF31700AB98DC /* de */,
 				4D51F0B0233BE5D600F5BB3D /* ru */,
+				4D4695B423878E44009D3BC7 /* uk */,
+				4D4695D323878E6C009D3BC7 /* fr */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -5899,6 +5995,8 @@
 				4D770F882303249D00CBE244 /* Base */,
 				4D8A99B9230AF31700AB98DC /* de */,
 				4D51F0CB233BE5DB00F5BB3D /* ru */,
+				4D4695B923878E4A009D3BC7 /* uk */,
+				4D4695D823878E6F009D3BC7 /* fr */,
 			);
 			name = EditPasswordCell.xib;
 			sourceTree = "<group>";
@@ -5909,6 +6007,8 @@
 				4D770F8C230324A800CBE244 /* Base */,
 				4D8A99BA230AF31700AB98DC /* de */,
 				4D51F0CC233BE5DB00F5BB3D /* ru */,
+				4D4695BA23878E4A009D3BC7 /* uk */,
+				4D4695D923878E70009D3BC7 /* fr */,
 			);
 			name = IconTableCell.xib;
 			sourceTree = "<group>";
@@ -5919,6 +6019,8 @@
 				4D770F8F2303262400CBE244 /* Base */,
 				4D8A99AF230AF31700AB98DC /* de */,
 				4D51F0B5233BE5D700F5BB3D /* ru */,
+				4D4695BB23878E4A009D3BC7 /* uk */,
+				4D4695DA23878E70009D3BC7 /* fr */,
 			);
 			name = QRCodeScannerViewController.xib;
 			path = StrongBox;
@@ -5930,6 +6032,8 @@
 				4D770F922303263100CBE244 /* Base */,
 				4D8A99BC230AF31700AB98DC /* de */,
 				4D51F0BD233BE5D900F5BB3D /* ru */,
+				4D4695C323878E4B009D3BC7 /* uk */,
+				4D4695E223878E71009D3BC7 /* fr */,
 			);
 			name = PrivacyViewController.xib;
 			path = StrongBox;
@@ -5941,6 +6045,8 @@
 				4D770F99230326A200CBE244 /* Base */,
 				4D8A99B6230AF31700AB98DC /* de */,
 				4D51F0C3233BE5DA00F5BB3D /* ru */,
+				4D4695C923878E4C009D3BC7 /* uk */,
+				4D4695E823878E71009D3BC7 /* fr */,
 			);
 			name = IconsCollectionViewController.xib;
 			path = StrongBox;
@@ -5952,6 +6058,8 @@
 				4D770F9D230326B900CBE244 /* Base */,
 				4D8A99C1230AF31700AB98DC /* de */,
 				4D51F0C6233BE5DA00F5BB3D /* ru */,
+				4D4695CC23878E4C009D3BC7 /* uk */,
+				4D4695EB23878E72009D3BC7 /* fr */,
 			);
 			name = SFTPSessionConfigurationViewController.xib;
 			path = StrongBox;
@@ -5963,6 +6071,8 @@
 				4D770FA1230326BE00CBE244 /* Base */,
 				4D8A99B2230AF31700AB98DC /* de */,
 				4D51F0C5233BE5DA00F5BB3D /* ru */,
+				4D4695CB23878E4C009D3BC7 /* uk */,
+				4D4695EA23878E72009D3BC7 /* fr */,
 			);
 			name = WebDAVConfigurationViewController.xib;
 			path = StrongBox;
@@ -5974,6 +6084,8 @@
 				4D7C2661233EA14800412AA5 /* Base */,
 				4D7C2664233EA16B00412AA5 /* de */,
 				4D7C2666233EA16D00412AA5 /* ru */,
+				4D4695B223878E43009D3BC7 /* uk */,
+				4D4695D123878E6C009D3BC7 /* fr */,
 			);
 			name = Backups.storyboard;
 			path = StrongBox;
@@ -5984,6 +6096,8 @@
 			children = (
 				4D8A99A5230AF31700AB98DC /* de */,
 				4D51F0CA233BE5DB00F5BB3D /* ru */,
+				4D4695D023878E4D009D3BC7 /* uk */,
+				4D4695EF23878E72009D3BC7 /* fr */,
 			);
 			name = InfoPlist.strings;
 			path = "Strongbox Auto Fill";
@@ -5994,6 +6108,8 @@
 			children = (
 				4D8A99A8230AF31700AB98DC /* de */,
 				4D51F0C9233BE5DA00F5BB3D /* ru */,
+				4D4695CF23878E4D009D3BC7 /* uk */,
+				4D4695EE23878E72009D3BC7 /* fr */,
 			);
 			name = RMStore.strings;
 			path = StrongBox;
@@ -6004,6 +6120,8 @@
 			children = (
 				4D8A99AB230AF31700AB98DC /* de */,
 				4D51F0C8233BE5DA00F5BB3D /* ru */,
+				4D4695CE23878E4D009D3BC7 /* uk */,
+				4D4695ED23878E72009D3BC7 /* fr */,
 			);
 			name = InfoPlist.strings;
 			path = StrongBox;
@@ -6015,6 +6133,8 @@
 				4D9677E823102BFB004AF091 /* Base */,
 				4D9677EB23102C01004AF091 /* de */,
 				4D51F0C2233BE5DA00F5BB3D /* ru */,
+				4D4695C823878E4C009D3BC7 /* uk */,
+				4D4695E723878E71009D3BC7 /* fr */,
 			);
 			name = Upgrade.storyboard;
 			path = StrongBox;
@@ -6026,6 +6146,8 @@
 				4DE7F0C922F89BDD0095F51F /* Base */,
 				4D8A99B7230AF31700AB98DC /* de */,
 				4D51F0B9233BE5D800F5BB3D /* ru */,
+				4D4695BF23878E4B009D3BC7 /* uk */,
+				4D4695DE23878E70009D3BC7 /* fr */,
 			);
 			name = CreateDatabaseOrSetCredentials.storyboard;
 			path = StrongBox;
@@ -6037,6 +6159,8 @@
 				4DE7F0CC22F89CE30095F51F /* Base */,
 				4D8A99B5230AF31700AB98DC /* de */,
 				4D51F0AF233BE5D600F5BB3D /* ru */,
+				4D4695B323878E43009D3BC7 /* uk */,
+				4D4695D223878E6C009D3BC7 /* fr */,
 			);
 			name = MasterDetail.storyboard;
 			path = StrongBox;
@@ -6047,6 +6171,8 @@
 			children = (
 				4DE7F0D022F89D120095F51F /* Base */,
 				4D51F0B1233BE5D700F5BB3D /* ru */,
+				4D4695B523878E44009D3BC7 /* uk */,
+				4D4695D423878E6D009D3BC7 /* fr */,
 			);
 			name = LaunchScreen.storyboard;
 			path = StrongBox;
@@ -6058,6 +6184,8 @@
 				4DE7F0D322F89D1D0095F51F /* Base */,
 				4D8A99B4230AF31700AB98DC /* de */,
 				4D51F0B2233BE5D700F5BB3D /* ru */,
+				4D4695B623878E44009D3BC7 /* uk */,
+				4D4695D523878E6F009D3BC7 /* fr */,
 			);
 			name = Welcome.storyboard;
 			path = StrongBox;
@@ -6069,6 +6197,8 @@
 				4DE7F0D622F89D270095F51F /* Base */,
 				4D8A99B8230AF31700AB98DC /* de */,
 				4D51F0B3233BE5D700F5BB3D /* ru */,
+				4D4695B723878E45009D3BC7 /* uk */,
+				4D4695D623878E6F009D3BC7 /* fr */,
 			);
 			name = Browse.storyboard;
 			path = StrongBox;
@@ -6080,6 +6210,8 @@
 				4DE7F0D922F89D3E0095F51F /* Base */,
 				4D8A99B0230AF31700AB98DC /* de */,
 				4D51F0B4233BE5D700F5BB3D /* ru */,
+				4D4695B823878E4A009D3BC7 /* uk */,
+				4D4695D723878E6F009D3BC7 /* fr */,
 			);
 			name = ItemDetails.storyboard;
 			path = StrongBox;
@@ -6091,6 +6223,8 @@
 				4DE7F0DC22F89D480095F51F /* Base */,
 				4D8A99BB230AF31700AB98DC /* de */,
 				4D51F0B6233BE5D700F5BB3D /* ru */,
+				4D4695BC23878E4A009D3BC7 /* uk */,
+				4D4695DB23878E70009D3BC7 /* fr */,
 			);
 			name = ItemDetailsPreferences.storyboard;
 			path = StrongBox;
@@ -6102,6 +6236,8 @@
 				4DE7F0DF22F89D510095F51F /* Base */,
 				4D8A99B3230AF31700AB98DC /* de */,
 				4D51F0B7233BE5D800F5BB3D /* ru */,
+				4D4695BD23878E4B009D3BC7 /* uk */,
+				4D4695DC23878E70009D3BC7 /* fr */,
 			);
 			name = KeePassHistory.storyboard;
 			path = StrongBox;
@@ -6113,6 +6249,8 @@
 				4DE7F0E222F89D550095F51F /* Base */,
 				4D8A99C3230AF31700AB98DC /* de */,
 				4D51F0B8233BE5D800F5BB3D /* ru */,
+				4D4695BE23878E4B009D3BC7 /* uk */,
+				4D4695DD23878E70009D3BC7 /* fr */,
 			);
 			name = PasswordSafeHistory.storyboard;
 			path = StrongBox;
@@ -6124,6 +6262,8 @@
 				4DE7F0E622F89D610095F51F /* Base */,
 				4D8A99BF230AF31700AB98DC /* de */,
 				4D51F0BA233BE5D800F5BB3D /* ru */,
+				4D4695C023878E4B009D3BC7 /* uk */,
+				4D4695DF23878E70009D3BC7 /* fr */,
 			);
 			name = SelectKeyFile.storyboard;
 			path = StrongBox;
@@ -6135,6 +6275,8 @@
 				4DE7F0E922F89D680095F51F /* Base */,
 				4D8A99B1230AF31700AB98DC /* de */,
 				4D51F0BB233BE5D800F5BB3D /* ru */,
+				4D4695C123878E4B009D3BC7 /* uk */,
+				4D4695E023878E70009D3BC7 /* fr */,
 			);
 			name = SelectStorage.storyboard;
 			path = StrongBox;
@@ -6146,6 +6288,8 @@
 				4DE7F0ED22F89D6F0095F51F /* Base */,
 				4D8A99AE230AF31700AB98DC /* de */,
 				4D51F0BC233BE5D800F5BB3D /* ru */,
+				4D4695C223878E4B009D3BC7 /* uk */,
+				4D4695E123878E71009D3BC7 /* fr */,
 			);
 			name = PinEntry.storyboard;
 			path = StrongBox;
@@ -6157,6 +6301,8 @@
 				4DE7F0F022F89D790095F51F /* Base */,
 				4D8A99C2230AF31700AB98DC /* de */,
 				4D51F0BE233BE5D900F5BB3D /* ru */,
+				4D4695C423878E4B009D3BC7 /* uk */,
+				4D4695E323878E71009D3BC7 /* fr */,
 			);
 			name = DatabaseOperations.storyboard;
 			path = StrongBox;
@@ -6168,6 +6314,8 @@
 				4DE7F0F322F89D820095F51F /* Base */,
 				4D8A99BD230AF31700AB98DC /* de */,
 				4D51F0BF233BE5D900F5BB3D /* ru */,
+				4D4695C523878E4C009D3BC7 /* uk */,
+				4D4695E423878E71009D3BC7 /* fr */,
 			);
 			name = Preferences.storyboard;
 			path = StrongBox;
@@ -6178,6 +6326,8 @@
 			children = (
 				4DE7F0F622F89D870095F51F /* Base */,
 				4D51F0C0233BE5D900F5BB3D /* ru */,
+				4D4695C623878E4C009D3BC7 /* uk */,
+				4D4695E523878E71009D3BC7 /* fr */,
 			);
 			name = SelectItem.storyboard;
 			path = StrongBox;
@@ -6189,6 +6339,8 @@
 				4DE7F0FA22F89D8D0095F51F /* Base */,
 				4D8A99C4230AF31700AB98DC /* de */,
 				4D2854762362FF9800DC3664 /* ru */,
+				4D4695C723878E4C009D3BC7 /* uk */,
+				4D4695E623878E71009D3BC7 /* fr */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -6200,6 +6352,8 @@
 				4DE7F11322F8A16A0095F51F /* Base */,
 				4D8A99AD230AF31700AB98DC /* de */,
 				4D51F0C7233BE5DA00F5BB3D /* ru */,
+				4D4695CD23878E4C009D3BC7 /* uk */,
+				4D4695EC23878E72009D3BC7 /* fr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -6307,7 +6461,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = PwSafeModel;
@@ -6372,7 +6526,7 @@
 		};
 		4DBE5B4C1C8356C700C310BC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */;
+			baseConfigurationReference = 995318EF87E4F10707DD2E51 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
@@ -6380,7 +6534,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6400,7 +6554,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6463,7 +6617,7 @@
 		};
 		4DBE5B4D1C8356C700C310BC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */;
+			baseConfigurationReference = 999196594E8683BD59B4F185 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
@@ -6471,7 +6625,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6491,7 +6645,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6554,14 +6708,14 @@
 		};
 		4DC4E16C23488BAA000743C4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A87BCC5C1EF4FB462EDB53E6 /* Pods-common-ios-Strongbox-iOS.debug.xcconfig */;
+			baseConfigurationReference = DA33DC7FB4377A1F6D168891 /* Pods-common-ios-Strongbox-iOS Family.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6581,7 +6735,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6644,14 +6798,14 @@
 		};
 		4DC4E16D23488BAA000743C4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AF4DFF72ACBBE4C7EFABEFF0 /* Pods-common-ios-Strongbox-iOS.release.xcconfig */;
+			baseConfigurationReference = D487227EA46AE89313C27CCE /* Pods-common-ios-Strongbox-iOS Family.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6671,7 +6825,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6734,9 +6888,8 @@
 		};
 		4DC4E27423488BAE000743C4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */;
+			baseConfigurationReference = 17BF2299E9A260609D8530EA /* Pods-common-ios-Strongbox Auto Fill Family.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -6747,7 +6900,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6766,7 +6919,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6821,9 +6974,8 @@
 		};
 		4DC4E27523488BAE000743C4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */;
+			baseConfigurationReference = 2958F8474D6C3EE56FC20FA0 /* Pods-common-ios-Strongbox Auto Fill Family.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -6834,7 +6986,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6853,7 +7005,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6906,7 +7058,7 @@
 		};
 		4DE48A64216F54A300C9C991 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A21C3796CFEF659C1579DD90 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */;
+			baseConfigurationReference = A68DD626305D5F20944A3A29 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -6919,7 +7071,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6938,7 +7090,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6993,7 +7145,7 @@
 		};
 		4DE48A65216F54A300C9C991 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C8CDE50DB3D11F15DE9ADDAE /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */;
+			baseConfigurationReference = FF91E5B75A1A9424D1BF9ADD /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -7006,7 +7158,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2728;
+				CURRENT_PROJECT_VERSION = 2729;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7025,7 +7177,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.3;
+				MARKETING_VERSION = 1.44.4;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
