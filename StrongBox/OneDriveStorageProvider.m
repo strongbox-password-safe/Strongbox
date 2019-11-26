@@ -8,7 +8,7 @@
 
 #import "OneDriveStorageProvider.h"
 #import "Utils.h"
-#import <SVProgressHUD/SVProgressHUD.h>
+#import "SVProgressHUD.h"
 #import "OneDriveSDK.h"
 
 @interface OneDriveStorageProvider()

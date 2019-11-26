@@ -9,7 +9,7 @@
 #import "DropboxV2StorageProvider.h"
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "Utils.h"
-#import <SVProgressHUD/SVProgressHUD.h>
+#import "SVProgressHUD.h"
 
 @implementation DropboxV2StorageProvider
 
@@ -184,7 +184,6 @@
 - (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
                                            task:(void (^)(BOOL userCancelled, NSError *error))task {
     if (!DBClientsManager.authorizedClient) {
-        
 #ifndef IS_APP_EXTENSION
         NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
         id __block token = [center addObserverForName:@"isDropboxLinked"
@@ -215,7 +214,8 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
                                            controller:viewController
-                                              openURL:^(NSURL *url) { [[UIApplication sharedApplication] openURL:url]; }];
+                                              openURL:^(NSURL *url) {
+                [[UIApplication sharedApplication] openURL:url]; }];
         });
         
 #else

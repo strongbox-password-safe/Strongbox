@@ -26,7 +26,11 @@
 -(instancetype)initAsKeePassRoot:(XmlProcessingContext*)context {
     self = [self initWithContext:context];
     if (self) {
-        self.name = kDefaultRootGroupName;
+        NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
+        if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+            rootGroupName = kDefaultRootGroupName;
+        }
+        self.name = rootGroupName;
     }
     return self;
 }

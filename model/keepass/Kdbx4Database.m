@@ -48,7 +48,11 @@ static const BOOL kLogVerbose = NO;
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
     Node* rootGroup = [[Node alloc] initAsRoot:nil];
     
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
+    if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+      rootGroupName = kDefaultRootGroupName;
+    }
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
     [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3B5DC529C2F2DD9D3EEA12BB /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */; };
-		4BAE12962D343F874D3840E0 /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 		4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
 		4D004CDA21F4C26700E2B194 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCC21F4C26600E2B194 /* OTPToken+Serialization.m */; };
 		4D004CDB21F4C26700E2B194 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
@@ -107,7 +106,6 @@
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
 		4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
 		4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
-		4D1884C721709CBF001AE6B0 /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
 		4D1884C821709CCD001AE6B0 /* StrongboxUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* StrongboxUIDocument.m */; };
 		4D1884C921709CD4001AE6B0 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2C1FB1E27700A68A92 /* Utils.m */; };
 		4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579D1C8361D200E6356F /* IOsUtils.m */; };
@@ -171,6 +169,10 @@
 		4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D2259F422C6C28A005547EA /* EditDateCell.xib */; };
 		4D2259F922C6C463005547EA /* EditDateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F822C6C463005547EA /* EditDateCell.m */; };
 		4D2259FA22C6C463005547EA /* EditDateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F822C6C463005547EA /* EditDateCell.m */; };
+		4D24C76D238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
+		4D24C76E238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
+		4D24C76F238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
+		4D24C770238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
 		4D2561AC233FE9C400179B84 /* libYubiKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2561AB233FE98900179B84 /* libYubiKit.a */; };
 		4D2561AF233FEAEA00179B84 /* YubiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2561AE233FEAEA00179B84 /* YubiManager.m */; };
 		4D2561B1233FEB6E00179B84 /* YubiKeyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2561B0233FEB6E00179B84 /* YubiKeyTests.m */; };
@@ -383,7 +385,6 @@
 		4D5F5B76218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B75218B39BF00A0739A /* InnerRandomStreamFactory.m */; };
 		4D5F5B77218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B75218B39BF00A0739A /* InnerRandomStreamFactory.m */; };
 		4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
-		4D5F5B7B218B4C2E00A0739A /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4D5F5B7C218B4C3500A0739A /* OpenSafeSequenceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */; };
 		4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
 		4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
@@ -411,6 +412,28 @@
 		4D67B1E42191FD0400B0D29A /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E32191FD0400B0D29A /* XmlProcessingContext.m */; };
 		4D67B1E52191FD0400B0D29A /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E32191FD0400B0D29A /* XmlProcessingContext.m */; };
 		4D6A45C3217A0D7400724A3D /* keypass-database-with-binary.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D6A45C2217A0D7400724A3D /* keypass-database-with-binary.xml */; };
+		4D6B503D238BAF4100DF2F88 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99A4230AF31700AB98DC /* InfoPlist.strings */; };
+		4D6B503E238BAF4900DF2F88 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99AA230AF31700AB98DC /* InfoPlist.strings */; };
+		4D6B504A238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5041238BBA1E00DF2F88 /* SVProgressHUD.m */; };
+		4D6B504B238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5041238BBA1E00DF2F88 /* SVProgressHUD.m */; };
+		4D6B504C238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5041238BBA1E00DF2F88 /* SVProgressHUD.m */; };
+		4D6B504D238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5041238BBA1E00DF2F88 /* SVProgressHUD.m */; };
+		4D6B504E238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5044238BBA1E00DF2F88 /* SVRadialGradientLayer.m */; };
+		4D6B504F238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5044238BBA1E00DF2F88 /* SVRadialGradientLayer.m */; };
+		4D6B5050238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5044238BBA1E00DF2F88 /* SVRadialGradientLayer.m */; };
+		4D6B5051238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5044238BBA1E00DF2F88 /* SVRadialGradientLayer.m */; };
+		4D6B5052238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5046238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m */; };
+		4D6B5053238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5046238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m */; };
+		4D6B5054238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5046238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m */; };
+		4D6B5055238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5046238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m */; };
+		4D6B5056238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */; };
+		4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */; };
+		4D6B5058238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */; };
+		4D6B5059238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */; };
+		4D6B505A238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */; };
+		4D6B505B238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */; };
+		4D6B505C238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */; };
+		4D6B505D238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
 		4D6FE2BB2194400300EB9997 /* twofish-argon-2.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BA2194400300EB9997 /* twofish-argon-2.kdbx */; };
 		4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */; };
@@ -483,13 +506,15 @@
 		4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B62199B7790044E617 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
 		4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */; };
+		4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
+		4D8354CB2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
+		4D8354CC2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
+		4D8354CD2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
 		4D87569C2222B46B00D6B8EA /* CustomNavigationItemTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */; };
 		4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B3E21AC30BA00805DED /* CustomFieldsViewController.m */; };
 		4D876B4321AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
 		4D876B4421AC36F800805DED /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
-		4D8A99A6230AF31700AB98DC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99A4230AF31700AB98DC /* InfoPlist.strings */; };
 		4D8A99A9230AF31700AB98DC /* RMStore.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99A7230AF31700AB98DC /* RMStore.strings */; };
-		4D8A99AC230AF31700AB98DC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D8A99AA230AF31700AB98DC /* InfoPlist.strings */; };
 		4D8AC1622319B22F00CAB5F5 /* MemoryConsumptionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8AC1612319B22F00CAB5F5 /* MemoryConsumptionTests.m */; };
 		4D8C147D2074F5D100CE9CAE /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C147C2074F5D100CE9CAE /* CHCSVParser.m */; };
 		4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14802074F5F700CE9CAE /* PwSafeSerialization.m */; };
@@ -1053,7 +1078,6 @@
 		4DC4E1F523488BAE000743C4 /* GenericBasicCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98962270B4E200A811C4 /* GenericBasicCell.m */; };
 		4DC4E1F623488BAE000743C4 /* StaticDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */; };
 		4DC4E1F723488BAE000743C4 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E147B2183049E00A41CA0 /* Kdbx4Serialization.m */; };
-		4DC4E1F823488BAE000743C4 /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4DC4E1F923488BAE000743C4 /* CASGTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */; };
 		4DC4E1FA23488BAE000743C4 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4DC4E1FB23488BAE000743C4 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
@@ -1081,7 +1105,6 @@
 		4DC4E21123488BAE000743C4 /* StrongboxUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* StrongboxUIDocument.m */; };
 		4DC4E21223488BAE000743C4 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E08EF21824CBF007BA1E7 /* Kdbx4Database.m */; };
 		4DC4E21323488BAE000743C4 /* Argon2KdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14A52183365000A41CA0 /* Argon2KdfCipher.m */; };
-		4DC4E21423488BAE000743C4 /* GoogleDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579A1C8361D200E6356F /* GoogleDriveStorageProvider.m */; };
 		4DC4E21523488BAE000743C4 /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
 		4DC4E21623488BAE000743C4 /* EditDateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F822C6C463005547EA /* EditDateCell.m */; };
 		4DC4E21723488BAE000743C4 /* FontManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835B02284742000CA7405 /* FontManager.m */; };
@@ -1309,7 +1332,6 @@
 		4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */; };
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
-		589015F03BC8C62337589A4F /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 		F8BC916E4E9421DA0B191040 /* Pods_common_ios_Strongbox_iOS_Family.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7523D7C245F96F478BCBC5E0 /* Pods_common_ios_Strongbox_iOS_Family.framework */; };
@@ -1557,6 +1579,8 @@
 		4D2259F422C6C28A005547EA /* EditDateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditDateCell.xib; sourceTree = "<group>"; };
 		4D2259F722C6C463005547EA /* EditDateCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditDateCell.h; sourceTree = "<group>"; };
 		4D2259F822C6C463005547EA /* EditDateCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditDateCell.m; sourceTree = "<group>"; };
+		4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMcG_MF_Base32Additions.m; path = lib/Base32/MMcG_MF_Base32Additions.m; sourceTree = "<group>"; };
+		4D24C76C238B9D1A000F8461 /* MMcG_MF_Base32Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMcG_MF_Base32Additions.h; path = lib/Base32/MMcG_MF_Base32Additions.h; sourceTree = "<group>"; };
 		4D2561AB233FE98900179B84 /* libYubiKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libYubiKit.a; path = lib/YubiKit/debug_universal/libYubiKit.a; sourceTree = "<group>"; };
 		4D2561AD233FEAEA00179B84 /* YubiManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YubiManager.h; path = StrongBox/YubiManager.h; sourceTree = "<group>"; };
 		4D2561AE233FEAEA00179B84 /* YubiManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = YubiManager.m; path = StrongBox/YubiManager.m; sourceTree = "<group>"; };
@@ -1896,6 +1920,16 @@
 		4D67B1E32191FD0400B0D29A /* XmlProcessingContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = XmlProcessingContext.m; path = model/keepass/XmlProcessingContext.m; sourceTree = "<group>"; };
 		4D6A45BE217A093900724A3D /* InnerRandomStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InnerRandomStream.h; path = model/keepass/InnerRandomStream.h; sourceTree = SOURCE_ROOT; };
 		4D6A45C2217A0D7400724A3D /* keypass-database-with-binary.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "keypass-database-with-binary.xml"; sourceTree = "<group>"; };
+		4D6B5040238BBA1E00DF2F88 /* SVProgressHUD-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SVProgressHUD-Prefix.pch"; path = "lib/SVProgressHUD/SVProgressHUD-Prefix.pch"; sourceTree = "<group>"; };
+		4D6B5041238BBA1E00DF2F88 /* SVProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SVProgressHUD.m; path = lib/SVProgressHUD/SVProgressHUD.m; sourceTree = "<group>"; };
+		4D6B5042238BBA1E00DF2F88 /* SVIndefiniteAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SVIndefiniteAnimatedView.h; path = lib/SVProgressHUD/SVIndefiniteAnimatedView.h; sourceTree = "<group>"; };
+		4D6B5043238BBA1E00DF2F88 /* SVProgressAnimatedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SVProgressAnimatedView.h; path = lib/SVProgressHUD/SVProgressAnimatedView.h; sourceTree = "<group>"; };
+		4D6B5044238BBA1E00DF2F88 /* SVRadialGradientLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SVRadialGradientLayer.m; path = lib/SVProgressHUD/SVRadialGradientLayer.m; sourceTree = "<group>"; };
+		4D6B5045238BBA1E00DF2F88 /* SVProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SVProgressHUD.h; path = lib/SVProgressHUD/SVProgressHUD.h; sourceTree = "<group>"; };
+		4D6B5046238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SVIndefiniteAnimatedView.m; path = lib/SVProgressHUD/SVIndefiniteAnimatedView.m; sourceTree = "<group>"; };
+		4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SVProgressAnimatedView.m; path = lib/SVProgressHUD/SVProgressAnimatedView.m; sourceTree = "<group>"; };
+		4D6B5048238BBA1F00DF2F88 /* SVRadialGradientLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SVRadialGradientLayer.h; path = lib/SVProgressHUD/SVRadialGradientLayer.h; sourceTree = "<group>"; };
+		4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SVProgressHUD.bundle; path = lib/SVProgressHUD/SVProgressHUD.bundle; sourceTree = "<group>"; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafeDetailsView.h; path = StrongBox/SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafeDetailsView.m; path = StrongBox/SafeDetailsView.m; sourceTree = "<group>"; };
 		4D6FE2BA2194400300EB9997 /* twofish-argon-2.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "twofish-argon-2.kdbx"; sourceTree = "<group>"; };
@@ -1960,6 +1994,8 @@
 		4D8144B32199B4A80044E617 /* NodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
 		4D82332922B01BE200A37BAC /* SortOrderTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SortOrderTableViewController.h; path = StrongBox/SortOrderTableViewController.h; sourceTree = "<group>"; };
 		4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SortOrderTableViewController.m; path = StrongBox/SortOrderTableViewController.m; sourceTree = "<group>"; };
+		4D8354C82389141F00E264E0 /* FavIconManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FavIconManager.h; path = model/FavIconManager.h; sourceTree = "<group>"; };
+		4D8354C92389141F00E264E0 /* FavIconManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FavIconManager.m; path = model/FavIconManager.m; sourceTree = "<group>"; };
 		4D87569A2222B46A00D6B8EA /* CustomNavigationItemTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomNavigationItemTitleView.h; path = StrongBox/CustomNavigationItemTitleView.h; sourceTree = "<group>"; };
 		4D87569B2222B46A00D6B8EA /* CustomNavigationItemTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomNavigationItemTitleView.m; path = StrongBox/CustomNavigationItemTitleView.m; sourceTree = "<group>"; };
 		4D876B3D21AC30BA00805DED /* CustomFieldsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldsViewController.h; path = StrongBox/CustomFieldsViewController.h; sourceTree = "<group>"; };
@@ -2426,7 +2462,6 @@
 				4D57606F232BFB09000818F5 /* FavIcon.framework in Frameworks */,
 				E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
 				4D33F60B23489E1800C48679 /* StoreKit.framework in Frameworks */,
-				4BAE12962D343F874D3840E0 /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2474,7 +2509,6 @@
 				4D8EC42A22302649008EE004 /* libcrypto.a in Frameworks */,
 				9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 				4D326E9A22302BED00DCD8C7 /* libssh2.a in Frameworks */,
-				589015F03BC8C62337589A4F /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2823,6 +2857,15 @@
 			name = "Privacy and Lock";
 			sourceTree = "<group>";
 		};
+		4D24C764238B9BEC000F8461 /* Base32 */ = {
+			isa = PBXGroup;
+			children = (
+				4D24C76C238B9D1A000F8461 /* MMcG_MF_Base32Additions.h */,
+				4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */,
+			);
+			name = Base32;
+			sourceTree = "<group>";
+		};
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2968,6 +3011,8 @@
 		4D326EA1223032C800DCD8C7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				4D6B503F238BBA0600DF2F88 /* SVProgressHUD */,
+				4D24C764238B9BEC000F8461 /* Base32 */,
 				4D08B58B234C95F4003D1953 /* GCDWebServer */,
 				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
 				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
@@ -3170,6 +3215,7 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				4DED20C72168BF1800A5800A /* Home */,
 				4DE4665B233D2EFA00398A65 /* Backups */,
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
@@ -3178,7 +3224,6 @@
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4DE7F0D122F89D120095F51F /* LaunchScreen.storyboard */,
 				4D12084F22A79F0C00139570 /* Welcome */,
-				4DED20C72168BF1800A5800A /* Home */,
 				4D0835DD2284769900CA7405 /* Browse */,
 				4DAE986A2270B39100A811C4 /* Item Details */,
 				4DE2688B22A659BF00A1D158 /* History */,
@@ -3229,6 +3274,23 @@
 				4D2F6C1A21807C25007931E4 /* XMLWriter.m */,
 			);
 			name = XmlWriting;
+			sourceTree = "<group>";
+		};
+		4D6B503F238BBA0600DF2F88 /* SVProgressHUD */ = {
+			isa = PBXGroup;
+			children = (
+				4D6B5042238BBA1E00DF2F88 /* SVIndefiniteAnimatedView.h */,
+				4D6B5046238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m */,
+				4D6B5043238BBA1E00DF2F88 /* SVProgressAnimatedView.h */,
+				4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */,
+				4D6B5040238BBA1E00DF2F88 /* SVProgressHUD-Prefix.pch */,
+				4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */,
+				4D6B5045238BBA1E00DF2F88 /* SVProgressHUD.h */,
+				4D6B5041238BBA1E00DF2F88 /* SVProgressHUD.m */,
+				4D6B5048238BBA1F00DF2F88 /* SVRadialGradientLayer.h */,
+				4D6B5044238BBA1E00DF2F88 /* SVRadialGradientLayer.m */,
+			);
+			name = SVProgressHUD;
 			sourceTree = "<group>";
 		};
 		4D6FE2BD219444F900EB9997 /* Kdb-1 */ = {
@@ -3795,6 +3857,8 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D8354C82389141F00E264E0 /* FavIconManager.h */,
+				4D8354C92389141F00E264E0 /* FavIconManager.m */,
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4D62E26423437F8200119604 /* DebugHelper.h */,
 				4D62E26523437F8200119604 /* DebugHelper.m */,
@@ -4176,7 +4240,6 @@
 				4DC4E17223488BAE000743C4 /* Sources */,
 				4DC4E23C23488BAE000743C4 /* Frameworks */,
 				4DC4E24523488BAE000743C4 /* Resources */,
-				A0EF3F10D56D6EBC20A34926 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -4195,7 +4258,6 @@
 				4DE48A51216F54A300C9C991 /* Sources */,
 				4DE48A52216F54A300C9C991 /* Frameworks */,
 				4DE48A53216F54A300C9C991 /* Resources */,
-				38B2EE2731DB86953C435F18 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -4214,7 +4276,7 @@
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Original;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
 					4D25E8EA2175F4CD00ACF108 = {
@@ -4293,9 +4355,9 @@
 			targets = (
 				4DBE5B301C8356C700C310BC /* Strongbox-iOS */,
 				4DE48A54216F54A300C9C991 /* Strongbox Auto Fill */,
-				4D25E8EA2175F4CD00ACF108 /* StrongboxTests */,
 				4DC4E01323488BAA000743C4 /* Strongbox-iOS Family */,
 				4DC4E17023488BAE000743C4 /* Strongbox Auto Fill Family */,
+				4D25E8EA2175F4CD00ACF108 /* StrongboxTests */,
 			);
 		};
 /* End PBXProject section */
@@ -4356,8 +4418,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D6B503E238BAF4900DF2F88 /* InfoPlist.strings in Resources */,
 				4D36B0B822C94740003E9B68 /* eff_large_wordlist.utf8.txt in Resources */,
-				4D8A99AC230AF31700AB98DC /* InfoPlist.strings in Resources */,
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4DE18BB622F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
@@ -4375,6 +4437,7 @@
 				4DE7F0EF22F89D790095F51F /* DatabaseOperations.storyboard in Resources */,
 				4DE7F0E122F89D550095F51F /* PasswordSafeHistory.storyboard in Resources */,
 				4D36B0CE22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D6B505A238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */,
 				4D7C2660233EA14800412AA5 /* Backups.storyboard in Resources */,
 				4D36B0C222C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D770F97230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
@@ -4449,6 +4512,7 @@
 				4DC4E13223488BAA000743C4 /* DatabaseOperations.storyboard in Resources */,
 				4DC4E13323488BAA000743C4 /* PasswordSafeHistory.storyboard in Resources */,
 				4DC4E13423488BAA000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D6B505C238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */,
 				4DC4E13523488BAA000743C4 /* Backups.storyboard in Resources */,
 				4DC4E13623488BAA000743C4 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E13723488BAA000743C4 /* IconsCollectionViewController.xib in Resources */,
@@ -4539,6 +4603,7 @@
 				4D7F5A4A2360212F003ED785 /* RecordView.storyboard in Resources */,
 				4DC4E26023488BAE000743C4 /* IconsCollectionViewController.xib in Resources */,
 				4DC4E26123488BAE000743C4 /* BrowseItemCell.xib in Resources */,
+				4D6B505D238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */,
 				4D7F5A422360202B003ED785 /* ItemDetailsPreferences.storyboard in Resources */,
 				4D7F5A4623602073003ED785 /* KeePassHistory.storyboard in Resources */,
 				4DC4E26223488BAE000743C4 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
@@ -4566,6 +4631,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D6B503D238BAF4100DF2F88 /* InfoPlist.strings in Resources */,
 				4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4D8EC42E22302649008EE004 /* LICENSE in Resources */,
 				4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
@@ -4576,7 +4642,6 @@
 				4DE7F0CF22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
 				4D12E59122FB866F00CBFECC /* Localizable.strings in Resources */,
 				4D7F5A4F236021B5003ED785 /* DatabaseOperations.storyboard in Resources */,
-				4D8A99A6230AF31700AB98DC /* InfoPlist.strings in Resources */,
 				4D8FCEA523606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */,
@@ -4601,6 +4666,7 @@
 				4D7F5A492360212E003ED785 /* RecordView.storyboard in Resources */,
 				4D770F98230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4D06E12222859F0100A754F5 /* BrowseItemCell.xib in Resources */,
+				4D6B505B238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */,
 				4D7F5A412360202A003ED785 /* ItemDetailsPreferences.storyboard in Resources */,
 				4D7F5A4523602072003ED785 /* KeePassHistory.storyboard in Resources */,
 				4D36B0B322C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
@@ -4636,67 +4702,45 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Base32-iOS/Base32.framework",
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
+				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/JNKeychain/JNKeychain.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
-				"${BUILT_PRODUCTS_DIR}/SVProgressHUD-Pods-common-ios-Strongbox-iOS Family/SVProgressHUD.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JNKeychain.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS Family/Pods-common-ios-Strongbox-iOS Family-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		38B2EE2731DB86953C435F18 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill/Pods-common-ios-Strongbox Auto Fill-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */ = {
@@ -4808,65 +4852,43 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Base32-iOS/Base32.framework",
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
+				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/JNKeychain/JNKeychain.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
-				"${BUILT_PRODUCTS_DIR}/SVProgressHUD-Pods-common-ios-Strongbox-iOS/SVProgressHUD.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JNKeychain.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A0EF3F10D56D6EBC20A34926 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill Family/Pods-common-ios-Strongbox Auto Fill Family-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox Auto Fill Family/Pods-common-ios-Strongbox Auto Fill Family-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C02A3952148B9EA3F8B5512D /* [CP] Check Pods Manifest.lock */ = {
@@ -5051,6 +5073,7 @@
 				4D5B1EA72194AAAF00ECAF0D /* KdbEntry.m in Sources */,
 				4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
 				4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */,
+				4D6B5052238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4D4D6B57222EF3E80056514E /* RMStore.m in Sources */,
 				4D7F5A3B236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4D3E149521832C1500A41CA0 /* core.c in Sources */,
@@ -5067,6 +5090,7 @@
 				4D3E14882183293200A41CA0 /* KeePassCiphers.m in Sources */,
 				4D0835B72284742000CA7405 /* CustomFieldEditorViewController.m in Sources */,
 				4DF97F2121BF101B0090A55E /* DAVBaseRequest.m in Sources */,
+				4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
@@ -5095,6 +5119,7 @@
 				4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
 				4D08B5C7234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
+				4D24C76D238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
 				4D556F2422B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8322302BED00DCD8C7 /* socket_helper.m in Sources */,
 				4D0835CB228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */,
@@ -5141,6 +5166,7 @@
 				4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */,
 				4D08B5B5234C9613003D1953 /* GCDWebServerFunctions.m in Sources */,
 				4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */,
+				4D6B504E238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4D47670B217905AB00C4358F /* Meta.m in Sources */,
 				4DE268A022A67A6200A1D158 /* MasterDetailViewController.m in Sources */,
 				4DB574002274913E001BB13C /* ItemMetadataEntry.m in Sources */,
@@ -5175,6 +5201,7 @@
 				4D5F5B72218B350C00A0739A /* DatabaseAttachment.m in Sources */,
 				4D0AFD2222A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m in Sources */,
 				4D004CDB21F4C26700E2B194 /* OTPTokenType.m in Sources */,
+				4D6B5056238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
@@ -5243,6 +5270,7 @@
 				4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
 				4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
+				4D6B504A238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D2962B3223173FC0082897D /* History.m in Sources */,
 				4D4598CD2193048400792EF7 /* TwoFishCipher.m in Sources */,
@@ -5328,6 +5356,7 @@
 				4DC4E05D23488BAA000743C4 /* KdbEntry.m in Sources */,
 				4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */,
 				4DC4E05F23488BAA000743C4 /* FileManager.m in Sources */,
+				4D6B5054238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4DC4E06023488BAA000743C4 /* RMStore.m in Sources */,
 				4D7F5A3D236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DC4E06123488BAA000743C4 /* core.c in Sources */,
@@ -5344,6 +5373,7 @@
 				4DC4E06C23488BAA000743C4 /* KeePassCiphers.m in Sources */,
 				4DC4E06D23488BAA000743C4 /* CustomFieldEditorViewController.m in Sources */,
 				4DC4E06E23488BAA000743C4 /* DAVBaseRequest.m in Sources */,
+				4D8354CC2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DC4E06F23488BAA000743C4 /* TotpCell.m in Sources */,
 				4DC4E07023488BAA000743C4 /* KeePassDatabaseMetadata.m in Sources */,
 				4DC4E07123488BAA000743C4 /* SelectStorageProviderController.m in Sources */,
@@ -5372,6 +5402,7 @@
 				4DC4E08623488BAA000743C4 /* CASGParams.m in Sources */,
 				4DC4E08723488BAA000743C4 /* Alerts.m in Sources */,
 				4D08B5C8234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
+				4D24C76F238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
 				4DC4E08823488BAA000743C4 /* LocalDatabaseIdentifier.m in Sources */,
 				4DC4E08923488BAA000743C4 /* socket_helper.m in Sources */,
 				4DC4E08A23488BAA000743C4 /* WebDAVSessionConfiguration.m in Sources */,
@@ -5418,6 +5449,7 @@
 				4DC4E0B223488BAA000743C4 /* crypt_argchk.c in Sources */,
 				4D08B5B6234C9613003D1953 /* GCDWebServerFunctions.m in Sources */,
 				4DC4E0B323488BAA000743C4 /* CustomFieldsViewController.m in Sources */,
+				4D6B5050238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC4E0B423488BAA000743C4 /* Meta.m in Sources */,
 				4DC4E0B523488BAA000743C4 /* MasterDetailViewController.m in Sources */,
 				4DC4E0B623488BAA000743C4 /* ItemMetadataEntry.m in Sources */,
@@ -5452,6 +5484,7 @@
 				4DC4E0D023488BAA000743C4 /* DatabaseAttachment.m in Sources */,
 				4DC4E0D123488BAA000743C4 /* WelcomeMasterPasswordViewController.m in Sources */,
 				4DC4E0D223488BAA000743C4 /* OTPTokenType.m in Sources */,
+				4D6B5058238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4DC4E0D323488BAA000743C4 /* RMStoreKeychainPersistence.m in Sources */,
 				4DC4E0D423488BAA000743C4 /* Settings.m in Sources */,
 				4DC4E0D523488BAA000743C4 /* KdbxSerializationCommon.m in Sources */,
@@ -5520,6 +5553,7 @@
 				4DC4E11023488BAA000743C4 /* SafeStorageProviderFactory.m in Sources */,
 				4DC4E11123488BAA000743C4 /* NotesTableViewCell.m in Sources */,
 				4DC4E11223488BAA000743C4 /* LocalDeviceStorageProvider.m in Sources */,
+				4D6B504C238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4DC4E11323488BAA000743C4 /* AesKdfCipher.m in Sources */,
 				4DC4E11423488BAA000743C4 /* History.m in Sources */,
 				4DC4E11523488BAA000743C4 /* TwoFishCipher.m in Sources */,
@@ -5549,6 +5583,7 @@
 				4DC4E18323488BAE000743C4 /* String.m in Sources */,
 				4DC4E18423488BAE000743C4 /* DAVListingParser.m in Sources */,
 				4DC4E18523488BAE000743C4 /* ChaCha20Cipher.m in Sources */,
+				4D8354CD2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DC4E18623488BAE000743C4 /* GZipInputStream.m in Sources */,
 				4DC4E18723488BAE000743C4 /* Model.m in Sources */,
 				4DC4E18823488BAE000743C4 /* NSArray+Extensions.m in Sources */,
@@ -5564,9 +5599,11 @@
 				4DC4E19223488BAE000743C4 /* DatabaseSearchAndSorter.m in Sources */,
 				4DC4E19323488BAE000743C4 /* KdbxSerializationCommon.m in Sources */,
 				4DC4E19423488BAE000743C4 /* ItemDetailsViewController.m in Sources */,
+				4D6B5055238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4DC4E19523488BAE000743C4 /* EditAttachmentCell.m in Sources */,
 				4DC4E19623488BAE000743C4 /* WebDAVConfigurationViewController.m in Sources */,
 				4DC4E19723488BAE000743C4 /* CompositeKeyFactors.m in Sources */,
+				4D6B504D238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4DC4E19823488BAE000743C4 /* XmlSerializer.m in Sources */,
 				4DC4E19923488BAE000743C4 /* ref.c in Sources */,
 				4DC4E19A23488BAE000743C4 /* DAVRequestGroup.m in Sources */,
@@ -5649,6 +5686,7 @@
 				4DC4E1E623488BAE000743C4 /* Record.m in Sources */,
 				4DC4E1E723488BAE000743C4 /* OTPToken+Serialization.m in Sources */,
 				4DC4E1E823488BAE000743C4 /* MBAutoGrowingTextView.m in Sources */,
+				4D24C770238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
 				4DC4E1E923488BAE000743C4 /* CustomFieldViewModel.m in Sources */,
 				4DC4E1EA23488BAE000743C4 /* Group.m in Sources */,
 				4DC4E1EB23488BAE000743C4 /* DAVRequest.m in Sources */,
@@ -5664,7 +5702,6 @@
 				4DC4E1F523488BAE000743C4 /* GenericBasicCell.m in Sources */,
 				4DC4E1F623488BAE000743C4 /* StaticDataTableViewController.m in Sources */,
 				4DC4E1F723488BAE000743C4 /* Kdbx4Serialization.m in Sources */,
-				4DC4E1F823488BAE000743C4 /* GoogleDriveManager.m in Sources */,
 				4DC4E1F923488BAE000743C4 /* CASGTableViewController.m in Sources */,
 				4DC4E1FA23488BAE000743C4 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4DC4E1FB23488BAE000743C4 /* StorageBrowserItem.m in Sources */,
@@ -5692,7 +5729,6 @@
 				4DC4E21123488BAE000743C4 /* StrongboxUIDocument.m in Sources */,
 				4DC4E21223488BAE000743C4 /* Kdbx4Database.m in Sources */,
 				4DC4E21323488BAE000743C4 /* Argon2KdfCipher.m in Sources */,
-				4DC4E21423488BAE000743C4 /* GoogleDriveStorageProvider.m in Sources */,
 				4DC4E21523488BAE000743C4 /* UIImage+FixOrientation.m in Sources */,
 				4DC4E21623488BAE000743C4 /* EditDateCell.m in Sources */,
 				4DC4E21723488BAE000743C4 /* FontManager.m in Sources */,
@@ -5728,8 +5764,10 @@
 				4DC4E23523488BAE000743C4 /* CredentialProviderViewController.m in Sources */,
 				4DC4E23623488BAE000743C4 /* InnerRandomStreamFactory.m in Sources */,
 				4DC4E23723488BAE000743C4 /* SafesListTableViewController.m in Sources */,
+				4D6B5051238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC4E23823488BAE000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4DC4E23923488BAE000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
+				4D6B5059238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4DC4E23A23488BAE000743C4 /* VariantObject.m in Sources */,
 				4DC4E23B23488BAE000743C4 /* PickCredentialsTableViewController.m in Sources */,
 			);
@@ -5758,6 +5796,7 @@
 				4D2F6C3921807C7E007931E4 /* String.m in Sources */,
 				4DF972C921C01ABF00F384C9 /* DAVListingParser.m in Sources */,
 				4D5F5B6F218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
+				4D8354CB2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4D1BF4FF232441D2007DF0E6 /* GZipInputStream.m in Sources */,
 				4D1885632170E260001AE6B0 /* Model.m in Sources */,
 				4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */,
@@ -5773,9 +5812,11 @@
 				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				4D33FA3922872008006C31B2 /* ItemDetailsViewController.m in Sources */,
+				4D6B5053238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4D0835D2228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
 				4D3169A822DE33AF003FAD3F /* CompositeKeyFactors.m in Sources */,
+				4D6B504B238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4D2F6C2021807C25007931E4 /* XmlSerializer.m in Sources */,
 				4D3E14A221832D5500A41CA0 /* ref.c in Sources */,
 				4DF972CB21C01ABF00F384C9 /* DAVRequestGroup.m in Sources */,
@@ -5858,6 +5899,7 @@
 				4D1884D521709E18001AE6B0 /* Record.m in Sources */,
 				4D004CEA21F4F7BB00E2B194 /* OTPToken+Serialization.m in Sources */,
 				4D0835BA2284742000CA7405 /* MBAutoGrowingTextView.m in Sources */,
+				4D24C76E238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
 				4DAE98C72270B4E200A811C4 /* CustomFieldViewModel.m in Sources */,
 				4D1884D421709E13001AE6B0 /* Group.m in Sources */,
 				4DF972CA21C01ABF00F384C9 /* DAVRequest.m in Sources */,
@@ -5873,7 +5915,6 @@
 				4DAE98BF2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
 				4D9AC55722A153FA00449F3F /* StaticDataTableViewController.m in Sources */,
 				4D3E147D2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */,
-				4D5F5B7B218B4C2E00A0739A /* GoogleDriveManager.m in Sources */,
 				4DC5C10722A51B7D00E0F740 /* CASGTableViewController.m in Sources */,
 				4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */,
@@ -5901,7 +5942,6 @@
 				4D1884C821709CCD001AE6B0 /* StrongboxUIDocument.m in Sources */,
 				4D9E08F121824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D3E14A72183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
-				4D1884C721709CBF001AE6B0 /* GoogleDriveStorageProvider.m in Sources */,
 				4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				4D2259FA22C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0835B62284742000CA7405 /* FontManager.m in Sources */,
@@ -5937,8 +5977,10 @@
 				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
 				4D5F5B77218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */,
+				4D6B504F238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D56D91021B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */,
+				4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D3AC320219074C40010CFCD /* VariantObject.m in Sources */,
 				4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */,
 			);
@@ -6459,13 +6501,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = PwSafeModel;
-				VALID_ARCHS = "arm64 armv7 armv7s";
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
 			};
 			name = Debug;
 		};
@@ -6513,14 +6555,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = PwSafeModel;
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = "arm64 armv7 armv7s";
+				VALID_ARCHS = "$(ARCHS_STANDARD)";
 			};
 			name = Release;
 		};
@@ -6534,7 +6576,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6554,7 +6596,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6576,8 +6618,6 @@
 					"-framework",
 					"\"GoogleSignIn\"",
 					"-framework",
-					"\"GoogleToolboxForMac\"",
-					"-framework",
 					"\"ISMessages\"",
 					"-framework",
 					"\"JNKeychain\"",
@@ -6593,8 +6633,6 @@
 					"\"OneDriveSDK\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -6625,7 +6663,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6645,7 +6683,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6667,8 +6705,6 @@
 					"-framework",
 					"\"GoogleSignIn\"",
 					"-framework",
-					"\"GoogleToolboxForMac\"",
-					"-framework",
 					"\"ISMessages\"",
 					"-framework",
 					"\"JNKeychain\"",
@@ -6684,8 +6720,6 @@
 					"\"OneDriveSDK\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -6715,7 +6749,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6735,7 +6769,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6743,21 +6777,11 @@
 					"-framework",
 					"\"ADAL\"",
 					"-framework",
-					"\"Base32\"",
-					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
 					"-framework",
 					"\"DZNEmptyDataSet\"",
-					"-framework",
-					"\"GTMSessionFetcher\"",
-					"-framework",
-					"\"GoogleAPIClientForREST\"",
-					"-framework",
-					"\"GoogleSignIn\"",
-					"-framework",
-					"\"GoogleToolboxForMac\"",
 					"-framework",
 					"\"ISMessages\"",
 					"-framework",
@@ -6774,8 +6798,6 @@
 					"\"OneDriveSDK\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -6805,7 +6827,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6825,7 +6847,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6833,21 +6855,11 @@
 					"-framework",
 					"\"ADAL\"",
 					"-framework",
-					"\"Base32\"",
-					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
 					"-framework",
 					"\"DZNEmptyDataSet\"",
-					"-framework",
-					"\"GTMSessionFetcher\"",
-					"-framework",
-					"\"GoogleAPIClientForREST\"",
-					"-framework",
-					"\"GoogleSignIn\"",
-					"-framework",
-					"\"GoogleToolboxForMac\"",
 					"-framework",
 					"\"ISMessages\"",
 					"-framework",
@@ -6864,8 +6876,6 @@
 					"\"OneDriveSDK\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -6900,7 +6910,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6919,7 +6929,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6927,21 +6937,11 @@
 					"$(inherited)",
 					"-ObjC",
 					"-framework",
-					"\"Base32\"",
-					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
 					"-framework",
 					"\"DZNEmptyDataSet\"",
-					"-framework",
-					"\"GTMSessionFetcher\"",
-					"-framework",
-					"\"GoogleAPIClientForREST\"",
-					"-framework",
-					"\"GoogleSignIn\"",
-					"-framework",
-					"\"GoogleToolboxForMac\"",
 					"-framework",
 					"\"JNKeychain\"",
 					"-framework",
@@ -6952,8 +6952,6 @@
 					"\"ObjectiveDropboxOfficial\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -6986,7 +6984,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7005,27 +7003,17 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-framework",
-					"\"Base32\"",
 					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
 					"-framework",
 					"\"DZNEmptyDataSet\"",
-					"-framework",
-					"\"GTMSessionFetcher\"",
-					"-framework",
-					"\"GoogleAPIClientForREST\"",
-					"-framework",
-					"\"GoogleSignIn\"",
-					"-framework",
-					"\"GoogleToolboxForMac\"",
 					"-framework",
 					"\"JNKeychain\"",
 					"-framework",
@@ -7036,8 +7024,6 @@
 					"\"ObjectiveDropboxOfficial\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -7071,7 +7057,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7090,7 +7076,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -7098,21 +7084,11 @@
 					"$(inherited)",
 					"-ObjC",
 					"-framework",
-					"\"Base32\"",
-					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
 					"-framework",
 					"\"DZNEmptyDataSet\"",
-					"-framework",
-					"\"GTMSessionFetcher\"",
-					"-framework",
-					"\"GoogleAPIClientForREST\"",
-					"-framework",
-					"\"GoogleSignIn\"",
-					"-framework",
-					"\"GoogleToolboxForMac\"",
 					"-framework",
 					"\"JNKeychain\"",
 					"-framework",
@@ -7123,8 +7099,6 @@
 					"\"ObjectiveDropboxOfficial\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -7158,7 +7132,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2729;
+				CURRENT_PROJECT_VERSION = 2732;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7177,27 +7151,17 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.4;
+				MARKETING_VERSION = 1.44.5;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-framework",
-					"\"Base32\"",
 					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
 					"-framework",
 					"\"DZNEmptyDataSet\"",
-					"-framework",
-					"\"GTMSessionFetcher\"",
-					"-framework",
-					"\"GoogleAPIClientForREST\"",
-					"-framework",
-					"\"GoogleSignIn\"",
-					"-framework",
-					"\"GoogleToolboxForMac\"",
 					"-framework",
 					"\"JNKeychain\"",
 					"-framework",
@@ -7208,8 +7172,6 @@
 					"\"ObjectiveDropboxOfficial\"",
 					"-framework",
 					"\"Reachability\"",
-					"-framework",
-					"\"SVProgressHUD\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",

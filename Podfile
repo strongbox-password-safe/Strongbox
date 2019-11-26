@@ -8,84 +8,45 @@ target 'Strongbox' do
     pod 'KissXML'
     pod 'SAMKeychain'
     pod 'libsodium'
-    pod 'Base32'
-end
-
-pre_install do |installer|
-    pod_targets = installer.pod_targets.flat_map do |pod_target|
-        pod_target.name == "SVProgressHUD" ? pod_target.scoped : pod_target
-    end
-    installer.aggregate_targets.each do |aggregate_target|
-        aggregate_target.pod_targets = pod_targets.select do |pod_target|
-            pod_target.target_definitions.include?(aggregate_target.target_definition)
-        end
-    end
 end
 
 abstract_target 'common-ios' do
     project 'Strongbox.xcodeproj'
-    platform :ios, '9.2'
+    platform :ios, '10.0'
     use_frameworks!
 
-    #pod 'NMSSH'
-    pod 'GoogleAPIClientForREST/Drive'
     pod 'JNKeychain'
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
     pod 'Reachability'
     pod 'libsodium'    
     pod 'KissXML'
-    pod 'Base32'
-    pod 'GoogleSignIn', '4.4.0'
-#    pod 'SWTableViewCell'
 
     target 'Strongbox-iOS' do
-	use_frameworks!
+        use_frameworks!
       
         pod 'ISMessages'
-        pod 'SVProgressHUD' 
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
+        pod 'GoogleAPIClientForREST/Drive'
+        pod 'GoogleSignIn'
     end
 
     target 'Strongbox-iOS Family' do
         use_frameworks!
 
         pod 'ISMessages'
-        pod 'SVProgressHUD'
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
+        pod 'GoogleAPIClientForREST/Drive'
+        pod 'GoogleSignIn'
     end
 
    target 'Strongbox Auto Fill' do
-       pod 'SVProgressHUD'
+
    end
 
    target 'Strongbox Auto Fill Family' do
-       pod 'SVProgressHUD'
+
    end
 end
-
-post_install do |installer|
-    installer.pods_project.targets.each do |target|
-        #puts "#{target.name}"
-        if target.name == "SVProgressHUD-Pods-common-ios-Strongbox Auto Fill"
-            puts "Adding SV_APP_EXTENSIONS"    
-            target.build_configurations.each do |config|
-                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SV_APP_EXTENSIONS'
-            end
-        end
-
-        # God Help Me...
-        
-        if target.name == "SVProgressHUD-Pods-common-ios-Strongbox Auto Fill Family"
-            puts "Adding SV_APP_EXTENSIONS"
-            target.build_configurations.each do |config|
-                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SV_APP_EXTENSIONS'
-            end
-        end
-    end
-end
-

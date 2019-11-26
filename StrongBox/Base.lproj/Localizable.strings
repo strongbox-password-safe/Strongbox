@@ -2154,3 +2154,6 @@
 
 /* Clear */
 "generic_clear" = "Clear";
+
+/* Database */
+"generic_database" = "Database";

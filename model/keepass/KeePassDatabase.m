@@ -38,9 +38,14 @@
     Node* rootGroup = [[Node alloc] initAsRoot:nil];
     
     // Keepass has it's own root group to work off of, and doesn't allow entries at the actual root.
-    // In the UI we don't display the actual root but the Keepass Root
+    // In the UI we don't display the actual root but the Keepass Root - We do display the name though
     
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
+    if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+        rootGroupName = kDefaultRootGroupName;
+    }
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    
     [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     
     KeePassDatabaseMetadata* metadata = [[KeePassDatabaseMetadata alloc] init];

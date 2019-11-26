@@ -198,4 +198,39 @@
     NSLog(@"Custom Fields: %@", node.fields.customFields);
 }
 
+- (void)testOtpRaw {
+    StringValue* stringValue = [StringValue valueWithString:@"ZOFHRYXNSJDUGHSJ"];
+    OTPToken* token = [NodeFields getOtpTokenFromRecord:@"" fields:@{@"otp" : stringValue} notes:@""];
+
+    XCTAssertNotNil(token);
+    
+    NSLog(@"%@", token);
+}
+
+- (void)testOtpRawSpaced {
+    StringValue* stringValue = [StringValue valueWithString:@"ZOFH RYXN SJDU GHSJ"];
+    OTPToken* token = [NodeFields getOtpTokenFromRecord:@"" fields:@{@"otp" : stringValue} notes:@""];
+
+    XCTAssertNotNil(token);
+    
+    NSLog(@"%@", token);
+}
+
+- (void)testOtpRawLowercase {
+    StringValue* stringValue = [StringValue valueWithString:@"zofhryxnsjdughsj"];
+    OTPToken* token = [NodeFields getOtpTokenFromRecord:@"" fields:@{@"otp" : stringValue} notes:@""];
+
+    XCTAssertNotNil(token);
+    
+    NSLog(@"%@", token);
+}
+
+- (void)testOtpRawLowercaseSpaced {
+    StringValue* stringValue = [StringValue valueWithString:@"zofh ryxn sjdu ghsj"];
+    OTPToken* token = [NodeFields getOtpTokenFromRecord:@"" fields:@{@"otp" : stringValue} notes:@""];
+
+    XCTAssertNotNil(token);
+    
+    NSLog(@"%@", token);
+}
 @end

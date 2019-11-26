@@ -9,7 +9,7 @@
 #import "GoogleDriveManager.h"
 #import "Utils.h"
 #import "GTMSessionFetcherService.h"
-#import "SVProgressHUD/SVProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "real-secrets.h"
 #import "Settings.h"
 
@@ -34,23 +34,13 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
 - (instancetype)init {
     if(self = [super init]) {
         [GIDSignIn sharedInstance].clientID = GOOGLE_CLIENT_ID;
-        
-        // Try to sign in if we have a previous session. This allows us to display the Signout Button
-        // state correctly. No need to popup sign in window at this stage, as user may not be using google drive at all
-        
-        GIDSignIn *signIn = [GIDSignIn sharedInstance];
-        
-        signIn.delegate = nil;
-        signIn.scopes = @[kGTLRAuthScopeDrive];
-        
-        authenticationcompletion = nil;
-        
-        dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main queue
-            [signIn signInSilently];
-        });
     }
     
     return self;
+}
+
+- (BOOL)handleUrl:(NSURL*)url {
+    return [GIDSignIn.sharedInstance handleURL:url];
 }
 
 - (GTLRDriveService *)driveService {
@@ -66,7 +56,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
 }
 
 - (BOOL)isAuthorized {
-    return [[GIDSignIn sharedInstance] hasAuthInKeychain];
+    return GIDSignIn.sharedInstance.hasPreviousSignIn;
 }
 
 - (void)signout {
@@ -74,19 +64,25 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     [[GIDSignIn sharedInstance] disconnect];
 }
 
-- (void)authenticate:(UIViewController*)viewController completion:(void (^)(BOOL userCancelled, NSError *error))completion {
+- (void)authenticate:(UIViewController*)viewController
+          completion:(void (^)(BOOL userCancelled, NSError *error))completion {
     GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
     signIn.delegate = self;
-    signIn.uiDelegate = (id<GIDSignInUIDelegate>)viewController;
-    
+    signIn.presentingViewController = viewController;
+
     signIn.scopes = @[kGTLRAuthScopeDrive];
 
     authenticationcompletion = completion;
 
     dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main queue
-        Settings.sharedInstance.suppressPrivacyScreen = YES;
-        [signIn signIn];
+        if(signIn.hasPreviousSignIn) {
+            [signIn restorePreviousSignIn];
+        }
+        else {
+            Settings.sharedInstance.suppressPrivacyScreen = YES;
+            [signIn signIn];
+        }
     });
 }
 
@@ -94,7 +90,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     didSignInForUser:(GIDGoogleUser *)user
            withError:(NSError *)error {
     if (error != nil) {
-        //NSLog(@"Google Sign In Error: %@", error);
+        NSLog(@"Google Sign In Error: %@", error);
         self.driveService.authorizer = nil;
     }
     else {

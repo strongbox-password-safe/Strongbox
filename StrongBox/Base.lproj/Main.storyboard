@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="waq-lN-OIc">
     <device id="retina5_9" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -128,7 +128,7 @@
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="6tI-B2-q0P">
                                 <rect key="frame" x="0.0" y="44" width="375" height="734"/>
-                                <string key="text">Strongbox is an application for keeping all your passwords safely stored and protected by one master password. Supporting the open source Password Safe and KeePass formats. Strongbox is a Freemium application offering enhanced Premium options as well as a super functional basic feature set.
+                                <mutableString key="text">Strongbox is an application for keeping all your passwords safely stored and protected by one master password. Supporting the open source Password Safe and KeePass formats. Strongbox is a Freemium application offering enhanced Premium options as well as a super functional basic feature set.
 
 Face ID &amp; Touch ID capability or PIN Codes, for the ultimate in convenience and speed. 
 
@@ -144,7 +144,7 @@ Standards compliant, using the time tested Password Safe and KeePass formats so 
 
 Import/Export by Files app, Email, CSV, iTunes File Sharing or use cloud storage.
 ---------------------------------------------------------------------
-• Strongbox Password Safe provides In-App Purchases (both auto renewable subscriptions and one-off non consumable) for Pro versions of the App
+• Strongbox provides In-App Purchases (both auto renewable subscriptions and one-off non consumable) for Pro versions of the App
 • Subscriptions are auto renewable with recurring billing. Cancel anytime.
 • The time period of the subscriptions are monthly, 3-monthly or yearly at users discretion
 • The user can also choose to purchase a 'Lifetime' one-off Pro version of the App
@@ -154,7 +154,7 @@ Import/Export by Files app, Email, CSV, iTunes File Sharing or use cloud storage
 • Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase
 • Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription to that publication, where applicable
 • Strongbox Privacy Policy may be found here: https://strongboxsafe.com/privacy-policy/
-• Strongbox Terms of Use may be found here: https://strongboxsafe.com/terms/</string>
+• Strongbox Terms of Use may be found here: https://strongboxsafe.com/terms/</mutableString>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -511,7 +511,7 @@ Cheers,
                                         <rect key="frame" x="0.0" y="187.33333206176758" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Kni-6G-YSR" id="keo-xM-5Fy">
-                                            <rect key="frame" x="0.0" y="0.0" width="347.66666666666669" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Top Right Field" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="twk-09-o4B">
@@ -521,7 +521,7 @@ Cheers,
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Filename" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J1f-Hw-xlG" userLabel="Browse View Type">
-                                                    <rect key="frame" x="270.66666666666669" y="11.999999999999998" width="69" height="20.333333333333329"/>
+                                                    <rect key="frame" x="271" y="11.999999999999998" width="69" height="20.333333333333329"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -541,7 +541,7 @@ Cheers,
                                         <rect key="frame" x="0.0" y="231.33333206176758" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="uD1-Su-bzX" id="6zZ-hK-RxT">
-                                            <rect key="frame" x="0.0" y="0.0" width="347.66666666666669" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle 1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qTF-1a-gbp">
@@ -551,7 +551,7 @@ Cheers,
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Storage" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yfh-Hh-J6T" userLabel="Item Field">
-                                                    <rect key="frame" x="279.33333333333331" y="11.999999999999998" width="60.333333333333314" height="20.333333333333329"/>
+                                                    <rect key="frame" x="279.66666666666669" y="11.999999999999998" width="60.333333333333314" height="20.333333333333329"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -571,7 +571,7 @@ Cheers,
                                         <rect key="frame" x="0.0" y="275.33333206176758" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="QSi-AB-z4W" id="2p7-Ar-aqU">
-                                            <rect key="frame" x="0.0" y="0.0" width="347.66666666666669" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle 2" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tV1-x8-Tcd">
@@ -581,7 +581,7 @@ Cheers,
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Last Cached Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O5J-1b-Zbl" userLabel="Item Field">
-                                                    <rect key="frame" x="203.33333333333331" y="11.999999999999998" width="136.33333333333331" height="20.333333333333329"/>
+                                                    <rect key="frame" x="203.66666666666663" y="11.999999999999998" width="136.33333333333337" height="20.333333333333329"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>

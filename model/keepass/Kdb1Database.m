@@ -38,7 +38,11 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (void)addKeePassDefaultRootGroup:(Node*)rootGroup {
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
+    if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+      rootGroupName = kDefaultRootGroupName;
+    }
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
     [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
 }
 

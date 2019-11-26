@@ -12,7 +12,6 @@
 #import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
-#import "GoogleDriveManager.h"
 #import "Settings.h"
 #import "SafesViewController.h"
 #import "SafesViewController.h"
@@ -24,6 +23,7 @@
 #import "FileManager.h"
 #import "LocalDeviceStorageProvider.h"
 #import "ClipboardManager.h"
+#import "GoogleDriveManager.h"
 
 @interface AppDelegate ()
 
@@ -176,11 +176,8 @@
 
         return YES;
     }
-    else if ([url.absoluteString hasPrefix:@"com.googleusercontent.apps"])
-    {
-        return [[GIDSignIn sharedInstance] handleURL:url
-                                   sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
-                                          annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+    else if ([url.absoluteString hasPrefix:@"com.googleusercontent.apps"]) {
+        return [GoogleDriveManager.sharedInstance handleUrl:url];
     }
     else {
         SafesViewController *safesViewController = [self getInitialViewController];

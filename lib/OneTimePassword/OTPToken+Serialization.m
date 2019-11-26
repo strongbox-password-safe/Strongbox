@@ -24,8 +24,7 @@
 
 #import "OTPToken+Serialization.h"
 #import "NSURL+QueryItems.h"
-#import <Base32/MF_Base32Additions.h>
-
+#import "MMcG_MF_Base32Additions.h"
 
 static NSString *const kOTPAuthScheme = @"otpauth";
 static NSString *const kQueryAlgorithmKey = @"algorithm";

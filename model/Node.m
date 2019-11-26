@@ -11,7 +11,7 @@
 #import "OTPToken+Serialization.h"
 #import "OTPToken+Generation.h"
 #import "NSURL+QueryItems.h"
-#import <Base32/MF_Base32Additions.h>
+#import "MMcG_MF_Base32Additions.h"
 #import "NSArray+Extensions.h"
 
 @interface Node ()

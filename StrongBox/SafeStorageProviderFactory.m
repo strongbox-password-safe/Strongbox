@@ -7,7 +7,6 @@
 //
 
 #import "SafeStorageProviderFactory.h"
-#import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
@@ -16,14 +15,22 @@
 #import "WebDAVStorageProvider.h"
 
 #ifndef IS_APP_EXTENSION
+
 #import "OneDriveStorageProvider.h"
+#import "GoogleDriveStorageProvider.h"
+
 #endif
 
 @implementation SafeStorageProviderFactory
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
     if (providerId == kGoogleDrive) {
+#ifndef IS_APP_EXTENSION
         return [GoogleDriveStorageProvider sharedInstance];
+#else
+        NSLog(@"Google's new Library doesn't support App Extensions...");
+        return nil;
+#endif
     }
     else if (providerId == kDropbox)
     {

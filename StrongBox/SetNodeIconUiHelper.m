@@ -10,16 +10,11 @@
 #import "SetNodeIconUiHelper.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "Utils.h"
-#import "SVProgressHUD/SVProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "Alerts.h"
 #import "IconsCollectionViewController.h"
 #import "Settings.h"
-
-//#ifndef IS_APP_EXTENSION
-@import FavIcon;
-//#endif
-
-static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
+#import "FavIconManager.h"
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
@@ -166,10 +161,10 @@ static const int kMaxRecommendedCustomIconDimension = 256; // Future: Setting?
 }
 
 - (void)downloadFavIcon:(NSURL*)url silent:(BOOL)silent completion:(DownloadFavIconCompletionBlock)completion {
-    //[Fav downloadPreferred:];
     [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_downloading_favicon", @"Downloading FavIcon")];
     NSLog(@"attempting to download favicon for: [%@]", url);
-    [FavIcon downloadPreferred:url width:kMaxRecommendedCustomIconDimension height:kMaxRecommendedCustomIconDimension completion:^(UIImage * _Nullable image) {
+    [FavIconManager.sharedInstance downloadPreferred:url
+                                          completion:^(UIImage * _Nullable image) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
             

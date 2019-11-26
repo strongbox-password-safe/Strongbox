@@ -13,7 +13,7 @@
 #import "Alerts.h"
 #import "SafeStorageProviderFactory.h"
 #import "OfflineDetector.h"
-#import <SVProgressHUD/SVProgressHUD.h>
+#import "SVProgressHUD.h"
 #import "KeyFileParser.h"
 #import "Utils.h"
 #import "PinEntryController.h"

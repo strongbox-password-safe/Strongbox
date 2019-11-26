@@ -11,13 +11,15 @@
 #import <GoogleSignIn/GoogleSignIn.h>
 #import "GTLRDrive.h"
 
-@interface GoogleDriveManager : NSObject <GIDSignInDelegate, GIDSignInUIDelegate>
+@interface GoogleDriveManager : NSObject <GIDSignInDelegate>
 
 + (GoogleDriveManager *)sharedInstance;
 
 @property (NS_NONATOMIC_IOSONLY, getter = isAuthorized, readonly) BOOL authorized;
 
 - (void)                signout;
+
+- (BOOL)handleUrl:(NSURL*)url;
 
 - (void)                      create:(UIViewController *)viewController
                            withTitle:(NSString *)title

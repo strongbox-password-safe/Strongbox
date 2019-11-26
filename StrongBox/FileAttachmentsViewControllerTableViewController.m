@@ -13,7 +13,7 @@
 #import <Photos/Photos.h>
 #import "Alerts.h"
 #import "Utils.h"
-#import "SVProgressHUD/SVProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "AddAttachmentHelper.h"
 #import "NSArray+Extensions.h"
 

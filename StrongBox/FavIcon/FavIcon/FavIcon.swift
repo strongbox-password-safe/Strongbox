@@ -65,8 +65,10 @@ public enum IconDownloadResult {
     /// - parameter url: The base URL to scan.
     /// - parameter completion: A closure to call when the scan has completed. The closure will be call
     ///                         on the main queue.
-    @objc public static func scan(_ url: URL, completion: @escaping ([DetectedIcon], [String:String]) -> Void) {
-        let queue = DispatchQueue(label: "org.bitserf.FavIcon", attributes: [])
+    @objc public static func scan(_ url: URL,
+                                  on queue: OperationQueue? = nil,
+                                  completion: @escaping ([DetectedIcon], [String:String]) -> Void) {
+        let syncQueue = DispatchQueue(label: "org.bitserf.FavIcon", attributes: [])
         var icons: [DetectedIcon] = []
         var additionalDownloads: [URLRequestWithCallback] = []
         let urlSession = urlSessionProvider()
@@ -80,7 +82,7 @@ public enum IconDownloadResult {
 
                     let htmlIcons = extractHTMLHeadIcons(document, baseURL: actualURL)
                     let htmlMeta = examineHTMLMeta(document, baseURL: actualURL)
-                    queue.sync {
+                    syncQueue.sync {
                         icons.append(contentsOf: htmlIcons)
                         meta = htmlMeta
                     }
@@ -94,7 +96,7 @@ public enum IconDownloadResult {
                                     manifestJSON,
                                     baseURL: actualURL
                                 )
-                                queue.sync {
+                                syncQueue.sync {
                                     icons.append(contentsOf: jsonIcons)
                                 }
                             }
@@ -113,7 +115,7 @@ public enum IconDownloadResult {
                                     document,
                                     baseURL: actualURL
                                 )
-                                queue.sync {
+                                syncQueue.sync {
                                     icons.append(contentsOf: xmlIcons)
                                 }
                             }
@@ -129,7 +131,7 @@ public enum IconDownloadResult {
         let checkFavIconOperation = CheckURLExistsOperation(url: favIconURL, session: urlSession)
         let checkFavIcon = urlRequestOperation(checkFavIconOperation) { result in
             if case let .success(actualURL) = result {
-                queue.sync {
+                syncQueue.sync {
                     icons.append(DetectedIcon(url: actualURL, type: .classic))
                 }
             }
@@ -139,15 +141,15 @@ public enum IconDownloadResult {
         let checkTouchIconOperation = CheckURLExistsOperation(url: touchIconURL, session: urlSession)
         let checkTouchIcon = urlRequestOperation(checkTouchIconOperation) { result in
           if case let .success(actualURL) = result {
-            queue.sync {
+            syncQueue.sync {
               icons.append(DetectedIcon(url: actualURL, type: .appleIOSWebClip, width: 60, height: 60))
             }
           }
         }
 
-        executeURLOperations([downloadHTML, checkFavIcon, checkTouchIcon]) {
+        executeURLOperations([downloadHTML, checkFavIcon, checkTouchIcon], on: queue) {
             if additionalDownloads.count > 0 {
-                executeURLOperations(additionalDownloads) {
+                executeURLOperations(additionalDownloads, on: queue) {
                     DispatchQueue.main.async {
                         completion(icons, meta)
                     }
@@ -202,6 +204,39 @@ public enum IconDownloadResult {
         }
     }
 
+    @objc public static func downloadMark(_ urls: [URL],
+                                            width: Int,
+                                            height: Int,
+                                            on queue: OperationQueue? = nil,
+                                        completion: @escaping (URL, ImageType?) -> Void) {
+        for url in urls {
+            scan(url, on: queue) { icons, meta in
+                let iconMap = icons.reduce(into: [URL:DetectedIcon](), { current,icon in
+                    current[icon.url] = icon
+                })
+                
+                let uniqueIcons = Array(iconMap.values);
+                dl(uniqueIcons, on: queue) { downloaded in
+                    let sortedIcons = iconsInPreferredOrder(uniqueIcons, width: width, height: height)
+                    
+                    for best in sortedIcons {
+                        let maybeBest = downloaded[best.url]
+                        if(maybeBest != nil) {
+                            DispatchQueue.main.async {
+                                completion(url, maybeBest!)
+                            }
+                            return
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        completion(url, nil)
+                    }
+                }
+            }
+        }
+    }
+
     @objc public static func downloadPreferred(_ url: URL,
                                           width: Int,
                                           height: Int,
@@ -232,14 +267,14 @@ public enum IconDownloadResult {
         }
     }
     
-    @objc public static func dl(_ icons: [DetectedIcon], completion: @escaping ([URL: ImageType]) -> Void) {
+    @objc public static func dl(_ icons: [DetectedIcon], on queue: OperationQueue? = nil, completion: @escaping ([URL: ImageType]) -> Void) {
         let urlSession = urlSessionProvider()
         let operations: [DownloadImageOperation] =
             icons.map { DownloadImageOperation(url: $0.url, session: urlSession) }
         
         var myDictionary =  [URL: ImageType]()
         
-        executeURLOperations(operations) { results in
+        executeURLOperations(operations, on: queue) { results in
             for result in results {
                 switch result {
                 case let .imageDownloaded(url, image):

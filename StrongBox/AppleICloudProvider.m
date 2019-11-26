@@ -13,7 +13,7 @@
 #import "SafesList.h"
 #import "Settings.h"
 #import "iCloudSafesCoordinator.h"
-#import "SVProgressHUD/SVProgressHUD.h"
+#import "SVProgressHUD.h"
 
 @implementation AppleICloudProvider
 

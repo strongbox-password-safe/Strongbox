@@ -53,7 +53,12 @@
     else {
         // No Proper Root Group found in Xml Model. We'll create one
         
-        Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:rootNode allowDuplicateGroupTitles:YES uuid:nil];
+        NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
+        if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+          rootGroupName = kDefaultRootGroupName;
+        }
+
+        Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootNode allowDuplicateGroupTitles:YES uuid:nil];
         [rootNode addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
     }
     

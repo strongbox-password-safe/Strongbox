@@ -14,7 +14,7 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "CredentialProviderViewController.h"
 #import "OpenSafeSequenceHelper.h"
-#import <SVProgressHUD/SVProgressHUD.h>
+#import "SVProgressHUD.h"
 #import "PickCredentialsTableViewController.h"
 #import "CacheManager.h"
 #import "NSArray+Extensions.h"
@@ -176,8 +176,12 @@
     
     UIImage* databaseIcon = nil;
     if(Settings.sharedInstance.showDatabaseIcon) {
+        // Manual Icons for unsupported/uncompilable providers in App Extension
         if(database.storageProvider == kOneDrive) {
             databaseIcon = [UIImage imageNamed:@"one-drive-icon-only-32x32"];
+        }
+        else if (database.storageProvider == kGoogleDrive) {
+            databaseIcon = [UIImage imageNamed:@"product32"];
         }
         else {
             id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
@@ -232,6 +236,9 @@
     NSString* providerString;
     if(database.storageProvider == kOneDrive) {
         providerString = @"OneDrive";
+    }
+    else if (database.storageProvider == kGoogleDrive) {
+        providerString = @"Google Drive";
     }
     else {
         id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];

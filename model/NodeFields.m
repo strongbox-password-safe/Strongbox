@@ -12,7 +12,7 @@
 #import "OTPToken+Serialization.h"
 #import "OTPToken+Generation.h"
 #import "NSURL+QueryItems.h"
-#import <Base32/MF_Base32Additions.h>
+#import "MMcG_MF_Base32Additions.h"
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
@@ -542,7 +542,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     StringValue* keeOtpSecretEntry = fields[kKeeOtpPluginKey];
     
     if(keeOtpSecretEntry) {
-        // New KeePassXC Style...
+        // New KeePassXC Style... URL in the OTP Field - Ideally everyone should use this...
         
         NSURL *url = [NSURL URLWithString:keeOtpSecretEntry.value];
         OTPToken* t = [NodeFields getOtpTokenFromUrl:url];
@@ -577,10 +577,27 @@ static NSString* const kKeeOtpPluginKey = @"otp";
                     token.digits = [params[@"size"] integerValue];
                 }
                 
-                if([token validate])
-                {
+                if([token validate]) {
                     return token;
                 }
+            }
+            
+            // Could just be a raw token in here...
+            // Examples from a user on Github:
+            //            otp: ZOFHRYXNSJDUGHSJ
+            //
+            //            otp: ZOFH RYXN SJDU GHSJ
+            //
+            //            otp: zofhryxnsjdughsj
+            //
+            //            otp: zofh ryxn sjdu ghsj
+
+            OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer
+                                               secret:[NSData secretWithString:keeOtpSecret]
+                                                 name:@"<Unknown>" issuer:@"<Unknown>"];
+
+            if([token validate]) {
+                return token;
             }
         }
     }

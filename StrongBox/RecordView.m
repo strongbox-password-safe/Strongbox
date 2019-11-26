@@ -11,7 +11,7 @@
 #import "PasswordHistoryViewController.h"
 #import "PasswordHistory.h"
 #import "Alerts.h"
-#import "SVProgressHUD/SVProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "ISMessages/ISMessages.h"
 #import "TextFieldAutoSuggest.h"
 #import "Settings.h"

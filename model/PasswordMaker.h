@@ -7,8 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import "PasswordGenerationConfig.h"
+
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,7 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)generateForConfig:(PasswordGenerationConfig*)config;
 - (NSString*)generateForConfigOrDefault:(PasswordGenerationConfig*)config;
 
+#if TARGET_OS_IPHONE
 - (void)promptWithSuggestions:(UIViewController*)viewController usernames:(BOOL)usernames action:(void (^)(NSString *response))action;
+#endif
 
 - (NSString*)generateUsername;
 

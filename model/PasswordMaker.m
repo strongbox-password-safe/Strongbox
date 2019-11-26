@@ -109,6 +109,8 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
 //    return [[NSString alloc] initWithBytes:&bytes length:sizeof(uint32_t) encoding:NSUTF32StringEncoding];
 //}
 
+#if TARGET_OS_IPHONE
+
 - (void)promptWithSuggestions:(UIViewController *)viewController usernames:(BOOL)usernames action:(void (^)(NSString * _Nonnull))action {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* title = NSLocalizedString(@"select_generated_field_title", @"Select your preferred generated field title.");
@@ -158,6 +160,8 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
         [viewController presentViewController:alertController animated:YES completion:nil];
     });
 }
+
+#endif
 
 - (NSString*)generateUsername {
     if(!self.firstNamesCache) {

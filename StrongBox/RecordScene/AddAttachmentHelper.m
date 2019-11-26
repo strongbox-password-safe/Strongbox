@@ -10,7 +10,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "Alerts.h"
 #import "Utils.h"
-#import "SVProgressHUD/SVProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "UiAttachment.h"
 #import "UIImage+FixOrientation.h"
 
