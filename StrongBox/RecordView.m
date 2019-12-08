@@ -69,14 +69,16 @@ static const int kMinNotesCellHeight = 160;
         urlHint = trim(self.textFieldTitle.text);
     }
     
-    [self.sni changeIcon:self urlHint:urlHint
+    [self.sni changeIcon:self
+                    node:self.record
+                 urlOverride:urlHint
                   format:self.viewModel.database.format
-              completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, UIImage * _Nullable userSelectedNewCustomIcon) {
+              completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nullable selected) {
         //NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
         if(goNoGo) {
             self.userSelectedNewIconIndex = userSelectedNewIconIndex;
             self.userSelectedNewExistingCustomIconId = userSelectedExistingCustomIconId;
-            self.userSelectedNewCustomIcon = userSelectedNewCustomIcon;
+            self.userSelectedNewCustomIcon = selected ? selected.allValues.firstObject : nil;
 
             if(self.userSelectedNewCustomIcon) {
                 self.imageViewIcon.image = self.userSelectedNewCustomIcon;
@@ -723,8 +725,7 @@ static const int kMinNotesCellHeight = 160;
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToKeePassHistory"] && (self.record != nil)) {
-        UINavigationController* nav = segue.destinationViewController;
-        KeePassHistoryController *vc = (KeePassHistoryController *)nav.topViewController;
+        KeePassHistoryController *vc = (KeePassHistoryController *)segue.destinationViewController;
 
         vc.historicalItems = self.record.fields.keePassHistory;
         vc.viewModel = self.viewModel;
@@ -1191,8 +1192,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             self.sni = [[SetNodeIconUiHelper alloc] init];
             self.sni.customIcons = self.viewModel.database.customIcons;
             
-            [self.sni tryDownloadFavIcon:urlHint completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
-                if(goNoGo && userSelectedNewCustomIcon) {
+            [self.sni expressDownloadBestFavIcon:urlHint completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
+                if(userSelectedNewCustomIcon) {
                     NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
                     [self.viewModel.database setNodeCustomIcon:self.record data:data rationalize:YES];
                 }

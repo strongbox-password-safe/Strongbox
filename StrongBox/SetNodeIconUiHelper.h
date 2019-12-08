@@ -7,21 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "AbstractDatabaseFormatAdaptor.h"
+#import "FavIconBulkViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, NSNumber* _Nullable userSelectedNewIconIndex, NSUUID*_Nullable userSelectedExistingCustomIconId, UIImage* _Nullable userSelectedNewCustomIcon);
-typedef void (^DownloadFavIconCompletionBlock)(BOOL goNoGo, UIImage* _Nullable userSelectedNewCustomIcon);
+typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, NSNumber* _Nullable userSelectedNewIconIndex, NSUUID*_Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID*, UIImage*>* _Nullable selected);
 
 @interface SetNodeIconUiHelper : NSObject
 
-- (void)changeIcon:(UIViewController*)viewController
-           urlHint:(NSString* _Nullable)urlHint
+- (void)changeIcon:(UIViewController *)viewController
+              node:(Node* _Nonnull)node
+           urlOverride:(NSString* _Nullable)urlHint
             format:(DatabaseFormat)format
         completion:(ChangeIconCompletionBlock)completion;
 
-- (void)tryDownloadFavIcon:(NSString*)urlHint completion:(DownloadFavIconCompletionBlock)completion;
+- (void)expressDownloadBestFavIcon:(NSString*)urlOverride completion:(void (^)(UIImage * _Nullable))completion;
 
 @property NSDictionary<NSUUID*, NSData*>* customIcons;
 

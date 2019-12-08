@@ -85,6 +85,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
 @property BOOL isAutoFillContext;
 @property BOOL inCellHeightsChangedProcess;
 
+@property BOOL urlJustChanged;
+
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
 #ifndef IS_APP_EXTENSION
@@ -395,6 +397,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         else {
             if(self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone]) {
+                self.urlJustChanged = ![self.model.url isEqualToString:self.preEditModelClone.url];
                 self.preEditModelClone = nil;
                 [self saveChanges];
                 return; // We will perform below changes when saving is done...
@@ -926,8 +929,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         };
     }
     else if ([segue.identifier isEqualToString:@"toKeePassHistory"] && (self.item != nil)) {
-        UINavigationController* nav = segue.destinationViewController;
-        KeePassHistoryController *vc = (KeePassHistoryController *)nav.topViewController;
+        KeePassHistoryController *vc = (KeePassHistoryController *)segue.destinationViewController;
 
         vc.historicalItems = self.item.fields.keePassHistory;
         vc.viewModel = self.databaseModel;
@@ -1086,11 +1088,13 @@ static NSString* const kEditDateCell = @"EditDateCell";
     NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
     
     [self.sni changeIcon:self
-                 urlHint:urlHint
+                    node:self.item
+                 urlOverride:urlHint
                   format:self.databaseModel.database.format
-              completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, UIImage * _Nullable userSelectedNewCustomIcon) {
-                  NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
+                   completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nullable selected) {
+    
                   if(goNoGo) {
+                      UIImage* userSelectedNewCustomIcon = selected ? selected.allValues.firstObject : nil;
                       self.model.icon = [SetIconModel setIconModelWith:userSelectedNewIconIndex customUuid:userSelectedExistingCustomIconId customImage:userSelectedNewCustomIcon];
                       
                       [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -1397,7 +1401,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
         [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
     }
-    else if(self.model.icon.customUuid) {
+    else if(![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
         self.item.customIconUuid = self.model.icon.customUuid;
     }
     else if(self.model.icon.index != nil) {
@@ -1409,7 +1413,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         self.item.customIconUuid = nil;
     }
-    else if(self.createNewItem) {
+    else if(self.createNewItem || self.urlJustChanged) {
+        self.urlJustChanged = NO;
         // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
         // grab a FavIcon?
 #ifndef IS_APP_EXTENSION
@@ -1420,9 +1425,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
             self.sni = [[SetNodeIconUiHelper alloc] init];
             self.sni.customIcons = self.databaseModel.database.customIcons;
             
-            [self.sni tryDownloadFavIcon:self.model.url
-                              completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
-                                  if(goNoGo && userSelectedNewCustomIcon) {
+            [self.sni expressDownloadBestFavIcon:self.model.url
+                                      completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
+                                  if(userSelectedNewCustomIcon) {
                                       NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
                                       [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
                                   }

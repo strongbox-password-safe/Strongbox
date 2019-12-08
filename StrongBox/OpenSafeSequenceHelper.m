@@ -446,15 +446,13 @@
         scVc.offlineCacheDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:self.safe];
     }
     
-    // Auto Detect Key File?
+    // Auto Detect Key File if there's none explicitly set...
     
     if(!self.safe.keyFileUrl) {
-        if(!Settings.sharedInstance.doNotAutoDetectKeyFiles) {
-            NSURL* autoDetectedKeyFileUrl = [self getAutoDetectedKeyFileUrl];
-            if(autoDetectedKeyFileUrl) {
-                scVc.autoDetectedKeyFileUrl = YES;
-                scVc.initialKeyFileUrl = autoDetectedKeyFileUrl;
-            }
+        NSURL* autoDetectedKeyFileUrl = [self getAutoDetectedKeyFileUrl];
+        if(autoDetectedKeyFileUrl) {
+            scVc.autoDetectedKeyFileUrl = YES;
+            scVc.initialKeyFileUrl = autoDetectedKeyFileUrl;
         }
     }
     
@@ -577,7 +575,7 @@
         }
         else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
             NSString * modDateStr = getLastCachedDate(self.safe);
-            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_user_looks_offline_open_offline_instead_fmt", @"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
             
             [self openWithOfflineCacheFile:message];
         }
@@ -603,7 +601,7 @@
             NSLog(@"Error: %@", error);
             if(providerCanFallbackToOfflineCache(provider, self.safe)) {
                 NSString * modDateStr = getLastCachedDate(self.safe);
-                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
+                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
                 
                 [self openWithOfflineCacheFile:message];
             }

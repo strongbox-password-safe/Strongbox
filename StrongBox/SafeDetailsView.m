@@ -23,6 +23,7 @@
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "BiometricsManager.h"
+#import "FavIconBulkViewController.h"
 
 @interface SafeDetailsView ()
 
@@ -36,10 +37,19 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoFillAlwaysUseCache;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellBulkUpdateFavIcons;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
+
+@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfGroups;
+@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfRecords;
+@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfUniqueUsernames;
+@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfUniquePasswords;
+@property (weak, nonatomic) IBOutlet UILabel * labelMostPopularUsername;
+@property (weak, nonatomic) IBOutlet UILabel * labelExportByEmail;
+
 
 @end
 
@@ -164,8 +174,6 @@
         vc.viewModel = self.viewModel;
     }
     else if([segue.identifier isEqualToString:@"segueToSetCredentials"]) {
-        NSLog(@"Set Creds - XXXXXXXX");
-        
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
         
@@ -380,8 +388,23 @@
     else if (cell == self.cellDatabaseAutoLockDelay) {
         [self promptForAutoLockTimeout];
     }
+    else if (cell == self.cellBulkUpdateFavIcons) {
+        [self onBulkUpdateFavIcons];
+    }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)onBulkUpdateFavIcons {
+    [FavIconBulkViewController presentModal:self
+                                      nodes:self.viewModel.database.activeRecords
+                                     onDone:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+        
+        if(go && selectedFavIcons) {
+            self.onDatabaseBulkIconUpdate(selectedFavIcons); // Browse will take care of updating itself here...
+        }
+    }];
 }
 
 - (void)promptForAutoLockTimeout {

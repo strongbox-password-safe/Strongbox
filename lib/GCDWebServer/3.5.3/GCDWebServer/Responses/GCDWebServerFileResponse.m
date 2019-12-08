@@ -100,7 +100,7 @@ static inline NSDate* _NSDateFromTimeSpec(const struct timespec* t) {
       range.location = fileSize - range.length;
     }
     if (range.length == 0) {
-      return nil;  // TODO: Return 416 status code and "Content-Range: bytes */{file length}" header
+      return nil;  // TDO: Return 416 status code and "Content-Range: bytes */{file length}" header
     }
   } else {
     range.location = 0;

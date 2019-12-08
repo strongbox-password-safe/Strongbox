@@ -198,17 +198,16 @@
     // Compare Original and Regenerated
     
     
-    NSString *originalXml = getXml(origRootGroup, NO);
-    
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/orig.xml" contents:[originalXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+//    NSString *originalXml = getXml(origRootGroup, NO);
+//    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/orig.xml" contents:[originalXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
     //NSLog(@"%@", originalXml);
     
 
     NSLog(@"============================================================================================================================");
     
-    NSString *regeneratedXml = getXml(regeneratedRootGroup, NO);
+//    NSString *regeneratedXml = getXml(regeneratedRootGroup, NO);
     //NSLog(@"%@", regeneratedXml);
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regen.xml" contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+//    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regen.xml" contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 
     XCTAssertEqualObjects(origRootGroup, regeneratedRootGroup);
 }

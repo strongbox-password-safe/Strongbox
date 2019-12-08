@@ -73,7 +73,7 @@
     }
     else if (cell == self.deleteAllBackupsCell) {
         [Alerts yesNo:self
-                title:NSLocalizedString(@"safes_vc_question_confirm_are_you_sure", @"Are you sure?")
+                title:NSLocalizedString(@"generic_are_you_sure", @"Are you sure?")
               message:NSLocalizedString(@"backups_vc_delete_all_backups_prompt_message", @"Are you sure you want to delete all backups?")
                action:^(BOOL response) {
             if (response) {

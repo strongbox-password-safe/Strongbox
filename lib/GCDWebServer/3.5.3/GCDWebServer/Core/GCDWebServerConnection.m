@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_END
       if (success) {
         if (hasBody) {
           [self writeBodyWithCompletionBlock:^(BOOL successInner) {
-            [self->_response performClose];  // TODO: There's nothing we can do on failure as headers have already been sent
+            [self->_response performClose];  // TDO: There's nothing we can do on failure as headers have already been sent
           }];
         }
       } else if (hasBody) {
@@ -312,7 +312,7 @@ NS_ASSUME_NONNULL_END
                 if (self->_request.usesChunkedTransferEncoding || (extraData.length <= self->_request.contentLength)) {
                   NSString* expectHeader = [requestHeaders objectForKey:@"Expect"];
                   if (expectHeader) {
-                    if ([expectHeader caseInsensitiveCompare:@"100-continue"] == NSOrderedSame) {  // TODO: Actually validate request before continuing
+                    if ([expectHeader caseInsensitiveCompare:@"100-continue"] == NSOrderedSame) {  // TDO: Actually validate request before continuing
                       [self writeData:_continueData
                           withCompletionBlock:^(BOOL success) {
                             if (success) {
@@ -747,7 +747,7 @@ static inline NSUInteger _ScanHexNumber(const void* bytes, NSUInteger size) {
     }
     if (!authenticated) {
       response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_Unauthorized];
-      [response setValue:[NSString stringWithFormat:@"Digest realm=\"%@\", nonce=\"%@\"%@", _server.authenticationRealm, _digestAuthenticationNonce, isStaled ? @", stale=TRUE" : @""] forAdditionalHeader:@"WWW-Authenticate"];  // TODO: Support Quality of Protection ("qop")
+      [response setValue:[NSString stringWithFormat:@"Digest realm=\"%@\", nonce=\"%@\"%@", _server.authenticationRealm, _digestAuthenticationNonce, isStaled ? @", stale=TRUE" : @""] forAdditionalHeader:@"WWW-Authenticate"];  // TDO: Support Quality of Protection ("qop")
     }
   }
   return response;

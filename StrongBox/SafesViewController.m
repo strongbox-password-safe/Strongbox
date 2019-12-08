@@ -887,7 +887,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     
     [Alerts yesNo:self
-            title:NSLocalizedString(@"safes_vc_question_confirm_are_you_sure", @"Are you sure? Title")
+            title:NSLocalizedString(@"generic_are_you_sure", @"Are you sure? Title")
           message:message
            action:^(BOOL response) {
                if (response) {

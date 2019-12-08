@@ -1,9 +1,3 @@
-/* Options Title - What would like to do? Options are to Add a Database or Create New etc */
-"safes_vc_what_would_you_like_to_do" = "What would you like to do?";
-
-/* Are you sure? Title */
-"safes_vc_question_confirm_are_you_sure" = "Are you sure?";
-
 /* Upgrade Button Title - Upgrade Info */
 "safes_vc_upgrade_info_button_title" = "Upgrade Info";
 
@@ -25,20 +19,11 @@
 /* Date and Time last cache was taken */
 "safes_vc_cached_date_time_fmt" = "Cached: %@";
 
-/* Remove this database table action */
-"safes_vc_slide_left_remove_database_action" = "Remove...";
-
 /* Open ths database offline table action */
 "safes_vc_slide_left_open_offline_action" = "Open Offline";
 
-/* View more actions table action */
-"safes_vc_slide_left_more_actions" = "More...";
-
 /* Title of the 'More Actions' alert/action sheet */
 "safes_vc_database_actions_sheet_title" = "Database Actions";
-
-/* Button to Rename the Database */
-"safes_vc_action_rename_database" = "Rename...";
 
 /* Button Title to Unset Quick Launch */
 "safes_vc_action_unset_as_quick_launch" = "Unset as Quick Launch...";
@@ -275,53 +260,14 @@
 /* Confirm Password */
 "alerts_confirm_password" = "Confirm Password";
 
-/* No */
-"alerts_no" = "No";
-
 /* Not Empty! */
 "alerts_not_empty" = "Not Empty!";
-
-/* OK */
-"alerts_ok" = "OK";
-
-/* Password */
-"alerts_password" = "Password";
-
-/* Unknown Error */
-"alerts_unknown_error" = "Unknown Error";
-
-/* Yes */
-"alerts_yes" = "Yes";
 
 /* Double Tap Action */
 "browse_prefs_double_tap_action" = "Double Tap Action";
 
 /* Item Subtitle */
 "browse_prefs_item_subtitle" = "Item Subtitle";
-
-/* Date Created */
-"browse_prefs_item_subtitle_date_created" = "Date Created";
-
-/* Date Modified */
-"browse_prefs_item_subtitle_date_modified" = "Date Modified";
-
-/* Email */
-"browse_prefs_item_subtitle_email" = "Email";
-
-/* None */
-"browse_prefs_item_subtitle_none" = "None";
-
-/* Notes */
-"browse_prefs_item_subtitle_notes" = "Notes";
-
-/* Password */
-"browse_prefs_item_subtitle_password" = "Password";
-
-/* URL */
-"browse_prefs_item_subtitle_url" = "URL";
-
-/* Username */
-"browse_prefs_item_subtitle_username" = "Username";
 
 /* Long Press Action */
 "browse_prefs_long_press_action" = "Long Press Action";
@@ -374,23 +320,8 @@
 /* TOTP List */
 "browse_prefs_view_as_totp_list" = "TOTP List";
 
-/* Delete */
-"browse_vc_action_delete" = "Delete";
-
-/* Duplicate */
-"browse_vc_action_duplicate" = "Duplicate";
-
-/* Edit */
-"browse_vc_action_edit" = "Edit";
-
-/* Rename */
-"browse_vc_action_rename" = "Rename";
-
 /* Set Icon */
 "browse_vc_action_set_icon" = "Set Icon";
-
-/* Are you sure? */
-"browse_vc_are_you_sure" = "Are you sure?";
 
 /* Are you sure you want to permanently delete these item(s)? */
 "browse_vc_are_you_sure_delete" = "Are you sure you want to permanently delete these item(s)?";
@@ -467,18 +398,6 @@
 /* All Fields */
 "browse_vc_search_scope_all" = "All Fields";
 
-/* Password */
-"browse_vc_search_scope_password" = "Password";
-
-/* Title */
-"browse_vc_search_scope_title" = "Title";
-
-/* URL */
-"browse_vc_search_scope_url" = "URL";
-
-/* Username */
-"browse_vc_search_scope_username" = "Username";
-
 /* Sort Items By Title? */
 "browse_vc_sort_by_title" = "Sort Items By Title?";
 
@@ -516,14 +435,8 @@
 /* Show/Hide Password */
 "casg_accessibility_label_show_hide_pw" = "Show/Hide Password";
 
-/* Add */
-"casg_add_action" = "Add";
-
 /* Add Existing Database */
 "casg_add_existing_database_action" = "Add Existing Database";
-
-/* Create */
-"casg_create_action" = "Create";
 
 /* Create Database */
 "casg_create_database_action" = "Create Database";
@@ -567,9 +480,6 @@
 /* Empty Password or None? */
 "casg_question_title_empty_password" = "Empty Password or None?";
 
-/* Rename */
-"casg_rename_action" = "Rename";
-
 /* Rename Database */
 "casg_rename_database_action" = "Rename Database";
 
@@ -587,9 +497,6 @@
 
 /* %@'s Database %d */
 "casg_suggested_database_name_users_database_number_suffix_fmt" = "%@'s Database %d";
-
-/* Password */
-"casg_text_field_placeholder_password" = "Password";
 
 /* Password (Required) */
 "casg_text_field_placeholder_password_required" = "Password (Required)";
@@ -684,23 +591,11 @@
 /* Email Copied */
 "item_details_email_copied" = "Email Copied";
 
-/* Email */
-"item_details_email_field_title" = "Email";
-
-/* Expires */
-"item_details_expires_field_title" = "Expires";
-
-/* Never */
-"item_details_expiry_never" = "Never";
+/* Username Copied */
+"item_details_username_copied" = "Username Copied";
 
 /* Item History */
 "item_details_item_history" = "Item History";
-
-/* Created */
-"item_details_metadata_created_field_title" = "Created";
-
-/* Modified */
-"item_details_metadata_modified_field_title" = "Modified";
 
 /* New Custom Field... */
 "item_details_new_custom_field_button" = "New Custom Field...";
@@ -713,9 +608,6 @@
 
 /* Password Copied. Launching URL... */
 "item_details_password_copied_and_launching" = "Password Copied. Launching URL...";
-
-/* Password */
-"item_details_password_field_title" = "Password";
 
 /* Password History */
 "item_details_password_history" = "Password History";
@@ -737,9 +629,6 @@
 
 /* Metadata */
 "item_details_section_header_metadata" = "Metadata";
-
-/* Notes */
-"item_details_section_header_notes" = "Notes";
 
 /* Setup TOTP... */
 "item_details_setup_totp" = "Setup TOTP...";
@@ -777,23 +666,8 @@
 /* Title Copied */
 "item_details_title_copied" = "Title Copied";
 
-/* Title */
-"item_details_title_field_name" = "Title";
-
 /* One Time Password Copied */
 "item_details_totp_copied" = "One Time Password Copied";
-
-/* URL Copied */
-"item_details_url_copied" = "URL Copied";
-
-/* URL */
-"item_details_url_field_title" = "URL";
-
-/* Username Copied */
-"item_details_username_copied" = "Username Copied";
-
-/* Username */
-"item_details_username_field_title" = "Username";
 
 /* Are you sure you want to discard all your changes? */
 "item_details_vc_are_you_sure_discard_changes" = "Are you sure you want to discard all your changes?";
@@ -806,9 +680,6 @@
 
 /* Restore */
 "keepass_history_action_restore" = "Restore";
-
-/* Are you sure? */
-"keepass_history_are_you_sure" = "Are you sure?";
 
 /* Are you sure you want to delete this historical item? */
 "keepass_history_are_you_sure_delete_message" = "Are you sure you want to delete this historical item?";
@@ -891,12 +762,6 @@
 /* PINs do not match */
 "prefs_vc_pins_dont_match_warning_title" = "PINs do not match";
 
-/* Disabled */
-"prefs_vc_setting_disabled" = "Disabled";
-
-/* None */
-"prefs_vc_time_interval_none" = "None";
-
 /* Use iCloud */
 "prefs_vc_use_icloud_action" = "Use iCloud";
 
@@ -923,12 +788,6 @@
 
 /* Select Folder For New Database */
 "sbtvc_select_new_database_location" = "Select Folder For New Database";
-
-/* Face ID */
-"settings_face_id_name" = "Face ID";
-
-/* Touch ID */
-"settings_touch_id_name" = "Touch ID";
 
 /* Copy from URL... */
 "sspc_copy_from_url_action" = "Copy from URL...";
@@ -1053,9 +912,6 @@
 /* Last Cached Date */
 "databases_preferences_subtitle_field_name_last_cached_data" = "Last Cached Date";
 
-/* None */
-"databases_preferences_subtitle_field_name_none" = "None";
-
 /* It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt. */
 "upgrade_mgr_downgrade_message" = "It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt.";
 
@@ -1083,14 +939,8 @@
 /* %@ (Required) */
 "generic_kv_cell_value_empty_value_validation_fmt" = "%@ (Required)";
 
-/* Date */
-"edit_date_cell_date_field_placeholder" = "Date";
-
 /* Date Text Field */
 "edit_date_cell_date_field_accessibility_label" = "Date Text Field";
-
-/* Time */
-"edit_date_cell_time_field_placeholder" = "Time";
 
 /* Time Text Field */
 "edit_date_cell_time_field_accessibility_label" = "Time Text Field";
@@ -1234,15 +1084,6 @@
 
 /* Application Local Files */
 "key_files_vc_section_header_local" = "Documents Folder (Auto-Fill not supported)";
-
-/* No Key File */
-"key_files_vc_no_key_file" = "No Key File";
-
-/* Remove */
-"key_files_vc_option_remove" = "Remove";
-
-/* Import */
-"key_files_vc_option_import" = "Import";
 
 /* Remove After Import */
 "key_files_vc_remove_after_import_title" = "Remove After Import";
@@ -1574,9 +1415,11 @@
 /* Could not open this database in offline mode. Does the Offline Cache exist? */
 "open_sequence_couldnt_open_offline_message" = "Could not open this database in offline mode. Does the Offline Cache exist?";
 
-/* Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@
-   There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ */
-"open_sequence_storage_unreachable_open_offline_instead_fmt" = "Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";
+/* Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ */
+"open_sequence_user_looks_offline_open_offline_instead_fmt" = "Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";
+
+/* There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ */
+"open_sequence_storage_unreachable_open_offline_instead_fmt" = "There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";
 
 /* Could not open database
    There was a problem opening the database. */
@@ -1588,8 +1431,8 @@
 /* Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB). */
 "open_sequence_autofill_creash_likely_message" = "Your database is quite large, or has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption.\nThis will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed system limitation.\nYou could consider reducing file size or changing the amount of resources consumed (Memory in particular with Argon2 to below 64MB).";
 
-/* Decrypting... */
-"open_sequence_progress_decrypting" = "Decrypting...";
+/* No Key File */
+"key_files_vc_no_key_file" = "No Key File";
 
 /* The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled. */
 "open_sequence_problem_opening_convenience_incorrect_message" = "The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.";
@@ -1632,9 +1475,6 @@
 
 /* Use a PIN Code... */
 "open_sequence_prompt_use_convenience_use_pin" = "Use a PIN Code...";
-
-/* No */
-"open_sequence_prompt_option_no" = "No";
 
 /* PIN Conflict */
 "open_sequence_warn_pin_conflict_title" = "PIN Conflict";
@@ -1795,21 +1635,6 @@
 /* Error Signing out of OneDrive */
 "cloud_sessions_prompt_onedrive_signout_error" = "Error Signing out of OneDrive";
 
-/* Title */
-"pick_creds_vc_search_scope_title" = "Title";
-
-/* Username */
-"pick_creds_vc_search_scope_username" = "Username";
-
-/* Password */
-"pick_creds_vc_search_scope_password" = "Password";
-
-/* URL */
-"pick_creds_vc_search_scope_url" = "URL";
-
-/* All Fields */
-"pick_creds_vc_search_scope_all_fields" = "All Fields";
-
 /* (in /) */
 "pick_creds_vc_group_path_display_string_root" = "(in /)";
 
@@ -1891,6 +1716,18 @@
 /* Swedish */
 "pwgen_wordlist_swedish" = "Swedish";
 
+/* Game of Thrones (EFF Fandom) */
+"pwgen_wordlist_gameofthrones" = "Game of Thrones (EFF Fandom)";
+
+/* Harry Potter (EFF Fandom) */
+"pwgen_wordlist_harrypotter" = "Harry Potter (EFF Fandom)";
+
+/* Star Trek (EFF Fandom) */
+"pwgen_wordlist_star_trek" = "Star Trek (EFF Fandom)";
+
+/* Star Wars (EFF Fandom) */
+"pwgen_wordlist_starwars" = "Star Wars (EFF Fandom)";
+
 /* Do Not Change */
 "pwgen_casing_do_not_change" = "Do Not Change";
 
@@ -1912,9 +1749,6 @@
 /* Symbols */
 "pwgen_casing_symbols" = "Symbols";
 
-/* None */
-"pwgen_hacker_level_none" = "None";
-
 /* Basic (Some Words) */
 "pwgen_hacker_level_basic_some" = "Basic (Some Words)";
 
@@ -1926,9 +1760,6 @@
 
 /* Pro (All Words) */
 "pwgen_hacker_level_pro_all" = "Pro (All Words)";
-
-/* None */
-"pwgen_salt_mode_none" = "None";
 
 /* Prefix */
 "pwgen_salt_mode_prefix" = "Prefix";
@@ -2075,7 +1906,7 @@
 "upgrade_family_sharing_info_title" = "Family Sharing";
 
 /* A message about how you will need to download/purchase a separate App for Family Sharing to work */
-"upgrade_family_sharing_info_message" = "To benefit from Family Sharing you should purchase the separate Family Edition.\nTap OK to view this edition on the App Store";
+"upgrade_family_sharing_info_message" = "To benefit from Family Sharing you need to have 'Apple Family Sharing' setup for your family. Then you should purchase the separate Family Sharing Edition of Strongbox.\nTap OK to view this edition on the App Store";
 
 /* Need Family Sharing? */
 "upgrade_family_sharing_button_title" = "Need Family Sharing?";
@@ -2107,6 +1938,9 @@
 /* No comment provided by engineer. */
 "transfer_over_local_network_website_prologue" = "<p>Drag &amp; drop files on this window or use the \"Upload Files&hellip;\" button to upload new files. If these files are valid KeePass or Password Safe databases they will be automatically be added to your Databases collection.</p><p>NB: If you want these files to work with iOS AutoFill you should slide left on the database in app, and choose 'Make Auto-Fillable'.</p>";
 
+/**********************************************************************************************************************/
+/* TODO: genericise... */
+
 /* Title */
 "generic_fieldname_title" = "Title";
 
@@ -2137,6 +1971,9 @@
 /* Done */
 "generic_done" = "Done";
 
+/* Failed */
+"generic_failed" = "Failed";
+
 /* Error */
 "generic_error" = "Error";
 
@@ -2157,3 +1994,253 @@
 
 /* Database */
 "generic_database" = "Database";
+
+/* Options Title - What would like to do? Options are to Add a Database or Create New etc */
+"safes_vc_what_would_you_like_to_do" = "What would you like to do?";
+
+/* Are you sure? */
+"safes_vc_question_confirm_are_you_sure" = "Are you sure?";
+
+/* Are you sure? */
+"generic_are_you_sure" = "Are you sure?";
+
+/* Are you sure? */
+"browse_vc_are_you_sure" = "Are you sure?";
+
+/* Are you sure? */
+"keepass_history_are_you_sure" = "Are you sure?";
+
+/* View more actions table action */
+"safes_vc_slide_left_more_actions" = "More...";
+
+/* Button to Rename the Database */
+"safes_vc_action_rename_database" = "Rename...";
+
+/* Remove this database table action */
+"safes_vc_slide_left_remove_database_action" = "Remove...";
+
+/* No */
+"alerts_no" = "No";
+
+/* OK */
+"alerts_ok" = "OK";
+
+/* Yes */
+"alerts_yes" = "Yes";
+
+/* Password */
+"alerts_password" = "Password";
+
+/* Unknown Error */
+"alerts_unknown_error" = "Unknown Error";
+
+/* Date Created */
+"browse_prefs_item_subtitle_date_created" = "Date Created";
+
+/* Date Modified */
+"browse_prefs_item_subtitle_date_modified" = "Date Modified";
+
+/* Email */
+"browse_prefs_item_subtitle_email" = "Email";
+
+/* None */
+"browse_prefs_item_subtitle_none" = "None";
+/* None */
+"prefs_vc_time_interval_none" = "None";
+/* None */
+"pwgen_hacker_level_none" = "None";
+/* None */
+"pwgen_salt_mode_none" = "None";
+/* None */
+"databases_preferences_subtitle_field_name_none" = "None";
+
+/* Notes */
+"browse_prefs_item_subtitle_notes" = "Notes";
+
+/* Password */
+"browse_prefs_item_subtitle_password" = "Password";
+
+/* URL */
+"browse_prefs_item_subtitle_url" = "URL";
+
+/* Username */
+"browse_prefs_item_subtitle_username" = "Username";
+
+/* Duplicate */
+"browse_vc_action_duplicate" = "Duplicate";
+
+/* Delete */
+"browse_vc_action_delete" = "Delete";
+
+/* Edit */
+"browse_vc_action_edit" = "Edit";
+
+/* Rename */
+"browse_vc_action_rename" = "Rename";
+
+/* Password */
+"browse_vc_search_scope_password" = "Password";
+
+/* Title */
+"browse_vc_search_scope_title" = "Title";
+
+/* URL */
+"browse_vc_search_scope_url" = "URL";
+
+/* Username */
+"browse_vc_search_scope_username" = "Username";
+
+/* Add */
+"casg_add_action" = "Add";
+
+/* Create */
+"casg_create_action" = "Create";
+
+/* Rename */
+"casg_rename_action" = "Rename";
+
+/* Password */
+"casg_text_field_placeholder_password" = "Password";
+
+/* Email */
+"item_details_email_field_title" = "Email";
+
+/* Expires */
+"item_details_expires_field_title" = "Expires";
+
+/* Created */
+"item_details_metadata_created_field_title" = "Created";
+
+/* Modified */
+"item_details_metadata_modified_field_title" = "Modified";
+
+/* Password */
+"item_details_password_field_title" = "Password";
+
+/* Notes */
+"item_details_section_header_notes" = "Notes";
+
+/* Title */
+"item_details_title_field_name" = "Title";
+
+/* URL Copied */
+"item_details_url_copied" = "URL Copied";
+
+/* URL */
+"item_details_url_field_title" = "URL";
+
+/* Username */
+"item_details_username_field_title" = "Username";
+
+/* Disabled */
+"prefs_vc_setting_disabled" = "Disabled";
+
+/* Face ID */
+"settings_face_id_name" = "Face ID";
+
+/* Touch ID */
+"settings_touch_id_name" = "Touch ID";
+
+/* Date */
+"edit_date_cell_date_field_placeholder" = "Date";
+
+/* Time */
+"edit_date_cell_time_field_placeholder" = "Time";
+
+/* Remove */
+"key_files_vc_option_remove" = "Remove";
+
+/* Import */
+"key_files_vc_option_import" = "Import";
+
+/* Decrypting... */
+"open_sequence_progress_decrypting" = "Decrypting...";
+
+/* No */
+"open_sequence_prompt_option_no" = "No";
+
+/* Title */
+"pick_creds_vc_search_scope_title" = "Title";
+
+/* Username */
+"pick_creds_vc_search_scope_username" = "Username";
+
+/* Password */
+"pick_creds_vc_search_scope_password" = "Password";
+
+/* URL */
+"pick_creds_vc_search_scope_url" = "URL";
+
+/* All Fields */
+"pick_creds_vc_search_scope_all_fields" = "All Fields";
+
+/* Never */
+"item_details_expiry_never" = "Never";
+
+/**********************************************************************************************************************/
+
+/* Download FavIcon */
+"set_icon_vc_icon_source_download_favicons" = "Download Child FavIcons";
+
+/* Download FavIcon (Pro Only) */
+"set_icon_vc_icon_source_download_favicons_pro_only" = "Download Child FavIcons (Pro Only)";
+
+/* Set Icons */
+"browse_vc_action_set_icons" = "Icons...";
+
+/* Tap Play to start search */
+"favicon_status_initial" = "Tap Play to start search";
+
+/* Searching... */
+"favicon_status_in_progress" = "Searching...";
+
+/* Pausing (may take a few seconds)... */
+"favicon_status_pausing" = "Pausing (may take a few seconds)...";
+
+/* FavIcon search paused. Tap Play to Continue... */
+"favicon_status_paused"= "Search paused. Tap Play to Continue...";
+
+/* Search Complete. Tap View Results to see FavIcons */
+"favicon_status_done" = "Search Complete. Tap View Results to see FavIcons";
+
+/* Are you sure you want to clear current results and retry all items? */
+"favicon_clear_all_and_retry_message" = "Are you sure you want to clear current results and retry all items?";
+
+/* Retry All or Failed? */
+"favicon_retry_all_or_failed_title" = "Retry All or Failed?";
+
+/* Would you like to retry all items, or just the failed ones? */
+"favicon_retry_all_or_failed_message" = "Would you like to retry all items, or just the failed ones?";
+
+/* Retry All */
+"favicon_retry_all_action" = "Retry All";
+
+/* Retry Failed */
+"favicon_retry_failed_action" = "Retry Failed";
+
+/* No eligible items with valid URLs found... */
+"favicon_status_no_eligible_items" = "No eligible items/valid URLs found...";
+
+/* FavIcon Results */
+"favicon_results_title" = "FavIcon Results";
+
+/* FavIcon Results (Pro Only) */
+"favicon_results_title_pro_only" = "FavIcon Results (Pro Only)";
+
+/* %lu Icons Found (%dx%d selected) */
+"favicon_results_n_icons_found_with_xy_resolution_fmt" = "%lu Icons Found (%dx%d selected)";
+
+/* %dx%d selected */
+"favicon_results_one_icon_found_with_xy_resolution_fmt" = "%dx%d selected";
+
+/* No FavIcons Found */
+"favicon_results_no_icons_found" = "No FavIcons Found";
+
+/* Are you sure you want to remove this FavIcon result? */
+"favicon_results_are_you_sure_remove_result_message" = "Are you sure you want to remove this FavIcon result?";
+
+/* Invalid FavIcon Preferences */
+"favicon_invalid_preferences_alert_title" = "Invalid FavIcon Preferences";
+
+/* This set of preferences will not produce valid FavIcon results. */
+"favicon_invalid_preferences_alert_message" = "This set of preferences will not produce valid FavIcon results.";

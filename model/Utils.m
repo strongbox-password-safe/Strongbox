@@ -412,7 +412,7 @@ UIImage* scaleImage(UIImage* image, CGSize newSize)
 {
     float heightToWidthRatio = image.size.height / image.size.width;
     float scaleFactor = 1;
-    if(heightToWidthRatio > 0) {
+    if(heightToWidthRatio > 1) {
         scaleFactor = newSize.height / image.size.height;
     } else {
         scaleFactor = newSize.width / image.size.width;
@@ -436,7 +436,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
 {
     float heightToWidthRatio = image.size.height / image.size.width;
     float scaleFactor = 1;
-    if(heightToWidthRatio > 0) {
+    if(heightToWidthRatio > 1) {
         scaleFactor = newSize.height / image.size.height;
     } else {
         scaleFactor = newSize.width / image.size.width;

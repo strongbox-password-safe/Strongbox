@@ -472,33 +472,19 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.sni = [[SetNodeIconUiHelper alloc] init];
     self.sni.customIcons = self.viewModel.database.customIcons;
     
-    NSString* urlHint;
-    if(!item.isGroup) {
-        urlHint = item.fields.url;
-        if(!urlHint.length) {
-            urlHint = item.title;
-        }
-    }    
-    
     [self.sni changeIcon:self
-                 urlHint:urlHint
+                    node:item
+             urlOverride:nil
                   format:self.viewModel.database.format
-              completion:^(BOOL goNoGo, NSNumber * userSelectedNewIconIndex, NSUUID * userSelectedExistingCustomIconId, UIImage * userSelectedNewCustomIcon) {
-        NSLog(@"completion: %d - %@-%@-%@", goNoGo, userSelectedNewIconIndex, userSelectedExistingCustomIconId, userSelectedNewCustomIcon);
+              completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nonnull selected) {
         if(goNoGo) {
-            if(!item.isGroup) {
-                Node* originalNodeForHistory = [item cloneForHistory];
-                [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+            if (selected) {
+                [self setCustomIcons:item selected:selected isRecursiveGroupFavIconResult:isRecursiveGroupFavIconResult];
+                [self saveChangesToSafeAndRefreshView];
             }
-            
-            [item touch:YES touchParents:YES];
-
-            if(userSelectedNewCustomIcon) {
-                NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                [self.viewModel.database setNodeCustomIcon:item data:data rationalize:YES];
-            }
-            else if(userSelectedExistingCustomIconId) {
+            else if (userSelectedExistingCustomIconId) {
                 item.customIconUuid = userSelectedExistingCustomIconId;
+                [self saveChangesToSafeAndRefreshView];
             }
             else if(userSelectedNewIconIndex) {
                 if(userSelectedNewIconIndex.intValue == -1) {
@@ -508,11 +494,40 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                     item.iconId = userSelectedNewIconIndex;
                 }
                 item.customIconUuid = nil;
-            }
-            
-            [self saveChangesToSafeAndRefreshView];
+                
+                [self saveChangesToSafeAndRefreshView];
+            }            
         }
     }];
+}
+
+- (void)setCustomIcons:(Node*)item
+              selected:(NSDictionary<NSUUID *,UIImage *>*)selected
+isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
+    if(isRecursiveGroupFavIconResult) {
+        for(Node* node in item.allChildRecords) {
+            UIImage* img = selected[node.uuid];
+            if(img) {
+                [self setCustomIcon:node image:img];
+            }
+        }
+    }
+    else {
+        // Direct set for item/group
+        [self setCustomIcon:item image:selected.allValues.firstObject];
+    }
+}
+
+- (void)setCustomIcon:(Node*)item image:(UIImage*)image {
+    if(!item.isGroup) {
+        Node* originalNodeForHistory = [item cloneForHistory];
+        [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+    }
+    
+    [item touch:YES touchParents:YES];
+
+    NSData *data = UIImagePNGRepresentation(image);
+    [self.viewModel.database setNodeCustomIcon:item data:data rationalize:YES];
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -531,11 +546,14 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }];
     renameAction.backgroundColor = UIColor.blueColor;
     
-    UITableViewRowAction *setIconAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                             title:NSLocalizedString(@"browse_vc_action_set_icon", @"Set Icon") handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *setIconAction =
+        [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                           title:item.isGroup ? NSLocalizedString(@"browse_vc_action_set_icons", @"Icons...") :
+                                                                                                  NSLocalizedString(@"browse_vc_action_set_icon", @"Set Icon")
+                                         handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onSetIconForItem:indexPath];
     }];
-    setIconAction.backgroundColor = UIColor.purpleColor;
+    setIconAction.backgroundColor = UIColor.orangeColor;
 
     UITableViewRowAction *duplicateItemAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                                    title:NSLocalizedString(@"browse_vc_action_duplicate", @"Duplicate")
@@ -558,7 +576,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
         }
         else {
-            return @[removeAction, renameAction, duplicateItemAction, pinAction];
+            return @[removeAction, renameAction, duplicateItemAction, setIconAction, pinAction]; // TODO: Icons instead of text!
         }
     }
     else {
@@ -997,6 +1015,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         UINavigationController* nav = segue.destinationViewController;
         SafeDetailsView *vc = (SafeDetailsView *)nav.topViewController;
         vc.viewModel = self.viewModel;
+        vc.onDatabaseBulkIconUpdate = ^(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+            for(Node* node in self.viewModel.database.activeRecords) {
+                UIImage* img = selectedFavIcons[node.uuid];
+                if(img) {
+                    [self setCustomIcon:node image:img];
+                }
+            }
+            
+            [self saveChangesToSafeAndRefreshView]; // TODO: This is called from SafeDetailsView do we need a spinner?
+        };
     }
     else if([segue.identifier isEqualToString:@"segueToViewSettings"]) {
         UINavigationController* nav = segue.destinationViewController;

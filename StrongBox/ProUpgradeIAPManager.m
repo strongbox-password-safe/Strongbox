@@ -177,6 +177,9 @@
         self.products = [NSMutableDictionary dictionary];
         if (products) {
             for (SKProduct *validProduct in products) {
+//                NSLog(@"Got App Store Product [%@-%@]",
+//                      validProduct.productIdentifier,
+//                      validProduct.price);
                 [self.products setValue:validProduct forKey:validProduct.productIdentifier];
             }
         }

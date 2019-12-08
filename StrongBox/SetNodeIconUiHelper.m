@@ -15,6 +15,7 @@
 #import "IconsCollectionViewController.h"
 #import "Settings.h"
 #import "FavIconManager.h"
+#import "FavIconBulkViewController.h"
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
@@ -25,22 +26,26 @@
 
 @implementation SetNodeIconUiHelper
 
-- (void)changeIcon:(UIViewController *)viewController urlHint:(NSString *)urlHint format:(DatabaseFormat)format completion:(ChangeIconCompletionBlock)completion {
+- (void)changeIcon:(UIViewController *)viewController
+              node:(Node*_Nonnull)node
+       urlOverride:(NSString*)urlOverride
+            format:(DatabaseFormat)format
+        completion:(ChangeIconCompletionBlock)completion {
     self.viewController = viewController;
     self.completionBlock = completion;
     
     if(format == kPasswordSafe) {
         NSLog(@"Should not be calling this if safe is Password Safe!!");
-        self.completionBlock(NO, nil, nil, nil);
+        self.completionBlock(NO, nil, nil, NO, nil);
         return;
     }
     if(format == kKeePass1) {
         [self presentKeePassAndDatabaseIconSets];
     }
     else {
-        NSURL* url = [self smartDetermineUrlFromHint:urlHint];
+        BOOL favIconPossible = node ? (node.isGroup || [NSURL URLWithString:node.fields.url] != nil) : [self smartDetermineUrlFromHint:urlOverride] != nil;
         
-        if (url) { // FavIcon support not available on free tier
+        if (favIconPossible) {
             UIAlertController *alertController =
             [UIAlertController alertControllerWithTitle:
              NSLocalizedString(@"set_icon_vc_select_icon_source_title", @"Select Icon Source")
@@ -60,18 +65,32 @@
                                            NSLocalizedString(@"set_icon_vc_icon_source_media_libary", @"Media Library")
                                                                    style:UIAlertActionStyleDefault
                                                                  handler:^(UIAlertAction *a) { [self presentCustomIconImagePicker]; }];
+
             
-            UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+            UIAlertAction *thirdAction;
+            
+            if(node && node.isGroup) {
+                thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+                                          NSLocalizedString(@"set_icon_vc_icon_source_download_favicons", @"Download FavIcons") :
+                                          NSLocalizedString(@"set_icon_vc_icon_source_download_favicons_pro_only", @"Download FavIcons (Pro Only)")
+                                         style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction *a) {
+                    [self onDownloadFavIcons:viewController node:node urlOverride:urlOverride completion:completion];
+                }];
+            }
+            else {
+                thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon", @"Download FavIcon") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon_pro_only", @"Download FavIcon (Pro Only)")
-                                                                  style:UIAlertActionStyleDefault
-                                                                handler:^(UIAlertAction *a) {  [self downloadFavIcon:url silent:NO completion:^(BOOL goNoGo, UIImage * _Nullable userSelectedNewCustomIcon) {
-                completion(goNoGo, nil, nil, userSelectedNewCustomIcon);
-            }]; }];
+                                         style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction *a) {
+                    [self onDownloadFavIcons:viewController node:node urlOverride:urlOverride completion:completion];
+                }];
+            }
             
             UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                    style:UIAlertActionStyleCancel
-                                                                 handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, nil); }];
+                                                                 handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, NO,  nil); }];
             
             thirdAction.enabled = Settings.sharedInstance.isProOrFreeTrial;
             
@@ -97,22 +116,73 @@
                        [self presentCustomIconImagePicker];
                    }
                    else {
-                       self.completionBlock(NO, nil, nil, nil); // Cancelled
+                       self.completionBlock(NO, nil, nil,  NO, nil); // Cancelled
                    }}];
         }
     }
 }
 
-- (void)tryDownloadFavIcon:(NSString*)urlHint completion:(DownloadFavIconCompletionBlock)completion {
-    NSURL* url = [self smartDetermineUrlFromHint:urlHint];
+- (void)onDownloadFavIcons:(UIViewController *)viewController
+                      node:(Node* _Nonnull)node
+               urlOverride:(NSString*)urlOverride
+                completion:(ChangeIconCompletionBlock)completion {
+    if(node.isGroup) {
+        [self downloadFavIcon:viewController
+                        nodes:node.allChildRecords
+                      urlOverride:urlOverride
+                   completion:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+            completion(go, nil, nil, YES, selectedFavIcons);
+        }];
+    }
+    else {
+        [self downloadFavIcon:viewController
+                        nodes:@[node]
+                  urlOverride:urlOverride
+                   completion:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+            completion(go, nil, nil, NO, selectedFavIcons);
+        }];
+    }
+}
+
+- (void)downloadFavIcon:(UIViewController*)presentingVc
+                  nodes:(NSArray<Node*>*)nodes
+            urlOverride:(NSString*)urlOverride
+             completion:(FavIconBulkDoneBlock)completion {
+    if (urlOverride) {
+        [FavIconBulkViewController presentModal:presentingVc node:nodes.firstObject urlOverride:urlOverride
+                                         onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
+            [presentingVc dismissViewControllerAnimated:YES completion:nil];
+            completion(go, selectedFavIcons);
+        }];
+    }
+    else {
+        [FavIconBulkViewController presentModal:presentingVc nodes:nodes onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
+            [presentingVc dismissViewControllerAnimated:YES completion:nil];
+            completion(go, selectedFavIcons);
+        }];
+    }
+}
+
+- (void)expressDownloadBestFavIcon:(NSString*)urlOverride completion:(void (^)(UIImage * _Nullable))completion {
+    NSURL* url = [self smartDetermineUrlFromHint:urlOverride];
     
-    if(url) {
+    if (url) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self downloadFavIcon:url silent:YES completion:completion];
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_downloading_favicon", @"Downloading FavIcon")];
+            NSLog(@"attempting to download favicon for: [%@]", url);
+
+            [FavIconManager.sharedInstance downloadPreferred:url
+                                                     options:FavIconDownloadOptions.express
+                                                  completion:^(UIImage * _Nullable image) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                    completion(image);
+                });
+            }];
         });
     }
     else {
-        completion(NO, nil);
+        completion(nil);
     }
 }
 
@@ -160,30 +230,6 @@
     return url;
 }
 
-- (void)downloadFavIcon:(NSURL*)url silent:(BOOL)silent completion:(DownloadFavIconCompletionBlock)completion {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_downloading_favicon", @"Downloading FavIcon")];
-    NSLog(@"attempting to download favicon for: [%@]", url);
-    [FavIconManager.sharedInstance downloadPreferred:url
-                                          completion:^(UIImage * _Nullable image) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-            
-            if(image && image.size.width > 0 && image.size.height > 0) {
-                completion(YES, image);
-                NSLog(@"FavIcon download Done!");
-            }
-            else {
-                if(!silent) {
-                    [Alerts warn:self.viewController
-                           title:NSLocalizedString(@"set_icon_vc_error_downloading_favicon_title", @"FavIcon Problem")
-                         message:NSLocalizedString(@"set_icon_vc_error_downloading_favicon_message", @"Could not download favicon for this item")];
-                }
-                completion(NO, nil);
-            }
-        });
-    }];
-}
-
 - (void)presentKeePassAndDatabaseIconSets {
     IconsCollectionViewController* vc = [[IconsCollectionViewController alloc] init];
     vc.customIcons = self.customIcons;
@@ -192,10 +238,10 @@
     vc.onDone = ^(BOOL response, NSInteger selectedIndex, NSUUID * _Nullable selectedCustomIconId) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(response) {
-                self.completionBlock(YES, @(selectedIndex), selectedCustomIconId, nil);
+                self.completionBlock(YES, @(selectedIndex), selectedCustomIconId, NO, nil);
             }
             else {
-                self.completionBlock(NO, nil, nil, nil);
+                self.completionBlock(NO, nil, nil, NO, nil);
             }
         }];
     };
@@ -215,7 +261,7 @@
         [Alerts info:self.viewController
                title:NSLocalizedString(@"set_icon_vc_image_src_unavailable_title", @"Image Source Unavailable")
              message:NSLocalizedString(@"set_icon_vc_image_src_photos_unavailable_message", @"Could not access photos source.")];
-        self.completionBlock(NO, nil, nil, nil);
+        self.completionBlock(NO, nil, nil, NO, nil);
         return;
     }
     
@@ -235,7 +281,7 @@
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:^
      {
-         self.completionBlock(NO, nil, nil, nil);
+         self.completionBlock(NO, nil, nil, NO, nil);
      }];
 }
 
@@ -253,7 +299,7 @@
                 [Alerts error:self.viewController
                         title:NSLocalizedString(@"set_icon_vc_error_reading_image", @"Error Reading Image")
                         error:error];
-                self.completionBlock(NO, nil, nil, nil);
+                self.completionBlock(NO, nil, nil, NO, nil);
             }
             else {
                 [self analyzeCustomIconAndSet:data];
@@ -261,6 +307,8 @@
         });
     });
 }
+
+static const int kMaxRecommendedCustomIconDimension = 256;
 
 - (void)analyzeCustomIconAndSet:(NSData*)data {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_analyzing_image", @"Analyzing Image...")];
@@ -287,18 +335,18 @@
                             title:NSLocalizedString(@"set_icon_vc_prompt_rescale_image_title", @"Large Custom Icon Image, Rescale?")
                           message:message
                            action:^(BOOL response) {
-                        self.completionBlock(YES, nil, nil, response ? rescaled : image);
+                        self.completionBlock(YES, nil, nil, NO, @{ NSUUID.UUID : response ? rescaled : image});
                     }];
                 }
                 else {
-                    self.completionBlock(YES, nil, nil, image);
+                    self.completionBlock(YES, nil, nil, NO, @{ NSUUID.UUID : image });
                 }
             });
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD dismiss];
-                self.completionBlock(YES, nil, nil, image);
+                self.completionBlock(YES, nil, nil, NO, @{ NSUUID.UUID : image } ); // SO hacky - split entry functions up so we don't need to do this badness
             });
         }
     });

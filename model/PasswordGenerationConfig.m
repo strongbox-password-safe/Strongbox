@@ -33,6 +33,11 @@ static NSString* const kWordListJapanese = @"japanese-diceware.wordlist.utf8";
 static NSString* const kWordListPolish = @"polish-diceware.wordlist.utf8";
 static NSString* const kWordListSwedish = @"swedish-diceware.wordlist.utf8";
 
+static NSString* const kWordListFandomGameOfThrones = @"gameofthrones_8k_2018.utf8";
+static NSString* const kWordListFandomHarryPotter = @"harrypotter_8k_2018.utf8";
+static NSString* const kWordListFandomStarTrek = @"star_trek_8k_2018.utf8";
+static NSString* const kWordListFandomStarWars = @"starwars_8k_2018.utf8";
+
 const static NSDictionary<NSString*, NSString*> *wordLists;
 
 + (void)initialize {
@@ -55,6 +60,10 @@ const static NSDictionary<NSString*, NSString*> *wordLists;
                           kWordListJapanese : NSLocalizedString(@"pwgen_wordlist_japanese", @"Japanese"),
                           kWordListPolish : NSLocalizedString(@"pwgen_wordlist_polish", @"Polish"),
                           kWordListSwedish : NSLocalizedString(@"pwgen_wordlist_swedish", @"Swedish"),
+                          kWordListFandomGameOfThrones : NSLocalizedString(@"pwgen_wordlist_gameofthrones", @"Game of Thrones (EFF Fandom)"),
+                          kWordListFandomHarryPotter  : NSLocalizedString(@"pwgen_wordlist_harrypotter", @"Harry Potter (EFF Fandom)"),
+                          kWordListFandomStarTrek : NSLocalizedString(@"pwgen_wordlist_star_trek", @"Star Trek (EFF Fandom)"),
+                          kWordListFandomStarWars  : NSLocalizedString(@"pwgen_wordlist_starwars", @"Star Wars (EFF Fandom)"),
                          };
         });
     }

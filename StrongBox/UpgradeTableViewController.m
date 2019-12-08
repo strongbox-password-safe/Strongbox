@@ -446,11 +446,13 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
 - (IBAction)onFamilySharing:(id)sender {
     self.buttonFamilySharing.enabled = NO;
 
-    [Alerts info:self
-           title:NSLocalizedString(@"upgrade_family_sharing_info_title", @"Title of info dialog about Family Sharing upgrade")
-         message:NSLocalizedString(@"upgrade_family_sharing_info_message", @"A message about how you will need to download/purchase a separate App for Family Sharing to work")
-      completion:^{
-        [self showFamilySharingAppInAppStore];
+    [Alerts okCancel:self
+               title:NSLocalizedString(@"upgrade_family_sharing_info_title", @"Title of info dialog about Family Sharing upgrade")
+             message:NSLocalizedString(@"upgrade_family_sharing_info_message", @"A message about how you will need to download/purchase a separate App for Family Sharing to work")
+              action:^(BOOL response) {
+        if(response) {
+            [self showFamilySharingAppInAppStore];
+        }
     }];
 }
 

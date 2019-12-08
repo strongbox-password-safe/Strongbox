@@ -83,7 +83,7 @@
     
     LocalDatabaseIdentifier *identifier = [[LocalDatabaseIdentifier alloc] init];
     identifier.filename = suggestedFilename;
-    identifier.sharedStorage = Settings.sharedInstance.useLocalSharedStorage;
+    identifier.sharedStorage = YES;
     
     SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:identifier];
     completion(metadata, nil);
@@ -368,7 +368,7 @@
 }
 
 - (NSURL*)getDefaultStorageFileUrl:(NSString*)filename {
-    NSURL* folder = [self getDirectory:Settings.sharedInstance.useLocalSharedStorage];
+    NSURL* folder = [self getDirectory:YES];
     return [folder URLByAppendingPathComponent:filename];
 }
 

@@ -221,7 +221,7 @@
     XCTAssertNil(error);
     XCTAssertNotNil(data);
     
-    [data writeToFile:@"/Users/mark/Desktop/large.kdbx" options:kNilOptions error:&error];
+//    [data writeToFile:@"/Users/mark/Desktop/large.kdbx" options:kNilOptions error:&error];
     
     NSLog(@"%@", error);
 }

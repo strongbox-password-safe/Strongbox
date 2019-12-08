@@ -27,16 +27,15 @@
     NSOperationQueue* queue = [NSOperationQueue new];
     queue.maxConcurrentOperationCount = 8;
 
-    // TODO: Cancellable... ?
-
     NSMutableDictionary<NSURL*, UIImage*>* results = [NSMutableDictionary dictionary];
 
     __block NSUInteger doneCount = 0;
     [FavIconManager.sharedInstance getFavIconsForUrls:urls
                                                 queue:queue
-                                         withProgress:^(NSURL * url, UIImage * _Nullable image) {
-        NSLog(@"Got %@ => %@ - %lu", url, image, (unsigned long)doneCount);
-        results[url] = image;
+                                              options:FavIconDownloadOptions.defaults
+                                         withProgress:^(NSURL * _Nonnull url, NSArray<UIImage *> * _Nonnull images) {
+        NSLog(@"Got %@ => %@ - %lu", url, images, (unsigned long)doneCount);
+        results[url] = images.firstObject;
       
         doneCount++;
         
@@ -76,6 +75,7 @@
     NSURL *url = [NSURL URLWithString:str];
     
     [FavIconManager.sharedInstance downloadPreferred:url
+                                             options:FavIconDownloadOptions.defaults
                                           completion:^(UIImage * _Nullable image) {
         NSLog(@"%@", image);
                         

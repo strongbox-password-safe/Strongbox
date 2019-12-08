@@ -10,6 +10,8 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 
+static const NSInteger kDefaultClearClipboardTimeout = 90;
+
 static NSString* const kLaunchCountKey = @"launchCount";
 static NSString* const kPromptedForReview = @"newPromptedForReview";
 static NSString* const kIsProKey = @"isPro";
@@ -24,23 +26,16 @@ static NSString* const kiCloudPrompted = @"iCloudPrompted";
 static NSString* const kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
 static NSString* const kInstallDate = @"installDate";
 static NSString* const kDisallowBiometricId = @"disallowBiometricId";
-//static NSString* const kDoNotAutoAddNewLocalSafes = @"doNotAutoAddNewLocalSafes"; // Dead
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
-
-static NSString* const kUseQuickLaunchAsRootView = @"useQuickLaunchAsRootView"; // TODO: Retire / Remove - Dead
-
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
 static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
 static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
 static NSString* const kHideTips = @"hideTips";
 static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
 
-static const NSInteger kDefaultClearClipboardTimeout = 90;
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
 
-//static NSString* const kHideTotpInAutoFill = @"hideTotpInAutofill"; // DEAD
-//static NSString* const kDoNotAutoDetectKeyFiles = @"doNotAutoDetectKeyFiles"; // DEAD
 static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
 static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
 //static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
@@ -76,9 +71,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 static NSString* cachedAppGroupName;
 
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
-//static NSString* const kUseLocalSharedStorage = @"useLocalSharedStorage"; // DEAD
 static NSString* const kQuickLaunchUuid = @"quickLaunchUuid";
-static NSString* const kMigratedToNewQuickLaunchSystem = @"migratedToNewQuickLaunchSystem";
 
 static NSString* const kShowDatabaseIcon = @"showDatabaseIcon";
 static NSString* const kShowDatabaseStatusIcon = @"showDatabaseStatusIcon";
@@ -88,6 +81,7 @@ static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
 static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
+static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 
 @implementation Settings
 
@@ -117,6 +111,26 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (FavIconDownloadOptions *)favIconDownloadOptions {
+    NSUserDefaults *defaults = [self getUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kFavIconDownloadOptions];
+
+    if(encodedObject == nil) {
+        return FavIconDownloadOptions.defaults;
+    }
+
+    FavIconDownloadOptions *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+
+    return object;
+}
+
+- (void)setFavIconDownloadOptions:(FavIconDownloadOptions *)favIconDownloadOptions {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:favIconDownloadOptions];
+    NSUserDefaults *defaults = [self getUserDefaults];
+    [defaults setObject:encodedObject forKey:kFavIconDownloadOptions];
+    [defaults synchronize];
+}
 
 - (BOOL)hasDoneProFamilyCheck {
     return [self getBool:kHasDoneProFamilyCheck];
@@ -182,26 +196,12 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
     [self setInteger:kDatabaseCellSubtitle2 value:databaseCellSubtitle2];
 }
 
-//
-
-- (BOOL)migratedToNewQuickLaunchSystem {
-    return [self getBool:kMigratedToNewQuickLaunchSystem];
-}
-
-- (void)setMigratedToNewQuickLaunchSystem:(BOOL)migratedToNewQuickLaunchSystem {
-    [self setBool:kMigratedToNewQuickLaunchSystem value:migratedToNewQuickLaunchSystem];
-}
-
 - (NSString *)quickLaunchUuid {
     return [self getString:kQuickLaunchUuid];
 }
 
 - (void)setQuickLaunchUuid:(NSString *)quickLaunchUuid {
     [self setString:kQuickLaunchUuid value:quickLaunchUuid];
-}
-
-- (BOOL)useLocalSharedStorage {
-    return YES; // [self getBool:kUseLocalSharedStorage fallback:YES];
 }
 
 - (BOOL)showYubikeySecretWorkaroundField {
@@ -617,15 +617,6 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
     [[self getUserDefaults] synchronize];
 }
 
-- (BOOL)useQuickLaunchAsRootView {
-    return [[self getUserDefaults] boolForKey:kUseQuickLaunchAsRootView];
-}
-
-- (void)setUseQuickLaunchAsRootView:(BOOL)useQuickLaunchAsRootView {
-    [[self getUserDefaults] setBool:useQuickLaunchAsRootView forKey:kUseQuickLaunchAsRootView];
-    [[self getUserDefaults] synchronize];
-}
-
 - (BOOL)showKeePassCreateSafeOptions {
     return [[self getUserDefaults] boolForKey:kShowKeePassCreateSafeOptions];
 }
@@ -683,10 +674,6 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 
 -(void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
     return [self setInteger:kClearClipboardAfterSeconds value:clearClipboardAfterSeconds];
-}
-
-- (BOOL)doNotAutoDetectKeyFiles {
-    return NO; //[[self getUserDefaults] boolForKey:kDoNotAutoDetectKeyFiles];
 }
 
 - (NSDate *)lastEntitlementCheckAttempt {

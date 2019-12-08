@@ -122,7 +122,7 @@ static void _SignalHandler(int signal) {
 // This utility function is used to ensure scheduled callbacks on the main thread are called when running the server synchronously
 // https://developer.apple.com/library/mac/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html
 // The main queue works with the application’s run loop to interleave the execution of queued tasks with the execution of other event sources attached to the run loop
-// TODO: Ensure all scheduled blocks on the main queue are also executed
+// TDO: Ensure all scheduled blocks on the main queue are also executed
 static void _ExecuteMainThreadRunLoopSources() {
   SInt32 result;
   do {
@@ -723,7 +723,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
   GWS_DCHECK([NSThread isMainThread]);
   GWS_LOG_DEBUG(@"Will enter foreground");
   if (!_source4) {
-    [self _start:NULL];  // TODO: There's probably nothing we can do on failure
+    [self _start:NULL];  // TDO: There's probably nothing we can do on failure
   }
 }
 

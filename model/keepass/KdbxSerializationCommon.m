@@ -297,22 +297,22 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void dumpXml(NSInputStream* lib) {
-    NSInteger read;
-    
-    NSMutableData *d = [NSMutableData data];
-    const int kChunkSize = 32 * 1024;
-    uint8_t chunk[kChunkSize];
-    
-    while ((read = [lib read:chunk maxLength:kChunkSize])) {
-        [d appendBytes:chunk length:read];
-    }
-    
-    NSString* xml = [[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding];
-    NSError* error;
-    [xml writeToFile:@"/Users/mark/Desktop/dump.xml" atomically:YES encoding:NSUTF8StringEncoding error:&error];
-    NSLog(@"XML Dumped: [%@]", error);
-}
+//void dumpXml(NSInputStream* lib) {
+//    NSInteger read;
+//    
+//    NSMutableData *d = [NSMutableData data];
+//    const int kChunkSize = 32 * 1024;
+//    uint8_t chunk[kChunkSize];
+//    
+//    while ((read = [lib read:chunk maxLength:kChunkSize])) {
+//        [d appendBytes:chunk length:read];
+//    }
+//    
+//    NSString* xml = [[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding];
+//    NSError* error;
+//    [xml writeToFile:@"/Users/mark/Desktop/dump.xml" atomically:YES encoding:NSUTF8StringEncoding error:&error];
+//    NSLog(@"XML Dumped: [%@]", error);
+//}
 
 RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
                               NSData* innerRandomStreamKey,

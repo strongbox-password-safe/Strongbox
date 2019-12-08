@@ -16,6 +16,7 @@
 #import "BrowseViewType.h"
 #import "PasswordGenerationConfig.h"
 #import "DatabaseCellSubtitleField.h"
+#import "FavIconDownloadOptions.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -64,7 +65,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property (nonatomic) BOOL disallowAllPinCodeOpens;
 @property (nonatomic) BOOL disallowAllBiometricId;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
-@property (nonatomic) BOOL useQuickLaunchAsRootView; // DEAD
 @property (nonatomic) BOOL showKeePassCreateSafeOptions;
 @property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
 @property (nonatomic) BOOL hasShownKeePassBetaWarning;
@@ -101,7 +101,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL showYubikeySecretWorkaroundField;
 
 @property (nullable) NSString* quickLaunchUuid;
-@property BOOL migratedToNewQuickLaunchSystem;
 
 @property BOOL showDatabaseIcon;
 @property BOOL showDatabasesSeparator;
@@ -110,14 +109,13 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property DatabaseCellSubtitleField databaseCellSubtitle1;
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
 
-@property (readonly) BOOL useLocalSharedStorage; // TODO: Remove
-@property (readonly) BOOL doNotAutoDetectKeyFiles;  // TODO: Remove
-
 @property BOOL monitorInternetConnectivity;
 
 @property BOOL hasDoneProFamilyCheck;
 
 @property BOOL suppressPrivacyScreen; // Used by Biometric Auth and Google Drive to suppress privacy screen which interferes with their operation
+
+@property FavIconDownloadOptions *favIconDownloadOptions;
 
 NS_ASSUME_NONNULL_END
 

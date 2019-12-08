@@ -16,12 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) Model *viewModel;
 
-@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfGroups;
-@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfRecords;
-@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfUniqueUsernames;
-@property (weak, nonatomic) IBOutlet UILabel * labelNumberOfUniquePasswords;
-@property (weak, nonatomic) IBOutlet UILabel * labelMostPopularUsername;
-@property (weak, nonatomic) IBOutlet UILabel *labelExportByEmail;
+@property (nonatomic, copy) void (^onDatabaseBulkIconUpdate)(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons);
 
 @end
 

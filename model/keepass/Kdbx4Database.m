@@ -243,7 +243,9 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
             NSArray<CustomIcon*> *icons = meta.customIconList.icons;
             NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
             for (CustomIcon* icon in icons) {
-                [ret setObject:icon.data forKey:icon.uuid];
+                if(icon.data != nil) { // Android KeePass DX seems some how to include no data sometimes? Causes crash
+                    [ret setObject:icon.data forKey:icon.uuid];
+                }
             }
             return ret;
         }

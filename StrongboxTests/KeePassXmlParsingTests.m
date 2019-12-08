@@ -91,9 +91,9 @@
     NSString *regeneratedXml = getXml(rootObject, NO);
     NSLog(@"\n%@", regeneratedXml);
     
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regenerated.xml"
-                                            contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding]
-                                          attributes:nil];
+//    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regenerated.xml"
+//                                            contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding]
+//                                          attributes:nil];
 }
 
 - (void)tstRegenerateXmlAndVerifyEquivalent {
@@ -149,10 +149,10 @@
     NSLog(@"%@\n======================================================================================\n%@", xml, regeneratedXml);
    
     XCTAssertTrue(compareOriginalAndRegeneratedXml(xml, regeneratedXml));
-    
-    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regenerated.xml"
-                                            contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding]
-                                          attributes:nil];
+//
+//    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/regenerated.xml"
+//                                            contents:[regeneratedXml dataUsingEncoding:NSUTF8StringEncoding]
+//                                          attributes:nil];
 }
 
 - (void)broken_testSalsa20DecryptAndEncryptAgain {

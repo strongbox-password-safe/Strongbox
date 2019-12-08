@@ -100,6 +100,10 @@
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D60CC6F1F4C1627005B66B8 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */; };
+		4D6C853E2396306A00008391 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C853A2396306900008391 /* starwars_8k_2018.utf8.txt */; };
+		4D6C853F2396306A00008391 /* harrypotter_8k_3column-txt.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C853B2396306900008391 /* harrypotter_8k_3column-txt.utf8.txt */; };
+		4D6C85402396306A00008391 /* gameofthrones_8k-2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C853C2396306900008391 /* gameofthrones_8k-2018.utf8.txt */; };
+		4D6C85412396306A00008391 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C853D2396306900008391 /* star_trek_8k_2018.utf8.txt */; };
 		4D75D08A22CFED3000D704BF /* CheckboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D75D08922CFED3000D704BF /* CheckboxCell.xib */; };
 		4D7E39D52266420600EC940E /* InstalledWebBrowserHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39D42266420600EC940E /* InstalledWebBrowserHelper.m */; };
 		4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
@@ -403,6 +407,10 @@
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D60CC6D1F4C1627005B66B8 /* UpgradeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UpgradeWindowController.xib; path = MacBox/UpgradeWindowController.xib; sourceTree = "<group>"; };
+		4D6C853A2396306900008391 /* starwars_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = starwars_8k_2018.utf8.txt; path = ../resources/wordlists/starwars_8k_2018.utf8.txt; sourceTree = "<group>"; };
+		4D6C853B2396306900008391 /* harrypotter_8k_3column-txt.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "harrypotter_8k_3column-txt.utf8.txt"; path = "../resources/wordlists/harrypotter_8k_3column-txt.utf8.txt"; sourceTree = "<group>"; };
+		4D6C853C2396306900008391 /* gameofthrones_8k-2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "gameofthrones_8k-2018.utf8.txt"; path = "../resources/wordlists/gameofthrones_8k-2018.utf8.txt"; sourceTree = "<group>"; };
+		4D6C853D2396306900008391 /* star_trek_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = star_trek_8k_2018.utf8.txt; path = ../resources/wordlists/star_trek_8k_2018.utf8.txt; sourceTree = "<group>"; };
 		4D75D08922CFED3000D704BF /* CheckboxCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = CheckboxCell.xib; path = MacBox/CheckboxCell.xib; sourceTree = "<group>"; };
 		4D7E39D32266420600EC940E /* InstalledWebBrowserHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InstalledWebBrowserHelper.h; sourceTree = "<group>"; };
 		4D7E39D42266420600EC940E /* InstalledWebBrowserHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InstalledWebBrowserHelper.m; sourceTree = "<group>"; };
@@ -677,6 +685,10 @@
 		4D216F5B22CBCDBF000954D0 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
+				4D6C853C2396306900008391 /* gameofthrones_8k-2018.utf8.txt */,
+				4D6C853B2396306900008391 /* harrypotter_8k_3column-txt.utf8.txt */,
+				4D6C853D2396306900008391 /* star_trek_8k_2018.utf8.txt */,
+				4D6C853A2396306900008391 /* starwars_8k_2018.utf8.txt */,
 				4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */,
 				4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */,
 				4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */,
@@ -1403,9 +1415,11 @@
 				4DBCE223222414A100A2AFA2 /* SelectPredefinedIconController.xib in Resources */,
 				4D553B54219DD2CE00AA4BAB /* AttachmentItem.xib in Resources */,
 				4D14A13A224D1A9400C71ABF /* NodeDetailsWindowController.xib in Resources */,
+				4D6C85412396306A00008391 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DBCE22822241D6700A2AFA2 /* PredefinedKeePassIcon.xib in Resources */,
+				4D6C853F2396306A00008391 /* harrypotter_8k_3column-txt.utf8.txt in Resources */,
 				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
@@ -1413,6 +1427,8 @@
 				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
 				4DDCE1CC21BBFF7800D1DE09 /* ProgressWindow.xib in Resources */,
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
+				4D6C85402396306A00008391 /* gameofthrones_8k-2018.utf8.txt in Resources */,
+				4D6C853E2396306A00008391 /* starwars_8k_2018.utf8.txt in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				4D9903C5223664D3002C10EE /* KeePassHistoryController.xib in Resources */,
 				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,

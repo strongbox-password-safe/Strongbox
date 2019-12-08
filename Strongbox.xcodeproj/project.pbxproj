@@ -326,6 +326,14 @@
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4D446809216CE02C00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446808216CE02C00F6358D /* Csv.m */; };
+		4D44982B23924CCC00B21794 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D62E26523437F8200119604 /* DebugHelper.m */; };
+		4D44982C23924CCC00B21794 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D62E26523437F8200119604 /* DebugHelper.m */; };
+		4D44982D23925BFB00B21794 /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
+		4D44982E23925BFC00B21794 /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
+		4D44983123926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44983023926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m */; };
+		4D44983223926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44983023926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m */; };
+		4D44983323926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44983023926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m */; };
+		4D44983423926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44983023926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m */; };
 		4D4554AE2285C0BB0015C236 /* BrowseItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4554AD2285C0BB0015C236 /* BrowseItemCell.m */; };
 		4D4554AF2285C0BB0015C236 /* BrowseItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4554AD2285C0BB0015C236 /* BrowseItemCell.m */; };
 		4D4598C42192EDC400792EF7 /* Database-Aes-Argon2NonDefault.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D4598C22192EAC900792EF7 /* Database-Aes-Argon2NonDefault.kdbx */; };
@@ -333,6 +341,10 @@
 		4D4598CA2193033800792EF7 /* TwoFish-with-AesKdf.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D4598C8219302FD00792EF7 /* TwoFish-with-AesKdf.kdbx */; };
 		4D4598CD2193048400792EF7 /* TwoFishCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4598CC2193048400792EF7 /* TwoFishCipher.m */; };
 		4D4598CE2193048400792EF7 /* TwoFishCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4598CC2193048400792EF7 /* TwoFishCipher.m */; };
+		4D461FFE239C21D400AC4038 /* FavIconBulk.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D462003239C21D400AC4038 /* FavIconBulk.storyboard */; };
+		4D461FFF239C21D400AC4038 /* FavIconBulk.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D462003239C21D400AC4038 /* FavIconBulk.storyboard */; };
+		4D462000239C21D400AC4038 /* FavIconBulk.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D462003239C21D400AC4038 /* FavIconBulk.storyboard */; };
+		4D462001239C21D400AC4038 /* FavIconBulk.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D462003239C21D400AC4038 /* FavIconBulk.storyboard */; };
 		4D4766E02178C82B00C4358F /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766C52178C82900C4358F /* SerializationData.m */; };
 		4D4766E12178C82B00C4358F /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766C52178C82900C4358F /* SerializationData.m */; };
 		4D4766F22178C82B00C4358F /* DecryptionParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766D72178C82B00C4358F /* DecryptionParameters.m */; };
@@ -435,6 +447,22 @@
 		4D6B505C238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */; };
 		4D6B505D238BBA1F00DF2F88 /* SVProgressHUD.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */; };
 		4D6C51981F6407580035640E /* SafeDetailsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6C51971F6407580035640E /* SafeDetailsView.m */; };
+		4D6C8546239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */; };
+		4D6C8547239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */; };
+		4D6C8548239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */; };
+		4D6C8549239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */; };
+		4D6C854A239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */; };
+		4D6C854B239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */; };
+		4D6C854C239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */; };
+		4D6C854D239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */; };
+		4D6C854E239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */; };
+		4D6C854F239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */; };
+		4D6C8550239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */; };
+		4D6C8551239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */; };
+		4D6C8552239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8545239630A300008391 /* starwars_8k_2018.utf8.txt */; };
+		4D6C8553239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8545239630A300008391 /* starwars_8k_2018.utf8.txt */; };
+		4D6C8554239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8545239630A300008391 /* starwars_8k_2018.utf8.txt */; };
+		4D6C8555239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D6C8545239630A300008391 /* starwars_8k_2018.utf8.txt */; };
 		4D6FE2BB2194400300EB9997 /* twofish-argon-2.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BA2194400300EB9997 /* twofish-argon-2.kdbx */; };
 		4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */; };
 		4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */; };
@@ -548,6 +576,8 @@
 		4D8FCEAA23606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
 		4D8FCEAB23606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
 		4D8FCEAC23606D78001F2172 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FCEA823606D78001F2172 /* first.names.us.txt */; };
+		4D9098EC239956BA0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9098EB239956BA0063DAC7 /* FavIconPreferencesTableViewController.m */; };
+		4D9098EE239956BE0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9098EB239956BA0063DAC7 /* FavIconPreferencesTableViewController.m */; };
 		4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */; };
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -1211,6 +1241,10 @@
 		4DC8D9B021B6EBC9004F1812 /* sample-32-binary.key in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8D9AF21B6EBC9004F1812 /* sample-32-binary.key */; };
 		4DC8D9B521B6F14C004F1812 /* sample-hex-text.key in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B421B6F14C004F1812 /* sample-hex-text.key */; };
 		4DC95E9E2231AA3B00DE4E9F /* KeePassHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC95E9D2231AA3B00DE4E9F /* KeePassHistoryController.m */; };
+		4DC9690F238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC9690E238FD4D700D6286F /* FavIconDownloadOptions.m */; };
+		4DC96910238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC9690E238FD4D700D6286F /* FavIconDownloadOptions.m */; };
+		4DC96911238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC9690E238FD4D700D6286F /* FavIconDownloadOptions.m */; };
+		4DC96912238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC9690E238FD4D700D6286F /* FavIconDownloadOptions.m */; };
 		4DCC3F8A2177BA1A00FB13C2 /* password-three-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F892177BA1A00FB13C2 /* password-three-entries-ladder.xml */; };
 		4DCC3F8C2177BEEE00FB13C2 /* password-five-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F8B2177BEEE00FB13C2 /* password-five-entries-ladder.xml */; };
 		4DCC3F8E2177C08400FB13C2 /* ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC3F8D2177C08400FB13C2 /* ladder.xml */; };
@@ -1223,6 +1257,8 @@
 		4DD696A5218F0B170082DC08 /* AttachmentsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD696A4218F0B170082DC08 /* AttachmentsRationalizer.m */; };
 		4DD696A7218F13C80082DC08 /* AttachmentsRationalizerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD696A6218F13C80082DC08 /* AttachmentsRationalizerTests.m */; };
 		4DD696A8218F38EC0082DC08 /* AttachmentsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD696A4218F0B170082DC08 /* AttachmentsRationalizer.m */; };
+		4DD6CB53238E6491005B94CF /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
+		4DD6CB54238E6491005B94CF /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
 		4DD755EB232F084900758824 /* ExportOptionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */; };
 		4DD755EE232F087A00758824 /* WelcomeUseICloudViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */; };
 		4DD755F3232F093900758824 /* XmlToDictionaryParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755F1232F093900758824 /* XmlToDictionaryParser.m */; };
@@ -1329,6 +1365,10 @@
 		4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
 		4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
 		4DFA67E522C80824000FC012 /* PasswordMakerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E422C80824000FC012 /* PasswordMakerTests.m */; };
+		4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
+		4DFF34C5238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
+		4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
+		4DFF34C7238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
 		4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */; };
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
@@ -1739,6 +1779,8 @@
 		4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StorageBrowserItem.m; path = StrongBox/StorageBrowserItem.m; sourceTree = "<group>"; };
 		4D446807216CE02C00F6358D /* Csv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = model/Csv.h; sourceTree = SOURCE_ROOT; };
 		4D446808216CE02C00F6358D /* Csv.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = model/Csv.m; sourceTree = SOURCE_ROOT; };
+		4D44982F23926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconSelectFromMultipleFavIconsTableViewController.h; path = StrongBox/FavIconSelectFromMultipleFavIconsTableViewController.h; sourceTree = "<group>"; };
+		4D44983023926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconSelectFromMultipleFavIconsTableViewController.m; path = StrongBox/FavIconSelectFromMultipleFavIconsTableViewController.m; sourceTree = "<group>"; };
 		4D4554AC2285C0BB0015C236 /* BrowseItemCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseItemCell.h; path = StrongBox/BrowseItemCell.h; sourceTree = "<group>"; };
 		4D4554AD2285C0BB0015C236 /* BrowseItemCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BrowseItemCell.m; path = StrongBox/BrowseItemCell.m; sourceTree = "<group>"; };
 		4D4598C22192EAC900792EF7 /* Database-Aes-Argon2NonDefault.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Database-Aes-Argon2NonDefault.kdbx"; sourceTree = "<group>"; };
@@ -1747,6 +1789,11 @@
 		4D4598CB2193048400792EF7 /* TwoFishCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TwoFishCipher.h; path = model/keepass/TwoFishCipher.h; sourceTree = "<group>"; };
 		4D4598CC2193048400792EF7 /* TwoFishCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TwoFishCipher.m; path = model/keepass/TwoFishCipher.m; sourceTree = "<group>"; };
 		4D4598D1219308B600792EF7 /* tomcrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tomcrypt.h; path = model/pwsafe/twofish/tomcrypt.h; sourceTree = "<group>"; };
+		4D462002239C21D400AC4038 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/FavIconBulk.storyboard; sourceTree = "<group>"; };
+		4D462005239C21F200AC4038 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/FavIconBulk.strings; sourceTree = "<group>"; };
+		4D462007239C21F300AC4038 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/FavIconBulk.strings; sourceTree = "<group>"; };
+		4D462009239C21F500AC4038 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/FavIconBulk.strings; sourceTree = "<group>"; };
+		4D46200B239C21F600AC4038 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/FavIconBulk.strings; sourceTree = "<group>"; };
 		4D4695B223878E43009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Backups.strings; sourceTree = "<group>"; };
 		4D4695B323878E43009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/MasterDetail.strings; sourceTree = "<group>"; };
 		4D4695B423878E44009D3BC7 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/Main.strings; sourceTree = "<group>"; };
@@ -1932,6 +1979,10 @@
 		4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SVProgressHUD.bundle; path = lib/SVProgressHUD/SVProgressHUD.bundle; sourceTree = "<group>"; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafeDetailsView.h; path = StrongBox/SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafeDetailsView.m; path = StrongBox/SafeDetailsView.m; sourceTree = "<group>"; };
+		4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = star_trek_8k_2018.utf8.txt; path = resources/wordlists/star_trek_8k_2018.utf8.txt; sourceTree = "<group>"; };
+		4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = harrypotter_8k_2018.utf8.txt; path = resources/wordlists/harrypotter_8k_2018.utf8.txt; sourceTree = "<group>"; };
+		4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = gameofthrones_8k_2018.utf8.txt; path = resources/wordlists/gameofthrones_8k_2018.utf8.txt; sourceTree = "<group>"; };
+		4D6C8545239630A300008391 /* starwars_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = starwars_8k_2018.utf8.txt; path = resources/wordlists/starwars_8k_2018.utf8.txt; sourceTree = "<group>"; };
 		4D6FE2BA2194400300EB9997 /* twofish-argon-2.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "twofish-argon-2.kdbx"; sourceTree = "<group>"; };
 		4D6FE2BE2194451D00EB9997 /* Kdb1Database.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kdb1Database.h; path = model/keepass/Kdb1Database.h; sourceTree = "<group>"; };
 		4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Kdb1Database.m; path = model/keepass/Kdb1Database.m; sourceTree = "<group>"; };
@@ -2181,6 +2232,8 @@
 		4D8FBEF021A9D9C5004797FA /* kp1-keyfile-only.kdb */ = {isa = PBXFileReference; lastKnownFileType = file; path = "kp1-keyfile-only.kdb"; sourceTree = "<group>"; };
 		4D8FCEA323606D6F001F2172 /* surnames.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = surnames.us.txt; path = resources/names/surnames/surnames.us.txt; sourceTree = "<group>"; };
 		4D8FCEA823606D78001F2172 /* first.names.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = first.names.us.txt; path = resources/names/first/first.names.us.txt; sourceTree = "<group>"; };
+		4D9098EA239956BA0063DAC7 /* FavIconPreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconPreferencesTableViewController.h; path = StrongBox/FavIconPreferencesTableViewController.h; sourceTree = "<group>"; };
+		4D9098EB239956BA0063DAC7 /* FavIconPreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconPreferencesTableViewController.m; path = StrongBox/FavIconPreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D915D721EDC068D002615F6 /* PasswordHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordHistoryViewController.h; path = StrongBox/PasswordHistoryViewController.h; sourceTree = "<group>"; };
 		4D915D731EDC068D002615F6 /* PasswordHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordHistoryViewController.m; path = StrongBox/PasswordHistoryViewController.m; sourceTree = "<group>"; };
 		4D915D751EDC06A0002615F6 /* PreviousPasswordsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreviousPasswordsTableViewController.h; path = StrongBox/PreviousPasswordsTableViewController.h; sourceTree = "<group>"; };
@@ -2292,6 +2345,8 @@
 		4DC8DFF01EE19CE300F1F757 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4DC95E9C2231AA3B00DE4E9F /* KeePassHistoryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassHistoryController.h; path = StrongBox/KeePassHistoryController.h; sourceTree = "<group>"; };
 		4DC95E9D2231AA3B00DE4E9F /* KeePassHistoryController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassHistoryController.m; path = StrongBox/KeePassHistoryController.m; sourceTree = "<group>"; };
+		4DC9690D238FD4D700D6286F /* FavIconDownloadOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconDownloadOptions.h; path = StrongBox/FavIconDownloadOptions.h; sourceTree = "<group>"; };
+		4DC9690E238FD4D700D6286F /* FavIconDownloadOptions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconDownloadOptions.m; path = StrongBox/FavIconDownloadOptions.m; sourceTree = "<group>"; };
 		4DCC3F892177BA1A00FB13C2 /* password-three-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-three-entries-ladder.xml"; sourceTree = "<group>"; };
 		4DCC3F8B2177BEEE00FB13C2 /* password-five-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-five-entries-ladder.xml"; sourceTree = "<group>"; };
 		4DCC3F8D2177C08400FB13C2 /* ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ladder.xml; sourceTree = "<group>"; };
@@ -2307,6 +2362,8 @@
 		4DD696A3218F0B170082DC08 /* AttachmentsRationalizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AttachmentsRationalizer.h; path = model/keepass/AttachmentsRationalizer.h; sourceTree = "<group>"; };
 		4DD696A4218F0B170082DC08 /* AttachmentsRationalizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentsRationalizer.m; path = model/keepass/AttachmentsRationalizer.m; sourceTree = "<group>"; };
 		4DD696A6218F13C80082DC08 /* AttachmentsRationalizerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentsRationalizerTests.m; path = StrongboxTests/AttachmentsRationalizerTests.m; sourceTree = "<group>"; };
+		4DD6CB51238E6491005B94CF /* FavIconBulkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconBulkViewController.h; path = StrongBox/FavIconBulkViewController.h; sourceTree = "<group>"; };
+		4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconBulkViewController.m; path = StrongBox/FavIconBulkViewController.m; sourceTree = "<group>"; };
 		4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExportOptionsTableViewController.m; path = StrongBox/ExportOptionsTableViewController.m; sourceTree = "<group>"; };
 		4DD755EA232F084900758824 /* ExportOptionsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExportOptionsTableViewController.h; path = StrongBox/ExportOptionsTableViewController.h; sourceTree = "<group>"; };
 		4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WelcomeUseICloudViewController.m; path = StrongBox/WelcomeUseICloudViewController.m; sourceTree = "<group>"; };
@@ -2420,6 +2477,8 @@
 		4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationViewController.h; path = StrongBox/PasswordGenerationViewController.h; sourceTree = "<group>"; };
 		4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationViewController.m; path = StrongBox/PasswordGenerationViewController.m; sourceTree = "<group>"; };
 		4DFA67E422C80824000FC012 /* PasswordMakerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordMakerTests.m; sourceTree = "<group>"; };
+		4DFF34C2238E75B800BEB941 /* FavIconDownloadResultsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconDownloadResultsViewController.h; path = StrongBox/FavIconDownloadResultsViewController.h; sourceTree = "<group>"; };
+		4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconDownloadResultsViewController.m; path = StrongBox/FavIconDownloadResultsViewController.m; sourceTree = "<group>"; };
 		4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModelTests.m; path = StrongboxTests/PwSafeModelTests.m; sourceTree = "<group>"; };
 		4DFF4002218066F900B69383 /* BasicOrderedDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BasicOrderedDictionary.h; path = model/BasicOrderedDictionary.h; sourceTree = SOURCE_ROOT; };
 		4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BasicOrderedDictionary.m; path = model/BasicOrderedDictionary.m; sourceTree = SOURCE_ROOT; };
@@ -2650,6 +2709,10 @@
 		4D0835E522847BAF00CA7405 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
+				4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */,
+				4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */,
+				4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */,
+				4D6C8545239630A300008391 /* starwars_8k_2018.utf8.txt */,
 				4D36B0AE22C9473F003E9B68 /* beale.wordlist.utf8.txt */,
 				4D36B0AD22C9473F003E9B68 /* catalan-diceware.wordlist.utf8.txt */,
 				4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */,
@@ -2912,6 +2975,12 @@
 		4D2962AC223171BA0082897D /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				4D2561AD233FEAEA00179B84 /* YubiManager.h */,
+				4D2561AE233FEAEA00179B84 /* YubiManager.m */,
+				4D2CB48F2332CBE400C2E084 /* ClipboardManager.h */,
+				4D2CB4902332CBE400C2E084 /* ClipboardManager.m */,
+				4D62E26423437F8200119604 /* DebugHelper.h */,
+				4D62E26523437F8200119604 /* DebugHelper.m */,
 				4DF544FA2231627A00DDEECE /* apple.cer */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
 			);
@@ -3215,14 +3284,14 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				4DED20C72168BF1800A5800A /* Home */,
-				4DE4665B233D2EFA00398A65 /* Backups */,
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
 				4DE2689F22A67A6200A1D158 /* MasterDetailViewController.m */,
-				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4DE7F0D122F89D120095F51F /* LaunchScreen.storyboard */,
+				4DED20C72168BF1800A5800A /* Home */,
+				4DF78E45238D4DC2007E2F80 /* FavIcon */,
+				4DE4665B233D2EFA00398A65 /* Backups */,
 				4D12084F22A79F0C00139570 /* Welcome */,
 				4D0835DD2284769900CA7405 /* Browse */,
 				4DAE986A2270B39100A811C4 /* Item Details */,
@@ -3757,12 +3826,12 @@
 		4DAE986A2270B39100A811C4 /* Item Details */ = {
 			isa = PBXGroup;
 			children = (
-				4DE7F0DA22F89D3E0095F51F /* ItemDetails.storyboard */,
-				4D0835D82284759E00CA7405 /* ItemDetailsViewController.h */,
-				4D0835D72284759E00CA7405 /* ItemDetailsViewController.m */,
 				4DAE989A2270B4E200A811C4 /* Model */,
 				4DAE98822270B4E200A811C4 /* CustomCells */,
 				4D0835E02284775E00CA7405 /* Deprecated */,
+				4DE7F0DA22F89D3E0095F51F /* ItemDetails.storyboard */,
+				4D0835D82284759E00CA7405 /* ItemDetailsViewController.h */,
+				4D0835D72284759E00CA7405 /* ItemDetailsViewController.m */,
 				4DE9A60221F5FEF700128560 /* QRCodeScannerViewController.h */,
 				4DE9A60321F5FEF700128560 /* QRCodeScannerViewController.m */,
 				4D770F902303262400CBE244 /* QRCodeScannerViewController.xib */,
@@ -3857,15 +3926,8 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
-				4D8354C82389141F00E264E0 /* FavIconManager.h */,
-				4D8354C92389141F00E264E0 /* FavIconManager.m */,
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
-				4D62E26423437F8200119604 /* DebugHelper.h */,
-				4D62E26523437F8200119604 /* DebugHelper.m */,
-				4D2561AD233FEAEA00179B84 /* YubiManager.h */,
-				4D2561AE233FEAEA00179B84 /* YubiManager.m */,
-				4D2CB48F2332CBE400C2E084 /* ClipboardManager.h */,
-				4D2CB4902332CBE400C2E084 /* ClipboardManager.m */,
+				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
@@ -4079,6 +4141,26 @@
 				4DE18BBE22F0C477007D902D /* DatabasesViewPreferencesController.m */,
 			);
 			name = Home;
+			sourceTree = "<group>";
+		};
+		4DF78E45238D4DC2007E2F80 /* FavIcon */ = {
+			isa = PBXGroup;
+			children = (
+				4D462003239C21D400AC4038 /* FavIconBulk.storyboard */,
+				4DC9690D238FD4D700D6286F /* FavIconDownloadOptions.h */,
+				4DC9690E238FD4D700D6286F /* FavIconDownloadOptions.m */,
+				4D8354C82389141F00E264E0 /* FavIconManager.h */,
+				4D8354C92389141F00E264E0 /* FavIconManager.m */,
+				4DD6CB51238E6491005B94CF /* FavIconBulkViewController.h */,
+				4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */,
+				4DFF34C2238E75B800BEB941 /* FavIconDownloadResultsViewController.h */,
+				4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */,
+				4D44982F23926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.h */,
+				4D44983023926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m */,
+				4D9098EA239956BA0063DAC7 /* FavIconPreferencesTableViewController.h */,
+				4D9098EB239956BA0063DAC7 /* FavIconPreferencesTableViewController.m */,
+			);
+			name = FavIcon;
 			sourceTree = "<group>";
 		};
 		4DF97EEF21BF0F2F0090A55E /* DAVKit */ = {
@@ -4423,6 +4505,7 @@
 				4DE498C02271F746007EF98C /* TotpCell.xib in Resources */,
 				4DE18BB622F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
+				4D6C854E239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4D8A99A9230AF31700AB98DC /* RMStore.strings in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
@@ -4431,9 +4514,11 @@
 				4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D36B0C422C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D8EC42D22302649008EE004 /* LICENSE in Resources */,
+				4D6C8552239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */,
 				4D06E12122859F0100A754F5 /* BrowseItemCell.xib in Resources */,
 				4D770F9F230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */,
 				4D08B5D0234C9F4D003D1953 /* GCDWebUploader.bundle in Resources */,
+				4D6C8546239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4DE7F0EF22F89D790095F51F /* DatabaseOperations.storyboard in Resources */,
 				4DE7F0E122F89D550095F51F /* PasswordSafeHistory.storyboard in Resources */,
 				4D36B0CE22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4468,6 +4553,8 @@
 				4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
 				4D8FCEA423606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
+				4D461FFE239C21D400AC4038 /* FavIconBulk.storyboard in Resources */,
+				4D6C854A239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4DE7F0CB22F89CE30095F51F /* MasterDetail.storyboard in Resources */,
 				4D9677E723102BFB004AF091 /* Upgrade.storyboard in Resources */,
 				4DE7F0D522F89D270095F51F /* Browse.storyboard in Resources */,
@@ -4498,6 +4585,7 @@
 				4DC4E12523488BAA000743C4 /* TotpCell.xib in Resources */,
 				4DC4E12623488BAA000743C4 /* DatabaseCell.xib in Resources */,
 				4DC4E12723488BAA000743C4 /* securedrop.wordlist.utf8.txt in Resources */,
+				4D6C8550239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4DC4E12823488BAA000743C4 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E12923488BAA000743C4 /* RMStore.strings in Resources */,
 				4DC4E12A23488BAA000743C4 /* ViewAttachmentCell.xib in Resources */,
@@ -4506,9 +4594,11 @@
 				4DC4E12D23488BAA000743C4 /* MainInterface.storyboard in Resources */,
 				4DC4E12E23488BAA000743C4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DC4E12F23488BAA000743C4 /* LICENSE in Resources */,
+				4D6C8554239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */,
 				4DC4E13023488BAA000743C4 /* BrowseItemCell.xib in Resources */,
 				4DC4E13123488BAA000743C4 /* WebDAVConfigurationViewController.xib in Resources */,
 				4D08B5D1234C9F4D003D1953 /* GCDWebUploader.bundle in Resources */,
+				4D6C8548239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4DC4E13223488BAA000743C4 /* DatabaseOperations.storyboard in Resources */,
 				4DC4E13323488BAA000743C4 /* PasswordSafeHistory.storyboard in Resources */,
 				4DC4E13423488BAA000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4543,6 +4633,8 @@
 				4DC4E15023488BAA000743C4 /* beale.wordlist.utf8.txt in Resources */,
 				4D8FCEA623606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DC4E15123488BAA000743C4 /* IconsSectionHeaderReusableView.xib in Resources */,
+				4D462000239C21D400AC4038 /* FavIconBulk.storyboard in Resources */,
+				4D6C854C239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4DC4E15223488BAA000743C4 /* MasterDetail.storyboard in Resources */,
 				4DC4E15323488BAA000743C4 /* Upgrade.storyboard in Resources */,
 				4DC4E15423488BAA000743C4 /* Browse.storyboard in Resources */,
@@ -4570,8 +4662,10 @@
 			files = (
 				4DC4E24623488BAE000743C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4DC4E24723488BAE000743C4 /* LICENSE in Resources */,
+				4D6C8549239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4DC4E24823488BAE000743C4 /* EditAttachmentCell.xib in Resources */,
 				4DC4E24923488BAE000743C4 /* PinEntry.storyboard in Resources */,
+				4D6C8551239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4DC4E24A23488BAE000743C4 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4DC4E24B23488BAE000743C4 /* beale.wordlist.utf8.txt in Resources */,
 				4DC4E24C23488BAE000743C4 /* Images.xcassets in Resources */,
@@ -4583,6 +4677,7 @@
 				4DC4E25023488BAE000743C4 /* DatabaseCell.xib in Resources */,
 				4DC4E25123488BAE000743C4 /* EditDateCell.xib in Resources */,
 				4DC4E25223488BAE000743C4 /* apple.cer in Resources */,
+				4D6C854D239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D7F5A482360210F003ED785 /* MasterDetail.storyboard in Resources */,
 				4DC4E25423488BAE000743C4 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DC4E25523488BAE000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4599,6 +4694,7 @@
 				4DC4E25C23488BAE000743C4 /* MainInterface.storyboard in Resources */,
 				4DC4E25D23488BAE000743C4 /* TotpCell.xib in Resources */,
 				4DC4E25E23488BAE000743C4 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
+				4D6C8555239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */,
 				4DC4E25F23488BAE000743C4 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				4D7F5A4A2360212F003ED785 /* RecordView.storyboard in Resources */,
 				4DC4E26023488BAE000743C4 /* IconsCollectionViewController.xib in Resources */,
@@ -4609,6 +4705,7 @@
 				4DC4E26223488BAE000743C4 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4DC4E26323488BAE000743C4 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26423488BAE000743C4 /* GoogleService-Info.plist in Resources */,
+				4D462001239C21D400AC4038 /* FavIconBulk.storyboard in Resources */,
 				4DC4E26523488BAE000743C4 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4DC4E26623488BAE000743C4 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26723488BAE000743C4 /* PasswordGenerationPreferences.storyboard in Resources */,
@@ -4633,8 +4730,10 @@
 			files = (
 				4D6B503D238BAF4100DF2F88 /* InfoPlist.strings in Resources */,
 				4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
+				4D6C8547239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4D8EC42E22302649008EE004 /* LICENSE in Resources */,
 				4DAE98AF2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
+				4D6C854F239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4DE7F0EC22F89D6F0095F51F /* PinEntry.storyboard in Resources */,
 				4D36B0C722C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4D36B0CB22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
@@ -4646,6 +4745,7 @@
 				4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */,
 				4DF544FC2231627A00DDEECE /* apple.cer in Resources */,
+				4D6C854B239630A300008391 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D7F5A472360210E003ED785 /* MasterDetail.storyboard in Resources */,
 				4D36B0C522C94740003E9B68 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4662,6 +4762,7 @@
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
 				4DE7F0C822F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
+				4D6C8553239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */,
 				4D36B0B722C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				4D7F5A492360212E003ED785 /* RecordView.storyboard in Resources */,
 				4D770F98230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
@@ -4672,6 +4773,7 @@
 				4D36B0B322C94740003E9B68 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D36B0D122C94740003E9B68 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D18856A2170EAA4001AE6B0 /* GoogleService-Info.plist in Resources */,
+				4D461FFF239C21D400AC4038 /* FavIconBulk.storyboard in Resources */,
 				4D770F9C230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D36B0C922C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4DE7F0F922F89D8D0095F51F /* PasswordGenerationPreferences.storyboard in Resources */,
@@ -5117,6 +5219,7 @@
 				4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
 				4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */,
+				4D44983123926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
 				4D08B5C7234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
 				4D24C76D238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
@@ -5128,6 +5231,7 @@
 				4DCF5FBC1F7294A800011756 /* StrongboxUIDocument.m in Sources */,
 				4D2E47AE233CFD8D00C1DE90 /* BackupsManager.m in Sources */,
 				4D08B5C9234C9613003D1953 /* GCDWebServerFileRequest.m in Sources */,
+				4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DF2997B2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
 				4DF972B521BFD81800F384C9 /* SFTPStorageProvider.m in Sources */,
@@ -5150,6 +5254,7 @@
 				4DE498BD2271E911007EF98C /* IconTableCell.m in Sources */,
 				4D2F6C1621807C00007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4D3E149221832BEF00A41CA0 /* encoding.c in Sources */,
+				4DC9690F238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
 				4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D556F2F22B832EB00E16027 /* BrowseItemTotpCell.m in Sources */,
@@ -5206,6 +5311,7 @@
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				4D5F5B93218B6C9D00A0739A /* NodeFileAttachment.m in Sources */,
+				4D9098EC239956BA0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */,
 				4D25673221E8B086006260B7 /* PinsConfigurationController.m in Sources */,
 				4D5F5B6E218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
@@ -5222,6 +5328,7 @@
 				4D08B5C3234C9613003D1953 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */,
 				4D004CDA21F4C26700E2B194 /* OTPToken+Serialization.m in Sources */,
+				4DD6CB53238E6491005B94CF /* FavIconBulkViewController.m in Sources */,
 				4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */,
 				4D93AC972184B04D00A141C6 /* OfflineCacheNameDetector.m in Sources */,
 				4D56D90F21B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */,
@@ -5400,6 +5507,7 @@
 				4DC4E08423488BAA000743C4 /* PasswordGenerationParameters.m in Sources */,
 				4DC4E08523488BAA000743C4 /* Group.m in Sources */,
 				4DC4E08623488BAA000743C4 /* CASGParams.m in Sources */,
+				4D44983323926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4DC4E08723488BAA000743C4 /* Alerts.m in Sources */,
 				4D08B5C8234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
 				4D24C76F238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
@@ -5411,6 +5519,7 @@
 				4DC4E08D23488BAA000743C4 /* StrongboxUIDocument.m in Sources */,
 				4DC4E08E23488BAA000743C4 /* BackupsManager.m in Sources */,
 				4D08B5CA234C9613003D1953 /* GCDWebServerFileRequest.m in Sources */,
+				4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DC4E08F23488BAA000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
 				4DC4E09023488BAA000743C4 /* GoogleDriveStorageProvider.m in Sources */,
 				4DC4E09123488BAA000743C4 /* SFTPStorageProvider.m in Sources */,
@@ -5433,6 +5542,7 @@
 				4DC4E0A223488BAA000743C4 /* IconTableCell.m in Sources */,
 				4DC4E0A323488BAA000743C4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4DC4E0A423488BAA000743C4 /* encoding.c in Sources */,
+				4DC96911238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4DC4E0A523488BAA000743C4 /* Field.m in Sources */,
 				4DC4E0A623488BAA000743C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4DC4E0A723488BAA000743C4 /* BrowseItemTotpCell.m in Sources */,
@@ -5489,6 +5599,7 @@
 				4DC4E0D423488BAA000743C4 /* Settings.m in Sources */,
 				4DC4E0D523488BAA000743C4 /* KdbxSerializationCommon.m in Sources */,
 				4DC4E0D623488BAA000743C4 /* NodeFileAttachment.m in Sources */,
+				4D9098EE239956BE0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */,
 				4DC4E0D723488BAA000743C4 /* PinsConfigurationController.m in Sources */,
 				4DC4E0D823488BAA000743C4 /* ChaCha20Cipher.m in Sources */,
 				4DC4E0D923488BAA000743C4 /* Entry.m in Sources */,
@@ -5505,6 +5616,7 @@
 				4D08B5C4234C9613003D1953 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				4DC4E0E523488BAA000743C4 /* RecordView.m in Sources */,
 				4DC4E0E623488BAA000743C4 /* OTPToken+Serialization.m in Sources */,
+				4DD6CB54238E6491005B94CF /* FavIconBulkViewController.m in Sources */,
 				4DC4E0E723488BAA000743C4 /* StorageBrowserTableViewController.m in Sources */,
 				4DC4E0E823488BAA000743C4 /* OfflineCacheNameDetector.m in Sources */,
 				4DC4E0E923488BAA000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
@@ -5587,6 +5699,7 @@
 				4DC4E18623488BAE000743C4 /* GZipInputStream.m in Sources */,
 				4DC4E18723488BAE000743C4 /* Model.m in Sources */,
 				4DC4E18823488BAE000743C4 /* NSArray+Extensions.m in Sources */,
+				4D44983423926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4DC4E18923488BAE000743C4 /* UiAttachment.m in Sources */,
 				4DC4E18A23488BAE000743C4 /* VariantDictionary.m in Sources */,
 				4DC4E18B23488BAE000743C4 /* OpenSafeSequenceHelper.m in Sources */,
@@ -5625,6 +5738,7 @@
 				4DC4E1A923488BAE000743C4 /* OTPAlgorithm.m in Sources */,
 				4DC4E1AA23488BAE000743C4 /* PasswordGenerationViewController.m in Sources */,
 				4DC4E1AB23488BAE000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
+				4DC96912238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4DC4E1AC23488BAE000743C4 /* regdom.c in Sources */,
 				4DC4E1AD23488BAE000743C4 /* DecryptionParameters.m in Sources */,
 				4DC4E1AE23488BAE000743C4 /* NodeFileAttachment.m in Sources */,
@@ -5707,6 +5821,7 @@
 				4DC4E1FB23488BAE000743C4 /* StorageBrowserItem.m in Sources */,
 				4DC4E1FC23488BAE000743C4 /* AutoCompleteTextField.m in Sources */,
 				4DC4E1FD23488BAE000743C4 /* OfflineDetector.m in Sources */,
+				4D44982B23924CCC00B21794 /* DebugHelper.m in Sources */,
 				4DC4E1FE23488BAE000743C4 /* CustomFieldTableCell.m in Sources */,
 				4DC4E1FF23488BAE000743C4 /* Entry.m in Sources */,
 				4DC4E20023488BAE000743C4 /* NMSFTPFile.m in Sources */,
@@ -5719,6 +5834,7 @@
 				4DC4E20723488BAE000743C4 /* IconViewCell.m in Sources */,
 				4DC4E20823488BAE000743C4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4DC4E20923488BAE000743C4 /* KeePass2TagPackage.m in Sources */,
+				4DFF34C7238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DC4E20A23488BAE000743C4 /* DatabaseModel.m in Sources */,
 				4DC4E20B23488BAE000743C4 /* iCloudSafesCoordinator.m in Sources */,
 				4DC4E20C23488BAE000743C4 /* V3Binary.m in Sources */,
@@ -5742,6 +5858,7 @@
 				4DC4E21F23488BAE000743C4 /* DatabaseAttachment.m in Sources */,
 				4DC4E22023488BAE000743C4 /* CacheManager.m in Sources */,
 				4DC4E22123488BAE000743C4 /* PasswordGenerationConfig.m in Sources */,
+				4D44982E23925BFC00B21794 /* FavIconBulkViewController.m in Sources */,
 				4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */,
 				4DC4E22323488BAE000743C4 /* LocalDeviceStorageProvider.m in Sources */,
 				4DC4E22423488BAE000743C4 /* PasswordGenerationParameters.m in Sources */,
@@ -5800,6 +5917,7 @@
 				4D1BF4FF232441D2007DF0E6 /* GZipInputStream.m in Sources */,
 				4D1885632170E260001AE6B0 /* Model.m in Sources */,
 				4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */,
+				4D44983223926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4D0835BE2284744B00CA7405 /* UiAttachment.m in Sources */,
 				4D3E1481218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				4D5F5B7C218B4C3500A0739A /* OpenSafeSequenceHelper.m in Sources */,
@@ -5838,6 +5956,7 @@
 				4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */,
 				4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
+				4DC96910238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
 				4D4766F32178C82B00C4358F /* DecryptionParameters.m in Sources */,
 				4D5F5B94218B6C9D00A0739A /* NodeFileAttachment.m in Sources */,
@@ -5920,6 +6039,7 @@
 				4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */,
 				4D33FA4422872384006C31B2 /* AutoCompleteTextField.m in Sources */,
 				4D5F5B7F218B4C5800A0739A /* OfflineDetector.m in Sources */,
+				4D44982C23924CCC00B21794 /* DebugHelper.m in Sources */,
 				4D33FA412287232E006C31B2 /* CustomFieldTableCell.m in Sources */,
 				4D2F6C3D21807C7E007931E4 /* Entry.m in Sources */,
 				4D326E8C22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
@@ -5932,6 +6052,7 @@
 				4D766D5422204E4A00AEF439 /* IconViewCell.m in Sources */,
 				4D2F6C1721807C04007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4D27D74D21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
+				4DFF34C5238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4D1884CC21709CF1001AE6B0 /* DatabaseModel.m in Sources */,
 				4D1884CB21709CE5001AE6B0 /* iCloudSafesCoordinator.m in Sources */,
 				4D74B92A218C40B000FC369E /* V3Binary.m in Sources */,
@@ -5955,6 +6076,7 @@
 				4D5F5B73218B350C00A0739A /* DatabaseAttachment.m in Sources */,
 				4D556F1222B7FF6100E16027 /* CacheManager.m in Sources */,
 				4D216F8022CBCED4000954D0 /* PasswordGenerationConfig.m in Sources */,
+				4D44982D23925BFB00B21794 /* FavIconBulkViewController.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
 				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,
@@ -6007,6 +6129,19 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		4D462003239C21D400AC4038 /* FavIconBulk.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D462002239C21D400AC4038 /* Base */,
+				4D462005239C21F200AC4038 /* fr */,
+				4D462007239C21F300AC4038 /* de */,
+				4D462009239C21F500AC4038 /* ru */,
+				4D46200B239C21F600AC4038 /* uk */,
+			);
+			name = FavIconBulk.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
 		4D5F5B80218B4C9300A0739A /* MainInterface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -6576,7 +6711,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2734;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6596,7 +6731,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6663,7 +6798,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2734;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6683,7 +6818,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6744,12 +6879,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DA33DC7FB4377A1F6D168891 /* Pods-common-ios-Strongbox-iOS Family.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2733;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6769,7 +6905,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6822,12 +6958,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D487227EA46AE89313C27CCE /* Pods-common-ios-Strongbox-iOS Family.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2733;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -6847,7 +6984,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -6910,7 +7047,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2733;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6929,7 +7066,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -6984,7 +7121,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2733;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7003,7 +7140,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7057,7 +7194,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2734;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7076,7 +7213,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -7132,7 +7269,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2732;
+				CURRENT_PROJECT_VERSION = 2734;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7151,7 +7288,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.44.5;
+				MARKETING_VERSION = 1.45.0;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

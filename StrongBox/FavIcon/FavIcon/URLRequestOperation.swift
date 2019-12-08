@@ -67,7 +67,7 @@ class URLRequestOperation: Operation {
 
     @objc init(url: URL, session: URLSession) {
         self.session = session
-        self.urlRequest = URLRequest(url: url)
+        self.urlRequest = URLRequest(url: url, timeoutInterval: 8.0) // Reduce timeout to 5s max - MMcG
         self.semaphore = nil
     }
 
