@@ -173,7 +173,7 @@ viewController:(UIViewController *)viewController
     
     NSString* b64 = isAutoFill ? dictionary[@"autoFillBookMark"] : dictionary[@"bookMark"];
     
-    return b64 ? [[NSData alloc] initWithBase64EncodedString:b64 options:kNilOptions] : nil;
+    return b64 ? [[NSData alloc] initWithBase64EncodedString:b64 options:NSDataBase64DecodingIgnoreUnknownCharacters] : nil;
 }
 
 - (NSURL*)filesAppUrlFromMetaData:(SafeMetaData*)safeMetaData isAutoFill:(BOOL)isAutoFill ppError:(NSError**)ppError {

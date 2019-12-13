@@ -30,9 +30,9 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Overwrite Existing Icons" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vt5-Lc-5dy">
-                                <rect key="frame" x="20" y="451" width="183.66666666666666" height="20.333333333333314"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Include Items with Custom Icons in Search" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vt5-Lc-5dy">
+                                <rect key="frame" x="19.999999999999986" y="451" width="239.66666666666663" height="14.333333333333314"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -110,13 +110,13 @@
                                 </constraints>
                             </stackView>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QFE-vM-n4k">
-                                <rect key="frame" x="306" y="445.66666666666669" width="51" height="31"/>
+                                <rect key="frame" x="306" y="442.66666666666669" width="51" height="31"/>
                                 <connections>
                                     <action selector="onOverwriteExistingChanged:" destination="lTR-Ja-jpr" eventType="valueChanged" id="Vis-zR-u4c"/>
                                 </connections>
                             </switch>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vY6-iO-zoU">
-                                <rect key="frame" x="20" y="496.66666666666669" width="335" height="51.666666666666686"/>
+                                <rect key="frame" x="20" y="493.66666666666669" width="335" height="51.666666666666686"/>
                                 <string key="text">Note: You can adjust search settings by tapping the gear icon in the top right corner, this may affect the accuracy of the search process</string>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                 <nil key="textColor"/>
@@ -232,7 +232,7 @@
                             <outlet property="delegate" destination="rNe-e9-apD" id="5dW-Xi-lDj"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="FavIcon Results" prompt="Right swipe to remove or tap Done to save changes" id="pDZ-u1-BxL">
+                    <navigationItem key="navigationItem" title="FavIcon Results" prompt="Left swipe to remove or tap Done to save changes" id="pDZ-u1-BxL">
                         <barButtonItem key="rightBarButtonItem" title="Save" style="done" id="bkT-Yb-LXr">
                             <connections>
                                 <action selector="onDone:" destination="rNe-e9-apD" id="msC-Tw-oYR"/>

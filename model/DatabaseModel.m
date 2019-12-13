@@ -68,12 +68,14 @@
           [Kdb1Database isAValidSafe:candidate error:&k3];
 
     if(!ret && error) {
-        NSString* errorSummary = @"Could not recognise this a valid Database:\n";
+        NSData* prefixBytes = [candidate subdataWithRange:NSMakeRange(0, MIN(12, candidate.length))];
         
-        errorSummary = [errorSummary stringByAppendingFormat:@"- Password Safe: %@\n", pw.localizedDescription];
-        errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass Classic: %@\n", k1.localizedDescription];
-        errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass Advanced: %@\n", k2.localizedDescription];
-        errorSummary = [errorSummary stringByAppendingFormat:@"- KeePass 1: %@\n", k3.localizedDescription];
+        NSString* errorSummary = @"Invalid Database. Debug Info:\n";
+        
+        errorSummary = [errorSummary stringByAppendingFormat:@"PFX: [%@]\n", [Utils hexadecimalString:prefixBytes]];
+        errorSummary = [errorSummary stringByAppendingFormat:@"PWS: [%@]\n", pw.localizedDescription];
+        errorSummary = [errorSummary stringByAppendingFormat:@"KP:[%@]-[%@]\n", k1.localizedDescription, k2.localizedDescription];
+        errorSummary = [errorSummary stringByAppendingFormat:@"KP1: [%@]\n", k3.localizedDescription];
         
         *error = [Utils createNSError:errorSummary errorCode:-1];
     }

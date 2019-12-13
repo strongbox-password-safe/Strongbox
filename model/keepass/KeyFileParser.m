@@ -124,7 +124,7 @@ static NSString* const kDataElementName = @"Data";
                 if([childNode.name isEqualToString:kDataElementName]) {
                     //NSLog(@"%@", childNode.stringValue);
                     
-                    NSData* key = [[NSData alloc] initWithBase64EncodedString:childNode.stringValue options:kNilOptions];
+                    NSData* key = [[NSData alloc] initWithBase64EncodedString:childNode.stringValue options:NSDataBase64DecodingIgnoreUnknownCharacters];
                     
                     return key; 
                 }

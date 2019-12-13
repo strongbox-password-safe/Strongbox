@@ -95,6 +95,12 @@ suggestedFilename:nil
     if(!fileURL) {
         fileURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:nickName extension:extension]];
     }
+
+    if(!fileURL || fileURL.absoluteString.length == 0) {
+        // Not sure how this can happen but apparently it can...
+        completion(nil, [Utils createNSError:@"Could not create an iCloud database because could not find a good path for it!" errorCode:-1]);
+        return;
+    }
     
     NSLog(@"Want to create file at %@", fileURL);
     

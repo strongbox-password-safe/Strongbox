@@ -27,7 +27,7 @@
     }
     else if([withXmlElementName isEqualToString:kCustomIconDataElementName]) {
         NSString* b64 = [SimpleXmlValueExtractor getStringFromText:completedObject];
-        self.data = [[NSData alloc] initWithBase64EncodedString:b64 options:kNilOptions];
+        self.data = [[NSData alloc] initWithBase64EncodedString:b64 options:NSDataBase64DecodingIgnoreUnknownCharacters ];
         return YES;
     }
     
