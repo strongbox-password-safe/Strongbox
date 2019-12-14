@@ -162,7 +162,9 @@ static NSImage* kStrongBox256Image;
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
-    self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:@"Unlock with %@", BiometricIdHelper.sharedInstance.biometricIdName];
+    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@");
+    
+    self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     self.buttonUnlockWithTouchId.hidden = YES;
     
     self.imageViewTogglePassword.clickable = YES;
@@ -295,13 +297,17 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)disableFeaturesForLiteVersion {
-    [self.searchField setPlaceholderString:@"Search Disabled - Please Upgrade"];
+    NSString* loc = NSLocalizedString(@"mac_search_disabled_please_upgrade", @"Search Disabled - Please Upgrade");
+    
+    [self.searchField setPlaceholderString:loc];
     self.searchField.enabled = NO;
     self.searchSegmentedControl.enabled = NO;
 }
 
 - (void)enableFeaturesForFullVersion {
-    [self.searchField setPlaceholderString:@"Search (⌘F)"];
+    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
+    
+    [self.searchField setPlaceholderString:loc];
     self.searchField.enabled = YES;
     self.searchSegmentedControl.enabled = YES;
 }
@@ -353,43 +359,53 @@ static NSImage* kStrongBox256Image;
 //////////////
 
 - (void)onItemIconChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Icon"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_icon", @"Icon");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onItemTitleChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Title"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_title", @"Title");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onItemPasswordChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Password"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_password", @"Password");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onItemUsernameChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Username"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_username", @"Username");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onItemEmailChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Email"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_email", @"Email");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onItemUrlChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"URL"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_url", @"URL");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onItemNotesChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Notes"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_notes", @"Notes");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onCustomFieldsChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Custom Fields"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_custom_fields", @"Custom Fields");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onTotpChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"TOTP"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_totp", @"TOTP");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)onAttachmentsChanged:(NSNotification*)notification {
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:@"Attachments"];
+    NSString *loc = NSLocalizedString(@"generic_fieldname_attachments", @"Attachments");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
 - (void)genericReloadOnUpdateAndMaintainSelection:(NSNotification*)notification popupMessage:(NSString*)popupMessage {
@@ -409,7 +425,9 @@ static NSImage* kStrongBox256Image;
         }
     }
     Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' %@ Changed...", node.title, popupMessage]];
+
+    NSString *loc = NSLocalizedString(@"mac_field_changed_popup_notification_fmt", @"'%@' %@ Changed... First parameter Title of Item, second parameter which field changed, e.g. Username or Password");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, node.title, popupMessage]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1152,7 +1170,9 @@ static NSImage* kStrongBox256Image;
             
             if(!data) {
                 NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
-                [Alerts error:@"Could not open key file." error:error window:self.view.window];
+                
+                NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
+                [Alerts error:loc error:error window:self.view.window];
                 return;
             }
             
@@ -1195,7 +1215,8 @@ static NSImage* kStrongBox256Image;
         }
         else {
             NSLog(@"Touch ID button pressed but no Touch ID Stored?");
-            [Alerts info:@"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared." window:self.view.window];
+            NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared.");
+            [Alerts info:loc window:self.view.window];
             
             if(metadata) {
                 [SafesList.sharedInstance remove:metadata.uuid];
@@ -1214,11 +1235,15 @@ static NSImage* kStrongBox256Image;
     if(self.model && !self.model.locked) {
         if(!self.model.document.isDocumentEdited) {
             if(!Settings.sharedInstance.autoReloadAfterForeignChanges) {
-                [Alerts yesNo:@"The database has been changed by another application, would you like to reload this latest version and automatically unlock?"
+                NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
+
+                [Alerts yesNo:loc
                        window:self.view.window
                    completion:^(BOOL yesNo) {
                     if(yesNo) {
-                        [self showPopupToastNotification:@"Reloading after external changes..."];
+                        NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
+
+                        [self showPopupToastNotification:loc];
                         
                         self.model.selectedItem = [self selectedItemSerializationId];
                         
@@ -1228,7 +1253,9 @@ static NSImage* kStrongBox256Image;
                 return;
             }
             else {
-                [self showPopupToastNotification:@"Reloading after external changes..."];
+                NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
+
+                [self showPopupToastNotification:loc];
 
                 self.model.selectedItem = [self selectedItemSerializationId];
                 [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
@@ -1247,7 +1274,8 @@ static NSImage* kStrongBox256Image;
 
 - (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen {
     if(self.model) {
-        [self showProgressModal:@"Unlocking..."];
+        NSString* loc = NSLocalizedString(@"generic_unlocking_ellipsis", @"Unlocking...");
+        [self showProgressModal:loc];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self.model reloadAndUnlock:compositeKeyFactors completion:^(BOOL success, NSError * _Nullable error) {
@@ -1288,7 +1316,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             [SafesList.sharedInstance update:safe];
         }
         
-        [Alerts error:@"Could Not Unlock Database" error:error window:self.view.window];
+        NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
+        [Alerts error:loc error:error window:self.view.window];
     }
     
     self.isPromptingAboutUnderlyingFileChange = NO;// Reset in case we ended up here by auto reload
@@ -1300,7 +1329,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         !safeMetaData.hasPromptedForTouchIdEnrol) {
         NSLog(@"Biometric ID is available on Device. Should we enrol?");
 
-        NSString* message = [NSString stringWithFormat:@"Would you like to use %@ to open this database in the future?", BiometricIdHelper.sharedInstance.biometricIdName];
+        NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ to open this database in the future?");        
+        NSString* message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName];
 
         [Alerts yesNo:message
                window:self.view.window
@@ -1326,8 +1356,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(!Settings.sharedInstance.warnedAboutTouchId) { // First Time? Display Touch ID Caveat
         Settings.sharedInstance.warnedAboutTouchId = YES;
         
-        [Alerts info:@"Touch ID Considerations\n\nWhile this is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device or your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch ID. In addition, on your Mac, your master password will be securely stored in the Keychain. This means it is possible for someone with administrative privileges to search your Keychain for your master password. You should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox.\n\nPlease take all of this into account, and make your decision to use Touch ID based on your preferred balance of convenience and security."
-              window:self.view.window];
+        NSString* loc = NSLocalizedString(@"mac_touch_id_one_time_warning", @"Touch ID Considerations\n\nWhile this is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device or your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch ID. In addition, on your Mac, your master password will be securely stored in the Keychain. This means it is possible for someone with administrative privileges to search your Keychain for your master password. You should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox.\n\nPlease take all of this into account, and make your decision to use Touch ID based on your preferred balance of convenience and security.");
+      
+        [Alerts info:loc window:self.view.window];
     }
 }
 
@@ -1343,11 +1374,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (IBAction)onLock:(id)sender {
     if(self.model && !self.model.locked) {
-//        NSLog(@"isDocumentEdited: %d", self.model.document.isDocumentEdited);
         if([self.model.document isDocumentEdited]) {
-            [Alerts yesNo:@"You cannot lock a database while changes are pending. Save changes and lock now?" window:self.view.window completion:^(BOOL yesNo) {
+            NSString* loc = NSLocalizedString(@"mac_cant_lock_db_while_changes_pending", @"You cannot lock a database while changes are pending. Save changes and lock now?");
+            
+            [Alerts yesNo:loc window:self.view.window completion:^(BOOL yesNo) {
                 if(yesNo) {
-                    [self showProgressModal:@"Locking..."];
+                    NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
+                    [self showProgressModal:loc];
                     [self.model.document saveDocumentWithDelegate:self didSaveSelector:@selector(lockSafeContinuation:) contextInfo:nil];
                 }
                 else {
@@ -1356,7 +1389,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             }];
         }
         else {
-            [self showProgressModal:@"Locking..."];
+            NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
+            [self showProgressModal:loc];
 
             [self lockSafeContinuation:nil];
         }
@@ -1398,7 +1432,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
-            self.changeMasterPassword.titleText = new ? @"Please Enter the Master Credentials for this Database" : @"Change Master Credentials";
+            NSString* loc = new ? NSLocalizedString(@"mac_please_set_master_credentials", @"Please Enter the Master Credentials for this Database") : NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
+            
+            self.changeMasterPassword.titleText = loc;
             self.changeMasterPassword.databaseFormat = self.model.format;
             
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
@@ -1418,7 +1454,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self promptForMasterPassword:NO completion:^(BOOL okCancel) {
         if(okCancel) {
             [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-            [Alerts info:@"Master Credentials Changed and Database Saved" window:self.view.window];
+            
+            NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
+            [Alerts info:loc window:self.view.window];
         }
     }];
 }
@@ -1541,43 +1579,52 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 -(void)copyCustomField:(CustomField*)field {
     [[NSPasteboard generalPasteboard] clearContents];
     [[NSPasteboard generalPasteboard] setString:field.value forType:NSStringPboardType];
-    
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Custom Field Copied", field.key]];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, field.key, NSLocalizedString(@"generic_fieldname_custom_field", @"Custom Field")]];
 }
 
 - (void)copyTitle:(Node*)item {
     if(!item) return;
     
     [self copyToPasteboard:item.title item:item];
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Title Copied", item.title]];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_title", @"Title")]];
 }
 
 - (void)copyUsername:(Node*)item {
     if(!item) return;
     
     [self copyToPasteboard:item.fields.username item:item];
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Username Copied", item.title]];
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_username", @"Username")]];
 }
 
 - (void)copyEmail:(Node*)item {
     if(!item) return;
     
     [self copyToPasteboard:item.fields.email item:item];
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Email Copied", item.title]];
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];
 }
 
 - (void)copyUrl:(Node*)item {
     if(!item) return;
     
     [self copyToPasteboard:item.fields.url item:item];
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' URL Copied", item.title]];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_url", @"URL")]];
 }
 
 - (void)copyNotes:(Node*)item {
     if(!item) return;
     
     [self copyToPasteboard:item.fields.notes item:item];
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Notes Copied", item.title]];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_notes", @"Notes")]];
 }
 
 - (void)copyPassword:(Node*)item {
@@ -1590,7 +1637,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSString *password = [self.model dereference:item.fields.password node:item];
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' Password Copied", item.title]];
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_password", @"Password")]];
 }
 
 - (void)copyTotp:(Node*)item {
@@ -1602,7 +1650,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSString *password = item.fields.otpToken.password;
     [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 
-    [self showPopupToastNotification:[NSString stringWithFormat:@"'%@' TOTP Copied", item.title]];
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1938,7 +1987,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }];
     
     if(nodesWithEmails.count) {
-        [Alerts yesNo:@"KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue?"
+        NSString* loc = NSLocalizedString(@"mac_drag_drop_between_databases_keepass_email_field_not_supported", @"KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue?");
+
+        [Alerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -1977,7 +2028,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.model.rootGroup) && rootEntries.count);
     
     if(nodesWithEmails.count || pastingEntriesToRoot) {
-        [Alerts yesNo:@"KeePass 1 does not support entries at the root level, these will be discarded. KeePass 1 also does not natively support the 'Email' field. Strongbox will append it instead to the end of the 'Notes' field.\nDo you want to continue?"
+        NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries", @"KeePass 1 does not support entries at the root level, these will be discarded. KeePass 1 also does not natively support the 'Email' field. Strongbox will append it instead to the end of the 'Notes' field.\nDo you want to continue?");
+        
+        [Alerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2024,7 +2077,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }];
 
     if(incompatibles.count) {
-        [Alerts yesNo:@"The Password Safe format does not support icons, attachments or custom fields. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?"
+        NSString* loc = NSLocalizedString(@"mac_password_safe_fmt_does_not_support_icons_attachments_warning", @"The Password Safe format does not support icons, attachments or custom fields. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?");
+        
+        [Alerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2070,7 +2125,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.model.rootGroup) && rootEntries.count);
 
     if(incompatibles.count || pastingEntriesToRoot) {
-        [Alerts yesNo:@"The KeePass 1 (KDB) does not support entries at the root level, these will be discarded.\n\nThe KeePass 1 (KDB) format also does not support multiple attachments, custom fields or custom icons. If you continue only the first attachment from each item will be copied to this database. Custom Fields and Icons will be discarded.\nDo you want to continue?"
+        NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries_or_attachments", @"The KeePass 1 (KDB) does not support entries at the root level, these will be discarded.\n\nThe KeePass 1 (KDB) format also does not support multiple attachments, custom fields or custom icons. If you continue only the first attachment from each item will be copied to this database. Custom Fields and Icons will be discarded.\nDo you want to continue?");
+
+        [Alerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2120,7 +2177,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }];
     
     if(incompatibles.count) {
-        [Alerts yesNo:@"The Password Safe format does not support attachments or icons. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?"
+        NSString* loc = NSLocalizedString(@"mac_password_safe_does_not_support_attachments_icons_continue_yes_no", @"The Password Safe format does not support attachments or icons. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?");
+        
+        [Alerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2245,7 +2304,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
 
     if(![self.model addNewRecord:parent]) {
-        [Alerts info:@"You cannot create a new record here. It must be within an existing folder." window:self.view.window];
+        NSString* loc = NSLocalizedString(@"mac_alert_cannot_create_item_here", @"You cannot create a new item here. It must be within an existing folder.");
+        [Alerts info:loc window:self.view.window];
         return;
     }
 }
@@ -2254,7 +2314,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     Node *item = [self getCurrentSelectedItem];
     Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
     
-    NSString* title = [[[Alerts alloc] init] input:@"Please enter a Title for your new Group" defaultValue:kDefaultNewTitle allowEmpty:NO];
+    NSString* loc = NSLocalizedString(@"mac_please_enter_a_title_for_new_group", @"Please enter a Title for your new Group");
+    NSString* title = [[[Alerts alloc] init] input:loc defaultValue:kDefaultNewTitle allowEmpty:NO];
     
     if(title.length) {
         [self.model addNewGroup:parent title:title];
@@ -2288,7 +2349,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             return;
         }
         BOOL willRecycle = [self.model deleteWillRecycle:item];
-        [Alerts yesNo:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send '%@' to the Recycle Bin?" : @"Are you sure you want to delete '%@'?", item.title] window:self.view.window completion:^(BOOL yesNo) {
+        
+        NSString* loc = willRecycle ? NSLocalizedString(@"mac_are_you_sure_recycle_bin_yes_no_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
+                                    NSLocalizedString(@"mac_are_you_sure_delete_yes_no_fmt", @"Are you sure you want to delete '%@'?");
+        
+        [Alerts yesNo:[NSString stringWithFormat:loc, item.title]
+               window:self.view.window
+           completion:^(BOOL yesNo) {
             if(yesNo) {
                 if(![self.model deleteItem:item]) {
                     [Alerts info:@"There was a problem trying to delete this item." window:self.view.window];
@@ -2297,8 +2364,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         }];
     }
     else {
-        BOOL willRecycle = self.model.recycleBinEnabled;        
-        [Alerts yesNo:[NSString stringWithFormat:willRecycle ? @"Are you sure you want to send %lu items to the Recycle Bin?" : @"Are you sure you want to delete %lu items?", (unsigned long)rows.count]
+        BOOL willRecycle = self.model.recycleBinEnabled;
+        
+        NSString* loc = willRecycle ?
+            NSLocalizedString(@"mac_are_you_sure_recycle_bin_multiple_yes_no_fmt", @"Are you sure you want to send %lu items to the Recycle Bin?") :
+            NSLocalizedString(@"mac_are_you_sure_delete_multiple_yes_no_fmt", @"Are you sure you want to delete %lu items?");
+        
+        [Alerts yesNo:[NSString stringWithFormat:loc, (unsigned long)rows.count]
                window:self.view.window
            completion:^(BOOL yesNo) {
             if(yesNo) {
@@ -2357,11 +2429,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else if (theAction == @selector(onDelete:)) {
         if(self.outlineView.selectedRowIndexes.count > 1) {
             NSMenuItem* mi = (NSMenuItem*)anItem;
-            [mi setTitle:@"Delete Items"];
+            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
+            [mi setTitle:loc];
         }
         else {
             NSMenuItem* mi = (NSMenuItem*)anItem;
-            [mi setTitle:@"Delete Item"];
+            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
+            [mi setTitle:loc];
         }
         return item != nil;
     }
@@ -2466,7 +2540,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (NSURL*)getFileThroughFileOpenDialog
 {  
     NSOpenPanel * panel = [NSOpenPanel openPanel];
-    [panel setTitle:@"Choose CSV file to Import"];
+    
+    NSString* loc = NSLocalizedString(@"mac_choose_csv_file_import", @"Choose CSV file to Import");
+    [panel setTitle:loc];
     [panel setAllowsMultipleSelection:NO];
     [panel setCanChooseDirectories:NO];
     [panel setCanChooseFiles:YES];
@@ -2484,9 +2560,16 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (IBAction)onImportFromCsvFile:(id)sender {
-    NSString* message = [NSString stringWithFormat:@"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.", kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes];
+    NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
+
+    NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes];
    
-    [Alerts info:@"CSV Format" informativeText:message window:self.view.window completion:^{
+    loc = NSLocalizedString(@"mac_csv_format_info_title", @"CSV Format");
+    
+    [Alerts info:loc
+ informativeText:message
+          window:self.view.window
+      completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{[self importFromCsvFile];});
     }];
 }
@@ -2505,7 +2588,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             return;
         }
         else if(rows.count == 0){
-            [Alerts info:@"CSV File Contains Zero Rows. Cannot Import." window:self.view.window];
+            NSString* loc = NSLocalizedString(@"mac_csv_file_contains_zero_rows", @"CSV File Contains Zero Rows. Cannot Import.");
+            [Alerts info:loc window:self.view.window];
         }
         else {
             CHCSVOrderedDictionary *firstRow = [rows firstObject];
@@ -2516,18 +2600,22 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                [firstRow objectForKey:kCSVHeaderEmail] ||
                [firstRow objectForKey:kCSVHeaderPassword] ||
                [firstRow objectForKey:kCSVHeaderNotes]) {
-                NSString* message = [NSString stringWithFormat:@"Found %lu valid rows in CSV file. Are you sure you would like to import now?", (unsigned long)rows.count];
+                NSString* loc = NSLocalizedString(@"mac_found_n_valid_rows_in_csv_file_prompt_to_import_fmt", @"Found %lu valid rows in CSV file. Are you sure you would like to import now?");
+                NSString* message = [NSString stringWithFormat:loc, (unsigned long)rows.count];
                 
                 [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
                     if(yesNo) {
                         [self.model importRecordsFromCsvRows:rows];
-                        
-                        [Alerts info:@"CSV File Successfully Imported." window:self.view.window];
+
+                        NSString* loc = NSLocalizedString(@"mac_csv_file_successfully_imported", @"CSV File Successfully Imported.");
+                        [Alerts info:loc window:self.view.window];
                     }
                 }];
             }
             else {
-                [Alerts info:@"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields." window:self.view.window];
+                NSString* loc = NSLocalizedString(@"mac_no_valid_csv_rows_found", @"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields.");
+
+                [Alerts info:loc window:self.view.window];
             }
         }
     }
@@ -2578,11 +2666,16 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         [ret addKey:key andValue:value];
     }
     
-    [ret addKey:@"Unique Usernames" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.usernameSet.count]];
-    [ret addKey:@"Unique Passwords" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.passwordSet.count]];
-    [ret addKey:@"Most Popular Username" andValue:model.mostPopularUsername ? model.mostPopularUsername : @"<None>"];
-    [ret addKey:@"Number of Entries" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfRecords]];
-    [ret addKey:@"Number of Folders" andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfGroups]];
+    [ret addKey:NSLocalizedString(@"mac_database_summary_unique_usernames", @"Unique Usernames")
+       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.usernameSet.count]];
+    [ret addKey:NSLocalizedString(@"mac_database_summary_unique_passwords", @"Unique Passwords")
+       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.passwordSet.count]];
+    [ret addKey:NSLocalizedString(@"mac_database_summary_most_popular_username", @"Most Popular Username")
+       andValue:model.mostPopularUsername ? model.mostPopularUsername : @"<None>"];
+    [ret addKey:NSLocalizedString(@"mac_database_summary_number_of_entries", @"Number of Entries")
+       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfRecords]];
+    [ret addKey:NSLocalizedString(@"mac_database_summary_number_of_folders", @"Number of Folders")
+       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfGroups]];
     
     return ret;
 }
@@ -2683,7 +2776,10 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
                 
                 if(saving > (32 * 1024)) {
                     NSString* savingStr = [[[NSByteCountFormatter alloc] init] stringFromByteCount:saving];
-                    NSString* message = [NSString stringWithFormat:@"This is a large image to use as an icon. Would you like to use a scaled down version to save %@?", savingStr];
+                    
+                    NSString* loc = NSLocalizedString(@"mac_large_image_as_icon_use_scaled_down_version_fmt", @"This is a large image to use as an icon. Would you like to use a scaled down version to save %@?");
+                    
+                    NSString* message = [NSString stringWithFormat:loc, savingStr];
                     [Alerts yesNo:message window:window completion:^(BOOL yesNo) {
                         if(yesNo) {
                             [model setItemIcon:item index:index existingCustom:existingCustom custom:compressed];
@@ -2702,7 +2798,8 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
             }
         }
         else {
-            [Alerts info:@"This is not a valid image file." window:window];
+            NSString* loc = NSLocalizedString(@"mac_not_a_valid_image_file", @"This is not a valid image file.");
+            [Alerts info:loc window:window];
         }
     }
     else {
@@ -2796,10 +2893,14 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         return;
     }
     
-    NSString* response = [[Alerts alloc] input:@"Please enter the secret or an OTPAuth URL" defaultValue:@"" allowEmpty:NO];
+    NSString* loc = NSLocalizedString(@"mac_please_enter_totp_secret_or_otpauth_url", @"Please enter the secret or an OTPAuth URL");
+    NSString* response = [[Alerts alloc] input:loc defaultValue:@"" allowEmpty:NO];
     
     if(response) {
-        [Alerts yesNo:@"Is this a Steam Token? (Say 'No' if you're unsure)" window:self.view.window completion:^(BOOL yesNo) {
+        NSString* loc = NSLocalizedString(@"mac_is_this_a_stream_token_yes_no", @"Is this a Steam Token? (Say 'No' if you're unsure)");
+        [Alerts yesNo:loc
+               window:self.view.window
+           completion:^(BOOL yesNo) {
             [self.model setTotp:item otp:response steam:yesNo];
         }];
     }
@@ -2841,7 +2942,11 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (void)bindQuickViewButton {
-    [self.buttonToggleQuickViewPanel setTitle:self.quickViewColumn.hidden ? @"Show Quick View Panel" : @"Hide Quick View Panel"];
+    NSString* loc = self.quickViewColumn.hidden ?
+        NSLocalizedString(@"mac_show_quick_view_panel", @"Show Quick View Panel") :
+        NSLocalizedString(@"mac_hide_quick_view_panel", @"Hide Quick View Panel");
+
+    [self.buttonToggleQuickViewPanel setTitle:loc];
 }
 
 - (IBAction)onCollapseAll:(id)sender {
@@ -2853,7 +2958,9 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (IBAction)onPrintDatabase:(id)sender {
-    NSString* databaseName = [NSString stringWithFormat:@"%@ Emergency Sheet", [self getDatabaseMetaData].nickName];
+    NSString* loc = NSLocalizedString(@"mac_database_print_emergency_sheet_fmt", @"%@ Emergency Sheet");
+    
+    NSString* databaseName = [NSString stringWithFormat:loc, [self getDatabaseMetaData].nickName];
     NSString* htmlString = [self.model getHtmlPrintString:databaseName];
 
     //    NSError* error;

@@ -38,8 +38,7 @@ static SafesMetaDataViewer* sharedInstance;
 
 + (void)show:(BOOL)debug
 {
-    if (!sharedInstance)
-    {
+    if (!sharedInstance) {
         sharedInstance = [[SafesMetaDataViewer alloc] initWithWindowNibName:@"SafesMetaDataViewer"];
     }
     
@@ -108,7 +107,9 @@ static SafesMetaDataViewer* sharedInstance;
 - (IBAction)onRename:(id)sender {
     if(self.tableView.selectedRow != -1) {
         SafeMetaData *safe = [self.safes objectAtIndex:self.tableView.selectedRow];
-        NSString* response = [[[Alerts alloc] init] input:@"Enter a new name for this database" defaultValue:safe.nickName allowEmpty:NO];
+        
+        NSString* loc = NSLocalizedString(@"mac_enter_new_name_for_db", @"Enter a new name for this database");
+        NSString* response = [[[Alerts alloc] init] input:loc defaultValue:safe.nickName allowEmpty:NO];
         
         if(response) {
             NSLog(@"Rename: [%@]", response);
@@ -164,13 +165,20 @@ static SafesMetaDataViewer* sharedInstance;
 NSString* getStorageProviderName(StorageProvider sp) {
     switch (sp) {
         case kLocalDevice:
-            return @"File Based";
+            {
+                NSString* loc = NSLocalizedString(@"mac_storage_provider_name_file", @"File Based");
+                return loc;
+            }
             break;
         case kSFTP:
-            return @"SFTP";
+            {
+                return @"SFTP";
+            }
             break;
         case kWebDAV:
-            return @"WebDAV";
+            {
+                return @"WebDAV";
+            }
             break;
         default:
             return @"Unknown";
@@ -220,7 +228,12 @@ NSString* getStorageProviderName(StorageProvider sp) {
            if(error) {
                [SafesList.sharedInstance remove:database.uuid];
 
-               [Alerts error:@"There was a problem opening this file. It will be removed from your databases." error:error window:self.window completion:^{
+               NSString* loc = NSLocalizedString(@"mac_problem_opening_db", @"There was a problem opening this file. It will be removed from your databases.");
+                       
+               [Alerts error:loc
+                       error:error
+                      window:self.window
+                  completion:^{
                     [self refresh];
                }];
            }

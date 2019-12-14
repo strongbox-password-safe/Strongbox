@@ -36,7 +36,11 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = @"Local Device";
+        _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
+        if([self.displayName isEqualToString:@"storage_provider_name_local_device"]) {
+            _displayName = @"Local Device";
+        }
+        
         _icon = @"iphone_x";
         _storageId = kLocalDevice;
         _allowOfflineCache = NO;

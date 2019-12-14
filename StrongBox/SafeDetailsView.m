@@ -110,6 +110,7 @@
 }
 
 - (void)setupTableView {
+    [self cell:self.cellBulkUpdateFavIcons setHidden:self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1];
     [self cell:self.cellViewAttachments setHidden:self.viewModel.database.attachments.count == 0];
 }
 

@@ -424,7 +424,8 @@
     settings.titleAutoFillMode = selected == 0 ? kDefault : selected == 1 ? kSmartUrlFill : kCustom;
     
     if(settings.titleAutoFillMode == kCustom) {
-        NSString* response = [[Alerts alloc] input:@"Please enter your custom Title auto fill" defaultValue:settings.titleCustomAutoFill allowEmpty:NO];
+        NSString* loc = NSLocalizedString(@"mac_enter_custom_title_default", @"Please enter your custom Title auto fill");
+        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.titleCustomAutoFill allowEmpty:NO];
 
         if(response) {
             settings.titleCustomAutoFill = response;
@@ -442,7 +443,8 @@
     settings.usernameAutoFillMode = selected == 0 ? kNone : selected == 1 ? kMostUsed : kCustom;
     
     if(settings.usernameAutoFillMode == kCustom) {
-        NSString* response = [[Alerts alloc] input:@"Please enter your custom Username auto fill" defaultValue:settings.usernameCustomAutoFill allowEmpty:NO];
+        NSString* loc = NSLocalizedString(@"mac_enter_custom_username_default", @"Please enter your custom Username auto fill");
+        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.usernameCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.usernameCustomAutoFill = response;
@@ -460,7 +462,8 @@
     settings.emailAutoFillMode = selected == 0 ? kNone : selected == 1 ? kMostUsed : kCustom;
     
     if(settings.emailAutoFillMode == kCustom) {
-        NSString* response = [[Alerts alloc] input:@"Please enter your custom Email auto fill" defaultValue:settings.emailCustomAutoFill allowEmpty:NO];
+        NSString* loc = NSLocalizedString(@"mac_enter_custom_email_default", @"Please enter your custom Email auto fill");
+        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.emailCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.emailCustomAutoFill = response;
@@ -478,7 +481,8 @@
     settings.passwordAutoFillMode = selected == 0 ? kNone : selected == 1 ? kGenerated : kCustom;
     
     if(settings.passwordAutoFillMode == kCustom) {
-        NSString* response = [[Alerts alloc] input:@"Please enter your custom Password auto fill" defaultValue:settings.passwordCustomAutoFill allowEmpty:NO];
+        NSString* loc = NSLocalizedString(@"mac_enter_custom_password_default", @"Please enter your custom Password auto fill");
+        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.passwordCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.passwordCustomAutoFill = response;
@@ -496,7 +500,8 @@
     settings.urlAutoFillMode = selected == 0 ? kNone : selected == 1 ? kSmartUrlFill : kCustom;
     
     if(settings.urlAutoFillMode == kCustom) {
-        NSString* response = [[Alerts alloc] input:@"Please enter your custom URL auto fill" defaultValue:settings.urlCustomAutoFill allowEmpty:NO];
+        NSString* loc = NSLocalizedString(@"mac_enter_custom_url_default", @"Please enter your custom URL auto fill");
+        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.urlCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.urlCustomAutoFill = response;
@@ -514,7 +519,8 @@
     settings.notesAutoFillMode = selected == 0 ? kNone : selected == 1 ? kClipboard : kCustom;
     
     if(settings.notesAutoFillMode == kCustom) {
-        NSString* response = [[Alerts alloc] input:@"Please enter your custom Notes auto fill" defaultValue:settings.notesCustomAutoFill allowEmpty:NO];
+        NSString* loc = NSLocalizedString(@"mac_enter_custom_notes_default", @"Please enter your custom Notes auto fill");
+        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.notesCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.notesCustomAutoFill = response;

@@ -26,7 +26,6 @@ NSString* const kModelUpdateNotificationAttachmentsChanged = @"kModelUpdateNotif
 NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotificationTotpChanged";
 
 NSString* const kNotificationUserInfoKeyNode = @"node";
-static NSString* const kDefaultNewTitle = @"Untitled";
 
 @interface ViewModel ()
 
@@ -159,7 +158,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
                                                     keyFileDigest:self.passwordDatabase.compositeKeyFactors.keyFileDigest];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setCompositeKeyFactors:original];
-    [self.document.undoManager setActionName:@"Change Master Credentials"];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_change_master_credentials", @"Change Master Credentials");
+    [self.document.undoManager setActionName:loc];
     
     self.passwordDatabase.compositeKeyFactors.password = compositeKeyFactors.password;
     self.passwordDatabase.compositeKeyFactors.keyFileDigest = compositeKeyFactors.keyFileDigest;
@@ -236,7 +237,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         }
         
         [[self.document.undoManager prepareWithInvocationTarget:self] setItemTitle:item title:old modified:oldModified];
-        [self.document.undoManager setActionName:@"Title Change"];
+        
+        NSString* loc = NSLocalizedString(@"mac_undo_action_title_change", @"Title Change");
+        [self.document.undoManager setActionName:loc];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTitleChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -268,7 +271,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.modified = modified ? modified : [[NSDate alloc] init]; // TODO: Use Touch() when we can make it undo-able
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemEmail:item email:old modified:oldModified];
-    [self.document.undoManager setActionName:@"Email Change"];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_email_change", @"Email Change");
+    [self.document.undoManager setActionName:loc];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationEmailChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -295,7 +300,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemUsername:item username:old modified:oldModified];
-    [self.document.undoManager setActionName:@"Username Change"];
+  
+    NSString* loc = NSLocalizedString(@"mac_undo_action_username_change", @"Username Change");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationUsernameChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -322,7 +329,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemUrl:item url:old modified:oldModified];
-    [self.document.undoManager setActionName:@"URL Change"];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_url_change", @"URL Change");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationUrlChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -350,7 +359,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.passwordModified = item.fields.modified;
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemPassword:item password:old modified:oldModified];
-    [self.document.undoManager setActionName:@"Password Change"];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_password_change", @"Password Change");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationPasswordChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -377,7 +388,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     item.fields.modified = modified ? modified : [[NSDate alloc] init];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemNotes:item notes:old modified:oldModified];
-    [self.document.undoManager setActionName:@"Notes Change"];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_notes_change", @"Notes Change");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNotesChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -430,7 +443,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     // Save data rather than existing custom icon here, as custom icon could be rationalized away, holding data guarantees we can undo...
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex existingCustom:nil custom:oldCustom modified:oldModified rationalize:NO];
-    [self.document.undoManager setActionName:@"Icon Change"];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_icon_change", @"Icon Change");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationIconChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -440,6 +455,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 - (void)deleteHistoryItem:(Node *)item historicalItem:(Node *)historicalItem {
     [self deleteHistoryItem:item historicalItem:historicalItem index:-1 modified:nil];
 }
+
 - (void)deleteHistoryItem:(Node *)item historicalItem:(Node *)historicalItem index:(NSUInteger)index modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -462,7 +478,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
                                                                               index:index
                                                                            modified:oldModified];
     
-    [self.document.undoManager setActionName:@"Delete History Item"];
+    NSString* loc = NSLocalizedString(@"mac_undo_action_delete_history_item", @"Delete History Item");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.onDeleteHistoryItem(item, historicalItem);
@@ -472,6 +489,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 - (void)restoreHistoryItem:(Node *)item historicalItem:(Node *)historicalItem {
     [self restoreHistoryItem:item historicalItem:historicalItem modified:nil];
 }
+
 - (void)restoreHistoryItem:(Node *)item historicalItem:(Node *)historicalItem modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
@@ -497,7 +515,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
                                                                       historicalItem:originalNode
                                                                             modified:oldModified];
     
-    [self.document.undoManager setActionName:@"Restore History Item"];
+    NSString* loc = NSLocalizedString(@"mac_undo_action_restore_history_item", @"Restore History Item");
+    [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         self.onRestoreHistoryItem(item, historicalItem);
@@ -529,7 +548,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item attachment:old modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Remove Attachment"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_remove_attachment", @"Remove Attachment");
+        [self.document.undoManager setActionName:loc];
     }
 
     [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
@@ -596,7 +616,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] removeItemAttachment:item atIndex:foundIndex modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Add Attachment"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_add_attachment", @"Add Attachment");
+        [self.document.undoManager setActionName:loc];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -629,11 +650,14 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 
     if(oldValue) {
         [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
-        [self.document.undoManager setActionName:@"Set Custom Field"];
+        
+        NSString* loc = NSLocalizedString(@"mac_undo_action_set_custom_field", @"Set Custom Field");
+        [self.document.undoManager setActionName:loc];
     }
     else {
         [[self.document.undoManager prepareWithInvocationTarget:self] removeCustomField:item key:key modified:oldModified];
-        [self.document.undoManager setActionName:@"Add Custom Field"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_add_custom_field", @"Add Custom Field");
+        [self.document.undoManager setActionName:loc];
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -667,7 +691,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Remove Custom Field"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_remove_custom_field", @"Remove Custom Field");
+        [self.document.undoManager setActionName:loc];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -695,7 +720,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     
     if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Set TOTP"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_set_totp", @"Set TOTP");
+        [self.document.undoManager setActionName:loc];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -728,7 +754,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     [[self.document.undoManager prepareWithInvocationTarget:self] setTotp:item otp:oldOtpTokenUrl.absoluteString steam:oldOtpToken.algorithm == OTPAlgorithmSteam];
     
     if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Clear TOTP"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_clear_totp", @"Clear TOTP");
+        [self.document.undoManager setActionName:loc];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -749,10 +776,15 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         [self addItem:child parent:parent newItemCreated:NO];
     }
     
-    [self.document.undoManager setActionName:@"Add Items"];
+    NSString* loc = NSLocalizedString(@"mac_undo_action_add_items", @"Add Items");
+    [self.document.undoManager setActionName:loc];
     [self.document.undoManager endUndoGrouping];
 
     return YES;
+}
+
+- (NSString*)getDefaultTitle {
+    return NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled");
 }
 
 - (BOOL)addNewRecord:(Node *_Nonnull)parentGroup {
@@ -760,8 +792,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     
     // Title
     
-    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? kDefaultNewTitle :
-            autoFill.titleAutoFillMode == kSmartUrlFill ? getSmartFillTitle() : autoFill.titleCustomAutoFill;
+    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? [self getDefaultTitle] :
+            autoFill.titleAutoFillMode == kSmartUrlFill ? [self getSmartFillTitle] : autoFill.titleCustomAutoFill;
     
     // Username
     
@@ -825,7 +857,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     
     [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
     if(!self.document.undoManager.isUndoing) {
-        [self.document.undoManager setActionName:@"Add Item"];
+        NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
+        [self.document.undoManager setActionName:loc];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -847,7 +880,8 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         
         [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent newItemCreated:NO];
         if(!self.document.undoManager.isUndoing) {
-            [self.document.undoManager setActionName:@"Delete Item"];
+            NSString* loc = NSLocalizedString(@"mac_undo_action_delete_item", @"Delete Item");
+            [self.document.undoManager setActionName:loc];
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -881,7 +915,12 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     Node* old = node.parent;
     
     [[self.document.undoManager prepareWithInvocationTarget:self] changeParent:old node:node isRecycleOp:isRecycleOp];
-    [self.document.undoManager setActionName:isRecycleOp ? @"Delete Item" : @"Move Item"];
+    
+    NSString* loc = isRecycleOp ?
+        NSLocalizedString(@"mac_undo_action_delete_item", @"Delete Item") :
+        NSLocalizedString(@"mac_undo_action_move_item", @"Move Item");
+
+    [self.document.undoManager setActionName:loc];
     
     BOOL ret = [node changeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe];
 
@@ -927,7 +966,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
         [self addItem:record parent:self.passwordDatabase.rootGroup newItemCreated:NO];
     }
     
-    [self.document.undoManager setActionName:@"Import Entries from CSV"];
+    NSString* loc = NSLocalizedString(@"mac_undo_action_import_entries_from_csv", @"Import Entries from CSV");
+
+    [self.document.undoManager setActionName:loc];
     [self.document.undoManager endUndoGrouping];
 }
 
@@ -937,7 +978,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
     return [node validateChangeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe];
 }
 
-NSString* getSmartFillTitle() {
+- (NSString*)getSmartFillTitle {
     NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
     NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
     
@@ -952,7 +993,7 @@ NSString* getSmartFillTitle() {
         }
     }
     
-    return kDefaultNewTitle;
+    return [self getDefaultTitle];
 }
 
 NSString* getSmartFillUrl() {

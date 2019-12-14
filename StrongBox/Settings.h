@@ -117,6 +117,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property FavIconDownloadOptions *favIconDownloadOptions;
 
+@property BOOL clipboardHandoff;
+
 NS_ASSUME_NONNULL_END
 
 @end

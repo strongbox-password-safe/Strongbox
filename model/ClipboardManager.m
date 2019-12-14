@@ -54,12 +54,12 @@
             NSLog(@"Expiration: %@", expirationTime);
             
             [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(YES) ,
+                         options: @{ UIPasteboardOptionLocalOnly : @(!Settings.sharedInstance.clipboardHandoff) ,
                                      UIPasteboardOptionExpirationDate : expirationTime }];
         }
         else {
             [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(YES) }];
+                         options: @{ UIPasteboardOptionLocalOnly : @(!Settings.sharedInstance.clipboardHandoff) }];
         }
     }
     else {

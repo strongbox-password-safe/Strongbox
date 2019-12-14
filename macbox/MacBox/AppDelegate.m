@@ -223,12 +223,15 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
     [Settings sharedInstance].endFreeTrialDate = date;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [Alerts info:@"Welcome to Strongbox"
-     informativeText:@"Hi and welcome to Strongbox!\n\n"
-         @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of Strongbox for the next three months. "
-         @"After that point, you will be transitioned to the regular version of Strongbox.\n\n"
-         @"You can always find out more at any time by tapping 'Upgrade to Pro' in the Strongbox menu item.\n\n"
-         @"Thanks!\n-Mark"
+        NSString* loc = NSLocalizedString(@"mac_welcome_to_strongbox_title", @"Welcome to Strongbox");
+        NSString* loc2 = NSLocalizedString(@"mac_welcome_to_strongbox_message", @"Hi and welcome to Strongbox!\n\n"
+                                @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of Strongbox for the next three months. "
+                                @"After that point, you will be transitioned to the regular version of Strongbox.\n\n"
+                                @"You can always find out more at any time by tapping 'Upgrade to Pro' in the Strongbox menu item.\n\n"
+                                @"Thanks!\n-Mark");
+
+        [Alerts info:loc
+     informativeText:loc2
               window:[NSApplication sharedApplication].mainWindow 
           completion:nil];
     });
@@ -299,7 +302,7 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 - (void)removeUnwantedMenuItems {
     // Remove Start Dictation and Emoji menu Items
     
-    NSMenu* edit = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Edit"] submenu];
+    NSMenu* edit = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Edit"] submenu]; // TODO: Localization Problem here?
     
     if ([[edit itemAtIndex: [edit numberOfItems] - 1] action] == NSSelectorFromString(@"orderFrontCharacterPalette:")) {
         [edit removeItemAtIndex: [edit numberOfItems] - 1];
@@ -330,15 +333,15 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
     //    removeItemWithSelector(@selector(moveDocument:));
     //    removeItemWithSelector(@selector(renameDocument:));
 
-    [self removeMenuItem:@"File" action:@"saveDocumentAs:"];
+    [self removeMenuItem:@"File" action:@"saveDocumentAs:"];  // TODO: Localization Problem here?
 }
 
 - (void)removeShowSafesMetaDataItem {
-    [self removeMenuItem:@"View" action:@"onViewDebugDatabasesList:"];
+    [self removeMenuItem:@"View" action:@"onViewDebugDatabasesList:"];  // TODO: Localization Problem here?
 }
 
 - (void)removeCopyDiagnosticDumpItem {
-    [self removeMenuItem:@"Database" action:@"onCopyDiagnosticDump:"];
+    [self removeMenuItem:@"Database" action:@"onCopyDiagnosticDump:"];  // TODO: Localization Problem here?
 }
 
 - (void)removeUpgradeMenuItem {

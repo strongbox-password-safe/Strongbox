@@ -645,7 +645,9 @@
     NSString* providerString = provider.displayName;
     BOOL localDeviceOption = database.storageProvider == kLocalDevice;
     if(localDeviceOption) {
-        providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ? @"Local" : @"Local (Documents)";
+        providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
+        NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
+        NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
     }
     return providerString;
 }

@@ -82,6 +82,7 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
 static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
+static NSString* const kClipboardHandoff = @"clipboardHandoff";
 
 @implementation Settings
 
@@ -111,6 +112,14 @@ static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)clipboardHandoff {
+    return [self getBool:kClipboardHandoff];
+}
+
+- (void)setClipboardHandoff:(BOOL)clipboardHandoff {
+    return [self setBool:kClipboardHandoff value:clipboardHandoff];
+}
 
 - (FavIconDownloadOptions *)favIconDownloadOptions {
     NSUserDefaults *defaults = [self getUserDefaults];

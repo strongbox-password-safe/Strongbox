@@ -29,7 +29,8 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 - (void)newDocument:(id)sender {
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
-    wizard.titleText = @"Please Enter the Master Credentials for this Database";
+    NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
+    wizard.titleText = loc;
     wizard.databaseFormat = kKeePass4;
     wizard.createSafeWizardMode = YES;
     
@@ -40,12 +41,20 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     }
     
     NSSavePanel *panel = [NSSavePanel savePanel];
-    panel.title = @"Save New Password Database...";
-    panel.prompt = @"Save";
-    panel.message = @"You must save this new database before you can use it";
+    
+    NSString* loc2 = NSLocalizedString(@"mac_save_new_database",  @"Save New Password Database...");
+    panel.title = loc2;
+
+    NSString* loc3 = NSLocalizedString(@"mac_save_action",  @"Save");
+    panel.prompt = loc3;
+    
+    NSString* loc4 = NSLocalizedString(@"mac_save_new_db_message",  @"You must save this new database before you can use it");
+    panel.message = loc4;
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:wizard.databaseFormat];
-    panel.nameFieldStringValue = [NSString stringWithFormat:@"Untitled.%@", adaptor.fileExtension ];
+    
+    NSString* loc5 = NSLocalizedString(@"mac_untitled_database_filename_fmt", @"Untitled.%@");
+    panel.nameFieldStringValue = [NSString stringWithFormat:loc5, adaptor.fileExtension ];
     
     NSInteger modalCode = [panel runModal];
 

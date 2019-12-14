@@ -65,7 +65,8 @@
 
 - (IBAction)saveDocument:(id)sender {
     if(self.model.locked) {
-        [Alerts info:@"Cannot save database while it is locked." window:self.windowController.window];
+        NSString* loc = NSLocalizedString(@"mac_cannot_save_db_while_locked", @"Cannot save database while it is locked.");
+        [Alerts info:loc window:self.windowController.window];
         return;
     }
 
@@ -165,7 +166,8 @@
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
     if(fileWrapper.isDirectory) { // Strongbox crashes unless we check if someone is trying to open a package/wrapper...
         if(outError != nil) {
-            *outError = [Utils createNSError:@"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please directly select a KeePass or Password Safe database file." errorCode:-1];
+            NSString* loc = NSLocalizedString(@"mac_strongbox_cant_open_file_wrappers", @"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please directly select a KeePass or Password Safe database file.");
+            *outError = [Utils createNSError:loc errorCode:-1];
         }
         return NO;
     }

@@ -27,16 +27,19 @@
         
     if(![Settings sharedInstance].fullVersion) {
         if (![Settings sharedInstance].freeTrial) {
-            freeTrialLiteSuffix = @" - (Pro Upgrade Available)";
+            NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
+            freeTrialLiteSuffix = loc;
         }
         else {
             long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
             
             if(daysLeft < 1) {
-                freeTrialLiteSuffix = @" - (Pro Upgrade Available)";
+                NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
+                freeTrialLiteSuffix = loc;
             }
             else if(daysLeft < 15) {
-                freeTrialLiteSuffix = [NSString stringWithFormat:@" - [%ld 'Pro' Days Left]", daysLeft];
+                NSString* loc = NSLocalizedString(@"mac_pro_days_left_window_title_suffix_fmt", @" - [%ld 'Pro' Days Left]");
+                freeTrialLiteSuffix = [NSString stringWithFormat:loc, daysLeft];
             }
         }
     }

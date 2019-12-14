@@ -25,6 +25,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDetectOffline;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowClipboardHandoff;
 
 @end
 
@@ -63,6 +64,7 @@
     Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     Settings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
     Settings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
+    Settings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
     
     if(Settings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -80,6 +82,7 @@
     self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchShowYubikeySecretWorkaround.on = Settings.sharedInstance.showYubikeySecretWorkaroundField;
     self.switchDetectOffline.on = Settings.sharedInstance.monitorInternetConnectivity;
+    self.switchAllowClipboardHandoff.on = Settings.sharedInstance.clipboardHandoff;
 }
 
 - (void)bindAllowPinCodeOpen {
