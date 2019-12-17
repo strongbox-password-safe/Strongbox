@@ -159,7 +159,11 @@
     
     Node* node = self.history[row];
     
-    [Alerts yesNo:@"Are you sure you want to delete this history item?" window:self.window completion:^(BOOL yesNo) {
+    NSString* loc = NSLocalizedString(@"mac_keepass_history_are_sure_delete", @"Are you sure you want to delete this history item?");
+    
+    [Alerts yesNo:loc
+           window:self.window
+       completion:^(BOOL yesNo) {
         if(yesNo) {
             self.onDeleteHistoryItem(node);
             // [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
@@ -177,7 +181,11 @@
     
     Node* node = self.history[row];
     
-    [Alerts yesNo:@"Are you sure you want to restore this history item?" window:self.window completion:^(BOOL yesNo) {
+    NSString* loc = NSLocalizedString(@"mac_keepass_history_are_sure_restore", @"Are you sure you want to restore this history item?");
+    
+    [Alerts yesNo:loc
+           window:self.window
+       completion:^(BOOL yesNo) {
         if(yesNo) {
             self.onRestoreHistoryItem(node);
             [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];

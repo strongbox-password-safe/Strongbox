@@ -8,7 +8,7 @@
 
 #import "Alerts.h"
 #import <MobileCoreServices/MobileCoreServices.h>
-#import "Utils.h"
+#import "utils.h"
 
 @interface Alerts ()
 

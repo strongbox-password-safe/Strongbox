@@ -576,7 +576,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
         }
         else {
-            return @[removeAction, renameAction, duplicateItemAction, setIconAction, pinAction]; // TODO: Icons instead of text!
+            return @[removeAction, duplicateItemAction, setIconAction, pinAction]; // TODO: Icons instead of text!
         }
     }
     else {

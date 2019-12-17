@@ -137,7 +137,11 @@ static UpgradeWindowController *sharedInstance = nil;
     
     if(self.product != nil) {
         NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:@"Upgrade\n" attributes:dict1]];
+        
+        NSString* loc = NSLocalizedString(@"mac_upgrade_button_title", @"Upgrade");
+
+        loc = [loc stringByAppendingString:@"\n"];
+        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:loc attributes:dict1]];
         
         NSString* priceText = [self getPriceTextFromProduct];
         [attString appendAttributedString:[[NSAttributedString alloc] initWithString:priceText attributes:dict2]];
@@ -167,12 +171,15 @@ static UpgradeWindowController *sharedInstance = nil;
         }
 
         NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:@"Upgrade Momentarily Unavailable"
-                                           @"\nPlease Check Your Connection and Try Again Later"
+
+        NSString* loc = NSLocalizedString(@"mac_upgrade_momentarily_unavailble", @"Upgrade Momentarily Unavailable\nPlease Check Your Connection and Try Again Later");
+        
+        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:loc
                                                                           attributes:dict3]];
         [self.buttonUpgrade setAttributedTitle:attString];
 
-        [self.buttonRestore setTitle:@"Restore Momentarily Unavailable"];
+        NSString* loc2 = NSLocalizedString(@"mac_restore_momentarily_unavailble", @"Restore Momentarily Unavailable");
+        [self.buttonRestore setTitle:loc2];
     
         self.buttonUpgrade.enabled = NO;
         self.buttonRestore.enabled = NO;
@@ -183,7 +190,9 @@ static UpgradeWindowController *sharedInstance = nil;
     NSLog(@"Starting No Thanks Countdown with %ld delay", (long)self.cancelDelay);
     
     [self.buttonNoThanks setEnabled:NO];
-    [self.buttonNoThanks setTitle:[NSString stringWithFormat:@"No Thanks (%ld)", (long)self.cancelDelay]];
+    
+    NSString* loc = NSLocalizedString(@"mac_upgrade_no_thanks_seconds_remaining_fmt", @"No Thanks (%ld)");
+    [self.buttonNoThanks setTitle:[NSString stringWithFormat:loc, (long)self.cancelDelay]];
 
     if(self.countdownTimer) {
         [self.countdownTimer invalidate];
@@ -203,13 +212,16 @@ static UpgradeWindowController *sharedInstance = nil;
     self.secondsRemaining--;
 
     if(self.secondsRemaining < 1) {
-        [self.buttonNoThanks setTitle:@"No Thanks"];
+        NSString* loc = NSLocalizedString(@"mac_upgrade_no_thanks", @"No Thanks");
+
+        [self.buttonNoThanks setTitle:loc];
         [self.buttonNoThanks setEnabled:YES];
         [self.countdownTimer invalidate];
         self.countdownTimer = nil;
     }
     else {
-        [self.buttonNoThanks setTitle:[NSString stringWithFormat:@"No Thanks (%ld)", (long)self.secondsRemaining]];
+        NSString* loc = NSLocalizedString(@"mac_upgrade_no_thanks_seconds_remaining_fmt", @"No Thanks (%ld)");
+        [self.buttonNoThanks setTitle:[NSString stringWithFormat:loc, (long)self.secondsRemaining]];
     }
 }
 
@@ -237,7 +249,8 @@ static UpgradeWindowController *sharedInstance = nil;
         [[SKPaymentQueue defaultQueue] addPayment:payment];
     }
     else{
-        [Alerts info:@"Purchases Are Disabled on Your Device." window:self.window];
+        NSString* loc = NSLocalizedString(@"mac_upgrade_purchases_disabled_on_device", @"Purchases Are Disabled on Your Device.");
+        [Alerts info:loc window:self.window];
     }
 }
 
@@ -269,8 +282,11 @@ static UpgradeWindowController *sharedInstance = nil;
     
     if(queue.transactions.count == 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [Alerts info:@"Restoration Unsuccessful"
-         informativeText:@"Could not find any previously purchased products."
+            NSString* loc = NSLocalizedString(@"mac_upgrade_restoration_unsuccessful", @"Restoration Unsuccessful");
+            NSString* loc2 = NSLocalizedString(@"mac_upgrade_could_not_find_any_previous_purchases", @"Could not find any previously purchased products.");
+
+            [Alerts info:loc
+         informativeText:loc2
                   window:self.window
               completion:^{
                     [self close:NO];
@@ -284,9 +300,12 @@ static UpgradeWindowController *sharedInstance = nil;
 
 - (void)onSuccessfulRestore {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [Alerts info:@"Welcome back to Strongbox Pro"
-     informativeText:@"Upgrade Restored Successfully. Thank you for your support!\n\n"
-         @"Please restart the Application to enjoy your Pro features."
+        NSString* loc = NSLocalizedString(@"mac_upgrade_welcome_back_to_strongbox", @"Welcome back to Strongbox Pro");
+        NSString* loc2 = NSLocalizedString(@"mac_upgrade_upgrade_restored_success", @"Upgrade Restored Successfully. Thank you for your support!\n\n"
+        @"Please restart the Application to enjoy your Pro features.");
+
+        [Alerts info:loc
+     informativeText:loc2
               window:self.window
           completion:^{
               [self close:YES];
@@ -304,10 +323,13 @@ updatedTransactions:(NSArray *)transactions {
             case SKPaymentTransactionStatePurchased:
             {
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
-                
+
+                NSString* loc = NSLocalizedString(@"mac_upgrade_welcome_to_strongbox", @"Welcome to Strongbox Pro");
+                NSString* loc2 = NSLocalizedString(@"mac_upgrade_upgrade_successful_thank_you", @"Upgrade to Pro version successful! Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features.");
+
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [Alerts info:@"Welcome to Strongbox Pro"
-                 informativeText:@"Upgrade to Pro version successful! Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features."
+                    [Alerts info:loc
+                 informativeText:loc2
                           window:self.window  completion:^{
                         [self close:YES];
                     }];
@@ -331,7 +353,12 @@ updatedTransactions:(NSArray *)transactions {
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [Alerts error:@"Failed to Upgrade" error:transaction.error window:self.window completion:^{
+                    NSString* loc = NSLocalizedString(@"mac_upgrade_failed_to_upgrade", @"Failed to Upgrade");
+
+                    [Alerts error:loc
+                            error:transaction.error
+                           window:self.window
+                       completion:^{
                         [self close:NO];
                     }];
                 });

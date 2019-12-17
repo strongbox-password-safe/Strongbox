@@ -2266,9 +2266,6 @@
 /* Local Device */
 "storage_provider_name_local_device" = "Local Device";
 
-/* '%@' %@ Changed... First parameter Title of Item, second parameter which field changed, e.g. Username or Password */
-"mac_field_changed_popup_notification_fmt" = "'%@' %@ Changed...";
-
 /* Unlock with %@ */
 "mac_unlock_database_with_biometric_fmt" = "Unlock with %@";
 
@@ -2307,9 +2304,6 @@
 
 /* Master Credentials Changed and Database Saved */
 "mac_master_credentials_changed_and_saved" = "Master Credentials Changed and Database Saved";
-
-/* '%@' %@ Copied - Translators Note: 1st Param is Title of Item, 2nd Param is the Field name e.g. Username or Password */
-"mac_field_copied_to_clipboard_fmt" = "'%@' %@ Copied";
 
 /* KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue? */
 "mac_drag_drop_between_databases_keepass_email_field_not_supported" = "KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue?";
@@ -2535,4 +2529,158 @@
 /* There was a problem opening this file. It will be removed from your databases. */
 "mac_problem_opening_db" = "There was a problem opening this file. It will be removed from your databases.";
 
+/* Create New Password Database */
+"mac_create_new_database_title" = "Create New Password Database";
 
+/* Enter Database Master Credentials */
+"mac_enter_database_master_credentials" = "Enter Database Master Credentials";
+
+/* Click Browse to Select a Key File */
+"mac_click_browse_select_key_file" = "Click Browse to Select a Key File";
+
+/* Passwords don't match */
+"mac_passwords_dont_match" = "Passwords don't match";
+
+/* Key File Invalid */
+"mac_key_file_invalid" = "Key File Invalid";
+
+/* Select a Key File */
+"mac_select_key_file" = "Select a Key File";
+
+/* You must use at least a Password or a Key File */
+"mac_you_must_use_at_least_a_password_or_key_file" = "You must use at least a Password or a Key File";
+
+/* Password cannot be Empty */
+"mac_password_cannot_be_empty" = "Password cannot be Empty";
+
+/* Weak Credentials */
+"mac_weak_credentials" = "Weak Credentials";
+
+/* Protected */
+"mac_alerts_input_custom_field_protected_checkbox" = "Protected";
+
+/* Key */
+"mac_alerts_input_custom_field_label_key" = "Key";
+
+/* Value */
+"mac_alerts_input_custom_field_label_value" = "Value";
+
+/* Field cannot be empty */
+"mac_alerts_field_cannot_be_empty" = "Field cannot be empty";
+
+/* Upgrade */
+"mac_upgrade_button_title" = "Upgrade";
+
+/* Upgrade Momentarily Unavailable\nPlease Check Your Connection and Try Again Later */
+"mac_upgrade_momentarily_unavailble" = "Upgrade Momentarily Unavailable\nPlease Check Your Connection and Try Again Later";
+
+/* Restore Momentarily Unavailable */
+"mac_restore_momentarily_unavailble" = "Restore Momentarily Unavailable";
+
+/* No Thanks (%ld) */
+"mac_upgrade_no_thanks_seconds_remaining_fmt" = "No Thanks (%ld)";
+
+/* No Thanks */
+"mac_upgrade_no_thanks" = "No Thanks";
+
+/* Purchases Are Disabled on Your Device. */
+"mac_upgrade_purchases_disabled_on_device" = "Purchases Are Disabled on Your Device.";
+
+/* Restoration Unsuccessful */
+"mac_upgrade_restoration_unsuccessful" = "Restoration Unsuccessful";
+
+/* Could not find any previously purchased products. */
+"mac_upgrade_could_not_find_any_previous_purchases" = "Could not find any previously purchased products.";
+
+/* Welcome back to Strongbox Pro */
+"mac_upgrade_welcome_back_to_strongbox" = "Welcome back to Strongbox Pro";
+
+/* Upgrade Restored Successfully. Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features. */
+"mac_upgrade_upgrade_restored_success" = "Upgrade Restored Successfully. Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features.";
+
+/* Welcome to Strongbox Pro */
+"mac_upgrade_welcome_to_strongbox" = "Welcome to Strongbox Pro";
+
+/* Upgrade to Pro version successful! Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features. */
+"mac_upgrade_upgrade_successful_thank_you" = "Upgrade to Pro version successful! Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features.";
+
+/* Failed to Upgrade */
+"mac_upgrade_failed_to_upgrade" = "Failed to Upgrade";
+
+/* Discard New Entry? */
+"mac_node_details_discard_new_entry" = "Discard New Entry?";
+
+/* Save Changes? */
+"mac_node_details_save_changes" = "Save Changes?";
+
+/* You have made no changes to this new entry, do you want to discard?" */
+"mac_node_details_you_made_changes_discard" = "You have made no changes to this new entry, do you want to discard?";
+
+/* There are unsaved changes present. Would you like to save those before exiting? */
+"mac_node_details_unsaved_changes_save" = "There are unsaved changes present. Would you like to save those before exiting?";
+
+/* %@ (Historical Item) */
+"mac_node_details_historical_item_suffix_fmt" = "%@ (Historical Item)";
+
+/* Edit Custom Field */
+"mac_node_details_edit_custom_field" = "Edit Custom Field";
+
+/* Are you sure you want to remove the custom field '%@'? */
+"mac_node_details_are_you_sure_remove_custom_field_fmt" = "Are you sure you want to remove the custom field '%@'?";
+
+/* Are you sure you want to remove the custom field '%@'? */
+"mac_node_details_are_you_sure_remove_custom_field_fmt" = "Are you sure you want to remove the custom field '%@'?";
+
+/* Add Custom Field */
+"mac_node_details_add_custom_field" = "Add Custom Field";
+
+/* You cannot use that Key here as it already exists in custom fields. */
+"mac_node_details_you_cannot_use_that_key_already_exists" = "You cannot use that Key here as it already exists in custom fields.";
+
+/* You cannot use that Key here as it is reserved for standard KeePass fields. */
+"mac_node_details_you_cannot_use_key_reserved" = "You cannot use that Key here as it is reserved for standard KeePass fields.";
+
+/* Are you sure you want to remove the attachment: %@? */
+"mac_node_details_are_you_sure_remove_attachment_fmt" = "Are you sure you want to remove the attachment: %@?";
+
+/* Password Copied and URL Launched */
+"mac_node_details_password_copied_url_launched" = "Password Copied and URL Launched";
+
+/* Please enter the secret or an OTPAuth URL */
+"mac_node_details_please_enter_secret_totp" = "Please enter the secret or an OTPAuth URL";
+
+/* Is this a Steam Token? (Say 'No' if you're unsure) */
+"mac_node_details_is_this_steam_totp" = "Is this a Steam Token? (Say 'No' if you're unsure)";
+
+/* Could not change group! Validate failed... */
+"mac_node_details_could_not_change_group" = "Could not change group! Validate failed...";
+
+/* '%@' %@ Copied - Translators Note: 1st Param is Title of Item, 2nd Param is the Field name e.g. Username or Password */
+"mac_field_copied_to_clipboard_fmt" = "'%@' %@ Copied";
+
+/* '%@' %@ Changed... First parameter is field that changed, e.g. Username or Password */
+"mac_field_changed_notification_fmt" = "%@ Changed...";
+
+/* '%@' %@ Changed... First parameter Title of Item, second parameter which field changed, e.g. Username or Password */
+"mac_field_changed_popup_notification_fmt" = "'%@' %@ Changed...";
+
+/* Are you sure you want to delete this history item? */
+"mac_keepass_history_are_sure_delete" = "Are you sure you want to delete this history item?";
+
+/* Are you sure you want to restore this history item? */
+"mac_keepass_history_are_sure_restore" = "Are you sure you want to restore this history item?";
+
+/* Could not open this file. */
+"mac_could_not_open_this_file" = "Could not open this file.";
+
+/* Database Icons */
+"mac_database_icons" = "Database Icons";
+
+/* KeePass Icons */
+"mac_keepass_icons" = "KeePass Icons";
+
+/* Identify to Open Database */
+"mac_biometrics_identify_to_open_database" = "Identify to Open Database";
+
+/* Biometrics is not available on this device! */
+"mac_biometrics_not_available" = "Biometrics is not available on this device!";

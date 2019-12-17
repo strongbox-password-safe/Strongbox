@@ -524,7 +524,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
 NSString* localizedYesOrNoFromBool(BOOL george) {
     return george ?
     NSLocalizedString(@"alerts_yes", @"Yes") :
-    NSLocalizedString(@"alerts_no", @"No"); // TODO: change to use generic_yes and generic_no?
+    NSLocalizedString(@"alerts_no", @"No");
 }
 
 //    [[Settings sharedInstance] setPro:NO];

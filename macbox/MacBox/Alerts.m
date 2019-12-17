@@ -26,7 +26,9 @@
     
     [alert setMessageText:info];
     [alert setAlertStyle:NSAlertStyleInformational];
-    [alert addButtonWithTitle:@"OK"];
+    
+    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+    [alert addButtonWithTitle:loc];
     
     [alert beginSheetModalForWindow:window completionHandler:nil];
 }
@@ -40,7 +42,9 @@
     [alert setMessageText:message];
     [alert setInformativeText:informativeText];
     [alert setAlertStyle:NSAlertStyleInformational];
-    [alert addButtonWithTitle:@"OK"];
+    
+    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+    [alert addButtonWithTitle:loc];
     
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         if(completion) {
@@ -57,8 +61,10 @@
     
     [alert setAlertStyle:NSAlertStyleInformational];
     
-    [alert addButtonWithTitle:@"No"];
-    [alert addButtonWithTitle:@"Yes"];
+    NSString* loc = NSLocalizedString(@"alerts_no", @"No");
+    [alert addButtonWithTitle:loc];
+    NSString* loc2 = NSLocalizedString(@"alerts_yes", @"Yes");
+    [alert addButtonWithTitle:loc2];
     
     [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
     [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; // ENTER
@@ -74,10 +80,13 @@
 
 + (void)error:(NSError*)error window:(NSWindow*)window {
     NSAlert *alert = [[NSAlert alloc] init];
-    
-    [alert setMessageText:error ? error.localizedDescription : @"Unknown Error (nil)"];
+
+    NSString* loc = NSLocalizedString(@"alerts_unknown_error", @"Unknown Error");
+    [alert setMessageText:error ? error.localizedDescription : loc];
     [alert setAlertStyle:NSAlertStyleWarning];
-    [alert addButtonWithTitle:@"OK"];
+    
+    NSString* loc2 = NSLocalizedString(@"alerts_ok", @"OK");
+    [alert addButtonWithTitle:loc2];
     
     [alert beginSheetModalForWindow:window completionHandler:nil];
 }
@@ -96,7 +105,9 @@
     }
     
     [alert setAlertStyle:NSAlertStyleWarning];
-    [alert addButtonWithTitle:@"OK"];
+    
+    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+    [alert addButtonWithTitle:loc];
 
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         if(completion) {
@@ -109,11 +120,12 @@
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:prompt];
     
-    self.allowEmptyInput = allowEmpty;
-    self.okButton = [alert addButtonWithTitle:@"OK"];
+    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+    self.okButton = [alert addButtonWithTitle:loc];
     self.okButton.enabled = self.allowEmptyInput || defaultValue.length;// ? YES :NO;
-    
-    [alert addButtonWithTitle:@"Cancel"];
+
+    NSString* loc2 = NSLocalizedString(@"alerts_cancel", @"Cancel");
+    [alert addButtonWithTitle:loc2];
     
     self.simpleInputTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
     [self.simpleInputTextField setStringValue:defaultValue];
@@ -147,14 +159,19 @@
     [alert setMessageText:prompt];
     //alert.informativeText = @"Informative?";
     
-    self.okButton = [alert addButtonWithTitle:@"OK"];
+    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+    self.okButton = [alert addButtonWithTitle:loc];
     self.okButton.enabled = NO;
-    [alert addButtonWithTitle:@"Cancel"];
+    
+    NSString* loc2 = NSLocalizedString(@"alerts_cancel", @"Cancel");
+    [alert addButtonWithTitle:loc2];
     
     // Accessory View
 
     self.checkboxProtected = [[NSButton alloc] initWithFrame:NSMakeRect(40, 0, 100, 30)];
-    [self.checkboxProtected setTitle:@"Protected"];
+    
+    NSString* loc3 = NSLocalizedString(@"mac_alerts_input_custom_field_protected_checkbox", @"Protected");
+    [self.checkboxProtected setTitle:loc3];
     [self.checkboxProtected setButtonType:NSButtonTypeSwitch];
     self.checkboxProtected.target = self;
     self.checkboxProtected.action = @selector(onCheckboxProtected);
@@ -164,14 +181,16 @@
     self.keyTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(40, 75, 295, 24)];
     NSTextField *valueLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 35, 295, 16)];
     self.valueTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(40, 33, 295, 24)];
-    
-    keyLabel.stringValue = @"Key";
+
+    NSString* loc4 = NSLocalizedString(@"mac_alerts_input_custom_field_label_key", @"Key");
+    keyLabel.stringValue = loc4;
     [keyLabel setBezeled:NO];
     [keyLabel setDrawsBackground:NO];
     [keyLabel setEditable:NO];
     [keyLabel setSelectable:NO];
-    
-    valueLabel.stringValue = @"Value";
+
+    NSString* loc5 = NSLocalizedString(@"mac_alerts_input_custom_field_label_value", @"Value");
+    valueLabel.stringValue = loc5;
     [valueLabel setBezeled:NO];
     [valueLabel setDrawsBackground:NO];
     [valueLabel setEditable:NO];
@@ -217,7 +236,8 @@
     
     if(textField == self.simpleInputTextField) {
         if(!self.allowEmptyInput && !textField.stringValue.length) {
-            textField.placeholderString = @"Field cannot be empty";
+            NSString* loc = NSLocalizedString(@"mac_alerts_field_cannot_be_empty", @"Field cannot be empty");
+            textField.placeholderString = loc;
         }
         self.okButton.enabled = self.allowEmptyInput || textField.stringValue.length;
     }

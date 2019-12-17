@@ -42,8 +42,8 @@
 }
 
 - (NSString*)biometricIdName {
-    NSString* biometricIdName = @"Touch ID";
-    
+    NSString* loc = NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
+    NSString* biometricIdName = loc;
     return biometricIdName;
 }
 
@@ -56,22 +56,26 @@
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
 
+        NSString* loc = NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Open Database");
+        
         NSError *authError;
         if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
             [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                             localizedReason:@"Identify to Open Database"
+                             localizedReason:loc
                                        reply:^(BOOL success, NSError *error) {
                                            completion(success, error);
                                        }];
         }
         else {
             NSLog(@"Biometrics is not available on this device");
-            completion(NO, [Utils createNSError:@"Biometrics is not available on this device!" errorCode:24321]);
+            NSString* loc = NSLocalizedString(@"mac_biometrics_not_available", @"Biometrics is not available on this device!");
+            completion(NO, [Utils createNSError:loc errorCode:24321]);
         }
     }
     else {
         NSLog(@"Biometrics is not available on this device");
-        completion(NO, [Utils createNSError:@"Biometrics is not available on this device!" errorCode:24321]);
+        NSString* loc = NSLocalizedString(@"mac_biometrics_not_available", @"Biometrics is not available on this device!");
+        completion(NO, [Utils createNSError:loc errorCode:24321]);
     }
 }
 

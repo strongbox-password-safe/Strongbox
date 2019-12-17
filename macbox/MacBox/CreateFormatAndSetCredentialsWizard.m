@@ -32,7 +32,12 @@
     self.tabView.delegate = self;
     
     [self.tabView selectTabViewItem:self.tabView.tabViewItems[self.createSafeWizardMode ? 0 : 1]];
-    self.window.title = self.createSafeWizardMode ? @"Create New Password Database" : @"Enter Database Master Credentials";
+    
+    NSString* loc = self.createSafeWizardMode ?
+        NSLocalizedString(@"mac_create_new_database_title", @"Create New Password Database") :
+        NSLocalizedString(@"mac_enter_database_master_credentials", @"Enter Database Master Credentials");
+    
+    self.window.title = loc;
     
     [self setUIFromFormat];
     
@@ -89,7 +94,9 @@
         
         if(!data) {
             NSLog(@"Could not read file at %@. Error: %@", self.keyFilePath, error);
-            [Alerts error:@"Could not open key file." error:error window:self.window];
+            
+            NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
+            [Alerts error:loc error:error window:self.window];
             _confirmedCompositeKeyFactors = nil;
             return;
         }
@@ -126,7 +133,10 @@
     if(self.checkboxUseAKeyFile.state == NSOnState) {
         self.buttonBrowse.enabled = YES;
         self.labelKeyFilePath.stringValue = self.keyFilePath ? self.keyFilePath : @"";
-        self.labelKeyFilePath.placeholderString = self.keyFilePath ? @"" : @"Click Browse to Select a Key File";
+        
+        NSString* loc = NSLocalizedString(@"mac_click_browse_select_key_file", @"Click Browse to Select a Key File");
+
+        self.labelKeyFilePath.placeholderString = self.keyFilePath ? @"" : loc;
     }
     else {
         self.buttonBrowse.enabled = NO;
@@ -144,7 +154,8 @@
     if(self.checkboxUseAPassword.state == NSOnState) {
         if(![self.textFieldNew.stringValue isEqualToString:self.textFieldConfirm.stringValue]) {
             if(self.textFieldConfirm.stringValue.length) {
-                self.labelPasswordsMatch.stringValue = @"🛑 Passwords don't match";
+                NSString* loc = NSLocalizedString(@"mac_passwords_dont_match", @"Passwords don't match");
+                self.labelPasswordsMatch.stringValue = loc;
             }
             
             return NO; // No Further Validation For THe Moment
@@ -153,13 +164,18 @@
     
     if(self.checkboxUseAKeyFile.state == NSOnState) {
         if(self.keyFilePath == nil || ![NSFileManager.defaultManager fileExistsAtPath:self.keyFilePath]) {
-            self.labelPasswordsMatch.stringValue = self.keyFilePath ? @"🛑 Key File Invalid" : @"🛑 Select a Key File";
+            NSString* loc = self.keyFilePath ?
+                NSLocalizedString(@"mac_key_file_invalid", @"Key File Invalid") :
+                NSLocalizedString(@"mac_select_key_file", @"Select a Key File");
+
+            self.labelPasswordsMatch.stringValue = loc;
             return NO;
         }
     }
     
     if(self.checkboxUseAPassword.state == NSOffState && self.checkboxUseAKeyFile.state == NSOffState) {
-        self.labelPasswordsMatch.stringValue = @"🛑 You must use at least a Password or a Key File";
+        NSString* loc = NSLocalizedString(@"mac_you_must_use_at_least_a_password_or_key_file", @"You must use at least a Password or a Key File");
+        self.labelPasswordsMatch.stringValue = loc;
         return NO;
     }
     
@@ -168,7 +184,8 @@
     if(self.databaseFormat == kKeePass1 || self.databaseFormat == kPasswordSafe) {
         if(self.checkboxUseAPassword.state == NSOnState) {
             if(self.textFieldNew.stringValue.length == 0) {
-                self.labelPasswordsMatch.stringValue = @"🛑 Password cannot be Empty";
+                NSString* loc = NSLocalizedString(@"mac_password_cannot_be_empty", @"Password cannot be Empty");
+                self.labelPasswordsMatch.stringValue = loc;
                 return NO;
             }
         }
@@ -177,11 +194,13 @@
     // Warn on simple weak password
     
     if(self.textFieldNew.stringValue.length < 8) {
-        self.labelPasswordsMatch.stringValue = @"☠️ Weak Credentials";
+        NSString* loc = NSLocalizedString(@"mac_weak_credentials", @"Weak Credentials");
+        self.labelPasswordsMatch.stringValue = loc;
         self.labelPasswordsMatch.textColor = [NSColor orangeColor];
     }
     else {
-        self.labelPasswordsMatch.stringValue = @"✅ Valid Credentials";
+        NSString* loc = NSLocalizedString(@"mac_valid_credentials", @"Valid Credentials");
+        self.labelPasswordsMatch.stringValue = loc;
         self.labelPasswordsMatch.textColor = [NSColor greenColor];
     }
     

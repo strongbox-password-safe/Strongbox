@@ -118,9 +118,14 @@ static NSImage* kDefaultAttachmentIcon;
 }
 
 - (void)promptToSaveSimpleUIChangesBeforeClose {
-    NSString* message = self.newEntry ? @"Discard New Entry?" : @"Save Changes?";
+    NSString* loc = self.newEntry ? NSLocalizedString(@"mac_node_details_discard_new_entry", @"Discard New Entry?") : NSLocalizedString(@"mac_node_details_save_changes", @"Save Changes?");
     
-    NSString* informative = self.newEntry ? @"You have made no changes to this new entry, do you want to discard?" : @"There are unsaved changes present. Would you like to save those before exiting?";
+    NSString* loc2 = self.newEntry ?
+    NSLocalizedString(@"mac_node_details_you_made_changes_discard", @"You have made no changes to this new entry, do you want to discard?") :
+    NSLocalizedString(@"mac_node_details_unsaved_changes_save", @"There are unsaved changes present. Would you like to save those before exiting?");
+    
+    NSString* message = loc;
+    NSString* informative = loc2;
     
     [Alerts yesNo:message
   informativeText:informative
@@ -271,7 +276,9 @@ static NSImage* kDefaultAttachmentIcon;
     [self.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; // Take focus off Title so that edits require some effort...
 
     NSString* title = [self.model dereference:self.node.title node:self.node];
-    NSString* aTitle = [NSString stringWithFormat:self.historical ? @"%@ (Historical Item)" : @"%@", title];
+    
+    NSString* loc = NSLocalizedString(@"mac_node_details_historical_item_suffix_fmt", @"%@ (Historical Item)");
+    NSString* aTitle = [NSString stringWithFormat:self.historical ? loc : @"%@", title];
     [self.window setTitle:aTitle];
 }
 
@@ -548,7 +555,14 @@ static NSImage* kDefaultAttachmentIcon;
     }
     Alerts* alert = [[Alerts alloc] init];
     
-    [alert inputKeyValue:@"Edit Custom Field" initKey:field.key initValue:field.value initProtected:field.protected placeHolder:NO completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
+    NSString* loc = NSLocalizedString(@"mac_node_details_edit_custom_field", @"Edit Custom Field");
+
+    [alert inputKeyValue:loc
+                 initKey:field.key
+               initValue:field.value
+           initProtected:field.protected
+             placeHolder:NO
+              completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
         if(yesNo) {
             [self setCustomField:key value:value allowUpdate:YES protected:protected];
         }
@@ -589,7 +603,9 @@ static NSImage* kDefaultAttachmentIcon;
     
     CustomField *field = self.customFields[row];
     
-    [Alerts yesNo:[NSString stringWithFormat:@"Are you sure you want to remove the custom field '%@'?", field.key]
+    NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_custom_field_fmt", @"Are you sure you want to remove the custom field '%@'?");
+
+    [Alerts yesNo:[NSString stringWithFormat:loc, field.key]
            window:self.window
        completion:^(BOOL yesNo) {
            if(yesNo) {
@@ -605,8 +621,10 @@ static NSImage* kDefaultAttachmentIcon;
     
     if(self.tableViewCustomFields.selectedRow != -1) {
         CustomField *field = self.customFields[self.tableViewCustomFields.selectedRow];
-        
-        [Alerts yesNo:[NSString stringWithFormat:@"Are you sure you want to remove the custom field '%@'?", field.key]
+            
+        NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_custom_field_fmt", @"Are you sure you want to remove the custom field '%@'?");
+
+        [Alerts yesNo:[NSString stringWithFormat:loc, field.key]
                window:self.window
            completion:^(BOOL yesNo) {
             if(yesNo) {
@@ -623,7 +641,16 @@ static NSImage* kDefaultAttachmentIcon;
     
     Alerts* alert = [[Alerts alloc] init];
     
-    [alert inputKeyValue:@"Add Custom Field" initKey:@"Key" initValue:@"Value" initProtected:NO placeHolder:YES completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
+    NSString* loc1 = NSLocalizedString(@"mac_node_details_add_custom_field", @"Add Custom Field");
+    NSString* loc2 = NSLocalizedString(@"mac_alerts_input_custom_field_label_key", @"Key");
+    NSString* loc3 = NSLocalizedString(@"mac_alerts_input_custom_field_label_value", @"Value");
+
+    [alert inputKeyValue:loc1
+                 initKey:loc2
+               initValue:loc3
+           initProtected:NO
+             placeHolder:YES
+              completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
         if(yesNo) {
             [self setCustomField:key value:value allowUpdate:NO protected:protected];
         }
@@ -639,12 +666,14 @@ static NSImage* kDefaultAttachmentIcon;
     const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
     
     if(!allowUpdate && [existingKeySet containsObject:key]) {
-        [Alerts info:@"You cannot use that Key here as it already exists in custom fields." window:self.window];
+        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_that_key_already_exists", @"You cannot use that Key here as it already exists in custom fields.");
+        [Alerts info:loc window:self.window];
         return;
     }
     
     if([keePassReserved containsObject:key]) {
-        [Alerts info:@"You cannot use that Key here as it is reserved for standard KeePass fields." window:self.window];
+        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_key_reserved", @"You cannot use that Key here as it is reserved for standard KeePass fields.");
+        [Alerts info:loc window:self.window];
         return;
     }
     
@@ -958,7 +987,9 @@ NSString* trimField(NSTextField* textField) {
     }
     
     NodeFileAttachment* nodeAttachment = self.attachments[idx];
-    NSString* prompt = [NSString stringWithFormat:@"Are you sure you want to remove the attachment: %@?", nodeAttachment.filename];
+    
+    NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_attachment_fmt", @"Are you sure you want to remove the attachment: %@?");
+    NSString* prompt = [NSString stringWithFormat:loc, nodeAttachment.filename];
     [Alerts yesNo:prompt window:self.window completion:^(BOOL yesNo) {
         if(yesNo) {
             [self.model removeItemAttachment:self.node atIndex:idx];
@@ -1001,37 +1032,61 @@ NSString* trimField(NSTextField* textField) {
 - (IBAction)onCopyTitle:(id)sender {
     [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.title];
-    [self showPopupToastNotification:@"Title Copied"];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_title", @"Title");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (IBAction)onCopyUsername:(id)sender {
     [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.username];
-    [self showPopupToastNotification:@"Username Copied"];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_username", @"Username");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (IBAction)onCopyEmail:(id)sender {
     [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.email];
-    [self showPopupToastNotification:@"Email Copied"];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_email", @"Email");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (IBAction)onCopyUrl:(id)sender {
     [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.url];
-    [self showPopupToastNotification:@"URL Copied"];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_url", @"URL");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (IBAction)onCopyNotes:(id)sender {
     [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.notes];
-    [self showPopupToastNotification:@"Notes Copied"];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_notes", @"Notes");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (IBAction)onCopyPassword:(id)sender {
     [self.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
     [self copyToPasteboard:self.node.fields.password];
-    [self showPopupToastNotification:@"Password Copied"];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_password", @"Password");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
@@ -1050,7 +1105,9 @@ NSString* trimField(NSTextField* textField) {
     }
     
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
-    [self showPopupToastNotification:@"Password Copied and URL Launched"];
+    
+    NSString* loc = NSLocalizedString(@"mac_node_details_password_copied_url_launched", @"Password Copied and URL Launched");
+    [self showPopupToastNotification:loc];
 }
 
 - (IBAction)onCopyTotp:(id)sender {
@@ -1061,16 +1118,26 @@ NSString* trimField(NSTextField* textField) {
         [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
     }
     
-    [self showPopupToastNotification:@"TOTP Copied"];
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"%@ Copied");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_totp", @"TOTP");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction)onSetTotp:(id)sender {
-    NSString* response = [[Alerts alloc] input:@"Please enter the secret or an OTPAuth URL" defaultValue:@"" allowEmpty:NO];
+    NSString* loc = NSLocalizedString(@"mac_node_details_please_enter_secret_totp", @"Please enter the secret or an OTPAuth URL");
+
+    NSString* response = [[Alerts alloc] input:loc
+                                  defaultValue:@""
+                                    allowEmpty:NO];
     
     if(response) {
-        [Alerts yesNo:@"Is this a Steam Token? (Say 'No' if you're unsure)" window:self.window completion:^(BOOL yesNo) {
+        NSString* loc = NSLocalizedString(@"mac_node_details_is_this_steam_totp", @"Is this a Steam Token? (Say 'No' if you're unsure)");
+
+        [Alerts yesNo:loc
+               window:self.window completion:^(BOOL yesNo) {
             [self.model setTotp:self.node otp:response steam:yesNo];
         }];
     }
@@ -1095,19 +1162,34 @@ NSString* trimField(NSTextField* textField) {
         self.newEntry = NO;
         
         if(notification.name == kModelUpdateNotificationTitleChanged) {
-            [self showPopupToastNotification:@"Title Changed"];
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_title", @"Title");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
         }
         else if(notification.name == kModelUpdateNotificationUsernameChanged){
-            [self showPopupToastNotification:@"Username Changed"];
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_username", @"Username");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
         }
         else if(notification.name == kModelUpdateNotificationUrlChanged){
-            [self showPopupToastNotification:@"URL Changed"];
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_url", @"URL");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
         }
         else if(notification.name == kModelUpdateNotificationEmailChanged){
-            [self showPopupToastNotification:@"Email Changed"];
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_email", @"Email");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
         }
         else if(notification.name == kModelUpdateNotificationNotesChanged){
-            [self showPopupToastNotification:@"Notes Changed"];
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_notes", @"Notes");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
         }
         else if(notification.name == kModelUpdateNotificationPasswordChanged){
             // Blocks UI if we notify... couldn't find a really satisfactory solution to get this working without blcok UI :(
@@ -1125,7 +1207,10 @@ NSString* trimField(NSTextField* textField) {
 //            dispatch_after(when, dispatch_get_main_queue(), self.passwordChangedNotifyTask);
         }
         else if(notification.name == kModelUpdateNotificationIconChanged){
-            [self showPopupToastNotification:@"Icon Changed"];
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_icon", @"Icon");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
         }
     }
 }
@@ -1140,7 +1225,10 @@ NSString* trimField(NSTextField* textField) {
     
     self.newEntry = NO;
     
-    [self showPopupToastNotification:@"Custom Fields Changed"];
+    NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_custom_fields", @"Custom Fields");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (void)onAttachmentsChanged:(NSNotification*)notification {
@@ -1153,7 +1241,10 @@ NSString* trimField(NSTextField* textField) {
     
     self.newEntry = NO;
     
-    [self showPopupToastNotification:@"Attachments Changed"];
+    NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_attachments", @"Attachments");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (void)onTotpChanged:(NSNotification*)notification {
@@ -1166,7 +1257,11 @@ NSString* trimField(NSTextField* textField) {
     
     self.newEntry = NO;
     
-    [self showPopupToastNotification:@"TOTP Changed"];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_totp", @"TOTP");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
 }
 
 - (void)showPopupToastNotification:(NSString*)message {
@@ -1212,7 +1307,9 @@ NSString* trimField(NSTextField* textField) {
     
     if(self.node.parent != group) {
         if(![self.model validateChangeParent:group node:self.node]) { // Should never happen - but safety in case we someday cover groups?
-            [Alerts info:@"Could not change group! Validate failed..." window:self.window];
+            
+            NSString* loc = NSLocalizedString(@"mac_node_details_could_not_change_group", @"Could not change group! Validate failed...");
+            [Alerts info:loc window:self.window];
             [self syncComboGroupWithNode];
         }
         else {

@@ -97,7 +97,9 @@
             
             if(!data) {
                 NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
-                [Alerts error:@"Could not open this file." error:error window:self.window];
+                
+                NSString* loc = NSLocalizedString(@"mac_could_not_open_this_file", @"Could not open this file.");
+                [Alerts error:loc error:error window:self.window];
                 return;
             }
 
@@ -111,8 +113,11 @@
     if (kind == NSCollectionElementKindSectionHeader) {
         CollectionViewHeader* ret = [self.collectionView makeSupplementaryViewOfKind:kind withIdentifier:@"CollectionViewHeader" forIndexPath:indexPath];
         
-        
-        ret.labelTitle.stringValue = [self hasCustomIcons] && indexPath.section == 0 ? @"Database Icons" : @"KeePass Icons";
+        NSString* loc = [self hasCustomIcons] && indexPath.section == 0 ?
+            NSLocalizedString(@"mac_database_icons", @"Database Icons") :
+            NSLocalizedString(@"mac_keepass_icons", @"KeePass Icons");
+
+        ret.labelTitle.stringValue = loc;
         
         return ret;
     }
