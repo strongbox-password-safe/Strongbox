@@ -10,6 +10,7 @@
 #import "PasswordGenerationParameters.h"
 #import "PasswordGenerationConfig.h"
 #import "AutoFillNewRecordSettings.h"
+#import "FavIconDownloadOptions.h"
 
 extern NSString* const kTitleColumn;
 extern NSString* const kUsernameColumn;
@@ -75,9 +76,6 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL concealEmptyProtectedFields;
 @property BOOL showCustomFieldsOnQuickViewPanel;
 
-//@property BOOL showDatabasesListAtStartup;
-
-
 @property PasswordGenerationConfig *passwordGenerationConfig;
 @property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property BOOL migratedToNewPasswordGenerator;
@@ -86,6 +84,12 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL autoPromptForTouchIdOnActivate;
 @property BOOL showSystemTrayIcon;
+
+@property FavIconDownloadOptions *favIconDownloadOptions;
+
+@property BOOL expressDownloadFavIconOnNewOrUrlChanged;
+
+@property BOOL allowWatchUnlock;
 
 @end
 

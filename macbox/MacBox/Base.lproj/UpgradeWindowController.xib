@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,24 +20,24 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Upgrade to Pro?" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES"/>
-            <rect key="contentRect" x="196" y="240" width="597" height="584"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="contentRect" x="196" y="240" width="597" height="619"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="597" height="584"/>
+                <rect key="frame" x="0.0" y="0.0" width="597" height="619"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <scrollView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e6X-Fc-sXn">
-                        <rect key="frame" x="20" y="176" width="557" height="388"/>
+                        <rect key="frame" x="20" y="176" width="557" height="423"/>
                         <clipView key="contentView" drawsBackground="NO" id="K16-FS-nxk">
-                            <rect key="frame" x="0.0" y="0.0" width="542" height="388"/>
+                            <rect key="frame" x="0.0" y="0.0" width="557" height="423"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" selectable="NO" importsGraphics="NO" horizontallyResizable="YES" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" textCompletion="NO" id="gBW-lD-OqW">
-                                    <rect key="frame" x="0.0" y="0.0" width="542" height="388"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="557" height="423"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="542" height="388"/>
+                                    <size key="minSize" width="557" height="423"/>
                                     <size key="maxSize" width="755" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="Pro Upgrade ">
@@ -92,7 +92,7 @@ Cg
 </string>
                                             <attributes>
                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <font key="NSFont" size="12" name="Helvetica"/>
+                                                <font key="NSFont" metaFont="user"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
                                                         <textTab alignment="left" location="28.299999237060547">
@@ -141,7 +141,7 @@ Cg
 </string>
                                             <attributes>
                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <font key="NSFont" size="12" name="Helvetica"/>
+                                                <font key="NSFont" metaFont="user"/>
                                                 <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO">
                                                     <tabStops>
                                                         <textTab alignment="left" location="28.299999237060547">
@@ -282,7 +282,9 @@ Cgo
                                                 </paragraphStyle>
                                             </attributes>
                                         </fragment>
-                                        <fragment content="Pro Features">
+                                        <fragment>
+                                            <string key="content">Pro Features
+</string>
                                             <attributes>
                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <font key="NSFont" size="24" name="Futura-Medium"/>
@@ -326,6 +328,8 @@ Cgo
                                                         </textTab>
                                                     </tabStops>
                                                 </paragraphStyle>
+                                                <integer key="NSUnderline" value="1"/>
+                                                <color key="NSUnderlineColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             </attributes>
                                         </fragment>
                                         <fragment>
@@ -375,11 +379,16 @@ Cg
                                                         </textTab>
                                                     </tabStops>
                                                 </paragraphStyle>
+                                                <color key="NSUnderlineColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             </attributes>
                                         </fragment>
                                         <fragment>
-                                            <string key="content">Touch ID
-Search Your Safes
+                                            <string key="content">Touch ID Unlock
+Apple Watch Unlock
+Search
+KeePass FavIcons
+No More Nag Screens!
+
 Support Development via Caffeine Supply!</string>
                                             <attributes>
                                                 <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -427,6 +436,7 @@ Support Development via Caffeine Supply!</string>
                                                         </textTab>
                                                     </tabStops>
                                                 </paragraphStyle>
+                                                <color key="NSUnderlineColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                             </attributes>
                                         </fragment>
                                     </attributedString>
@@ -434,12 +444,12 @@ Support Development via Caffeine Supply!</string>
                                 </textView>
                             </subviews>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="zld-Al-bXC">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="zld-Al-bXC">
                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="FPG-j6-DMY">
-                            <rect key="frame" x="542" y="0.0" width="15" height="388"/>
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="FPG-j6-DMY">
+                            <rect key="frame" x="541" y="0.0" width="16" height="423"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -495,7 +505,7 @@ DQ
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qUL-Pl-gGo">
                         <rect key="frame" x="18" y="36" width="142" height="14"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="* One Time Purchase Only" id="aa7-y6-JNA">
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="label" size="11"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -503,13 +513,13 @@ DQ
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jcc-jf-Ou8">
                         <rect key="frame" x="18" y="20" width="341" height="14"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="** Upgrade for Mac only. Separate upgrade required for iOS App" id="YLi-lp-lIE">
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="label" size="11"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="EAJ-3L-JEi">
-                        <rect key="frame" x="283" y="276" width="32" height="32"/>
+                        <rect key="frame" x="283" y="294" width="32" height="32"/>
                     </progressIndicator>
                 </subviews>
                 <constraints>
@@ -534,7 +544,7 @@ DQ
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="817.5" y="246"/>
+            <point key="canvasLocation" x="817.5" y="263.5"/>
         </window>
     </objects>
 </document>

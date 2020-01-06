@@ -149,8 +149,7 @@
     }
 }
 
-- (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers
-{
+- (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"prepareCredentialListForServiceIdentifiers = %@", serviceIdentifiers);
     self.serviceIdentifiers = serviceIdentifiers;
     self.quickTypeMode = NO;
@@ -248,13 +247,11 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
     if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
         Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
         
-        // TODO: Localize
-        
         [Alerts info:vc
-               title:@"Welcome"
-             message:@"It should be noted that the following storage providers do not support live access to your database from App Extensions:" \
+               title:NSLocalizedString(@"auto_fill_welcome_message_header", @"Welcome")
+             message:NSLocalizedString(@"auto_fill_welcome_live_storage_warning_message", @"It should be noted that the following storage providers do not support live access to your database from App Extensions:" \
          "\nDropbox, OneDrive & Google Drive\n"\
-         "In these cases, Strongbox can use a cache... Enjoy Strongbox Auto Fill!\n-Mark"];
+         "In these cases, Strongbox can use a cache... Enjoy Strongbox Auto Fill!\n-Mark")];
     }
 }
 

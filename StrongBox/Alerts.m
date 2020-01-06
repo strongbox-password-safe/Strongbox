@@ -284,7 +284,6 @@
         [viewController presentViewController:alertController animated:YES completion:nil];
     });
 }
-    
 
 + (void) twoOptionsWithCancel:(UIViewController *)viewController
                         title:(NSString *)title

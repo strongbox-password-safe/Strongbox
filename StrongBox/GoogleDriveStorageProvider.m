@@ -26,7 +26,11 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = @"Google Drive";
+        _displayName = NSLocalizedString(@"storage_provider_name_google_drive", @"Google Drive");
+        if([_displayName isEqualToString:@"storage_provider_name_google_drive"]) {
+            _displayName = @"Google Drive";
+        }
+
         _icon = @"product32";
         _storageId = kGoogleDrive;
         _allowOfflineCache = YES;

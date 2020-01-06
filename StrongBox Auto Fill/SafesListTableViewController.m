@@ -58,6 +58,11 @@
             });
         }
     }
+    
+    //  Debug
+    //    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
+    //    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+    //    [Alerts info:self title:@"Blah" message:@(serviceId.identifier).stringValue];
 }
 
 - (void)refreshSafes {

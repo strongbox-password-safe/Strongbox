@@ -21,6 +21,13 @@
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 + (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 
++ (void)twoOptionsWithCancel:(NSString *)messageText
+             informativeText:(NSString*)informativeText
+           option1AndDefault:(NSString*)option1AndDefault
+                     option2:(NSString*)option2
+                      window:(NSWindow*)window
+                  completion:(void (^)(NSUInteger zeroForCancel))completion;
+
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty;
 
 - (void)inputKeyValue:(NSString*)prompt

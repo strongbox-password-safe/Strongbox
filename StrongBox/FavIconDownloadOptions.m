@@ -14,19 +14,6 @@
     return [[FavIconDownloadOptions alloc] init];
 }
 
-+ (instancetype)express {
-    FavIconDownloadOptions* ret = [[FavIconDownloadOptions alloc] init];
-
-    ret.checkCommonFavIconFiles = NO;
-    ret.duckDuckGo = YES;
-    ret.domainOnly = YES;
-    ret.scanHtml = NO;
-    ret.google = NO;
-    ret.ignoreInvalidSSLCerts = NO;
-    
-    return ret;
-}
-
 - (instancetype)init
 {
     self = [super init];
@@ -41,6 +28,19 @@
     }
     
     return self;
+}
+
++ (instancetype)express {
+    FavIconDownloadOptions* ret = [[FavIconDownloadOptions alloc] init];
+
+    ret.checkCommonFavIconFiles = NO;
+    ret.duckDuckGo = YES;
+    ret.domainOnly = YES;
+    ret.scanHtml = NO;
+    ret.google = NO;
+    ret.ignoreInvalidSSLCerts = NO;
+    
+    return ret;
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder {

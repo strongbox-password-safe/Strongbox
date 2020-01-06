@@ -33,7 +33,11 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = @"OneDrive";
+        _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
+        if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
+            _displayName = @"OneDrive";
+        }
+
         _icon = @"one-drive-icon-only-32x32";
         _storageId = kOneDrive;
         _allowOfflineCache = YES;

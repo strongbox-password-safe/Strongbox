@@ -287,9 +287,14 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 - (void)touch:(BOOL)modified {
     _usageCount = self.usageCount != nil ? @(self.usageCount.integerValue + 1) : @(1);
     _accessed = NSDate.date;
+    
     if(modified) {
-        _modified = NSDate.date;
+        [self touchWithExplicitModifiedDate:NSDate.date];
     }
+}
+
+- (void)touchWithExplicitModifiedDate:(NSDate*)modDate {
+    _modified = modDate;
 }
 
 - (void)setTouchProperties:(NSDate*)accessed modified:(NSDate*)modified usageCount:(NSNumber*)usageCount {
@@ -452,6 +457,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 + (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary<NSString*, StringValue*>*)fields notes:(NSString*)notes usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
+    // Good reference for OTPAuth URL here: https://github.com/google/google-authenticator/wiki/Key-Uri-Format
+    
     // KyPass and others... - OTPAuth url in the Password field…
     
     NSURL *otpUrl = [NSURL URLWithString:password];

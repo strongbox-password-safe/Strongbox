@@ -1,8 +1,8 @@
 //
-//  KeePassHistoryController.h
+//  MacKeePassHistoryViewController.h
 //  Strongbox
 //
-//  Created by Mark on 11/03/2019.
+//  Created by Mark on 27/12/2019.
 //  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MacKeePassHistoryController : NSWindowController
+@interface MacKeePassHistoryViewController : NSViewController
 
 @property (copy)void (^onRestoreHistoryItem)(Node* node);
 @property (copy)void (^onDeleteHistoryItem)(Node* node);

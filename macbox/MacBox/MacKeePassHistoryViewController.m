@@ -1,17 +1,17 @@
 //
-//  KeePassHistoryController.m
+//  MacKeePassHistoryViewController.m
 //  Strongbox
 //
-//  Created by Mark on 11/03/2019.
+//  Created by Mark on 27/12/2019.
 //  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
-#import "MacKeePassHistoryController.h"
+#import "MacKeePassHistoryViewController.h"
 #import "MacNodeIconHelper.h"
 #import "Alerts.h"
-#import "NodeDetailsWindowController.h"
+#import "NodeDetailsViewController.h"
 
-@interface MacKeePassHistoryController () <NSTableViewDelegate, NSTableViewDataSource>
+@interface MacKeePassHistoryViewController () <NSTableViewDelegate, NSTableViewDataSource>
 
 @property (weak) IBOutlet NSTableView *tableViewHistory;
 @property (weak) IBOutlet NSButton *closeButton;
@@ -21,10 +21,10 @@
 
 @end
 
-@implementation MacKeePassHistoryController
+@implementation MacKeePassHistoryViewController
 
-- (void)windowDidLoad {
-    [super windowDidLoad];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 
@@ -51,9 +51,19 @@
 }
 
 - (void)openDetails:(Node*)node {
-    [NodeDetailsWindowController showNode:node model:self.model newEntry:NO historical:YES onClosed:^{
-        // TODO:?;
-    }];
+    [self performSegueWithIdentifier:@"segueToItemDetails" sender:node];
+}
+
+- (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
+    if([segue.identifier isEqualToString:@"segueToItemDetails"]) {
+        NodeDetailsViewController* vc = (NodeDetailsViewController*)segue.destinationController;
+
+        vc.node = sender;
+        vc.model = self.model;
+        vc.newEntry = NO;
+        vc.historical = YES;
+        vc.onClosed = nil;
+    }
 }
 
 - (IBAction)onShowPasswords:(id)sender {
@@ -61,7 +71,7 @@
 }
 
 - (IBAction)onClose:(id)sender {
-    [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+    [self.presentingViewController dismissViewController:self];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
@@ -84,7 +94,7 @@
     }
     else if([tableColumn.identifier isEqualToString:@"Password"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryPlainCellIdentifier" owner:nil];
-        cell.textField.stringValue = self.showPasswordsCheckbox.state == NSOnState ? item.fields.password : @"*************" ; 
+        cell.textField.stringValue = self.showPasswordsCheckbox.state == NSOnState ? item.fields.password : @"*************" ;
     }
     else if([tableColumn.identifier isEqualToString:@"URL"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryPlainCellIdentifier" owner:nil];
@@ -162,7 +172,7 @@
     NSString* loc = NSLocalizedString(@"mac_keepass_history_are_sure_delete", @"Are you sure you want to delete this history item?");
     
     [Alerts yesNo:loc
-           window:self.window
+           window:self.view.window
        completion:^(BOOL yesNo) {
         if(yesNo) {
             self.onDeleteHistoryItem(node);
@@ -184,11 +194,12 @@
     NSString* loc = NSLocalizedString(@"mac_keepass_history_are_sure_restore", @"Are you sure you want to restore this history item?");
     
     [Alerts yesNo:loc
-           window:self.window
+           window:self.view.window
        completion:^(BOOL yesNo) {
         if(yesNo) {
             self.onRestoreHistoryItem(node);
-            [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+            
+            [self.presentingViewController dismissViewController:self];
         }
     }];
 }

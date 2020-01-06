@@ -348,7 +348,9 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     NSInteger xmlMarker = findXmlMarker(chnk, read);
     
-    NSLog(@"Found XML marker starting at offset: %ld", (long)xmlMarker);
+    if(xmlMarker != 0) {
+        NSLog(@"WARN: Found XML marker starting at offset: %ld", (long)xmlMarker);
+    }
     
     if(xmlMarker > 0) {
         read -= xmlMarker;

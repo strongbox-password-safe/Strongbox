@@ -18,6 +18,7 @@
 
 @property (weak) IBOutlet NSCollectionView *collectionView;
 @property (weak) IBOutlet NSButton *buttonSelectFile;
+@property (weak) IBOutlet NSButton *buttonFindFavIcons;
 
 @end
 
@@ -30,6 +31,7 @@
     self.collectionView.delegate = self;
 
     self.buttonSelectFile.hidden = self.hideSelectFile;
+    self.buttonFindFavIcons.hidden = self.hideFavIconButton;
 }
 
 - (BOOL)hasCustomIcons {
@@ -68,10 +70,10 @@
         
         if([self hasCustomIcons] && indexPath.section == 0) {
             NSUUID* uuid = self.customIcons.allKeys[indexPath.item];
-            self.onSelectedItem(nil, nil, uuid);
+            self.onSelectedItem(nil, nil, uuid, NO);
         }
         else {
-            self.onSelectedItem(@(indexPath.item), nil, nil);
+            self.onSelectedItem(@(indexPath.item), nil, nil, NO);
         }
         
     }
@@ -79,7 +81,7 @@
 
 - (IBAction)onUseDefault:(id)sender {
     [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-    self.onSelectedItem(@(-1), nil, nil);
+    self.onSelectedItem(@(-1), nil, nil, NO);
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -104,12 +106,13 @@
             }
 
             [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-            self.onSelectedItem(nil, data, nil);
+            self.onSelectedItem(nil, data, nil, NO);
         }
     }];
 }
 
-- (NSView *)collectionView:(NSCollectionView *)collectionView viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind atIndexPath:(NSIndexPath *)indexPath {
+- (NSView *)collectionView:(NSCollectionView *)collectionView viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath {
     if (kind == NSCollectionElementKindSectionHeader) {
         CollectionViewHeader* ret = [self.collectionView makeSupplementaryViewOfKind:kind withIdentifier:@"CollectionViewHeader" forIndexPath:indexPath];
         
@@ -123,6 +126,11 @@
     }
     
     return nil;
+}
+
+- (IBAction)onFindFavIcons:(id)sender {
+    [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+    self.onSelectedItem(nil, nil, nil, YES);
 }
 
 @end

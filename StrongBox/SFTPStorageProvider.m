@@ -36,7 +36,11 @@
 
 - (instancetype)init {
     if(self = [super init]) {
-        _displayName = @"SFTP";
+        _displayName = NSLocalizedString(@"storage_provider_name_sftp", @"SFTP");
+        if([self.displayName isEqualToString:@"storage_provider_name_sftp"]) {
+            _displayName = @"SFTP";
+        }
+        
         _icon = @"sftp-32x32"; 
         _storageId = kSFTP;
         _allowOfflineCache = YES;

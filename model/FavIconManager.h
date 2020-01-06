@@ -9,9 +9,11 @@
 #import <Foundation/Foundation.h>
 
 #if TARGET_OS_IPHONE
-#import <UIKit/UIKit.h>
+    #import <UIKit/UIKit.h>
+    typedef UIImage* IMAGE_TYPE_PTR;
 #else
-#import <Cocoa/Cocoa.h>
+    #import <Cocoa/Cocoa.h>
+    typedef NSImage* IMAGE_TYPE_PTR;
 #endif
 
 #import "FavIconDownloadOptions.h"
@@ -24,20 +26,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-#if TARGET_OS_IPHONE
+//#if TARGET_OS_IPHONE
 
 - (void)getFavIconsForUrls:(NSArray<NSURL*>*)urls
                      queue:(NSOperationQueue*)queue
                    options:(FavIconDownloadOptions*)options
-              withProgress:(void (^)(NSURL *url, NSArray<UIImage*>* images))withProgress;
+              withProgress:(void (^)(NSURL *url, NSArray<IMAGE_TYPE_PTR>* images))withProgress;
 
 - (void)downloadPreferred:(NSURL*)url
                   options:(FavIconDownloadOptions*)options
-               completion:(void (^)(UIImage * _Nullable image))completion;
+               completion:(void (^)(IMAGE_TYPE_PTR _Nullable image))completion;
 
-- (UIImage*)selectBest:(NSArray<UIImage*>*)images;
+- (IMAGE_TYPE_PTR)selectBest:(NSArray<IMAGE_TYPE_PTR>*)images;
 
-#endif
+//#else //if TARGET_OS_OSX
+
+//- (void)getFavIconsForUrls:(NSArray<NSURL*>*)urls
+//                     queue:(NSOperationQueue*)queue
+//                   options:(FavIconDownloadOptions*)options
+//              withProgress:(void (^)(NSURL *url, NSArray<IMAGE_TYPE_PTR*>* images))withProgress;
+
+//- (void)downloadPreferred:(NSURL*)url
+//                  options:(FavIconDownloadOptions*)options
+//               completion:(void (^)(NSImage * _Nullable image))completion;
+
+//- (NSImage*)selectBest:(NSArray<NSImage*>*)images;
+
+//#endif
 
 @end
 

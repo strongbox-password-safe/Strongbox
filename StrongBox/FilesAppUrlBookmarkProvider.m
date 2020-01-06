@@ -24,7 +24,11 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = @"iOS Files";
+        _displayName = NSLocalizedString(@"storage_provider_name_ios_files", @"iOS Files");
+        if([self.displayName isEqualToString:@"storage_provider_name_ios_files"]) {
+            _displayName = @"iOS Files"; 
+        }
+        
         _icon = @"lock"; 
         _storageId = kFilesAppUrlBookmark;
         _allowOfflineCache = YES;

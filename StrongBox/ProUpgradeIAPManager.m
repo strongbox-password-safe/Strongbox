@@ -172,7 +172,8 @@
     self.readyState = kWaitingOnAppStoreProducts;
     self.products = @{};
 
-    NSSet *products = [NSSet setWithArray:@[kIapProId, kMonthly, kYearly]]; // k3Monthly,
+    NSSet *products = [NSSet setWithArray:@[kIapProId, kMonthly, kYearly]];
+    
     [[RMStore defaultStore] requestProducts:products success:^(NSArray *products, NSArray *invalidProductIdentifiers) {
         self.products = [NSMutableDictionary dictionary];
         if (products) {

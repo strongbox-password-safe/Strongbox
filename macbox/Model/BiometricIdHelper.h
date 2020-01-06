@@ -18,5 +18,6 @@
 @property (nonatomic) BOOL biometricIdAvailable;
 
 @property BOOL dummyMode;
+@property BOOL biometricsInProgress;
 
 @end

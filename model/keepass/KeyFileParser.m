@@ -51,7 +51,7 @@ static NSString* const kDataElementName = @"Data";
 }
 
 + (NSData*)getHexTextKey:(NSData*)data {
-    if(data.length == 64) {
+    if(isAll64CharactersAreHex(data)) {
         NSString *text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         
         return [KeyFileParser dataWithHexString:text];
@@ -60,8 +60,26 @@ static NSString* const kDataElementName = @"Data";
     return nil;
 }
 
-+(NSData*)dataWithHexString:(NSString *)hex
-{
+BOOL isAll64CharactersAreHex(NSData* data) {
+    const int BUF_LEN = 64;
+    
+    if(data.length != BUF_LEN) {
+        return NO;
+    }
+    
+    unsigned char buf[BUF_LEN];
+    [data getBytes:buf range:NSMakeRange(0, BUF_LEN)];
+    
+    for(int i=0;i<BUF_LEN;i++) {
+        if(!ishexnumber(buf[i])) {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
++(NSData*)dataWithHexString:(NSString *)hex {
     char buf[3];
     buf[2] = '\0';
     

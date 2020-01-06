@@ -35,7 +35,11 @@
 
 - (instancetype)init {
     if(self = [super init]) {
-        _displayName = @"WebDAV";
+        _displayName = NSLocalizedString(@"storage_provider_name_webdav", @"WebDAV");
+        if([self.displayName isEqualToString:@"storage_provider_name_webdav"]) {
+            _displayName = @"WebDAV";
+        }
+        
         _icon = @"webdav-32x32";
         _storageId = kWebDAV;
         _allowOfflineCache = YES;

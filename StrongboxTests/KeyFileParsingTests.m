@@ -57,6 +57,17 @@
     XCTAssert([[digest base64EncodedStringWithOptions:kNilOptions] isEqualToString:@"FQK8UFYMILsFSw0J2j0TizBuKdZuBbAwdC3QWg8AddY="]);
 }
 
+- (void)testLoadNon64ByteHexFile {
+    NSData *blob = [CommonTesting getDataFromBundleFile:@"sample-non-hex-64" ofType:@"key"];
+    XCTAssert(blob);
+    
+    NSData* digest = [KeyFileParser getKeyFileDigestFromFileData:blob checkForXml:YES];
+    
+    NSLog(@"Digest: [%@]", [digest base64EncodedStringWithOptions:kNilOptions]);
+    
+    XCTAssert([[digest base64EncodedStringWithOptions:kNilOptions] isEqualToString:@"/yn7c2XAwio/VK3z0fcnIhT1zDRds10rNx8w71QQsxM="]);
+}
+
 - (void)testLoadAnyOtherKeyFile {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"];
     XCTAssert(blob);

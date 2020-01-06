@@ -208,7 +208,7 @@ static UpgradeWindowController *sharedInstance = nil;
 }
 
 - (void)updateNoThanksCountdown {
-    NSLog(@"timer: %ld", (long)self.secondsRemaining);
+//    NSLog(@"timer: %ld", (long)self.secondsRemaining);
     self.secondsRemaining--;
 
     if(self.secondsRemaining < 1) {

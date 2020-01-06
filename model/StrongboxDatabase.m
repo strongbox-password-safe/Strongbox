@@ -11,6 +11,7 @@
 #import "KeePassDatabaseMetadata.h"
 #import "KeePass4DatabaseMetadata.h"
 #import "KeePassConstants.h"
+#import "CustomIconsRationalizer.h"
 
 static NSString* const kKeePass1BackupGroupName = @"Backup";
 
@@ -275,44 +276,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (void)rationalizeCustomIcons {
-    //NSLog(@"Before Rationalization: [%@]", self.mutableCustomIcons.allKeys);
-    
-    NSArray<Node*>* currentCustomIconNodes = [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return node.customIconUuid != nil;
-    }];
-    
-    NSArray<Node*>* allNodesWithHistoryAndCustomIcons = [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup && [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
-            return obj.customIconUuid != nil;
-        }];
-    }];
-    
-    NSArray<Node*>* allHistoricalNodesWithCustomIcons = [allNodesWithHistoryAndCustomIcons flatMap:^id _Nonnull(Node * _Nonnull node, NSUInteger idx) {
-        return [node.fields.keePassHistory filter:^BOOL(Node * _Nonnull obj) {
-            return obj.customIconUuid != nil;
-        }];
-    }];
-    
-    //
-    
-    NSMutableArray *customIconNodes = [NSMutableArray arrayWithArray:currentCustomIconNodes];
-    [customIconNodes addObjectsFromArray:allHistoricalNodesWithCustomIcons];
-
-    NSMutableDictionary<NSUUID*, NSData*>* fresh = [NSMutableDictionary dictionaryWithCapacity:customIconNodes.count];
-    for (Node* node in customIconNodes) {
-        NSUUID* key = node.customIconUuid;
-        if(self.mutableCustomIcons[key]) {
-            fresh[key] = self.mutableCustomIcons[key];
-        }
-        else {
-            NSLog(@"Removed bad Custom Icon reference [%@]-[%@]", node.title, key);
-            node.customIconUuid = nil;
-        }
-    }
-    
-    //NSLog(@"Rationalized: [%@]", fresh.allKeys);
-    
-    self.mutableCustomIcons = fresh;
+    self.mutableCustomIcons = [CustomIconsRationalizer rationalize:self.customIcons root:self.rootGroup];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

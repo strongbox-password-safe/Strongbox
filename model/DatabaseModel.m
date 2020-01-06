@@ -83,8 +83,6 @@
     return ret;
 }
 
-const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 3 * 1024 * 1024;
-
 + (BOOL)isAutoFillLikelyToCrash:(NSData*)data {
     // Argon 2 Memory Consumption
     
@@ -106,7 +104,9 @@ const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 3 * 1024 * 1024;
     }
     
     // Very large DBs
-    
+
+    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 6 * 1024 * 1024;
+
     if (data.length > kProbablyTooLargeToOpenInAutoFillSizeBytes) {
         return YES;
     }

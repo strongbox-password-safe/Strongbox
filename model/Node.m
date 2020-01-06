@@ -263,6 +263,14 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     }
 }
 
+- (void)touchWithExplicitModifiedDate:(NSDate *)modDate touchParents:(BOOL)touchParents {
+    [self.fields touchWithExplicitModifiedDate:modDate];
+    
+    if(touchParents && self.parent) {
+        [self.parent touchWithExplicitModifiedDate:modDate touchParents:YES];
+    }
+}
+
 - (NSArray<Node*>*)children {
     return self.isGroup ? [self filterChildren:NO predicate:nil] : [NSArray array];
 }

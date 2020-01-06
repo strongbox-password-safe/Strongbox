@@ -24,6 +24,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "ClipboardManager.h"
 #import "GoogleDriveManager.h"
+#import "iCloudSafesCoordinator.h"
 
 @interface AppDelegate ()
 
@@ -36,6 +37,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDropbox];
 
+    [self performEarlyBasicICloudInitialization];
+    
     [self initializeInstallSettingsAndLaunchCount];   
     
     [self initializeProFamilyEdition];
@@ -58,6 +61,18 @@
     // NSLog(@"Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
+}
+
+- (void)performEarlyBasicICloudInitialization {
+    // MMcG: 18-Dec-2019 - Doing this because app activation doesn't work well with iPadOS Split Screen - The
+    // Initialization doesn't happen properly from a cold start if the app is launched via iPADOS split screen... If
+    // this is not initialized then, the calls to the READ api will fail... This silent initialization should helps keep
+    // the app ready for such a situation... H/T: Manuel!
+    
+    [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
+        NSLog(@"Early iCloud Initialization Done: Available = [%d]", available);
+        Settings.sharedInstance.iCloudAvailable = available;
+    }];
 }
 
 - (void)initializeProFamilyEdition {

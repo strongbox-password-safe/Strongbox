@@ -153,6 +153,10 @@
 		4D1BF503232455A4007DF0E6 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D1BF502232455A4007DF0E6 /* libxml2.2.dylib */; };
 		4D1BF50523245636007DF0E6 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D1BF502232455A4007DF0E6 /* libxml2.2.dylib */; };
 		4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
+		4D1E77EB23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77EA23AFEDC3007240FA /* CustomIconsRationalizer.m */; };
+		4D1E77EC23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77EA23AFEDC3007240FA /* CustomIconsRationalizer.m */; };
+		4D1E77ED23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77EA23AFEDC3007240FA /* CustomIconsRationalizer.m */; };
+		4D1E77EE23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77EA23AFEDC3007240FA /* CustomIconsRationalizer.m */; };
 		4D1F5809233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1F5808233E12BF00A01FB4 /* BackupsTableViewController.m */; };
 		4D1F580A233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1F5808233E12BF00A01FB4 /* BackupsTableViewController.m */; };
 		4D1F580D233E19EC00A01FB4 /* BackupsBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1F580C233E19EC00A01FB4 /* BackupsBrowserTableViewController.m */; };
@@ -323,6 +327,7 @@
 		4D3E14A72183365000A41CA0 /* Argon2KdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14A52183365000A41CA0 /* Argon2KdfCipher.m */; };
 		4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
 		4D40935A217E2AA900E69844 /* ladder-single-entry.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D409359217E2AA900E69844 /* ladder-single-entry.xml */; };
+		4D40B09323BFBF9F00BAD0D2 /* sample-non-hex-64.key in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B09123BFBF7400BAD0D2 /* sample-non-hex-64.key */; };
 		4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
 		4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4D446809216CE02C00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446808216CE02C00F6358D /* Csv.m */; };
@@ -1604,6 +1609,8 @@
 		4D1BF502232455A4007DF0E6 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = ../../../../usr/lib/libxml2.2.dylib; sourceTree = "<group>"; };
 		4D1D6FD51F38760F00D2B8EC /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Model.h; path = StrongBox/Model.h; sourceTree = "<group>"; };
 		4D1D6FD61F38760F00D2B8EC /* Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Model.m; path = StrongBox/Model.m; sourceTree = "<group>"; };
+		4D1E77E923AFEDC3007240FA /* CustomIconsRationalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomIconsRationalizer.h; path = model/CustomIconsRationalizer.h; sourceTree = "<group>"; };
+		4D1E77EA23AFEDC3007240FA /* CustomIconsRationalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CustomIconsRationalizer.m; path = model/CustomIconsRationalizer.m; sourceTree = "<group>"; };
 		4D1F5807233E12BF00A01FB4 /* BackupsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BackupsTableViewController.h; path = StrongBox/BackupsTableViewController.h; sourceTree = "<group>"; };
 		4D1F5808233E12BF00A01FB4 /* BackupsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BackupsTableViewController.m; path = StrongBox/BackupsTableViewController.m; sourceTree = "<group>"; };
 		4D1F580B233E19EC00A01FB4 /* BackupsBrowserTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BackupsBrowserTableViewController.h; path = StrongBox/BackupsBrowserTableViewController.h; sourceTree = "<group>"; };
@@ -1773,6 +1780,7 @@
 		4D402D702074EAFF00F7BC70 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = StrongBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
 		4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = model/StorageProvider.h; sourceTree = SOURCE_ROOT; };
 		4D409359217E2AA900E69844 /* ladder-single-entry.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ladder-single-entry.xml"; sourceTree = "<group>"; };
+		4D40B09123BFBF7400BAD0D2 /* sample-non-hex-64.key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "sample-non-hex-64.key"; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageBrowserTableViewController.h; path = StrongBox/StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StorageBrowserTableViewController.m; path = StrongBox/StorageBrowserTableViewController.m; sourceTree = "<group>"; };
 		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageBrowserItem.h; path = StrongBox/StorageBrowserItem.h; sourceTree = "<group>"; };
@@ -3436,6 +3444,8 @@
 				4D2E47AD233CFD8D00C1DE90 /* BackupsManager.m */,
 				4DE46657233D2BBD00398A65 /* BackupItem.h */,
 				4DE46658233D2BBD00398A65 /* BackupItem.m */,
+				4D1E77E923AFEDC3007240FA /* CustomIconsRationalizer.h */,
+				4D1E77EA23AFEDC3007240FA /* CustomIconsRationalizer.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -3713,6 +3723,7 @@
 				4D51EEFB21B94CC100623CA1 /* xml-keyfile.kdbx */,
 				4D51EEFC21B94CC100623CA1 /* xml-keyfile.key */,
 				4DC8D9B421B6F14C004F1812 /* sample-hex-text.key */,
+				4D40B09123BFBF7400BAD0D2 /* sample-non-hex-64.key */,
 				4DC8D9A721B6E4B6004F1812 /* sample-xml.key */,
 				4DC8D9AF21B6EBC9004F1812 /* sample-32-binary.key */,
 				4D8FBEE921A9A70F004797FA /* ferrari.jpg */,
@@ -4461,6 +4472,7 @@
 				4DA12F0A219860BD0000CEBB /* custom-icon.kdbx in Resources */,
 				4D210F5121959F3300B061B1 /* Database-1.kdb in Resources */,
 				4DCC3F8A2177BA1A00FB13C2 /* password-three-entries-ladder.xml in Resources */,
+				4D40B09323BFBF9F00BAD0D2 /* sample-non-hex-64.key in Resources */,
 				4DC8D9B021B6EBC9004F1812 /* sample-32-binary.key in Resources */,
 				4DC8D9B521B6F14C004F1812 /* sample-hex-text.key in Resources */,
 				4D98343A21773B3300731FFC /* generic-keepass.xml in Resources */,
@@ -5274,6 +5286,7 @@
 				4D876B3F21AC30BA00805DED /* CustomFieldsViewController.m in Sources */,
 				4D6B504E238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4D47670B217905AB00C4358F /* Meta.m in Sources */,
+				4D1E77EB23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4DE268A022A67A6200A1D158 /* MasterDetailViewController.m in Sources */,
 				4DB574002274913E001BB13C /* ItemMetadataEntry.m in Sources */,
 				4D326EA6223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
@@ -5562,6 +5575,7 @@
 				4DC4E0B323488BAA000743C4 /* CustomFieldsViewController.m in Sources */,
 				4D6B5050238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC4E0B423488BAA000743C4 /* Meta.m in Sources */,
+				4D1E77ED23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4DC4E0B523488BAA000743C4 /* MasterDetailViewController.m in Sources */,
 				4DC4E0B623488BAA000743C4 /* ItemMetadataEntry.m in Sources */,
 				4DC4E0B723488BAA000743C4 /* NSData+GZIP.m in Sources */,
@@ -5836,6 +5850,7 @@
 				4DC4E20823488BAE000743C4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4DC4E20923488BAE000743C4 /* KeePass2TagPackage.m in Sources */,
 				4DFF34C7238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
+				4D1E77EE23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4DC4E20A23488BAE000743C4 /* DatabaseModel.m in Sources */,
 				4DC4E20B23488BAE000743C4 /* iCloudSafesCoordinator.m in Sources */,
 				4DC4E20C23488BAE000743C4 /* V3Binary.m in Sources */,
@@ -6054,6 +6069,7 @@
 				4D2F6C1721807C04007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4D27D74D21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
 				4DFF34C5238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
+				4D1E77EC23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4D1884CC21709CF1001AE6B0 /* DatabaseModel.m in Sources */,
 				4D1884CB21709CE5001AE6B0 /* iCloudSafesCoordinator.m in Sources */,
 				4D74B92A218C40B000FC369E /* V3Binary.m in Sources */,

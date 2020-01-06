@@ -25,6 +25,7 @@ extern NSString* const kModelUpdateNotificationNotesChanged;
 extern NSString* const kModelUpdateNotificationIconChanged;
 extern NSString* const kModelUpdateNotificationAttachmentsChanged;
 extern NSString* const kModelUpdateNotificationTotpChanged;
+extern NSString* const kNotificationUserInfoKeyIsBatchIconUpdate;
 
 @interface ViewModel : NSObject
 
@@ -50,12 +51,21 @@ extern NSString* const kModelUpdateNotificationTotpChanged;
 - (void)setItemPassword:(Node*)item password:(NSString*)password;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
 
-- (void)setItemIcon:(Node *)item index:(NSNumber*_Nullable)index existingCustom:(NSUUID*_Nullable)existingCustom custom:(NSData*_Nullable)custom;
+- (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage;
+
 - (void)setItemIcon:(Node *)item
               index:(NSNumber*_Nullable)index
      existingCustom:(NSUUID*_Nullable)existingCustom
-             custom:(NSData* _Nullable)custom
-        rationalize:(BOOL)rationalize;
+             custom:(NSData*_Nullable)custom;
+
+- (void)setItemIcon:(Node *)item
+              index:(NSNumber*_Nullable)index
+     existingCustom:(NSUUID*_Nullable)existingCustom
+             custom:(NSData*_Nullable)custom
+        rationalize:(BOOL)rationalize
+        batchUpdate:(BOOL)batchUpdate;
+
+- (void)batchSetIcons:(NSDictionary<NSUUID*, NSImage*>*)iconMap;
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;

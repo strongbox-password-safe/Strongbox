@@ -7,16 +7,30 @@ https://apps.apple.com/app/strongbox-password-safe/id897283731
 
 Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes.
 
-# Licence Notes
-This software is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project.
+# License Notes
+This software provided here on Github is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project. Copyright/Ownership is held by Mark McGuill. Strongbox is licensed to Apple under a different license which is compatible with the App Store.
 
-If you are interested in using the code in some other fashion, or require an alternative licence then please contact me directly: [mark@strongboxsafe.com](mailto:mark@strongboxsafe.com).
+If you are interested in using the code, commercially, or in some other fashion for which the GPL is unsuitable, or if you would simply like to discuss an alternative licence or custom builds for your organization, then please contact Mark directly: [mark@strongboxsafe.com](mailto:mark@strongboxsafe.com).
 
-# Support
+# Supporting Development through Patreon
+If you like the app and are feeling generous you can help by contributing financially on Patreon here:
+
+https://www.patreon.com/strongboxpasswordsafe
+
+Obviously the more support I get here the more time I can allocate to development, I rely on the community to support the work as in-app purchases are a one off payment and just about cover Apple's yearly developer program fee. If you can chip in the price of a cup of coffee every month I'd be very grateful.
+
+# Other ways to support Strongbox
+If you like the app, you can always help out by leaving a 5 star review in the App Store. This is very helpful, and helps get the word out about Strongbox. If you can please leave a positive comment too. You can review the App here:
+
+https://apps.apple.com/app/strongbox-password-safe/id897283731
+
+Of course it is also great if you can tell your friends and family about the App, spread the word on Twitter, Reddit or otherwise.
+
+# Help / Tech Support
 If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") or [Reddit r/strongbox](https://www.reddit.com/r/strongbox/ "r/strongbox"). Lastly if all of the above don't help you can email (in English only) [support@strongboxsafe.com](mailto:support@strongboxsafe.com). It is important to only email after checking the above avenues as more time spent on support means less time spent on development.
 
 # Localization (Help Wanted)
-Localization and translation is managed through the Parallel Babel project here:
+Localization and translation is managed through the parallel Babel project here:
 
 https://github.com/strongbox-password-safe/babel
 
@@ -29,13 +43,6 @@ Big thank you to all the localization contributors
 Russian - wishes to remain anonymous!
 German - @Slummi
 Ukrainian - Artem Polivanchuk
-
-# Supporting Development through Patreon
-If you like the app and are feeling generous you can help by contributing financially on Patreon here:
-
-https://www.patreon.com/strongboxpasswordsafe
-
-Obviously the more support I get here the more time I can allocate to development, I rely on the community to support the work as in-app purchases are a one off payment and just about cover Apple's yearly developer program fee. If you can chip in the price of a cup of coffee every month I'd be very grateful.
 
 # Build Issues
 The code is provided here for reasons of security, transparency and openness. Anyone can view the code and verify that everything is above board, the algorithms are correct and there are no backdoors or other malicious features present. You will need Google Drive, OneDrive and Dropbox developer accounts (with keys/secrets) before building. Familiarity with Cocoapods and other build tools is a prerequisite. Please do not file issues about build issues, I can't guarantee what is here will build in your environment. If instead of examining the code, you simply want to use the app, please download from the App Store, the free version is more than functional. Lastly, if you are attempting to bypass built-in Pro/Free limitations for your own app usage, please consider your actions, and consider supporting further development by contributing via the official application (in app purchase upgrade). It will be very much appreciated. If you need all the Pro features and cannot afford the in app purchase upgrade, just drop me a mail and I'll help you out.

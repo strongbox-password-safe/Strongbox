@@ -13,6 +13,7 @@
 #import "PasswordMaker.h"
 #import "Settings.h"
 #import "OTPToken+Serialization.h"
+#import "FavIconManager.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -24,6 +25,7 @@ NSString* const kModelUpdateNotificationNotesChanged = @"kModelUpdateNotificatio
 NSString* const kModelUpdateNotificationIconChanged = @"kModelUpdateNotificationIconChanged";
 NSString* const kModelUpdateNotificationAttachmentsChanged = @"kModelUpdateNotificationAttachmentsChanged";
 NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotificationTotpChanged";
+NSString* const kNotificationUserInfoKeyIsBatchIconUpdate = @"kNotificationUserInfoKeyIsBatchIconUpdate";
 
 NSString* const kNotificationUserInfoKeyNode = @"node";
 
@@ -207,12 +209,45 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self setItemNotes:item notes:notes modified:nil];
 }
 
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom {
-    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom rationalize:YES];
+    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom rationalize:NO batchUpdate:NO];
 }
 
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom  rationalize:(BOOL)rationalize {
-    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom modified:nil rationalize:rationalize];
+- (void)setItemIcon:(Node *)item
+              index:(NSNumber*)index
+     existingCustom:(NSUUID*)existingCustom
+             custom:(NSData*)custom
+        rationalize:(BOOL)rationalize
+        batchUpdate:(BOOL)batchUpdate {
+    [self setItemIcon:item
+                index:index
+       existingCustom:existingCustom
+               custom:custom
+             modified:nil
+          rationalize:rationalize
+          batchUpdate:batchUpdate];
+}
+
+- (void)batchSetIcons:(NSDictionary<NSUUID *,NSImage *>*)iconMap {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+            
+    for (Node* item in self.rootGroup.allChildRecords) {
+        NSImage* selectedImage = iconMap[item.uuid];
+        if(selectedImage) {
+            [self setItemIcon:item customImage:selectedImage rationalize:NO batchUpdate:YES];
+        }
+    }
+
+    NSString* loc = NSLocalizedString(@"mac_undo_action_set_icons", @"Set Icon(s)");
+
+    [self.document.undoManager setActionName:loc];
+    [self.document.undoManager endUndoGrouping];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,7 +262,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     Node* cloneForHistory = [item cloneForHistory];
     if([item setTitle:title allowDuplicateGroupTitles:self.format != kPasswordSafe]) {
-        item.fields.modified = modified ? modified : [[NSDate alloc] init];
+        [self touchAndModify:item modDate:modified];
         
         if(self.document.undoManager.isUndoing) {
             if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
@@ -268,7 +303,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     item.fields.email = email;
-    item.fields.modified = modified ? modified : [[NSDate alloc] init]; // TODO: Use Touch() when we can make it undo-able
+
+    [self touchAndModify:item modDate:modified];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemEmail:item email:old modified:oldModified];
     
@@ -278,6 +314,15 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationEmailChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
+}
+
+- (void)touchAndModify:(Node*)item modDate:(NSDate*_Nullable)modDate {
+    if(modDate) {
+        [item touchWithExplicitModifiedDate:modDate touchParents:YES];
+    }
+    else {
+        [item touch:YES touchParents:YES];
+    }
 }
 
 - (void)setItemUsername:(Node*_Nonnull)item username:(NSString*_Nonnull)username modified:(NSDate*)modified {
@@ -297,7 +342,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     item.fields.username = username;
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemUsername:item username:old modified:oldModified];
   
@@ -326,7 +371,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     item.fields.url = url;
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemUrl:item url:old modified:oldModified];
     
@@ -355,7 +400,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     item.fields.password = password;
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
     item.fields.passwordModified = item.fields.modified;
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemPassword:item password:old modified:oldModified];
@@ -385,7 +430,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     item.fields.notes = notes;
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemNotes:item notes:old modified:oldModified];
     
@@ -397,12 +442,25 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
+- (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage {
+    [self setItemIcon:item customImage:customImage rationalize:NO batchUpdate:NO];
+}
+
+- (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage rationalize:(BOOL)rationalize batchUpdate:(BOOL)batchUpdate {
+    CGImageRef cgRef = [customImage CGImageForProposedRect:NULL context:nil hints:nil];
+    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+    NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+    
+    [self setItemIcon:item index:nil existingCustom:nil custom:selectedImageData modified:nil rationalize:rationalize batchUpdate:batchUpdate];
+}
+
 - (void)setItemIcon:(Node *)item
               index:(NSNumber*)index
      existingCustom:(NSUUID*)existingCustom
              custom:(NSData*)custom
            modified:(NSDate*)modified
-        rationalize:(BOOL)rationalize  {
+        rationalize:(BOOL)rationalize
+        batchUpdate:(BOOL)batchUpdate  {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -414,7 +472,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     NSDate* oldModified = item.fields.modified;
     
-    if(index && index.intValue == -1) {
+    if(index != nil && index.intValue == -1) {
         index = item.isGroup ? @(48) : @(0);
     }
     
@@ -438,17 +496,26 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [self.passwordDatabase setNodeCustomIcon:item data:custom rationalize:rationalize];
     }
     
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
     
     // Save data rather than existing custom icon here, as custom icon could be rationalized away, holding data guarantees we can undo...
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item index:oldIndex existingCustom:nil custom:oldCustom modified:oldModified rationalize:NO];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item
+                                                                        index:oldIndex
+                                                               existingCustom:nil
+                                                                       custom:oldCustom
+                                                                     modified:oldModified
+                                                                  rationalize:NO
+                                                                  batchUpdate:batchUpdate];
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_icon_change", @"Icon Change");
     [self.document.undoManager setActionName:loc];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationIconChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationIconChanged
+                                                          object:self
+                                                        userInfo:@{ kNotificationUserInfoKeyNode : item,
+                                                                    kNotificationUserInfoKeyIsBatchIconUpdate : @(batchUpdate)}];
     });
 }
 
@@ -463,7 +530,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
     NSDate* oldModified = item.fields.modified;
     
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
     
     if(!self.document.undoManager.isUndoing) {
         index = [item.fields.keePassHistory indexOfObject:historicalItem]; // removeObjectAtIndex:index];
@@ -498,8 +565,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSDate* oldModified = item.fields.modified;
     Node* originalNode = [item cloneForHistory];
 
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
-
+    [self touchAndModify:item modDate:modified];
+    
     // Record History
     
     [item.fields.keePassHistory addObject:originalNode];
@@ -553,8 +620,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
-
+    
+    [self touchAndModify:item modDate:modified];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationAttachmentsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
@@ -588,8 +656,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSDate* oldModified = item.fields.modified;
 
     [self.passwordDatabase addNodeAttachment:item attachment:attachment rationalize:rationalize];
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
-
+    
+    [self touchAndModify:item modDate:modified];
+    
     // To Undo we need to find this attachment's index!
     
     int i=0;
@@ -646,8 +715,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     [item.fields setCustomField:key value:value];
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
-
+    
+    [self touchAndModify:item modDate:modified];
+    
     if(oldValue) {
         [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
         
@@ -686,7 +756,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     [item.fields removeCustomField:key];
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    
+    [self touchAndModify:item modDate:modified];
 
     [[self.document.undoManager prepareWithInvocationTarget:self] setCustomField:item key:key value:oldValue modified:oldModified];
     
@@ -712,7 +783,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     Node* cloneForHistory = [item cloneForHistory];
     [item.fields.keePassHistory addObject:cloneForHistory];
     
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
+    
     [item.fields setTotpWithString:otp
                   appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
                         forceSteam:steam];
@@ -748,7 +820,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     Node* cloneForHistory = [item cloneForHistory];
     [item.fields.keePassHistory addObject:cloneForHistory];
     
-    item.fields.modified = modified ? modified : [[NSDate alloc] init];
+    [self touchAndModify:item modDate:modified];
+    
     [item.fields clearTotp];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setTotp:item otp:oldOtpTokenUrl.absoluteString steam:oldOtpToken.algorithm == OTPAlgorithmSteam];

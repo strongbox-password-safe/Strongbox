@@ -11,8 +11,6 @@
 
 @import FavIcon;
 
-static const int kIdealFavIconDimension = 48;
-
 @implementation FavIconManager
 
 + (instancetype)sharedInstance {
@@ -25,12 +23,10 @@ static const int kIdealFavIconDimension = 48;
     return sharedInstance;
 }
 
-#if TARGET_OS_IPHONE
-
 - (void)getFavIconsForUrls:(NSArray<NSURL*>*)urls
                      queue:(NSOperationQueue*)queue
                    options:(FavIconDownloadOptions*)options
-              withProgress:(void (^)(NSURL *url, NSArray<UIImage*>* images))withProgress {
+              withProgress:(void (^)(NSURL *url, NSArray<IMAGE_TYPE_PTR>* images))withProgress {
     for (NSURL* url in urls) {
         [queue addOperationWithBlock:^{
             // This is a little hacky but better than re-architecting the Library to be fully async, cancellable etc
@@ -40,7 +36,7 @@ static const int kIdealFavIconDimension = 48;
 
             [self downloadAll:url
                       options:options
-                   completion:^(NSArray<UIImage*>* _Nullable images) {
+                   completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
                 dispatch_semaphore_signal(sema);
                     withProgress(url, images);
             }];
@@ -52,7 +48,7 @@ static const int kIdealFavIconDimension = 48;
 
 - (void)downloadPreferred:(NSURL *)url
                   options:(FavIconDownloadOptions*)options
-               completion:(void (^)(UIImage * _Nullable))completion {
+               completion:(void (^)(IMAGE_TYPE_PTR _Nullable))completion {
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
     
     [FavIcon downloadAll:url
@@ -61,15 +57,15 @@ static const int kIdealFavIconDimension = 48;
               duckDuckGo:options.duckDuckGo
                   google:options.google
     allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
-              completion:^(NSArray<UIImage *>* _Nullable images) {
-        UIImage* best = [self selectBest:images];
+              completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
+        IMAGE_TYPE_PTR best = [self selectBest:images];
         completion(best);
     }];
 }
 
 - (void)downloadAll:(NSURL *)url
             options:(FavIconDownloadOptions*)options
-         completion:(void (^)(NSArray<UIImage*>* _Nullable))completion {
+         completion:(void (^)(NSArray<IMAGE_TYPE_PTR>* _Nullable))completion {
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
     
     [FavIcon downloadAll:url
@@ -78,15 +74,15 @@ static const int kIdealFavIconDimension = 48;
               duckDuckGo:options.duckDuckGo
                   google:options.google
     allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
-              completion:^(NSArray<UIImage *>* _Nullable images) {
+              completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
         completion(images);
     }];
 }
 
-- (UIImage*)selectBest:(NSArray<UIImage*>*)images {
-    NSArray<UIImage*>* sorted = [images sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        UIImage *imageA = (UIImage*)obj1;
-        UIImage *imageB = (UIImage*)obj2;
+- (IMAGE_TYPE_PTR)selectBest:(NSArray<IMAGE_TYPE_PTR>*)images {
+    NSArray<IMAGE_TYPE_PTR>* sorted = [images sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        IMAGE_TYPE_PTR imageA = (IMAGE_TYPE_PTR)obj1;
+        IMAGE_TYPE_PTR imageB = (IMAGE_TYPE_PTR)obj2;
         
 //        NSLog(@"Comparing A and B: (%dx%d) : (%dx%d)", (int)imageA.size.width, (int)imageA.size.height, (int)imageB.size.width, (int)imageB.size.height);
 
@@ -112,6 +108,8 @@ static const int kIdealFavIconDimension = 48;
             return NSOrderedAscending;
         }
         
+        static const int kIdealFavIconDimension = 48;
+        
         int distanceA = imageA.size.width - kIdealFavIconDimension;
         int distanceB = imageB.size.width - kIdealFavIconDimension;
 
@@ -127,7 +125,7 @@ static const int kIdealFavIconDimension = 48;
         return NSOrderedSame;
     }];
     
-//    for (UIImage* item in sorted) {
+//    for (IMAGE_TYPE_PTR item in sorted) {
 //        NSLog(@"%dx%d", (int)item.size.width, (int)item.size.height);
 //    }
     
@@ -162,7 +160,5 @@ static const int kIdealFavIconDimension = 48;
     
     return url;
 }
-
-#endif
 
 @end

@@ -1401,7 +1401,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
         [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
     }
-    else if(![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
+    else if(self.model.icon.customUuid != nil && ![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
         self.item.customIconUuid = self.model.icon.customUuid;
     }
     else if(self.model.icon.index != nil) {
@@ -1443,7 +1443,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)addHistoricalNode:(Node*)originalNodeForHistory {
-    BOOL shouldAddHistory = YES; // FUTURE: only valid for KeePass 2+ also...
+    BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
     if(shouldAddHistory && originalNodeForHistory != nil) {
         [self.item.fields.keePassHistory addObject:originalNodeForHistory];
     }

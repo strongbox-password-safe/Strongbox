@@ -273,6 +273,9 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
             }
         }];
     }
+    else if (errored.count == self.results.count) {
+        [self retryAll];
+    }
     else {
         [Alerts twoOptionsWithCancel:self
                                title:NSLocalizedString(@"favicon_retry_all_or_failed_title", @"Retry All or Failed?")

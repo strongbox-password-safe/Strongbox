@@ -398,13 +398,17 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
     GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
+
+    fileName = [fileName stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@"'" withString:@"\\\'"];
+    fileName = [fileName stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+
     query.q = [NSString stringWithFormat:@"name = '%@' and '%@' in parents and trashed=false", fileName, parentFileIdentifier ? parentFileIdentifier : @"root" ];
 
     [[self driveService] executeQuery:query
                     completionHandler:^(GTLRServiceTicket *ticket,
                                               GTLRDrive_FileList *fileList,
-                                              NSError *error)
-    {
+                                              NSError *error) {
         if (!error) {
             if (fileList.files != nil && fileList.files.count > 0) {
                 GTLRDrive_File *file = fileList.files[0];

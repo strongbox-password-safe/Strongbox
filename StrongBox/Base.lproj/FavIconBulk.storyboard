@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7Nl-b9-5wU">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7Nl-b9-5wU">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -233,7 +233,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="FavIcon Results" prompt="Left swipe to remove or tap Done to save changes" id="pDZ-u1-BxL">
-                        <barButtonItem key="rightBarButtonItem" title="Save" style="done" id="bkT-Yb-LXr">
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="bkT-Yb-LXr">
                             <connections>
                                 <action selector="onDone:" destination="rNe-e9-apD" id="msC-Tw-oYR"/>
                             </connections>

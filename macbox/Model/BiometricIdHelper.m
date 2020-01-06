@@ -9,6 +9,7 @@
 #import "BiometricIdHelper.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Utils.h"
+#import "Settings.h"
 
 @interface BiometricIdHelper ()
 
@@ -35,10 +36,19 @@
         LAContext *localAuthContext = [[LAContext alloc] init];
         
         NSError *authError;
-        return [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError];
+        return [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
     }
     
     return NO;
+}
+
+- (NSUInteger)getLAPolicy {
+    if (@available(macOS 10.15, *)) {
+        return Settings.sharedInstance.allowWatchUnlock ? LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch : LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+    }
+    else {
+        return LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+    }
 }
 
 - (NSString*)biometricIdName {
@@ -53,17 +63,25 @@
         return;
     }
     
+    if(self.biometricsInProgress) {
+        completion(NO, [Utils createNSError:@"Already a biometrics request in progress, cannot instantiate 2" errorCode:-2412]);
+        return;
+    }
+    
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
 
         NSString* loc = NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Open Database");
         
         NSError *authError;
-        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError]) {
-            [localAuthContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
+        if([localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError]) {
+            self.biometricsInProgress = YES;
+            
+            [localAuthContext evaluatePolicy:[self getLAPolicy]
                              localizedReason:loc
                                        reply:^(BOOL success, NSError *error) {
                                            completion(success, error);
+                                           self.biometricsInProgress = NO;
                                        }];
         }
         else {

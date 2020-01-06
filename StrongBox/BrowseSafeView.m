@@ -480,13 +480,22 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         if(goNoGo) {
             if (selected) {
                 [self setCustomIcons:item selected:selected isRecursiveGroupFavIconResult:isRecursiveGroupFavIconResult];
-                [self saveChangesToSafeAndRefreshView];
             }
             else if (userSelectedExistingCustomIconId) {
+                if(!item.isGroup) {
+                    Node* originalNodeForHistory = [item cloneForHistory];
+                    [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+                }
+                [item touch:YES touchParents:YES];
                 item.customIconUuid = userSelectedExistingCustomIconId;
-                [self saveChangesToSafeAndRefreshView];
             }
             else if(userSelectedNewIconIndex) {
+                if(!item.isGroup) {
+                    Node* originalNodeForHistory = [item cloneForHistory];
+                    [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+                }
+                [item touch:YES touchParents:YES];
+
                 if(userSelectedNewIconIndex.intValue == -1) {
                     item.iconId = !item.isGroup ? @(0) : @(48); // Default
                 }
@@ -494,13 +503,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                     item.iconId = userSelectedNewIconIndex;
                 }
                 item.customIconUuid = nil;
-                
-                [self saveChangesToSafeAndRefreshView];
-            }            
+            }
+            
+            [self saveChangesToSafeAndRefreshView];
         }
     }];
 }
-
+    
 - (void)setCustomIcons:(Node*)item
               selected:(NSDictionary<NSUUID *,UIImage *>*)selected
 isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {

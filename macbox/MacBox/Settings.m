@@ -52,14 +52,52 @@ static NSString* const kAutoReloadAfterForeignChanges = @"autoReloadAfterForeign
 static NSString* const kDetectForeignChanges = @"detectForeignChanges";
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
-//static NSString* const kShowDatabasesListAtStartup = @"showDatabasesListAtStartup";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
 static NSString* const kMigratedToNewPasswordGenerator = @"migratedToNewPasswordGenerator";
 static NSString* const kAutoOpenFirstDatabaseOnEmptyLaunch = @"autoOpenFirstDatabaseOnEmptyLaunch";
 static NSString* const kAutoPromptForTouchIdOnActivate = @"autoPromptForTouchIdOnActivate";
 static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
+static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
+static NSString* const kExpressDownloadFavIconOnNewOrUrlChanged = @"expressDownloadFavIconOnNewOrUrlChanged";
+static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
 
 @implementation Settings
+
+- (BOOL)allowWatchUnlock {
+    return [self getBool:kAllowWatchUnlock fallback:YES];
+}
+
+- (void)setAllowWatchUnlock:(BOOL)allowWatchUnlock {
+    [self setBool:kAllowWatchUnlock value:allowWatchUnlock];
+}
+
+- (BOOL)expressDownloadFavIconOnNewOrUrlChanged {
+    return [self getBool:kExpressDownloadFavIconOnNewOrUrlChanged fallback:YES];
+}
+
+- (void)setExpressDownloadFavIconOnNewOrUrlChanged:(BOOL)expressDownloadFavIconOnNewOrUrlChanged {
+    [self setBool:kExpressDownloadFavIconOnNewOrUrlChanged value:expressDownloadFavIconOnNewOrUrlChanged];
+}
+
+- (FavIconDownloadOptions *)favIconDownloadOptions {
+    NSUserDefaults *defaults = [self getUserDefaults];
+    NSData *encodedObject = [defaults objectForKey:kFavIconDownloadOptions];
+
+    if(encodedObject == nil) {
+        return FavIconDownloadOptions.defaults;
+    }
+
+    FavIconDownloadOptions *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+
+    return object;
+}
+
+- (void)setFavIconDownloadOptions:(FavIconDownloadOptions *)favIconDownloadOptions {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:favIconDownloadOptions];
+    NSUserDefaults *defaults = [self getUserDefaults];
+    [defaults setObject:encodedObject forKey:kFavIconDownloadOptions];
+    [defaults synchronize];
+}
 
 - (BOOL)showSystemTrayIcon {
     return [self getBool:kShowSystemTrayIcon fallback:YES];

@@ -30,6 +30,11 @@
 
 - (instancetype)init {
     if (self = [super init]) {
+        _displayName = NSLocalizedString(@"storage_provider_name_icloud", @"iCloud");
+        if([_displayName isEqualToString:@"storage_provider_name_icloud"]) {
+            _displayName = @"iCloud";
+        }
+
         _storageId = kiCloud;
         _allowOfflineCache = YES;
         _providesIcons = NO;
@@ -42,10 +47,6 @@
     else {
         return nil;
     }
-}
-
-- (NSString *)displayName {
-    return @"iCloud";
 }
 
 - (NSString *)icon {

@@ -63,6 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setCustomField:(NSString*)key value:(StringValue*)value;
 
 - (void)touch:(BOOL)modified;
+- (void)touchWithExplicitModifiedDate:(NSDate*)modDate; // largely designed for undo...
+
 - (void)setTouchProperties:(NSDate*_Nullable)accessed modified:(NSDate*_Nullable)modified usageCount:(NSNumber*_Nullable)usageCount;
 
 ///////////////////////////////////////////////

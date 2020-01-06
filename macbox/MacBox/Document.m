@@ -18,7 +18,7 @@
 #import "SafeMetaData.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
-#import "NodeDetailsWindowController.h"
+#import "NodeDetailsViewController.h"
 #import "BiometricIdHelper.h"
 
 @interface Document ()

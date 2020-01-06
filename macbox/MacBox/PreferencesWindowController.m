@@ -25,6 +25,7 @@
 @property (weak) IBOutlet NSButton *checkboxVerticalGridLines;
 @property (weak) IBOutlet NSButton *checkboxShowAutoCompleteSuggestions;
 
+
 @property (weak) IBOutlet NSButton *checkboxTitleIsEditable;
 @property (weak) IBOutlet NSButton *checkboxOtherFieldsAreEditable;
 @property (weak) IBOutlet NSButton *checkboxDereferenceQuickView;
@@ -80,6 +81,8 @@
 @property (weak) IBOutlet NSButton *checkboxDetectForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxAutoSave;
+@property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
+@property (weak) IBOutlet NSButton *allowAppleWatchUnlock;
 
 @property (weak) IBOutlet NSButton *switchAutoClearClipboard;
 @property (weak) IBOutlet NSTextField *textFieldClearClipboard;
@@ -91,6 +94,13 @@
 
 @property (weak) IBOutlet NSButton *switchShowInMenuBar;
 @property (weak) IBOutlet NSButton *switchAutoPromptTouchID;
+
+@property (weak) IBOutlet NSButton *useDuckDuckGo;
+@property (weak) IBOutlet NSButton *checkDomainOnly;
+@property (weak) IBOutlet NSButton *useGoogle;
+@property (weak) IBOutlet NSButton *scanHtml;
+@property (weak) IBOutlet NSButton *ignoreSsl;
+@property (weak) IBOutlet NSButton *scanCommonFiles;
 
 @end
 
@@ -130,6 +140,8 @@
     [self bindAutoFillToSettings];
     [self bindAutoLockToSettings];
     [self bindAutoClearClipboard];
+    
+    [self bindFavIconDownloading];
     
     NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
     [self.labelSamplePassword addGestureRecognizer:click];
@@ -179,12 +191,19 @@
     self.checkboxDereferenceSearch.state = Settings.sharedInstance.dereferenceDuringSearch ? NSOnState : NSOffState;
     self.checkboxDetectForeignChanges.state = Settings.sharedInstance.detectForeignChanges ? NSOnState : NSOffState;
     self.checkboxReloadForeignChanges.state = Settings.sharedInstance.autoReloadAfterForeignChanges ? NSOnState : NSOffState;
+    self.checkboxAutoDownloadFavIcon.state = Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged ? NSOnState : NSOffState;
+
     self.checkboxConcealEmptyProtected.state = Settings.sharedInstance.concealEmptyProtectedFields ? NSOnState : NSOffState;
     self.showCustomFieldsInQuickView.state = Settings.sharedInstance.showCustomFieldsOnQuickViewPanel ? NSOnState : NSOffState;
     
     self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
-    
     self.switchAutoPromptTouchID.state = Settings.sharedInstance.autoPromptForTouchIdOnActivate ? NSOnState : NSOffState;
+
+    self.allowAppleWatchUnlock.state = Settings.sharedInstance.allowWatchUnlock ? NSOnState : NSOffState;
+    
+    if(!Settings.sharedInstance.fullVersion) {
+        self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
+    }
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -207,6 +226,8 @@
     Settings.sharedInstance.dereferenceDuringSearch = self.checkboxDereferenceSearch.state == NSOnState;
     Settings.sharedInstance.detectForeignChanges = self.checkboxDetectForeignChanges.state == NSOnState;
     Settings.sharedInstance.autoReloadAfterForeignChanges = Settings.sharedInstance.detectForeignChanges && (self.checkboxReloadForeignChanges.state == NSOnState);
+    Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged = self.checkboxAutoDownloadFavIcon.state == NSOnState;
+    
     Settings.sharedInstance.concealEmptyProtectedFields = self.checkboxConcealEmptyProtected.state == NSOnState;
     Settings.sharedInstance.showCustomFieldsOnQuickViewPanel = self.showCustomFieldsInQuickView.state == NSOnState;
     
@@ -215,11 +236,13 @@
     
     Settings.sharedInstance.autoPromptForTouchIdOnActivate = self.switchAutoPromptTouchID.state == NSOnState;
     
+    Settings.sharedInstance.allowWatchUnlock = self.allowAppleWatchUnlock.state ==  NSOnState;
+    
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
--(void) bindAutoFillToSettings {
+-(void)bindAutoFillToSettings {
     AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
 
     int index = [self autoFillModeToSegmentIndex:settings.titleAutoFillMode];
@@ -257,6 +280,35 @@
     self.segmentNotes.selectedSegment = index;
     self.labelCustomNotes.stringValue = settings.notesAutoFillMode == kCustom ? settings.notesCustomAutoFill : @"";
 }
+
+- (void)bindFavIconDownloading {
+    FavIconDownloadOptions* options = Settings.sharedInstance.favIconDownloadOptions;
+
+    self.useDuckDuckGo.state = options.duckDuckGo ? NSOnState : NSOffState;
+    self.checkDomainOnly.state = options.domainOnly ? NSOnState : NSOffState;
+    self.useGoogle.state = options.google ? NSOnState : NSOffState;
+    self.scanHtml.state = options.scanHtml ? NSOnState : NSOffState;
+    self.ignoreSsl.state = options.ignoreInvalidSSLCerts ? NSOnState : NSOffState;
+    self.scanCommonFiles.state = options.checkCommonFavIconFiles ? NSOnState : NSOffState;
+}
+
+- (IBAction)onChangeFavIconSettings:(id)sender {
+    FavIconDownloadOptions* options = Settings.sharedInstance.favIconDownloadOptions;
+
+    options.duckDuckGo = self.useDuckDuckGo.state == NSOnState;
+    options.domainOnly = self.checkDomainOnly.state == NSOnState;
+    options.google = self.useGoogle.state == NSOnState;
+    options.scanHtml = self.scanHtml.state == NSOnState;
+    options.ignoreInvalidSSLCerts = self.ignoreSsl.state == NSOnState;
+    options.checkCommonFavIconFiles = self.scanCommonFiles.state == NSOnState;
+
+    if(options.isValid) {
+        Settings.sharedInstance.favIconDownloadOptions = options;
+    }
+    
+    [self bindFavIconDownloading];
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Password Generation

@@ -96,6 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
 
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
+- (void)touchWithExplicitModifiedDate:(NSDate*)modDate touchParents:(BOOL)touchParents; // Used mostly for undo...
 
 ///////////////////////////////////////////////
 // For use by any Safe Format Provider

@@ -21,7 +21,8 @@
 
 @implementation Alerts
 
-+ (void)info:(NSString *)info  window:(NSWindow*)window {
++ (void)info:(NSString *)info
+      window:(NSWindow*)window {
     NSAlert *alert = [[NSAlert alloc] init];
     
     [alert setMessageText:info];
@@ -34,9 +35,9 @@
 }
 
 + (void)info:(NSString *)message
-    informativeText:(NSString*)informativeText
-            window:(NSWindow*)window
-  completion:(void (^)(void))completion; {
+informativeText:(NSString*)informativeText
+      window:(NSWindow*)window
+  completion:(void (^)(void))completion {
     NSAlert *alert = [[NSAlert alloc] init];
     
     [alert setMessageText:message];
@@ -124,7 +125,7 @@
     self.okButton = [alert addButtonWithTitle:loc];
     self.okButton.enabled = self.allowEmptyInput || defaultValue.length;// ? YES :NO;
 
-    NSString* loc2 = NSLocalizedString(@"alerts_cancel", @"Cancel");
+    NSString* loc2 = NSLocalizedString(@"generic_cancel", @"Cancel");
     [alert addButtonWithTitle:loc2];
     
     self.simpleInputTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
@@ -163,7 +164,7 @@
     self.okButton = [alert addButtonWithTitle:loc];
     self.okButton.enabled = NO;
     
-    NSString* loc2 = NSLocalizedString(@"alerts_cancel", @"Cancel");
+    NSString* loc2 = NSLocalizedString(@"generic_cancel", @"Cancel");
     [alert addButtonWithTitle:loc2];
     
     // Accessory View
@@ -248,6 +249,34 @@
 
 - (void)onCheckboxProtected {
     self.okButton.enabled = self.keyTextField.stringValue.length;
+}
+
+
++ (void)twoOptionsWithCancel:(NSString *)messageText
+             informativeText:(NSString*)informativeText
+           option1AndDefault:(NSString*)option1AndDefault
+                     option2:(NSString*)option2
+                      window:(NSWindow*)window
+                  completion:(void (^)(NSUInteger zeroForCancel))completion {
+    NSAlert *alert = [[NSAlert alloc] init];
+    
+    if (informativeText) [alert setInformativeText:informativeText];
+    if (messageText) [alert setMessageText:messageText];
+    
+    [alert setAlertStyle:NSAlertStyleInformational];
+    
+    NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
+    [alert addButtonWithTitle:localizedCancel];
+    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
+    
+    [alert addButtonWithTitle:option1AndDefault];
+    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; // ENTER
+    
+    [alert addButtonWithTitle:option2];
+        
+    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+        completion(returnCode - NSAlertFirstButtonReturn);
+    }];
 }
 
 @end

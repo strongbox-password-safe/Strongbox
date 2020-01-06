@@ -25,7 +25,11 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = @"Dropbox";
+        _displayName = NSLocalizedString(@"storage_provider_name_dropbox", @"Dropbox");
+        if([_displayName isEqualToString:@"storage_provider_name_dropbox"]) {
+            _displayName = @"Dropbox";
+        }
+
         _icon = @"dropbox-blue-32x32-nologo";
         _storageId = kDropbox;
         _allowOfflineCache = YES;

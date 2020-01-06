@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SelectPredefinedIconController">
             <connections>
+                <outlet property="buttonFindFavIcons" destination="nTm-od-gjA" id="GL9-rb-HrZ"/>
                 <outlet property="buttonSelectFile" destination="STV-Hs-hOA" id="Zod-kT-C1U"/>
                 <outlet property="collectionView" destination="lFk-kt-54F" id="267-cG-cBa"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
@@ -24,14 +25,14 @@
                 <rect key="frame" x="0.0" y="0.0" width="570" height="424"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nCr-GA-F2s">
-                        <rect key="frame" x="20" y="61" width="530" height="307"/>
+                    <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nCr-GA-F2s">
+                        <rect key="frame" x="20" y="61" width="530" height="308"/>
                         <clipView key="contentView" id="CaZ-8e-QHd">
-                            <rect key="frame" x="1" y="1" width="528" height="305"/>
+                            <rect key="frame" x="1" y="1" width="528" height="306"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <collectionView selectable="YES" id="lFk-kt-54F">
-                                    <rect key="frame" x="0.0" y="0.0" width="528" height="158"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="528" height="306"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="QyG-3a-gal">
                                         <size key="itemSize" width="56" height="56"/>
@@ -42,7 +43,7 @@
                             </subviews>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="txs-RG-7JO">
-                            <rect key="frame" x="1" y="144" width="233" height="15"/>
+                            <rect key="frame" x="-100" y="-100" width="233" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="QYu-tY-hFG">
@@ -84,16 +85,29 @@ Gw
                         </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZYx-hs-rzI">
-                        <rect key="frame" x="171" y="387" width="229" height="17"/>
+                        <rect key="frame" x="171" y="388" width="229" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Please select a new icon for this item" id="ys3-kg-5ag">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nTm-od-gjA">
+                        <rect key="frame" x="148" y="13" width="151" height="32"/>
+                        <buttonCell key="cell" type="push" title="Find FavIcons(s)..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JX2-hC-obx">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="onFindFavIcons:" target="-2" id="sfP-ty-9hU"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="nTm-od-gjA" firstAttribute="top" secondItem="nCr-GA-F2s" secondAttribute="bottom" constant="20" id="56L-HV-o33"/>
+                    <constraint firstAttribute="bottom" secondItem="nTm-od-gjA" secondAttribute="bottom" constant="20" id="8l6-6u-OYN"/>
                     <constraint firstItem="ZYx-hs-rzI" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="Bxz-0y-9oD"/>
+                    <constraint firstItem="STV-Hs-hOA" firstAttribute="leading" secondItem="nTm-od-gjA" secondAttribute="trailing" constant="12" id="FI9-YT-KjQ"/>
                     <constraint firstItem="ZYx-hs-rzI" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" id="IPB-9k-ZP9"/>
                     <constraint firstItem="guW-A7-hbt" firstAttribute="leading" secondItem="STV-Hs-hOA" secondAttribute="trailing" constant="12" id="IYY-St-zyw"/>
                     <constraint firstAttribute="trailing" secondItem="guW-A7-hbt" secondAttribute="trailing" constant="20" id="Mmm-oj-WUO"/>

@@ -161,7 +161,7 @@ static NSString* const kFontName =  @"Futura-Bold";
         SKProduct* monthlyProduct = ProUpgradeIAPManager.sharedInstance.availableProducts[kMonthly];
         NSString * bonusText;
         if(monthlyProduct) {
-            int percentSavings = calculatePercentageSavings(product.price, monthlyProduct.price, 3);
+            int percentSavings = calculatePercentageSavings([self getEffectivePrice:product], [self getEffectivePrice:monthlyProduct], 3);
             bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_with_percentage_saving_fmt", @"%@/month (Save %d%%)"), [self getPriceTextFromProduct:product divisor:3], percentSavings];
         }
         else {
@@ -199,7 +199,7 @@ static NSString* const kFontName =  @"Futura-Bold";
         SKProduct* monthlyProduct = ProUpgradeIAPManager.sharedInstance.availableProducts[kMonthly];
         NSString * bonusText;
         if(monthlyProduct) {
-            int percentSavings = calculatePercentageSavings(product.price, monthlyProduct.price, 12);
+            int percentSavings = calculatePercentageSavings([self getEffectivePrice:product], [self getEffectivePrice:monthlyProduct], 12);
             bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_with_percentage_saving_fmt", @"%@/month (Save %d%%)"), [self getPriceTextFromProduct:product divisor:12], percentSavings];
         }
         else {
@@ -340,11 +340,21 @@ static NSString* const kFontName =  @"Futura-Bold";
     formatter.locale = product.priceLocale;
     
     NSDecimalNumber* div = [NSDecimalNumber decimalNumberWithMantissa:divisor exponent:0 isNegative:NO];
-    NSDecimalNumber* price = [product.price decimalNumberByDividingBy:div];
+    NSDecimalNumber* price = [[self getEffectivePrice:product] decimalNumberByDividingBy:div];
     
     NSString* localCurrency = [formatter stringFromNumber:price];
     NSString* priceText = [NSString stringWithFormat:@"%@", localCurrency];
     return priceText;
+}
+
+- (NSDecimalNumber*)getEffectivePrice:(SKProduct*)product {
+    if (@available(iOS 11.2, *)) {
+        if(product.introductoryPrice) {
+            return product.introductoryPrice.price;
+        }
+    }
+
+    return product.price;
 }
 
 int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyPrice, int numberOfMonths) {

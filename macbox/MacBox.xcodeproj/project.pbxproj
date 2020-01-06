@@ -11,6 +11,8 @@
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
 		4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
 		4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
+		4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */; };
+		4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */; };
 		4D216F5522CBCCDE000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
 		4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
 		4D216F6B22CBCE0D000954D0 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
@@ -38,6 +40,10 @@
 		4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
 		4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
 		4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
+		4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */; };
+		4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */; };
+		4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */; };
+		4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B08623BFB8AA00BAD0D2 /* NodeDetails.storyboard */; };
 		4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		4D44680C216CE08B00F6358D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
 		4D4A003A2312CC5400B69E09 /* SerializationPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4A00392312CC5400B69E09 /* SerializationPackage.m */; };
@@ -91,14 +97,16 @@
 		4D559F9E20750C2C009856E3 /* SafesMetaDataViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */; };
 		4D559FA520750D1D009856E3 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* SafeMetaData.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
-		4D59DA54224D254100D1D6E4 /* NodeDetailsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59DA53224D254100D1D6E4 /* NodeDetailsWindowController.m */; };
 		4D59DA57224D3C5100D1D6E4 /* CustomFieldTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
+		4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
+		4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */; };
 		4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
 		4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
 		4D8354C6238908AB00E264E0 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87F8AB22304A04006A6320 /* NSData+GZIP.m */; };
+		4D88E6CE23A9190700A75D1F /* FavIconDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88E6CD23A9190700A75D1F /* FavIconDownloader.m */; };
 		4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */; };
 		4D8DE9BB21F898470043DDC0 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */; };
 		4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AF21F898460043DDC0 /* OTPToken+Serialization.m */; };
@@ -107,7 +115,6 @@
 		4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */; };
 		4D8DE9C021F898470043DDC0 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B521F898470043DDC0 /* OTPToken.m */; };
 		4D92C8271F38A03500341A58 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
-		4D9903C4223664D3002C10EE /* MacKeePassHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9903C2223664D3002C10EE /* MacKeePassHistoryController.m */; };
 		4D9903C82237BFDA002C10EE /* MacNodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */; };
 		4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D9E098121825108007BA1E7 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
@@ -160,9 +167,7 @@
 		4DC805A123A116DD001E742E /* SafesMetaDataViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A323A116DD001E742E /* SafesMetaDataViewer.xib */; };
 		4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A623A116E3001E742E /* UpgradeWindowController.xib */; };
 		4DC805A723A116E9001E742E /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A923A116E9001E742E /* ChangeMasterPasswordWindowController.xib */; };
-		4DC805AA23A116F0001E742E /* NodeDetailsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805AC23A116F0001E742E /* NodeDetailsWindowController.xib */; };
 		4DC805AD23A11702001E742E /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805AF23A11702001E742E /* ProgressWindow.xib */; };
-		4DC805B023A1170A001E742E /* KeePassHistoryController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805B223A1170A001E742E /* KeePassHistoryController.xib */; };
 		4DC805B323A1170E001E742E /* SelectPredefinedIconController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805B523A1170E001E742E /* SelectPredefinedIconController.xib */; };
 		4DC805B823A1173D001E742E /* CollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805BA23A1173D001E742E /* CollectionViewHeader.xib */; };
 		4DC805BF23A11749001E742E /* PredefinedKeePassIcon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805C123A11749001E742E /* PredefinedKeePassIcon.xib */; };
@@ -240,6 +245,9 @@
 		4D0835A7228472FC00CA7405 /* KeyDerivationCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyDerivationCipher.h; path = ../model/KeyDerivationCipher.h; sourceTree = "<group>"; };
 		4D0835A82284732500CA7405 /* StrongboxDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = ../model/StrongboxDatabase.h; sourceTree = "<group>"; };
 		4D0835A92284732500CA7405 /* StrongboxDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxDatabase.m; path = ../model/StrongboxDatabase.m; sourceTree = "<group>"; };
+		4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomIconsRationalizer.h; path = ../model/CustomIconsRationalizer.h; sourceTree = "<group>"; };
+		4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomIconsRationalizer.m; path = ../model/CustomIconsRationalizer.m; sourceTree = "<group>"; };
+		4D1E77E323AFEBF4007240FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DownloadFavIcons.storyboard; sourceTree = "<group>"; };
 		4D216F5322CBCCDE000954D0 /* PasswordMaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = ../model/PasswordMaker.h; sourceTree = "<group>"; };
 		4D216F5422CBCCDE000954D0 /* PasswordMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = ../model/PasswordMaker.m; sourceTree = "<group>"; };
 		4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = ../model/PasswordGenerationConfig.m; sourceTree = "<group>"; };
@@ -286,6 +294,26 @@
 		4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = ../../../../../usr/lib/libxml2.2.dylib; sourceTree = "<group>"; };
 		4D2CB4A22332D92900C2E084 /* XmlSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlSerializer.h; path = ../model/keepass/XmlSerializer.h; sourceTree = "<group>"; };
 		4D2CB4A32332D92900C2E084 /* XmlSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlSerializer.m; path = ../model/keepass/XmlSerializer.m; sourceTree = "<group>"; };
+		4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = FavIconResultTableCell.xib; path = MacBox/FavIconResultTableCell.xib; sourceTree = "<group>"; };
+		4D3F190123AE5A2E008A58AF /* FavIconResultTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FavIconResultTableCellView.h; sourceTree = "<group>"; };
+		4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FavIconResultTableCellView.m; sourceTree = "<group>"; };
+		4D40B06E23BFB59800BAD0D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D40B07023BFB5AC00BAD0D2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D40B07223BFB5AE00BAD0D2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D40B07423BFB5AF00BAD0D2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D40B07623BFB5B000BAD0D2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D40B07823BFB85800BAD0D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MacKeePassHistory.storyboard; sourceTree = "<group>"; };
+		4D40B07B23BFB85E00BAD0D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D40B07D23BFB86200BAD0D2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D40B07F23BFB86700BAD0D2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D40B08123BFB86800BAD0D2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D40B08323BFB86A00BAD0D2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D40B08523BFB8AA00BAD0D2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/NodeDetails.storyboard; sourceTree = "<group>"; };
+		4D40B08823BFB8B600BAD0D2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D40B08A23BFB8B800BAD0D2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D40B08C23BFB8B900BAD0D2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D40B08E23BFB8BB00BAD0D2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D40B09023BFB8BD00BAD0D2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/NodeDetails.strings; sourceTree = "<group>"; };
 		4D446804216CDA4400F6358D /* NSArray+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "../model/NSArray+Extensions.h"; sourceTree = "<group>"; };
 		4D446805216CDA4500F6358D /* NSArray+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSArray+Extensions.m"; path = "../model/NSArray+Extensions.m"; sourceTree = "<group>"; };
 		4D44680A216CE08A00F6358D /* Csv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = ../model/Csv.h; sourceTree = "<group>"; };
@@ -394,19 +422,23 @@
 		4D559FA320750D1D009856E3 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = MacBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
 		4D58A459207368B10061E046 /* PreferencesWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PreferencesWindowController.h; path = MacBox/PreferencesWindowController.h; sourceTree = "<group>"; };
 		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PreferencesWindowController.m; path = MacBox/PreferencesWindowController.m; sourceTree = "<group>"; };
-		4D59DA52224D254100D1D6E4 /* NodeDetailsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeDetailsWindowController.h; path = MacBox/NodeDetailsWindowController.h; sourceTree = "<group>"; };
-		4D59DA53224D254100D1D6E4 /* NodeDetailsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeDetailsWindowController.m; path = MacBox/NodeDetailsWindowController.m; sourceTree = "<group>"; };
 		4D59DA55224D3C5100D1D6E4 /* CustomFieldTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldTableCellView.h; path = MacBox/CustomFieldTableCellView.h; sourceTree = "<group>"; };
 		4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldTableCellView.m; path = MacBox/CustomFieldTableCellView.m; sourceTree = "<group>"; };
 		4D5AE1E81F432BBC000A34D7 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = MacBox/Settings.h; sourceTree = "<group>"; };
 		4D5AE1E91F432BBC000A34D7 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = MacBox/Settings.m; sourceTree = "<group>"; };
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
+		4D643B9D23B65075000C383A /* NodeDetailsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeDetailsViewController.h; path = MacBox/NodeDetailsViewController.h; sourceTree = "<group>"; };
+		4D643B9E23B65075000C383A /* NodeDetailsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeDetailsViewController.m; path = MacBox/NodeDetailsViewController.m; sourceTree = "<group>"; };
+		4D643BA323B67E18000C383A /* MacKeePassHistoryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacKeePassHistoryViewController.h; path = MacBox/MacKeePassHistoryViewController.h; sourceTree = "<group>"; };
+		4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacKeePassHistoryViewController.m; path = MacBox/MacKeePassHistoryViewController.m; sourceTree = "<group>"; };
 		4D8354C12389086E00E264E0 /* FavIconManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconManager.h; path = ../model/FavIconManager.h; sourceTree = "<group>"; };
 		4D8354C22389086E00E264E0 /* FavIconManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconManager.m; path = ../model/FavIconManager.m; sourceTree = "<group>"; };
 		4D8354C4238908AB00E264E0 /* FavIcon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FavIcon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D87F8AB22304A04006A6320 /* NSData+GZIP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+GZIP.m"; path = "../lib/GZIP/NSData+GZIP.m"; sourceTree = "<group>"; };
 		4D87F8AC22304A04006A6320 /* NSData+GZIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+GZIP.h"; path = "../lib/GZIP/NSData+GZIP.h"; sourceTree = "<group>"; };
+		4D88E6CC23A9190700A75D1F /* FavIconDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconDownloader.h; path = MacBox/FavIconDownloader.h; sourceTree = "<group>"; };
+		4D88E6CD23A9190700A75D1F /* FavIconDownloader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconDownloader.m; path = MacBox/FavIconDownloader.m; sourceTree = "<group>"; };
 		4D8DE9AA21F898460043DDC0 /* OTPToken+Persistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Persistence.h"; path = "../lib/OneTimePassword/OTPToken+Persistence.h"; sourceTree = "<group>"; };
 		4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+QueryItems.m"; path = "../lib/OneTimePassword/NSURL+QueryItems.m"; sourceTree = "<group>"; };
 		4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OTPToken+Generation.m"; path = "../lib/OneTimePassword/OTPToken+Generation.m"; sourceTree = "<group>"; };
@@ -424,8 +456,6 @@
 		4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+QueryItems.h"; path = "../lib/OneTimePassword/NSURL+QueryItems.h"; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WindowController.h; path = MacBox/WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WindowController.m; path = MacBox/WindowController.m; sourceTree = "<group>"; };
-		4D9903C1223664D3002C10EE /* MacKeePassHistoryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacKeePassHistoryController.h; path = MacBox/MacKeePassHistoryController.h; sourceTree = "<group>"; };
-		4D9903C2223664D3002C10EE /* MacKeePassHistoryController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacKeePassHistoryController.m; path = MacBox/MacKeePassHistoryController.m; sourceTree = "<group>"; };
 		4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacNodeIconHelper.h; path = MacBox/MacNodeIconHelper.h; sourceTree = "<group>"; };
 		4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacNodeIconHelper.m; path = MacBox/MacNodeIconHelper.m; sourceTree = "<group>"; };
 		4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = ../model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = "<group>"; };
@@ -524,19 +554,14 @@
 		4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = starwars_8k_2018.utf8.txt; path = ../resources/wordlists/starwars_8k_2018.utf8.txt; sourceTree = "<group>"; };
 		4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = gameofthrones_8k_2018.utf8.txt; path = ../resources/wordlists/gameofthrones_8k_2018.utf8.txt; sourceTree = "<group>"; };
 		4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = star_trek_8k_2018.utf8.txt; path = ../resources/wordlists/star_trek_8k_2018.utf8.txt; sourceTree = "<group>"; };
-		4DC8059623A115EE001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		4DC8059F23A116D5001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferencesWindowController.xib; sourceTree = "<group>"; };
 		4DC805A223A116DD001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SafesMetaDataViewer.xib; sourceTree = "<group>"; };
 		4DC805A523A116E3001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/UpgradeWindowController.xib; sourceTree = "<group>"; };
 		4DC805A823A116E9001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ChangeMasterPasswordWindowController.xib; sourceTree = "<group>"; };
-		4DC805AB23A116F0001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/NodeDetailsWindowController.xib; sourceTree = "<group>"; };
 		4DC805AE23A11702001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ProgressWindow.xib; sourceTree = "<group>"; };
-		4DC805B123A1170A001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/KeePassHistoryController.xib; sourceTree = "<group>"; };
 		4DC805B423A1170E001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SelectPredefinedIconController.xib; sourceTree = "<group>"; };
-		4DC805B723A11731001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NodeDetailsWindowController.strings; sourceTree = "<group>"; };
 		4DC805B923A1173D001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/CollectionViewHeader.xib; sourceTree = "<group>"; };
 		4DC805BC23A11740001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
-		4DC805BE23A11743001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/KeePassHistoryController.strings; sourceTree = "<group>"; };
 		4DC805C023A11749001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PredefinedKeePassIcon.xib; sourceTree = "<group>"; };
 		4DC805C323A1174D001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
 		4DC805C523A11752001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/AttachmentItem.xib; sourceTree = "<group>"; };
@@ -544,7 +569,6 @@
 		4DC805CB23A1175D001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
 		4DC805CD23A11762001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		4DC805CF23A11766001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
-		4DC805D123A1176A001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
 		4DC805D323A1176E001E742E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/CheckboxCell.xib; sourceTree = "<group>"; };
 		4DC805DC23A11793001E742E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
 		4DC8D9B921B6F391004F1812 /* KeyFileParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeyFileParser.m; path = ../model/keepass/KeyFileParser.m; sourceTree = "<group>"; };
@@ -570,12 +594,10 @@
 		4DE68C4823A53223007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
 		4DE68C4923A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		4DE68C4A23A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
-		4DE68C4B23A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/NodeDetailsWindowController.strings; sourceTree = "<group>"; };
 		4DE68C4C23A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
 		4DE68C4D23A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
 		4DE68C4E23A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
 		4DE68C4F23A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
-		4DE68C5023A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/KeePassHistoryController.strings; sourceTree = "<group>"; };
 		4DE68C5123A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
 		4DE68C5223A53224007C445C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
 		4DE68C5323A53230007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
@@ -584,12 +606,10 @@
 		4DE68C5623A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
 		4DE68C5723A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		4DE68C5823A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
-		4DE68C5923A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/NodeDetailsWindowController.strings; sourceTree = "<group>"; };
 		4DE68C5A23A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
 		4DE68C5B23A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
 		4DE68C5C23A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
 		4DE68C5D23A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
-		4DE68C5E23A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/KeePassHistoryController.strings; sourceTree = "<group>"; };
 		4DE68C5F23A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
 		4DE68C6023A53231007C445C /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
 		4DE68C6123A5324C007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
@@ -598,12 +618,10 @@
 		4DE68C6423A5324C007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
 		4DE68C6523A5324C007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		4DE68C6623A5324C007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
-		4DE68C6723A5324C007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/NodeDetailsWindowController.strings; sourceTree = "<group>"; };
 		4DE68C6823A5324C007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
 		4DE68C6923A5324D007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
 		4DE68C6A23A5324D007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
 		4DE68C6B23A5324D007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
-		4DE68C6C23A5324D007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/KeePassHistoryController.strings; sourceTree = "<group>"; };
 		4DE68C6D23A5324D007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
 		4DE68C6E23A5324D007C445C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
 		4DE68C6F23A53260007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
@@ -612,12 +630,10 @@
 		4DE68C7223A53260007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
 		4DE68C7323A53260007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		4DE68C7423A53260007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
-		4DE68C7523A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/NodeDetailsWindowController.strings; sourceTree = "<group>"; };
 		4DE68C7623A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
 		4DE68C7723A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
 		4DE68C7823A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
 		4DE68C7923A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
-		4DE68C7A23A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/KeePassHistoryController.strings; sourceTree = "<group>"; };
 		4DE68C7B23A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
 		4DE68C7C23A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
 		4DEA5893224BFA7200013808 /* StringValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringValue.h; path = ../model/keepass/StringValue.h; sourceTree = "<group>"; };
@@ -705,9 +721,9 @@
 		4D14A13B224D211400C71ABF /* Node Details */ = {
 			isa = PBXGroup;
 			children = (
-				4D59DA52224D254100D1D6E4 /* NodeDetailsWindowController.h */,
-				4D59DA53224D254100D1D6E4 /* NodeDetailsWindowController.m */,
-				4DC805AC23A116F0001E742E /* NodeDetailsWindowController.xib */,
+				4D40B08623BFB8AA00BAD0D2 /* NodeDetails.storyboard */,
+				4D643B9D23B65075000C383A /* NodeDetailsViewController.h */,
+				4D643B9E23B65075000C383A /* NodeDetailsViewController.m */,
 				4D59DA55224D3C5100D1D6E4 /* CustomFieldTableCellView.h */,
 				4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */,
 				4DC805C923A11756001E742E /* CustomFieldTableCellView.xib */,
@@ -991,8 +1007,15 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4D643BA023B67D48000C383A /* KeePass History */,
 				4D14A13B224D211400C71ABF /* Node Details */,
-				4DF59F651F30DB7A00D68BFE /* Info.plist */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
+				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
+				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
+				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
+				4D88E6CF23A9191000A75D1F /* FavIcon */,
+				4D88E6D023A9249E00A75D1F /* Preferences */,
+				4D88E6D123A924D100A75D1F /* Databases Manager */,
 				4D553B47219DB2E400AA4BAB /* CustomPasswordTextField.h */,
 				4D553B48219DB2E400AA4BAB /* CustomPasswordTextField.m */,
 				4DDCE1C821BBFF7800D1DE09 /* ProgressWindow.h */,
@@ -1001,9 +1024,6 @@
 				4DBCE22422241D6700A2AFA2 /* PredefinedKeePassIcon.h */,
 				4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */,
 				4DC805C123A11749001E742E /* PredefinedKeePassIcon.xib */,
-				4D9903C1223664D3002C10EE /* MacKeePassHistoryController.h */,
-				4D9903C2223664D3002C10EE /* MacKeePassHistoryController.m */,
-				4DC805B223A1170A001E742E /* KeePassHistoryController.xib */,
 				4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */,
 				4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */,
 				4DC805B523A1170E001E742E /* SelectPredefinedIconController.xib */,
@@ -1012,8 +1032,21 @@
 				4DC805BA23A1173D001E742E /* CollectionViewHeader.xib */,
 				4DF299812243CED70080F9DC /* CollectionViewHeader.h */,
 				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
+				4DC805A623A116E3001E742E /* UpgradeWindowController.xib */,
+				4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */,
+				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
 			);
 			name = View;
+			sourceTree = "<group>";
+		};
+		4D643BA023B67D48000C383A /* KeePass History */ = {
+			isa = PBXGroup;
+			children = (
+				4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */,
+				4D643BA323B67E18000C383A /* MacKeePassHistoryViewController.h */,
+				4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */,
+			);
+			name = "KeePass History";
 			sourceTree = "<group>";
 		};
 		4D87F8AA223049EB006A6320 /* GZIP */ = {
@@ -1023,6 +1056,43 @@
 				4D87F8AB22304A04006A6320 /* NSData+GZIP.m */,
 			);
 			name = GZIP;
+			sourceTree = "<group>";
+		};
+		4D88E6CF23A9191000A75D1F /* FavIcon */ = {
+			isa = PBXGroup;
+			children = (
+				4DC8058B23A113EC001E742E /* FavIconDownloadOptions.h */,
+				4DC8058A23A113EC001E742E /* FavIconDownloadOptions.m */,
+				4D8354C12389086E00E264E0 /* FavIconManager.h */,
+				4D8354C22389086E00E264E0 /* FavIconManager.m */,
+				4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */,
+				4D88E6CC23A9190700A75D1F /* FavIconDownloader.h */,
+				4D88E6CD23A9190700A75D1F /* FavIconDownloader.m */,
+				4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */,
+				4D3F190123AE5A2E008A58AF /* FavIconResultTableCellView.h */,
+				4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */,
+			);
+			name = FavIcon;
+			sourceTree = "<group>";
+		};
+		4D88E6D023A9249E00A75D1F /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				4DC805A023A116D5001E742E /* PreferencesWindowController.xib */,
+				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
+				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
+			);
+			name = Preferences;
+			sourceTree = "<group>";
+		};
+		4D88E6D123A924D100A75D1F /* Databases Manager */ = {
+			isa = PBXGroup;
+			children = (
+				4DC805A323A116DD001E742E /* SafesMetaDataViewer.xib */,
+				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
+				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
+			);
+			name = "Databases Manager";
 			sourceTree = "<group>";
 		};
 		4D8DE9A921F898240043DDC0 /* OneTimePassword */ = {
@@ -1145,17 +1215,6 @@
 			name = MyAutoComplete;
 			sourceTree = "<group>";
 		};
-		4DC8058923A1136B001E742E /* FavIcon */ = {
-			isa = PBXGroup;
-			children = (
-				4DC8058B23A113EC001E742E /* FavIconDownloadOptions.h */,
-				4DC8058A23A113EC001E742E /* FavIconDownloadOptions.m */,
-				4D8354C12389086E00E264E0 /* FavIconManager.h */,
-				4D8354C22389086E00E264E0 /* FavIconManager.m */,
-			);
-			name = FavIcon;
-			sourceTree = "<group>";
-		};
 		4DD2BAB6238BE42600513271 /* Base32 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1196,6 +1255,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
+				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
 				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
 				4D2CB4A32332D92900C2E084 /* XmlSerializer.m */,
 				4D2CB4992332D82D00C2E084 /* KeePassXmlParser.h */,
@@ -1205,8 +1266,6 @@
 				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
 				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
-				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
-				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
 				4D0835A4228472D200CA7405 /* UiAttachment.h */,
 				4D0835A5228472D200CA7405 /* UiAttachment.m */,
 				4DBFD385225CFE2F00290488 /* NSDictionary+Extensions.h */,
@@ -1255,6 +1314,8 @@
 				4DF347FB2074FA6C00148741 /* Utils.m */,
 				4D4A00382312CC5400B69E09 /* SerializationPackage.h */,
 				4D4A00392312CC5400B69E09 /* SerializationPackage.m */,
+				4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */,
+				4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -1263,34 +1324,21 @@
 			isa = PBXGroup;
 			children = (
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
-				4DC805D423A1176E001E742E /* CheckboxCell.xib */,
-				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
-				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
-				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
-				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
-				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
-				4DC805A023A116D5001E742E /* PreferencesWindowController.xib */,
-				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
 				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
-				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
 				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
+				4D524D2B219B503F00C22CB4 /* View */,
 				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
 				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
 				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
 				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
 				4D92C8251F38A03500341A58 /* WindowController.h */,
 				4D92C8261F38A03500341A58 /* WindowController.m */,
-				4DC805A323A116DD001E742E /* SafesMetaDataViewer.xib */,
-				4D559F9B20750C2C009856E3 /* SafesMetaDataViewer.h */,
-				4D559F9C20750C2C009856E3 /* SafesMetaDataViewer.m */,
-				4DC8058923A1136B001E742E /* FavIcon */,
+				4DF59F651F30DB7A00D68BFE /* Info.plist */,
 				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4DFC06D5226467AA00A4254A /* libs */,
 				4DF59F531F30DB7A00D68BFE /* MacBox */,
-				4D524D2B219B503F00C22CB4 /* View */,
 				4D9E0948218250F6007BA1E7 /* KeePass */,
 				4DF347EF2074FA5A00148741 /* Model */,
 				4DF347D52074FA1D00148741 /* PwSafe */,
@@ -1317,10 +1365,12 @@
 		4DF59F531F30DB7A00D68BFE /* MacBox */ = {
 			isa = PBXGroup;
 			children = (
+				4DC805D423A1176E001E742E /* CheckboxCell.xib */,
+				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
+				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
 				4DBCE22D2224438800A2AFA2 /* KSPasswordField.h */,
 				4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */,
 				4DF59F571F30DB7A00D68BFE /* Supporting Files */,
-				4DC805A623A116E3001E742E /* UpgradeWindowController.xib */,
 				4DC805A923A116E9001E742E /* ChangeMasterPasswordWindowController.xib */,
 				4DEAEC261F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.h */,
 				4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */,
@@ -1328,8 +1378,6 @@
 				4D00B1F71F3DB03300D7560B /* Alerts.m */,
 				4D5AE1E81F432BBC000A34D7 /* Settings.h */,
 				4D5AE1E91F432BBC000A34D7 /* Settings.m */,
-				4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */,
-				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
 				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
 				4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */,
 				4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */,
@@ -1487,6 +1535,7 @@
 				4DC805D223A1176E001E742E /* CheckboxCell.xib in Resources */,
 				4DC8059123A11493001E742E /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */,
 				4DC805B823A1173D001E742E /* CollectionViewHeader.xib in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
@@ -1494,7 +1543,6 @@
 				4DC805B323A1170E001E742E /* SelectPredefinedIconController.xib in Resources */,
 				4DC805C423A11752001E742E /* AttachmentItem.xib in Resources */,
 				4DC8059423A11493001E742E /* star_trek_8k_2018.utf8.txt in Resources */,
-				4DC805AA23A116F0001E742E /* NodeDetailsWindowController.xib in Resources */,
 				4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DC805BF23A11749001E742E /* PredefinedKeePassIcon.xib in Resources */,
@@ -1502,13 +1550,14 @@
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */,
+				4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */,
 				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
 				4DC8059223A11493001E742E /* starwars_8k_2018.utf8.txt in Resources */,
 				4DC805AD23A11702001E742E /* ProgressWindow.xib in Resources */,
 				4DC8059323A11493001E742E /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
+				4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
-				4DC805B023A1170A001E742E /* KeePassHistoryController.xib in Resources */,
 				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DC805A723A116E9001E742E /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,
@@ -1519,6 +1568,7 @@
 				4D216F7122CBCE0D000954D0 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
 				4D216F6E22CBCE0D000954D0 /* eff_large_wordlist.utf8.txt in Resources */,
+				4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */,
 				4DC805A123A116DD001E742E /* SafesMetaDataViewer.xib in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
 			);
@@ -1601,6 +1651,8 @@
 				4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
 				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
+				4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */,
+				4D88E6CE23A9190700A75D1F /* FavIconDownloader.m in Sources */,
 				4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */,
 				4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
@@ -1629,6 +1681,7 @@
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */,
+				4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */,
 				4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */,
 				4D524D0A219B490100C22CB4 /* NodeFileAttachment.m in Sources */,
 				4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */,
@@ -1650,7 +1703,7 @@
 				4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
-				4D9903C4223664D3002C10EE /* MacKeePassHistoryController.m in Sources */,
+				4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
 				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
@@ -1689,7 +1742,6 @@
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,
 				4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
-				4D59DA54224D254100D1D6E4 /* NodeDetailsWindowController.m in Sources */,
 				4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
 				4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */,
@@ -1712,6 +1764,7 @@
 				4D524CEC219B481200C22CB4 /* ChaCha20Cipher.m in Sources */,
 				4D59DA57224D3C5100D1D6E4 /* CustomFieldTableCellView.m in Sources */,
 				4DE0CB712232C0F200E109F9 /* History.m in Sources */,
+				4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */,
 				4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */,
@@ -1749,6 +1802,48 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D1E77E323AFEBF4007240FA /* Base */,
+				4D40B06E23BFB59800BAD0D2 /* en */,
+				4D40B07023BFB5AC00BAD0D2 /* fr */,
+				4D40B07223BFB5AE00BAD0D2 /* de */,
+				4D40B07423BFB5AF00BAD0D2 /* ru */,
+				4D40B07623BFB5B000BAD0D2 /* uk */,
+			);
+			name = DownloadFavIcons.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D40B07823BFB85800BAD0D2 /* Base */,
+				4D40B07B23BFB85E00BAD0D2 /* en */,
+				4D40B07D23BFB86200BAD0D2 /* fr */,
+				4D40B07F23BFB86700BAD0D2 /* de */,
+				4D40B08123BFB86800BAD0D2 /* ru */,
+				4D40B08323BFB86A00BAD0D2 /* uk */,
+			);
+			name = MacKeePassHistory.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		4D40B08623BFB8AA00BAD0D2 /* NodeDetails.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D40B08523BFB8AA00BAD0D2 /* Base */,
+				4D40B08823BFB8B600BAD0D2 /* en */,
+				4D40B08A23BFB8B800BAD0D2 /* fr */,
+				4D40B08C23BFB8B900BAD0D2 /* de */,
+				4D40B08E23BFB8BB00BAD0D2 /* ru */,
+				4D40B09023BFB8BD00BAD0D2 /* uk */,
+			);
+			name = NodeDetails.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
 		4D4A003B231317A900B69E09 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1761,7 +1856,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DC8059F23A116D5001E742E /* Base */,
-				4DC805D123A1176A001E742E /* en */,
 				4DE68C4723A53223007C445C /* fr */,
 				4DE68C5523A53230007C445C /* de */,
 				4DE68C6323A5324C007C445C /* uk */,
@@ -1813,20 +1907,6 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
-		4DC805AC23A116F0001E742E /* NodeDetailsWindowController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4DC805AB23A116F0001E742E /* Base */,
-				4DC805B723A11731001E742E /* en */,
-				4DE68C4B23A53224007C445C /* fr */,
-				4DE68C5923A53231007C445C /* de */,
-				4DE68C6723A5324C007C445C /* uk */,
-				4DE68C7523A53261007C445C /* ru */,
-			);
-			name = NodeDetailsWindowController.xib;
-			path = MacBox;
-			sourceTree = "<group>";
-		};
 		4DC805AF23A11702001E742E /* ProgressWindow.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1838,20 +1918,6 @@
 				4DE68C7823A53261007C445C /* ru */,
 			);
 			name = ProgressWindow.xib;
-			path = MacBox;
-			sourceTree = "<group>";
-		};
-		4DC805B223A1170A001E742E /* KeePassHistoryController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4DC805B123A1170A001E742E /* Base */,
-				4DC805BE23A11743001E742E /* en */,
-				4DE68C5023A53224007C445C /* fr */,
-				4DE68C5E23A53231007C445C /* de */,
-				4DE68C6C23A5324D007C445C /* uk */,
-				4DE68C7A23A53261007C445C /* ru */,
-			);
-			name = KeePassHistoryController.xib;
 			path = MacBox;
 			sourceTree = "<group>";
 		};
@@ -1939,7 +2005,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DF59F631F30DB7A00D68BFE /* Base */,
-				4DC8059623A115EE001E742E /* en */,
 				4DE68C4623A53223007C445C /* fr */,
 				4DE68C5423A53230007C445C /* de */,
 				4DE68C6223A5324C007C445C /* uk */,
@@ -2114,13 +2179,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2658;
+				CURRENT_PROJECT_VERSION = 2662;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.11.3;
+				MARKETING_VERSION = 1.12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2136,13 +2201,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2658;
+				CURRENT_PROJECT_VERSION = 2662;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.11.3;
+				MARKETING_VERSION = 1.12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

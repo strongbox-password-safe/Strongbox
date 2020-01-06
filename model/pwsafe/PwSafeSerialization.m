@@ -253,7 +253,7 @@
 
 + (PasswordSafe3Header)getHeader:(NSData*)data {
     PasswordSafe3Header ret;
-    
+        
     [data getBytes:&ret length:SIZE_OF_PASSWORD_SAFE_3_HEADER];
     
     return ret;

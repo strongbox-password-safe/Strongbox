@@ -25,14 +25,19 @@
 #import "ProgressWindow.h"
 #import "SelectPredefinedIconController.h"
 #import "KeePassPredefinedIcons.h"
-#import "MacKeePassHistoryController.h"
+#import "MacKeePassHistoryViewController.h"
 #import "MacNodeIconHelper.h"
 #import "OTPToken+Generation.h"
-#import "NodeDetailsWindowController.h"
+
 #import "MBProgressHUD.h"
 #import "CustomFieldTableCellView.h"
 #import "SearchScope.h"
 #import <WebKit/WebKit.h>
+#import "FavIconDownloader.h"
+#import "FavIconManager.h"
+
+#import "NodeDetailsViewController.h"
+
 
 const int kMaxRecommendCustomIconSize = 128*1024;
 const int kMaxCustomIconDimension = 256;
@@ -40,9 +45,8 @@ const int kMaxCustomIconDimension = 256;
 static NSString* const kPasswordCellIdentifier = @"CustomFieldValueCellIdentifier";
 static NSString* const kDefaultNewTitle = @"Untitled";
 
-@interface ViewController ()
+@interface ViewController () <NSWindowDelegate>
 
-@property (strong, nonatomic) MacKeePassHistoryController *keePassHistoryController;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) ProgressWindow* progressWindow;
@@ -54,7 +58,6 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property NSFont* italicFont;
 @property NSFont* regularFont;
 
-@property NSMutableDictionary<NSUUID*, NodeDetailsWindowController*>* detailsWindowControllers; // Required to keep a hold of these window objects or actions don't work!
 @property (weak) IBOutlet NSTextField *labelTitle;
 @property (weak) IBOutlet NSTextField *labelUsername;
 @property (weak) IBOutlet NSTextField *labelEmail;
@@ -73,6 +76,11 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (weak) IBOutlet NSTableView *customFieldsTable;
 @property NSArray* customFields;
 
+
+@property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
+
+@property NSDate* lastAutoPromptForTouchIdThrottle; // HACK: Sigh
+
 @end
 
 static NSImage* kStrongBox256Image;
@@ -85,68 +93,10 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-- (void)viewDidAppear {
-    [super viewDidAppear];
-    
-    [self initializeFullOrTrialOrLiteUI];
-    
-    [self setInitialFocus];
-    
-    [self startRefreshOtpTimer];
-}
-
-- (void)viewDidDisappear {
-    [super viewDidDisappear];
-
-    [self stopRefreshOtpTimer];
-
-    [self closeAllDetailsWindows];
-}
-
-- (void)closeAllDetailsWindows {
-    for (NodeDetailsWindowController *wc in [self.detailsWindowControllers.allValues copy]) { // Copy as race condition of windows closing and calling into us will lead to crash
-        [wc close];
-    }
-
-    [self.detailsWindowControllers removeAllObjects];
-}
-
-- (IBAction)onViewItemDetails:(id)sender {
-    [self showItemDetails];
-}
-
-- (void)showItemDetails {
-    Node* item = [self getCurrentSelectedItem];
-    [self openItemDetails:item newEntry:NO];
-}
-
-- (void)openItemDetails:(Node*)item newEntry:(BOOL)newEntry {
-    if(!item || item.isGroup) {
-        return;
-    }
-    
-    NodeDetailsWindowController* wc = self.detailsWindowControllers[item.uuid];
-    
-    if(wc)
-    {
-        NSLog(@"Details window already exists... Activating... [%@]", wc);
-        [wc showWindow:nil];
-    }
-    else {
-        wc = [NodeDetailsWindowController showNode:item model:self.model newEntry:newEntry historical:NO onClosed:^{
-            NSLog(@"Removing Details WindowController to List: [%@]", wc);
-            [self.detailsWindowControllers removeObjectForKey:item.uuid];
-        }];
-        
-        NSLog(@"Adding Details WindowController to List: [%@]", wc);
-        self.detailsWindowControllers[item.uuid] = wc;
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.detailsWindowControllers = [NSMutableDictionary dictionary];
+    self.detailsViewControllers = @{}.mutableCopy;
     
     [self enableDragDrop];
 
@@ -158,11 +108,121 @@ static NSImage* kStrongBox256Image;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
 }
 
+- (void)viewDidAppear {
+    NSLog(@"viewDidAppear...");
+    
+    [super viewDidAppear];
+    
+    self.view.window.delegate = self;
+    
+    [self initializeFullOrTrialOrLiteUI];
+    
+    [self setInitialFocus];
+    
+    [self startRefreshOtpTimer];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)notification {
+    NSLog(@"[%@] Window Became Key!", [self getDatabaseMetaData].nickName);
+
+    // MMcG: Seems to be unfortunately required - as key window is not set if we call straight away... hack :(
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self autoPromptForTouchIdIfDesired];
+    });
+}
+
+- (void)viewDidDisappear {
+    [super viewDidDisappear];
+
+    [self stopRefreshOtpTimer];
+
+    [self closeAllDetailsWindows];
+}
+
+- (void)closeAllDetailsWindows {
+    // Copy as race condition of windows closing and calling into us will lead to crash
+
+    NSArray<NodeDetailsViewController*>* vcs = [self.detailsViewControllers.allValues copy];
+        
+    for (NodeDetailsViewController *vc in vcs) {
+        [vc close];
+    }
+
+    [self.detailsViewControllers removeAllObjects];
+}
+
+- (IBAction)onViewItemDetails:(id)sender {
+    [self showItemDetails];
+}
+
+- (void)showItemDetails {
+    Node* item = [self getCurrentSelectedItem];
+    [self openItemDetails:item newEntry:NO];
+}
+
+static NSString* const kItemKey = @"item";
+static NSString* const kNewEntryKey = @"newEntry";
+
+- (void)openItemDetails:(Node*)item newEntry:(BOOL)newEntry {
+    if(!item || item.isGroup) {
+        return;
+    }
+    
+    NodeDetailsViewController* vc = self.detailsViewControllers[item.uuid];
+    
+    if(vc) {
+        NSLog(@"Details window already exists... Activating... [%@]", item.title);
+        [vc.view.window makeKeyAndOrderFront:nil];
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToShowItemDetails" sender:@{ kItemKey : item, kNewEntryKey : @(newEntry)}];
+    }
+}
+
+- (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
+    NSDictionary<NSString*, id> *params = sender;
+    Node* item = params[kItemKey];
+
+    if([segue.identifier isEqualToString:@"segueToShowItemDetails"]) {
+        NSNumber* newEntry = params[kNewEntryKey];
+        
+        NodeDetailsViewController* vc = (NodeDetailsViewController*)segue.destinationController;
+        
+        vc.node = item;
+        vc.model = self.model;
+        vc.newEntry = newEntry.boolValue;
+        vc.historical = NO;
+        
+        vc.onClosed = ^{
+            NSLog(@"Removing Details View from List: [%@]", item.title);
+            [self.detailsViewControllers removeObjectForKey:item.uuid];
+        };
+        
+        NSLog(@"Adding Details View to List: [%@]", item.title);
+        
+        self.detailsViewControllers[item.uuid] = vc;
+    }
+    else if([segue.identifier isEqualToString:@"segueToItemHistory"]) {
+        MacKeePassHistoryViewController* vc = (MacKeePassHistoryViewController*)segue.destinationController;
+        
+        vc.onDeleteHistoryItem = ^(Node * _Nonnull node) {
+            [self.model deleteHistoryItem:item historicalItem:node];
+        };
+        vc.onRestoreHistoryItem = ^(Node * _Nonnull node) {
+            [self.model restoreHistoryItem:item historicalItem:node];
+        };
+        
+        vc.model = self.model;
+        vc.history = item.fields.keePassHistory;
+    }
+}
+
 - (void)customizeUi {
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
-    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@");
+    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch"); // TODO: if only one method available then word this more precisely
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     self.buttonUnlockWithTouchId.hidden = YES;
@@ -196,7 +256,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)customizeOutlineView {
-    // TODO: Sorting...
+    // FUTURE: Sorting...
     //self.outlineView.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES] ];
     
     NSNib* nib = [[NSNib alloc] initWithNibNamed:@"CustomFieldTableCellView" bundle:nil];
@@ -360,7 +420,11 @@ static NSImage* kStrongBox256Image;
 
 - (void)onItemIconChanged:(NSNotification*)notification {
     NSString *loc = NSLocalizedString(@"generic_fieldname_icon", @"Icon");
-    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
+    
+    NSNumber* foo = (NSNumber*)notification.userInfo[kNotificationUserInfoKeyIsBatchIconUpdate];
+    
+    
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc suppressPopupMessage:foo == nil || foo.boolValue == YES];
 }
 
 - (void)onItemTitleChanged:(NSNotification*)notification {
@@ -386,6 +450,31 @@ static NSImage* kStrongBox256Image;
 - (void)onItemUrlChanged:(NSNotification*)notification {
     NSString *loc = NSLocalizedString(@"generic_fieldname_url", @"URL");
     [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
+
+    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
+
+    [self expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:node];
+}
+
+- (void)expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:(Node*)node {
+    NSURL* url = [NSURL URLWithString:node.fields.url];
+        
+    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+
+    if(url && featureAvailable && Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
+            [FavIconManager.sharedInstance downloadPreferred:url
+                                                     options:FavIconDownloadOptions.express
+                                                  completion:^(IMAGE_TYPE_PTR  _Nullable image) {
+                if(image) {
+                    NSLog(@"Got FavIcon on Change URL or New Entry: [%@]", image);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.model setItemIcon:node customImage:image];
+                    });
+                }
+            }];
+        });
+    }
 }
 
 - (void)onItemNotesChanged:(NSNotification*)notification {
@@ -409,6 +498,10 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)genericReloadOnUpdateAndMaintainSelection:(NSNotification*)notification popupMessage:(NSString*)popupMessage {
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:popupMessage suppressPopupMessage:NO];
+}
+
+- (void)genericReloadOnUpdateAndMaintainSelection:(NSNotification*)notification popupMessage:(NSString*)popupMessage suppressPopupMessage:(BOOL)suppressPopupMessage {
     if(notification.object != self.model) {
         return;
     }
@@ -424,24 +517,13 @@ static NSImage* kStrongBox256Image;
             [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         }
     }
-    Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
-
-    NSString *loc = NSLocalizedString(@"mac_field_changed_popup_notification_fmt", @"'%@' %@ Changed... First parameter Title of Item, second parameter which field changed, e.g. Username or Password");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, node.title, popupMessage]];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (BOOL)biometricOpenIsAvailableForSafe {
-    SafeMetaData* metaData = [self getDatabaseMetaData];
     
-    BOOL ret =  (metaData == nil ||
-            !metaData.isTouchIdEnabled ||
-            !(metaData.touchIdPassword || metaData.touchIdKeyFileDigest) ||
-            !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
-    !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
+    if(!suppressPopupMessage) {
+        Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
 
-    return !ret;
+        NSString *loc = NSLocalizedString(@"mac_field_changed_popup_notification_fmt", @"'%@' %@ Changed... First parameter Title of Item, second parameter which field changed, e.g. Username or Password");
+        [self showPopupToastNotification:[NSString stringWithFormat:loc, node.title, popupMessage]];
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -451,7 +533,7 @@ static NSImage* kStrongBox256Image;
         return nil;
     }
     
-    // TODO: Check Storage type when impl sftp or webdav
+    // FUTURE: Check Storage type when impl sftp or webdav
     
     return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
         return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
@@ -493,21 +575,6 @@ static NSImage* kStrongBox256Image;
     });
 }
 
-- (void)autoPromptForTouchIdIfDesired {
-    if(self.model && self.model.locked) {
-        if([self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) { 
-            NSLog(@"autoPromptForTouchIdIfDesired: GOOD Prompting...");
-            [self onUnlockWithTouchId:nil];
-        }
-        else {
-            NSLog(@"autoPromptForTouchIdIfDesired: Biometric not available or Auto Prompt configured Off...");
-        }
-    }
-    else {
-        NSLog(@"autoPromptForTouchIdIfDesired: Model not in LOCKED state, ignoring");
-    }
-}
-
 - (void)bindToModel {
     [self stopObservingModelChanges];
     [self closeAllDetailsWindows];
@@ -516,19 +583,7 @@ static NSImage* kStrongBox256Image;
     
     if(self.model == nil || self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
-        
-        if(![self biometricOpenIsAvailableForSafe]) {
-            self.buttonUnlockWithTouchId.hidden = YES;
-            
-            //[self.buttonUnlockWithPassword setKeyEquivalent:@""];
-            //[self.buttonUnlockWithPassword setKeyEquivalent:@"\r"];
-        }
-        else {
-            self.buttonUnlockWithTouchId.hidden = NO;
-
-            //[self.buttonUnlockWithTouchId setKeyEquivalent:@""];
-            [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
-        }
+        [self bindBiometricButtonsOnLockScreen];
     }
     else {
         [self startObservingModelChanges];
@@ -541,6 +596,16 @@ static NSImage* kStrongBox256Image;
         [self selectItem:selectedItem];
         
         [self bindDetailsPane];
+    }
+}
+
+- (void)bindBiometricButtonsOnLockScreen {
+    if(![self biometricOpenIsAvailableForSafe]) {
+        self.buttonUnlockWithTouchId.hidden = YES;
+            }
+    else {
+        self.buttonUnlockWithTouchId.hidden = NO;
+        [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
     }
 }
 
@@ -968,7 +1033,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors {
-    // TODO: Sorting...
+    // FUTURE: Sorting...
     NSLog(@"sortDescriptors did change!");
 }
 
@@ -1189,38 +1254,70 @@ static NSImage* kStrongBox256Image;
     [self reloadAndUnlock:ckf isBiometricOpen:NO];
 }
 
-- (IBAction)onUnlockWithTouchId:(id)sender {
-    if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-        SafeMetaData *metadata = [self getDatabaseMetaData];
-        
-        if(metadata && metadata.isTouchIdEnabled && (metadata.touchIdPassword || metadata.touchIdKeyFileDigest)) {
-            [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if(success) {
-                        CompositeKeyFactors* ckf = [CompositeKeyFactors password:metadata.touchIdPassword keyFileDigest:metadata.touchIdKeyFileDigest];
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                        [self reloadAndUnlock:ckf isBiometricOpen:YES];
+- (BOOL)biometricOpenIsAvailableForSafe {
+    SafeMetaData* metaData = [self getDatabaseMetaData];
+    
+    BOOL ret =  (metaData == nil ||
+            !metaData.isTouchIdEnabled ||
+            !(metaData.touchIdPassword || metaData.touchIdKeyFileDigest) ||
+            !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
+    !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
+
+    return !ret;
+}
+
+- (void)autoPromptForTouchIdIfDesired {
+    if(self.model && self.model.locked) {
+        BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
+                
+        if(weAreKeyWindow && [self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) {
+            NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.lastAutoPromptForTouchIdThrottle];
+//            NSLog(@"seconds: %f", secondsBetween);
+            if(self.lastAutoPromptForTouchIdThrottle != nil && secondsBetween < 1.5) {
+                NSLog(@"Too many auto biometric requests too soon - ignoring...");
+                return;
+            }
+
+            [self onUnlockWithTouchId:nil];
+        }
+    }
+}
+
+- (IBAction)onUnlockWithTouchId:(id)sender {
+    if([self biometricOpenIsAvailableForSafe]) {
+        [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.lastAutoPromptForTouchIdThrottle = NSDate.date;
+
+                if(success) {
+                    SafeMetaData* metaData = [self getDatabaseMetaData];
+                    CompositeKeyFactors* ckf = [CompositeKeyFactors password:metaData.touchIdPassword keyFileDigest:metaData.touchIdKeyFileDigest];
+
+                    [self reloadAndUnlock:ckf isBiometricOpen:YES];
+                }
+                else {
+                    NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
+                    
+                    if(error && (error.code == LAErrorUserFallback || error.code == LAErrorUserCancel || error.code == -2412)) {
+                        NSLog(@"User cancelled or selected fallback. Ignore...");
                     }
                     else {
-                        NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
-                        
-                        if(error && (error.code == LAErrorUserFallback || error.code == LAErrorUserCancel)) {
-                            NSLog(@"User cancelled or selected fallback. Ignore...");
-                        }
-                        else {
-                            [Alerts error:error window:self.view.window];
-                        }
+                        [Alerts error:error window:self.view.window];
                     }
-                });}];
-        }
-        else {
-            NSLog(@"Touch ID button pressed but no Touch ID Stored?");
-            NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared.");
-            [Alerts info:loc window:self.view.window];
-            
-            if(metadata) {
-                [SafesList.sharedInstance remove:metadata.uuid];
-            }
+                }
+            });
+        }];
+    }
+    else if(BiometricIdHelper.sharedInstance.biometricIdAvailable) { // Don't clear if user has just disabled Bio-Id / Watch
+        NSLog(@"Touch ID button pressed but no Touch ID Stored?");
+        NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared.");
+        [Alerts info:loc window:self.view.window];
+        
+        SafeMetaData* metaData = [self getDatabaseMetaData];
+        if(metaData) {
+            [SafesList.sharedInstance remove:metaData.uuid];
         }
     }
 }
@@ -1319,8 +1416,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
         [Alerts error:loc error:error window:self.view.window];
     }
-    
-    self.isPromptingAboutUnderlyingFileChange = NO;// Reset in case we ended up here by auto reload
 }
 
 - (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors safeMetaData:(SafeMetaData*)safeMetaData {
@@ -2264,7 +2359,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         NSString* b64Data = customIconsMap[original.UUIDString];
         NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
         
-        [self.model setItemIcon:node index:nil existingCustom:nil custom:data rationalize:NO]; // Make sure not to rationalize
+        [self.model setItemIcon:node index:nil existingCustom:nil custom:data rationalize:NO batchUpdate:NO]; // Make sure not to rationalize
     }
     
     // Recurse into children
@@ -2337,7 +2432,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
     if(newRecord) {
         [self openItemDetails:node newEntry:YES];
-    }
+    }    
 }
 
 - (IBAction)onDelete:(id)sender {
@@ -2400,16 +2495,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
 }
 
-- (IBAction)onCopyDiagnosticDump:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    
-    NSString *dump = [self.model description];
-    
-    [[NSPasteboard generalPasteboard] setString:dump forType:NSStringPboardType];
-}
-
-- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
-{
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
     SEL theAction = [anItem action];
     
     Node* item = [self getCurrentSelectedItem];
@@ -2445,7 +2531,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     else if (theAction == @selector(onChangeMasterPassword:) ||
              theAction == @selector(onCopyAsCsv:) ||
-             theAction == @selector(onCopyDiagnosticDump:) ||
              theAction == @selector(onImportFromCsvFile:) ||
              theAction == @selector(onLock:)) {
         return self.model && !self.model.locked;
@@ -2513,7 +2598,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else if(theAction == @selector(onPrintDatabase:)) {
         return self.model && !self.model.locked;
     }
-    
+    else if (theAction == @selector(onDownloadFavIcons:)) {
+        return !self.model.locked && (item == nil || ((self.model.format == kKeePass || self.model.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
+    }
+
     return YES;
 }
 
@@ -2645,16 +2733,22 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        Node* currentSelection = [self getCurrentSelectedItem];
-        
-        self.itemsCache = nil; // Clear items cache
-        
-        [self bindColumnsToSettings];
-        [self customizeOutlineView];
-        
-        [self.outlineView reloadData];
-        
-        [self selectItem:currentSelection];
+        if(self.model == nil || self.model.locked) {
+            [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
+            [self bindBiometricButtonsOnLockScreen]; // User may have enabled/disabled Watch open
+        }
+        else {
+            Node* currentSelection = [self getCurrentSelectedItem];
+                  
+            self.itemsCache = nil; // Clear items cache
+
+            [self bindColumnsToSettings];
+            [self customizeOutlineView];
+
+            [self.outlineView reloadData];
+
+            [self selectItem:currentSelection];
+        }
     });
 }
 
@@ -2751,9 +2845,15 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
     self.selectPredefinedIconController.customIcons = self.model.customIcons;
     self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
-    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data, NSUUID * _Nullable existingCustom) {
-        onSelectedNewIcon(weakSelf.model, item, index, data, existingCustom, weakSelf.view.window);
+    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data, NSUUID * _Nullable existingCustom, BOOL showFindFavIcons) {
+        if(showFindFavIcons) {
+            [weakSelf showFindFavIconsForItem:item];
+        }
+        else {
+            onSelectedNewIcon(weakSelf.model, item, index, data, existingCustom, weakSelf.view.window);
+        }
     };
+
     
     [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
 }
@@ -2815,21 +2915,8 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
        (!(self.model.format == kKeePass || self.model.format == kKeePass4))) {
         return;
     }
-    
-    self.keePassHistoryController = [[MacKeePassHistoryController alloc] initWithWindowNibName:@"KeePassHistoryController"];
 
-    __weak ViewController* weakSelf = self;
-    self.keePassHistoryController.onDeleteHistoryItem = ^(Node * _Nonnull node) {
-        [weakSelf.model deleteHistoryItem:item historicalItem:node];
-    };
-    self.keePassHistoryController.onRestoreHistoryItem = ^(Node * _Nonnull node) {
-        [weakSelf.model restoreHistoryItem:item historicalItem:node];
-    };
-    
-    self.keePassHistoryController.model = self.model;
-    self.keePassHistoryController.history = item.fields.keePassHistory; 
-    
-    [self.view.window beginSheet:self.keePassHistoryController.window completionHandler:nil];
+    [self performSegueWithIdentifier:@"segueToItemHistory" sender:@{ kItemKey : item }];
 }
 
 - (IBAction)refreshOtpCode:(id)sender {
@@ -2983,6 +3070,22 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
                                   
         [printOp runOperation];
     });
+}
+
+- (IBAction)onDownloadFavIcons:(id)sender {
+    Node* item = [self getCurrentSelectedItem];
+
+    [self showFindFavIconsForItem:item];
+}
+
+- (void)showFindFavIconsForItem:(Node*)item {
+    NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.model.rootGroup.allChildRecords;
+    
+    [FavIconDownloader showUi:self nodes:items viewModel:self.model onDone:^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
+        if(go) {
+            [self.model batchSetIcons:selectedFavIcons];
+        }
+    }];
 }
 
 @end

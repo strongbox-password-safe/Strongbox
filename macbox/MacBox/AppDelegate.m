@@ -26,6 +26,12 @@ NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
 NSString* const kDragAndDropInternalUti = @"com.markmcguill.strongbox.drag.and.drop.internal.uti";
 NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.drop.external.uti";
 
+static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
+//static const NSInteger kTopLevelMenuItemTagFile = 1111;
+//static const NSInteger kTopLevelMenuItemTagEdit = 1112;
+static const NSInteger kTopLevelMenuItemTagView = 1113;
+//static const NSInteger kTopLevelMenuItemTagDatabase = 1114;
+
 @interface AppDelegate ()
 
 @property (strong) IBOutlet NSMenu *systemTraymenu;
@@ -60,8 +66,6 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
     [self performMigrations];
     
     [self removeUnwantedMenuItems];
-    [self removeCopyDiagnosticDumpItem];
-    [self removeShowSafesMetaDataItem];
     
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
@@ -89,7 +93,10 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 
     self.applicationHasFinishedLaunching = YES;
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onPreferencesChanged:)
+                                                 name:kPreferencesChangedNotification
+                                               object:nil];
 }
 
 - (void)showHideSystemStatusBarIcon {
@@ -179,29 +186,30 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
         self.autoLockWorkBlock = nil;
     }
 
-    ViewController* viewController = [self getActiveViewController];
-    if(viewController) {
-        [viewController autoPromptForTouchIdIfDesired];
-    }
+//    ViewController* viewController = [self getActiveViewController];
+//    if(viewController) { // && !BiometricIdHelper.sharedInstance.biometricsInProgress) {
+//        NSLog(@"Activated!");
+////        [viewController autoPromptForTouchIdIfDesired];
+//    }
 }
 
-- (ViewController*)getActiveViewController {
-    if(NSApplication.sharedApplication.keyWindow) {
-        NSWindow *window = NSApplication.sharedApplication.keyWindow;
-        NSDocument* doc = [NSDocumentController.sharedDocumentController documentForWindow:window];
-        
-        if(doc && doc.windowControllers.count) {
-            NSWindowController* windowController = [doc.windowControllers firstObject];
-            NSViewController* vc = windowController.contentViewController;
-            
-            if(vc && [vc isKindOfClass:ViewController.class]) {
-                return (ViewController*)vc;
-            }
-        }
-    }
-    
-    return nil;
-}
+//- (ViewController*)getActiveViewController {
+//    if(NSApplication.sharedApplication.keyWindow) {
+//        NSWindow *window = NSApplication.sharedApplication.keyWindow;
+//        NSDocument* doc = [NSDocumentController.sharedDocumentController documentForWindow:window];
+//        
+//        if(doc && doc.windowControllers.count) {
+//            NSWindowController* windowController = [doc.windowControllers firstObject];
+//            NSViewController* vc = windowController.contentViewController;
+//            
+//            if(vc && [vc isKindOfClass:ViewController.class]) {
+//                return (ViewController*)vc;
+//            }
+//        }
+//    }
+//    
+//    return nil;
+//}
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
     NSInteger timeout = [[Settings sharedInstance] autoLockTimeoutSeconds];
@@ -300,67 +308,26 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)removeUnwantedMenuItems {
-    // Remove Start Dictation and Emoji menu Items
-    
-    NSMenu* edit = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: @"Edit"] submenu]; // TODO: Localization Problem here?
-    
-    if ([[edit itemAtIndex: [edit numberOfItems] - 1] action] == NSSelectorFromString(@"orderFrontCharacterPalette:")) {
-        [edit removeItemAtIndex: [edit numberOfItems] - 1];
-    }
-    
-    if ([[edit itemAtIndex: [edit numberOfItems] - 1] action] == NSSelectorFromString(@"startDictation:")) {
-        [edit removeItemAtIndex: [edit numberOfItems] - 1];
-    }
-    
-    if ([[edit itemAtIndex: [edit numberOfItems] - 1] isSeparatorItem]) {
-        [edit removeItemAtIndex: [edit numberOfItems] - 1];
-    }
-    
-    NSMenu *fileMenu = NSApp.mainMenu.itemArray[1].submenu;
-    
-    void (^removeItemWithSelector)(SEL) = ^void(SEL selector) {
-        NSInteger idx = [fileMenu indexOfItemWithTarget:nil andAction:selector];
-        if (idx != -1)
-        {
-            [fileMenu removeItemAtIndex:idx];
-        }
-    };
-
-    // FUTURE: Figure out what's wrong with these guys!!`
-    removeItemWithSelector(@selector(duplicateDocument:));
-    removeItemWithSelector(@selector(saveDocumentAs:));
-    
-    //    removeItemWithSelector(@selector(moveDocument:));
-    //    removeItemWithSelector(@selector(renameDocument:));
-
-    [self removeMenuItem:@"File" action:@"saveDocumentAs:"];  // TODO: Localization Problem here?
-}
-
-- (void)removeShowSafesMetaDataItem {
-    [self removeMenuItem:@"View" action:@"onViewDebugDatabasesList:"];  // TODO: Localization Problem here?
-}
-
-- (void)removeCopyDiagnosticDumpItem {
-    [self removeMenuItem:@"Database" action:@"onCopyDiagnosticDump:"];  // TODO: Localization Problem here?
+    [self removeMenuItem:kTopLevelMenuItemTagView action:@selector(onViewDebugDatabasesList:)];
 }
 
 - (void)removeUpgradeMenuItem {
-    [self removeMenuItem:@"Strongbox" action:@"onUpgradeToFullVersion:"];
+    [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
 }
 
-- (void)removeMenuItem:(NSString*)topLevelTitle action:(NSString*)action {
-    NSMenu* strongBox = [[[[NSApplication sharedApplication] mainMenu] itemWithTitle: topLevelTitle] submenu];
+- (void)removeMenuItem:(NSInteger)topLevelTag action:(SEL)action {
+    NSMenu* topLevelMenuItem = [NSApplication.sharedApplication.mainMenu itemWithTag:topLevelTag].submenu;
     
-    NSUInteger index = [strongBox.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        return obj.action == NSSelectorFromString(action);
+    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.action == action;
     }];
     
     if(index != NSNotFound) {
-        NSLog(@"Removing %@ from %@ Menu", action, topLevelTitle);
-        [strongBox removeItemAtIndex:index];
+        NSLog(@"Removing %@ from %ld Menu", NSStringFromSelector(action), (long)topLevelTag);
+        [topLevelMenuItem removeItemAtIndex:index];
     }
     else {
-        NSLog(@"WARN: Menu Item %@ not found to remove.", action);
+        NSLog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
     }
 }
 
@@ -466,7 +433,7 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 }
 
 - (void)startClipboardWatchingTask {
-    NSLog(@"startClipboardWatchingTask...");
+//    NSLog(@"startClipboardWatchingTask...");
     self.currentClipboardVersion = -1;
     
     self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f
@@ -484,7 +451,7 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 }
 
 - (void)killClipboardWatchingTask {
-    NSLog(@"killClipboardWatchingTask...");
+//    NSLog(@"killClipboardWatchingTask...");
     
     self.currentClipboardVersion = -1;
     
