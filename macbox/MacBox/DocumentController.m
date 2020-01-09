@@ -12,9 +12,11 @@
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "DatabaseModel.h"
 #import "Settings.h"
-#import "SafesMetaDataViewer.h"
-#import "SafesList.h"
+#import "DatabasesManagerView.h"
+#import "DatabasesManager.h"
 #import "Alerts.h"
+#import "Utils.h"
+#import "NSArray+Extensions.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
@@ -78,11 +80,11 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 
 - (void)openDocument:(id)sender {
     if(self.documents.count == 0) { // Empty Launch...
-        if(SafesList.sharedInstance.snapshot.count > 0 && Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-            [self openDatabase:SafesList.sharedInstance.snapshot.firstObject];
+        if(DatabasesManager.sharedInstance.snapshot.count > 0 && Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
+            [self openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject];
         }
         else {
-            [SafesMetaDataViewer show:NO];
+            [DatabasesManagerView show:NO];
         }
     }
     else {
@@ -94,22 +96,92 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     return [super openDocument:sender];
 }
 
-- (void)openDatabase:(SafeMetaData*)database {
-    NSLog(@"Open: %@", database.nickName);
+- (void)openDatabase:(DatabaseMetadata *)database {
+    [self openDatabase:database completion:^(NSError *error) {
+        if(error) {
+            [DatabasesManagerView show:NO];
+        }
+    }];
+}
+
+//
+
+- (DatabaseMetadata *)getDatabaseByFileUrl:(NSURL *)url {
+    // FUTURE: Check Storage type when impl sftp or webdav
     
+    return [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return [obj.fileUrl isEqual:url];
+    }];
+}
+
+- (void)addDatabaseToDatabases:(NSURL *)url {
+    DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
+    if(safe) {
+        NSLog(@"Database is already in Databases List... Not Adding");
+        return;
+    }
+    
+    NSData *bookmark = nil;
+    NSError *error = nil;
+    bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+             includingResourceValuesForKeys:nil
+                              relativeToURL:nil
+                                      error:&error];
+    if (error) {
+        NSLog(@"Error while creating bookmark for URL (%@): %@", url, error);
+        return;
+    }
+
+    NSString *fileIdentifier = [bookmark base64EncodedStringWithOptions:kNilOptions];
+    
+    safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
+                                     storageProvider:kLocalDevice
+                                             fileUrl:url
+                                      storageInfo:fileIdentifier];
+    
+    [DatabasesManager.sharedInstance add:safe];
+}
+
+- (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     if(database.storageProvider == kLocalDevice) {
-        NSURL* url = [NSURL URLWithString:database.fileIdentifier];
+        NSError *error = nil;
+        BOOL bookmarkDataIsStale;
+
+        NSData* bookmarkData = [[NSData alloc] initWithBase64EncodedString:database.storageInfo options:kNilOptions];
         
-        [self openDocumentWithContentsOfURL:url
-                                    display:YES
-                          completionHandler:^(NSDocument * _Nullable document,
-                                              BOOL documentWasAlreadyOpen,
-                                              NSError * _Nullable error) {
-             NSLog(@"Done! = %@", error);
-             if(error) {
-                 [SafesMetaDataViewer show:NO];
-             }
-         }];
+        if(bookmarkData == nil) {
+            completion([Utils createNSError:@"Could not decode bookmark." errorCode:-1]);
+            return;
+        }
+        
+        NSURL* bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmarkData
+                                                           options:NSURLBookmarkResolutionWithSecurityScope
+                                                     relativeToURL:nil
+                                               bookmarkDataIsStale:&bookmarkDataIsStale
+                                                             error:&error];
+        if(!bookmarkFileURL) {
+            completion([Utils createNSError:@"Could not get bookmark URL." errorCode:-1]);
+            return;
+        }
+
+        BOOL access = [bookmarkFileURL startAccessingSecurityScopedResource];
+        
+        if(access) {
+            [self openDocumentWithContentsOfURL:bookmarkFileURL
+                                       display:YES
+                             completionHandler:^(NSDocument * _Nullable document,
+                                                 BOOL documentWasAlreadyOpen,
+                                                 NSError * _Nullable error) {
+                [bookmarkFileURL stopAccessingSecurityScopedResource];
+
+                NSLog(@"Done! = %@", error);
+
+                completion(error);
+            }];
+        }
+        else {
+            completion([Utils createNSError:@"Could not access security scope URL" errorCode:-1]);
+        }
     }
 }
 

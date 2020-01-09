@@ -14,7 +14,7 @@
 #import "Utils.h"
 #import "Strongbox.h"
 #import "PreferencesWindowController.h"
-#import "SafesMetaDataViewer.h"
+#import "DatabasesManagerView.h"
 #import "BiometricIdHelper.h"
 //#import "DAVKit.h"
 #import "ViewController.h"
@@ -351,11 +351,11 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (IBAction)onViewDatabases:(id)sender {
-    [SafesMetaDataViewer show:NO]; // Debug: YES
+    [DatabasesManagerView show:NO]; // Debug: YES
 }
 
 - (IBAction)onViewDebugDatabasesList:(id)sender {
-    [SafesMetaDataViewer show:YES]; // Debug: YES
+    [DatabasesManagerView show:YES]; // Debug: YES
 }
 
 - (IBAction)onPreferences:(id)sender {

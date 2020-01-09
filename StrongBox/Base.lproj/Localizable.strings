@@ -2730,3 +2730,8 @@
 /* Set Icons (Pro Only) */
 "mac_button_set_favicons_pro_only" = "Set Icons (Pro Only)";
 
+/* ⌘R to Reveal */
+"mac_button_reveal_master_password_title" = "⌘R to Reveal";
+
+/* ⌘R to Conceal */
+"mac_button_conceal_master_password_title" = "⌘R to Conceal";

@@ -15,8 +15,8 @@
 #import "WindowController.h"
 #import "Settings.h"
 #import "AppDelegate.h"
-#import "SafeMetaData.h"
-#import "SafesList.h"
+#import "DatabaseMetadata.h"
+#import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "NodeDetailsViewController.h"
 #import "BiometricIdHelper.h"
@@ -72,7 +72,7 @@
 
     [super saveDocument:sender];
 
-    SafeMetaData* safe = [self getSafeMetaData];
+    DatabaseMetadata* safe = [self getSafeMetaData];
     if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
         // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
         // Update Touch Id Password
@@ -96,13 +96,13 @@
     }];
 }
 
-- (SafeMetaData*)getSafeMetaData {
+- (DatabaseMetadata*)getSafeMetaData {
     if(!self.model || !self.model.fileUrl) {
         return nil;
     }
     
-    return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
+    return [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return [obj.storageInfo isEqualToString:self.model.fileUrl.absoluteString];
     }];
 }
 
@@ -229,6 +229,13 @@
     
     [self.undoManager removeAllActions]; // Clear undo stack
     NSFileWrapper* wrapper = [[NSFileWrapper alloc] initWithURL:self.fileURL options:NSFileWrapperReadingImmediate error:&error];
+    
+    if(!wrapper) {
+        NSLog(@"Could not create file wrapper: [%@]", error);
+        completion(NO, error);
+        return;
+    }
+    
     BOOL success = [self readFromFileWrapper:wrapper ofType:self.fileType error:&error];
     if(success) {
         self.fileModificationDate = wrapper.fileAttributes.fileModificationDate;

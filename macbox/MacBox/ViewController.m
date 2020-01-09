@@ -14,7 +14,7 @@
 #import "Utils.h"
 #import "CHCSVParser.h"
 #import <LocalAuthentication/LocalAuthentication.h>
-#import "SafesList.h"
+#import "DatabasesManager.h"
 #import "BiometricIdHelper.h"
 #import "PreferencesWindowController.h"
 #import "Csv.h"
@@ -37,7 +37,7 @@
 #import "FavIconManager.h"
 
 #import "NodeDetailsViewController.h"
-
+#import "DocumentController.h"
 
 const int kMaxRecommendCustomIconSize = 128*1024;
 const int kMaxCustomIconDimension = 256;
@@ -58,6 +58,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property NSFont* italicFont;
 @property NSFont* regularFont;
 
+@property (weak) IBOutlet NSButton *buttonToggleRevealMasterPasswordTip;
 @property (weak) IBOutlet NSTextField *labelTitle;
 @property (weak) IBOutlet NSTextField *labelUsername;
 @property (weak) IBOutlet NSTextField *labelEmail;
@@ -68,17 +69,30 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (weak) IBOutlet NSView *totpRow;
 @property (weak) IBOutlet NSTabView *quickViewColumn;
 @property (weak) IBOutlet NSButton *buttonToggleQuickViewPanel;
-
+@property (weak) IBOutlet ClickableImageView *imageViewGroupDetails;
+@property (weak) IBOutlet NSTableView *tableViewSummary;
+@property (weak) IBOutlet NSOutlineView *outlineView;
+@property (weak) IBOutlet NSTabView *tabViewLockUnlock;
+@property (weak) IBOutlet NSTabView *tabViewRightPane;
+@property (weak) IBOutlet NSButton *buttonCreateGroup;
+@property (weak) IBOutlet NSButton *buttonCreateRecord;
+@property (weak) IBOutlet NSView *emailRow;
+@property (weak) IBOutlet KSPasswordField *textFieldMasterPassword;
+@property (weak) IBOutlet NSSegmentedControl *searchSegmentedControl;
+@property (weak) IBOutlet NSSearchField *searchField;
+@property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
+@property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
+@property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
+@property (weak) IBOutlet NSTextField *textFieldTotp;
+@property (weak) IBOutlet NSProgressIndicator *progressTotp;
 @property (strong) IBOutlet NSMenu *outlineHeaderColumnsMenu;
-@property (strong, nonatomic) ViewModel* model;
-@property BOOL isPromptingAboutUnderlyingFileChange;
 @property (weak) IBOutlet NSView *customFieldsRow;
 @property (weak) IBOutlet NSTableView *customFieldsTable;
+
+@property (strong, nonatomic) ViewModel* model;
+@property BOOL isPromptingAboutUnderlyingFileChange;
 @property NSArray* customFields;
-
-
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
-
 @property NSDate* lastAutoPromptForTouchIdThrottle; // HACK: Sigh
 
 @end
@@ -231,14 +245,14 @@ static NSString* const kNewEntryKey = @"newEntry";
     self.imageViewTogglePassword.onClick = ^{
         [self onToggleShowHideQuickViewPassword:nil];
     };
+    [self bindRevealMasterPasswordTextField];
     
     self.showPassword = Settings.sharedInstance.alwaysShowPassword;
 
     self.imageViewShowHidePassword.clickable = YES;
     self.imageViewShowHidePassword.showClickableBorder = NO;
     self.imageViewShowHidePassword.onClick = ^{
-        self.textFieldMasterPassword.showsText = !self.textFieldMasterPassword.showsText;
-        self.imageViewShowHidePassword.image = !self.textFieldMasterPassword.showsText ? [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
+        [self toggleRevealMasterPasswordTextField:nil];
     };
 
     self.tableViewSummary.dataSource = self;
@@ -528,34 +542,19 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (SafeMetaData*)getDatabaseMetaData {
+- (DatabaseMetadata*)getDatabaseMetaData {
     if(!self.model || !self.model.fileUrl) {
         return nil;
     }
     
-    // FUTURE: Check Storage type when impl sftp or webdav
-    
-    return [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.fileIdentifier isEqualToString:self.model.fileUrl.absoluteString];
-    }];
+    DocumentController* dc = NSDocumentController.sharedDocumentController;
+    return [dc getDatabaseByFileUrl:self.model.document.fileURL];
 }
 
 - (void)addThisDatabaseToDatabases {
-    SafeMetaData *safe = [self getDatabaseMetaData];
+    DocumentController* dc = NSDocumentController.sharedDocumentController;
     
-    if(safe) {
-        NSLog(@"Database is already in Databases List... Not Adding");
-        return;
-    }
-    
-    NSURL* url = self.model.fileUrl;
-    
-    safe = [[SafeMetaData alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
-                                  storageProvider:kLocalDevice
-                                         fileName:url.lastPathComponent
-                                   fileIdentifier:url.absoluteString];
-    
-    [SafesList.sharedInstance add:safe];
+    [dc addDatabaseToDatabases:self.model.document.fileURL];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1211,8 +1210,10 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (void)hideProgressModal {
     if(self.progressWindow) {
-        [self.view.window endSheet:self.progressWindow.window];
-        self.progressWindow = nil;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.view.window endSheet:self.progressWindow.window];
+            self.progressWindow = nil;
+        });
     }
 }
 
@@ -1257,7 +1258,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)biometricOpenIsAvailableForSafe {
-    SafeMetaData* metaData = [self getDatabaseMetaData];
+    DatabaseMetadata* metaData = [self getDatabaseMetaData];
     
     BOOL ret =  (metaData == nil ||
             !metaData.isTouchIdEnabled ||
@@ -1292,7 +1293,7 @@ static NSString* const kNewEntryKey = @"newEntry";
                 self.lastAutoPromptForTouchIdThrottle = NSDate.date;
 
                 if(success) {
-                    SafeMetaData* metaData = [self getDatabaseMetaData];
+                    DatabaseMetadata* metaData = [self getDatabaseMetaData];
                     CompositeKeyFactors* ckf = [CompositeKeyFactors password:metaData.touchIdPassword keyFileDigest:metaData.touchIdKeyFileDigest];
 
                     [self reloadAndUnlock:ckf isBiometricOpen:YES];
@@ -1315,9 +1316,9 @@ static NSString* const kNewEntryKey = @"newEntry";
         NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared.");
         [Alerts info:loc window:self.view.window];
         
-        SafeMetaData* metaData = [self getDatabaseMetaData];
+        DatabaseMetadata* metaData = [self getDatabaseMetaData];
         if(metaData) {
-            [SafesList.sharedInstance remove:metaData.uuid];
+            [DatabasesManager.sharedInstance remove:metaData.uuid];
         }
     }
 }
@@ -1376,11 +1377,13 @@ static NSString* const kNewEntryKey = @"newEntry";
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self.model reloadAndUnlock:compositeKeyFactors completion:^(BOOL success, NSError * _Nullable error) {
-                [self hideProgressModal];
-                if(success) {
-                    self.textFieldMasterPassword.stringValue = @"";
-                }
-                [self onUnlocked:success error:error compositeKeyFactors:compositeKeyFactors isBiometricUnlock:isBiometricOpen];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self hideProgressModal];
+                    if(success) {
+                        self.textFieldMasterPassword.stringValue = @"";
+                    }
+                    [self onUnlocked:success error:error compositeKeyFactors:compositeKeyFactors isBiometricUnlock:isBiometricOpen];
+                });
             }];
         });
     }
@@ -1390,7 +1393,7 @@ static NSString* const kNewEntryKey = @"newEntry";
              error:(NSError*)error
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
  isBiometricUnlock:(BOOL)isBiometricUnlock {
-    SafeMetaData *safe = [self getDatabaseMetaData];
+    DatabaseMetadata *safe = [self getDatabaseMetaData];
 
     if(success) {
         if(safe == nil) {
@@ -1410,7 +1413,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             safe.touchIdKeyFileDigest = nil;
             safe.hasPromptedForTouchIdEnrol = NO;
             
-            [SafesList.sharedInstance update:safe];
+            [DatabasesManager.sharedInstance update:safe];
         }
         
         NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
@@ -1418,7 +1421,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
-- (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors safeMetaData:(SafeMetaData*)safeMetaData {
+- (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors safeMetaData:(DatabaseMetadata*)safeMetaData {
     if ( BiometricIdHelper.sharedInstance.biometricIdAvailable &&
         (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) &&
         !safeMetaData.hasPromptedForTouchIdEnrol) {
@@ -1442,7 +1445,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                }
            
                safeMetaData.hasPromptedForTouchIdEnrol = YES;
-               [SafesList.sharedInstance update:safeMetaData];
+               [DatabasesManager.sharedInstance update:safeMetaData];
            }];
     }
 }
@@ -1590,6 +1593,22 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         
         [self selectItem:currentSelection];
     }
+}
+
+- (IBAction)toggleRevealMasterPasswordTextField:(id)sender {
+    self.textFieldMasterPassword.showsText = !self.textFieldMasterPassword.showsText;
+
+    [self bindRevealMasterPasswordTextField];
+}
+
+- (void)bindRevealMasterPasswordTextField {
+    NSString* title = !self.textFieldMasterPassword.showsText ?
+        NSLocalizedString(@"mac_button_reveal_master_password_title", @"⌘R to Reveal") :
+        NSLocalizedString(@"mac_button_conceal_master_password_title", @"⌘R to Conceal");
+
+    [self.buttonToggleRevealMasterPasswordTip setTitle:title];
+    
+    self.imageViewShowHidePassword.image = !self.textFieldMasterPassword.showsText ? [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
 }
 
 - (IBAction)onToggleShowHideQuickViewPassword:(id)sender {
@@ -2498,7 +2517,11 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
     SEL theAction = [anItem action];
     
-    Node* item = [self getCurrentSelectedItem];
+    Node* item = nil;
+    
+    if(self.model && !self.model.locked) {
+        item = [self getCurrentSelectedItem];
+    }
     
     if (theAction == @selector(onViewItemDetails:)) {
         return item != nil && !item.isGroup;
@@ -2568,7 +2591,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
     else if (theAction == @selector(onClearTouchId:)) {
-        SafeMetaData* metaData = [self getDatabaseMetaData];
+        DatabaseMetadata* metaData = [self getDatabaseMetaData];
         return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
     }
     else if (theAction == @selector(saveDocument:)) {
@@ -2606,14 +2629,14 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (IBAction)onClearTouchId:(id)sender {
-    SafeMetaData* metaData = [self getDatabaseMetaData];
+    DatabaseMetadata* metaData = [self getDatabaseMetaData];
     
     if(metaData) {
         metaData.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
         metaData.touchIdKeyFileDigest = nil;
         metaData.touchIdPassword = nil;
         
-        [SafesList.sharedInstance update:metaData];
+        [DatabasesManager.sharedInstance update:metaData];
     }
 }
 
