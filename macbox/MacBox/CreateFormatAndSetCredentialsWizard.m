@@ -101,7 +101,7 @@
             return;
         }
 
-        ret.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong for XML KDB Only
+        ret.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.databaseFormat != kKeePass1];
     }
 
     _confirmedCompositeKeyFactors = ret;

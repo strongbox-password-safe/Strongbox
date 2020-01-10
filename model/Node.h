@@ -98,6 +98,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
 - (void)touchWithExplicitModifiedDate:(NSDate*)modDate touchParents:(BOOL)touchParents; // Used mostly for undo...
 
+- (BOOL)setTotpWithString:(NSString *)string
+         appendUrlToNotes:(BOOL)appendUrlToNotes
+               forceSteam:(BOOL)forceSteam;
+
 ///////////////////////////////////////////////
 // For use by any Safe Format Provider
 //

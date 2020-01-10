@@ -74,9 +74,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; // Unit Testing
 
-+ (OTPToken*_Nullable)getOtpTokenFromString:(NSString * _Nonnull)string forceSteam:(BOOL)forceSteam;
-
-- (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes forceSteam:(BOOL)forceSteam;
++ (OTPToken*_Nullable)getOtpTokenFromString:(NSString *)string
+                                 forceSteam:(BOOL)forceSteam
+                                     issuer:(NSString*)issuer
+                                   username:(NSString*)username;
 
 - (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes;
 
@@ -86,6 +87,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL expired;
 @property (readonly) BOOL nearlyExpired;
+
+// Alternative URLs - Just a view on Custom Fields with Keys matching (KP2A_URL[_*])
+
+@property (readonly) NSArray<NSString*> *alternativeUrls;
 
 @end
 

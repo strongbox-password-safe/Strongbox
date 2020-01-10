@@ -598,7 +598,18 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-    return [foo localizedCaseInsensitiveContainsString:searchText];
+    if([foo localizedCaseInsensitiveContainsString:searchText]) {
+        return YES;
+    }
+
+    for (NSString* altUrl in node.fields.alternativeUrls) {
+        NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
+        if([foo localizedCaseInsensitiveContainsString:searchText]) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {

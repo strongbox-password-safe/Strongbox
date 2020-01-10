@@ -8,6 +8,8 @@
 
 #import "NodeFields.h"
 #import "NSArray+Extensions.h"
+#import "NSDictionary+Extensions.h"
+#import "Utils.h"
 
 #import "OTPToken+Serialization.h"
 #import "OTPToken+Generation.h"
@@ -30,8 +32,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
 @implementation NodeFields
 
-+ (NSRegularExpression *)regex
-{
++ (NSRegularExpression *)totpNotesRegex {
     static NSRegularExpression *_regex;
     static dispatch_once_t onceToken;
     
@@ -197,7 +198,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     ret.passwordModified = self.passwordModified;
     ret.expires = self.expires;
 
-    // TODO: Copy Dates?
+    // FUTURE: Optionally Copy Dates?
     [ret setTouchProperties:NSDate.date modified:NSDate.date usageCount:@(0)];
 
     ret.locationChanged = self.locationChanged;
@@ -317,28 +318,20 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return self.cachedOtpToken;
 }
 
-- (BOOL)setTotpWithString:(NSString *)string appendUrlToNotes:(BOOL)appendUrlToNotes forceSteam:(BOOL)forceSteam {
-    OTPToken* token = [NodeFields getOtpTokenFromString:string forceSteam:forceSteam];
-    
-    if(token) {
-        [self setTotp:token appendUrlToNotes:appendUrlToNotes];
-        return YES;
-    }
-    
-    return NO;
-}
-
-+ (OTPToken*)getOtpTokenFromString:(NSString * _Nonnull)string forceSteam:(BOOL)forceSteam {
++ (OTPToken*)getOtpTokenFromString:(NSString * _Nonnull)string
+                        forceSteam:(BOOL)forceSteam
+                            issuer:(NSString*)issuer
+                          username:(NSString*)username {
     OTPToken *token = nil;
-    NSURL *url = [self findOtpUrlInString:string];
+    NSURL *url = [NodeFields findOtpUrlInString:string];
     
     if(url) {
-        token = [self getOtpTokenFromUrl:url];
+        token = [NodeFields getOtpTokenFromUrl:url];
     }
     else {
         NSData* secretData = [NSData secretWithString:string];
         if(secretData) {
-            token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secretData name:@"<Unknown>" issuer:@"<Unknown>"];
+            token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secretData name:username issuer:issuer];
             token = [token validate] ? token : nil;
         }
     }
@@ -418,7 +411,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     // Notes Field if it's a Password Safe database
     
-    NSTextCheckingResult *result = [[NodeFields regex] firstMatchInString:self.notes options:kNilOptions range:NSMakeRange(0, self.notes.length)];
+    NSTextCheckingResult *result = [[NodeFields totpNotesRegex] firstMatchInString:self.notes options:kNilOptions range:NSMakeRange(0, self.notes.length)];
     
     if(result) {
         NSLog(@"Found matching OTP in Notes: [%@]", [self.notes substringWithRange:result.range]);
@@ -456,7 +449,10 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return nil;
 }
 
-+ (OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary<NSString*, StringValue*>*)fields notes:(NSString*)notes usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
++ (OTPToken*)getOtpTokenFromRecord:(NSString*)password
+                            fields:(NSDictionary<NSString*, StringValue*>*)fields
+                             notes:(NSString*)notes
+            usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
     // Good reference for OTPAuth URL here: https://github.com/google/google-authenticator/wiki/Key-Uri-Format
     
     // KyPass and others... - OTPAuth url in the Password field…
@@ -663,6 +659,18 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     NSInteger days = [components day];
 
     return days < 14;
+}
+
+- (NSArray<NSString *> *)alternativeUrls {
+    NSDictionary<NSString*, StringValue*> *filtered = [self.mutableCustomFields filter:^BOOL(NSString * _Nonnull key, StringValue * _Nonnull value) {
+        return [key hasPrefix:@"KP2A_URL"];
+    }];
+    
+    NSArray<NSString*>* values = [filtered map:^id _Nonnull(NSString * _Nonnull key, StringValue * _Nonnull value) {
+        return value.value;
+    }];
+    
+    return [values sortedArrayUsingComparator:finderStringComparator];
 }
 
 - (NSString *)description {

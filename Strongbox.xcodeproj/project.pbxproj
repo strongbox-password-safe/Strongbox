@@ -193,6 +193,7 @@
 		4D2CB4912332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
+		4D2E3CF423C7886200712FC6 /* AlternativeUrlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */; };
 		4D2E47AE233CFD8D00C1DE90 /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E47AD233CFD8D00C1DE90 /* BackupsManager.m */; };
 		4D2E47AF233D001500C1DE90 /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E47AD233CFD8D00C1DE90 /* BackupsManager.m */; };
 		4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C1121807BFF007931E4 /* XmlStrongboxNodeModelAdaptor.m */; };
@@ -1687,6 +1688,7 @@
 		4D2CB4902332CBE400C2E084 /* ClipboardManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClipboardManager.m; path = model/ClipboardManager.m; sourceTree = "<group>"; };
 		4D2E35671F62C9CB0064B5D5 /* SelectStorageProviderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectStorageProviderController.h; path = StrongBox/SelectStorageProviderController.h; sourceTree = "<group>"; };
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectStorageProviderController.m; path = StrongBox/SelectStorageProviderController.m; sourceTree = "<group>"; };
+		4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AlternativeUrlTests.m; path = StrongboxTests/AlternativeUrlTests.m; sourceTree = "<group>"; };
 		4D2E47AC233CFD8D00C1DE90 /* BackupsManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BackupsManager.h; path = StrongBox/BackupsManager.h; sourceTree = "<group>"; };
 		4D2E47AD233CFD8D00C1DE90 /* BackupsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BackupsManager.m; path = StrongBox/BackupsManager.m; sourceTree = "<group>"; };
 		4D2F6C1121807BFF007931E4 /* XmlStrongboxNodeModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongboxNodeModelAdaptor.m; path = model/keepass/XmlStrongboxNodeModelAdaptor.m; sourceTree = SOURCE_ROOT; };
@@ -2973,6 +2975,7 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */,
 				4D2561B0233FEB6E00179B84 /* YubiKeyTests.m */,
 				4D98344621775F3800731FFC /* test-files */,
 				4D1BF4FA23244150007DF0E6 /* ZlibStreamTests.m */,
@@ -3325,6 +3328,7 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				4DE48A57216F54A300C9C991 /* Auto-Fill-Extension */,
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
 				4DE2689F22A67A6200A1D158 /* MasterDetailViewController.m */,
@@ -3982,7 +3986,6 @@
 				4D8A99AA230AF31700AB98DC /* InfoPlist.strings */,
 				4D8A99A7230AF31700AB98DC /* RMStore.strings */,
 				4D62D6941C85F2B50051E13B /* UI */,
-				4DE48A57216F54A300C9C991 /* Auto-Fill-Extension */,
 				4D78AC241FB1E23B00A68A92 /* PwSafe */,
 				4D78AC251FB1E24D00A68A92 /* Keepass */,
 				4D62D6961C85F35E0051E13B /* StorageProviders */,
@@ -5129,6 +5132,7 @@
 				4D8AC1622319B22F00CAB5F5 /* MemoryConsumptionTests.m in Sources */,
 				4DF97F2E21BF116A0090A55E /* DavKitTests.m in Sources */,
 				4D2561B1233FEB6E00179B84 /* YubiKeyTests.m in Sources */,
+				4D2E3CF423C7886200712FC6 /* AlternativeUrlTests.m in Sources */,
 				4DD755F3232F093900758824 /* XmlToDictionaryParser.m in Sources */,
 				4D25E8EE2175F4CE00ACF108 /* KeePassXmlSerializationTests.m in Sources */,
 				4DC8D9A621B6E444004F1812 /* KeyFileParsingTests.m in Sources */,

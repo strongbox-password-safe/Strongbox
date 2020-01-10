@@ -570,6 +570,23 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     return ret;
 }
 
+
+- (BOOL)setTotpWithString:(NSString *)string
+         appendUrlToNotes:(BOOL)appendUrlToNotes
+               forceSteam:(BOOL)forceSteam {
+    OTPToken* token = [NodeFields getOtpTokenFromString:string
+                                             forceSteam:forceSteam
+                                                 issuer:self.title
+                                               username:self.fields.username];
+    
+    if(token) {
+        [self.fields setTotp:token appendUrlToNotes:appendUrlToNotes];
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (NSString *)description {
     if(self.isGroup) {
         if(self.children.count) {

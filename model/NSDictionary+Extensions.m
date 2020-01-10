@@ -33,6 +33,22 @@
     return ret;
 }
 
+- (NSDictionary *)filter:(BOOL (^)(id _Nonnull, id _Nonnull))block {
+    NSMutableDictionary *ret = @{}.mutableCopy;
+    
+    NSArray *allKeys = [self allKeys];
+    for (id key in allKeys) {
+        id value = [self objectForKey:key];
+        BOOL go = block(key, value);
+        
+        if (go) {
+            ret[key] = value;
+        }
+    }
+    
+    return ret.copy;
+}
+
 //- (NSArray *)map:(id (^)(id obj, NSUInteger idx))block {
 //    NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
 //    [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {

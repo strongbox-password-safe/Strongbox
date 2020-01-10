@@ -35,6 +35,8 @@ static NSString *const kQueryPeriodKey = @"period";
 static NSString *const kQueryIssuerKey = @"issuer";
 static NSString *const kQueryEncoderKey = @"encoder";
 
+static NSString* const kStrongboxTotpIssuer = @"Strongbox";
+
 
 @implementation OTPToken (Serialization)
 
@@ -146,9 +148,10 @@ static NSString *const kQueryEncoderKey = @"encoder";
     urlComponents.scheme = kOTPAuthScheme;
     urlComponents.host = [NSString stringForTokenType:self.type];
     
-    if(self.name.length) {
-        urlComponents.path = [@"/" stringByAppendingString:self.name];
+    if(self.name.length && self.issuer.length) {
+        urlComponents.path = [NSString stringWithFormat:@"/%@:%@", self.issuer, self.name];
     }
+    
     urlComponents.queryItems = query;
 
     //NSLog(@"URL: [%@]", urlComponents);

@@ -28,16 +28,15 @@
 #import "MacKeePassHistoryViewController.h"
 #import "MacNodeIconHelper.h"
 #import "OTPToken+Generation.h"
-
 #import "MBProgressHUD.h"
 #import "CustomFieldTableCellView.h"
 #import "SearchScope.h"
 #import <WebKit/WebKit.h>
 #import "FavIconDownloader.h"
 #import "FavIconManager.h"
-
 #import "NodeDetailsViewController.h"
 #import "DocumentController.h"
+#import "ClipboardManager.h"
 
 const int kMaxRecommendCustomIconSize = 128*1024;
 const int kMaxCustomIconDimension = 256;
@@ -45,7 +44,9 @@ const int kMaxCustomIconDimension = 256;
 static NSString* const kPasswordCellIdentifier = @"CustomFieldValueCellIdentifier";
 static NSString* const kDefaultNewTitle = @"Untitled";
 
-@interface ViewController () <NSWindowDelegate>
+@interface ViewController () <  NSWindowDelegate,
+                                QLPreviewPanelDataSource,
+                                QLPreviewPanelDelegate>
 
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
@@ -81,7 +82,17 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (weak) IBOutlet NSSegmentedControl *searchSegmentedControl;
 @property (weak) IBOutlet NSSearchField *searchField;
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
+
+@property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
+
+// Group View Fields
+
+@property (weak) IBOutlet NSTextField *textFieldSummaryTitle;
+
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
+@property (weak) IBOutlet NSButton *buttonUserKeyFileAndPassword;
+@property (weak) IBOutlet NSButton *buttonUseKeyFile;
+
 @property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
 @property (weak) IBOutlet NSTextField *textFieldTotp;
 @property (weak) IBOutlet NSProgressIndicator *progressTotp;
@@ -89,6 +100,13 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (weak) IBOutlet NSView *customFieldsRow;
 @property (weak) IBOutlet NSTableView *customFieldsTable;
 @property (weak) IBOutlet NSImageView *imageViewIcon;
+@property (weak) IBOutlet NSView *containerViewForEnterMasterCredentials;
+
+@property (weak) IBOutlet NSView *attachmentsRow;
+@property (weak) IBOutlet NSTableView *attachmentsTable;
+@property NSDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
+
+@property NSArray* attachments;
 
 @property (strong, nonatomic) ViewModel* model;
 @property BOOL isPromptingAboutUnderlyingFileChange;
@@ -237,7 +255,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
-    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch"); // TODO: if only one method available then word this more precisely
+    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch"); // FUTURE: if only one method available then word this more precisely
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     self.buttonUnlockWithTouchId.hidden = YES;
@@ -263,6 +281,10 @@ static NSString* const kNewEntryKey = @"newEntry";
     self.customFieldsTable.delegate = self;
     self.customFieldsTable.dataSource = self;
     self.customFieldsTable.doubleAction = @selector(onDoubleClickCustomField:);
+   
+    self.attachmentsTable.delegate = self;
+    self.attachmentsTable.dataSource = self;
+    self.attachmentsTable.doubleAction = @selector(onPreviewQuickViewAttachment:);
     
     [self customizeOutlineView];
     
@@ -508,6 +530,8 @@ static NSString* const kNewEntryKey = @"newEntry";
 }
 
 - (void)onAttachmentsChanged:(NSNotification*)notification {
+    self.attachmentsIconCache = nil;
+    
     NSString *loc = NSLocalizedString(@"generic_fieldname_attachments", @"Attachments");
     [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
@@ -733,6 +757,17 @@ static NSString* const kNewEntryKey = @"newEntry";
         
         self.customFieldsRow.hidden = self.model.format == kPasswordSafe || self.customFields.count == 0 || !Settings.sharedInstance.showCustomFieldsOnQuickViewPanel;
         [self.customFieldsTable reloadData];
+        
+        // Attachments
+        
+        self.attachments = [it.fields.attachments sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            NodeFileAttachment* f1 = obj1;
+            NodeFileAttachment* f2 = obj2;
+            return finderStringCompare(f1.filename, f2.filename);
+        }];
+        
+        self.attachmentsRow.hidden = self.model.format == kPasswordSafe || self.attachments.count == 0 || !Settings.sharedInstance.showAttachmentsOnQuickViewPanel;
+        [self.attachmentsTable reloadData];
     }
 }
 
@@ -781,8 +816,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
 }
 
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
-{
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
     if(!self.model || self.model.locked) {
         return 0;
     }
@@ -823,7 +857,7 @@ static NSString* const kNewEntryKey = @"newEntry";
         
         cell.value = it.isGroup ? @"" : password;
         cell.protected = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-        cell.valueHidden = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
+        cell.valueHidden = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields) && !Settings.sharedInstance.showPasswordImmediatelyInOutline;
         
         return cell;
     }
@@ -1118,30 +1152,32 @@ static NSString* const kNewEntryKey = @"newEntry";
     NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
     
     NSString* searchText = self.searchField.stringValue;
-    if(![searchText length]) {
-        // Filter Recycle Bin if Required in Browse
-        if(Settings.sharedInstance.doNotShowRecycleBinInBrowse && self.model.recycleBinNode) {
-            return [sorted filter:^BOOL(Node * _Nonnull obj) {
-                return obj != self.model.recycleBinNode;
+    BOOL isSearching = searchText.length != 0;
+    BOOL showRecycleBin = isSearching ? Settings.sharedInstance.showRecycleBinInSearchResults : !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
+
+    NSArray<Node*> *filtered = sorted;
+    if(self.model.format == kKeePass1) {
+        if(!showRecycleBin && self.model.keePass1BackupNode) {
+            filtered = [sorted filter:^BOOL(Node * _Nonnull obj) {
+                return obj != self.model.keePass1BackupNode;
             }];
         }
-        
-        return sorted;
     }
     else {
-        // Filter Recycle Bin if Required in Search - also TODO: KeePass1 Backup Group, Expired etc...
-        if(!Settings.sharedInstance.showRecycleBinInSearchResults && self.model.recycleBinNode) {
-            sorted = [sorted filter:^BOOL(Node * _Nonnull obj) {
+        if(!showRecycleBin && self.model.recycleBinNode) {
+            filtered = [sorted filter:^BOOL(Node * _Nonnull obj) {
                 return obj != self.model.recycleBinNode;
             }];
         }
     }
 
-    // Filter by Search term
-    
-    return [sorted filter:^BOOL(Node * _Nonnull obj) {
+    // Filter by Search term if necessary
+     
+    NSArray<Node*> *matches = !isSearching ? filtered : [filtered filter:^BOOL(Node * _Nonnull obj) {
         return [self isSafeItemMatchesSearchCriteria:obj recurse:YES];
     }];
+    
+    return matches;
 }
 
 - (BOOL)isSafeItemMatchesSearchCriteria:(Node*)item recurse:(BOOL)recurse {
@@ -1238,7 +1274,7 @@ static NSString* const kNewEntryKey = @"newEntry";
             NSError* error;
             NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
             
-            if(!data) {
+            if (!data) {
                 NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
                 
                 NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
@@ -1246,7 +1282,7 @@ static NSString* const kNewEntryKey = @"newEntry";
                 return;
             }
             
-            NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:YES]; // TODO: Wrong KDB Xml
+            NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.model.format != kKeePass1];
             
             CompositeKeyFactors* ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
             [self reloadAndUnlock:ckf isBiometricOpen:NO];
@@ -1374,8 +1410,18 @@ static NSString* const kNewEntryKey = @"newEntry";
     self.isPromptingAboutUnderlyingFileChange = NO;
 }
 
+- (void)enableMasterCredentialsEntry:(BOOL)enable {
+    [self.textFieldMasterPassword setEnabled:enable];
+    [self.buttonUnlockWithTouchId setEnabled:enable];
+    [self.buttonUnlockWithPassword setEnabled:enable];
+    [self.buttonUseKeyFile setEnabled:enable];
+    [self.buttonUserKeyFileAndPassword setEnabled:enable];
+}
+
 - (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen {
     if(self.model) {
+        [self enableMasterCredentialsEntry:NO];
+        
         NSString* loc = NSLocalizedString(@"generic_unlocking_ellipsis", @"Unlocking...");
         [self showProgressModal:loc];
         
@@ -1397,8 +1443,9 @@ static NSString* const kNewEntryKey = @"newEntry";
              error:(NSError*)error
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
  isBiometricUnlock:(BOOL)isBiometricUnlock {
-    DatabaseMetadata *safe = [self getDatabaseMetaData];
+    [self enableMasterCredentialsEntry:YES];
 
+    DatabaseMetadata *safe = [self getDatabaseMetaData];
     if(success) {
         if(safe == nil) {
             [self addThisDatabaseToDatabases];
@@ -1630,7 +1677,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(void)copyToPasteboard:(NSString*)text item:(Node*)item {
+-(void)dereferenceAndCopyToPasteboard:(NSString*)text item:(Node*)item {
     if(!item || !text.length) {
         [[NSPasteboard generalPasteboard] clearContents];
         return;
@@ -1638,8 +1685,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     NSString* deref = [self.model dereference:text node:item];
     
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:deref forType:NSStringPboardType];
+    [ClipboardManager.sharedInstance copyConcealedString:deref];
 }
 
 - (IBAction)onCopyTitle:(id)sender {
@@ -1696,9 +1742,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self copyCustomField:field];
 }
 
--(void)copyCustomField:(CustomField*)field {
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:field.value forType:NSStringPboardType];
+- (void)copyCustomField:(CustomField*)field {
+    [ClipboardManager.sharedInstance copyConcealedString:field.value];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, field.key, NSLocalizedString(@"generic_fieldname_custom_field", @"Custom Field")]];
@@ -1707,7 +1752,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)copyTitle:(Node*)item {
     if(!item) return;
     
-    [self copyToPasteboard:item.title item:item];
+    [self dereferenceAndCopyToPasteboard:item.title item:item];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_title", @"Title")]];
@@ -1716,7 +1761,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)copyUsername:(Node*)item {
     if(!item) return;
     
-    [self copyToPasteboard:item.fields.username item:item];
+    [self dereferenceAndCopyToPasteboard:item.fields.username item:item];
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_username", @"Username")]];
 }
@@ -1724,7 +1769,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)copyEmail:(Node*)item {
     if(!item) return;
     
-    [self copyToPasteboard:item.fields.email item:item];
+    [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];
 }
@@ -1732,7 +1777,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)copyUrl:(Node*)item {
     if(!item) return;
     
-    [self copyToPasteboard:item.fields.url item:item];
+    [self dereferenceAndCopyToPasteboard:item.fields.url item:item];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_url", @"URL")]];
@@ -1741,7 +1786,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)copyNotes:(Node*)item {
     if(!item) return;
     
-    [self copyToPasteboard:item.fields.notes item:item];
+    [self dereferenceAndCopyToPasteboard:item.fields.notes item:item];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_notes", @"Notes")]];
@@ -1752,11 +1797,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return;
     }
 
-    [[NSPasteboard generalPasteboard] clearContents];
+    [self dereferenceAndCopyToPasteboard:item.fields.password item:item];
     
-    NSString *password = [self.model dereference:item.fields.password node:item];
-    [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
-
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_password", @"Password")]];
 }
@@ -1765,11 +1807,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(!item || !item.fields.otpToken) {
         return;
     }
-    
-    [[NSPasteboard generalPasteboard] clearContents];
-    NSString *password = item.fields.otpToken.password;
-    [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
 
+    NSString *password = item.fields.otpToken.password;
+    [ClipboardManager.sharedInstance copyConcealedString:password];
+    
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
 }
@@ -2632,7 +2673,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else if (theAction == @selector(onDownloadFavIcons:)) {
         return !self.model.locked && (item == nil || ((self.model.format == kKeePass || self.model.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
     }
-
+    else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
+        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.attachments.count > 0 && self.attachmentsTable.selectedRow != -1;
+    }
+    else if (theAction == @selector(onSaveQuickViewAttachmentAs:)) {
+        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.attachments.count > 0 && self.attachmentsTable.selectedRow != -1;
+    }
+    
     return YES;
 }
 
@@ -2814,6 +2861,9 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
         return dictionary.count;
     }
+    else if (tableView == self.attachmentsTable) {
+        return self.attachments.count;
+    }
     else {
         return self.customFields.count;
     }
@@ -2832,6 +2882,32 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         
         cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
         
+        return cell;
+    }
+    else if (tableView == self.attachmentsTable) {
+        NodeFileAttachment* attachment = self.attachments[row];
+        DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
+
+        BOOL isFileNameColumn = [tableColumn.identifier isEqualToString:@"filename"];
+        NSString* cellId = isFileNameColumn ? @"AttachmentFileNameCellIdentifier" : @"AttachmentFileSizeCellIdentifier";
+        NSTableCellView* cell = [self.attachmentsTable makeViewWithIdentifier:cellId owner:nil];
+
+        cell.textField.stringValue = isFileNameColumn ? attachment.filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.data.length countStyle:NSByteCountFormatterCountStyleFile];
+        
+        if(self.attachmentsIconCache == nil) {
+            self.attachmentsIconCache = @{};
+            [self buildAttachmentsIconCache];
+        }
+        
+        NSImage* cachedIcon = self.attachmentsIconCache[@(attachment.index)];
+        if(cachedIcon && Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel) {
+            cell.imageView.image = cachedIcon;
+        }
+        else {
+            NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename.pathExtension];
+            cell.imageView.image = img;
+        }
+
         return cell;
     }
     else  {
@@ -2855,6 +2931,120 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             return cell;
         }
     }
+}
+
+- (void)buildAttachmentsIconCache {
+    NSArray *workingCopy = [self.model.attachments copy];
+    NSMutableDictionary *tmp = @{}.mutableCopy;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        for (int i=0;i<workingCopy.count;i++) {
+            DatabaseAttachment* dbAttachment = workingCopy[i];
+            
+            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.data];
+            if(img) {
+                img = scaleImage(img, CGSizeMake(17, 17));
+                tmp[@(i)] = img;
+            }
+        }
+        
+        self.attachmentsIconCache = tmp.copy;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.attachmentsTable reloadData];
+            [self.view setNeedsDisplay:YES];
+        });
+    });
+}
+
+// Preview Attachments
+
+- (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
+    NSUInteger idx = self.attachmentsTable.selectedRow;
+    if(idx == -1) {
+        return 0;
+    }
+    
+    return 1;
+}
+
+- (id<QLPreviewItem>)previewPanel:(QLPreviewPanel *)panel previewItemAtIndex:(NSInteger)index {
+    if(index != 0) {
+        return nil;
+    }
+    
+    NSUInteger idx = self.attachmentsTable.selectedRow;
+    if(idx == -1) {
+        return nil;
+    }
+    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    
+    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
+        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
+        return nil;
+    }
+    
+    DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
+    
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
+    
+    NSError* error;
+    //BOOL success =
+    [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
+    NSURL* url = [NSURL fileURLWithPath:f];
+    
+    return url;
+}
+
+- (BOOL)acceptsPreviewPanelControl:(QLPreviewPanel *)panel {
+    return YES;
+}
+
+- (void)beginPreviewPanelControl:(QLPreviewPanel *)panel {
+    panel.dataSource = self;
+    panel.delegate = self;
+}
+
+- (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
+    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+    for (NSString *file in tmpDirectory) {
+        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
+        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+    }
+}
+
+- (IBAction)onPreviewQuickViewAttachment:(id)sender {
+    NSInteger selected = self.attachmentsTable.selectedRow;
+    if(selected >= 0 && selected < self.attachments.count) {
+        [QLPreviewPanel.sharedPreviewPanel makeKeyAndOrderFront:self];
+    }
+}
+
+- (IBAction)onSaveQuickViewAttachmentAs:(id)sender {
+    NSInteger selected = self.attachmentsTable.selectedRow;
+    if(selected < 0 || selected >= self.attachments.count) {
+        return;
+    }
+    
+    NodeFileAttachment* nodeAttachment = self.attachments[selected];
+    
+    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
+        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
+        return;
+    }
+    
+    // Save As Dialog...
+    
+    NSSavePanel * savePanel = [NSSavePanel savePanel];
+    savePanel.nameFieldStringValue = nodeAttachment.filename;
+    
+    [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
+            [dbAttachment.data writeToFile:savePanel.URL.path atomically:YES];
+            [savePanel orderOut:self];
+        }
+    }];
 }
 
 - (IBAction)onSetItemIcon:(id)sender {
@@ -3004,6 +3194,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 - (uint64_t)getTotpRemainingSeconds:(Node*)item {
     return item.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)item.fields.otpToken.period);
 }
+
 - (IBAction)onSetTotp:(id)sender {
     Node *item = [self getCurrentSelectedItem];
     

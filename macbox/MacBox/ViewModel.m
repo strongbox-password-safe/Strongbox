@@ -182,6 +182,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self createNewRecycleBinNode];
 }
 
+- (Node *)keePass1BackupNode {
+    return self.passwordDatabase.keePass1BackupNode;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title
@@ -785,9 +789,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     [self touchAndModify:item modDate:modified];
     
-    [item.fields setTotpWithString:otp
-                  appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
-                        forceSteam:steam];
+    [item setTotpWithString:otp
+           appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
+                 forceSteam:steam];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     

@@ -480,6 +480,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 static NSInteger clipboardChangeCount;
+
 - (void)onStrongboxDidChangeClipboard {
     NSLog(@"onApplicationDidChangeClipboard...");
     
@@ -511,10 +512,12 @@ static NSInteger clipboardChangeCount;
 
 - (void)clearAppCustomClipboard {
     NSPasteboard* appCustomPasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-    BOOL somethingOnAppCustomClipboard = [appCustomPasteboard dataForType:kDragAndDropExternalUti] != nil;
-    if(somethingOnAppCustomClipboard) {
-        NSLog(@"Clearing Custom App Pasteboard!");
-        [appCustomPasteboard clearContents];
+    
+    @synchronized (self) {
+        if([appCustomPasteboard canReadItemWithDataConformingToTypes:@[kDragAndDropExternalUti]]) {
+            [appCustomPasteboard clearContents];
+            NSLog(@"Clearing Custom App Pasteboard!");
+        }
     }
 }
 

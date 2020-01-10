@@ -23,15 +23,6 @@
 - (void)onFileChangedByOtherApplication;
 - (void)resetModel:(ViewModel *)model;
 
-- (IBAction)onSearch:(id)sender;
-- (IBAction)onOutlineViewDoubleClick:(id)sender;
-- (IBAction)onEnterMasterPassword:(id)sender;
-@property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
-
-// Group View Fields
-
-@property (weak) IBOutlet NSTextField *textFieldSummaryTitle;
-
 // Used by Node Details too...
 
 void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window);

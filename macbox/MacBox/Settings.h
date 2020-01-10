@@ -37,6 +37,8 @@ extern NSString* const kCustomFieldsColumn;
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
 
 @property (nonatomic) BOOL alwaysShowPassword;
+@property (nonatomic) BOOL showPasswordImmediatelyInOutline;
+
 @property (nonatomic) BOOL warnedAboutTouchId;
 
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
@@ -90,6 +92,10 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL expressDownloadFavIconOnNewOrUrlChanged;
 
 @property BOOL allowWatchUnlock;
+
+@property BOOL showAttachmentsOnQuickViewPanel;
+@property BOOL showAttachmentImagePreviewsOnQuickViewPanel;
+
 
 @end
 

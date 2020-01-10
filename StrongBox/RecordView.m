@@ -1053,10 +1053,12 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
+                    BOOL appendToNotes = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1;
                     Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
-                    BOOL success = [self.record.fields setTotpWithString:string
-                                                        appendUrlToNotes:self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1
-                                                              forceSteam:NO];
+                    
+                    BOOL success = [self.record setTotpWithString:string
+                                                 appendUrlToNotes:appendToNotes
+                                                       forceSteam:NO];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
                     }
@@ -1077,8 +1079,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
                    Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
                    
                    BOOL steam = response == 2;
-                   BOOL success = [self.record.fields setTotpWithString:text
-                                                       appendUrlToNotes:self.viewModel.database.format == kPasswordSafe forceSteam:steam];
+            
+                   BOOL appendToNotes = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1;
+                   
+                   BOOL success = [self.record setTotpWithString:text
+                                                appendUrlToNotes:appendToNotes
+                                                      forceSteam:steam];
+
                    if(!success) {
                        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
                    }

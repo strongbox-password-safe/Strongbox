@@ -120,6 +120,8 @@ extern NSString* const kNotificationUserInfoKeyIsBatchIconUpdate;
 @property (readonly) Node* recycleBinNode;
 - (void)createNewRecycleBinNode;
 
+@property (readonly) Node* keePass1BackupNode;
+
 // Convenience / Summary
 
 @property (readonly) NSArray<Node*>* activeRecords;

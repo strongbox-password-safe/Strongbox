@@ -26,6 +26,9 @@
 #import "CustomFieldTableCellView.h"
 #import "FavIconDownloader.h"
 #import "PreferencesWindowController.h"
+#import "ClipboardManager.h"
+#import "QRCodePresenterPopover.h"
+#import "OTPToken+Serialization.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -81,14 +84,6 @@
 @end
 
 @implementation NodeDetailsViewController
-
-static NSImage* kDefaultAttachmentIcon;
-
-+ (void)initialize {
-    if(self == [NodeDetailsViewController class]) {
-        kDefaultAttachmentIcon = [NSImage imageNamed:@"document_empty_64"];
-    }
-}
 
 static NSString* trimField(NSTextField* textField) {
     return [Utils trim:textField.stringValue];
@@ -425,7 +420,7 @@ static NSString* trimField(NSTextField* textField) {
     self.attachments = [self.node.fields.attachments copy];
     [self.attachmentsView reloadData];
     
-    self.buttonAddAttachment.enabled = !self.historical;
+    self.buttonAddAttachment.enabled = !self.historical && !(self.model.format == kKeePass1 && self.attachments.count > 0);
     self.buttonRemoveAttachment.enabled = !self.historical;
 }
 
@@ -735,8 +730,8 @@ static NSString* trimField(NSTextField* textField) {
     }
     
     CustomField *field = self.customFields[row];
-    [NSPasteboard.generalPasteboard clearContents];
-    [NSPasteboard.generalPasteboard setString:field.key forType:NSStringPboardType];
+    
+    [ClipboardManager.sharedInstance copyConcealedString:field.key];
 }
 
 - (IBAction)onCopyCustomFieldValue:(id)sender {
@@ -746,8 +741,8 @@ static NSString* trimField(NSTextField* textField) {
     }
     
     CustomField *field = self.customFields[row];
-    [NSPasteboard.generalPasteboard clearContents];
-    [NSPasteboard.generalPasteboard setString:field.value forType:NSStringPboardType];
+    
+    [ClipboardManager.sharedInstance copyConcealedString:field.value];
 }
 
 - (IBAction)onDeleteCustomField:(id)sender {
@@ -906,7 +901,6 @@ static NSString* trimField(NSTextField* textField) {
     DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
     
     item.textField.stringValue = attachment.filename;
-    item.imageView.image = kDefaultAttachmentIcon;
     item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.data.length countStyle:NSByteCountFormatterCountStyleFile];
     
     if(self.attachmentsIconCache == nil) {
@@ -919,12 +913,7 @@ static NSString* trimField(NSTextField* textField) {
         item.imageView.image = cachedIcon;
     }
     else {
-        NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename];
-        
-        if(img.size.width != 32 || img.size.height != 32) {
-            img = scaleImage(img, CGSizeMake(32, 32));
-        }
-        
+        NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename.pathExtension];        
         item.imageView.image = img;
     }
     
@@ -1102,7 +1091,8 @@ static NSString* trimField(NSTextField* textField) {
     [[NSPasteboard generalPasteboard] clearContents];
     
     if(text.length) {
-        [[NSPasteboard generalPasteboard] setString:[self.model dereference:text node:self.node] forType:NSStringPboardType];
+        NSString* str = [self.model dereference:text node:self.node];
+        [ClipboardManager.sharedInstance copyConcealedString:str];
     }
 }
 
@@ -1192,7 +1182,7 @@ static NSString* trimField(NSTextField* textField) {
 
     if(self.node.fields.otpToken) {
         NSString *password = self.node.fields.otpToken.password;
-        [[NSPasteboard generalPasteboard] setString:password forType:NSStringPboardType];
+        [ClipboardManager.sharedInstance copyConcealedString:password];
     }
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1293,7 +1283,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onAddAttachment:(id)sender {
-    if(self.historical) {
+    if(self.historical || (self.model.format == kKeePass1 && self.attachments.count > 0)) {
         return;
     }
     
@@ -1316,6 +1306,65 @@ static NSString* trimField(NSTextField* textField) {
             }
         }
     }];
+}
+
+#pragma mark - QR Code Generator
+
+- (CIImage *)createQRForString:(NSString *)qrString {
+    NSData *stringData = [qrString dataUsingEncoding:NSUTF8StringEncoding];
+
+    // Create the filter
+    
+    CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
+    
+    // Set the message content and error-correction level
+    
+    [qrFilter setValue:stringData forKey:@"inputMessage"];
+    [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
+
+    // Send the image back
+    
+    return qrFilter.outputImage;
+}
+
+- (NSImage*)generateTheQRCodeImageFromDataBaseInfo:(NSString*)string {
+    CIImage *input = [self createQRForString:string];
+
+    // Scale it up to 2x Image View size (retina)
+
+    static NSUInteger kImageViewSize = 256;
+    CGFloat scale = kImageViewSize / input.extent.size.width;
+
+    // NSLog(@"Scaling by %f to %f pixels", scale, size);
+
+    CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
+
+    CIImage *qrCode = [input imageByApplyingTransform:transform];
+
+    NSCIImageRep *rep = [NSCIImageRep imageRepWithCIImage:qrCode];
+    NSImage *nsImage = [[NSImage alloc] initWithSize:rep.size];
+    
+    [nsImage addRepresentation:rep];
+
+    return nsImage;
+}
+
+- (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
+    if([segue.identifier isEqualToString:@"segueToQrCodePresentation"]) {
+        QRCodePresenterPopover* qr = (QRCodePresenterPopover*)segue.destinationController;
+        
+        if(!self.node.fields.otpToken) {
+            return;
+        }
+        
+        NSURL *totpUrl = [self.node.fields.otpToken url:YES];
+        
+        NSLog(@"Showing QR Code for totp url [%@]", totpUrl);
+        
+        NSImage* image = [self generateTheQRCodeImageFromDataBaseInfo:totpUrl.absoluteString];
+        
+        qr.qrCodeImage = image ? image : [NSImage imageNamed:@"error"];
+    }
 }
 
 @end

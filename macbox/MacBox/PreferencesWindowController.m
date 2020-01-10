@@ -34,6 +34,8 @@
 @property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
 @property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
 @property (weak) IBOutlet NSTableView *tableViewWordLists;
+@property (weak) IBOutlet NSButton *showAttachmentsInQuickView;
+@property (weak) IBOutlet NSButton *showAttachmentImagePreviewsInQuickView;
 
 @property (weak) IBOutlet NSButton *radioBasic;
 @property (weak) IBOutlet NSButton *radioXkcd;
@@ -59,6 +61,7 @@
 
 @property (weak) IBOutlet NSTextField *labelWordcount;
 
+@property (weak) IBOutlet NSButton *checkboxShowPasswordImmediatelyInOutline;
 @property (weak) IBOutlet NSButton *checkboxAlwaysShowPassword;
 @property (weak) IBOutlet NSButton *checkboxKeePassNoSort;
 
@@ -174,6 +177,8 @@
 - (void)bindGeneralUiToSettings {
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
+    self.checkboxShowPasswordImmediatelyInOutline.state = Settings.sharedInstance.showPasswordImmediatelyInOutline ? NSOnState : NSOffState;
+    
     self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
     self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
     self.checkboxShowRecycleBinInBrowse.state = Settings.sharedInstance.doNotShowRecycleBinInBrowse ? NSOffState : NSOnState;
@@ -195,6 +200,8 @@
 
     self.checkboxConcealEmptyProtected.state = Settings.sharedInstance.concealEmptyProtectedFields ? NSOnState : NSOffState;
     self.showCustomFieldsInQuickView.state = Settings.sharedInstance.showCustomFieldsOnQuickViewPanel ? NSOnState : NSOffState;
+    self.showAttachmentsInQuickView.state = Settings.sharedInstance.showAttachmentsOnQuickViewPanel ? NSOnState : NSOffState;
+    self.showAttachmentImagePreviewsInQuickView.state = Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel ? NSOnState : NSOffState;
     
     self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
     self.switchAutoPromptTouchID.state = Settings.sharedInstance.autoPromptForTouchIdOnActivate ? NSOnState : NSOffState;
@@ -207,6 +214,7 @@
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
+    Settings.sharedInstance.showPasswordImmediatelyInOutline = self.checkboxShowPasswordImmediatelyInOutline.state == NSOnState;
     Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
     Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
     Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
@@ -230,9 +238,11 @@
     
     Settings.sharedInstance.concealEmptyProtectedFields = self.checkboxConcealEmptyProtected.state == NSOnState;
     Settings.sharedInstance.showCustomFieldsOnQuickViewPanel = self.showCustomFieldsInQuickView.state == NSOnState;
+
+    Settings.sharedInstance.showAttachmentsOnQuickViewPanel = self.showAttachmentsInQuickView.state == NSOnState;
+    Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel = self.showAttachmentImagePreviewsInQuickView.state == NSOnState;
     
-    Settings.sharedInstance.showSystemTrayIcon =
-        self.switchShowInMenuBar.state == NSOnState;
+    Settings.sharedInstance.showSystemTrayIcon = self.switchShowInMenuBar.state == NSOnState;
     
     Settings.sharedInstance.autoPromptForTouchIdOnActivate = self.switchAutoPromptTouchID.state == NSOnState;
     

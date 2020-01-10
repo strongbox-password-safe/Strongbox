@@ -201,6 +201,9 @@
 		4DF348052074FA6C00148741 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
 		4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF348072074FA6C00148741 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF348002074FA6C00148741 /* Node.m */; };
+		4DF522B623C8ABEF00CD948E /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF522B523C8ABEF00CD948E /* ClipboardManager.m */; };
+		4DF522B823C8BACE00CD948E /* QRCodePresenter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF522B723C8BACE00CD948E /* QRCodePresenter.storyboard */; };
+		4DF522BB23C8BBA900CD948E /* QRCodePresenterPopover.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF522BA23C8BBA900CD948E /* QRCodePresenterPopover.m */; };
 		4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F551F30DB7A00D68BFE /* AppDelegate.m */; };
 		4DF59F591F30DB7A00D68BFE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F581F30DB7A00D68BFE /* main.m */; };
 		4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5B1F30DB7A00D68BFE /* ViewController.m */; };
@@ -684,6 +687,11 @@
 		4DF347FD2074FA6C00148741 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = ../model/StorageProvider.h; sourceTree = "<group>"; };
 		4DF347FE2074FA6C00148741 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../model/Node.h; sourceTree = "<group>"; };
 		4DF348002074FA6C00148741 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../model/Node.m; sourceTree = "<group>"; };
+		4DF522B423C8ABEF00CD948E /* ClipboardManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClipboardManager.h; path = MacBox/ClipboardManager.h; sourceTree = "<group>"; };
+		4DF522B523C8ABEF00CD948E /* ClipboardManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClipboardManager.m; path = MacBox/ClipboardManager.m; sourceTree = "<group>"; };
+		4DF522B723C8BACE00CD948E /* QRCodePresenter.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = QRCodePresenter.storyboard; path = MacBox/QRCodePresenter.storyboard; sourceTree = "<group>"; };
+		4DF522B923C8BBA900CD948E /* QRCodePresenterPopover.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QRCodePresenterPopover.h; path = MacBox/QRCodePresenterPopover.h; sourceTree = "<group>"; };
+		4DF522BA23C8BBA900CD948E /* QRCodePresenterPopover.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QRCodePresenterPopover.m; path = MacBox/QRCodePresenterPopover.m; sourceTree = "<group>"; };
 		4DF59F511F30DB7A00D68BFE /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DF59F541F30DB7A00D68BFE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = MacBox/AppDelegate.h; sourceTree = "<group>"; };
 		4DF59F551F30DB7A00D68BFE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = MacBox/AppDelegate.m; sourceTree = "<group>"; };
@@ -743,6 +751,9 @@
 				4DC805C623A11752001E742E /* AttachmentItem.xib */,
 				4DC46D0A219EDCD800D6C462 /* AttachmentCollectionView.h */,
 				4DC46D0B219EDCD800D6C462 /* AttachmentCollectionView.m */,
+				4DF522B723C8BACE00CD948E /* QRCodePresenter.storyboard */,
+				4DF522B923C8BBA900CD948E /* QRCodePresenterPopover.h */,
+				4DF522BA23C8BBA900CD948E /* QRCodePresenterPopover.m */,
 			);
 			name = "Node Details";
 			sourceTree = "<group>";
@@ -1018,14 +1029,12 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				4DD9EB1D23C4FD1500887237 /* Set Icon */,
-				4D4A003B231317A900B69E09 /* Localizable.strings */,
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DE2CA3E23C38B5E00F76255 /* Main */,
+				4D14A13B224D211400C71ABF /* Node Details */,
+				4DD9EB1D23C4FD1500887237 /* Set Icon */,
 				4DE2CA3D23C38B4100F76255 /* Change Password and Format */,
 				4D88E6D023A9249E00A75D1F /* Preferences */,
 				4D88E6CF23A9191000A75D1F /* FavIcon */,
-				4D14A13B224D211400C71ABF /* Node Details */,
 				4D643BA023B67D48000C383A /* KeePass History */,
 				4D88E6D123A924D100A75D1F /* Databases Manager */,
 				4D553B47219DB2E400AA4BAB /* CustomPasswordTextField.h */,
@@ -1357,6 +1366,8 @@
 				4D4A00392312CC5400B69E09 /* SerializationPackage.m */,
 				4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */,
 				4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */,
+				4DF522B423C8ABEF00CD948E /* ClipboardManager.h */,
+				4DF522B523C8ABEF00CD948E /* ClipboardManager.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -1364,6 +1375,8 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D4A003B231317A900B69E09 /* Localizable.strings */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4D524D2B219B503F00C22CB4 /* View */,
 				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
 				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
@@ -1577,6 +1590,7 @@
 				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
+				4DF522B823C8BACE00CD948E /* QRCodePresenter.storyboard in Resources */,
 				4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */,
 				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
@@ -1738,6 +1752,7 @@
 				4DF348022074FA6C00148741 /* NodeFields.m in Sources */,
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,
 				4D9E098921825108007BA1E7 /* String.m in Sources */,
+				4DF522B623C8ABEF00CD948E /* ClipboardManager.m in Sources */,
 				4D524CC0219B479900C22CB4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */,
 				4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */,
@@ -1745,6 +1760,7 @@
 				4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */,
 				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4D524CF0219B481200C22CB4 /* ChaCha20Stream.m in Sources */,
+				4DF522BB23C8BBA900CD948E /* QRCodePresenterPopover.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
 				4D44680C216CE08B00F6358D /* Csv.m in Sources */,
@@ -2218,13 +2234,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2664;
+				CURRENT_PROJECT_VERSION = 2665;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.2;
+				MARKETING_VERSION = 1.12.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2240,13 +2256,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2664;
+				CURRENT_PROJECT_VERSION = 2665;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.2;
+				MARKETING_VERSION = 1.12.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

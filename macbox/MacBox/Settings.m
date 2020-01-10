@@ -60,8 +60,19 @@ static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kExpressDownloadFavIconOnNewOrUrlChanged = @"expressDownloadFavIconOnNewOrUrlChanged";
 static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
+static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQuickViewPanel";
+static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
+static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
 
 @implementation Settings
+
+- (BOOL)showPasswordImmediatelyInOutline {
+    return [self getBool:kShowPasswordImmediatelyInOutline];
+}
+
+- (void)setShowPasswordImmediatelyInOutline:(BOOL)showPasswordImmediatelyInOutline {
+    [self setBool:kShowPasswordImmediatelyInOutline value:showPasswordImmediatelyInOutline];
+}
 
 - (BOOL)allowWatchUnlock {
     return [self getBool:kAllowWatchUnlock fallback:YES];
@@ -551,6 +562,22 @@ static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
 
 - (void)setShowCustomFieldsOnQuickViewPanel:(BOOL)showCustomFieldsOnQuickViewPanel {
     return [self setBool:kShowCustomFieldsOnQuickView value:showCustomFieldsOnQuickViewPanel];
+}
+
+- (BOOL)showAttachmentsOnQuickViewPanel {
+    return [self getBool:kShowAttachmentsOnQuickViewPanel fallback:YES];
+}
+
+- (void)setShowAttachmentsOnQuickViewPanel:(BOOL)showAttachmentsOnQuickViewPanel {
+    [self setBool:kShowAttachmentsOnQuickViewPanel value:showAttachmentsOnQuickViewPanel];
+}
+
+- (BOOL)showAttachmentImagePreviewsOnQuickViewPanel {
+    return [self getBool:kShowAttachmentImagePreviewsOnQuickViewPanel fallback:YES];
+}
+
+- (void)setShowAttachmentImagePreviewsOnQuickViewPanel:(BOOL)showAttachmentImagePreviewsOnQuickViewPanel {
+    [self setBool:kShowAttachmentImagePreviewsOnQuickViewPanel value:showAttachmentImagePreviewsOnQuickViewPanel];
 }
 
 @end

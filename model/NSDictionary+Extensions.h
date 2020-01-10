@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id _Nullable)objectForCaseInsensitiveKey:(NSString *)key;
 -(NSArray*)map:(id (^)(KeyType key, ValueType value))block;
+-(NSDictionary<KeyType, ValueType>*)filter:(BOOL (^)(KeyType key, ValueType value))block;
 
 @end
 

@@ -99,7 +99,9 @@
 
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node.fields setTotpWithString:@"otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase" appendUrlToNotes:YES forceSteam:NO];
+    BOOL ret = [node setTotpWithString:@"otpauth://totp/Coinbase:mark.mcguill@gmail.com?secret=2gqegflxxubjqelc&issuer=Coinbase"
+                      appendUrlToNotes:YES
+                            forceSteam:NO];
     
     XCTAssertTrue(ret);
     
@@ -117,7 +119,9 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node.fields setTotpWithString:@"otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=8&period=31" appendUrlToNotes:YES forceSteam:NO];
+    BOOL ret = [node setTotpWithString:@"otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=8&period=31"
+                      appendUrlToNotes:YES
+                            forceSteam:NO];
     
     XCTAssertTrue(ret);
     
@@ -135,7 +139,9 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node.fields setTotpWithString:@"" appendUrlToNotes:YES forceSteam:NO];
+    BOOL ret = [node setTotpWithString:@""
+                      appendUrlToNotes:YES
+                            forceSteam:NO];
     
     XCTAssertFalse(ret);
     
@@ -153,7 +159,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node.fields setTotpWithString:nil appendUrlToNotes:YES forceSteam:NO];
+    BOOL ret = [node setTotpWithString:nil appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertFalse(ret);
     
@@ -171,7 +177,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node.fields setTotpWithString:@"Absolute Garbage GIGO" appendUrlToNotes:YES forceSteam:NO];
+    BOOL ret = [node setTotpWithString:@"Absolute Garbage GIGO" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertTrue(ret); //Seemd to be fine!
     
@@ -189,7 +195,7 @@
     
     Node* node = [[Node alloc] initAsRecord:@"Title" parent:[[Node alloc] initAsRoot:nil]];
     
-    BOOL ret = [node.fields setTotpWithString:@"2gqegflxxubjqelc" appendUrlToNotes:YES forceSteam:NO];
+    BOOL ret = [node setTotpWithString:@"2gqegflxxubjqelc" appendUrlToNotes:YES forceSteam:NO];
     
     XCTAssertTrue(ret); //Seemd to be fine!
     

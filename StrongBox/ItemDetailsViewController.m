@@ -1158,7 +1158,11 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)setTotpWithString:(NSString*)string steam:(BOOL)steam {
-    OTPToken* token = [NodeFields getOtpTokenFromString:string forceSteam:steam];
+    OTPToken* token = [NodeFields getOtpTokenFromString:string
+                                             forceSteam:steam
+                                                 issuer:self.model.title
+                                               username:self.model.username];
+    
     if(token) {
         self.model.totp = token;
         
