@@ -20,7 +20,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="570" height="424"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="570" height="424"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -110,6 +110,7 @@ Gw
                     <constraint firstItem="STV-Hs-hOA" firstAttribute="leading" secondItem="nTm-od-gjA" secondAttribute="trailing" constant="12" id="FI9-YT-KjQ"/>
                     <constraint firstItem="ZYx-hs-rzI" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="20" id="IPB-9k-ZP9"/>
                     <constraint firstItem="guW-A7-hbt" firstAttribute="leading" secondItem="STV-Hs-hOA" secondAttribute="trailing" constant="12" id="IYY-St-zyw"/>
+                    <constraint firstItem="nTm-od-gjA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="k4b-DX-DI0" secondAttribute="trailing" constant="12" symbolic="YES" id="KYi-UD-z8E"/>
                     <constraint firstAttribute="trailing" secondItem="guW-A7-hbt" secondAttribute="trailing" constant="20" id="Mmm-oj-WUO"/>
                     <constraint firstItem="k4b-DX-DI0" firstAttribute="centerY" secondItem="STV-Hs-hOA" secondAttribute="centerY" id="RGJ-hN-td2"/>
                     <constraint firstAttribute="trailing" secondItem="nCr-GA-F2s" secondAttribute="trailing" constant="20" id="RhI-8g-fYy"/>

@@ -22,11 +22,11 @@
             <rect key="contentRect" x="196" y="240" width="609" height="387"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" misplaced="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="609" height="364"/>
+                <rect key="frame" x="0.0" y="0.0" width="609" height="387"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MSn-gZ-6X1">
-                        <rect key="frame" x="581" y="47" width="134" height="32"/>
+                        <rect key="frame" x="541" y="47" width="134" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="122" id="OZf-4j-pAF"/>
                         </constraints>
@@ -78,7 +78,7 @@ DQ
                         </connections>
                     </button>
                     <scrollView misplaced="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xpx-UG-Rzh">
-                        <rect key="frame" x="8" y="95" width="649" height="224"/>
+                        <rect key="frame" x="8" y="118" width="649" height="224"/>
                         <clipView key="contentView" id="KPl-fn-Wt0">
                             <rect key="frame" x="1" y="0.0" width="647" height="223"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -485,6 +485,7 @@ DQ
                     </scrollView>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9gr-Ef-QvP" secondAttribute="trailing" constant="20" symbolic="YES" id="4y6-IR-6kv"/>
                     <constraint firstItem="9gr-Ef-QvP" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="6Py-CK-r0Z"/>
                     <constraint firstItem="MSn-gZ-6X1" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivt-SI-hdL" secondAttribute="trailing" constant="20" id="8Cg-vi-kst"/>
                     <constraint firstItem="cIa-aT-idW" firstAttribute="centerY" secondItem="ivt-SI-hdL" secondAttribute="centerY" id="B07-d6-r9f"/>

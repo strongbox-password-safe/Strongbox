@@ -323,7 +323,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }];
     
     if(index != NSNotFound) {
-        NSLog(@"Removing %@ from %ld Menu", NSStringFromSelector(action), (long)topLevelTag);
+//        NSLog(@"Removing %@ from %ld Menu", NSStringFromSelector(action), (long)topLevelTag);
         [topLevelMenuItem removeItemAtIndex:index];
     }
     else {
@@ -503,7 +503,7 @@ static NSInteger clipboardChangeCount;
         [NSPasteboard.generalPasteboard clearContents];
     }
     else {
-        NSLog(@"General Clipboard change count DOES NOT matches after time delay... NOP");
+//        NSLog(@"General Clipboard change count DOES NOT matches after time delay... NOP");
     }
     
     [self clearAppCustomClipboard];

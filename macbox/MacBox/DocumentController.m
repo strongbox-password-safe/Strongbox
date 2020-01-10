@@ -114,13 +114,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     }];
 }
 
-- (void)addDatabaseToDatabases:(NSURL *)url {
-    DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
-    if(safe) {
-        NSLog(@"Database is already in Databases List... Not Adding");
-        return;
-    }
-    
+static NSString *getBookmarkFromUrlAsString(NSURL *url) {
     NSData *bookmark = nil;
     NSError *error = nil;
     bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
@@ -129,10 +123,26 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                                       error:&error];
     if (error) {
         NSLog(@"Error while creating bookmark for URL (%@): %@", url, error);
+        return nil;
+    }
+    
+    NSString *fileIdentifier = [bookmark base64EncodedStringWithOptions:kNilOptions];
+    
+    return fileIdentifier;
+}
+
+- (void)addDatabaseToDatabases:(NSURL *)url {
+    DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
+    if(safe) {
+//        NSLog(@"Database is already in Databases List... Not Adding");
         return;
     }
-
-    NSString *fileIdentifier = [bookmark base64EncodedStringWithOptions:kNilOptions];
+    
+    NSString * fileIdentifier = getBookmarkFromUrlAsString(url);
+    
+    if(!fileIdentifier) {
+        return;
+    }
     
     safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
                                      storageProvider:kLocalDevice
@@ -163,6 +173,31 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             completion([Utils createNSError:@"Could not get bookmark URL." errorCode:-1]);
             return;
         }
+        
+        if(bookmarkDataIsStale) {
+            if ([bookmarkFileURL startAccessingSecurityScopedResource]) {
+                NSLog(@"Regenerating Bookmark -> bookmarkDataIsStale = %d => [%@]", bookmarkDataIsStale, bookmarkFileURL);
+                
+                NSString* fileIdentifier = getBookmarkFromUrlAsString(bookmarkFileURL);
+
+                [bookmarkFileURL stopAccessingSecurityScopedResource];
+                
+                if(!fileIdentifier) {
+                    completion([Utils createNSError:@"Could not regenerate stale bookmark." errorCode:-1]);
+                    return;
+                }
+
+                database.storageInfo = fileIdentifier;
+                database.fileUrl = bookmarkFileURL;
+                
+                [DatabasesManager.sharedInstance update:database];
+            }
+            else {
+                NSLog(@"Regen Bookmark security failed....");
+                completion([Utils createNSError:@"Regen Bookmark security failed." errorCode:-1]);
+                return;
+            }
+        }
 
         BOOL access = [bookmarkFileURL startAccessingSecurityScopedResource];
         
@@ -172,10 +207,10 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                              completionHandler:^(NSDocument * _Nullable document,
                                                  BOOL documentWasAlreadyOpen,
                                                  NSError * _Nullable error) {
-                [bookmarkFileURL stopAccessingSecurityScopedResource];
-
-                NSLog(@"Done! = %@", error);
-
+                if(error) {
+                    NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
+                }
+                
                 completion(error);
             }];
         }

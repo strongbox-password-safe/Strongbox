@@ -534,10 +534,12 @@ DQ
                     <constraint firstItem="0sw-da-jUF" firstAttribute="leading" secondItem="nVF-RT-ORX" secondAttribute="leading" id="RrW-NY-C7j"/>
                     <constraint firstItem="qUL-Pl-gGo" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" id="UzF-b6-D2C"/>
                     <constraint firstItem="EAJ-3L-JEi" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" id="YM1-Xy-I1x"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="jcc-jf-Ou8" secondAttribute="trailing" constant="20" symbolic="YES" id="ZNP-7u-EMl"/>
                     <constraint firstItem="0sw-da-jUF" firstAttribute="top" secondItem="e6X-Fc-sXn" secondAttribute="bottom" constant="8" symbolic="YES" id="ZZh-kF-7Uw"/>
                     <constraint firstAttribute="trailing" secondItem="nVF-RT-ORX" secondAttribute="trailing" constant="20" symbolic="YES" id="dZt-Zo-k5b"/>
                     <constraint firstItem="qUL-Pl-gGo" firstAttribute="top" secondItem="nVF-RT-ORX" secondAttribute="bottom" constant="9" id="ey4-Ft-EDm"/>
                     <constraint firstItem="e6X-Fc-sXn" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="wfn-ds-MS4"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="qUL-Pl-gGo" secondAttribute="trailing" constant="20" symbolic="YES" id="xBR-A7-fiz"/>
                     <constraint firstItem="EAJ-3L-JEi" firstAttribute="centerX" secondItem="se5-gp-TjO" secondAttribute="centerX" id="yN8-iA-k5L"/>
                 </constraints>
             </view>

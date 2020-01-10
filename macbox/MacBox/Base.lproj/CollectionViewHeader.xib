@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,7 +14,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9uW-3b-spb">
-                    <rect key="frame" x="2" y="7" width="103" height="17"/>
+                    <rect key="frame" x="2" y="7" width="103" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="This is the Title" id="r6Q-rn-fFX">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -35,6 +35,7 @@
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="rzs-cV-tqQ" secondAttribute="trailing" id="180-J9-Duw"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9uW-3b-spb" secondAttribute="trailing" constant="20" symbolic="YES" id="2Xk-cJ-NTT"/>
                 <constraint firstItem="rzs-cV-tqQ" firstAttribute="top" secondItem="9uW-3b-spb" secondAttribute="bottom" constant="2" id="YTU-jz-Zz8"/>
                 <constraint firstItem="9uW-3b-spb" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" constant="4" id="b0Q-qE-z2i"/>
                 <constraint firstItem="9uW-3b-spb" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="cAE-UF-Y6a"/>

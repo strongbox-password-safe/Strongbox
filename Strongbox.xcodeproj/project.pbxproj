@@ -1640,6 +1640,38 @@
 		4D25E8EB2175F4CD00ACF108 /* StrongboxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrongboxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D25E8ED2175F4CE00ACF108 /* KeePassXmlSerializationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlSerializationTests.m; path = StrongboxTests/KeePassXmlSerializationTests.m; sourceTree = "<group>"; };
 		4D25E8EF2175F4CE00ACF108 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = StrongboxTests/Info.plist; sourceTree = "<group>"; };
+		4D27CC5523C7384000DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/MasterDetail.strings; sourceTree = "<group>"; };
+		4D27CC5623C7384100DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = StrongBox/sv.lproj/Main.strings; sourceTree = "<group>"; };
+		4D27CC5723C7384200DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		4D27CC5823C7384200DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/FavIconBulk.strings; sourceTree = "<group>"; };
+		4D27CC5923C7384200DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Backups.strings; sourceTree = "<group>"; };
+		4D27CC5A23C7384300DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Welcome.strings; sourceTree = "<group>"; };
+		4D27CC5B23C7384300DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Browse.strings; sourceTree = "<group>"; };
+		4D27CC5C23C7384400DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ItemDetails.strings; sourceTree = "<group>"; };
+		4D27CC5D23C7384400DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/QRCodeScannerViewController.strings; sourceTree = "<group>"; };
+		4D27CC5E23C7384500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ItemDetailsPreferences.strings; sourceTree = "<group>"; };
+		4D27CC5F23C7384500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/KeePassHistory.strings; sourceTree = "<group>"; };
+		4D27CC6023C7384500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PasswordSafeHistory.strings; sourceTree = "<group>"; };
+		4D27CC6123C7384600DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CreateDatabaseOrSetCredentials.strings; sourceTree = "<group>"; };
+		4D27CC6223C7384600DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SelectKeyFile.strings; sourceTree = "<group>"; };
+		4D27CC6323C7384700DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SelectStorage.strings; sourceTree = "<group>"; };
+		4D27CC6423C7384700DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PinEntry.strings; sourceTree = "<group>"; };
+		4D27CC6523C7384700DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
+		4D27CC6623C7384800DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/DatabaseOperations.strings; sourceTree = "<group>"; };
+		4D27CC6723C7384800DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Preferences.strings; sourceTree = "<group>"; };
+		4D27CC6823C7384800DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SelectItem.strings; sourceTree = "<group>"; };
+		4D27CC6923C7384800DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
+		4D27CC6A23C7384900DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Upgrade.strings; sourceTree = "<group>"; };
+		4D27CC6B23C7384900DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/IconsCollectionViewController.strings; sourceTree = "<group>"; };
+		4D27CC6C23C7384A00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/WebDAVConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D27CC6D23C7384A00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SFTPSessionConfigurationViewController.strings; sourceTree = "<group>"; };
+		4D27CC6E23C7385400DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D27CC6F23C7385500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/RMStore.strings; sourceTree = "<group>"; };
+		4D27CC7023C7385500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/EditPasswordCell.strings; sourceTree = "<group>"; };
+		4D27CC7123C7385500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/IconTableCell.strings; sourceTree = "<group>"; };
+		4D27CC7223C7385500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = "StrongBox Auto Fill/sv.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		4D27CC7323C7385500DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4D27CC7423C73CA300DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = StrongBox/sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4D27D74A21A00AB900CA7B06 /* KeePass2TagPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePass2TagPackage.h; path = model/keepass/KeePass2TagPackage.h; sourceTree = "<group>"; };
 		4D27D74B21A00AB900CA7B06 /* KeePass2TagPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePass2TagPackage.m; path = model/keepass/KeePass2TagPackage.m; sourceTree = "<group>"; };
 		4D2854762362FF9800DC3664 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
@@ -4441,6 +4473,7 @@
 				ru,
 				uk,
 				fr,
+				sv,
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
@@ -6154,6 +6187,7 @@
 				4D462007239C21F300AC4038 /* de */,
 				4D462009239C21F500AC4038 /* ru */,
 				4D46200B239C21F600AC4038 /* uk */,
+				4D27CC5823C7384200DF06ED /* sv */,
 			);
 			name = FavIconBulk.storyboard;
 			path = StrongBox;
@@ -6167,6 +6201,7 @@
 				4D51F0C4233BE5DA00F5BB3D /* ru */,
 				4D4695CA23878E4C009D3BC7 /* uk */,
 				4D4695E923878E71009D3BC7 /* fr */,
+				4D27CC7223C7385500DF06ED /* sv */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -6179,6 +6214,7 @@
 				4D51F0B0233BE5D600F5BB3D /* ru */,
 				4D4695B423878E44009D3BC7 /* uk */,
 				4D4695D323878E6C009D3BC7 /* fr */,
+				4D27CC5623C7384100DF06ED /* sv */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -6191,6 +6227,7 @@
 				4D51F0CB233BE5DB00F5BB3D /* ru */,
 				4D4695B923878E4A009D3BC7 /* uk */,
 				4D4695D823878E6F009D3BC7 /* fr */,
+				4D27CC7023C7385500DF06ED /* sv */,
 			);
 			name = EditPasswordCell.xib;
 			sourceTree = "<group>";
@@ -6203,6 +6240,7 @@
 				4D51F0CC233BE5DB00F5BB3D /* ru */,
 				4D4695BA23878E4A009D3BC7 /* uk */,
 				4D4695D923878E70009D3BC7 /* fr */,
+				4D27CC7123C7385500DF06ED /* sv */,
 			);
 			name = IconTableCell.xib;
 			sourceTree = "<group>";
@@ -6215,6 +6253,7 @@
 				4D51F0B5233BE5D700F5BB3D /* ru */,
 				4D4695BB23878E4A009D3BC7 /* uk */,
 				4D4695DA23878E70009D3BC7 /* fr */,
+				4D27CC5D23C7384400DF06ED /* sv */,
 			);
 			name = QRCodeScannerViewController.xib;
 			path = StrongBox;
@@ -6228,6 +6267,7 @@
 				4D51F0BD233BE5D900F5BB3D /* ru */,
 				4D4695C323878E4B009D3BC7 /* uk */,
 				4D4695E223878E71009D3BC7 /* fr */,
+				4D27CC6523C7384700DF06ED /* sv */,
 			);
 			name = PrivacyViewController.xib;
 			path = StrongBox;
@@ -6241,6 +6281,7 @@
 				4D51F0C3233BE5DA00F5BB3D /* ru */,
 				4D4695C923878E4C009D3BC7 /* uk */,
 				4D4695E823878E71009D3BC7 /* fr */,
+				4D27CC6B23C7384900DF06ED /* sv */,
 			);
 			name = IconsCollectionViewController.xib;
 			path = StrongBox;
@@ -6254,6 +6295,7 @@
 				4D51F0C6233BE5DA00F5BB3D /* ru */,
 				4D4695CC23878E4C009D3BC7 /* uk */,
 				4D4695EB23878E72009D3BC7 /* fr */,
+				4D27CC6D23C7384A00DF06ED /* sv */,
 			);
 			name = SFTPSessionConfigurationViewController.xib;
 			path = StrongBox;
@@ -6267,6 +6309,7 @@
 				4D51F0C5233BE5DA00F5BB3D /* ru */,
 				4D4695CB23878E4C009D3BC7 /* uk */,
 				4D4695EA23878E72009D3BC7 /* fr */,
+				4D27CC6C23C7384A00DF06ED /* sv */,
 			);
 			name = WebDAVConfigurationViewController.xib;
 			path = StrongBox;
@@ -6280,6 +6323,7 @@
 				4D7C2666233EA16D00412AA5 /* ru */,
 				4D4695B223878E43009D3BC7 /* uk */,
 				4D4695D123878E6C009D3BC7 /* fr */,
+				4D27CC5923C7384200DF06ED /* sv */,
 			);
 			name = Backups.storyboard;
 			path = StrongBox;
@@ -6292,6 +6336,7 @@
 				4D51F0CA233BE5DB00F5BB3D /* ru */,
 				4D4695D023878E4D009D3BC7 /* uk */,
 				4D4695EF23878E72009D3BC7 /* fr */,
+				4D27CC7323C7385500DF06ED /* sv */,
 			);
 			name = InfoPlist.strings;
 			path = "Strongbox Auto Fill";
@@ -6304,6 +6349,7 @@
 				4D51F0C9233BE5DA00F5BB3D /* ru */,
 				4D4695CF23878E4D009D3BC7 /* uk */,
 				4D4695EE23878E72009D3BC7 /* fr */,
+				4D27CC6F23C7385500DF06ED /* sv */,
 			);
 			name = RMStore.strings;
 			path = StrongBox;
@@ -6316,6 +6362,7 @@
 				4D51F0C8233BE5DA00F5BB3D /* ru */,
 				4D4695CE23878E4D009D3BC7 /* uk */,
 				4D4695ED23878E72009D3BC7 /* fr */,
+				4D27CC6E23C7385400DF06ED /* sv */,
 			);
 			name = InfoPlist.strings;
 			path = StrongBox;
@@ -6329,6 +6376,7 @@
 				4D51F0C2233BE5DA00F5BB3D /* ru */,
 				4D4695C823878E4C009D3BC7 /* uk */,
 				4D4695E723878E71009D3BC7 /* fr */,
+				4D27CC6A23C7384900DF06ED /* sv */,
 			);
 			name = Upgrade.storyboard;
 			path = StrongBox;
@@ -6342,6 +6390,7 @@
 				4D51F0B9233BE5D800F5BB3D /* ru */,
 				4D4695BF23878E4B009D3BC7 /* uk */,
 				4D4695DE23878E70009D3BC7 /* fr */,
+				4D27CC6123C7384600DF06ED /* sv */,
 			);
 			name = CreateDatabaseOrSetCredentials.storyboard;
 			path = StrongBox;
@@ -6355,6 +6404,7 @@
 				4D51F0AF233BE5D600F5BB3D /* ru */,
 				4D4695B323878E43009D3BC7 /* uk */,
 				4D4695D223878E6C009D3BC7 /* fr */,
+				4D27CC5523C7384000DF06ED /* sv */,
 			);
 			name = MasterDetail.storyboard;
 			path = StrongBox;
@@ -6367,6 +6417,7 @@
 				4D51F0B1233BE5D700F5BB3D /* ru */,
 				4D4695B523878E44009D3BC7 /* uk */,
 				4D4695D423878E6D009D3BC7 /* fr */,
+				4D27CC5723C7384200DF06ED /* sv */,
 			);
 			name = LaunchScreen.storyboard;
 			path = StrongBox;
@@ -6380,6 +6431,7 @@
 				4D51F0B2233BE5D700F5BB3D /* ru */,
 				4D4695B623878E44009D3BC7 /* uk */,
 				4D4695D523878E6F009D3BC7 /* fr */,
+				4D27CC5A23C7384300DF06ED /* sv */,
 			);
 			name = Welcome.storyboard;
 			path = StrongBox;
@@ -6393,6 +6445,7 @@
 				4D51F0B3233BE5D700F5BB3D /* ru */,
 				4D4695B723878E45009D3BC7 /* uk */,
 				4D4695D623878E6F009D3BC7 /* fr */,
+				4D27CC5B23C7384300DF06ED /* sv */,
 			);
 			name = Browse.storyboard;
 			path = StrongBox;
@@ -6406,6 +6459,7 @@
 				4D51F0B4233BE5D700F5BB3D /* ru */,
 				4D4695B823878E4A009D3BC7 /* uk */,
 				4D4695D723878E6F009D3BC7 /* fr */,
+				4D27CC5C23C7384400DF06ED /* sv */,
 			);
 			name = ItemDetails.storyboard;
 			path = StrongBox;
@@ -6419,6 +6473,7 @@
 				4D51F0B6233BE5D700F5BB3D /* ru */,
 				4D4695BC23878E4A009D3BC7 /* uk */,
 				4D4695DB23878E70009D3BC7 /* fr */,
+				4D27CC5E23C7384500DF06ED /* sv */,
 			);
 			name = ItemDetailsPreferences.storyboard;
 			path = StrongBox;
@@ -6432,6 +6487,7 @@
 				4D51F0B7233BE5D800F5BB3D /* ru */,
 				4D4695BD23878E4B009D3BC7 /* uk */,
 				4D4695DC23878E70009D3BC7 /* fr */,
+				4D27CC5F23C7384500DF06ED /* sv */,
 			);
 			name = KeePassHistory.storyboard;
 			path = StrongBox;
@@ -6445,6 +6501,7 @@
 				4D51F0B8233BE5D800F5BB3D /* ru */,
 				4D4695BE23878E4B009D3BC7 /* uk */,
 				4D4695DD23878E70009D3BC7 /* fr */,
+				4D27CC6023C7384500DF06ED /* sv */,
 			);
 			name = PasswordSafeHistory.storyboard;
 			path = StrongBox;
@@ -6458,6 +6515,7 @@
 				4D51F0BA233BE5D800F5BB3D /* ru */,
 				4D4695C023878E4B009D3BC7 /* uk */,
 				4D4695DF23878E70009D3BC7 /* fr */,
+				4D27CC6223C7384600DF06ED /* sv */,
 			);
 			name = SelectKeyFile.storyboard;
 			path = StrongBox;
@@ -6471,6 +6529,7 @@
 				4D51F0BB233BE5D800F5BB3D /* ru */,
 				4D4695C123878E4B009D3BC7 /* uk */,
 				4D4695E023878E70009D3BC7 /* fr */,
+				4D27CC6323C7384700DF06ED /* sv */,
 			);
 			name = SelectStorage.storyboard;
 			path = StrongBox;
@@ -6484,6 +6543,7 @@
 				4D51F0BC233BE5D800F5BB3D /* ru */,
 				4D4695C223878E4B009D3BC7 /* uk */,
 				4D4695E123878E71009D3BC7 /* fr */,
+				4D27CC6423C7384700DF06ED /* sv */,
 			);
 			name = PinEntry.storyboard;
 			path = StrongBox;
@@ -6497,6 +6557,7 @@
 				4D51F0BE233BE5D900F5BB3D /* ru */,
 				4D4695C423878E4B009D3BC7 /* uk */,
 				4D4695E323878E71009D3BC7 /* fr */,
+				4D27CC6623C7384800DF06ED /* sv */,
 			);
 			name = DatabaseOperations.storyboard;
 			path = StrongBox;
@@ -6511,6 +6572,7 @@
 				4D4695C523878E4C009D3BC7 /* uk */,
 				4D4695E423878E71009D3BC7 /* fr */,
 				4DBBF18123A2992100071EAC /* en */,
+				4D27CC6723C7384800DF06ED /* sv */,
 			);
 			name = Preferences.storyboard;
 			path = StrongBox;
@@ -6523,6 +6585,7 @@
 				4D51F0C0233BE5D900F5BB3D /* ru */,
 				4D4695C623878E4C009D3BC7 /* uk */,
 				4D4695E523878E71009D3BC7 /* fr */,
+				4D27CC6823C7384800DF06ED /* sv */,
 			);
 			name = SelectItem.storyboard;
 			path = StrongBox;
@@ -6536,6 +6599,7 @@
 				4D2854762362FF9800DC3664 /* ru */,
 				4D4695C723878E4C009D3BC7 /* uk */,
 				4D4695E623878E71009D3BC7 /* fr */,
+				4D27CC6923C7384800DF06ED /* sv */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -6549,6 +6613,7 @@
 				4D51F0C7233BE5DA00F5BB3D /* ru */,
 				4D4695CD23878E4C009D3BC7 /* uk */,
 				4D4695EC23878E72009D3BC7 /* fr */,
+				4D27CC7423C73CA300DF06ED /* sv */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

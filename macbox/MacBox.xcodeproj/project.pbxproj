@@ -271,6 +271,22 @@
 		4D22DA3D22609CBB00561AF7 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = MBProgressHUDMac/MBProgressHUD.m; sourceTree = "<group>"; };
 		4D23BBF2216136D10054C8D0 /* formatV3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = formatV3.txt; path = ../model/pwsafe/formatV3.txt; sourceTree = "<group>"; };
 		4D23BBF3216136D10054C8D0 /* formatV4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = formatV4.txt; path = ../model/pwsafe/formatV4.txt; sourceTree = "<group>"; };
+		4D27CC4523C737DE00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		4D27CC4623C737DE00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Main.strings; sourceTree = "<group>"; };
+		4D27CC4723C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		4D27CC4823C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		4D27CC4923C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D27CC4A23C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D27CC4B23C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
+		4D27CC4C23C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
+		4D27CC4D23C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D27CC4E23C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
+		4D27CC4F23C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
+		4D27CC5023C737DF00DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		4D27CC5123C737E000DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
+		4D27CC5223C737E000DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		4D27CC5323C737E000DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		4D27CC5423C737E000DF06ED /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = ../StrongBox/sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4D2965F821AD6B4B009B7936 /* TouchIdStorageTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TouchIdStorageTests.m; sourceTree = "<group>"; };
 		4D2965FA21AD6B4B009B7936 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D29660721AD6EFB009B7936 /* MacUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacUnitTests.m; sourceTree = "<group>"; };
@@ -635,6 +651,10 @@
 		4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreateFormatAndSetCredentialsWizard.m; path = MacBox/CreateFormatAndSetCredentialsWizard.m; sourceTree = "<group>"; };
 		4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSAdvancedTextField.h; path = MacBox/NSAdvancedTextField.h; sourceTree = "<group>"; };
 		4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSAdvancedTextField.m; path = MacBox/NSAdvancedTextField.m; sourceTree = "<group>"; };
+		4DEEE26823C73EF1007BBFFE /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = ../StrongBox/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4DEEE26923C73EF4007BBFFE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = ../StrongBox/de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4DEEE26A23C73EF6007BBFFE /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ../StrongBox/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4DEEE26B23C73EF9007BBFFE /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = ../StrongBox/uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4DF299812243CED70080F9DC /* CollectionViewHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CollectionViewHeader.h; sourceTree = "<group>"; };
 		4DF299822243CED70080F9DC /* CollectionViewHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollectionViewHeader.m; sourceTree = "<group>"; };
 		4DF347D62074FA3500148741 /* PwSafeDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeDatabase.h; path = ../model/pwsafe/PwSafeDatabase.h; sourceTree = "<group>"; };
@@ -998,6 +1018,7 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4DD9EB1D23C4FD1500887237 /* Set Icon */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DE2CA3E23C38B5E00F76255 /* Main */,
@@ -1017,9 +1038,6 @@
 				4DC805C123A11749001E742E /* PredefinedKeePassIcon.xib */,
 				4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */,
 				4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */,
-				4DC805B523A1170E001E742E /* SelectPredefinedIconController.xib */,
-				4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */,
-				4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */,
 				4DC805BA23A1173D001E742E /* CollectionViewHeader.xib */,
 				4DF299812243CED70080F9DC /* CollectionViewHeader.h */,
 				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
@@ -1219,6 +1237,16 @@
 				4DD2BAB8238BE44400513271 /* MMcG_MF_Base32Additions.m */,
 			);
 			name = Base32;
+			sourceTree = "<group>";
+		};
+		4DD9EB1D23C4FD1500887237 /* Set Icon */ = {
+			isa = PBXGroup;
+			children = (
+				4DC805B523A1170E001E742E /* SelectPredefinedIconController.xib */,
+				4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */,
+				4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */,
+			);
+			name = "Set Icon";
 			sourceTree = "<group>";
 		};
 		4DE2CA3D23C38B4100F76255 /* Change Password and Format */ = {
@@ -1506,6 +1534,7 @@
 				de,
 				uk,
 				ru,
+				sv,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
@@ -1809,6 +1838,7 @@
 				4D40B07223BFB5AE00BAD0D2 /* de */,
 				4D40B07423BFB5AF00BAD0D2 /* ru */,
 				4D40B07623BFB5B000BAD0D2 /* uk */,
+				4D27CC4923C737DF00DF06ED /* sv */,
 			);
 			name = DownloadFavIcons.storyboard;
 			path = MacBox;
@@ -1822,6 +1852,7 @@
 				4D40B07F23BFB86700BAD0D2 /* de */,
 				4D40B08123BFB86800BAD0D2 /* ru */,
 				4D40B08323BFB86A00BAD0D2 /* uk */,
+				4D27CC4D23C737DF00DF06ED /* sv */,
 			);
 			name = MacKeePassHistory.storyboard;
 			path = MacBox;
@@ -1835,6 +1866,7 @@
 				4D40B08C23BFB8B900BAD0D2 /* de */,
 				4D40B08E23BFB8BB00BAD0D2 /* ru */,
 				4D40B09023BFB8BD00BAD0D2 /* uk */,
+				4D27CC4A23C737DF00DF06ED /* sv */,
 			);
 			name = NodeDetails.storyboard;
 			path = MacBox;
@@ -1844,6 +1876,11 @@
 			isa = PBXVariantGroup;
 			children = (
 				4D4A003C231317A900B69E09 /* Base */,
+				4D27CC5423C737E000DF06ED /* sv */,
+				4DEEE26823C73EF1007BBFFE /* fr */,
+				4DEEE26923C73EF4007BBFFE /* de */,
+				4DEEE26A23C73EF6007BBFFE /* ru */,
+				4DEEE26B23C73EF9007BBFFE /* uk */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1856,6 +1893,7 @@
 				4DE68C5523A53230007C445C /* de */,
 				4DE68C6323A5324C007C445C /* uk */,
 				4DE68C7123A53260007C445C /* ru */,
+				4D27CC4823C737DF00DF06ED /* sv */,
 			);
 			name = PreferencesWindowController.xib;
 			path = MacBox;
@@ -1869,6 +1907,7 @@
 				4DE68C5623A53231007C445C /* de */,
 				4DE68C6423A5324C007C445C /* uk */,
 				4DE68C7223A53260007C445C /* ru */,
+				4D27CC4E23C737DF00DF06ED /* sv */,
 			);
 			name = SafesMetaDataViewer.xib;
 			path = MacBox;
@@ -1882,6 +1921,7 @@
 				4DE68C5723A53231007C445C /* de */,
 				4DE68C6523A5324C007C445C /* uk */,
 				4DE68C7323A53260007C445C /* ru */,
+				4D27CC5223C737E000DF06ED /* sv */,
 			);
 			name = UpgradeWindowController.xib;
 			path = MacBox;
@@ -1895,6 +1935,7 @@
 				4DE68C5823A53231007C445C /* de */,
 				4DE68C6623A5324C007C445C /* uk */,
 				4DE68C7423A53260007C445C /* ru */,
+				4D27CC4723C737DF00DF06ED /* sv */,
 			);
 			name = ChangeMasterPasswordWindowController.xib;
 			path = MacBox;
@@ -1908,6 +1949,7 @@
 				4DE68C5C23A53231007C445C /* de */,
 				4DE68C6A23A5324D007C445C /* uk */,
 				4DE68C7823A53261007C445C /* ru */,
+				4D27CC4F23C737DF00DF06ED /* sv */,
 			);
 			name = ProgressWindow.xib;
 			path = MacBox;
@@ -1921,6 +1963,7 @@
 				4DE68C5F23A53231007C445C /* de */,
 				4DE68C6D23A5324D007C445C /* uk */,
 				4DE68C7B23A53261007C445C /* ru */,
+				4D27CC4523C737DE00DF06ED /* sv */,
 			);
 			name = SelectPredefinedIconController.xib;
 			path = MacBox;
@@ -1934,6 +1977,7 @@
 				4DE68C6023A53231007C445C /* de */,
 				4DE68C6E23A5324D007C445C /* uk */,
 				4DE68C7C23A53261007C445C /* ru */,
+				4D27CC5123C737E000DF06ED /* sv */,
 			);
 			name = CollectionViewHeader.xib;
 			path = MacBox;
@@ -1947,6 +1991,7 @@
 				4DE68C5D23A53231007C445C /* de */,
 				4DE68C6B23A5324D007C445C /* uk */,
 				4DE68C7923A53261007C445C /* ru */,
+				4D27CC5023C737DF00DF06ED /* sv */,
 			);
 			name = PredefinedKeePassIcon.xib;
 			path = MacBox;
@@ -1960,6 +2005,7 @@
 				4DE68C5B23A53231007C445C /* de */,
 				4DE68C6923A5324D007C445C /* uk */,
 				4DE68C7723A53261007C445C /* ru */,
+				4D27CC4C23C737DF00DF06ED /* sv */,
 			);
 			name = AttachmentItem.xib;
 			path = MacBox;
@@ -1973,6 +2019,7 @@
 				4DE68C5A23A53231007C445C /* de */,
 				4DE68C6823A5324C007C445C /* uk */,
 				4DE68C7623A53261007C445C /* ru */,
+				4D27CC4B23C737DF00DF06ED /* sv */,
 			);
 			name = CustomFieldTableCellView.xib;
 			path = MacBox;
@@ -1986,6 +2033,7 @@
 				4DE68C5323A53230007C445C /* de */,
 				4DE68C6123A5324C007C445C /* uk */,
 				4DE68C6F23A53260007C445C /* ru */,
+				4D27CC5323C737E000DF06ED /* sv */,
 			);
 			name = CheckboxCell.xib;
 			path = MacBox;
@@ -1999,6 +2047,7 @@
 				4DE68C5423A53230007C445C /* de */,
 				4DE68C6223A5324C007C445C /* uk */,
 				4DE68C7023A53260007C445C /* ru */,
+				4D27CC4623C737DE00DF06ED /* sv */,
 			);
 			name = Main.storyboard;
 			path = MacBox;
@@ -2169,13 +2218,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2663;
+				CURRENT_PROJECT_VERSION = 2664;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.1;
+				MARKETING_VERSION = 1.12.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2191,13 +2240,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2663;
+				CURRENT_PROJECT_VERSION = 2664;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.1;
+				MARKETING_VERSION = 1.12.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -16,7 +16,7 @@
                         <subviews>
                             <tabView translatesAutoresizingMaskIntoConstraints="NO" id="kkD-iF-kN5">
                                 <rect key="frame" x="13" y="10" width="618" height="484"/>
-                                <font key="font" metaFont="label" size="13"/>
+                                <font key="font" metaFont="system"/>
                                 <tabViewItems>
                                     <tabViewItem label="Find" identifier="1" id="FKA-7m-a0x">
                                         <view key="view" id="erU-0O-ek1">
@@ -35,7 +35,7 @@
                                                     <rect key="frame" x="258" y="13" width="82" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xQS-9z-Yac">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -48,7 +48,7 @@ Gw
                                                     <rect key="frame" x="455" y="13" width="129" height="32"/>
                                                     <buttonCell key="cell" type="push" title="View Results..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xNA-dA-oTP">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -61,7 +61,7 @@ Gw
                                                     <rect key="frame" x="14" y="13" width="125" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Preferences..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TqQ-OG-aCU">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="onPreferences:" target="V6t-OV-p7O" id="JZB-ax-taj"/>
@@ -70,7 +70,7 @@ Gw
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tgN-Pg-iWf">
                                                     <rect key="frame" x="224" y="390" width="150" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Tap Play to Start Search" id="cAp-tG-VSs">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -78,7 +78,7 @@ Gw
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2I4-QE-ZFf">
                                                     <rect key="frame" x="15" y="147" width="55" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Success" id="ZJz-ra-Vsj">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -86,7 +86,7 @@ Gw
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lKP-p0-iGZ">
                                                     <rect key="frame" x="86" y="147" width="13" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="0" id="3Bu-oM-nIl">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -94,15 +94,15 @@ Gw
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pOS-2P-S0s">
                                                     <rect key="frame" x="86" y="123" width="13" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="0" id="Mv9-iO-ixg">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pLD-a2-HKc">
-                                                    <rect key="frame" x="15" y="123" width="40" height="16"/>
+                                                    <rect key="frame" x="15" y="123" width="67" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Failed" id="z9e-oX-GKj">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -110,7 +110,7 @@ Gw
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v3t-P8-Kdh">
                                                     <rect key="frame" x="287" y="212" width="25" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="0/5" id="nAn-QC-eJT">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -123,7 +123,7 @@ Gw
                                                     </constraints>
                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Play" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="ysY-Fg-Qmq">
                                                         <behavior key="behavior" lightByContents="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="onStartStop:" target="V6t-OV-p7O" id="Hfr-Cc-pZq"/>
@@ -139,7 +139,7 @@ Gw
                                                     <rect key="frame" x="15" y="59" width="279" height="18"/>
                                                     <buttonCell key="cell" type="check" title="Include Items with Custom Icons in Search" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="MUS-LL-wFP">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="onIncludeItemsWithCustomIcons:" target="V6t-OV-p7O" id="7Xj-hg-Epx"/>
@@ -165,7 +165,7 @@ Gw
                                                     <rect key="frame" x="372" y="13" width="83" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Retry..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="VWi-eR-uCU">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -177,6 +177,7 @@ Gw
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="aMp-kS-dAq" firstAttribute="top" relation="greaterThanOrEqual" secondItem="tgN-Pg-iWf" secondAttribute="bottom" constant="24" id="1Ie-lG-ldK"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Aqp-pf-DjP" secondAttribute="trailing" constant="20" symbolic="YES" id="2ks-Aw-8NQ"/>
                                                 <constraint firstItem="pLD-a2-HKc" firstAttribute="leading" secondItem="erU-0O-ek1" secondAttribute="leading" constant="17" id="3KC-4b-LSZ"/>
                                                 <constraint firstItem="2I4-QE-ZFf" firstAttribute="top" secondItem="Aqp-pf-DjP" secondAttribute="bottom" constant="8" id="3gx-O5-LcL"/>
                                                 <constraint firstItem="tgN-Pg-iWf" firstAttribute="centerX" secondItem="erU-0O-ek1" secondAttribute="centerX" id="9YG-c3-tsG"/>
@@ -186,6 +187,7 @@ Gw
                                                 <constraint firstItem="Rmh-MF-cAs" firstAttribute="leading" secondItem="FMs-pE-eEJ" secondAttribute="leading" id="D4Q-MY-EyT"/>
                                                 <constraint firstItem="2I4-QE-ZFf" firstAttribute="leading" secondItem="erU-0O-ek1" secondAttribute="leading" constant="17" id="DWm-Id-Z8G"/>
                                                 <constraint firstItem="pOS-2P-S0s" firstAttribute="leading" secondItem="lKP-p0-iGZ" secondAttribute="leading" id="Daw-rv-H6a"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Rmh-MF-cAs" secondAttribute="trailing" constant="20" symbolic="YES" id="G3v-Ie-UEh"/>
                                                 <constraint firstItem="v3t-P8-Kdh" firstAttribute="centerX" secondItem="erU-0O-ek1" secondAttribute="centerX" id="Glj-pc-bqA"/>
                                                 <constraint firstItem="a5O-NA-TYY" firstAttribute="leading" secondItem="erU-0O-ek1" secondAttribute="leading" constant="17" id="GwW-Gj-vgk"/>
                                                 <constraint firstAttribute="bottom" secondItem="exe-zS-pXB" secondAttribute="bottom" constant="20" id="GyK-Qq-CYn"/>
@@ -206,12 +208,16 @@ Gw
                                                 <constraint firstItem="v3t-P8-Kdh" firstAttribute="top" secondItem="a5O-NA-TYY" secondAttribute="bottom" constant="8" id="e8O-5m-0xH"/>
                                                 <constraint firstItem="lKP-p0-iGZ" firstAttribute="leading" secondItem="2I4-QE-ZFf" secondAttribute="trailing" constant="20" id="fNK-sJ-x7S"/>
                                                 <constraint firstItem="Aqp-pf-DjP" firstAttribute="leading" secondItem="erU-0O-ek1" secondAttribute="leading" constant="17" id="gna-Ea-kyU"/>
+                                                <constraint firstItem="pOS-2P-S0s" firstAttribute="leading" secondItem="pLD-a2-HKc" secondAttribute="trailing" constant="8" symbolic="YES" id="gpn-Hj-8o2"/>
                                                 <constraint firstItem="kJ3-k6-xfM" firstAttribute="top" secondItem="erU-0O-ek1" secondAttribute="top" constant="8" id="j12-RA-WbT"/>
                                                 <constraint firstItem="7dz-Nl-b6N" firstAttribute="leading" secondItem="exe-zS-pXB" secondAttribute="trailing" constant="12" id="jbd-Eb-wN2"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pOS-2P-S0s" secondAttribute="trailing" constant="20" symbolic="YES" id="lgf-Y6-sOH"/>
                                                 <constraint firstItem="tgN-Pg-iWf" firstAttribute="top" secondItem="kJ3-k6-xfM" secondAttribute="bottom" constant="8" id="oqu-JL-Z5o"/>
                                                 <constraint firstAttribute="bottom" secondItem="pBi-M2-hFg" secondAttribute="bottom" constant="20" id="sP6-zi-a2B"/>
                                                 <constraint firstAttribute="trailing" secondItem="7dz-Nl-b6N" secondAttribute="trailing" constant="20" id="tH7-MB-ga8"/>
                                                 <constraint firstItem="Rmh-MF-cAs" firstAttribute="top" secondItem="FMs-pE-eEJ" secondAttribute="bottom" constant="8" id="uNr-Tg-uaP"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="FMs-pE-eEJ" secondAttribute="trailing" constant="20" symbolic="YES" id="wSR-mo-iP2"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="lKP-p0-iGZ" secondAttribute="trailing" constant="20" symbolic="YES" id="wg4-SP-who"/>
                                                 <constraint firstItem="LTv-UG-Myv" firstAttribute="centerX" secondItem="erU-0O-ek1" secondAttribute="centerX" id="yjq-Nf-j8v"/>
                                             </constraints>
                                         </view>
@@ -225,7 +231,7 @@ Gw
                                                     <rect key="frame" x="14" y="13" width="132" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Back to Search" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aGh-Ad-cuD">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="onBackToSearch:" target="V6t-OV-p7O" id="BKn-YI-yTb"/>
@@ -235,7 +241,7 @@ Gw
                                                     <rect key="frame" x="20" y="61" width="558" height="295"/>
                                                     <clipView key="contentView" id="fxo-oW-enj">
                                                         <rect key="frame" x="1" y="1" width="556" height="293"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="32" usesAutomaticRowHeights="YES" viewBased="YES" id="YZ6-1k-mhd">
                                                                 <rect key="frame" x="0.0" y="0.0" width="556" height="293"/>
@@ -247,12 +253,12 @@ Gw
                                                                 <tableColumns>
                                                                     <tableColumn width="538" minWidth="40" maxWidth="1000" id="xco-nO-nsg">
                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                            <font key="font" metaFont="controlContent" size="11"/>
+                                                                            <font key="font" metaFont="menu" size="11"/>
                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                         </tableHeaderCell>
                                                                         <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="Csj-T3-YuD">
-                                                                            <font key="font" metaFont="label" size="13"/>
+                                                                            <font key="font" metaFont="system"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -271,7 +277,7 @@ Gw
                                                                                         <rect key="frame" x="25" y="0.0" width="512" height="17"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="rNc-cW-DRt">
-                                                                                            <font key="font" metaFont="label" size="13"/>
+                                                                                            <font key="font" metaFont="system"/>
                                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
@@ -313,7 +319,7 @@ Gw
                                                     <rect key="frame" x="258" y="13" width="82" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4XR-nj-II5">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 Gw
 </string>
@@ -326,7 +332,7 @@ Gw
                                                     <rect key="frame" x="486" y="13" width="97" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Set Icons" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RQ0-Tb-kWN">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
@@ -339,7 +345,7 @@ DQ
                                                     <rect key="frame" x="15" y="364" width="562" height="38"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" selectable="YES" alignment="center" id="MIt-0I-ch9">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <string key="title">Review found FavIcons below, select your preferred icons, or deselect those you don't like. When done click Set Icons if you're happy or Cancel to exit.</string>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -354,8 +360,10 @@ DQ
                                                 <constraint firstItem="VA9-gc-Dlz" firstAttribute="trailing" secondItem="YZ6-1k-mhd" secondAttribute="trailing" id="UWT-lP-u29"/>
                                                 <constraint firstItem="zOj-qF-fsQ" firstAttribute="top" secondItem="iOH-WG-7vB" secondAttribute="top" constant="8" id="Ug6-jY-qqQ"/>
                                                 <constraint firstItem="bGr-zD-kf5" firstAttribute="leading" secondItem="lFV-Gi-dWP" secondAttribute="leading" id="ZBw-Fv-5V0"/>
+                                                <constraint firstItem="pth-Rg-Jfw" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="gGu-bM-5DZ" secondAttribute="trailing" constant="12" symbolic="YES" id="Zpu-sn-6TQ"/>
                                                 <constraint firstItem="lFV-Gi-dWP" firstAttribute="top" secondItem="bGr-zD-kf5" secondAttribute="bottom" constant="8" id="cGO-Mt-b2s"/>
                                                 <constraint firstItem="gGu-bM-5DZ" firstAttribute="top" secondItem="lFV-Gi-dWP" secondAttribute="bottom" constant="20" id="dFv-Ju-o15"/>
+                                                <constraint firstItem="VA9-gc-Dlz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="pth-Rg-Jfw" secondAttribute="trailing" constant="12" symbolic="YES" id="go1-P7-bah"/>
                                                 <constraint firstAttribute="bottom" secondItem="pth-Rg-Jfw" secondAttribute="bottom" constant="20" id="hcO-Y7-gTH"/>
                                                 <constraint firstItem="gGu-bM-5DZ" firstAttribute="top" secondItem="iOH-WG-7vB" secondAttribute="top" constant="397" id="lTZ-dz-M8X"/>
                                                 <constraint firstItem="zOj-qF-fsQ" firstAttribute="centerX" secondItem="iOH-WG-7vB" secondAttribute="centerX" id="o99-5x-tlY"/>
@@ -384,7 +392,7 @@ DQ
                                                     <rect key="frame" x="15" y="380" width="562" height="22"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <textFieldCell key="cell" selectable="YES" alignment="center" title="Strongbox found multiple FavIcons for this Item, please select your preferred icon." id="tu9-Vy-FJr">
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -393,7 +401,7 @@ DQ
                                                     <rect key="frame" x="20" y="61" width="558" height="311"/>
                                                     <clipView key="contentView" id="fVg-uw-8p5">
                                                         <rect key="frame" x="1" y="1" width="556" height="309"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="32" usesAutomaticRowHeights="YES" viewBased="YES" id="RNL-k1-dic">
                                                                 <rect key="frame" x="0.0" y="0.0" width="556" height="309"/>
@@ -405,12 +413,12 @@ DQ
                                                                 <tableColumns>
                                                                     <tableColumn width="536" minWidth="40" maxWidth="1000" id="rmz-qh-cgs">
                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                            <font key="font" metaFont="controlContent" size="11"/>
+                                                                            <font key="font" metaFont="menu" size="11"/>
                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                         </tableHeaderCell>
                                                                         <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="rPb-et-iE7">
-                                                                            <font key="font" metaFont="label" size="13"/>
+                                                                            <font key="font" metaFont="system"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -429,7 +437,7 @@ DQ
                                                                                         <rect key="frame" x="25" y="0.0" width="510" height="17"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="TJy-5P-JGV">
-                                                                                            <font key="font" metaFont="label" size="13"/>
+                                                                                            <font key="font" metaFont="system"/>
                                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                         </textFieldCell>
@@ -463,7 +471,7 @@ DQ
                                                     <rect key="frame" x="14" y="13" width="180" height="32"/>
                                                     <buttonCell key="cell" type="push" title="Back to Search Results" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qJH-yP-ABj">
                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                        <font key="font" metaFont="label" size="13"/>
+                                                        <font key="font" metaFont="system"/>
                                                     </buttonCell>
                                                     <connections>
                                                         <action selector="onViewResults:" target="V6t-OV-p7O" id="LKB-SH-c3k"/>
@@ -482,6 +490,7 @@ DQ
                                                 <constraint firstItem="5hc-7i-1av" firstAttribute="top" secondItem="kxG-Wa-RCU" secondAttribute="bottom" constant="8" id="Z8r-r5-fQM"/>
                                                 <constraint firstItem="Xah-vR-PFN" firstAttribute="leading" secondItem="t6h-5a-Tps" secondAttribute="leading" constant="20" id="cHi-ca-Zk5"/>
                                                 <constraint firstAttribute="trailing" secondItem="Xah-vR-PFN" secondAttribute="trailing" constant="20" id="lBQ-cK-8Ie"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7Yk-Rm-DCU" secondAttribute="trailing" constant="20" symbolic="YES" id="tYE-cn-oNu"/>
                                                 <constraint firstItem="7Yk-Rm-DCU" firstAttribute="leading" secondItem="t6h-5a-Tps" secondAttribute="leading" constant="20" id="vb7-le-SWD"/>
                                             </constraints>
                                         </view>

@@ -13,7 +13,7 @@
 
 + (NSMutableDictionary<NSUUID *,NSData *> *)rationalize:(NSDictionary<NSUUID *,NSData *> *)customIcons root:(Node *)root {
     NSArray<Node*> *nodes = [CustomIconsRationalizer getAllNodesReferencingCustomIcons:root];
-    NSLog(@"Before Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)customIcons.allKeys.count, (unsigned long)nodes.count);
+//    NSLog(@"Before Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)customIcons.allKeys.count, (unsigned long)nodes.count);
     
     // 1. Node could point to non existent custom icon - clean those up and get a clean copy of the custom icon db
     
@@ -28,7 +28,7 @@
 
     freshCopy = [CustomIconsRationalizer removeBadCustomIconReferencesAndBuildFreshIconMap:nodes customIcons:freshCopy];
     
-    NSLog(@"After Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)freshCopy.allKeys.count, (unsigned long)nodes.count);
+//    NSLog(@"After Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)freshCopy.allKeys.count, (unsigned long)nodes.count);
     
     return freshCopy;
 }

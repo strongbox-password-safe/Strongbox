@@ -88,6 +88,7 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (strong) IBOutlet NSMenu *outlineHeaderColumnsMenu;
 @property (weak) IBOutlet NSView *customFieldsRow;
 @property (weak) IBOutlet NSTableView *customFieldsTable;
+@property (weak) IBOutlet NSImageView *imageViewIcon;
 
 @property (strong, nonatomic) ViewModel* model;
 @property BOOL isPromptingAboutUnderlyingFileChange;
@@ -123,7 +124,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)viewDidAppear {
-    NSLog(@"viewDidAppear...");
+//    NSLog(@"viewDidAppear...");
     
     [super viewDidAppear];
     
@@ -137,7 +138,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-    NSLog(@"[%@] Window Became Key!", [self getDatabaseMetaData].nickName);
+//    NSLog(@"[%@] Window Became Key!", [self getDatabaseMetaData].nickName);
 
     // MMcG: Seems to be unfortunately required - as key window is not set if we call straight away... hack :(
     
@@ -690,6 +691,9 @@ static NSString* const kNewEntryKey = @"newEntry";
         [self.tabViewRightPane selectTabViewItemAtIndex:0];
         self.emailRow.hidden = self.model.format != kPasswordSafe;
         
+        self.imageViewIcon.image = [self getIconForNode:it large:YES];
+        self.imageViewIcon.hidden = self.model.format == kPasswordSafe;
+
         //NSLog(@"Setting Text fields");
         self.labelTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
         self.labelPassword.stringValue = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
@@ -1487,8 +1491,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             }];
         }
         else {
-            NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
-            [self showProgressModal:loc];
+            // MMcG: Causes Dock Icon to Bounce which isn't great... Just forget about it...
+            
+            // NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
+            //[self showProgressModal:loc];
 
             [self lockSafeContinuation:nil];
         }
@@ -2451,6 +2457,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
     if(newRecord) {
         [self openItemDetails:node newEntry:YES];
+        
+        [self expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:node];
     }    
 }
 

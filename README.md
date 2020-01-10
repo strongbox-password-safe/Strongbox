@@ -40,8 +40,10 @@ You can submit Pull Requests any way you choose, and it will be much appreciated
 
 Big thank you to all the localization contributors
 
-Russian - wishes to remain anonymous!
+French - Charles-Ivan Chesneau
 German - @Slummi
+Russian - anonymous
+Swedish - Jari Häkkinen
 Ukrainian - Artem Polivanchuk
 
 # Build Issues
