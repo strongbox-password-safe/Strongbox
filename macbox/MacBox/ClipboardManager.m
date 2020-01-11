@@ -22,11 +22,12 @@
 }
 
 - (void)copyConcealedString:(NSString *)string {
-    static NSString* const kConcealedType = @"org.nspasteboard.ConcealedType";
+//    static NSString* const kConcealedType = @"org.nspasteboard.ConcealedType";
     
-    [[NSPasteboard generalPasteboard] clearContents];
-    [[NSPasteboard generalPasteboard] setString:(string ? string : @"")
-                                        forType:kConcealedType];
+    //NSLog(@"Copying: %@", string);
+    [NSPasteboard.generalPasteboard setString:(string ? string : @"")
+                                      forType:NSStringPboardType];
 }
 
 @end
+

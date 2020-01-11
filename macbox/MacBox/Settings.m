@@ -17,6 +17,7 @@ NSString* const kTOTPColumn = @"TOTPColumn";
 NSString* const kURLColumn = @"URLColumn";
 NSString* const kEmailColumn = @"EmailColumn";
 NSString* const kNotesColumn = @"NotesColumn";
+NSString* const kExpiresColumn = @"ExpiresColumn";
 NSString* const kAttachmentsColumn = @"AttachmentsColumn";
 NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 
@@ -194,7 +195,7 @@ static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmedia
     static dispatch_once_t onceToken;
     
     dispatch_once(&onceToken, ^{
-        _arr = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kTOTPColumn, kURLColumn, kEmailColumn, kNotesColumn, kAttachmentsColumn, kCustomFieldsColumn];
+        _arr = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kTOTPColumn, kURLColumn, kEmailColumn, kNotesColumn, kExpiresColumn, kAttachmentsColumn, kCustomFieldsColumn];
     });
     
     return _arr;

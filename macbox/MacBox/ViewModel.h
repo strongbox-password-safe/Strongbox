@@ -26,6 +26,7 @@ extern NSString* const kModelUpdateNotificationIconChanged;
 extern NSString* const kModelUpdateNotificationAttachmentsChanged;
 extern NSString* const kModelUpdateNotificationTotpChanged;
 extern NSString* const kNotificationUserInfoKeyIsBatchIconUpdate;
+extern NSString* const kModelUpdateNotificationExpiryChanged;
 
 @interface ViewModel : NSObject
 
@@ -50,6 +51,7 @@ extern NSString* const kNotificationUserInfoKeyIsBatchIconUpdate;
 - (void)setItemUrl:(Node*)item url:(NSString*)url;
 - (void)setItemPassword:(Node*)item password:(NSString*)password;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
+- (void)setItemExpires:(Node*)item expiry:(NSDate*_Nullable)expiry;
 
 - (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage;
 

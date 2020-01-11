@@ -106,6 +106,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (weak) IBOutlet NSTableView *attachmentsTable;
 @property NSDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
 
+@property (weak) IBOutlet NSView *expiresRow;
+@property (weak) IBOutlet NSTextField *labelExpires;
+
 @property NSArray* attachments;
 
 @property (strong, nonatomic) ViewModel* model;
@@ -479,6 +482,11 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 }
 
+- (void)onItemExpiryDateChanged:(NSNotification*)notification {
+    NSString *loc = NSLocalizedString(@"generic_fieldname_expiry_date", @"Expiry Date");
+    [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
+}
+
 - (void)onItemEmailChanged:(NSNotification*)notification {
     NSString *loc = NSLocalizedString(@"generic_fieldname_email", @"Email");
     [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
@@ -645,6 +653,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationCustomFieldsChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationTitleChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationUsernameChanged object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationExpiryChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationUrlChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationEmailChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationNotesChanged object:nil];
@@ -677,6 +686,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemUsernameChanged:) name: kModelUpdateNotificationUsernameChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemUrlChanged:) name: kModelUpdateNotificationUrlChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemEmailChanged:) name: kModelUpdateNotificationEmailChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemExpiryDateChanged:) name: kModelUpdateNotificationExpiryChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemNotesChanged:) name: kModelUpdateNotificationNotesChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemPasswordChanged:) name:kModelUpdateNotificationPasswordChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onItemIconChanged:) name:kModelUpdateNotificationIconChanged object:nil];
@@ -735,6 +745,12 @@ static NSString* const kNewEntryKey = @"newEntry";
         self.imageViewTogglePassword.hidden = (self.labelPassword.stringValue.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
         self.showPassword = Settings.sharedInstance.alwaysShowPassword || (self.labelPassword.stringValue.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
         [self showOrHideQuickViewPassword];
+        
+        // Expiry
+        
+        self.expiresRow.hidden = it.fields.expires == nil;
+        self.labelExpires.stringValue = friendlyDateString(it.fields.expires);
+        self.labelExpires.textColor = it.expired ? NSColor.redColor : nil;
         
         // TOTP
 
@@ -880,6 +896,12 @@ static NSString* const kNewEntryKey = @"newEntry";
     else if([tableColumn.identifier isEqualToString:kEmailColumn]) {
         return [self getEditableCell:it.fields.email node:it selector:@selector(onOutlineViewItemEmailEdited:)];
     }
+    else if([tableColumn.identifier isEqualToString:kExpiresColumn]) {
+        NSString* exp = friendlyDateStringVeryShort(it.fields.expires);
+        NSTableCellView* cell = [self getReadOnlyCell:exp];
+        cell.textField.textColor = it.expired ? NSColor.redColor : nil;
+        return cell;
+    }
     else if([tableColumn.identifier isEqualToString:kNotesColumn]) {
         return [self getEditableCell:it.fields.notes node:it selector:@selector(onOutlineViewItemNotesEdited:)];
     }
@@ -896,8 +918,11 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (NSTableCellView*)getReadOnlyCell:(NSString*)text {
     NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"ReadOnlyCell" owner:self];
+    
     cell.textField.stringValue = text;
     cell.textField.editable = NO;
+    cell.textField.textColor = nil;
+    
     return cell;
 }
 
@@ -2565,7 +2590,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
     SEL theAction = [anItem action];
-    
+
+//    NSLog(@"validating UI Item [%@]", NSStringFromSelector(theAction));
+
     Node* item = nil;
     
     if(self.model && !self.model.locked) {

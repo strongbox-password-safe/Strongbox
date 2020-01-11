@@ -22,6 +22,7 @@ NSString* const kModelUpdateNotificationUsernameChanged = @"kModelUpdateNotifica
 NSString* const kModelUpdateNotificationEmailChanged = @"kModelUpdateNotificationEmailChanged";
 NSString* const kModelUpdateNotificationUrlChanged = @"kModelUpdateNotificationUrlChanged";
 NSString* const kModelUpdateNotificationNotesChanged = @"kModelUpdateNotificationNotesChanged";
+NSString* const kModelUpdateNotificationExpiryChanged = @"kModelUpdateNotificationExpiryChanged";
 NSString* const kModelUpdateNotificationIconChanged = @"kModelUpdateNotificationIconChanged";
 NSString* const kModelUpdateNotificationAttachmentsChanged = @"kModelUpdateNotificationAttachmentsChanged";
 NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotificationTotpChanged";
@@ -211,6 +212,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes {
     [self setItemNotes:item notes:notes modified:nil];
+}
+
+- (void)setItemExpires:(Node *)item expiry:(NSDate *)expiry {
+    [self setItemExpires:item expiry:expiry modified:nil];
 }
 
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -443,6 +448,35 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNotesChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
+    });
+}
+
+- (void)setItemExpires:(Node*)item expiry:(NSDate*)expiry modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    NSDate* old = item.fields.expires;
+    NSDate* oldModified = item.fields.modified;
+
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+
+    item.fields.expires = expiry;
+    [self touchAndModify:item modDate:modified];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemExpires:item expiry:old modified:oldModified];
+
+    NSString* loc = NSLocalizedString(@"mac_undo_action_expiry_change", @"Expiry Date Change");
+    [self.document.undoManager setActionName:loc];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationExpiryChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 

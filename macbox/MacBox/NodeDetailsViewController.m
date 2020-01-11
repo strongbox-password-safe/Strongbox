@@ -81,6 +81,9 @@
 @property (strong) IBOutlet NSMenu *customFieldsContextMenu;
 @property (strong) IBOutlet NSMenu *attachmentsContextMenu;
 
+@property (weak) IBOutlet NSButton *checkboxExpires;
+@property (weak) IBOutlet NSDatePicker *datePickerExpires;
+
 @end
 
 @implementation NodeDetailsViewController
@@ -116,13 +119,16 @@ static NSString* trimField(NSTextField* textField) {
     [self setTitle:aTitle];
 }
 
+- (void)viewWillAppear {
+    [super viewWillAppear];
+    self.view.window.delegate = self; // Catch Window events like close / undo manager etc
+}
+
 - (void)viewDidAppear {
     [super viewDidAppear];
     
     [self.view.window setLevel:Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSNormalWindowLevel : NSFloatingWindowLevel];
     [self.view.window setHidesOnDeactivate:YES];
-
-    self.view.window.delegate = self; // Catch Window events like close / undo manager etc
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
@@ -258,6 +264,7 @@ static NSString* trimField(NSTextField* textField) {
 - (void)observeModelChanges {
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationTitleChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationUsernameChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationExpiryChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationUrlChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationEmailChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onSimpleFieldsChanged:) name:kModelUpdateNotificationNotesChanged object:nil];
@@ -453,6 +460,13 @@ static NSString* trimField(NSTextField* textField) {
     self.buttonGenerate.enabled = !self.historical;
     self.buttonSettings.enabled = !self.historical;
     
+    
+    self.checkboxExpires.state = self.node.fields.expires == nil ? NSOffState : NSOnState;
+    self.datePickerExpires.dateValue = self.node.fields.expires;
+    
+    self.checkboxExpires.enabled = !self.historical;
+    self.datePickerExpires.enabled = !self.historical && self.node.fields.expires != nil;
+    
     [self validateTitleAndIndicateValidityInUI];
     
     [self initializeTotp];
@@ -569,6 +583,12 @@ static NSString* trimField(NSTextField* textField) {
         else if(notification.name == kModelUpdateNotificationNotesChanged){
             NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
             NSString* loc2 = NSLocalizedString(@"generic_fieldname_notes", @"Notes");
+            NSString* foo = [NSString stringWithFormat:loc, loc2];
+            [self showPopupToastNotification:foo];
+        }
+        else if (notification.name == kModelUpdateNotificationExpiryChanged) {
+            NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+            NSString* loc2 = NSLocalizedString(@"generic_fieldname_expiry_date", @"Expiry Date");
             NSString* foo = [NSString stringWithFormat:loc, loc2];
             [self showPopupToastNotification:foo];
         }
@@ -1205,6 +1225,8 @@ static NSString* trimField(NSTextField* textField) {
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     SEL theAction = [menuItem action];
     
+    NSLog(@"validateMenuItem [%@]", NSStringFromSelector(theAction));
+
     if(theAction == @selector(onAddCustomField:) ||
        theAction == @selector(onRemoveCustomField:) ||
        theAction == @selector(onEditCustomField:)) {
@@ -1221,7 +1243,6 @@ static NSString* trimField(NSTextField* textField) {
         return [self.attachmentsView.selectionIndexes count] != 0;
     }
 
-    
     return YES;
 }
 
@@ -1359,12 +1380,34 @@ static NSString* trimField(NSTextField* textField) {
         
         NSURL *totpUrl = [self.node.fields.otpToken url:YES];
         
-        NSLog(@"Showing QR Code for totp url [%@]", totpUrl);
+//        NSLog(@"Showing QR Code for totp url [%@]", totpUrl);
         
         NSImage* image = [self generateTheQRCodeImageFromDataBaseInfo:totpUrl.absoluteString];
         
         qr.qrCodeImage = image ? image : [NSImage imageNamed:@"error"];
     }
+}
+
+- (IBAction)onExpiresCheckbox:(id)sender {
+    if(self.checkboxExpires.state == NSOnState) {
+        NSCalendar *cal = [NSCalendar currentCalendar];
+        NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:30 toDate:[NSDate date] options:0];
+        [self.model setItemExpires:self.node expiry:date];
+    }
+    else {
+        [self.model setItemExpires:self.node expiry:nil];
+    }
+}
+
+- (IBAction)onDatePickerChanged:(id)sender {
+    // Throttle changes - Only set after user leaves it for .5 seconds...
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setExpiryDate:) object:nil];
+    [self performSelector:@selector(setExpiryDate:) withObject:nil afterDelay:0.5f];
+}
+
+- (void)setExpiryDate:(NSDate*)date {
+    [self.model setItemExpires:self.node expiry:self.datePickerExpires.dateValue];
 }
 
 @end

@@ -18,6 +18,7 @@ extern NSString* const kPasswordColumn;
 extern NSString* const kTOTPColumn;
 extern NSString* const kURLColumn;
 extern NSString* const kEmailColumn;
+extern NSString* const kExpiresColumn;
 extern NSString* const kNotesColumn;
 extern NSString* const kAttachmentsColumn;
 extern NSString* const kCustomFieldsColumn;
