@@ -12,14 +12,18 @@ This software provided here on Github is licensed under the GNU AGPL by default,
 
 If you are interested in using the code, commercially, or in some other fashion for which the GPL is unsuitable, or if you would simply like to discuss an alternative licence or custom builds for your organization, then please contact Mark directly: [mark@strongboxsafe.com](mailto:mark@strongboxsafe.com).
 
-# Supporting Development through Patreon
-If you like the app and are feeling generous you can help by contributing financially on Patreon here:
+# Supporting Development
+There are several ways you can help support continuous development. Obviously if you purchase a subscription or lifetime licence that's really helpful. But there are a few other options if you like the app and you are feeling generous! You can help by contributing financially here:
 
-https://www.patreon.com/strongboxpasswordsafe
+- Patreon: https://www.patreon.com/strongboxpasswordsafe
+
+- Paypal: https://paypal.me/MarkMcGuill
+
+- Bitcoin: 3PXJZ939Y9oC1vX8nzQZZaNGiNp6HbNov4
 
 Obviously the more support I get here the more time I can allocate to development, I rely on the community to support the work as in-app purchases are a one off payment and just about cover Apple's yearly developer program fee. If you can chip in the price of a cup of coffee every month I'd be very grateful.
 
-# Other ways to support Strongbox
+# Non Financial Ways to Support Strongbox
 If you like the app, you can always help out by leaving a 5 star review in the App Store. This is very helpful, and helps get the word out about Strongbox. If you can please leave a positive comment too. You can review the App here:
 
 https://apps.apple.com/app/strongbox-password-safe/id897283731
@@ -27,7 +31,16 @@ https://apps.apple.com/app/strongbox-password-safe/id897283731
 Of course it is also great if you can tell your friends and family about the App, spread the word on Twitter, Reddit or otherwise.
 
 # Help / Tech Support
-If you're having trouble, please checkout the [FAQ](https://strongboxsafe.com/faq/) and [How-To Guide](https://strongboxsafe.com/how-to-guide/). You can also find Strongbox on [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") or [Reddit r/strongbox](https://www.reddit.com/r/strongbox/ "r/strongbox"). Lastly if all of the above don't help you can email (in English only) [support@strongboxsafe.com](mailto:support@strongboxsafe.com). It is important to only email after checking the above avenues as more time spent on support means less time spent on development.
+If you're having trouble, please checkout the following sources:
+
+- [FAQ](https://strongboxsafe.com/faq/) 
+- [How-To Guide](https://strongboxsafe.com/how-to-guide/). 
+- [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") 
+- [Reddit r/strongbox](https://www.reddit.com/r/strongbox/ "r/strongbox")
+
+Another important step is to restart your device, it's surprising how often this can fix issues. If you are having iCloud trouble, then signing in and out of iCloud/iCloud Drive can help.
+
+Lastly if all of the above don't help you can email (in English only) [support@strongboxsafe.com](mailto:support@strongboxsafe.com). It is important to only email after checking the above avenues as more time spent on support means less time spent on development.
 
 # Localization (Help Wanted)
 Localization and translation is managed through the parallel Babel project here:
@@ -40,14 +53,16 @@ You can submit Pull Requests any way you choose, and it will be much appreciated
 
 Big thank you to all the localization contributors
 
-French - Charles-Ivan Chesneau
-German - @Slummi
-Russian - anonymous
-Swedish - Jari Häkkinen
-Ukrainian - Artem Polivanchuk
+- French - Charles-Ivan Chesneau
+- German - @Slummi
+- Russian - anonymous
+- Swedish - Jari Häkkinen
+- Ukrainian - Artem Polivanchuk
 
 # Build Issues
-The code is provided here for reasons of security, transparency and openness. Anyone can view the code and verify that everything is above board, the algorithms are correct and there are no backdoors or other malicious features present. You will need Google Drive, OneDrive and Dropbox developer accounts (with keys/secrets) before building. Familiarity with Cocoapods and other build tools is a prerequisite. Please do not file issues about build issues, I can't guarantee what is here will build in your environment. If instead of examining the code, you simply want to use the app, please download from the App Store, the free version is more than functional. Lastly, if you are attempting to bypass built-in Pro/Free limitations for your own app usage, please consider your actions, and consider supporting further development by contributing via the official application (in app purchase upgrade). It will be very much appreciated. If you need all the Pro features and cannot afford the in app purchase upgrade, just drop me a mail and I'll help you out.
+The code is provided here for reasons of security, transparency and openness. Anyone can view the code and verify that everything is above board, the algorithms are correct and there are no backdoors or other malicious features present. You will need Google Drive, OneDrive and Dropbox developer accounts (with keys/secrets) before building. Familiarity with Cocoapods and other build tools is a prerequisite. Please do not file issues about build issues, I can't guarantee what is here will build in your environment. What is here is all of the functional code used in building Strongbox. XCode Interface Builder UI files, XCode project/solution/workspace, and other non functional code files may be removed to hinder copy cat apps. Translation strings files are managed in the separate Babel repository. 
+
+If instead of examining the code, you simply want to use the app, please download from the App Store, the free version is more than functional. Lastly, if you are attempting to bypass built-in Pro/Free limitations for your own app usage, I would ask you to keep that app to yourself and not distribute it. Also, please consider your actions, and consider supporting further development by contributing via the official application (in app purchase upgrade). It will be very much appreciated. Finally, if you really need all the Pro features and cannot afford the upgrade, just drop me a mail and I'll help you out.
 
 # Contributions or Pull Requests
 I cannot accept outside pull requests from the community for licensing reasons. To release to Apple's App Store I have to manage Strongbox under a dual licence. The code here is under the GPL which Apple will not allow in the App Store. As mentioned above the code is provided here for transparency and openness, something I consider a prerequisite for a Password Manager. I need to maintain full ownership of the code so that I can licence to Apple separately, and also any outside/other licencing that might come along, commercial or otherwise. Accepting contributions (no matter how awesome) would involve the contributer signing their life and probably first born child away... There is probably a way to do this but I believe it will involve legally binding documents and other bureaucracies so to keep things simple I'm just going to manage the development myself. Other people's code sucks anyway, right? 
