@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDictionary*)serializationDictionary;
 + (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
 
+-(NSString*)getKeyChainKey:(NSString*)propertyName;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -663,7 +663,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
 - (NSArray<NSString *> *)alternativeUrls {
     NSDictionary<NSString*, StringValue*> *filtered = [self.mutableCustomFields filter:^BOOL(NSString * _Nonnull key, StringValue * _Nonnull value) {
-        return [key hasPrefix:@"KP2A_URL"];
+        return [key hasPrefix:@"KP2A_URL"] || [key hasPrefix:@"URL"];
     }];
     
     NSArray<NSString*>* values = [filtered map:^id _Nonnull(NSString * _Nonnull key, StringValue * _Nonnull value) {

@@ -20,6 +20,8 @@ extern NSString *const CellHeightsChangedNotification;
 
 @interface ItemDetailsViewController : UITableViewController
 
++ (NSArray<NSNumber*>*)defaultCollapsedSections;
+
 @property BOOL createNewItem;
 @property BOOL editImmediately;
 

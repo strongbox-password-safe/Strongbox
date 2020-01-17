@@ -17,7 +17,7 @@
 #import "FavIconManager.h"
 #import "FavIconBulkViewController.h"
 
-@interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+@interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIDocumentPickerDelegate>
 
 @property UIViewController *viewController;
 @property ChangeIconCompletionBlock completionBlock;
@@ -62,15 +62,19 @@
                                                                   handler:^(UIAlertAction *a) { [self presentKeePassAndDatabaseIconSets]; }];
             
             UIAlertAction *secondAction = [UIAlertAction actionWithTitle:
+                                           NSLocalizedString(@"add_attachment_vc_prompt_source_option_files", @"Files")
+                                                                   style:UIAlertActionStyleDefault
+                                                                 handler:^(UIAlertAction *a) { [self presentFiles ]; }];
+
+            UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:
                                            NSLocalizedString(@"set_icon_vc_icon_source_media_libary", @"Media Library")
                                                                    style:UIAlertActionStyleDefault
                                                                  handler:^(UIAlertAction *a) { [self presentCustomIconImagePicker]; }];
-
             
-            UIAlertAction *thirdAction;
+            UIAlertAction *fourthAction;
             
             if(node && node.isGroup) {
-                thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons", @"Download FavIcons") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons_pro_only", @"Download FavIcons (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -79,7 +83,7 @@
                 }];
             }
             else {
-                thirdAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon", @"Download FavIcon") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon_pro_only", @"Download FavIcon (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -92,11 +96,12 @@
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, NO,  nil); }];
             
-            thirdAction.enabled = Settings.sharedInstance.isProOrFreeTrial;
+            fourthAction.enabled = Settings.sharedInstance.isProOrFreeTrial;
             
             [alertController addAction:defaultAction];
             [alertController addAction:secondAction];
             [alertController addAction:thirdAction];
+            [alertController addAction:fourthAction];
             [alertController addAction:cancelAction];
             
             [self.viewController presentViewController:alertController animated:YES completion:nil];
@@ -350,6 +355,34 @@ static const int kMaxRecommendedCustomIconDimension = 256;
             });
         }
     });
+}
+
+- (void)presentFiles {
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeImage] inMode:UIDocumentPickerModeImport];
+    vc.delegate = self;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    [self.viewController presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    
+    NSURL* url = [urls objectAtIndex:0];
+    NSError* error;
+    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
+    
+    if(!data) {
+        NSLog(@"Error: %@", error);
+        
+        [Alerts error:self.viewController
+                title:NSLocalizedString(@"set_icon_vc_error_reading_image", @"Error Reading Image")
+                error:error];
+
+        return;
+    }
+
+    [self analyzeCustomIconAndSet:data];
 }
 
 @end

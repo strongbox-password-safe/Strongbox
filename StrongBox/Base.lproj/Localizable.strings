@@ -2742,4 +2742,8 @@
 /* ⌘R to Conceal */
 "mac_button_conceal_master_password_title" = "⌘R to Conceal";
 
+/* Biometrics Database Changed */
+"open_sequence_warn_biometrics_db_changed_title" = "Biometrics Database Changed";
 
+/* It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons. */
+"open_sequence_warn_biometrics_db_changed_message" = "It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons.";

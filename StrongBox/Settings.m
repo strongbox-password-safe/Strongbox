@@ -38,27 +38,16 @@ static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSecond
 
 static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
 static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
-//static NSString* const kCopyOtpCodeOnAutoFillSelect = @"copyOtpCodeOnAutoFillSelect";
-//static NSString* const kDoNotUseQuickTypeAutoFill = @"doNotUseQuickTypeAutoFill"; // Dead
-static NSString* const kUseOldItemDetailsScene = @"useOldItemDetailsScene"; // DEAD
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
 static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
-//static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
-//static NSString* const kTemporaryUseOldUnlock = @"temporaryUseOldUnlock"; // DEAD
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 
-//static NSString* const kDoNotUseNewSplitViewController = @"doNotUseNewSplitViewController"; DEAD
-//static NSString* const kInterpretEmptyPasswordAsNoPassword = @"interpretEmptyPasswordAsNoPassword"; // DEAD
-static NSString* const kMigratedLocalDatabasesToNewSystem = @"migratedLocalDatabasesToNewSystem";
-
-static NSString* const kPasswordGenerationParameters = @"passwordGenerationSettings";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
-static NSString* const kMigratedToNewPasswordGenerator = @"migratedToNewPasswordGenerator";
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
@@ -83,6 +72,7 @@ static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectiv
 static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
+static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
 
 @implementation Settings
 
@@ -112,6 +102,14 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)migratedToNewSecretStore {
+    return [self getBool:kMigratedToNewSecretStore];
+}
+
+- (void)setMigratedToNewSecretStore:(BOOL)migratedToNewSecretStore {
+    [self setBool:kMigratedToNewSecretStore value:migratedToNewSecretStore];
+}
 
 - (BOOL)clipboardHandoff {
     return [self getBool:kClipboardHandoff];
@@ -221,39 +219,6 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
     [self setBool:kShowYubikeySecretWorkaroundField value:showYubikeySecretWorkaroundField];
 }
 
-- (BOOL)migratedToNewPasswordGenerator {
-    return [self getBool:kMigratedToNewPasswordGenerator];
-}
-
-- (void)setMigratedToNewPasswordGenerator:(BOOL)migratedToNewPasswordGenerator {
-    [self setBool:kMigratedToNewPasswordGenerator value:migratedToNewPasswordGenerator];
-}
-
-- (PasswordGenerationParameters *)passwordGenerationParameters {
-    NSUserDefaults *defaults = [self getUserDefaults];
-    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
-    
-    if(encodedObject == nil) {
-        return [[PasswordGenerationParameters alloc] initWithDefaults];
-    }
-    
-    PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
-    
-    //NSError *error; // This fails because PGP doesn't conform to NSSecureCoding... something to do some day...
-    //PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchivedObjectOfClass:PasswordGenerationParameters.class fromData:encodedObject error:&error];
-    
-    return object;
-}
-
--(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
-    NSUserDefaults *defaults = [self getUserDefaults];
-    [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
-    [defaults synchronize];
-}
-
-//
-
 - (PasswordGenerationConfig *)passwordGenerationConfig {
     NSUserDefaults *defaults = [self getUserDefaults];
     NSData *encodedObject = [defaults objectForKey:kPasswordGenerationConfig];
@@ -272,14 +237,6 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
     NSUserDefaults *defaults = [self getUserDefaults];
     [defaults setObject:encodedObject forKey:kPasswordGenerationConfig];
     [defaults synchronize];
-}
-
-- (BOOL)migratedLocalDatabasesToNewSystem {
-    return [self getBool:kMigratedLocalDatabasesToNewSystem];
-}
-
-- (void)setMigratedLocalDatabasesToNewSystem:(BOOL)migratedLocalDatabasesToNewSystem {
-    [self setBool:kMigratedLocalDatabasesToNewSystem value:migratedLocalDatabasesToNewSystem];
 }
 
 - (NSUserDefaults*)getUserDefaults {

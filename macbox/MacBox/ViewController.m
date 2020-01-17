@@ -38,8 +38,9 @@
 #import "DocumentController.h"
 #import "ClipboardManager.h"
 
-const int kMaxRecommendCustomIconSize = 128*1024;
-const int kMaxCustomIconDimension = 256;
+static const int kMaxRecommendCustomIconSize = 128*1024;
+static const int kMaxCustomIconDimension = 256;
+static const CGFloat kExpiredOutlineViewCellAlpha = 0.35f;
 
 static NSString* const kPasswordCellIdentifier = @"CustomFieldValueCellIdentifier";
 static NSString* const kDefaultNewTitle = @"Untitled";
@@ -719,6 +720,7 @@ static NSString* const kNewEntryKey = @"newEntry";
         self.imageViewGroupDetails.showClickableBorder = YES;
         self.imageViewGroupDetails.onClick = ^{ [self onEditNodeIcon:it]; };
 
+        
         self.textFieldSummaryTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];;
     }
     else {
@@ -750,7 +752,7 @@ static NSString* const kNewEntryKey = @"newEntry";
         
         self.expiresRow.hidden = it.fields.expires == nil;
         self.labelExpires.stringValue = friendlyDateString(it.fields.expires);
-        self.labelExpires.textColor = it.expired ? NSColor.redColor : nil;
+        self.labelExpires.textColor = it.expired ? NSColor.redColor : it.nearlyExpired ? NSColor.orangeColor : nil;
         
         // TOTP
 
@@ -875,18 +877,22 @@ static NSString* const kNewEntryKey = @"newEntry";
         cell.protected = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
         cell.valueHidden = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields) && !Settings.sharedInstance.showPasswordImmediatelyInOutline;
         
+        cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
+
         return cell;
     }
     else if([tableColumn.identifier isEqualToString:kTOTPColumn]) {
         NSString* totp = it.fields.otpToken ? it.fields.otpToken.password : @"";
         //NSLog(@"TOTP: %@", totp);
-        NSTableCellView* cell = [self getReadOnlyCell:totp];
+        NSTableCellView* cell = [self getReadOnlyCell:totp node:it];
 
         if(it.fields.otpToken) {
             uint64_t remainingSeconds = [self getTotpRemainingSeconds:item];
             
             cell.textField.textColor = (remainingSeconds < 5) ? NSColor.redColor : (remainingSeconds < 9) ? NSColor.orangeColor : NSColor.controlTextColor;
         }
+
+        cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
 
         return cell;
     }
@@ -898,31 +904,36 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
     else if([tableColumn.identifier isEqualToString:kExpiresColumn]) {
         NSString* exp = friendlyDateStringVeryShort(it.fields.expires);
-        NSTableCellView* cell = [self getReadOnlyCell:exp];
-        cell.textField.textColor = it.expired ? NSColor.redColor : nil;
+        NSTableCellView* cell = [self getReadOnlyCell:exp node:it];
+        cell.textField.textColor = it.expired ? NSColor.redColor : it.nearlyExpired ? NSColor.orangeColor : nil;
+        
+        cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
+
         return cell;
     }
     else if([tableColumn.identifier isEqualToString:kNotesColumn]) {
         return [self getEditableCell:it.fields.notes node:it selector:@selector(onOutlineViewItemNotesEdited:)];
     }
     else if([tableColumn.identifier isEqualToString:kAttachmentsColumn]) {
-        return [self getReadOnlyCell:it.isGroup ? @"" : @(it.fields.attachments.count).stringValue];
+        return [self getReadOnlyCell:it.isGroup ? @"" : @(it.fields.attachments.count).stringValue node:it];
     }
     else if([tableColumn.identifier isEqualToString:kCustomFieldsColumn]) {
-        return [self getReadOnlyCell:it.isGroup ? @"" : @(it.fields.customFields.count).stringValue];
+        return [self getReadOnlyCell:it.isGroup ? @"" : @(it.fields.customFields.count).stringValue node:it];
     }
     else {
-        return [self getReadOnlyCell:@"< Unknown Column TO DO >"];
+        return [self getReadOnlyCell:@"< Unknown Column TO DO >" node:it];
     }
 }
 
-- (NSTableCellView*)getReadOnlyCell:(NSString*)text {
+- (NSTableCellView*)getReadOnlyCell:(NSString*)text node:(Node*)node {
     NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"ReadOnlyCell" owner:self];
     
     cell.textField.stringValue = text;
     cell.textField.editable = NO;
     cell.textField.textColor = nil;
     
+    cell.alphaValue = node.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
+
     return cell;
 }
 
@@ -952,6 +963,8 @@ static NSString* const kNewEntryKey = @"newEntry";
 //            }
 //        }
 //    }
+    
+    cell.alphaValue = node.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
 
     return cell;
 }
@@ -968,6 +981,8 @@ static NSString* const kNewEntryKey = @"newEntry";
     cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
     cell.textField.action = selector;
     
+    cell.alphaValue = node.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
+
     return cell;
 }
 
@@ -989,9 +1004,9 @@ static NSString* const kNewEntryKey = @"newEntry";
     cell.textField.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
 
     BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.model isDereferenceableText:it.title];
-    cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
-
-    cell.textField.editable = !Settings.sharedInstance.outlineViewTitleIsReadonly;
+    cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly && !Settings.sharedInstance.outlineViewTitleIsReadonly;
+    
+    cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
     
     return cell;
 }

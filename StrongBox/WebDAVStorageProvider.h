@@ -10,6 +10,7 @@
 #import "SafeStorageProvider.h"
 #import "DAVKit.h"
 #import "WebDAVSessionConfiguration.h"
+#import "WebDAVProviderData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property WebDAVSessionConfiguration* unitTestSessionConfiguration;
 @property BOOL maintainSessionForListings;
+
+- (WebDAVProviderData*)getProviderDataFromMetaData:(SafeMetaData*)metaData;
 
 @end
 

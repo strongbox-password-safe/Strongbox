@@ -81,6 +81,7 @@
 @property BOOL searchDereferencedFields;
 @property BOOL showExpiredInSearch;
 @property BOOL showExpiredInBrowse;
+@property BOOL hideIconInBrowse;
 
 // Details View
 @property BOOL showEmptyFieldsInDetailsView;

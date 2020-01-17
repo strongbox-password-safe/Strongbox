@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *showChildCountOnFolder;
 @property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowIcons;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
 @property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
@@ -75,6 +76,7 @@
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
     
+    self.databaseMetaData.hideIconInBrowse = !self.switchShowIcons.on;
     self.databaseMetaData.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
     self.databaseMetaData.showFlagsInBrowse = self.showFlagsInBrowse.on;
     self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
@@ -101,6 +103,7 @@
 }
 
 - (void)bindPreferences {
+    self.switchShowIcons.on = !self.databaseMetaData.hideIconInBrowse;
     self.showChildCountOnFolder.on = self.databaseMetaData.showChildCountOnFolderInBrowse;
     self.showFlagsInBrowse.on = self.databaseMetaData.showFlagsInBrowse;
     self.switchStartWithSearch.on = self.databaseMetaData.immediateSearchOnBrowse;

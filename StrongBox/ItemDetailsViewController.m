@@ -44,6 +44,8 @@
 #endif
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
+
+//+ (NSArray<NSNumber*>*)defaultCollapsedSections - Remember to change this if you change the below sections
 static BOOL const kSeparateSectionForCustomFields = NO; // TODO: Remove and cleanup?
 
 static NSInteger const kSimpleFieldsSectionIdx = 0;
@@ -53,6 +55,9 @@ static NSInteger const kAttachmentsSectionIdx = 3;
 static NSInteger const kMetadataSectionIdx = 4;
 static NSInteger const kOtherSectionIdx = 5;
 static NSInteger const kSectionCount = 6;
+
+
+
 
 static NSInteger const kRowTitleAndIcon = 0;
 static NSInteger const kRowUsername = 1;
@@ -86,6 +91,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 @property BOOL inCellHeightsChangedProcess;
 
 @property BOOL urlJustChanged;
+@property BOOL iconExplicitlyChanged;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
@@ -100,6 +106,10 @@ static NSString* const kEditDateCell = @"EditDateCell";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation ItemDetailsViewController
+
++ (NSArray<NSNumber*>*)defaultCollapsedSections {
+   return @[@(0), @(0), @(0), @(0), @(1), @(1)];
+}
 
 - (void)onCellHeightChangedNotification {
     // MMcG: Sort of a not so great way around this infinite loop/stack overflow bug
@@ -527,6 +537,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowUsername && shouldHideEmpty && !self.model.username.length) {
+            return 0;
+        }
+        else if(indexPath.row == kRowPassword && shouldHideEmpty && !self.model.password.length) {
             return 0;
         }
         else if(indexPath.row == kRowURL && shouldHideEmpty && !self.model.url.length) {
@@ -1096,6 +1109,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
                   if(goNoGo) {
                       UIImage* userSelectedNewCustomIcon = selected ? selected.allValues.firstObject : nil;
                       self.model.icon = [SetIconModel setIconModelWith:userSelectedNewIconIndex customUuid:userSelectedExistingCustomIconId customImage:userSelectedNewCustomIcon];
+                      self.iconExplicitlyChanged = YES;
                       
                       [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
                       
@@ -1401,47 +1415,55 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)processIconBeforeSave:(void (^)(void))completion {
-    if(self.model.icon.customImage) {
-        NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
-        [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
-    }
-    else if(self.model.icon.customUuid != nil && ![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
-        self.item.customIconUuid = self.model.icon.customUuid;
-    }
-    else if(self.model.icon.index != nil) {
-        if(self.model.icon.index.intValue == -1) {
-            self.item.iconId = @(0); // Default
+    if(self.iconExplicitlyChanged) {
+        if(self.model.icon.customImage) {
+            NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
+            [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
         }
-        else {
-            self.item.iconId = self.model.icon.index;
+        else if(self.model.icon.customUuid != nil) {
+            if(![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
+                self.item.customIconUuid = self.model.icon.customUuid;
+            }
         }
-        self.item.customIconUuid = nil;
+        else if(self.model.icon.index != nil) {
+            if(self.model.icon.index.intValue == -1) {
+                self.item.iconId = @(0); // Default
+            }
+            else {
+                self.item.iconId = self.model.icon.index;
+            }
+            self.item.customIconUuid = nil;
+        }
     }
-    else if(self.createNewItem || self.urlJustChanged) {
-        self.urlJustChanged = NO;
-        // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
-        // grab a FavIcon?
+    else {
+        if(self.createNewItem || self.urlJustChanged) {
+            self.urlJustChanged = NO;
+            // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
+            // grab a FavIcon?
 #ifndef IS_APP_EXTENSION
-        if(Settings.sharedInstance.isProOrFreeTrial &&
-           self.databaseModel.metadata.tryDownloadFavIconForNewRecord &&
-           (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) &&
-           isValidUrl(self.model.url)) {
-            self.sni = [[SetNodeIconUiHelper alloc] init];
-            self.sni.customIcons = self.databaseModel.database.customIcons;
-            
-            [self.sni expressDownloadBestFavIcon:self.model.url
-                                      completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
-                                  if(userSelectedNewCustomIcon) {
-                                      NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                                      [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
-                                  }
-                                  
-                                  completion();
-                              }];
-            return;
-        }
+            if(Settings.sharedInstance.isProOrFreeTrial &&
+               self.databaseModel.metadata.tryDownloadFavIconForNewRecord &&
+               (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) &&
+               isValidUrl(self.model.url)) {
+                self.sni = [[SetNodeIconUiHelper alloc] init];
+                self.sni.customIcons = self.databaseModel.database.customIcons;
+                
+                [self.sni expressDownloadBestFavIcon:self.model.url
+                                          completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
+                                      if(userSelectedNewCustomIcon) {
+                                          NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
+                                          [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
+                                      }
+                                      
+                                      completion();
+                                  }];
+                return;
+            }
 #endif
+        }
     }
+    
+    self.iconExplicitlyChanged = NO;
     
     completion();
 }

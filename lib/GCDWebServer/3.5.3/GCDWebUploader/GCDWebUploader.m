@@ -308,7 +308,7 @@ NS_ASSUME_NONNULL_END
 
   NSError* error = nil;
   if (![[NSFileManager defaultManager] moveItemAtPath:file.temporaryPath toPath:absolutePath error:&error]) {
-    return [GCDWebServerErrorResponse responseWithServerError:kGCDWebServerHTTPStatusCode_InternalServerError underlyingError:error message:@"Failed moving uploaded file to \"%@\"", relativePath];
+      return [GCDWebServerErrorResponse responseWithServerError:kGCDWebServerHTTPStatusCode_InternalServerError underlyingError:error message:@"Failed moving uploaded file to \"%@\"", relativePath];
   }
 
   if ([self.delegate respondsToSelector:@selector(webUploader:didUploadFileAtPath:)]) {
@@ -316,6 +316,7 @@ NS_ASSUME_NONNULL_END
       [self.delegate webUploader:self didUploadFileAtPath:absolutePath];
     });
   }
+    
   return [GCDWebServerDataResponse responseWithJSONObject:@{} contentType:contentType];
 }
 

@@ -7,9 +7,10 @@
 //
 
 #import "SafeMetaData.h"
-#import "JNKeychain.h"
+#import "SecretStore.h"
 #import "Settings.h"
 #import "FileManager.h"
+#import "ItemDetailsViewController.h"
 
 static NSString* const kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
 static NSString* const kHideTotp = @"hideTotp";
@@ -33,32 +34,6 @@ static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePa
 static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse"; // DEAD
 static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1BackupGroupInSearchResults";
 
-@interface SafeMetaData ()
-
-// Migrated to SafeMetaData - remove after a while (23-Jun-2019)
-
-@property (readonly) BrowseSortField old_browseSortField;
-@property (readonly) BOOL old_browseSortOrderDescending;
-@property (readonly) BOOL old_browseSortFoldersSeparately;
-@property (readonly) BrowseItemSubtitleField old_browseItemSubtitleField;
-@property (readonly) BOOL old_immediateSearchOnBrowse;
-@property (readonly) BOOL old_hideTotpInBrowse;
-@property (readonly) BOOL old_showKeePass1BackupGroup;
-@property (readonly) BOOL old_showChildCountOnFolderInBrowse;
-@property (readonly) BOOL old_showFlagsInBrowse;
-@property (readonly) BOOL old_doNotShowRecycleBinInBrowse;
-@property (readonly) BOOL old_showRecycleBinInSearchResults;
-@property (readonly) BOOL old_viewDereferencedFields;
-@property (readonly) BOOL old_searchDereferencedFields;
-@property (readonly) BOOL old_showEmptyFieldsInDetailsView;
-@property (readonly) NSArray<NSNumber*>* old_detailsViewCollapsedSections;
-@property (readonly) BOOL old_easyReadFontForAll;
-@property (readonly) BOOL old_hideTotp;
-@property (readonly) BOOL old_tryDownloadFavIconForNewRecord;
-@property (readonly) BOOL old_showPasswordByDefaultOnEditScreen;
-
-@end
-
 @implementation SafeMetaData
 
 - (instancetype)init {
@@ -66,53 +41,42 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     if (self) {
         self.uuid = [[NSUUID UUID] UUIDString];
         self.failedPinAttempts = 0;
-//        self.offlineCacheEnabled = YES;
         self.autoFillEnabled = YES;
         self.likelyFormat = kFormatUnknown;
         self.browseViewType = kBrowseViewTypeHierarchy;
-        
-        // Old original defaults for people used to this... Different defaults for newly created databases
-        
         self.tapAction = kBrowseTapActionOpenDetails;
         self.doubleTapAction = kBrowseTapActionCopyUsername;
         self.tripleTapAction = kBrowseTapActionCopyTotp;
         self.longPressTapAction = kBrowseTapActionCopyPassword;
-        
-        // Migration - Remove after a long while and use defaults instead... 23-Jun-2019
-        
-        self.browseSortField = self.old_browseSortField;
-        self.browseSortOrderDescending = self.old_browseSortOrderDescending;
-        self.browseSortFoldersSeparately = self.old_browseSortFoldersSeparately;
-        self.browseItemSubtitleField = self.old_browseItemSubtitleField;
-        self.immediateSearchOnBrowse = self.old_immediateSearchOnBrowse;
-        self.hideTotpInBrowse = self.old_hideTotpInBrowse;
-        self.showKeePass1BackupGroup = self.old_showKeePass1BackupGroup;
-        self.showChildCountOnFolderInBrowse = self.old_showChildCountOnFolderInBrowse;
-        self.showFlagsInBrowse = self.old_showFlagsInBrowse;
-        self.doNotShowRecycleBinInBrowse = self.old_doNotShowRecycleBinInBrowse;
-        self.showRecycleBinInSearchResults = self.old_showRecycleBinInSearchResults;
-        self.viewDereferencedFields = self.old_viewDereferencedFields;
-        self.searchDereferencedFields = self.old_searchDereferencedFields;
-        self.showEmptyFieldsInDetailsView = self.old_showEmptyFieldsInDetailsView;
-        self.detailsViewCollapsedSections = self.old_detailsViewCollapsedSections;
-        self.easyReadFontForAll = self.old_easyReadFontForAll;
-        self.hideTotp = self.old_hideTotp;
-        self.tryDownloadFavIconForNewRecord = self.old_tryDownloadFavIconForNewRecord;
-        self.showPasswordByDefaultOnEditScreen = self.old_showPasswordByDefaultOnEditScreen;
-        
-        //
-        
+        self.browseSortField = kBrowseSortFieldTitle;
+        self.browseSortOrderDescending = NO;
+        self.browseSortFoldersSeparately = YES;
+        self.browseItemSubtitleField = kBrowseItemSubtitleUsername;
+        self.immediateSearchOnBrowse = NO;
+        self.hideTotpInBrowse = NO;
+        self.showKeePass1BackupGroup = NO;
+        self.showChildCountOnFolderInBrowse = NO;
+        self.showFlagsInBrowse = YES;
+        self.doNotShowRecycleBinInBrowse = NO;
+        self.showRecycleBinInSearchResults = NO;
+        self.viewDereferencedFields = YES;
+        self.searchDereferencedFields = YES;
+        self.showEmptyFieldsInDetailsView = NO;
+        self.detailsViewCollapsedSections = ItemDetailsViewController.defaultCollapsedSections;
+        self.easyReadFontForAll = NO;
+        self.hideTotp = NO;
+        self.tryDownloadFavIconForNewRecord = YES;
+        self.showPasswordByDefaultOnEditScreen = NO;
         self.showExpiredInBrowse = YES;
         self.showExpiredInSearch = YES;
-        
-        self.autoLockTimeoutSeconds = self.old_autoLockTimeoutSeconds;
+        self.autoLockTimeoutSeconds = @60;
         self.showQuickViewFavourites = YES;
         self.showQuickViewNearlyExpired = YES;
         self.favourites = @[];
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
-        
         self.hideTotpCustomFieldsInViewMode = YES;
+        self.hideIconInBrowse = NO;
     }
     
     return self;
@@ -221,6 +185,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     [encoder encodeInteger:self.maxBackupKeepCount forKey:@"maxBackupKeepCount"];
     
     [encoder encodeBool:self.hideTotpCustomFieldsInViewMode forKey:@"hideTotpCustomFieldsInViewMode"];
+    [encoder encodeBool:self.hideIconInBrowse forKey:@"hideIconInBrowse"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -394,6 +359,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         if([decoder containsValueForKey:@"hideTotpCustomFieldsInViewMode"]) {
             self.hideTotpCustomFieldsInViewMode = [decoder decodeBoolForKey:@"hideTotpCustomFieldsInViewMode"];
         }
+        
+        if([decoder containsValueForKey:@"hideIconInBrowse"]) {
+            self.hideIconInBrowse = [decoder decodeBoolForKey:@"hideIconInBrowse"];
+        }
     }
     
     return self;
@@ -402,7 +371,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
 - (NSArray<NSString *> *)favourites {
     NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
     
-    NSArray<NSString *>* ret = [JNKeychain loadValueForKey:key];
+    NSArray<NSString *>* ret = [SecretStore.sharedInstance getSecureObject:key];
     
     return ret ? ret : @[];
 }
@@ -411,71 +380,71 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
     
     if(favourites) {
-        [JNKeychain saveValue:favourites forKey:key];
+        [SecretStore.sharedInstance setSecureObject:favourites forIdentifier:key];
     }
     else {
-        [JNKeychain deleteValueForKey:key];
+        [SecretStore.sharedInstance deleteSecureItem:key];
     }
 }
 
 - (NSString *)convenienceMasterPassword {
-    return [JNKeychain loadValueForKey:self.uuid];
+    return [SecretStore.sharedInstance getSecureString:self.uuid];
 }
 
 - (void)setConvenienceMasterPassword:(NSString *)convenienceMasterPassword {
     if(convenienceMasterPassword) {
-        [JNKeychain saveValue:convenienceMasterPassword forKey:self.uuid];
+        [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:self.uuid];
     }
     else {
-        [JNKeychain deleteValueForKey:self.uuid];
+        [SecretStore.sharedInstance deleteSecureItem:self.uuid];
     }
 }
 
 - (NSString *)convenenienceYubikeySecret {
     NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
-    return [JNKeychain loadValueForKey:key];
+    return [SecretStore.sharedInstance getSecureString:key];
 }
 
 - (void)setConvenenienceYubikeySecret:(NSString *)convenenienceYubikeySecret {
     NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
     
     if(convenenienceYubikeySecret) {
-        [JNKeychain saveValue:convenenienceYubikeySecret forKey:key];
+        [SecretStore.sharedInstance setSecureString:convenenienceYubikeySecret forIdentifier:key];
     }
     else {
-        [JNKeychain deleteValueForKey:key];
+        [SecretStore.sharedInstance deleteSecureItem:key];
     }
 }
 
 - (NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
-    return [JNKeychain loadValueForKey:key];
+    return [SecretStore.sharedInstance getSecureString:key];
 }
 
 - (void)setConveniencePin:(NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
 
     if(conveniencePin) {
-        [JNKeychain saveValue:conveniencePin forKey:key];
+        [SecretStore.sharedInstance setSecureString:conveniencePin forIdentifier:key];
     }
     else {
-        [JNKeychain deleteValueForKey:key];
+        [SecretStore.sharedInstance deleteSecureItem:key];
     }
 }
 
 - (NSString *)duressPin {
     NSString *key = [NSString stringWithFormat:@"%@-duress-pin", self.uuid];
-    return [JNKeychain loadValueForKey:key];
+    return [SecretStore.sharedInstance getSecureString:key];
 }
 
 -(void)setDuressPin:(NSString *)duressPin {
     NSString *key = [NSString stringWithFormat:@"%@-duress-pin", self.uuid];
     
     if(duressPin) {
-        [JNKeychain saveValue:duressPin forKey:key];
+        [SecretStore.sharedInstance setSecureString:duressPin forIdentifier:key];
     }
     else {
-        [JNKeychain deleteValueForKey:key];
+        [SecretStore.sharedInstance deleteSecureItem:key];
     }
 }
 
@@ -488,130 +457,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     self.conveniencePin = nil;
 }
 
-///////////////////////////////////////////////////////////
-// Delete me after a while...
-
-- (NSUserDefaults*)getUserDefaults {
-    return [Settings.sharedInstance getUserDefaults];
-}
-
-- (NSInteger)getInteger:(NSString*)key {
-    return [self getInteger:key fallback:0];
-}
-
-- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
-    NSNumber* obj = [[self getUserDefaults] objectForKey:key];
-    return obj != nil ? obj.integerValue : fallback;
-}
-
-- (BOOL)getBool:(NSString*)key {
-    return [self getBool:key fallback:NO];
-}
-
-- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    NSNumber* obj = [userDefaults objectForKey:key];
-    
-    return obj != nil ? obj.boolValue : fallback;
-}
-
 //
-
-- (BrowseSortField)old_browseSortField {
-    BOOL oldDoNotSort = [self getBool:kUiDoNotSortKeePassNodesInBrowseView]; // TODO: Remove in a while - 24-Jul-2019
-    return (BrowseSortField)[self getInteger:kBrowseSortField fallback:oldDoNotSort ? kBrowseSortFieldNone : kBrowseSortFieldTitle];
-}
-
-- (BOOL)old_browseSortOrderDescending {
-    return [self getBool:kBrowseSortOrderDescending fallback:NO];
-}
-
-- (BOOL)old_browseSortFoldersSeparately {
-    return [self getBool:kBrowseSortFoldersSeparately fallback:YES];
-}
-
-- (BOOL)old_immediateSearchOnBrowse {
-    return [self getBool:kImmediateSearchOnBrowse];
-}
-
-- (BrowseItemSubtitleField)old_browseItemSubtitleField {
-    BOOL showUsernameInBrowse = [self getBool:kShowUsernameInBrowse fallback:YES];
-
-    BrowseItemSubtitleField deflt = showUsernameInBrowse ? kBrowseItemSubtitleUsername : kBrowseItemSubtitleNoField;
-    return (BrowseItemSubtitleField)[self getInteger:kBrowseItemSubtitleField fallback:deflt];
-}
-
--(BOOL)old_hideTotp {
-    return [self getBool:kHideTotp];
-}
-
-- (BOOL)old_showKeePass1BackupGroup {
-    return [self getBool:kShowKeePass1BackupGroupInSearchResults];
-}
-
-- (BOOL)old_showChildCountOnFolderInBrowse {
-    return [self getBool:kShowChildCountOnFolderInBrowse];
-}
-
-- (BOOL)old_showFlagsInBrowse {
-    return [self getBool:kShowFlagsInBrowse fallback:YES];
-}
-
-- (BOOL)old_doNotShowRecycleBinInBrowse {
-    return [self getBool:kDoNotShowRecycleBinInBrowse];
-}
-
-- (BOOL)old_showRecycleBinInSearchResults {
-    return [self getBool:kShowRecycleBinInSearchResults];
-}
-
-- (BOOL)old_viewDereferencedFields {
-    return [self getBool:kViewDereferencedFields];
-}
-
-- (BOOL)old_searchDereferencedFields {
-    return [self getBool:kSearchDereferencedFields];
-}
-
--(BOOL)old_showEmptyFieldsInDetailsView {
-    return ![self getBool:kHideEmptyFieldsInDetailsView fallback:YES];
-}
-
-- (NSArray<NSNumber *> *)old_detailsViewCollapsedSections {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    NSArray* ret = [userDefaults arrayForKey:kCollapsedSections];    
-    return ret ? ret : @[@(0), @(0), @(0), @(0), @(1), @(1)]; // Default
-}
-
-- (BOOL)old_easyReadFontForAll {
-    return [self getBool:kEasyReadFontForAll];
-}
-
--(BOOL)old_hideTotpInBrowse {
-    return [self getBool:kHideTotpInBrowse];
-}
-
--(BOOL)old_tryDownloadFavIconForNewRecord {
-    return [self getBool:kTryDownloadFavIconForNewRecord fallback:YES];
-}
-
-- (BOOL)old_showPasswordByDefaultOnEditScreen {
-    return [self getBool:kShowPasswordByDefaultOnEditScreen];
-}
-
--(NSNumber*)old_autoLockTimeoutSeconds
-{
-    static NSString* const kAutoLockTimeSeconds = @"autoLockTimeSeconds";
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    NSNumber *seconds = [userDefaults objectForKey:kAutoLockTimeSeconds];
-    
-    if (seconds == nil) {
-        seconds = @60;
-    }
-    
-    return seconds;
-}
 
 - (BOOL)offlineCacheEnabled {
     return YES;

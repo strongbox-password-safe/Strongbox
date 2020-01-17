@@ -10,12 +10,16 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Settings.h"
 #import "Alerts.h"
+#import "SecretStore.h"
 
 @interface BiometricsManager ()
 
 @property BOOL requestInProgress;
+@property NSData* lastKnownGoodDatabaseState;
 
 @end
+
+static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey";
 
 @implementation BiometricsManager
 
@@ -28,6 +32,15 @@
     });
     
     return sharedInstance;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.lastKnownGoodDatabaseState = [SecretStore.sharedInstance getSecureObject:kBiometricDatabaseStateKey];
+    }
+    return self;
 }
 
 + (BOOL)isBiometricIdAvailable {
@@ -47,6 +60,56 @@
     }
     
     return YES;
+}
+
+- (BOOL)isBiometricDatabaseStateRecorded {
+    return self.lastKnownGoodDatabaseState != nil;
+}
+
+- (void)clearBiometricRecordedDatabaseState {
+    [SecretStore.sharedInstance deleteSecureItem:kBiometricDatabaseStateKey];
+    self.lastKnownGoodDatabaseState = nil;
+}
+
+- (void)recordBiometricDatabaseState {
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    if (localAuthContext == nil) {
+        return;
+    }
+
+    NSError *error;
+    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
+    
+    if (error) {
+        NSLog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
+        [BiometricsManager logBiometricError:error];
+        return;
+    }
+    
+    self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+    [SecretStore.sharedInstance setSecureObject:self.lastKnownGoodDatabaseState forIdentifier:kBiometricDatabaseStateKey];
+}
+
+- (BOOL)isBiometricDatabaseStateHasChanged {
+    if(self.lastKnownGoodDatabaseState == nil) {
+        return NO;
+    }
+    
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    if (localAuthContext == nil) {
+        return NO;
+    }
+
+    NSError *error;
+    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
+    
+    if (error) {
+        NSLog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
+        [BiometricsManager logBiometricError:error];
+        return NO;
+    }
+    
+    return ![localAuthContext.evaluatedPolicyDomainState isEqualToData:self.lastKnownGoodDatabaseState];
 }
 
 + (void)logBiometricError:(NSError*)error {
@@ -124,6 +187,7 @@
     
     Settings.sharedInstance.suppressPrivacyScreen = YES;
     self.requestInProgress = YES;
+    
     [localAuthContext evaluatePolicy:fallbackTitle ? LAPolicyDeviceOwnerAuthenticationWithBiometrics : LAPolicyDeviceOwnerAuthentication
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
@@ -139,7 +203,7 @@
                                    }
                                    completion(success, error);
                                }];
-
+    
     return YES;
 }
 

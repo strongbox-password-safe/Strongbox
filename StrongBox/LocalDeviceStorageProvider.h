@@ -51,9 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData; // used by iCloud Migration
 - (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; // used by Import to see if we should update
 
-
-- (void)migrateLocalDatabasesToNewSystem;
-
 - (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata;
 - (BOOL)toggleSharedStorage:(SafeMetaData*)metadata error:(NSError**)error;
 

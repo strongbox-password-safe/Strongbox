@@ -88,12 +88,7 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL hideKeyFileOnUnlock;
 @property BOOL allowEmptyOrNoPasswordEntry;
-@property BOOL migratedLocalDatabasesToNewSystem;
 
-// TODO: Remove after migration...
-
-@property BOOL migratedToNewPasswordGenerator;
-@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 
 @property (readonly) NSString* appGroupName;
@@ -118,6 +113,8 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property FavIconDownloadOptions *favIconDownloadOptions;
 
 @property BOOL clipboardHandoff;
+
+@property BOOL migratedToNewSecretStore;
 
 NS_ASSUME_NONNULL_END
 

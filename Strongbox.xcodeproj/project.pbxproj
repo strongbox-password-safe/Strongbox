@@ -192,6 +192,7 @@
 		4D2BF3EC21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4D2CB4912332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
+		4D2CB7E823D1BCC0000A9ABC /* SecretStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB7E723D1BCC0000A9ABC /* SecretStoreTests.m */; };
 		4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */; };
 		4D2E3CF423C7886200712FC6 /* AlternativeUrlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */; };
 		4D2E47AE233CFD8D00C1DE90 /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E47AD233CFD8D00C1DE90 /* BackupsManager.m */; };
@@ -540,6 +541,10 @@
 		4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8144B32199B4A80044E617 /* NodeIconHelper.m */; };
 		4D8144B62199B7790044E617 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
 		4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */; };
+		4D832A9523CE226800A7885E /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D832A9423CE226800A7885E /* SecretStore.m */; };
+		4D832A9623CE226800A7885E /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D832A9423CE226800A7885E /* SecretStore.m */; };
+		4D832A9723CE226800A7885E /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D832A9423CE226800A7885E /* SecretStore.m */; };
+		4D832A9823CE226800A7885E /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D832A9423CE226800A7885E /* SecretStore.m */; };
 		4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
 		4D8354CB2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
 		4D8354CC2389141F00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C92389141F00E264E0 /* FavIconManager.m */; };
@@ -1686,6 +1691,7 @@
 		4D2BF3F221EFA2EB00E39EBB /* AppLockMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppLockMode.h; sourceTree = "<group>"; };
 		4D2CB48F2332CBE400C2E084 /* ClipboardManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClipboardManager.h; path = model/ClipboardManager.h; sourceTree = "<group>"; };
 		4D2CB4902332CBE400C2E084 /* ClipboardManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClipboardManager.m; path = model/ClipboardManager.m; sourceTree = "<group>"; };
+		4D2CB7E723D1BCC0000A9ABC /* SecretStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStoreTests.m; path = StrongboxTests/SecretStoreTests.m; sourceTree = "<group>"; };
 		4D2E35671F62C9CB0064B5D5 /* SelectStorageProviderController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectStorageProviderController.h; path = StrongBox/SelectStorageProviderController.h; sourceTree = "<group>"; };
 		4D2E35681F62C9CB0064B5D5 /* SelectStorageProviderController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectStorageProviderController.m; path = StrongBox/SelectStorageProviderController.m; sourceTree = "<group>"; };
 		4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AlternativeUrlTests.m; path = StrongboxTests/AlternativeUrlTests.m; sourceTree = "<group>"; };
@@ -2019,6 +2025,7 @@
 		4D6B5047238BBA1F00DF2F88 /* SVProgressAnimatedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SVProgressAnimatedView.m; path = lib/SVProgressHUD/SVProgressAnimatedView.m; sourceTree = "<group>"; };
 		4D6B5048238BBA1F00DF2F88 /* SVRadialGradientLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SVRadialGradientLayer.h; path = lib/SVProgressHUD/SVRadialGradientLayer.h; sourceTree = "<group>"; };
 		4D6B5049238BBA1F00DF2F88 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SVProgressHUD.bundle; path = lib/SVProgressHUD/SVProgressHUD.bundle; sourceTree = "<group>"; };
+		4D6BA68423CCB9CA008DCE8A /* SecretStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SecretStore.h; path = model/SecretStore.h; sourceTree = "<group>"; };
 		4D6C51961F6407580035640E /* SafeDetailsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafeDetailsView.h; path = StrongBox/SafeDetailsView.h; sourceTree = "<group>"; };
 		4D6C51971F6407580035640E /* SafeDetailsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafeDetailsView.m; path = StrongBox/SafeDetailsView.m; sourceTree = "<group>"; };
 		4D6C8542239630A200008391 /* star_trek_8k_2018.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = star_trek_8k_2018.utf8.txt; path = resources/wordlists/star_trek_8k_2018.utf8.txt; sourceTree = "<group>"; };
@@ -2087,6 +2094,7 @@
 		4D8144B32199B4A80044E617 /* NodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
 		4D82332922B01BE200A37BAC /* SortOrderTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SortOrderTableViewController.h; path = StrongBox/SortOrderTableViewController.h; sourceTree = "<group>"; };
 		4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SortOrderTableViewController.m; path = StrongBox/SortOrderTableViewController.m; sourceTree = "<group>"; };
+		4D832A9423CE226800A7885E /* SecretStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStore.m; path = model/SecretStore.m; sourceTree = "<group>"; };
 		4D8354C82389141F00E264E0 /* FavIconManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FavIconManager.h; path = model/FavIconManager.h; sourceTree = "<group>"; };
 		4D8354C92389141F00E264E0 /* FavIconManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FavIconManager.m; path = model/FavIconManager.m; sourceTree = "<group>"; };
 		4D87569A2222B46A00D6B8EA /* CustomNavigationItemTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomNavigationItemTitleView.h; path = StrongBox/CustomNavigationItemTitleView.h; sourceTree = "<group>"; };
@@ -2368,6 +2376,7 @@
 		4DC4E16F23488BAB000743C4 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "/Users/mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<absolute>"; };
 		4DC4E27623488BAE000743C4 /* Strongbox Auto Fill Family.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox Auto Fill Family.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DC4E27723488BAF000743C4 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "/Users/mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<absolute>"; };
+		4DC53A6C23D24B1B005E0397 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "StrongBox/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4DC5B9BC217B31F100FE9DD9 /* CommonTesting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CommonTesting.h; path = StrongboxTests/CommonTesting.h; sourceTree = "<group>"; };
 		4DC5B9BD217B31F100FE9DD9 /* CommonTesting.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CommonTesting.m; path = StrongboxTests/CommonTesting.m; sourceTree = "<group>"; };
 		4DC5B9BF217B376F00FE9DD9 /* Root.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Root.h; path = model/keepass/Root.h; sourceTree = SOURCE_ROOT; };
@@ -2421,6 +2430,40 @@
 		4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PickCredentialsTableViewController.m; path = "StrongBox Auto Fill/PickCredentialsTableViewController.m"; sourceTree = SOURCE_ROOT; };
 		4DD85C7F22E8FB2700700192 /* AttachmentsPoolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AttachmentsPoolViewController.h; path = StrongBox/AttachmentsPoolViewController.h; sourceTree = "<group>"; };
 		4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentsPoolViewController.m; path = StrongBox/AttachmentsPoolViewController.m; sourceTree = "<group>"; };
+		4DD8D57823CC9D7F00E7F57B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4DD8D57A23CC9EA200E7F57B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4DD8D57B23CC9F1B00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MasterDetail.strings"; sourceTree = "<group>"; };
+		4DD8D57C23CC9F1B00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "StrongBox/zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		4DD8D57D23CC9F1C00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		4DD8D57E23CC9F1C00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/FavIconBulk.strings"; sourceTree = "<group>"; };
+		4DD8D57F23CC9F1C00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Backups.strings"; sourceTree = "<group>"; };
+		4DD8D58023CC9F1F00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Welcome.strings"; sourceTree = "<group>"; };
+		4DD8D58123CC9F2000E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Browse.strings"; sourceTree = "<group>"; };
+		4DD8D58223CC9F2000E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ItemDetails.strings"; sourceTree = "<group>"; };
+		4DD8D58323CC9F2000E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/QRCodeScannerViewController.strings"; sourceTree = "<group>"; };
+		4DD8D58423CC9F2000E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ItemDetailsPreferences.strings"; sourceTree = "<group>"; };
+		4DD8D58523CC9F2100E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/KeePassHistory.strings"; sourceTree = "<group>"; };
+		4DD8D58623CC9F2100E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PasswordSafeHistory.strings"; sourceTree = "<group>"; };
+		4DD8D58723CC9F2100E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/CreateDatabaseOrSetCredentials.strings"; sourceTree = "<group>"; };
+		4DD8D58823CC9F2200E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SelectKeyFile.strings"; sourceTree = "<group>"; };
+		4DD8D58923CC9F2200E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SelectStorage.strings"; sourceTree = "<group>"; };
+		4DD8D58A23CC9F2200E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PinEntry.strings"; sourceTree = "<group>"; };
+		4DD8D58B23CC9F2200E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PrivacyViewController.strings"; sourceTree = "<group>"; };
+		4DD8D58C23CC9F2300E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DatabaseOperations.strings"; sourceTree = "<group>"; };
+		4DD8D58D23CC9F2300E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Preferences.strings"; sourceTree = "<group>"; };
+		4DD8D58E23CC9F2300E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SelectItem.strings"; sourceTree = "<group>"; };
+		4DD8D58F23CC9F2300E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PasswordGenerationPreferences.strings"; sourceTree = "<group>"; };
+		4DD8D59023CC9F2300E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Upgrade.strings"; sourceTree = "<group>"; };
+		4DD8D59123CC9F2400E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/IconsCollectionViewController.strings"; sourceTree = "<group>"; };
+		4DD8D59223CC9F2400E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/WebDAVConfigurationViewController.strings"; sourceTree = "<group>"; };
+		4DD8D59323CC9F2400E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SFTPSessionConfigurationViewController.strings"; sourceTree = "<group>"; };
+		4DD8D59423CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		4DD8D59523CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/RMStore.strings"; sourceTree = "<group>"; };
+		4DD8D59623CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		4DD8D59723CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "StrongBox Auto Fill/zh-Hans.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		4DD8D59823CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/EditPasswordCell.strings"; sourceTree = "<group>"; };
+		4DD8D59923CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/IconTableCell.strings"; sourceTree = "<group>"; };
+		4DD8D59A23CCA0CC00E7F57B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/RMStore.strings; sourceTree = "<group>"; };
 		4DDA015222425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "corrupt-recycly-bin-values.xml"; sourceTree = "<group>"; };
 		4DDA01542242621400C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
 		4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
@@ -2975,6 +3018,7 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4D2CB7E723D1BCC0000A9ABC /* SecretStoreTests.m */,
 				4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */,
 				4D2561B0233FEB6E00179B84 /* YubiKeyTests.m */,
 				4D98344621775F3800731FFC /* test-files */,
@@ -3407,6 +3451,15 @@
 			name = SVProgressHUD;
 			sourceTree = "<group>";
 		};
+		4D6BA68323CCB981008DCE8A /* StoredCredentialsManager */ = {
+			isa = PBXGroup;
+			children = (
+				4D6BA68423CCB9CA008DCE8A /* SecretStore.h */,
+				4D832A9423CE226800A7885E /* SecretStore.m */,
+			);
+			name = StoredCredentialsManager;
+			sourceTree = "<group>";
+		};
 		4D6FE2BD219444F900EB9997 /* Kdb-1 */ = {
 			isa = PBXGroup;
 			children = (
@@ -3438,6 +3491,7 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D6BA68323CCB981008DCE8A /* StoredCredentialsManager */,
 				4D637C58236187A800C273B3 /* BiometricsManager.h */,
 				4D637C59236187A800C273B3 /* BiometricsManager.m */,
 				4D0835D32284750900CA7405 /* StrongboxDatabase.h */,
@@ -4477,6 +4531,7 @@
 				uk,
 				fr,
 				sv,
+				"zh-Hans",
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
@@ -5119,6 +5174,7 @@
 				4DD755F4232F093900758824 /* XmlComparisonElement.m in Sources */,
 				4D19679F217F4E760057DF06 /* KeePassXmlStrongboxModelAdaptorTests.m in Sources */,
 				4DFA67E522C80824000FC012 /* PasswordMakerTests.m in Sources */,
+				4D2CB7E823D1BCC0000A9ABC /* SecretStoreTests.m in Sources */,
 				4D004CE621F4F67D00E2B194 /* OtpTests.m in Sources */,
 				4D0835E42284799900CA7405 /* KeePassKeyFileTests.m in Sources */,
 				4DC5B9BE217B31F100FE9DD9 /* CommonTesting.m in Sources */,
@@ -5311,6 +5367,7 @@
 				4D402D732074EAFF00F7BC70 /* SafeMetaData.m in Sources */,
 				4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
+				4D832A9523CE226800A7885E /* SecretStore.m in Sources */,
 				4D1F5809233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */,
@@ -5600,6 +5657,7 @@
 				4DC4E0A823488BAA000743C4 /* SafeMetaData.m in Sources */,
 				4DC4E0A923488BAA000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4DC4E0AA23488BAA000743C4 /* KeePassDatabase.m in Sources */,
+				4D832A9723CE226800A7885E /* SecretStore.m in Sources */,
 				4DC4E0AB23488BAA000743C4 /* BackupsTableViewController.m in Sources */,
 				4DC4E0AC23488BAA000743C4 /* SelectDestinationGroupController.m in Sources */,
 				4DC4E0AD23488BAA000743C4 /* IconViewCell.m in Sources */,
@@ -5789,6 +5847,7 @@
 				4DC4E1A823488BAE000743C4 /* ISO8601DateFormatter.m in Sources */,
 				4DC4E1A923488BAE000743C4 /* OTPAlgorithm.m in Sources */,
 				4DC4E1AA23488BAE000743C4 /* PasswordGenerationViewController.m in Sources */,
+				4D832A9823CE226800A7885E /* SecretStore.m in Sources */,
 				4DC4E1AB23488BAE000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
 				4DC96912238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4DC4E1AC23488BAE000743C4 /* regdom.c in Sources */,
@@ -6008,6 +6067,7 @@
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
 				4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */,
 				4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
+				4D832A9623CE226800A7885E /* SecretStore.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
 				4DC96910238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
@@ -6192,6 +6252,7 @@
 				4D462009239C21F500AC4038 /* ru */,
 				4D46200B239C21F600AC4038 /* uk */,
 				4D27CC5823C7384200DF06ED /* sv */,
+				4DD8D57E23CC9F1C00E7F57B /* zh-Hans */,
 			);
 			name = FavIconBulk.storyboard;
 			path = StrongBox;
@@ -6206,6 +6267,7 @@
 				4D4695CA23878E4C009D3BC7 /* uk */,
 				4D4695E923878E71009D3BC7 /* fr */,
 				4D27CC7223C7385500DF06ED /* sv */,
+				4DD8D59723CC9F2A00E7F57B /* zh-Hans */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -6219,6 +6281,7 @@
 				4D4695B423878E44009D3BC7 /* uk */,
 				4D4695D323878E6C009D3BC7 /* fr */,
 				4D27CC5623C7384100DF06ED /* sv */,
+				4DD8D57C23CC9F1B00E7F57B /* zh-Hans */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -6232,6 +6295,7 @@
 				4D4695B923878E4A009D3BC7 /* uk */,
 				4D4695D823878E6F009D3BC7 /* fr */,
 				4D27CC7023C7385500DF06ED /* sv */,
+				4DD8D59823CC9F2A00E7F57B /* zh-Hans */,
 			);
 			name = EditPasswordCell.xib;
 			sourceTree = "<group>";
@@ -6245,6 +6309,7 @@
 				4D4695BA23878E4A009D3BC7 /* uk */,
 				4D4695D923878E70009D3BC7 /* fr */,
 				4D27CC7123C7385500DF06ED /* sv */,
+				4DD8D59923CC9F2A00E7F57B /* zh-Hans */,
 			);
 			name = IconTableCell.xib;
 			sourceTree = "<group>";
@@ -6258,6 +6323,7 @@
 				4D4695BB23878E4A009D3BC7 /* uk */,
 				4D4695DA23878E70009D3BC7 /* fr */,
 				4D27CC5D23C7384400DF06ED /* sv */,
+				4DD8D58323CC9F2000E7F57B /* zh-Hans */,
 			);
 			name = QRCodeScannerViewController.xib;
 			path = StrongBox;
@@ -6272,6 +6338,7 @@
 				4D4695C323878E4B009D3BC7 /* uk */,
 				4D4695E223878E71009D3BC7 /* fr */,
 				4D27CC6523C7384700DF06ED /* sv */,
+				4DD8D58B23CC9F2200E7F57B /* zh-Hans */,
 			);
 			name = PrivacyViewController.xib;
 			path = StrongBox;
@@ -6286,6 +6353,7 @@
 				4D4695C923878E4C009D3BC7 /* uk */,
 				4D4695E823878E71009D3BC7 /* fr */,
 				4D27CC6B23C7384900DF06ED /* sv */,
+				4DD8D59123CC9F2400E7F57B /* zh-Hans */,
 			);
 			name = IconsCollectionViewController.xib;
 			path = StrongBox;
@@ -6300,6 +6368,7 @@
 				4D4695CC23878E4C009D3BC7 /* uk */,
 				4D4695EB23878E72009D3BC7 /* fr */,
 				4D27CC6D23C7384A00DF06ED /* sv */,
+				4DD8D59323CC9F2400E7F57B /* zh-Hans */,
 			);
 			name = SFTPSessionConfigurationViewController.xib;
 			path = StrongBox;
@@ -6314,6 +6383,7 @@
 				4D4695CB23878E4C009D3BC7 /* uk */,
 				4D4695EA23878E72009D3BC7 /* fr */,
 				4D27CC6C23C7384A00DF06ED /* sv */,
+				4DD8D59223CC9F2400E7F57B /* zh-Hans */,
 			);
 			name = WebDAVConfigurationViewController.xib;
 			path = StrongBox;
@@ -6328,6 +6398,7 @@
 				4D4695B223878E43009D3BC7 /* uk */,
 				4D4695D123878E6C009D3BC7 /* fr */,
 				4D27CC5923C7384200DF06ED /* sv */,
+				4DD8D57F23CC9F1C00E7F57B /* zh-Hans */,
 			);
 			name = Backups.storyboard;
 			path = StrongBox;
@@ -6341,6 +6412,8 @@
 				4D4695D023878E4D009D3BC7 /* uk */,
 				4D4695EF23878E72009D3BC7 /* fr */,
 				4D27CC7323C7385500DF06ED /* sv */,
+				4DD8D57A23CC9EA200E7F57B /* en */,
+				4DD8D59623CC9F2A00E7F57B /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			path = "Strongbox Auto Fill";
@@ -6354,6 +6427,8 @@
 				4D4695CF23878E4D009D3BC7 /* uk */,
 				4D4695EE23878E72009D3BC7 /* fr */,
 				4D27CC6F23C7385500DF06ED /* sv */,
+				4DD8D59523CC9F2A00E7F57B /* zh-Hans */,
+				4DD8D59A23CCA0CC00E7F57B /* en */,
 			);
 			name = RMStore.strings;
 			path = StrongBox;
@@ -6367,6 +6442,8 @@
 				4D4695CE23878E4D009D3BC7 /* uk */,
 				4D4695ED23878E72009D3BC7 /* fr */,
 				4D27CC6E23C7385400DF06ED /* sv */,
+				4DD8D57823CC9D7F00E7F57B /* en */,
+				4DD8D59423CC9F2A00E7F57B /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			path = StrongBox;
@@ -6381,6 +6458,7 @@
 				4D4695C823878E4C009D3BC7 /* uk */,
 				4D4695E723878E71009D3BC7 /* fr */,
 				4D27CC6A23C7384900DF06ED /* sv */,
+				4DD8D59023CC9F2300E7F57B /* zh-Hans */,
 			);
 			name = Upgrade.storyboard;
 			path = StrongBox;
@@ -6395,6 +6473,7 @@
 				4D4695BF23878E4B009D3BC7 /* uk */,
 				4D4695DE23878E70009D3BC7 /* fr */,
 				4D27CC6123C7384600DF06ED /* sv */,
+				4DD8D58723CC9F2100E7F57B /* zh-Hans */,
 			);
 			name = CreateDatabaseOrSetCredentials.storyboard;
 			path = StrongBox;
@@ -6409,6 +6488,7 @@
 				4D4695B323878E43009D3BC7 /* uk */,
 				4D4695D223878E6C009D3BC7 /* fr */,
 				4D27CC5523C7384000DF06ED /* sv */,
+				4DD8D57B23CC9F1B00E7F57B /* zh-Hans */,
 			);
 			name = MasterDetail.storyboard;
 			path = StrongBox;
@@ -6422,6 +6502,7 @@
 				4D4695B523878E44009D3BC7 /* uk */,
 				4D4695D423878E6D009D3BC7 /* fr */,
 				4D27CC5723C7384200DF06ED /* sv */,
+				4DD8D57D23CC9F1C00E7F57B /* zh-Hans */,
 			);
 			name = LaunchScreen.storyboard;
 			path = StrongBox;
@@ -6436,6 +6517,7 @@
 				4D4695B623878E44009D3BC7 /* uk */,
 				4D4695D523878E6F009D3BC7 /* fr */,
 				4D27CC5A23C7384300DF06ED /* sv */,
+				4DD8D58023CC9F1F00E7F57B /* zh-Hans */,
 			);
 			name = Welcome.storyboard;
 			path = StrongBox;
@@ -6450,6 +6532,7 @@
 				4D4695B723878E45009D3BC7 /* uk */,
 				4D4695D623878E6F009D3BC7 /* fr */,
 				4D27CC5B23C7384300DF06ED /* sv */,
+				4DD8D58123CC9F2000E7F57B /* zh-Hans */,
 			);
 			name = Browse.storyboard;
 			path = StrongBox;
@@ -6464,6 +6547,7 @@
 				4D4695B823878E4A009D3BC7 /* uk */,
 				4D4695D723878E6F009D3BC7 /* fr */,
 				4D27CC5C23C7384400DF06ED /* sv */,
+				4DD8D58223CC9F2000E7F57B /* zh-Hans */,
 			);
 			name = ItemDetails.storyboard;
 			path = StrongBox;
@@ -6478,6 +6562,7 @@
 				4D4695BC23878E4A009D3BC7 /* uk */,
 				4D4695DB23878E70009D3BC7 /* fr */,
 				4D27CC5E23C7384500DF06ED /* sv */,
+				4DD8D58423CC9F2000E7F57B /* zh-Hans */,
 			);
 			name = ItemDetailsPreferences.storyboard;
 			path = StrongBox;
@@ -6492,6 +6577,7 @@
 				4D4695BD23878E4B009D3BC7 /* uk */,
 				4D4695DC23878E70009D3BC7 /* fr */,
 				4D27CC5F23C7384500DF06ED /* sv */,
+				4DD8D58523CC9F2100E7F57B /* zh-Hans */,
 			);
 			name = KeePassHistory.storyboard;
 			path = StrongBox;
@@ -6506,6 +6592,7 @@
 				4D4695BE23878E4B009D3BC7 /* uk */,
 				4D4695DD23878E70009D3BC7 /* fr */,
 				4D27CC6023C7384500DF06ED /* sv */,
+				4DD8D58623CC9F2100E7F57B /* zh-Hans */,
 			);
 			name = PasswordSafeHistory.storyboard;
 			path = StrongBox;
@@ -6520,6 +6607,7 @@
 				4D4695C023878E4B009D3BC7 /* uk */,
 				4D4695DF23878E70009D3BC7 /* fr */,
 				4D27CC6223C7384600DF06ED /* sv */,
+				4DD8D58823CC9F2200E7F57B /* zh-Hans */,
 			);
 			name = SelectKeyFile.storyboard;
 			path = StrongBox;
@@ -6534,6 +6622,7 @@
 				4D4695C123878E4B009D3BC7 /* uk */,
 				4D4695E023878E70009D3BC7 /* fr */,
 				4D27CC6323C7384700DF06ED /* sv */,
+				4DD8D58923CC9F2200E7F57B /* zh-Hans */,
 			);
 			name = SelectStorage.storyboard;
 			path = StrongBox;
@@ -6548,6 +6637,7 @@
 				4D4695C223878E4B009D3BC7 /* uk */,
 				4D4695E123878E71009D3BC7 /* fr */,
 				4D27CC6423C7384700DF06ED /* sv */,
+				4DD8D58A23CC9F2200E7F57B /* zh-Hans */,
 			);
 			name = PinEntry.storyboard;
 			path = StrongBox;
@@ -6562,6 +6652,7 @@
 				4D4695C423878E4B009D3BC7 /* uk */,
 				4D4695E323878E71009D3BC7 /* fr */,
 				4D27CC6623C7384800DF06ED /* sv */,
+				4DD8D58C23CC9F2300E7F57B /* zh-Hans */,
 			);
 			name = DatabaseOperations.storyboard;
 			path = StrongBox;
@@ -6577,6 +6668,7 @@
 				4D4695E423878E71009D3BC7 /* fr */,
 				4DBBF18123A2992100071EAC /* en */,
 				4D27CC6723C7384800DF06ED /* sv */,
+				4DD8D58D23CC9F2300E7F57B /* zh-Hans */,
 			);
 			name = Preferences.storyboard;
 			path = StrongBox;
@@ -6590,6 +6682,7 @@
 				4D4695C623878E4C009D3BC7 /* uk */,
 				4D4695E523878E71009D3BC7 /* fr */,
 				4D27CC6823C7384800DF06ED /* sv */,
+				4DD8D58E23CC9F2300E7F57B /* zh-Hans */,
 			);
 			name = SelectItem.storyboard;
 			path = StrongBox;
@@ -6604,6 +6697,7 @@
 				4D4695C723878E4C009D3BC7 /* uk */,
 				4D4695E623878E71009D3BC7 /* fr */,
 				4D27CC6923C7384800DF06ED /* sv */,
+				4DD8D58F23CC9F2300E7F57B /* zh-Hans */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -6618,6 +6712,7 @@
 				4D4695CD23878E4C009D3BC7 /* uk */,
 				4D4695EC23878E72009D3BC7 /* fr */,
 				4D27CC7423C73CA300DF06ED /* sv */,
+				4DC53A6C23D24B1B005E0397 /* zh-Hans */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

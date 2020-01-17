@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "SafeMetaData.h"
+#import "DatabaseMetadata.h"
 
 @interface MB1Tests : XCTestCase
 
@@ -16,7 +16,7 @@
 @implementation MB1Tests
 
 - (void)testEmpty {
-    SafeMetaData* metadata = [[SafeMetaData alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileName:@"" fileIdentifier:@""];
+    DatabaseMetadata* metadata = [[DatabaseMetadata alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileUrl:[NSURL URLWithString:@""] storageInfo:@""];
     
     metadata.touchIdPassword = @"";
     
@@ -25,16 +25,16 @@
 }
 
 - (void)testNil {
-    SafeMetaData* metadata = [[SafeMetaData alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileName:@"" fileIdentifier:@""];
-    
+    DatabaseMetadata* metadata = [[DatabaseMetadata alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileUrl:[NSURL URLWithString:@""] storageInfo:@""];
+
     metadata.touchIdPassword = nil;
     
     XCTAssertNil(metadata.touchIdPassword);
 }
 
 - (void)testSomething {
-    SafeMetaData* metadata = [[SafeMetaData alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileName:@"" fileIdentifier:@""];
-    
+    DatabaseMetadata* metadata = [[DatabaseMetadata alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileUrl:[NSURL URLWithString:@""] storageInfo:@""];
+
     metadata.touchIdPassword = @"Something";
     
     XCTAssert([metadata.touchIdPassword isEqualToString:@"Something"]);

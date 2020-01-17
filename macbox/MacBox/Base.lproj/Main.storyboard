@@ -432,11 +432,11 @@ CA
             <objects>
                 <viewController id="5gI-5U-AMq" customClass="ViewController" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="ERx-hH-rdd">
-                        <rect key="frame" x="0.0" y="0.0" width="996" height="636"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1001" height="636"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tabView verticalHuggingPriority="252" verticalCompressionResistancePriority="749" initialItem="xow-Ku-u1Q" translatesAutoresizingMaskIntoConstraints="NO" id="lRf-9K-Xfe">
-                                <rect key="frame" x="-7" y="-10" width="1010" height="652"/>
+                                <rect key="frame" x="-7" y="-10" width="1015" height="652"/>
                                 <font key="font" metaFont="system"/>
                                 <tabViewItems>
                                     <tabViewItem label="Locked" identifier="1" id="xow-Ku-u1Q" userLabel="Locked">
@@ -598,17 +598,17 @@ CA
                                     </tabViewItem>
                                     <tabViewItem label="Unlocked" identifier="2" id="TeE-jX-AML" userLabel="Unlocked">
                                         <view key="view" id="ju3-Df-M8i">
-                                            <rect key="frame" x="10" y="33" width="990" height="606"/>
+                                            <rect key="frame" x="10" y="33" width="995" height="606"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oEB-NH-jlT">
-                                                    <rect key="frame" x="20" y="20" width="950" height="566"/>
+                                                    <rect key="frame" x="20" y="20" width="955" height="566"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H44-Hu-V25" userLabel="Outline">
-                                                            <rect key="frame" x="0.0" y="0.0" width="500" height="566"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="505" height="566"/>
                                                             <subviews>
                                                                 <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pbj-27-Yn8">
-                                                                    <rect key="frame" x="0.0" y="541" width="500" height="25"/>
+                                                                    <rect key="frame" x="0.0" y="541" width="505" height="25"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="25" id="AXb-9P-hL2"/>
                                                                     </constraints>
@@ -622,10 +622,10 @@ CA
                                                                     </connections>
                                                                 </searchField>
                                                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="HpG-p8-2GS" userLabel="Scope">
-                                                                    <rect key="frame" x="0.0" y="499" width="500" height="30"/>
+                                                                    <rect key="frame" x="0.0" y="499" width="505" height="30"/>
                                                                     <subviews>
                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="4A0-nj-hcL">
-                                                                            <rect key="frame" x="94" y="7" width="65" height="16"/>
+                                                                            <rect key="frame" x="99" y="7" width="65" height="16"/>
                                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Search In:" id="nZM-Ss-B9z">
                                                                                 <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -633,7 +633,7 @@ CA
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <segmentedControl verticalHuggingPriority="750" springLoaded="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Joh-VG-Yuw" userLabel="Search Scope">
-                                                                            <rect key="frame" x="163" y="3" width="339" height="24"/>
+                                                                            <rect key="frame" x="168" y="3" width="339" height="24"/>
                                                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="NaG-dV-Fz9">
                                                                                 <font key="font" metaFont="system"/>
                                                                                 <segments>
@@ -659,7 +659,7 @@ CA
                                                                     </constraints>
                                                                 </customView>
                                                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="d7t-jI-cVh" userLabel="Toolbar">
-                                                                    <rect key="frame" x="3" y="462" width="494" height="25"/>
+                                                                    <rect key="frame" x="5" y="462" width="494" height="25"/>
                                                                     <subviews>
                                                                         <button toolTip="Expand All" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ysP-ZH-RbR" userLabel="Expand All">
                                                                             <rect key="frame" x="-6" y="-14" width="52" height="51"/>
@@ -744,13 +744,13 @@ CA
                                                                     </constraints>
                                                                 </customView>
                                                                 <scrollView verticalHuggingPriority="251" verticalCompressionResistancePriority="749" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k9S-c9-cks">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="500" height="450"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="505" height="450"/>
                                                                     <clipView key="contentView" drawsBackground="NO" id="qzg-tJ-FdC">
-                                                                        <rect key="frame" x="1" y="0.0" width="498" height="449"/>
+                                                                        <rect key="frame" x="1.3665865384505571" y="0.0" width="503.00120192308185" height="434"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" autosaveName="Strongbox-OutlineView" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" headerView="WfS-hP-cVj" viewBased="YES" indentationPerLevel="14" autoresizesOutlineColumn="YES" outlineTableColumn="eZj-j7-ola" id="hwF-Mb-pXx">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="690" height="426"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="691" height="411"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                 <size key="intercellSpacing" width="5" height="5"/>
                                                                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -759,7 +759,7 @@ CA
                                                                                 <tableColumns>
                                                                                     <tableColumn identifier="TitleColumn" editable="NO" width="120" minWidth="100" maxWidth="1000" id="eZj-j7-ola">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Title">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                         </tableHeaderCell>
@@ -812,7 +812,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="UsernameColumn" width="80" minWidth="40" maxWidth="3.4028234663852886e+38" id="7Pf-Ib-Dx6">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Username">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -824,11 +824,11 @@ CA
                                                                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                                         <prototypeCellViews>
                                                                                             <tableCellView identifier="GenericCell" id="OOc-lJ-Mtp">
-                                                                                                <rect key="frame" x="127" y="2" width="80" height="17"/>
+                                                                                                <rect key="frame" x="128" y="2" width="78" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                 <subviews>
                                                                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BVg-8n-7Ot">
-                                                                                                        <rect key="frame" x="0.0" y="0.0" width="80" height="17"/>
+                                                                                                        <rect key="frame" x="0.0" y="0.0" width="78" height="17"/>
                                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Table View Cell" id="MyO-7y-Jdo">
                                                                                                             <font key="font" metaFont="system"/>
@@ -845,7 +845,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="PasswordColumn" editable="NO" width="80" minWidth="50" maxWidth="3.4028234663852886e+38" id="xnp-pW-Ub0" userLabel="Password">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Password">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -858,7 +858,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="TOTPColumn" editable="NO" width="80" minWidth="40" maxWidth="3.4028234663852886e+38" id="F4k-k8-SXu" userLabel="TOTP">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="TOTP / 2FA">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -870,11 +870,11 @@ CA
                                                                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                                         <prototypeCellViews>
                                                                                             <tableCellView identifier="ReadOnlyCell" id="x6q-Od-iL6">
-                                                                                                <rect key="frame" x="297" y="2" width="80" height="17"/>
+                                                                                                <rect key="frame" x="297" y="2" width="76" height="17"/>
                                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                 <subviews>
                                                                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hGl-JH-T9e">
-                                                                                                        <rect key="frame" x="0.0" y="0.0" width="80" height="17"/>
+                                                                                                        <rect key="frame" x="0.0" y="0.0" width="76" height="17"/>
                                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Read Only" id="1Od-z7-VPX">
                                                                                                             <font key="font" metaFont="system"/>
@@ -891,7 +891,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="URLColumn" editable="NO" width="80" minWidth="40" maxWidth="3.4028234663852886e+38" id="njm-ab-Ug3">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="URL">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -904,7 +904,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="EmailColumn" editable="NO" width="40" minWidth="40" maxWidth="3.4028234663852886e+38" id="vF8-1y-Khb" userLabel="Email">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Email">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -917,7 +917,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="ExpiresColumn" editable="NO" width="40" minWidth="40" maxWidth="3.4028234663852886e+38" id="Oux-le-RqE" userLabel="Expires">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Expires">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -930,7 +930,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="NotesColumn" editable="NO" width="40" minWidth="40" maxWidth="3.4028234663852886e+38" id="Rl3-tN-J0b">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Notes">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -943,7 +943,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="AttachmentsColumn" editable="NO" width="40" minWidth="10" maxWidth="80" id="BBi-S3-WMb">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Attachments">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -956,7 +956,7 @@ CA
                                                                                     </tableColumn>
                                                                                     <tableColumn identifier="CustomFieldsColumn" editable="NO" width="40" minWidth="10" maxWidth="80" id="Exa-P4-tTC">
                                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Custom Fields">
-                                                                                            <font key="font" metaFont="menu" size="11"/>
+                                                                                            <font key="font" metaFont="toolTip"/>
                                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                         </tableHeaderCell>
@@ -982,7 +982,7 @@ CA
                                                                         <constraint firstAttribute="height" constant="450" placeholder="YES" id="6k5-jc-JXF"/>
                                                                     </constraints>
                                                                     <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="1Mq-39-woA">
-                                                                        <rect key="frame" x="1" y="433" width="498" height="16"/>
+                                                                        <rect key="frame" x="1" y="434" width="503" height="15"/>
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                     <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="pKo-nv-B4e">
@@ -990,7 +990,7 @@ CA
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                     <tableHeaderView key="headerView" id="WfS-hP-cVj">
-                                                                        <rect key="frame" x="0.0" y="0.0" width="690" height="23"/>
+                                                                        <rect key="frame" x="0.0" y="0.0" width="691" height="23"/>
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </tableHeaderView>
                                                                 </scrollView>
@@ -1019,7 +1019,7 @@ CA
                                                             </customSpacing>
                                                         </stackView>
                                                         <tabView translatesAutoresizingMaskIntoConstraints="NO" id="GWN-fo-GiB" userLabel="Quick View">
-                                                            <rect key="frame" x="493" y="-10" width="464" height="582"/>
+                                                            <rect key="frame" x="498" y="-10" width="464" height="582"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="450" id="zDN-Ln-Rpb"/>
                                                             </constraints>
@@ -1037,7 +1037,7 @@ CA
                                                                                         <rect key="frame" x="0.0" y="504" width="424" height="32"/>
                                                                                         <subviews>
                                                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G9o-Xd-UoE">
-                                                                                                <rect key="frame" x="175" y="0.0" width="75" height="32"/>
+                                                                                                <rect key="frame" x="174" y="0.0" width="75" height="32"/>
                                                                                                 <subviews>
                                                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Oky-c7-Uha">
                                                                                                         <rect key="frame" x="0.0" y="0.0" width="32" height="32"/>
@@ -1411,7 +1411,7 @@ CA
                                                                                                             <tableColumns>
                                                                                                                 <tableColumn identifier="CustomFieldKeyColumn" width="116" minWidth="40" maxWidth="1000" id="HSd-bT-6pC">
                                                                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
-                                                                                                                        <font key="font" metaFont="menu" size="11"/>
+                                                                                                                        <font key="font" metaFont="toolTip"/>
                                                                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                                                     </tableHeaderCell>
@@ -1444,7 +1444,7 @@ CA
                                                                                                                 </tableColumn>
                                                                                                                 <tableColumn identifier="CustomFieldValueColumn" width="300" minWidth="40" maxWidth="1000" id="M7S-wo-fwb">
                                                                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Value">
-                                                                                                                        <font key="font" metaFont="menu" size="11"/>
+                                                                                                                        <font key="font" metaFont="toolTip"/>
                                                                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                                                     </tableHeaderCell>
@@ -1525,7 +1525,7 @@ CA
                                                                                         <rect key="frame" x="0.0" y="97" width="424" height="82"/>
                                                                                         <subviews>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BeO-VE-DTk" userLabel="Attachments Label">
-                                                                                                <rect key="frame" x="170" y="64" width="85" height="16"/>
+                                                                                                <rect key="frame" x="169" y="64" width="85" height="16"/>
                                                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Attachments" id="VOe-Sl-Xk6">
                                                                                                     <font key="font" metaFont="systemSemibold" size="13"/>
                                                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1546,8 +1546,8 @@ CA
                                                                                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                                                                             <tableColumns>
                                                                                                                 <tableColumn identifier="filename" width="330" minWidth="40" maxWidth="1000" id="lrA-OQ-37y" userLabel="File Name">
-                                                                                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="FIle Name">
-                                                                                                                        <font key="font" metaFont="menu" size="11"/>
+                                                                                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="File Name">
+                                                                                                                        <font key="font" metaFont="toolTip"/>
                                                                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                                                     </tableHeaderCell>
@@ -1586,7 +1586,7 @@ CA
                                                                                                                 </tableColumn>
                                                                                                                 <tableColumn identifier="filesize" width="86" minWidth="40" maxWidth="1000" id="MqS-Yt-uln" userLabel="File Size">
                                                                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="File Size">
-                                                                                                                        <font key="font" metaFont="menu" size="11"/>
+                                                                                                                        <font key="font" metaFont="toolTip"/>
                                                                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                                                     </tableHeaderCell>
@@ -1654,7 +1654,7 @@ CA
                                                                                         <rect key="frame" x="0.0" y="0.0" width="424" height="82"/>
                                                                                         <subviews>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8vG-fA-yRR" userLabel="Notes Label">
-                                                                                                <rect key="frame" x="191" y="64" width="42" height="16"/>
+                                                                                                <rect key="frame" x="183" y="64" width="42" height="16"/>
                                                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Notes" id="zsQ-Yj-TPx">
                                                                                                     <font key="font" metaFont="systemSemibold" size="13"/>
                                                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1664,15 +1664,15 @@ CA
                                                                                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nwU-ra-Y09">
                                                                                                 <rect key="frame" x="0.0" y="0.0" width="424" height="54"/>
                                                                                                 <clipView key="contentView" drawsBackground="NO" id="n6X-39-X3W">
-                                                                                                    <rect key="frame" x="1" y="1" width="422" height="52"/>
+                                                                                                    <rect key="frame" x="1" y="1" width="407" height="52"/>
                                                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                     <subviews>
                                                                                                         <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" allowsNonContiguousLayout="YES" linkDetection="YES" id="R2W-LK-2el">
-                                                                                                            <rect key="frame" x="0.0" y="0.0" width="422" height="52"/>
+                                                                                                            <rect key="frame" x="0.0" y="0.0" width="407" height="52"/>
                                                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                                            <size key="minSize" width="422" height="52"/>
+                                                                                                            <size key="minSize" width="407" height="52"/>
                                                                                                             <size key="maxSize" width="595" height="10000000"/>
                                                                                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                             <connections>
@@ -1689,7 +1689,7 @@ CA
                                                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                                                 </scroller>
                                                                                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="LLQ-pY-V30">
-                                                                                                    <rect key="frame" x="407" y="1" width="16" height="52"/>
+                                                                                                    <rect key="frame" x="408" y="1" width="15" height="52"/>
                                                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                                                 </scroller>
                                                                                             </scrollView>
@@ -1880,7 +1880,7 @@ CA
                                                                                                     <tableColumns>
                                                                                                         <tableColumn identifier="KeyColumn" editable="NO" width="200" minWidth="40" maxWidth="1000" id="E2z-2g-1mZ">
                                                                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
-                                                                                                                <font key="font" metaFont="menu" size="11"/>
+                                                                                                                <font key="font" metaFont="toolTip"/>
                                                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                                             </tableHeaderCell>
@@ -1913,7 +1913,7 @@ CA
                                                                                                         </tableColumn>
                                                                                                         <tableColumn identifier="ValueColumn" editable="NO" width="216" minWidth="40" maxWidth="1000" id="nRC-68-z9X">
                                                                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Value">
-                                                                                                                <font key="font" metaFont="menu" size="11"/>
+                                                                                                                <font key="font" metaFont="toolTip"/>
                                                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                                                             </tableHeaderCell>

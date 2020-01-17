@@ -25,6 +25,12 @@
 #import "ClipboardManager.h"
 #import "GoogleDriveManager.h"
 #import "iCloudSafesCoordinator.h"
+#import "SecretStore.h"
+
+// TODO: Remove in after 17 April or So Once migration done
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
+#import "JNKeychain.h"
 
 @interface AppDelegate ()
 
@@ -83,53 +89,96 @@
     }
 }
 
-- (void)performMigrations {
-    // 17-Jun-2019
-    if(!Settings.sharedInstance.migratedLocalDatabasesToNewSystem) {
-        [LocalDeviceStorageProvider.sharedInstance migrateLocalDatabasesToNewSystem];
-    }
-    
-    // 2-Jul-2019
-    if(!Settings.sharedInstance.migratedToNewPasswordGenerator) {
-        [self migrateToNewPasswordGenerator];
+- (void)performMigrations {    
+    if(!Settings.sharedInstance.migratedToNewSecretStore) {
+        [self migrateToNewSecretStore];
     }
 }
 
-- (void)migrateToNewPasswordGenerator {
-    NSLog(@"Migrating to new Password Generation System...");
-    
-    PasswordGenerationConfig* newConfig = Settings.sharedInstance.passwordGenerationConfig;
-    PasswordGenerationParameters* oldConfig = Settings.sharedInstance.passwordGenerationParameters;
-    
-    newConfig.algorithm = oldConfig.algorithm == kBasic ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
+- (void)migrateToNewSecretStore {
+    NSLog(@"Migrating to new Secret Store...");
 
-    newConfig.basicLength = oldConfig.maximumLength;
+    NSArray<SafeMetaData*>* databases = SafesList.sharedInstance.snapshot;
     
-    NSMutableArray<NSNumber*>* characterGroups = @[].mutableCopy;
-    if(oldConfig.useLower) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolLower)];
-    }
-    if(oldConfig.useUpper) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolUpper)];
-    }
-    if(oldConfig.useDigits) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolNumeric)];
-    }
-    if(oldConfig.useSymbols) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolSymbols)];
+    for (SafeMetaData* database in databases) {
+        NSString* conveniencePassword = [JNKeychain loadValueForKey:database.uuid];
+        
+        if(conveniencePassword) {
+            NSLog(@"Migrated Convenience Password for [%@]", database.nickName);
+            [SecretStore.sharedInstance setSecureObject:conveniencePassword forIdentifier:database.uuid];
+        }
+        
+        NSString* yubikeySecretKeyKey = [NSString stringWithFormat:@"%@-yubikey-secret", database.uuid];
+        NSString* yubikeySecretKey = [JNKeychain loadValueForKey:yubikeySecretKeyKey];
+        if(yubikeySecretKey) {
+            NSLog(@"Migrated Yubikey Secret for [%@]", database.nickName);
+            [SecretStore.sharedInstance setSecureObject:yubikeySecretKey forIdentifier:yubikeySecretKeyKey];
+        }
+        
+        
+        NSString* favouritesKey = [NSString stringWithFormat:@"%@-favourites", database.uuid];
+        NSArray<NSString *> * favourites = [JNKeychain loadValueForKey:favouritesKey];
+        if(favourites) {
+            NSLog(@"Migrated Favourites for [%@]", database.nickName);
+            [SecretStore.sharedInstance setSecureObject:favourites forIdentifier:favouritesKey];
+        }
+        
+        
+        NSString* conveniencePinKey = [NSString stringWithFormat:@"%@-convenience-pin", database.uuid];
+        NSString* conveniencePin = [JNKeychain loadValueForKey:conveniencePinKey];
+        if(conveniencePin) {
+            NSLog(@"Migrated Convenience PIN for [%@]", database.nickName);
+            [SecretStore.sharedInstance setSecureObject:conveniencePin forIdentifier:conveniencePinKey];
+        }
+        
+        
+        NSString* duressPinKey = [NSString stringWithFormat:@"%@-duress-pin", database.uuid];
+        NSString* duressPin = [JNKeychain loadValueForKey:duressPinKey];
+        if(duressPin) {
+            NSLog(@"Migrated Duress PIN for [%@]", database.nickName);
+            [SecretStore.sharedInstance setSecureObject:duressPin forIdentifier:duressPinKey];
+        }
+        
+        // SFTP
+        
+        if(database.storageProvider == kSFTP) {
+            NSLog(@"Migrated SFTP Config for [%@]", database.nickName);
+            
+            SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+            SFTPSessionConfiguration *config = pd.sFtpConfiguration;
+            
+            NSString* sftpPasswordKey = [config getKeyChainKey:@"password"];
+            NSString* sftpPassword = [JNKeychain loadValueForKey:sftpPasswordKey];
+            
+            NSString* sftpPrivateKeyKey = [config getKeyChainKey:@"privateKey"];
+            NSString* sftpPrivateKey = [JNKeychain loadValueForKey:sftpPrivateKeyKey];
+
+            NSString* sftpPublicKeyKey = [config getKeyChainKey:@"publicKey"];
+            NSString* sftpPublicKey = [JNKeychain loadValueForKey:sftpPublicKeyKey];
+
+            config.password = sftpPassword;
+            config.privateKey = sftpPrivateKey;
+            config.publicKey = sftpPublicKey;
+        }
+        
+        // WebDAV
+    
+        if(database.storageProvider == kWebDAV) {
+            NSLog(@"Migrated WebDAV Config for [%@]", database.nickName);
+            
+            WebDAVProviderData *pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+            WebDAVSessionConfiguration* config = pd.sessionConfiguration;
+        
+            NSString* webDavPasswordKey = [config getKeyChainKey:@"password"];
+            NSString* webDavPassword = [JNKeychain loadValueForKey:webDavPasswordKey];
+            
+            config.password = webDavPassword;
+        }
     }
     
-    newConfig.useCharacterGroups = characterGroups.copy;
-    newConfig.easyReadCharactersOnly = oldConfig.easyReadOnly;
-    newConfig.nonAmbiguousOnly = YES;
-    newConfig.pickFromEveryGroup = NO;
+    Settings.sharedInstance.migratedToNewSecretStore = YES;
     
-    newConfig.wordCount = oldConfig.xkcdWordCount;
-    newConfig.wordSeparator = oldConfig.wordSeparator;
-    newConfig.hackerify = NO;
-    
-    Settings.sharedInstance.passwordGenerationConfig = newConfig;
-    Settings.sharedInstance.migratedToNewPasswordGenerator = YES;
+    NSLog(@"Migrating to new Secret Store Done...");
 }
 
 - (void)cleanupInbox:(NSDictionary *)launchOptions {

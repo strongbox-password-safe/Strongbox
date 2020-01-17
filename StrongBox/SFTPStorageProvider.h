@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SafeStorageProvider.h"
 #import "SFTPSessionConfiguration.h"
+#import "SFTPProviderData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 
 @property BOOL maintainSessionForListing;
+
+- (SFTPProviderData*)getProviderDataFromMetaData:(SafeMetaData*)metaData;
 
 @end
 

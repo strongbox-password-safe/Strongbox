@@ -315,7 +315,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             childCount:childCount
                 italic:italic
          groupLocation:groupLocation
-                pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO];
+                pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+              hideIcon:self.model.metadata.hideIconInBrowse];
     }
     else {
         DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
@@ -329,7 +330,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                  pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
          hasAttachments:self.model.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
                 expired:node.expired
-               otpToken:node.fields.otpToken];
+               otpToken:node.fields.otpToken
+               hideIcon:self.model.metadata.hideIconInBrowse];
     }
     
     return cell;

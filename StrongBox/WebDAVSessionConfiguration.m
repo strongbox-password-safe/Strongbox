@@ -7,12 +7,11 @@
 //
 
 #import "WebDAVSessionConfiguration.h"
-#import "JNKeychain.h"
+#import "SecretStore.h"
 
 @interface WebDAVSessionConfiguration ()
 
 @property NSString* keyChainUuid;
-//@property NSString* root;
 
 @end
 
@@ -76,15 +75,15 @@
 }
 
 -(NSString *)password {
-    return [JNKeychain loadValueForKey:[self getKeyChainKey:@"password"]];
+    return [SecretStore.sharedInstance getSecureString:[self getKeyChainKey:@"password"]];
 }
 
 - (void)setPassword:(NSString *)password {
     if(password) {
-        [JNKeychain saveValue:password forKey:[self getKeyChainKey:@"password"]];
+        [SecretStore.sharedInstance setSecureString:password forIdentifier:[self getKeyChainKey:@"password"]];
     }
     else {
-        [JNKeychain deleteValueForKey:[self getKeyChainKey:@"password"]];
+        [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"password"]];
     }
 }
 

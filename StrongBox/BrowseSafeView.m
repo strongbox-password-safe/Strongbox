@@ -884,7 +884,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                     italic:italic
              groupLocation:groupLocation
                  tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil
-                    pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO];
+                    pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+                  hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         else {
             NSString* subtitle = [searcher getBrowseItemSubtitle:node];
@@ -896,7 +897,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                      pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
              hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
                     expired:node.expired
-                   otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
+                   otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
+                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         
         return cell;

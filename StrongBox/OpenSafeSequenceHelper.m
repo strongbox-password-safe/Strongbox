@@ -159,15 +159,55 @@
     [self beginSeq];
 }
 
+- (void)clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState {
+    NSArray<SafeMetaData*>* databases = SafesList.sharedInstance.snapshot;
+    
+    // Unenrol/Remove Convenience Unlock secrets for all DBs protected by Biometric ID...
+    // All because if an attacker adds a dummy db and successfully Bio authenticates -
+    // good state will change and allow access to previously enrolled dbs
+
+    for (SafeMetaData* database in databases) {
+        if(database.isTouchIdEnabled) {
+            NSLog(@"Clearing Biometrics for Database: [%@]", database.nickName);
+            
+            database.isEnrolledForConvenience = NO;
+            database.convenienceMasterPassword = nil;
+            database.convenenienceYubikeySecret = nil;
+            // database.conveniencePin = nil; // KEEP PIN for users who use both...
+            database.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful manual open
+
+            [SafesList.sharedInstance update:database];
+        }
+    }
+
+    [BiometricsManager.sharedInstance clearBiometricRecordedDatabaseState];
+}
+
 - (void)beginSeq {
     if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = self.safe.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
         BOOL biometricAllowed = !Settings.sharedInstance.disallowAllBiometricId;
         
         NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
-        
+                
         if(biometricPossible && biometricAllowed) {
-            [self showBiometricAuthentication];
+            BOOL bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged];
+                        
+            if(bioDbHasChanged) {
+                [self clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState];
+
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [Alerts warn:self.viewController
+                           title:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_title", @"Biometrics Database Changed")
+                         message:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_message", @"It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons.")
+                      completion:^{
+                        [self promptForManualCredentials];
+                    }];
+                });
+            }
+            else {
+                [self showBiometricAuthentication];
+            }
         }
         else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
             [self promptForConveniencePin];
@@ -320,10 +360,8 @@
     }
     else {
         BOOL ret = [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
-                                      
-                                               fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
-                                        
-                                                  completion:^(BOOL success, NSError * _Nullable error) {
+                                                          fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
+                                                             completion:^(BOOL success, NSError * _Nullable error) {
             [self onBiometricAuthenticationDone:success error:error];
         }];
         
@@ -338,8 +376,11 @@
 - (void)onBiometricAuthenticationDone:(BOOL)success
                 error:(NSError *)error {
     if (success) {
+        if(![BiometricsManager.sharedInstance isBiometricDatabaseStateRecorded]) {
+            [BiometricsManager.sharedInstance recordBiometricDatabaseState]; // Successful Auth and no good previous state recorded, record Biometrics database state now...
+        }
+
         self.isConvenienceUnlock = YES;
-        
         if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self promptForConveniencePin];

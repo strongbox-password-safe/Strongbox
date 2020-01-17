@@ -7,11 +7,9 @@
 //
 
 #import "SFTPSessionConfiguration.h"
-#import "JNKeychain.h"
+#import "SecretStore.h"
 
 @interface SFTPSessionConfiguration ()
-
-@property NSString* keyChainUuid;
 
 @end
 
@@ -62,41 +60,41 @@
 }
 
 -(NSString *)password {
-    return [JNKeychain loadValueForKey:[self getKeyChainKey:@"password"]];
+    return [SecretStore.sharedInstance getSecureString:[self getKeyChainKey:@"password"]];
 }
 
 - (void)setPassword:(NSString *)password {
     if(password) {
-        [JNKeychain saveValue:password forKey:[self getKeyChainKey:@"password"]];
+        [SecretStore.sharedInstance setSecureString:password forIdentifier:[self getKeyChainKey:@"password"]];
     }
     else {
-        [JNKeychain deleteValueForKey:[self getKeyChainKey:@"password"]];
+        [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"password"]];
     }
 }
 
 - (NSString *)privateKey {
-    return [JNKeychain loadValueForKey:[self getKeyChainKey:@"privateKey"]];
+    return [SecretStore.sharedInstance getSecureString:[self getKeyChainKey:@"privateKey"]];
 }
 
 - (void)setPrivateKey:(NSString *)privateKey {
     if(privateKey) {
-        [JNKeychain saveValue:privateKey forKey:[self getKeyChainKey:@"privateKey"]];
+        [SecretStore.sharedInstance setSecureString:privateKey forIdentifier:[self getKeyChainKey:@"privateKey"]];
     }
     else {
-        [JNKeychain deleteValueForKey:[self getKeyChainKey:@"privateKey"]];
+        [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"privateKey"]];
     }
 }
 
 - (NSString *)publicKey {
-    return [JNKeychain loadValueForKey:[self getKeyChainKey:@"publicKey"]];
+    return [SecretStore.sharedInstance getSecureString:[self getKeyChainKey:@"publicKey"]];
 }
 
 - (void)setPublicKey:(NSString *)publicKey {
     if(publicKey) {
-        [JNKeychain saveValue:publicKey forKey:[self getKeyChainKey:@"publicKey"]];
+        [SecretStore.sharedInstance setSecureString:publicKey forIdentifier:[self getKeyChainKey:@"publicKey"]];
     }
     else {
-        [JNKeychain deleteValueForKey:[self getKeyChainKey:@"publicKey"]];
+        [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"publicKey"]];
     }
 }
 

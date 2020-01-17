@@ -106,7 +106,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
              pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
      hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
             expired:node.expired
-           otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken];
+           otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
+           hideIcon:self.viewModel.metadata.hideIconInBrowse];
     
     return cell;
 }

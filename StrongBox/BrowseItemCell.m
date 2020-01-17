@@ -48,8 +48,9 @@
       childCount:(NSString*)childCount
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation
-          pinned:(BOOL)pinned {
-    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil pinned:pinned];
+          pinned:(BOOL)pinned
+        hideIcon:(BOOL)hideIcon {
+    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil pinned:pinned hideIcon:hideIcon];
 }
 
 - (void)setGroup:(NSString *)title
@@ -58,12 +59,14 @@
           italic:(BOOL)italic
    groupLocation:(NSString *)groupLocation
        tintColor:(UIColor*)tintColor
-          pinned:(BOOL)pinned {
+          pinned:(BOOL)pinned
+        hideIcon:(BOOL)hideIcon {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
     
     self.iconImageView.image = icon;
     self.iconImageView.tintColor = tintColor;
+    self.iconImageView.hidden = hideIcon;
     
     self.usernameLabel.text = @"";
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -87,12 +90,15 @@
            pinned:(BOOL)pinned
    hasAttachments:(BOOL)hasAttachments
           expired:(BOOL)expired
-         otpToken:(OTPToken*)otpToken {
+         otpToken:(OTPToken*)otpToken
+         hideIcon:(BOOL)hideIcon {
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
+    
     self.iconImageView.image = icon;
     self.iconImageView.tintColor = nil;
-
+    self.iconImageView.hidden = hideIcon;
+    
     self.usernameLabel.text = subtitle;
     self.pathLabel.text = groupLocation;
     self.accessoryType = UITableViewCellAccessoryNone;

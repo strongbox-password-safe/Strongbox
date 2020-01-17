@@ -381,26 +381,6 @@
     return [[NSFileManager defaultManager] fileExistsAtPath:fullPath.path];
 }
 
-// NB: 17-Jun-2019
-- (void)migrateLocalDatabasesToNewSystem {
-    NSArray<SafeMetaData*>* locals = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
-    
-    for (SafeMetaData* database in locals) {
-        NSLog(@"Migrating Local Database to new System: [%@]", database);
-        
-        LocalDatabaseIdentifier* identifier = [[LocalDatabaseIdentifier alloc] init];
-        
-        identifier.filename = database.fileIdentifier;
-        identifier.sharedStorage = NO;
-        
-        database.fileIdentifier = [identifier toJson];
-        
-        [SafesList.sharedInstance update:database];
-    }
-    
-    Settings.sharedInstance.migratedLocalDatabasesToNewSystem = YES;
-}
-
 - (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata {
     LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:metadata];
     return identifier.sharedStorage;
