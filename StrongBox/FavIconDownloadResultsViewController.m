@@ -116,7 +116,7 @@
     
     cell.detailTextLabel.textColor = image ? nil : UIColor.systemRedColor;
 
-    if(image.size.height != 32 || image.size.width != 32) {
+    if(image && (image.size.height != 32 || image.size.width != 32)) {
         image = scaleImage(image, CGSizeMake(32, 32));
     }
     cell.imageView.image = image ? image : [UIImage imageNamed:@"error"];

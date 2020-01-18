@@ -26,11 +26,11 @@ typedef NS_ENUM (NSInteger, SecretExpiryMode) {
 - (BOOL)setSecureObject:(id)object forIdentifier:(NSString*)identifier expiresAt:(NSDate*)expiresAt;
 - (BOOL)setSecureEphemeralObject:(id)object forIdentifer:(NSString*)identifier;
 
-- (id)getSecureObject:(NSString*)identifier;
-- (id)getSecureObject:(NSString *)identifier expired:(BOOL*_Nullable)expired;
+- (id _Nullable)getSecureObject:(NSString*)identifier;
+- (id _Nullable)getSecureObject:(NSString *)identifier expired:(BOOL*_Nullable)expired;
 
 - (BOOL)setSecureString:(NSString*)string forIdentifier:(NSString*)identifier;
-- (NSString*)getSecureString:(NSString*)identifier;
+- (NSString*_Nullable)getSecureString:(NSString*)identifier;
 
 - (void)deleteSecureItem:(NSString*)identifier;
 

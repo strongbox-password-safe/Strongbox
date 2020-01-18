@@ -95,6 +95,8 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     CFErrorRef cfError = nil;
     SecKeyRef privateKey = SecKeyCreateRandomKey((__bridge CFDictionaryRef)attributes, &cfError);
     if (!privateKey) {
+        if (access)     { CFRelease(access);     }
+        
         NSLog(@"Error creating AccessControl: [%@]", (__bridge NSError *)cfError);
         return NO;
     }
@@ -103,14 +105,21 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     
     SecKeyRef publicKey = SecKeyCopyPublicKey(privateKey);
     if (!publicKey) {
-      NSLog(@"Error getting match public key....");
-      return NO;
+        if (privateKey) { CFRelease(privateKey); }
+        if (access)     { CFRelease(access);     }
+
+        NSLog(@"Error getting match public key....");
+        return NO;
     }
 
     SecKeyAlgorithm algorithm = [SecretStore algorithm];
     if(!SecKeyIsAlgorithmSupported(publicKey, kSecKeyOperationTypeEncrypt, algorithm)) {
-       NSLog(@"Error algorithm is not support....");
-       return NO;
+        if (privateKey) { CFRelease(privateKey); }
+        if (publicKey)  { CFRelease(publicKey);  }
+        if (access)     { CFRelease(access);     }
+
+        NSLog(@"Error algorithm is not support....");
+        return NO;
     }
 
     NSDictionary* wrapper = [self wrapObject:object expiryMode:expiryMode expiry:expiresAt identifier:identifier];
@@ -119,11 +128,20 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
     CFDataRef cipherText = SecKeyCreateEncryptedData(publicKey, algorithm, (CFDataRef)clearData, &cfError);
     if(!cipherText) {
+        if (privateKey) { CFRelease(privateKey); }
+        if (publicKey)  { CFRelease(publicKey);  }
+        if (access)     { CFRelease(access);     }
+
         NSLog(@"Error encrypting.... [%@]", (__bridge NSError *)cfError);
         return NO;
     }
         
     if(![self storeEncryptedBlob:identifier encrypted:(__bridge NSData*)cipherText]) {
+        if (privateKey) { CFRelease(privateKey); }
+        if (publicKey)  { CFRelease(publicKey);  }
+        if (access)     { CFRelease(access);     }
+        if (cipherText) { CFRelease(cipherText); }
+
         NSLog(@"Error storing encrypted blob in Keychain...");
         return NO;
     }
