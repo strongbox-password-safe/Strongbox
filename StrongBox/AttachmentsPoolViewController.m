@@ -105,7 +105,8 @@
     }];
     
     if(fa) {
-        return fa.filename;
+        return forDisplay ? fa.filename :
+        [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  // Use a index as a prefix here because filenames can occur many times and preview won't work it will point to the last written file
     }
     
     fa = [self.historicalFileAttachments firstOrDefault:^BOOL(NodeFileAttachment * _Nonnull obj) {
@@ -113,7 +114,9 @@
     }];
     
     if(fa) {
-        return forDisplay ? [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_historical_fmt", @"%@ (Historical)"), fa.filename] : fa.filename;
+        return forDisplay ?
+            [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_historical_fmt", @"%@ (Historical)"), fa.filename] :
+            [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  // Use a index as a prefix here because filenames can occur many times and preview won't work it will point to the last written file
     }
     
     NSString* unknown = [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_orphan_fmt", @"<Orphan Attachment> [%lu]"), (unsigned long)poolIndex];

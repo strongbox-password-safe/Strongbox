@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>StrongBox Auto Fill.xcscheme</key>
+		<key>StrongBox-Auto-Fill.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<true/>
@@ -16,17 +16,17 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>Strongbox Auto Fill Family.xcscheme_^#shared#^_</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>32</integer>
-		</dict>
 		<key>Strongbox Auto Fill.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>21</integer>
 		</dict>
-		<key>Strongbox-iOS Family.xcscheme_^#shared#^_</key>
+		<key>Strongbox-Auto-Fill-Family.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>32</integer>
+		</dict>
+		<key>Strongbox-iOS-Family.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>31</integer>
