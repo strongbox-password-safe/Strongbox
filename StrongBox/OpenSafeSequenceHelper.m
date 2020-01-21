@@ -173,9 +173,10 @@
             database.isEnrolledForConvenience = NO;
             database.convenienceMasterPassword = nil;
             database.convenenienceYubikeySecret = nil;
+            
             // database.conveniencePin = nil; // KEEP PIN for users who use both...
+            
             database.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful manual open
-
             [SafesList.sharedInstance update:database];
         }
     }
@@ -191,11 +192,11 @@
         NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
                 
         if(biometricPossible && biometricAllowed) {
-            BOOL bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged];
+            BOOL bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged:self.isAutoFillOpen];
                         
             if(bioDbHasChanged) {
                 [self clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState];
-
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [Alerts warn:self.viewController
                            title:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_title", @"Biometrics Database Changed")
@@ -376,8 +377,8 @@
 - (void)onBiometricAuthenticationDone:(BOOL)success
                 error:(NSError *)error {
     if (success) {
-        if(![BiometricsManager.sharedInstance isBiometricDatabaseStateRecorded]) {
-            [BiometricsManager.sharedInstance recordBiometricDatabaseState]; // Successful Auth and no good previous state recorded, record Biometrics database state now...
+        if(![BiometricsManager.sharedInstance isBiometricDatabaseStateRecorded:self.isAutoFillOpen]) {
+            [BiometricsManager.sharedInstance recordBiometricDatabaseState:self.isAutoFillOpen]; // Successful Auth and no good previous state recorded, record Biometrics database state now...
         }
 
         self.isConvenienceUnlock = YES;
@@ -850,6 +851,40 @@
     }
 }
 
+- (void)enrolForBiometrics:(CompositeKeyFactors*)compositeKeyFactors {
+    self.safe.isTouchIdEnabled = YES;
+
+    self.safe.isEnrolledForConvenience = YES;
+    self.safe.convenienceMasterPassword = compositeKeyFactors.password;
+    self.safe.convenenienceYubikeySecret = self.yubikeySecret;
+    self.safe.hasBeenPromptedForConvenience = YES;
+    
+    [SafesList.sharedInstance update:self.safe];
+}
+
+- (void)enrolForPinCodeUnlock:(NSString*)pin compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
+    self.safe.conveniencePin = pin;
+
+    self.safe.isEnrolledForConvenience = YES;
+    self.safe.convenienceMasterPassword = compositeKeyFactors.password;
+    self.safe.convenenienceYubikeySecret = self.yubikeySecret;
+    self.safe.hasBeenPromptedForConvenience = YES;
+
+    [SafesList.sharedInstance update:self.safe];
+}
+
+- (void)unenrolFromConvenience {
+    self.safe.isTouchIdEnabled = NO;
+    self.safe.conveniencePin = nil;
+
+    self.safe.isEnrolledForConvenience = NO;
+    self.safe.convenienceMasterPassword = nil;
+    self.safe.convenenienceYubikeySecret = nil;
+    self.safe.hasBeenPromptedForConvenience = YES;
+
+    [SafesList.sharedInstance update:self.safe];
+}
+
 - (void)promptForConvenienceEnrolAndOpen:(BOOL)biometricPossible
                              pinPossible:(BOOL)pinPossible
                               openedSafe:(DatabaseModel*)openedSafe
@@ -885,17 +920,7 @@
                                           [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_bio_fmt", @"Use %@"), self.biometricIdName]
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) {
-                                                                self.safe.isTouchIdEnabled = YES;
-                                                                self.safe.isEnrolledForConvenience = YES;
-                                                                self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
-                                                                //self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
-                                                                
-                                                                self.safe.convenenienceYubikeySecret = self.yubikeySecret;
-                                                                
-                                                                self.safe.hasBeenPromptedForConvenience = YES;
-                                                                
-                                                                [SafesList.sharedInstance update:self.safe];
-                                                                
+                                                                [self enrolForBiometrics:openedSafe.compositeKeyFactors];
                                                                 [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                                                             }];
         [alertController addAction:biometricAction];
@@ -914,17 +939,7 @@
     UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"open_sequence_prompt_option_no", @"No")
                                                        style:UIAlertActionStyleCancel
                                                      handler:^(UIAlertAction *a) {
-                                                         self.safe.isTouchIdEnabled = NO;
-                                                         self.safe.conveniencePin = nil;
-                                                         
-                                                         self.safe.convenienceMasterPassword = nil;
-                                                         self.safe.convenenienceYubikeySecret = nil;
-                                                         
-                                                         self.safe.isEnrolledForConvenience = NO;
-                                                         self.safe.hasBeenPromptedForConvenience = YES;
-                                                         
-                                                         [SafesList.sharedInstance update:self.safe];
-                                                         
+                                                         [self unenrolFromConvenience];
                                                          [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                                                      }];
     
@@ -945,17 +960,7 @@
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
-                    self.safe.conveniencePin = pin;
-                    self.safe.isEnrolledForConvenience = YES;
-                    
-                    self.safe.convenienceMasterPassword = openedSafe.compositeKeyFactors.password;
-//                    self.safe.convenenienceKeyFileDigest = openedSafe.compositeKeyFactors.keyFileDigest;
-                    self.safe.convenenienceYubikeySecret = self.yubikeySecret;
-                    
-                    self.safe.hasBeenPromptedForConvenience = YES;
-                    
-                    [SafesList.sharedInstance update:self.safe];
-                    
+                    [self enrolForPinCodeUnlock:pin compositeKeyFactors:openedSafe.compositeKeyFactors];
                     [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                 }
                 else {

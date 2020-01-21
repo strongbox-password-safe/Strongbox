@@ -25,9 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString*)getBiometricIdName;
 
-- (BOOL)isBiometricDatabaseStateRecorded;
-- (void)recordBiometricDatabaseState;
-- (BOOL)isBiometricDatabaseStateHasChanged;
+- (BOOL)isBiometricDatabaseStateRecorded:(BOOL)autoFill;
+- (void)recordBiometricDatabaseState:(BOOL)autoFill;
+- (BOOL)isBiometricDatabaseStateHasChanged:(BOOL)autoFill;
 - (void)clearBiometricRecordedDatabaseState;
 
 @end

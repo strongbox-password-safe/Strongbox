@@ -80,10 +80,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 
 - (void)openDocument:(id)sender {
     if(self.documents.count == 0) { // Empty Launch...
-        if(DatabasesManager.sharedInstance.snapshot.count > 0 && Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-            [self openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject];
-        }
-        else {
+        if(!Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
             [DatabasesManagerView show:NO];
         }
     }

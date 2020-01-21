@@ -245,7 +245,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     items = [self getMatchingItems:domain scope:kSearchScopeAll];
     if(items.count) {
         [self.searchController.searchBar setText:domain];
-        [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
+        [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeAll];
         return;
     }
     else {
@@ -256,6 +256,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     
     NSString * searchTerm = getCompanyOrOrganisationNameFromDomain(domain);
     [self.searchController.searchBar setText:searchTerm];
+    [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeAll];
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {

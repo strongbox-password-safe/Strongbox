@@ -9,17 +9,18 @@
 #import "BiometricsManager.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Settings.h"
-#import "Alerts.h"
 #import "SecretStore.h"
 
 @interface BiometricsManager ()
 
 @property BOOL requestInProgress;
 @property NSData* lastKnownGoodDatabaseState;
+@property NSData* autoFillLastKnownGoodDatabaseState;
 
 @end
 
 static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey";
+static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricDatabaseStateKey"; // AutoFill has a different value... :(
 
 @implementation BiometricsManager
 
@@ -39,6 +40,7 @@ static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey"
     self = [super init];
     if (self) {
         self.lastKnownGoodDatabaseState = [SecretStore.sharedInstance getSecureObject:kBiometricDatabaseStateKey];
+        self.autoFillLastKnownGoodDatabaseState = [SecretStore.sharedInstance getSecureObject:kAutoFillBiometricDatabaseStateKey];
     }
     return self;
 }
@@ -62,16 +64,23 @@ static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey"
     return YES;
 }
 
-- (BOOL)isBiometricDatabaseStateRecorded {
-    return self.lastKnownGoodDatabaseState != nil;
+- (NSData*)getLastKnownGoodDatabaseState:(BOOL)autoFill {
+    return autoFill ? self.autoFillLastKnownGoodDatabaseState : self.lastKnownGoodDatabaseState;
+}
+
+- (BOOL)isBiometricDatabaseStateRecorded:(BOOL)autoFill {
+    return [self getLastKnownGoodDatabaseState:autoFill] != nil;
 }
 
 - (void)clearBiometricRecordedDatabaseState {
     [SecretStore.sharedInstance deleteSecureItem:kBiometricDatabaseStateKey];
+    [SecretStore.sharedInstance deleteSecureItem:kAutoFillBiometricDatabaseStateKey];
+
     self.lastKnownGoodDatabaseState = nil;
+    self.autoFillLastKnownGoodDatabaseState = nil;
 }
 
-- (void)recordBiometricDatabaseState {
+- (void)recordBiometricDatabaseState:(BOOL)autoFill {
     LAContext *localAuthContext = [[LAContext alloc] init];
     if (localAuthContext == nil) {
         return;
@@ -86,12 +95,18 @@ static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey"
         return;
     }
     
-    self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
-    [SecretStore.sharedInstance setSecureObject:self.lastKnownGoodDatabaseState forIdentifier:kBiometricDatabaseStateKey];
+    if(autoFill) {
+        self.autoFillLastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+        [SecretStore.sharedInstance setSecureObject:self.autoFillLastKnownGoodDatabaseState forIdentifier:kAutoFillBiometricDatabaseStateKey];
+    }
+    else {
+        self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+        [SecretStore.sharedInstance setSecureObject:self.lastKnownGoodDatabaseState forIdentifier:kBiometricDatabaseStateKey];
+    }
 }
 
-- (BOOL)isBiometricDatabaseStateHasChanged {
-    if(self.lastKnownGoodDatabaseState == nil) {
+- (BOOL)isBiometricDatabaseStateHasChanged:(BOOL)autoFill {
+    if([self getLastKnownGoodDatabaseState:autoFill] == nil) {
         return NO;
     }
     
@@ -109,7 +124,11 @@ static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey"
         return NO;
     }
     
-    return ![localAuthContext.evaluatedPolicyDomainState isEqualToData:self.lastKnownGoodDatabaseState];
+    NSLog(@"Biometrics State: [%@] vs Last Good: [%@]",
+          [localAuthContext.evaluatedPolicyDomainState base64EncodedStringWithOptions:kNilOptions],
+          [self.lastKnownGoodDatabaseState base64EncodedStringWithOptions:kNilOptions]);
+
+    return ![localAuthContext.evaluatedPolicyDomainState isEqualToData:[self getLastKnownGoodDatabaseState:autoFill]];
 }
 
 + (void)logBiometricError:(NSError*)error {

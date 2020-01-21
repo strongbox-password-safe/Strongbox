@@ -276,7 +276,7 @@
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
                                           openAutoFillCache:useAutoFillCache
-                                        canConvenienceEnrol:NO
+                                        canConvenienceEnrol:NO // MMcG: There appears to be problems with trying to sync from App Extensions here... just have user properly enrol in the main app...
                                              isAutoFillOpen:YES
                                      manualOpenOfflineCache:NO
                                 biometricAuthenticationDone:NO

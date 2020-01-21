@@ -16,8 +16,10 @@
 #import "PreferencesWindowController.h"
 #import "DatabasesManagerView.h"
 #import "BiometricIdHelper.h"
-//#import "DAVKit.h"
 #import "ViewController.h"
+#import "DatabasesManager.h"
+
+//#import "DAVKit.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -97,6 +99,15 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
                                              selector:@selector(onPreferencesChanged:)
                                                  name:kPreferencesChangedNotification
                                                object:nil];
+    
+    // Auto Open Primary...
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if(DatabasesManager.sharedInstance.snapshot.count > 0 && Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
+            DocumentController* dc = NSDocumentController.sharedDocumentController;
+            [dc openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject completion:^(NSError *error) { }];
+        }
+    });
 }
 
 - (void)showHideSystemStatusBarIcon {

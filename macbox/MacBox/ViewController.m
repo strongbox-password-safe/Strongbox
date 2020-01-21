@@ -146,8 +146,6 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)viewDidAppear {
-//    NSLog(@"viewDidAppear...");
-    
     [super viewDidAppear];
     
     self.view.window.delegate = self;
