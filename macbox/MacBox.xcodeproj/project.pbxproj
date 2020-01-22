@@ -199,9 +199,7 @@
 		4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347EB2074FA3F00148741 /* crypt_argchk.c */; };
 		4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F12074FA6B00148741 /* DatabaseModel.m */; };
 		4DF348022074FA6C00148741 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F22074FA6B00148741 /* NodeFields.m */; };
-		4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F32074FA6C00148741 /* PasswordGenerationParameters.m */; };
 		4DF348052074FA6C00148741 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
-		4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */; };
 		4DF348072074FA6C00148741 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF348002074FA6C00148741 /* Node.m */; };
 		4DF522B623C8ABEF00CD948E /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF522B523C8ABEF00CD948E /* ClipboardManager.m */; };
 		4DF522B823C8BACE00CD948E /* QRCodePresenter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF522B723C8BACE00CD948E /* QRCodePresenter.storyboard */; };
@@ -673,14 +671,10 @@
 		4DF347F02074FA6B00148741 /* Strongbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Strongbox.h; path = ../model/Strongbox.h; sourceTree = "<group>"; };
 		4DF347F12074FA6B00148741 /* DatabaseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModel.m; path = ../model/DatabaseModel.m; sourceTree = "<group>"; };
 		4DF347F22074FA6B00148741 /* NodeFields.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeFields.m; path = ../model/NodeFields.m; sourceTree = "<group>"; };
-		4DF347F32074FA6C00148741 /* PasswordGenerationParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationParameters.m; path = ../model/PasswordGenerationParameters.m; sourceTree = "<group>"; };
-		4DF347F42074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordSafe3PasswordGenerationParameters.h; path = ../model/PasswordSafe3PasswordGenerationParameters.h; sourceTree = "<group>"; };
 		4DF347F52074FA6C00148741 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../model/Utils.h; sourceTree = "<group>"; };
-		4DF347F62074FA6C00148741 /* PasswordGenerationParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationParameters.h; path = ../model/PasswordGenerationParameters.h; sourceTree = "<group>"; };
 		4DF347F82074FA6C00148741 /* DatabaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModel.h; path = ../model/DatabaseModel.h; sourceTree = "<group>"; };
 		4DF347FA2074FA6C00148741 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = ../model/NodeFields.h; sourceTree = "<group>"; };
 		4DF347FB2074FA6C00148741 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../model/Utils.m; sourceTree = "<group>"; };
-		4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordSafe3PasswordGenerationParameters.m; path = ../model/PasswordSafe3PasswordGenerationParameters.m; sourceTree = "<group>"; };
 		4DF347FD2074FA6C00148741 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = ../model/StorageProvider.h; sourceTree = "<group>"; };
 		4DF347FE2074FA6C00148741 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../model/Node.h; sourceTree = "<group>"; };
 		4DF348002074FA6C00148741 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../model/Node.m; sourceTree = "<group>"; };
@@ -777,8 +771,6 @@
 				4D216F5422CBCCDE000954D0 /* PasswordMaker.m */,
 				4D216F5722CBCD16000954D0 /* PasswordGenerationConfig.h */,
 				4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */,
-				4DF347F62074FA6C00148741 /* PasswordGenerationParameters.h */,
-				4DF347F32074FA6C00148741 /* PasswordGenerationParameters.m */,
 			);
 			name = "Password Generation";
 			sourceTree = "<group>";
@@ -1354,8 +1346,6 @@
 				4DF348002074FA6C00148741 /* Node.m */,
 				4DF347FA2074FA6C00148741 /* NodeFields.h */,
 				4DF347F22074FA6B00148741 /* NodeFields.m */,
-				4DF347F42074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.h */,
-				4DF347FC2074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m */,
 				4DF347FD2074FA6C00148741 /* StorageProvider.h */,
 				4DF347F02074FA6B00148741 /* Strongbox.h */,
 				4DF347F52074FA6C00148741 /* Utils.h */,
@@ -1688,7 +1678,6 @@
 				4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */,
 				4DBFD38B225D12A300290488 /* MMcGACTextField.m in Sources */,
 				4DF347EA2074FA3500148741 /* Record.m in Sources */,
-				4DF348032074FA6C00148741 /* PasswordGenerationParameters.m in Sources */,
 				4D524CBC219B479900C22CB4 /* Kdb1Database.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,
 				4D8DE9BB21F898470043DDC0 /* OTPToken+Generation.m in Sources */,
@@ -1789,7 +1778,6 @@
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,
 				4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
-				4DF348062074FA6C00148741 /* PasswordSafe3PasswordGenerationParameters.m in Sources */,
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
 				4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */,
 				4D524D01219B48D300C22CB4 /* CustomIconList.m in Sources */,
@@ -2229,13 +2217,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2667;
+				CURRENT_PROJECT_VERSION = 2668;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.5;
+				MARKETING_VERSION = 1.12.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2251,13 +2239,13 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2667;
+				CURRENT_PROJECT_VERSION = 2668;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.5;
+				MARKETING_VERSION = 1.12.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

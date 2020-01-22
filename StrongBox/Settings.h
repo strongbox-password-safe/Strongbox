@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PasswordGenerationParameters.h"
 #import "AutoFillNewRecordSettings.h"
 #import "SFTPSessionConfiguration.h"
 #import "AppLockMode.h"

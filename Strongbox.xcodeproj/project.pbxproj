@@ -187,7 +187,6 @@
 		4D27D74D21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D27D74B21A00AB900CA7B06 /* KeePass2TagPackage.m */; };
 		4D2962B3223173FC0082897D /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
 		4D2962B4223173FC0082897D /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
-		4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
 		4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4D2BF3EC21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4D2CB4912332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
@@ -769,7 +768,6 @@
 		4DC4E08123488BAA000743C4 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCA21F4C26600E2B194 /* NSURL+QueryItems.m */; };
 		4DC4E08223488BAA000743C4 /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4DC4E08323488BAA000743C4 /* ItemDetailsPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */; };
-		4DC4E08423488BAA000743C4 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
 		4DC4E08523488BAA000743C4 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14852074F5F800CE9CAE /* Group.m */; };
 		4DC4E08623488BAA000743C4 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
 		4DC4E08723488BAA000743C4 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
@@ -1161,7 +1159,6 @@
 		4DC4E22123488BAE000743C4 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7B22CBCEC1000954D0 /* PasswordGenerationConfig.m */; };
 		4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7C72188972600CF1663 /* CryptoParameters.m */; };
 		4DC4E22323488BAE000743C4 /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
-		4DC4E22423488BAE000743C4 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
 		4DC4E22523488BAE000743C4 /* KeePassFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C2A21807C7E007931E4 /* KeePassFile.m */; };
 		4DC4E22623488BAE000743C4 /* TotpCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498C22271F85B007EF98C /* TotpCell.m */; };
 		4DC4E22723488BAE000743C4 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
@@ -1334,7 +1331,6 @@
 		4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
 		4DEF7B97216FC74A00A3EE12 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
 		4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D77A0B92166598B003CB5CB /* AutoFillNewRecordSettings.m */; };
-		4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */; };
 		4DF14F6A2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */; };
 		4DF14F6B2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */; };
 		4DF176F223293D1500255CD6 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF176F123293D1500255CD6 /* KeePassXmlParser.m */; };
@@ -1683,8 +1679,6 @@
 		4D2854762362FF9800DC3664 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
 		4D2962B1223173FC0082897D /* History.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = History.h; path = model/keepass/History.h; sourceTree = "<group>"; };
 		4D2962B2223173FC0082897D /* History.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = History.m; path = model/keepass/History.m; sourceTree = "<group>"; };
-		4D29E46A206D328900AD537E /* PasswordGenerationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationParameters.h; path = model/PasswordGenerationParameters.h; sourceTree = SOURCE_ROOT; };
-		4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationParameters.m; path = model/PasswordGenerationParameters.m; sourceTree = SOURCE_ROOT; };
 		4D2BF3E821EE3ECD00E39EBB /* PinEntryResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PinEntryResponse.h; sourceTree = "<group>"; };
 		4D2BF3E921EF6B9000E39EBB /* DuressDummyStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuressDummyStorageProvider.h; path = StrongBox/DuressDummyStorageProvider.h; sourceTree = "<group>"; };
 		4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuressDummyStorageProvider.m; path = StrongBox/DuressDummyStorageProvider.m; sourceTree = "<group>"; };
@@ -4085,8 +4079,6 @@
 				4D78AC291FB1E27700A68A92 /* Strongbox.h */,
 				4D78AC2B1FB1E27700A68A92 /* Utils.h */,
 				4D78AC2C1FB1E27700A68A92 /* Utils.m */,
-				4D29E46A206D328900AD537E /* PasswordGenerationParameters.h */,
-				4D29E46B206D328900AD537E /* PasswordGenerationParameters.m */,
 				4D446807216CE02C00F6358D /* Csv.h */,
 				4D446808216CE02C00F6358D /* Csv.m */,
 				4D8C147B2074F5D100CE9CAE /* CHCSVParser.h */,
@@ -5322,7 +5314,6 @@
 				4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D48C6F022AD186D002B502E /* ItemDetailsPreferencesViewController.m in Sources */,
-				4D29E46C206D328900AD537E /* PasswordGenerationParameters.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
 				4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */,
 				4D44983123926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
@@ -5612,7 +5603,6 @@
 				4DC4E08123488BAA000743C4 /* NSURL+QueryItems.m in Sources */,
 				4DC4E08223488BAA000743C4 /* SafesViewController.m in Sources */,
 				4DC4E08323488BAA000743C4 /* ItemDetailsPreferencesViewController.m in Sources */,
-				4DC4E08423488BAA000743C4 /* PasswordGenerationParameters.m in Sources */,
 				4DC4E08523488BAA000743C4 /* Group.m in Sources */,
 				4DC4E08623488BAA000743C4 /* CASGParams.m in Sources */,
 				4D44983323926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
@@ -5973,7 +5963,6 @@
 				4D44982E23925BFC00B21794 /* FavIconBulkViewController.m in Sources */,
 				4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */,
 				4DC4E22323488BAE000743C4 /* LocalDeviceStorageProvider.m in Sources */,
-				4DC4E22423488BAE000743C4 /* PasswordGenerationParameters.m in Sources */,
 				4DC4E22523488BAE000743C4 /* KeePassFile.m in Sources */,
 				4DC4E22623488BAE000743C4 /* TotpCell.m in Sources */,
 				4DC4E22723488BAE000743C4 /* AutoFillNewRecordSettings.m in Sources */,
@@ -6193,7 +6182,6 @@
 				4D44982D23925BFB00B21794 /* FavIconBulkViewController.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
-				4DEF7B99216FC81600A3EE12 /* PasswordGenerationParameters.m in Sources */,
 				4D2F6C3521807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D33FA47228729A0006C31B2 /* TotpCell.m in Sources */,
 				4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */,
@@ -6913,7 +6901,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.45.2;
+				MARKETING_VERSION = 1.45.10;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7000,7 +6988,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.45.2;
+				MARKETING_VERSION = 1.45.10;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

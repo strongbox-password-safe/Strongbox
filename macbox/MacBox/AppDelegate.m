@@ -18,7 +18,7 @@
 #import "BiometricIdHelper.h"
 #import "ViewController.h"
 #import "DatabasesManager.h"
-
+#import <SAMKeychain/SAMKeychain.h> // TODO: Remove in April 2020 after migrations...
 //#import "DAVKit.h"
 
 //#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
@@ -138,48 +138,68 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)performMigrations {
-    // 2-Jul-2019
-    
-    if(!Settings.sharedInstance.migratedToNewPasswordGenerator) {
-        [self migrateToNewPasswordGenerator];
+    if(!Settings.sharedInstance.migratedToNewSecretStore) {
+        [self migrateToNewSecretStore];
     }
 }
 
-- (void)migrateToNewPasswordGenerator {
-    NSLog(@"Migrating to new Password Generation System...");
+- (void)migrateToNewSecretStore {
+    Settings.sharedInstance.migratedToNewSecretStore = YES;
+
+    // Fail Safe: First unenrol anyone enrolled - so in case of failure we will ask them to re-enrol naturally..
     
-    PasswordGenerationConfig* newConfig = Settings.sharedInstance.passwordGenerationConfig;
-    PasswordGenerationParameters* oldConfig = Settings.sharedInstance.passwordGenerationParameters;
-    
-    newConfig.algorithm = oldConfig.algorithm == kBasic ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
-    
-    newConfig.basicLength = oldConfig.maximumLength;
-    
-    NSMutableArray<NSNumber*>* characterGroups = @[].mutableCopy;
-    if(oldConfig.useLower) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolLower)];
-    }
-    if(oldConfig.useUpper) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolUpper)];
-    }
-    if(oldConfig.useDigits) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolNumeric)];
-    }
-    if(oldConfig.useSymbols) {
-        [characterGroups addObject:@(kPasswordGenerationCharacterPoolSymbols)];
+    NSMutableArray<DatabaseMetadata*>* enrolled = @[].mutableCopy;
+    for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
+        if(database.isTouchIdEnabled) {
+            if(database.hasPromptedForTouchIdEnrol) {
+                [enrolled addObject:database];
+                database.hasPromptedForTouchIdEnrol = NO;
+                [DatabasesManager.sharedInstance update:database];
+            }
+        }
     }
     
-    newConfig.useCharacterGroups = characterGroups.copy;
-    newConfig.easyReadCharactersOnly = oldConfig.easyReadOnly;
-    newConfig.nonAmbiguousOnly = YES;
-    newConfig.pickFromEveryGroup = NO;
+    // Could Crash on Mac 10.11 beyond this point... but that will only happen once...
     
-    newConfig.wordCount = oldConfig.xkcdWordCount;
-    newConfig.wordSeparator = oldConfig.wordSeparator;
-    newConfig.hackerify = NO;
+    static NSString* const kKeychainService = @"Strongbox";
+
+    for (DatabaseMetadata* database in enrolled) {
+        NSLog(@"Migrating Convenience Unlock enabled database [%@]", database.nickName);
     
-    Settings.sharedInstance.passwordGenerationConfig = newConfig;
-    Settings.sharedInstance.migratedToNewPasswordGenerator = YES;
+        // Password
+        
+        NSError *error;
+        NSData * ret = [SAMKeychain passwordDataForService:kKeychainService account:database.uuid error:&error];
+        if(ret) {
+            NSString* password = [[NSString alloc] initWithData:ret encoding:NSUTF8StringEncoding];
+            database.touchIdPassword = password;
+        }
+        
+        // Key File Digest
+
+        NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", database.uuid];
+        NSData* keyFileDigest = [SAMKeychain passwordDataForService:kKeychainService account:account];
+        if (keyFileDigest) {
+            database.touchIdKeyFileDigest = keyFileDigest;
+        }
+
+        // Restore Enrolled Prompted Status
+        
+        database.hasPromptedForTouchIdEnrol = YES;
+        [DatabasesManager.sharedInstance update:database];
+    }
+    
+    // Clean up old SAM Keychain records
+    
+    NSArray<NSDictionary<NSString*, id>*>* accounts = [SAMKeychain accountsForService:kKeychainService];
+    for (NSDictionary<NSString*, id>* account in accounts) {
+        NSString* acc = account[kSAMKeychainAccountKey];
+        if(acc) {
+            //NSString* pw = [SAMKeychain passwordForService:kKeychainService account:acc];
+            NSLog(@"Found old account: [%@]", acc);
+            [SAMKeychain deletePasswordForService:kKeychainService account:acc];
+        }
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

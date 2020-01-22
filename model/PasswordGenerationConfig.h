@@ -10,6 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef enum {
+    kBasic,
+    kXkcd
+} PasswordGenerationAlgorithm;
+
 typedef NS_ENUM (NSInteger, PasswordGenerationAlgo) {
     kPasswordGenerationAlgorithmBasic,
     kPasswordGenerationAlgorithmDiceware,

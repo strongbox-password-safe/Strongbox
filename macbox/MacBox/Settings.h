@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PasswordGenerationParameters.h"
 #import "PasswordGenerationConfig.h"
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
@@ -80,8 +79,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showCustomFieldsOnQuickViewPanel;
 
 @property PasswordGenerationConfig *passwordGenerationConfig;
-@property (nonatomic, strong) PasswordGenerationParameters *passwordGenerationParameters;
-@property BOOL migratedToNewPasswordGenerator;
+
+@property BOOL migratedToNewSecretStore;
 
 @property BOOL autoOpenFirstDatabaseOnEmptyLaunch;
 

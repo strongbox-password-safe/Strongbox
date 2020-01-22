@@ -27,7 +27,6 @@ static NSString* const kRevealDetailsImmediately = @"revealDetailsImmediately";
 static NSString* const kFullVersion = @"fullVersion";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kAutoLockTimeout = @"autoLockTimeout";
-static NSString* const kPasswordGenerationParameters = @"passwordGenerationParameters";
 static NSString* const kWarnedAboutTouchId = @"warnedAboutTouchId";
 static NSString* const kAlwaysShowPassword = @"alwaysShowPassword";
 static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
@@ -54,7 +53,6 @@ static NSString* const kDetectForeignChanges = @"detectForeignChanges";
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
-static NSString* const kMigratedToNewPasswordGenerator = @"migratedToNewPasswordGenerator";
 static NSString* const kAutoOpenFirstDatabaseOnEmptyLaunch = @"autoOpenFirstDatabaseOnEmptyLaunch";
 static NSString* const kAutoPromptForTouchIdOnActivate = @"autoPromptForTouchIdOnActivate";
 static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
@@ -64,8 +62,17 @@ static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
 static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQuickViewPanel";
 static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
 static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
+static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
 
 @implementation Settings
+
+- (BOOL)migratedToNewSecretStore {
+    return [self getBool:kMigratedToNewSecretStore];
+}
+
+- (void)setMigratedToNewSecretStore:(BOOL)migratedToNewSecretStore {
+    return [self setBool:kMigratedToNewSecretStore value:migratedToNewSecretStore];
+}
 
 - (BOOL)showPasswordImmediatelyInOutline {
     return [self getBool:kShowPasswordImmediatelyInOutline];
@@ -133,14 +140,6 @@ static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmedia
 
 - (void)setAutoOpenFirstDatabaseOnEmptyLaunch:(BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
     [self setBool:kAutoOpenFirstDatabaseOnEmptyLaunch value:autoOpenFirstDatabaseOnEmptyLaunch];
-}
-
-- (BOOL)migratedToNewPasswordGenerator {
-    return [self getBool:kMigratedToNewPasswordGenerator];
-}
-
-- (void)setMigratedToNewPasswordGenerator:(BOOL)migratedToNewPasswordGenerator {
-    [self setBool:kMigratedToNewPasswordGenerator value:migratedToNewPasswordGenerator];
 }
 
 - (PasswordGenerationConfig *)passwordGenerationConfig {
@@ -307,25 +306,6 @@ static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmedia
     [userDefaults setInteger:autoLockTimeoutSeconds forKey:kAutoLockTimeout];
     
     [userDefaults synchronize];
-}
-
-- (PasswordGenerationParameters *)passwordGenerationParameters {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationParameters];
-    
-    if(encodedObject == nil) {
-        return [[PasswordGenerationParameters alloc] initWithDefaults];
-    }
-    
-    PasswordGenerationParameters *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
-    return object;
-}
-
--(void)setPasswordGenerationParameters:(PasswordGenerationParameters *)passwordGenerationParameters {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationParameters];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:encodedObject forKey:kPasswordGenerationParameters];
-    [defaults synchronize];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {

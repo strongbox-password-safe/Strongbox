@@ -15,10 +15,7 @@
 
 #import "SecretStore.h"
 
-// TODO: Mac 10.11...
-// TODO: Mac Migration?
-// TODO: What is the behavior like when something expires is not there, do we just ask for new credentials and store them, should we indicate it was there and is now
-// TODO: Remove all usage of JNKeychain and SAMKeychain... eventually after migration
+// NB: Not sure if Mac 10.11 is supported
 
 static NSString* const kKeyApplicationLabel = @"Strongbox-Credential-Store-Key";
 static NSString* const kEncryptedBlobServiceName = @"Strongbox-Credential-Store";
@@ -255,7 +252,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
     }
     else {
-        return kSecKeyAlgorithmECIESEncryptionCofactorX963SHA256AESGCM; // TODO: this may not work on OSX 10.11...
+        return kSecKeyAlgorithmECIESEncryptionCofactorX963SHA256AESGCM; // TODO: this may or may not work on OSX 10.11...
     }
 #endif
 }
@@ -310,7 +307,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
     SecAccessControlRef access = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
                                                                  [SecretStore accessibility],
-                                                                 requestSecureEnclaveStorage ? kSecAccessControlPrivateKeyUsage : 0L, // TODO: 10.11 may break
+                                                                 requestSecureEnclaveStorage ? kSecAccessControlPrivateKeyUsage : 0L, // TODO: Mac 10.11 may ot may not break
                                                                  &cfError);
     
     if(!access) {

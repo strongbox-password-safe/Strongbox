@@ -7,9 +7,7 @@
 //
 
 #import "DatabaseMetadata.h"
-#import <SAMKeychain/SAMKeychain.h>
-
-static NSString* kKeychainService = @"Strongbox";
+#import "SecretStore.h"
 
 @implementation DatabaseMetadata
 
@@ -30,43 +28,24 @@ static NSString* kKeychainService = @"Strongbox";
 }
 
 - (NSString*)touchIdPassword {
-    NSError *error;
-    
-    NSData * ret = [SAMKeychain passwordDataForService:kKeychainService account:self.uuid error:&error];
-    
-    if(ret) {
-        return [[NSString alloc] initWithData:ret encoding:NSUTF8StringEncoding];
-    }
-    
-    return nil;
+    NSString* account = [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
+    return [SecretStore.sharedInstance getSecureString:account];
 }
 
 - (void)setTouchIdPassword:(NSString *)touchIdPassword {
-    if(touchIdPassword) {
-        NSData* data = [touchIdPassword dataUsingEncoding:NSUTF8StringEncoding];
-        [SAMKeychain setPasswordData:data forService:kKeychainService account:self.uuid];
-    }
-    else {
-        [SAMKeychain deletePasswordForService:kKeychainService account:self.uuid];
-    }
+    NSString* account = [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureString:touchIdPassword forIdentifier:account];
 }
 
 - (NSData *)touchIdKeyFileDigest {
     NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", self.uuid];
-    
-    return [SAMKeychain passwordDataForService:kKeychainService account:account];
+    return [SecretStore.sharedInstance getSecureObject:account];
 }
 
 - (void)setTouchIdKeyFileDigest:(NSData *)touchIdKeyFileDigest {
     NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", self.uuid];
-    
-    if(touchIdKeyFileDigest) {
-        [SAMKeychain setPasswordData:touchIdKeyFileDigest forService:kKeychainService account:account];
-    }
-    else {
-        [SAMKeychain deletePasswordForService:kKeychainService account:account];
-    }
 
+    [SecretStore.sharedInstance setSecureObject:touchIdKeyFileDigest forIdentifier:account];
 }
 
 - (NSString *)description {

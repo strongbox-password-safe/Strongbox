@@ -58,6 +58,7 @@ Big thank you to all the localization contributors
 - Russian - anonymous
 - Swedish - Jari Häkkinen
 - Ukrainian - Artem Polivanchuk
+- Chinese - GY
 
 # Build Issues
 The code is provided here for reasons of security, transparency and openness. Anyone can view the code and verify that everything is above board, the algorithms are correct and there are no backdoors or other malicious features present. You will need Google Drive, OneDrive and Dropbox developer accounts (with keys/secrets) before building. Familiarity with Cocoapods and other build tools is a prerequisite. Please do not file issues about build issues, I can't guarantee what is here will build in your environment. What is here is all of the functional code used in building Strongbox. XCode Interface Builder UI files, XCode project/solution/workspace, and other non functional code files may be removed to hinder copy cat apps. Translation strings files are managed in the separate Babel repository. 
