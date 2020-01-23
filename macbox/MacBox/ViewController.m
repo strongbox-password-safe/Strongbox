@@ -37,6 +37,7 @@
 #import "NodeDetailsViewController.h"
 #import "DocumentController.h"
 #import "ClipboardManager.h"
+#import "BookmarksHelper.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -91,8 +92,6 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property (weak) IBOutlet NSTextField *textFieldSummaryTitle;
 
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
-@property (weak) IBOutlet NSButton *buttonUserKeyFileAndPassword;
-@property (weak) IBOutlet NSButton *buttonUseKeyFile;
 
 @property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
 @property (weak) IBOutlet NSTextField *textFieldTotp;
@@ -117,6 +116,9 @@ static NSString* const kDefaultNewTitle = @"Untitled";
 @property NSArray* customFields;
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
 @property NSDate* lastAutoPromptForTouchIdThrottle; // HACK: Sigh
+
+@property (weak) IBOutlet NSPopUpButton *keyFilePopup;
+@property NSString* selectedKeyFileBookmark;
 
 @end
 
@@ -615,6 +617,10 @@ static NSString* const kNewEntryKey = @"newEntry";
     if(self.model == nil || self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
         [self bindBiometricButtonsOnLockScreen];
+        
+        DatabaseMetadata* database = [self getDatabaseMetaData];
+        self.selectedKeyFileBookmark = database.keyFileBookmark ? database.keyFileBookmark : nil;
+        [self refreshKeyFileDropdown];
     }
     else {
         [self startObservingModelChanges];
@@ -1295,39 +1301,6 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
 }
 
-- (IBAction)onUseKeyFileOnly:(id)sender {
-    [self onUseKeyFileCommon:nil];
-}
-
-- (IBAction)onUseKeyFile:(id)sender {
-    [self onUseKeyFileCommon:self.textFieldMasterPassword.stringValue];
-}
-
-- (void)onUseKeyFileCommon:(NSString*)password {
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
-            NSLog(@"Open Key File: %@", openPanel.URL);
-            
-            NSError* error;
-            NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
-            
-            if (!data) {
-                NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
-                
-                NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
-                [Alerts error:loc error:error window:self.view.window];
-                return;
-            }
-            
-            NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.model.format != kKeePass1];
-            
-            CompositeKeyFactors* ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
-            [self reloadAndUnlock:ckf isBiometricOpen:NO];
-        }
-    }];
-}
-
 - (IBAction)onEnterMasterPassword:(id)sender {
     CompositeKeyFactors* ckf = [CompositeKeyFactors password:self.textFieldMasterPassword.stringValue];
     [self reloadAndUnlock:ckf isBiometricOpen:NO];
@@ -1339,10 +1312,10 @@ static NSString* const kNewEntryKey = @"newEntry";
     DatabaseMetadata* metaData = [self getDatabaseMetaData];
     
     BOOL ret =  (metaData == nil ||
-            !metaData.isTouchIdEnabled ||
-            !(metaData.touchIdPassword || metaData.touchIdKeyFileDigest) ||
-            !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
-    !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
+                 !metaData.isTouchIdEnabled ||
+                 !(metaData.touchIdPassword) ||
+                 !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
+                 !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
 
     return !ret;
 }
@@ -1372,7 +1345,31 @@ static NSString* const kNewEntryKey = @"newEntry";
 
                 if(success) {
                     DatabaseMetadata* metaData = [self getDatabaseMetaData];
-                    CompositeKeyFactors* ckf = [CompositeKeyFactors password:metaData.touchIdPassword keyFileDigest:metaData.touchIdKeyFileDigest];
+                    
+                    NSData* keyFileDigest = nil; // TODO: Key File
+                    
+                    
+//            NSData* data = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
+//
+//if (!data) {
+//    NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
+//
+//    NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
+//    [Alerts error:loc error:error window:self.view.window];
+//    return;
+//}
+
+//
+//                     NSData* keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.model.format != kKeePass1];
+//
+//                     CompositeKeyFactors* ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
+//                     [self reloadAndUnlock:ckf isBiometricOpen:NO];
+                    
+                    
+                    
+                    
+                    CompositeKeyFactors* ckf = [CompositeKeyFactors password:metaData.touchIdPassword
+                                                               keyFileDigest:keyFileDigest];
 
                     [self reloadAndUnlock:ckf isBiometricOpen:YES];
                 }
@@ -1452,8 +1449,8 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self.textFieldMasterPassword setEnabled:enable];
     [self.buttonUnlockWithTouchId setEnabled:enable];
     [self.buttonUnlockWithPassword setEnabled:enable];
-    [self.buttonUseKeyFile setEnabled:enable];
-    [self.buttonUserKeyFileAndPassword setEnabled:enable];
+    
+    // TODO: Key File... Disable
 }
 
 - (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen {
@@ -1499,7 +1496,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else {
         if(isBiometricUnlock && safe != nil) {
             safe.touchIdPassword = nil;
-            safe.touchIdKeyFileDigest = nil;
             safe.hasPromptedForTouchIdEnrol = NO;
             
             [DatabasesManager.sharedInstance update:safe];
@@ -1525,7 +1521,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                if(yesNo) {
                    safeMetaData.isTouchIdEnabled = YES;
                    safeMetaData.touchIdPassword = compositeKeyFactors.password;
-                   safeMetaData.touchIdKeyFileDigest = compositeKeyFactors.keyFileDigest;
                    
                    [self caveatAboutTouchId];
                }
@@ -2728,7 +2723,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     if(metaData) {
         metaData.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
-        metaData.touchIdKeyFileDigest = nil;
         metaData.touchIdPassword = nil;
         
         [DatabasesManager.sharedInstance update:metaData];
@@ -3348,6 +3342,107 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
             [self.model batchSetIcons:selectedFavIcons];
         }
     }];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)refreshKeyFileDropdown {
+    [self.keyFilePopup.menu removeAllItems];
+    
+    // TODO: Localize
+    
+    // None & Browse
+    
+    [self.keyFilePopup.menu addItemWithTitle:@"None" action:@selector(onSelectNoneKeyFile) keyEquivalent:@""];
+    [self.keyFilePopup.menu addItemWithTitle:@"Browse..." action:@selector(onBrowseForKeyFile) keyEquivalent:@""];
+    
+    // Configured URL
+
+    DatabaseMetadata *database = [self getDatabaseMetaData];
+    NSURL* configuredUrl;
+    if(database.keyFileBookmark) {
+        NSString* updatedBookmark = nil;
+        NSError* error;
+        configuredUrl = [BookmarksHelper getUrlFromBookmark:database.keyFileBookmark updatedBookmark:&updatedBookmark error:&error];
+
+        if(!configuredUrl) {
+            // Ignore? TODO: Mark Error in the UI
+        }
+    }
+
+    // Currently Selected Bookmark...
+    
+    NSString* bookmark = self.selectedKeyFileBookmark;
+    NSURL* currentlySelectedUrl;
+    if(bookmark) {
+        NSString* updatedBookmark = nil;
+        NSError* error;
+        currentlySelectedUrl = [BookmarksHelper getUrlFromBookmark:bookmark updatedBookmark:&updatedBookmark error:&error];
+        
+        if(!currentlySelectedUrl) {
+            //
+     
+            NSLog(@"getUrlFromBookmark: [%@]", error);
+            
+            // TODO: Alert?
+        
+        }
+    }
+
+    if (configuredUrl) {
+        NSString* configuredTitle = [NSString stringWithFormat:@"%@ [Configured]", configuredUrl.lastPathComponent];
+        [self.keyFilePopup.menu addItemWithTitle:configuredTitle action:@selector(onSelectPreconfiguredKeyFile) keyEquivalent:@""];
+    
+        if(currentlySelectedUrl) {
+            if(![configuredUrl.absoluteString isEqualToString:currentlySelectedUrl.absoluteString]) {
+                [self.keyFilePopup.menu addItemWithTitle:currentlySelectedUrl.lastPathComponent action:nil keyEquivalent:@""];
+                [self.keyFilePopup selectItemAtIndex:3];
+            }
+            else {
+                [self.keyFilePopup selectItemAtIndex:2];
+            }
+        }
+    }
+    else if(currentlySelectedUrl) {
+        [self.keyFilePopup.menu addItemWithTitle:currentlySelectedUrl.lastPathComponent action:nil keyEquivalent:@""];
+        [self.keyFilePopup selectItemAtIndex:2];
+    }
+    else {
+        [self.keyFilePopup selectItemAtIndex:0];
+    }
+}
+
+- (void)onBrowseForKeyFile {
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            NSLog(@"Open Key File: %@", openPanel.URL);
+            
+            NSError* error;
+            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL error:&error];
+            
+            if(!bookmark) {
+                [Alerts error:error window:self.view.window];
+                [self refreshKeyFileDropdown];
+                return;
+            }
+
+            self.selectedKeyFileBookmark = bookmark;
+        }
+
+        [self refreshKeyFileDropdown];
+    }];
+}
+
+- (void)onSelectNoneKeyFile {
+    self.selectedKeyFileBookmark = nil;
+    [self refreshKeyFileDropdown];
+}
+
+- (void)onSelectPreconfiguredKeyFile {
+    DatabaseMetadata *database = [self getDatabaseMetaData];
+    self.selectedKeyFileBookmark = database.keyFileBookmark;
+    [self refreshKeyFileDropdown];
 }
 
 @end

@@ -79,7 +79,6 @@
         
 //        NSLog(@"Updating Touch ID Password in case is has changed");
         safe.touchIdPassword = self.model.compositeKeyFactors.password;
-        safe.touchIdKeyFileDigest = self.model.compositeKeyFactors.keyFileDigest;
     }
     
     if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){

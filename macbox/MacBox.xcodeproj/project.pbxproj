@@ -97,6 +97,7 @@
 		4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D553B51219DD2CE00AA4BAB /* AttachmentItem.m */; };
 		4D559F9E20750C2C009856E3 /* DatabasesManagerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* DatabasesManagerView.m */; };
 		4D559FA520750D1D009856E3 /* DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* DatabaseMetadata.m */; };
+		4D55A56F23D743C40057CBA8 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
 		4D59DA57224D3C5100D1D6E4 /* CustomFieldTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
@@ -433,6 +434,8 @@
 		4D559F9C20750C2C009856E3 /* DatabasesManagerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasesManagerView.m; path = MacBox/DatabasesManagerView.m; sourceTree = "<group>"; };
 		4D559FA020750D1D009856E3 /* DatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseMetadata.h; path = MacBox/DatabaseMetadata.h; sourceTree = SOURCE_ROOT; };
 		4D559FA320750D1D009856E3 /* DatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseMetadata.m; path = MacBox/DatabaseMetadata.m; sourceTree = SOURCE_ROOT; };
+		4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BookmarksHelper.h; path = ../model/BookmarksHelper.h; sourceTree = "<group>"; };
+		4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BookmarksHelper.m; path = ../model/BookmarksHelper.m; sourceTree = "<group>"; };
 		4D58A459207368B10061E046 /* PreferencesWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PreferencesWindowController.h; path = MacBox/PreferencesWindowController.h; sourceTree = "<group>"; };
 		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PreferencesWindowController.m; path = MacBox/PreferencesWindowController.m; sourceTree = "<group>"; };
 		4D59DA55224D3C5100D1D6E4 /* CustomFieldTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldTableCellView.h; path = MacBox/CustomFieldTableCellView.h; sourceTree = "<group>"; };
@@ -1363,6 +1366,8 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */,
+				4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */,
 				4D832A9923CE2AC000A7885E /* SecretStore.h */,
 				4DACA5BF23CCD40F00891366 /* SecretStore.m */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
@@ -1683,6 +1688,7 @@
 				4D8DE9BB21F898470043DDC0 /* OTPToken+Generation.m in Sources */,
 				4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
+				4D55A56F23D743C40057CBA8 /* BookmarksHelper.m in Sources */,
 				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
 				4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */,
 				4D88E6CE23A9190700A75D1F /* FavIconDownloader.m in Sources */,

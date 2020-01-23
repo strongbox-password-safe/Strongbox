@@ -175,14 +175,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
             database.touchIdPassword = password;
         }
         
-        // Key File Digest
-
-        NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", database.uuid];
-        NSData* keyFileDigest = [SAMKeychain passwordDataForService:kKeychainService account:account];
-        if (keyFileDigest) {
-            database.touchIdKeyFileDigest = keyFileDigest;
-        }
-
         // Restore Enrolled Prompted Status
         
         database.hasPromptedForTouchIdEnrol = YES;

@@ -25,7 +25,7 @@
 @property (nonatomic) BOOL isTouchIdEnabled;
 
 @property (nonatomic, strong) NSString* touchIdPassword;
-@property (nonatomic, strong) NSData* touchIdKeyFileDigest;
+@property (nonatomic, strong) NSString* keyFileBookmark;
 
 @property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
 

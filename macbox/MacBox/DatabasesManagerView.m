@@ -133,7 +133,7 @@ static DatabasesManagerView* sharedInstance;
 - (void)removeDatabase:(DatabaseMetadata*)safe {
     [DatabasesManager.sharedInstance remove:safe.uuid];
     safe.touchIdPassword = nil;
-    safe.touchIdKeyFileDigest = nil;
+    safe.keyFileBookmark = nil;
     [self refresh];
 }
 

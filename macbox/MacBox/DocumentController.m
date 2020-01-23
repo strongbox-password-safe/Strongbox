@@ -17,6 +17,7 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "NSArray+Extensions.h"
+#import "BookmarksHelper.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
@@ -111,23 +112,6 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     }];
 }
 
-static NSString *getBookmarkFromUrlAsString(NSURL *url) {
-    NSData *bookmark = nil;
-    NSError *error = nil;
-    bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
-             includingResourceValuesForKeys:nil
-                              relativeToURL:nil
-                                      error:&error];
-    if (error) {
-        NSLog(@"Error while creating bookmark for URL (%@): %@", url, error);
-        return nil;
-    }
-    
-    NSString *fileIdentifier = [bookmark base64EncodedStringWithOptions:kNilOptions];
-    
-    return fileIdentifier;
-}
-
 - (void)addDatabaseToDatabases:(NSURL *)url {
     DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
     if(safe) {
@@ -135,9 +119,10 @@ static NSString *getBookmarkFromUrlAsString(NSURL *url) {
         return;
     }
     
-    NSString * fileIdentifier = getBookmarkFromUrlAsString(url);
-    
+    NSError* error;
+    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url error:&error];
     if(!fileIdentifier) {
+        NSLog(@"getBookmarkFromUrl: [%@]", error);
         return;
     }
     
@@ -152,56 +137,28 @@ static NSString *getBookmarkFromUrlAsString(NSURL *url) {
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     if(database.storageProvider == kLocalDevice) {
         NSError *error = nil;
-        BOOL bookmarkDataIsStale;
-
-        NSData* bookmarkData = [[NSData alloc] initWithBase64EncodedString:database.storageInfo options:kNilOptions];
+        NSString* updatedBookmark;
+        NSURL* url = [BookmarksHelper getUrlFromBookmark:database.storageInfo updatedBookmark:&updatedBookmark error:&error];
         
-        if(bookmarkData == nil) {
-            completion([Utils createNSError:@"Could not decode bookmark." errorCode:-1]);
+        if(url == nil) {
+            completion(error);
             return;
         }
         
-        NSURL* bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmarkData
-                                                           options:NSURLBookmarkResolutionWithSecurityScope
-                                                     relativeToURL:nil
-                                               bookmarkDataIsStale:&bookmarkDataIsStale
-                                                             error:&error];
-        if(!bookmarkFileURL) {
-            completion([Utils createNSError:@"Could not get bookmark URL." errorCode:-1]);
-            return;
-        }
+        // URL / Bookmark may have changed...
         
-        if(bookmarkDataIsStale) {
-            if ([bookmarkFileURL startAccessingSecurityScopedResource]) {
-                NSLog(@"Regenerating Bookmark -> bookmarkDataIsStale = %d => [%@]", bookmarkDataIsStale, bookmarkFileURL);
-                
-                NSString* fileIdentifier = getBookmarkFromUrlAsString(bookmarkFileURL);
-
-                [bookmarkFileURL stopAccessingSecurityScopedResource];
-                
-                if(!fileIdentifier) {
-                    completion([Utils createNSError:@"Could not regenerate stale bookmark." errorCode:-1]);
-                    return;
-                }
-
-                database.storageInfo = fileIdentifier;
-                database.fileUrl = bookmarkFileURL;
-                
-                [DatabasesManager.sharedInstance update:database];
-            }
-            else {
-                NSLog(@"Regen Bookmark security failed....");
-                completion([Utils createNSError:@"Regen Bookmark security failed." errorCode:-1]);
-                return;
-            }
+        if (updatedBookmark) {
+            database.storageInfo = updatedBookmark;
         }
-
-        BOOL access = [bookmarkFileURL startAccessingSecurityScopedResource];
+        database.fileUrl = url;
+        [DatabasesManager.sharedInstance update:database];
+        
+        BOOL access = [url startAccessingSecurityScopedResource];
         
         if(access) {
-            [self openDocumentWithContentsOfURL:bookmarkFileURL
-                                       display:YES
-                             completionHandler:^(NSDocument * _Nullable document,
+            [self openDocumentWithContentsOfURL:url
+                                        display:YES
+                              completionHandler:^(NSDocument * _Nullable document,
                                                  BOOL documentWasAlreadyOpen,
                                                  NSError * _Nullable error) {
                 if(error) {

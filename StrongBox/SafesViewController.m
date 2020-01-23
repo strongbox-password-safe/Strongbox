@@ -180,27 +180,29 @@
     self.enterBackgroundTime = [[NSDate alloc] init];
     
     __weak SafesViewController* weakSelf = self;
-    self.privacyAndLockVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
-    self.privacyAndLockVc.onUnlockDone = ^(BOOL userJustCompletedBiometricAuthentication) {
+    PrivacyViewController* privacyVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
+    privacyVc.onUnlockDone = ^(BOOL userJustCompletedBiometricAuthentication) {
         [weakSelf hidePrivacyScreen:userJustCompletedBiometricAuthentication];
     };
-    
-    self.privacyAndLockVc.startupLockMode = startupLockMode;
-    
+    privacyVc.startupLockMode = startupLockMode;
+    privacyVc.modalPresentationStyle = UIModalPresentationOverFullScreen; // This stops the view controller interfering with UIAlertController if we happen to present on that. Less than Ideal?
+
     // Visible will be top most - usually the current nav top controller but can be another modal like Custom Fields editor
     
-    UIViewController* visible = self.navigationController.visibleViewController;
-    
+
+    UIViewController* visible = [self getVisibleViewController];
     NSLog(@"Presenting Privacy Screen on [%@]", [visible class]);
-    
-    self.privacyAndLockVc.modalPresentationStyle = UIModalPresentationOverFullScreen; // This stops the view controller interfering with UIAlertController if we happen to present on that. Less than Ideal?
-    
-    [visible presentViewController:self.privacyAndLockVc animated:NO completion:nil];
+    [visible presentViewController:privacyVc animated:NO completion:^{
+        NSLog(@"Presented Privacy Screen Successfully...");
+        self.privacyAndLockVc = privacyVc; // Only set this if we succeed in displaying...
+    }];
 }
 
 - (void)hidePrivacyScreen:(BOOL)userJustCompletedBiometricAuthentication {
     if (self.privacyAndLockVc) {
         if ([self shouldLockOpenDatabase]) {
+            NSLog(@"Should Lock Database now...");
+
             self.lastOpenedDatabase = nil; // Clear
             
             UINavigationController* nav = self.navigationController;
@@ -415,12 +417,16 @@
     }
 }
 
-//////
+- (UIViewController*)getVisibleViewController {
+    UIViewController* navVisible = self.navigationController.visibleViewController;
+    return navVisible.presentedViewController ? navVisible.presentedViewController : navVisible;
+}
 
 - (BOOL)isVisibleViewController {
-    BOOL ret = self.navigationController.visibleViewController == self;
+    UIViewController* visible =[self getVisibleViewController];
+    BOOL ret = visible == self;
 
-    NSLog(@"isVisibleViewController: %d [Actual Visible: [%@]]", ret, self.navigationController.visibleViewController);
+    NSLog(@"isVisibleViewController: %d [Actual Visible: [%@]]", ret, visible);
     
     return ret;
 }

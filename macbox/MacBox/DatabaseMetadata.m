@@ -37,15 +37,14 @@
     [SecretStore.sharedInstance setSecureString:touchIdPassword forIdentifier:account];
 }
 
-- (NSData *)touchIdKeyFileDigest {
-    NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", self.uuid];
-    return [SecretStore.sharedInstance getSecureObject:account];
+- (NSString *)keyFileBookmark {
+    NSString* account = [NSString stringWithFormat:@"keyFileBookmark-%@", self.uuid];
+    return [SecretStore.sharedInstance getSecureString:account];
 }
 
-- (void)setTouchIdKeyFileDigest:(NSData *)touchIdKeyFileDigest {
-    NSString* account = [NSString stringWithFormat:@"keyFileDigest-%@", self.uuid];
-
-    [SecretStore.sharedInstance setSecureObject:touchIdKeyFileDigest forIdentifier:account];
+- (void)setKeyFileBookmark:(NSString *)keyFileBookmark {
+    NSString* account = [NSString stringWithFormat:@"keyFileBookmark-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureString:keyFileBookmark forIdentifier:account];
 }
 
 - (NSString *)description {

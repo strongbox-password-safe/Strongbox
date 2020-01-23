@@ -727,7 +727,9 @@
         NSError *error;
         DatabaseModel *openedSafe = nil;
 
-        CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword keyFileDigest:self.keyFileDigest yubiKeyResponse:yubikeyResponse];
+        CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword
+                                                   keyFileDigest:self.keyFileDigest
+                                                 yubiKeyResponse:yubikeyResponse];
 
         if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) &&
            self.masterPassword.length == 0 && (self.keyFileDigest || yubikeyResponse)) {
