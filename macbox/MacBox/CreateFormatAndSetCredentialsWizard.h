@@ -13,6 +13,7 @@
 @interface CreateFormatAndSetCredentialsWizard : NSWindowController
 
 @property (nonatomic, readonly) CompositeKeyFactors* confirmedCompositeKeyFactors;
+@property NSURL* keyFileUrl;
 
 @property (nonatomic) NSString* titleText;
 @property DatabaseFormat databaseFormat;

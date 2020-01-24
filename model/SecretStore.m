@@ -15,7 +15,7 @@
 
 #import "SecretStore.h"
 
-// NB: Not sure if Mac 10.11 is supported
+// NB: OSX 10.11 (El Capitan) is NOT supported
 
 static NSString* const kKeyApplicationLabel = @"Strongbox-Credential-Store-Key";
 static NSString* const kEncryptedBlobServiceName = @"Strongbox-Credential-Store";
@@ -74,6 +74,11 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (BOOL)setSecureObject:(id)object forIdentifier:(NSString *)identifier expiryMode:(SecretExpiryMode)expiryMode expiresAt:(NSDate *)expiresAt {
+    if ([SecretStore isUnsupportedOS]) {
+        NSLog(@"Unsupported OS...");
+        return NO;
+    }
+
     [self deleteSecureItem:identifier]; // Clear any existing password first...
 
     if(object == nil) { // Nil is equivalent to delete
@@ -155,6 +160,11 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (id)getSecureObject:(NSString *)identifier expired:(BOOL*)expired {
+    if ([SecretStore isUnsupportedOS]) {
+        NSLog(@"Unsupported OS...");
+        return nil;
+    }
+
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
 //        NSLog(@"Could not get wrapped object.");
@@ -213,6 +223,11 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (void)deleteSecureItem:(NSString *)identifier {
+    if ([SecretStore isUnsupportedOS]) {
+        NSLog(@"Unsupported OS...");
+        return;
+    }
+
     [self deleteEncryptedBlob:identifier];
     [self.ephemeralObjectStore removeObjectForKey:identifier];
     
@@ -252,7 +267,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
     }
     else {
-        return kSecKeyAlgorithmECIESEncryptionCofactorX963SHA256AESGCM; // TODO: this may or may not work on OSX 10.11...
+        return kSecKeyAlgorithmECIESEncryptionCofactorX963SHA256AESGCM;
     }
 #endif
 }
@@ -261,9 +276,25 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return self._secureEnclaveAvailable;
 }
 
++ (BOOL)isUnsupportedOS {
+#if TARGET_OS_OSX
+    if (@available(macOS 10.12, *)) { } else {
+        NSLog(@"Mac OSX < 10.12 is not supported");
+        return YES;
+    }
+#endif
+    
+    return NO;
+}
+
 + (BOOL)isSecureEnclaveAvailable {
     if (TARGET_OS_SIMULATOR != 0) { // Check here because we get a crash if we try to run below code on a sim
         NSLog(@"Secure Enclave not available on Simulator");
+        return NO;
+    }
+
+    if ([SecretStore isUnsupportedOS]) {
+        NSLog(@"Unsupported OS...");
         return NO;
     }
 
@@ -307,7 +338,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
     SecAccessControlRef access = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
                                                                  [SecretStore accessibility],
-                                                                 requestSecureEnclaveStorage ? kSecAccessControlPrivateKeyUsage : 0L, // TODO: Mac 10.11 may ot may not break
+                                                                 requestSecureEnclaveStorage ? kSecAccessControlPrivateKeyUsage : 0L,
                                                                  &cfError);
     
     if(!access) {

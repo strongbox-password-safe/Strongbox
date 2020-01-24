@@ -2747,3 +2747,15 @@
 
 /* It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons. */
 "open_sequence_warn_biometrics_db_changed_message" = "It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons.";
+
+/* None - (Tranlators Note: When the user is not using or has not selected a key file on the Unlock screen.) */
+"mac_key_file_none" = "None";
+
+/* Browse... - (Translators Note: When user wants to open the File dialog to select a key file...)*/
+"mac_browse_for_key_file" = "Browse...";
+
+/* [Configured] - (Translators Note: User is using a key file, Strongbox knows what/where it is, but will not display the file name in the UI for privacy reasons. This appears on the unlock screen. */
+"mac_key_file_configured_but_filename_hidden" = "[Configured]";
+
+/* %@ [Configured] - (Translators Note: User is using a key file that has previously been set/remembered by Strongbox. First parameter is the filename of the key file. This appears on the unlock screen. */
+"mac_key_file_filename_configured_fmt" = "%@ [Configured]";

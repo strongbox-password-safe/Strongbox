@@ -265,17 +265,25 @@ informativeText:(NSString*)informativeText
     
     [alert setAlertStyle:NSAlertStyleInformational];
     
-    NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
-    [alert addButtonWithTitle:localizedCancel];
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
-    
     [alert addButtonWithTitle:option1AndDefault];
-    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; // ENTER
+    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; // ENTER
     
     [alert addButtonWithTitle:option2];
-        
+    
+    NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
+    [alert addButtonWithTitle:localizedCancel];
+    [[[alert buttons] objectAtIndex:2] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
+    
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        completion(returnCode - NSAlertFirstButtonReturn);
+        if(returnCode == NSAlertThirdButtonReturn) {
+            completion(0);
+        }
+        else if(returnCode == NSAlertFirstButtonReturn) {
+            completion(1);
+        }
+        else {
+            completion(2);
+        }
     }];
 }
 

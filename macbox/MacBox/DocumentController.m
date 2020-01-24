@@ -72,6 +72,20 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                 return;
             }
 
+            DatabaseMetadata* database = [self addDatabaseToDatabases:URL];
+            if(wizard.keyFileUrl) {
+                NSError* error;
+                NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:wizard.keyFileUrl error:&error];
+                
+                if(bookmark) {
+                    database.keyFileBookmark = bookmark;
+                    [DatabasesManager.sharedInstance update:database];
+                }
+                else {
+                    NSLog(@"Error getting bookmark for new db: [%@]", error);
+                }
+            }
+            
             [self addDocument:document];
             [document makeWindowControllers];
             [document showWindows];
@@ -112,18 +126,18 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     }];
 }
 
-- (void)addDatabaseToDatabases:(NSURL *)url {
+- (DatabaseMetadata*)addDatabaseToDatabases:(NSURL *)url {
     DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
     if(safe) {
 //        NSLog(@"Database is already in Databases List... Not Adding");
-        return;
+        return safe;
     }
     
     NSError* error;
     NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url error:&error];
     if(!fileIdentifier) {
         NSLog(@"getBookmarkFromUrl: [%@]", error);
-        return;
+        return nil;
     }
     
     safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
@@ -132,6 +146,8 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                                       storageInfo:fileIdentifier];
     
     [DatabasesManager.sharedInstance add:safe];
+    
+    return safe;
 }
 
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {

@@ -9,11 +9,15 @@
 #import <Cocoa/Cocoa.h>
 #import "DatabaseMetadata.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface DocumentController : NSDocumentController
 
-- (void)originalOpenDocument:(id)sender;
+- (void)originalOpenDocument:(id _Nullable)sender;
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion;
-- (void)addDatabaseToDatabases:(NSURL*)url;
-- (DatabaseMetadata*)getDatabaseByFileUrl:(NSURL*)url;
+- (DatabaseMetadata*_Nullable)addDatabaseToDatabases:(NSURL *)url;
+- (DatabaseMetadata*_Nullable)getDatabaseByFileUrl:(NSURL*)url;
 
 @end
+
+NS_ASSUME_NONNULL_END

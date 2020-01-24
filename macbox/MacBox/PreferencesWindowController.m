@@ -104,6 +104,9 @@
 @property (weak) IBOutlet NSButton *scanHtml;
 @property (weak) IBOutlet NSButton *ignoreSsl;
 @property (weak) IBOutlet NSButton *scanCommonFiles;
+@property (weak) IBOutlet NSButton *checkboxHideKeyFileName;
+@property (weak) IBOutlet NSButton *checkboxDoNotRememberKeyFile;
+@property (weak) IBOutlet NSButton *checkboxAllowEmptyPassword;
 
 @end
 
@@ -211,6 +214,11 @@
     if(!Settings.sharedInstance.fullVersion) {
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
     }
+    
+    self.checkboxHideKeyFileName.state = Settings.sharedInstance.hideKeyFileNameOnLockScreen ? NSOnState : NSOffState;
+    self.checkboxDoNotRememberKeyFile.state = Settings.sharedInstance.doNotRememberKeyFile ? NSOnState : NSOffState;
+
+    self.checkboxAllowEmptyPassword.state = Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -248,6 +256,11 @@
     
     Settings.sharedInstance.allowWatchUnlock = self.allowAppleWatchUnlock.state ==  NSOnState;
     
+    Settings.sharedInstance.hideKeyFileNameOnLockScreen = self.checkboxHideKeyFileName.state ==  NSOnState;
+    Settings.sharedInstance.doNotRememberKeyFile = self.checkboxDoNotRememberKeyFile.state ==  NSOnState;
+
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.checkboxAllowEmptyPassword.state == NSOnState;
+
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }

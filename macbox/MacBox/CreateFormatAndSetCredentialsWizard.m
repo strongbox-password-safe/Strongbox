@@ -14,8 +14,6 @@
 
 @interface CreateFormatAndSetCredentialsWizard () <NSTabViewDelegate>
 
-@property NSString* keyFilePath;
-
 @end
 
 @implementation CreateFormatAndSetCredentialsWizard
@@ -27,7 +25,7 @@
         self.textFieldTitle.stringValue = self.titleText;
     }
 
-    self.keyFilePath = nil;
+    self.keyFileUrl = nil;
     
     self.tabView.delegate = self;
     
@@ -90,10 +88,10 @@
 
     if(self.checkboxUseAKeyFile.state == NSOnState) {
         NSError* error;
-        NSData* data = [NSData dataWithContentsOfFile:self.keyFilePath options:kNilOptions error:&error];
+        NSData* data = [NSData dataWithContentsOfURL:self.keyFileUrl options:kNilOptions error:&error];
         
         if(!data) {
-            NSLog(@"Could not read file at %@. Error: %@", self.keyFilePath, error);
+            NSLog(@"Could not read file at %@. Error: %@", self.keyFileUrl, error);
             
             NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
             [Alerts error:loc error:error window:self.window];
@@ -115,8 +113,7 @@
     }
 }
 
-- (IBAction)controlTextDidChange:(NSSecureTextField *)obj
-{
+- (IBAction)controlTextDidChange:(NSSecureTextField *)obj {
     [self updateUi];
 }
 
@@ -132,11 +129,11 @@
     
     if(self.checkboxUseAKeyFile.state == NSOnState) {
         self.buttonBrowse.enabled = YES;
-        self.labelKeyFilePath.stringValue = self.keyFilePath ? self.keyFilePath : @"";
+        self.labelKeyFilePath.stringValue = self.keyFileUrl ? self.keyFileUrl.lastPathComponent : @"";
         
         NSString* loc = NSLocalizedString(@"mac_click_browse_select_key_file", @"Click Browse to Select a Key File");
 
-        self.labelKeyFilePath.placeholderString = self.keyFilePath ? @"" : loc;
+        self.labelKeyFilePath.placeholderString = self.keyFileUrl ? @"" : loc;
     }
     else {
         self.buttonBrowse.enabled = NO;
@@ -163,8 +160,8 @@
     }
     
     if(self.checkboxUseAKeyFile.state == NSOnState) {
-        if(self.keyFilePath == nil || ![NSFileManager.defaultManager fileExistsAtPath:self.keyFilePath]) {
-            NSString* loc = self.keyFilePath ?
+        if(self.keyFileUrl == nil || ![NSFileManager.defaultManager fileExistsAtPath:self.keyFileUrl.path]) {
+            NSString* loc = self.keyFileUrl ?
                 NSLocalizedString(@"mac_key_file_invalid", @"Key File Invalid") :
                 NSLocalizedString(@"mac_select_key_file", @"Select a Key File");
 
@@ -211,8 +208,7 @@
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            self.keyFilePath = openPanel.URL.path;
-
+            self.keyFileUrl = openPanel.URL;
             [self updateUi];
         }
     }];

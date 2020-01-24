@@ -96,6 +96,9 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showAttachmentsOnQuickViewPanel;
 @property BOOL showAttachmentImagePreviewsOnQuickViewPanel;
 
+@property BOOL hideKeyFileNameOnLockScreen;
+@property BOOL doNotRememberKeyFile;
+@property BOOL allowEmptyOrNoPasswordEntry;
 
 @end
 

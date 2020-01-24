@@ -70,4 +70,24 @@
     return bookmarkFileURL;
 }
 
++ (NSData *)dataWithContentsOfBookmark:(NSString *)bookmarkInB64 error:(NSError**)error {
+    NSString* updatedBookmark;
+    
+    NSURL* url = [BookmarksHelper getUrlFromBookmark:bookmarkInB64 updatedBookmark:&updatedBookmark error:error];
+
+    if(url && [url startAccessingSecurityScopedResource]) {
+        //NSLog(@"Reading File at [%@]", url);
+        NSData* ret = [NSData dataWithContentsOfURL:url options:kNilOptions error:error];
+        
+        [url stopAccessingSecurityScopedResource];
+        
+        return ret;
+    }
+    else {
+        NSLog(@"Could not read file... [%@]", *error);
+    }
+    
+    return nil;
+}
+
 @end

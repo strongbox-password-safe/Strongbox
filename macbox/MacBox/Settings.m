@@ -63,8 +63,35 @@ static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQui
 static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
 static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
 static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
+static NSString* const kHideKeyFileNameOnLockScreen = @"hideKeyFileNameOnLockScreen";
+static NSString* const kDoNotRememberKeyFile = @"doNotRememberKeyFile";
+static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
 
 @implementation Settings
+
+- (BOOL)allowEmptyOrNoPasswordEntry {
+    return [self getBool:kAllowEmptyOrNoPasswordEntry];
+}
+
+- (void)setAllowEmptyOrNoPasswordEntry:(BOOL)allowEmptyOrNoPasswordEntry {
+    [self setBool:kAllowEmptyOrNoPasswordEntry value:allowEmptyOrNoPasswordEntry];
+}
+
+- (BOOL)hideKeyFileNameOnLockScreen {
+    return [self getBool:kHideKeyFileNameOnLockScreen];
+}
+
+- (void)setHideKeyFileNameOnLockScreen:(BOOL)hideKeyFileNameOnLockScreen {
+    [self setBool:kHideKeyFileNameOnLockScreen value:hideKeyFileNameOnLockScreen];
+}
+
+- (BOOL)doNotRememberKeyFile {
+    return [self getBool:kDoNotRememberKeyFile];
+}
+
+- (void)setDoNotRememberKeyFile:(BOOL)doNotRememberKeyFile {
+    [self setBool:kDoNotRememberKeyFile value:doNotRememberKeyFile];
+}
 
 - (BOOL)migratedToNewSecretStore {
     return [self getBool:kMigratedToNewSecretStore];
