@@ -34,6 +34,7 @@
     if(self.authenticationMode) [ret setValue:@(self.authenticationMode) forKey:@"authenticationMode"];
     if(self.username) [ret setValue:self.username forKey:@"username"];
     if(self.keyChainUuid) [ret setValue:self.keyChainUuid forKey:@"keyChainUuid"];
+    if(self.initialDirectory) [ret setValue:self.initialDirectory forKey:@"initialDirectory"];
 
     return ret;
 }
@@ -51,6 +52,7 @@
     }
     
     ret.username = [dictionary objectForKey:@"username"];
+    ret.initialDirectory = [dictionary objectForKey:@"initialDirectory"];
     
     return ret;
 }

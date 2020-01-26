@@ -15,19 +15,23 @@
 #import "ClickableImageView.h"
 #import "KSPasswordField.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ViewController : NSViewController<   NSOutlineViewDelegate,
                                                 NSOutlineViewDataSource,
                                                 NSTableViewDelegate,
                                                 NSTableViewDataSource>
 
 - (void)onFileChangedByOtherApplication;
-- (void)resetModel:(ViewModel *)model;
+
+- (void)setInitialModel:(ViewModel*)model;
+- (void)updateModel:(ViewModel *)model;
 
 // Used by Node Details too...
-
 void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window);
 
 - (void)autoPromptForTouchIdIfDesired;
 
 @end
 
+NS_ASSUME_NONNULL_END

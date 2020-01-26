@@ -39,7 +39,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
 
-@property (nonatomic) BOOL applicationHasFinishedLaunching;
+//@property (nonatomic) BOOL applicationHasFinishedLaunching;
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
@@ -93,7 +93,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
     //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
 
-    self.applicationHasFinishedLaunching = YES;
+//    self.applicationHasFinishedLaunching = YES;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onPreferencesChanged:)
@@ -355,22 +355,22 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
-    if(!self.applicationHasFinishedLaunching) {
-        // Get the recent documents
-        NSDocumentController *controller =
-        [NSDocumentController sharedDocumentController];
-        NSArray *documents = [controller recentDocumentURLs];
-        
-        // If there is a recent document, try to open it.
-        if ([documents count] > 0)
-        {
-            [controller openDocumentWithContentsOfURL:[documents objectAtIndex:0] display:YES completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) { ; }];
-
-            return NO;
-        }
-    }
+//    if(!self.applicationHasFinishedLaunching) {
+//        // Get the recent documents
+//        NSDocumentController *controller =
+//        [NSDocumentController sharedDocumentController];
+//        NSArray *documents = [controller recentDocumentURLs];
+//
+//        // If there is a recent document, try to open it.
+//        if ([documents count] > 0)
+//        {
+//            [controller openDocumentWithContentsOfURL:[documents objectAtIndex:0] display:YES completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) { ; }];
+//
+//            return NO;
+//        }
+//    }
     
-    return YES;
+    return NO;
 }
 
 - (IBAction)onViewDatabases:(id)sender {

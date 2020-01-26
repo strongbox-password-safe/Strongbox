@@ -23,6 +23,7 @@ typedef NS_ENUM (NSUInteger, SFTPAuthenticationMode) {
 @property (nullable) NSString* password;
 @property (nullable) NSString* privateKey;
 @property (nullable) NSString* publicKey;
+@property (nullable) NSString* initialDirectory;
 
 @property NSString* keyChainUuid;
 

@@ -11,6 +11,7 @@
 #import "Node.h"
 #import "CHCSVParser.h"
 #import "DatabaseModel.h"
+#import "DatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -147,6 +148,10 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 @property (nullable) NSString* selectedItem;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
+
+- (void)updateTouchIdPassword:(NSString*)password;
+
+@property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
 
 @end
 

@@ -139,16 +139,44 @@ static NSImage* kStrongBox256Image;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // Note: Nothing really important can happen here because we can't access the Document or the View Model
+    // The real action kicks off after this function finishes and setInitialModel is called...
+    
     self.detailsViewControllers = @{}.mutableCopy;
     
     [self enableDragDrop];
 
     [self customizeUi];
-
-    [self bindToModel];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+}
+
+- (void)updateModel:(ViewModel *)model {
+    NSLog(@"updateModel [%@]", model);
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setModelFromMainThread:model];
+    });
+}
+
+- (void)setInitialModel:(ViewModel*)model {
+    // MUST be called on main thread...
+    NSLog(@"setInitialModel [%@]", model);
+
+    [self setModelFromMainThread:model];
+}
+
+- (void)setModelFromMainThread:(ViewModel *)model {
+    [self stopObservingModelChanges];
+    [self closeAllDetailsWindows];
+        
+    self.model = model;
+
+    [self bindToModel];
+    [self setInitialFocus];
+    
+    [self autoPromptForTouchIdIfDesired];
 }
 
 - (void)viewDidAppear {
@@ -578,38 +606,6 @@ static NSImage* kStrongBox256Image;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (DatabaseMetadata*)getDatabaseMetaData {
-    if(!self.model || !self.model.fileUrl) {
-        return nil;
-    }
-    
-    DocumentController* dc = NSDocumentController.sharedDocumentController;
-    return [dc getDatabaseByFileUrl:self.model.document.fileURL];
-}
-
-- (void)addThisDatabaseToDatabases {
-    DocumentController* dc = NSDocumentController.sharedDocumentController;
-    
-    [dc addDatabaseToDatabases:self.model.document.fileURL];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (void)resetModel:(ViewModel *)model {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self stopObservingModelChanges];
-        [self closeAllDetailsWindows];
-        
-        self.model = model;
-        [self addThisDatabaseToDatabases];
-        
-        [self bindToModel];
-        [self setInitialFocus];
-        
-        [self autoPromptForTouchIdIfDesired];
-    });
-}
 
 - (void)bindToModel {
     [self stopObservingModelChanges];
@@ -1351,7 +1347,7 @@ static NSImage* kStrongBox256Image;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)biometricOpenIsAvailableForSafe {
-    DatabaseMetadata* metaData = [self getDatabaseMetaData];
+    DatabaseMetadata* metaData = self.model.databaseMetadata;
     
     BOOL ret =  (metaData == nil ||
                  !metaData.isTouchIdEnabled ||
@@ -1396,8 +1392,8 @@ static NSImage* kStrongBox256Image;
                         return;
                     }
 
-                    DatabaseMetadata* metaData = [self getDatabaseMetaData];
-
+                    DatabaseMetadata* metaData = self.model.databaseMetadata;
+                    
                     CompositeKeyFactors* ckf = [CompositeKeyFactors password:metaData.touchIdPassword
                                                                keyFileDigest:keyFileDigest];
 
@@ -1507,28 +1503,19 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
  isBiometricUnlock:(BOOL)isBiometricUnlock {
     [self enableMasterCredentialsEntry:YES];
 
-    DatabaseMetadata *database = [self getDatabaseMetaData];
-
     if(success) {
-        if(database == nil) {
-            [self addThisDatabaseToDatabases];
-        }
-
-        database = [self getDatabaseMetaData];
-
-        [self maybePromptForBiometricEnrol:compositeKeyFactors
-                              safeMetaData:database];
+        [self maybePromptForBiometricEnrol:compositeKeyFactors];
         
         // Record Key File if one was used...
         
-        database.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
-        [DatabasesManager.sharedInstance update:database];
+        self.model.databaseMetadata.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
+        [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
     }
     else {
-        if(isBiometricUnlock && database != nil) {
-            database.touchIdPassword = nil;
-            database.hasPromptedForTouchIdEnrol = NO;
-            [DatabasesManager.sharedInstance update:database];
+        if(isBiometricUnlock && self.model.databaseMetadata != nil) {
+            self.model.databaseMetadata.touchIdPassword = nil;
+            self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO;
+            [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
         }
         
         NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
@@ -1538,10 +1525,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
-- (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors safeMetaData:(DatabaseMetadata*)safeMetaData {
+- (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors {
     if ( BiometricIdHelper.sharedInstance.biometricIdAvailable &&
         (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) &&
-        !safeMetaData.hasPromptedForTouchIdEnrol) {
+        !self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
         NSLog(@"Biometric ID is available on Device. Should we enrol?");
 
         NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ to open this database in the future?");        
@@ -1551,17 +1538,17 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
-                   safeMetaData.isTouchIdEnabled = YES;
-                   safeMetaData.touchIdPassword = compositeKeyFactors.password;
+                   self.model.databaseMetadata.isTouchIdEnabled = YES;
+                   self.model.databaseMetadata.touchIdPassword = compositeKeyFactors.password;
                    
                    [self caveatAboutTouchId];
                }
                else {
-                   safeMetaData.isTouchIdEnabled = NO;
+                   self.model.databaseMetadata.isTouchIdEnabled = NO;
                }
            
-               safeMetaData.hasPromptedForTouchIdEnrol = YES;
-               [DatabasesManager.sharedInstance update:safeMetaData];
+               self.model.databaseMetadata.hasPromptedForTouchIdEnrol = YES;
+               [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
            }];
     }
 }
@@ -1657,8 +1644,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                 if(returnCode == NSModalResponseOK) {
                     [self.model setCompositeKeyFactors:self.changeMasterPassword.confirmedCompositeKeyFactors];
 
-                    DatabaseMetadata* metadata = [self getDatabaseMetaData];
-
+                    DatabaseMetadata* metadata = self.model.databaseMetadata;
+                    
                     if(self.changeMasterPassword.keyFileUrl && !Settings.sharedInstance.doNotRememberKeyFile) {
                         NSError* error;
                         NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.changeMasterPassword.keyFileUrl error:&error];
@@ -2725,8 +2712,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
     else if (theAction == @selector(onClearTouchId:)) {
-        DatabaseMetadata* metaData = [self getDatabaseMetaData];
-        return metaData != nil && BiometricIdHelper.sharedInstance.biometricIdAvailable;
+        return BiometricIdHelper.sharedInstance.biometricIdAvailable;
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.model.locked;
@@ -2769,16 +2755,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (IBAction)onClearTouchId:(id)sender {
-    DatabaseMetadata* metaData = [self getDatabaseMetaData];
+    self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
+    self.model.databaseMetadata.touchIdPassword = nil;
     
-    if(metaData) {
-        metaData.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
-        metaData.touchIdPassword = nil;
-        
-        [DatabasesManager.sharedInstance update:metaData];
-        
-        [self bindLockScreenUi];
-    }
+    [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+    
+    [self bindLockScreenUi];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -3355,7 +3337,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 - (IBAction)onPrintDatabase:(id)sender {
     NSString* loc = NSLocalizedString(@"mac_database_print_emergency_sheet_fmt", @"%@ Emergency Sheet");
     
-    NSString* databaseName = [NSString stringWithFormat:loc, [self getDatabaseMetaData].nickName];
+    NSString* databaseName = [NSString stringWithFormat:loc, self.model.databaseMetadata.nickName];
     NSString* htmlString = [self.model getHtmlPrintString:databaseName];
 
     //    NSError* error;
@@ -3413,7 +3395,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     
     // Configured URL
 
-    DatabaseMetadata *database = [self getDatabaseMetaData];
+    DatabaseMetadata *database = self.model.databaseMetadata;
     NSURL* configuredUrl;
     if(database && database.keyFileBookmark) {
         NSString* updatedBookmark = nil;
@@ -3507,8 +3489,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (void)onSelectPreconfiguredKeyFile {
-    DatabaseMetadata *database = [self getDatabaseMetaData];
-    self.selectedKeyFileBookmark = database.keyFileBookmark;
+    self.selectedKeyFileBookmark = self.model.databaseMetadata.keyFileBookmark;
     [self refreshKeyFileDropdown];
 }
 
@@ -3550,7 +3531,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     
     [self bindBiometricButtonsOnLockScreen];
     
-    DatabaseMetadata* database = [self getDatabaseMetaData];
+    DatabaseMetadata* database = self.model.databaseMetadata;
     self.selectedKeyFileBookmark = database.keyFileBookmark ? database.keyFileBookmark : nil;
     
     [self refreshKeyFileDropdown];

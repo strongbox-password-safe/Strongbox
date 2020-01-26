@@ -72,7 +72,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                 return;
             }
 
-            DatabaseMetadata* database = [self addDatabaseToDatabases:URL];
+            DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:URL];
             if(wizard.keyFileUrl) {
                 NSError* error;
                 NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:wizard.keyFileUrl error:&error];
@@ -114,40 +114,6 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             [DatabasesManagerView show:NO];
         }
     }];
-}
-
-//
-
-- (DatabaseMetadata *)getDatabaseByFileUrl:(NSURL *)url {
-    // FUTURE: Check Storage type when impl sftp or webdav
-    
-    return [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
-        return [obj.fileUrl isEqual:url];
-    }];
-}
-
-- (DatabaseMetadata*)addDatabaseToDatabases:(NSURL *)url {
-    DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
-    if(safe) {
-//        NSLog(@"Database is already in Databases List... Not Adding");
-        return safe;
-    }
-    
-    NSError* error;
-    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url error:&error];
-    if(!fileIdentifier) {
-        NSLog(@"getBookmarkFromUrl: [%@]", error);
-        return nil;
-    }
-    
-    safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
-                                     storageProvider:kLocalDevice
-                                             fileUrl:url
-                                      storageInfo:fileIdentifier];
-    
-    [DatabasesManager.sharedInstance add:safe];
-    
-    return safe;
 }
 
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {

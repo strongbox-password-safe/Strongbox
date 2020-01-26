@@ -86,7 +86,7 @@ viewController:(UIViewController *)viewController
            configuration:(SFTPSessionConfiguration*)configuration
               completion:(void (^)(SafeMetaData *, NSError *))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
-    NSString *dir = [self getDirectoryFromParentFolderObject:parentFolder];
+    NSString *dir = [self getDirectoryFromParentFolderObject:parentFolder sessionConfig:configuration];
     NSString *path = [NSString pathWithComponents:@[dir, desiredFilename]];
 
     if(![sftp writeContents:data toFileAtPath:path progress:nil]) {
@@ -141,7 +141,7 @@ viewController:(UIViewController *)viewController
                           completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
     [SVProgressHUD showWithStatus:@"Listing..."];
     
-    NSString * dir = [self getDirectoryFromParentFolderObject:parentFolder];
+    NSString * dir = [self getDirectoryFromParentFolderObject:parentFolder sessionConfig:configuration];
     
     NSArray<NMSFTPFile*>* files = [sftp contentsOfDirectoryAtPath:dir];
     
@@ -261,9 +261,11 @@ viewController:(UIViewController *)viewController
                                    fileIdentifier:json];
 }
 
-- (NSString *)getDirectoryFromParentFolderObject:(NSObject *)parentFolder {
+- (NSString *)getDirectoryFromParentFolderObject:(NSObject *)parentFolder sessionConfig:(SFTPSessionConfiguration*)sessionConfig {
     SFTPProviderData* parent = (SFTPProviderData*)parentFolder;
-    NSString* dir = parent ? parent.filePath : @"/";
+
+    NSString* dir = parent ? parent.filePath : (sessionConfig != nil && sessionConfig.initialDirectory.length ? sessionConfig.initialDirectory : @"/");
+
     return dir;
 }
 
@@ -371,3 +373,4 @@ static SFTPProviderData* makeProviderData(NSString* path, SFTPSessionConfigurati
 }
 
 @end
+

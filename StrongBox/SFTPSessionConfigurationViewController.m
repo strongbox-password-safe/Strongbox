@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonLocateKey;
 @property (weak, nonatomic) IBOutlet UIButton *buttonConnect;
 @property (weak, nonatomic) IBOutlet UILabel *labelValidation;
+@property (weak, nonatomic) IBOutlet UITextField *textFieldPath;
 
 @property NSString* privateKey;
 
@@ -56,6 +57,7 @@
     self.configuration.password = self.textFieldPassword.text;
     self.configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
     self.configuration.privateKey = self.privateKey;
+    self.configuration.initialDirectory = self.textFieldPath.text;
     
     self.onDone(YES);
 }

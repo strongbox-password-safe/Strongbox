@@ -14,6 +14,7 @@
 #import "Settings.h"
 #import "OTPToken+Serialization.h"
 #import "FavIconManager.h"
+#import "DatabasesManager.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -51,6 +52,12 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         _document = document;
         self.passwordDatabase = database;
         self.selectedItem = selectedItem;
+        _databaseMetadata = [DatabasesManager.sharedInstance addOrGet:document.fileURL];
+        
+        if(self.databaseMetadata == nil) {
+            NSLog(@"Could not add or get metadata for [%@]", document.fileURL);
+            return nil;
+        }
     }
     
     return self;
@@ -1214,6 +1221,13 @@ NSString* getSmartFillNotes() {
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName {
     return [self.passwordDatabase getHtmlPrintString:databaseName];
+}
+
+- (void)updateTouchIdPassword:(NSString *)password {
+    if(self.databaseMetadata.isTouchIdEnabled && self.databaseMetadata.touchIdPassword) {
+        self.databaseMetadata.touchIdPassword = password;
+        [DatabasesManager.sharedInstance update:self.databaseMetadata];
+    }
 }
 
 @end

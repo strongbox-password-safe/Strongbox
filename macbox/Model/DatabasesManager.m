@@ -7,6 +7,8 @@
 //
 
 #import "DatabasesManager.h"
+#import "BookmarksHelper.h"
+#import "NSArray+Extensions.h"
 
 @interface DatabasesManager()
 
@@ -149,12 +151,38 @@ static NSString* kDatabasesDefaultsKey = @"databases";
     return [sanitized isEqualToString:nickName] && nickName.length > 0 && ![nicknamesLowerCase containsObject:nickName.lowercaseString];
 }
 
-- (NSArray<DatabaseMetadata*>*)getSafesOfProvider:(StorageProvider)storageProvider {
-    return [self.snapshot filteredArrayUsingPredicate:
-            [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        DatabaseMetadata* item = (DatabaseMetadata*)evaluatedObject;
-        return item.storageProvider == storageProvider;
-    }]];
+- (DatabaseMetadata *)getDatabaseByFileUrl:(NSURL *)url {
+    // FUTURE: Check Storage type when impl sftp or webdav
+    
+    return [self.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return [obj.fileUrl isEqual:url];
+    }];
 }
+
+- (DatabaseMetadata*)addOrGet:(NSURL *)url {
+    DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
+    if(safe) {
+//        NSLog(@"Database is already in Databases List... Not Adding");
+        return safe;
+    }
+    
+    NSError* error;
+    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url error:&error];
+    if(!fileIdentifier) {
+        NSLog(@"getBookmarkFromUrl: [%@]", error);
+        return nil;
+    }
+    
+    safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
+                                      storageProvider:kLocalDevice
+                                              fileUrl:url
+                                          storageInfo:fileIdentifier];
+    
+    [DatabasesManager.sharedInstance add:safe];
+    
+    return safe;
+}
+
+
 
 @end

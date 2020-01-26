@@ -15,8 +15,6 @@
 #import "WindowController.h"
 #import "Settings.h"
 #import "AppDelegate.h"
-#import "DatabaseMetadata.h"
-#import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "NodeDetailsViewController.h"
 #import "BiometricIdHelper.h"
@@ -27,7 +25,7 @@
 @property WindowController* windowController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *masterPasswordWindowController;
 
-@property CompositeKeyFactors* ckfForRevertWithUnlock;
+@property CompositeKeyFactors* credentialsForUnlock;
 @property NSString *selectedItemForUnlock;
 
 @end
@@ -57,10 +55,8 @@
 
 - (void)makeWindowControllers {
     self.windowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"Document Window Controller"];
-    
     [self addWindowController:self.windowController];
-
-    [self setWindowModel:self.model];
+    [[self getViewController] setInitialModel:self.model]; // DO this here without dispatching to avoid a flicker/delay in load...
 }
 
 - (IBAction)saveDocument:(id)sender {
@@ -72,18 +68,11 @@
 
     [super saveDocument:sender];
 
-    DatabaseMetadata* safe = [self getSafeMetaData];
-    if(safe && safe.isTouchIdEnabled && safe.touchIdPassword) {
-        // Autosaving here as I think it makes sense, also avoids issue with Touch ID Password getting out of sync some how
-        // Update Touch Id Password
-        
-//        NSLog(@"Updating Touch ID Password in case is has changed");
-        safe.touchIdPassword = self.model.compositeKeyFactors.password;
-    }
+    [self.model updateTouchIdPassword:self.model.compositeKeyFactors.password];
     
     if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
         AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-        [appDelegate showUpgradeModal:5];
+        [appDelegate showUpgradeModal:3];
     }
 }
 
@@ -95,71 +84,61 @@
     }];
 }
 
-- (DatabaseMetadata*)getSafeMetaData {
-    if(!self.model || !self.model.fileUrl) {
-        return nil;
-    }
-    
-    return [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
-        return [obj.storageInfo isEqualToString:self.model.fileUrl.absoluteString];
-    }];
-}
-
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
     [self unblockUserInteraction];
     return [self.model getPasswordDatabaseAsData:outError];
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-    NSError* error;
-    if(![DatabaseModel isAValidSafe:data error:&error]) {
-        if(outError != nil) {
-            *outError = error;
+    if(self.credentialsForUnlock) {
+        NSError* error;
+        if(![DatabaseModel isAValidSafe:data error:&error]) {
+            if(outError != nil) {
+                *outError = error;
+            }
+            
+            return NO;
         }
-        
-        return NO;
-    }
 
-    if(self.ckfForRevertWithUnlock) {
-        DatabaseModel* db = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:self.ckfForRevertWithUnlock error:&error];
+        DatabaseModel* db = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:self.credentialsForUnlock error:&error];
         
         if(!db) {
             if(outError != nil) {
                 *outError = error;
             }
             
-            self.ckfForRevertWithUnlock = nil;
+            self.credentialsForUnlock = nil;
             self.selectedItemForUnlock = nil;
             
             if(self.model && !self.model.locked) {
                 self.model = [[ViewModel alloc] initLocked:self];
-                [self setWindowModel:self.model];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[self getViewController] updateModel:self.model];
+                });
             }
+            
             return NO;
         }
         
         self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:self.selectedItemForUnlock];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[self getViewController] updateModel:self.model];
+        });
     }
     else {
         self.model = [[ViewModel alloc] initLocked:self];
+        // Make Window Controllers will get called, which will now instantiate the ViewController... once that's done
+        // we will call resetModel with the above
     }
 
-    self.ckfForRevertWithUnlock = nil;
+    self.credentialsForUnlock = nil;
     self.selectedItemForUnlock = nil;
-    
-    dispatch_async(dispatch_get_main_queue(),  ^{
-        [self setWindowModel:self.model];
-    });
-    
+        
     return YES;
 }
 
 - (ViewController*)getViewController {
     return (ViewController*)self.windowController.contentViewController;
-}
-
-- (void)setWindowModel:(ViewModel*)model {
-    [[self getViewController] resetModel:self.model];
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
@@ -216,7 +195,7 @@
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
             selectedItem:(NSString *)selectedItem
               completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    self.ckfForRevertWithUnlock = compositeKeyFactors;
+    self.credentialsForUnlock = compositeKeyFactors;
     self.selectedItemForUnlock = selectedItem;
     
     NSError* error;
@@ -240,7 +219,7 @@
         self.fileModificationDate = wrapper.fileAttributes.fileModificationDate;
     }
     
-    self.ckfForRevertWithUnlock = nil;
+    self.credentialsForUnlock = nil;
     self.selectedItemForUnlock = nil;
 
     if(completion) {
