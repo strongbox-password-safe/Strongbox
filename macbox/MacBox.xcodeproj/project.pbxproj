@@ -11,6 +11,7 @@
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
 		4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
 		4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
+		4D0BD69923DF4205004C48BB /* DatabasePropertiesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BD69823DF4205004C48BB /* DatabasePropertiesController.m */; };
 		4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */; };
 		4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */; };
 		4D216F5522CBCCDE000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
@@ -104,6 +105,8 @@
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
 		4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */; };
+		4D6EB45B23DF23FB0045C8D5 /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D6EB45A23DF23FB0045C8D5 /* DatabaseProperties.storyboard */; };
+		4D6EB45E23DF26910045C8D5 /* DatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */; };
 		4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
 		4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
 		4D8354C6238908AB00E264E0 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -249,6 +252,8 @@
 		4D0835A7228472FC00CA7405 /* KeyDerivationCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeyDerivationCipher.h; path = ../model/KeyDerivationCipher.h; sourceTree = "<group>"; };
 		4D0835A82284732500CA7405 /* StrongboxDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxDatabase.h; path = ../model/StrongboxDatabase.h; sourceTree = "<group>"; };
 		4D0835A92284732500CA7405 /* StrongboxDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxDatabase.m; path = ../model/StrongboxDatabase.m; sourceTree = "<group>"; };
+		4D0BD69723DF4205004C48BB /* DatabasePropertiesController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasePropertiesController.h; path = MacBox/DatabasePropertiesController.h; sourceTree = "<group>"; };
+		4D0BD69823DF4205004C48BB /* DatabasePropertiesController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasePropertiesController.m; path = MacBox/DatabasePropertiesController.m; sourceTree = "<group>"; };
 		4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomIconsRationalizer.h; path = ../model/CustomIconsRationalizer.h; sourceTree = "<group>"; };
 		4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomIconsRationalizer.m; path = ../model/CustomIconsRationalizer.m; sourceTree = "<group>"; };
 		4D1E77E323AFEBF4007240FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DownloadFavIcons.storyboard; sourceTree = "<group>"; };
@@ -448,6 +453,9 @@
 		4D643B9E23B65075000C383A /* NodeDetailsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeDetailsViewController.m; path = MacBox/NodeDetailsViewController.m; sourceTree = "<group>"; };
 		4D643BA323B67E18000C383A /* MacKeePassHistoryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacKeePassHistoryViewController.h; path = MacBox/MacKeePassHistoryViewController.h; sourceTree = "<group>"; };
 		4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacKeePassHistoryViewController.m; path = MacBox/MacKeePassHistoryViewController.m; sourceTree = "<group>"; };
+		4D6EB45A23DF23FB0045C8D5 /* DatabaseProperties.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = DatabaseProperties.storyboard; path = MacBox/DatabaseProperties.storyboard; sourceTree = "<group>"; };
+		4D6EB45C23DF26910045C8D5 /* DatabasePreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasePreferences.h; path = MacBox/DatabasePreferences.h; sourceTree = "<group>"; };
+		4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasePreferences.m; path = MacBox/DatabasePreferences.m; sourceTree = "<group>"; };
 		4D832A9923CE2AC000A7885E /* SecretStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SecretStore.h; path = ../model/SecretStore.h; sourceTree = "<group>"; };
 		4D8354C12389086E00E264E0 /* FavIconManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconManager.h; path = ../model/FavIconManager.h; sourceTree = "<group>"; };
 		4D8354C22389086E00E264E0 /* FavIconManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconManager.m; path = ../model/FavIconManager.m; sourceTree = "<group>"; };
@@ -1022,6 +1030,7 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4D6EB45923DF23750045C8D5 /* Database Properties */,
 				4DE2CA3E23C38B5E00F76255 /* Main */,
 				4D14A13B224D211400C71ABF /* Node Details */,
 				4DD9EB1D23C4FD1500887237 /* Set Icon */,
@@ -1058,6 +1067,18 @@
 				4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */,
 			);
 			name = "KeePass History";
+			sourceTree = "<group>";
+		};
+		4D6EB45923DF23750045C8D5 /* Database Properties */ = {
+			isa = PBXGroup;
+			children = (
+				4D6EB45A23DF23FB0045C8D5 /* DatabaseProperties.storyboard */,
+				4D6EB45C23DF26910045C8D5 /* DatabasePreferences.h */,
+				4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */,
+				4D0BD69723DF4205004C48BB /* DatabasePropertiesController.h */,
+				4D0BD69823DF4205004C48BB /* DatabasePropertiesController.m */,
+			);
+			name = "Database Properties";
 			sourceTree = "<group>";
 		};
 		4D87F8AA223049EB006A6320 /* GZIP */ = {
@@ -1576,6 +1597,7 @@
 				4DC805B823A1173D001E742E /* CollectionViewHeader.xib in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
+				4D6EB45B23DF23FB0045C8D5 /* DatabaseProperties.storyboard in Resources */,
 				4D216F7822CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4DC805B323A1170E001E742E /* SelectPredefinedIconController.xib in Resources */,
 				4DC805C423A11752001E742E /* AttachmentItem.xib in Resources */,
@@ -1677,6 +1699,7 @@
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
 				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
 				4D524CDA219B47DB00C22CB4 /* VariantDictionary.m in Sources */,
+				4D6EB45E23DF26910045C8D5 /* DatabasePreferences.m in Sources */,
 				4D524CAB219B45F700C22CB4 /* DatabaseAttachment.m in Sources */,
 				4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
@@ -1701,6 +1724,7 @@
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
 				4D8DE9BE21F898470043DDC0 /* OTPToken+Persistence.m in Sources */,
+				4D0BD69923DF4205004C48BB /* DatabasePropertiesController.m in Sources */,
 				4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */,
 				4DBFD391225D159200290488 /* MMcGACTextFieldCell.m in Sources */,
 				4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */,

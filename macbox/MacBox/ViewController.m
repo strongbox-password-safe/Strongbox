@@ -38,6 +38,7 @@
 #import "DocumentController.h"
 #import "ClipboardManager.h"
 #import "BookmarksHelper.h"
+#import "DatabasePropertiesController.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -165,6 +166,10 @@ static NSImage* kStrongBox256Image;
     NSLog(@"setInitialModel [%@]", model);
 
     [self setModelFromMainThread:model];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self autoPromptForTouchIdIfDesired];
+    });
 }
 
 - (void)setModelFromMainThread:(ViewModel *)model {
@@ -175,8 +180,6 @@ static NSImage* kStrongBox256Image;
 
     [self bindToModel];
     [self setInitialFocus];
-    
-    [self autoPromptForTouchIdIfDesired];
 }
 
 - (void)viewDidAppear {
@@ -192,7 +195,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-//    NSLog(@"[%@] Window Became Key!", [self getDatabaseMetaData].nickName);
+    NSLog(@"[%@] Window Became Key!", self.model.databaseMetadata.nickName);
 
     // MMcG: Seems to be unfortunately required - as key window is not set if we call straight away... hack :(
     
@@ -253,7 +256,7 @@ static NSImage* kStrongBox256Image;
     if([segue.identifier isEqualToString:@"segueToShowItemDetails"]) {
         NSNumber* newEntry = params[kNewEntryKey];
         
-        NodeDetailsViewController* vc = (NodeDetailsViewController*)segue.destinationController;
+        NodeDetailsViewController* vc = (segue.destinationController);
         
         vc.node = item;
         vc.model = self.model;
@@ -281,6 +284,13 @@ static NSImage* kStrongBox256Image;
         
         vc.model = self.model;
         vc.history = item.fields.keePassHistory;
+    }
+    else if([segue.identifier isEqualToString:@"segueToDatabasePreferences"]) {
+        NSWindowController *wc = segue.destinationController;
+        [wc.window center];
+
+        DatabasePropertiesController *vc = (DatabasePropertiesController*)wc.contentViewController;
+        [vc setModel:self.model.databaseMetadata];
     }
 }
 
@@ -1359,12 +1369,16 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)autoPromptForTouchIdIfDesired {
+    NSLog(@"autoPromptForTouchIdIfDesired: [%@]", self.model);
+    
     if(self.model && self.model.locked) {
         BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
-                
+
+        NSLog(@"autoPromptForTouchIdIfDesired: weAreKeyWindow = [%d]", weAreKeyWindow);
+
         if(weAreKeyWindow && [self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.lastAutoPromptForTouchIdThrottle];
-//            NSLog(@"seconds: %f", secondsBetween);
+            NSLog(@"seconds: %f", secondsBetween);
             if(self.lastAutoPromptForTouchIdThrottle != nil && secondsBetween < 1.5) {
                 NSLog(@"Too many auto biometric requests too soon - ignoring...");
                 return;
@@ -1418,7 +1432,7 @@ static NSImage* kStrongBox256Image;
         NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared.");
         [Alerts info:loc window:self.view.window];
         
-        [self onClearTouchId:nil];
+        [self clearTouchId];
     }
 }
 
@@ -2711,8 +2725,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
-    else if (theAction == @selector(onClearTouchId:)) {
-        return BiometricIdHelper.sharedInstance.biometricIdAvailable;
+    else if (theAction == @selector(onDatabasePreferences:)) {
+        return NO; // TODO:
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.model.locked;
@@ -2754,13 +2768,17 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     return YES;
 }
 
-- (IBAction)onClearTouchId:(id)sender {
+- (void)clearTouchId {
     self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
     self.model.databaseMetadata.touchIdPassword = nil;
     
     [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
     
     [self bindLockScreenUi];
+}
+
+- (IBAction)onDatabasePreferences:(id)sender {
+    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:nil];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {

@@ -11,6 +11,13 @@
 
 @implementation BookmarksHelper
 
++ (NSURL *)getExpressUrlFromBookmark:(NSString *)bookmark {
+    NSError* error;
+    NSString* updated;
+    
+    return [BookmarksHelper getUrlFromBookmark:bookmark updatedBookmark:&updated error:&error];
+}
+
 + (NSString *)getBookmarkFromUrl:(NSURL *)url error:(NSError *_Nonnull*)error {
     NSData *bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
                      includingResourceValuesForKeys:nil

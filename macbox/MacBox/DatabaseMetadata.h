@@ -22,11 +22,12 @@
 @property (nonatomic, strong) NSURL *fileUrl;
 @property (nonatomic, strong) NSString *storageInfo;
 @property (nonatomic) StorageProvider storageProvider;
-@property (nonatomic) BOOL isTouchIdEnabled;
 
 @property (nonatomic, strong) NSString* touchIdPassword;
 @property (nonatomic, strong) NSString* keyFileBookmark;
 
+@property (nonatomic) BOOL isTouchIdEnabled;
 @property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
+@property (nonatomic) NSInteger touchIdPasswordExpiryPeriodHours;
 
 @end

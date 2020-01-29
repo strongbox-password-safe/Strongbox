@@ -52,11 +52,14 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         _document = document;
         self.passwordDatabase = database;
         self.selectedItem = selectedItem;
-        _databaseMetadata = [DatabasesManager.sharedInstance addOrGet:document.fileURL];
         
-        if(self.databaseMetadata == nil) {
-            NSLog(@"Could not add or get metadata for [%@]", document.fileURL);
-            return nil;
+        if(self.document.fileURL) { // When we create a new database this can be null... 
+            _databaseMetadata = [DatabasesManager.sharedInstance addOrGet:self.document.fileURL];
+            
+            if(self.databaseMetadata == nil) {
+                NSLog(@"Could not add or get metadata for [%@]", document.fileURL);
+                return nil;
+            }
         }
     }
     
@@ -1228,6 +1231,10 @@ NSString* getSmartFillNotes() {
         self.databaseMetadata.touchIdPassword = password;
         [DatabasesManager.sharedInstance update:self.databaseMetadata];
     }
+}
+
+- (void)setDatabaseMetadata:(DatabaseMetadata *)databaseMetadata {
+    _databaseMetadata = databaseMetadata;
 }
 
 @end

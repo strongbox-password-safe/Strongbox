@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "CompositeKeyFactors.h"
+#import "DatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,7 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
             selectedItem:(NSString*_Nullable)selectedItem
               completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
 
-NS_ASSUME_NONNULL_END
+- (void)setDatabaseMetadata:(DatabaseMetadata*)databaseMetadata; // Called on new database creation once a successful save - because we can't create a database metadata entry without a file reference at the moment 
 
 @end
+
+NS_ASSUME_NONNULL_END
 

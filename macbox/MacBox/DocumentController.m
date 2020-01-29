@@ -87,6 +87,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             }
             
             [self addDocument:document];
+            [document setDatabaseMetadata:database];
             [document makeWindowControllers];
             [document showWindows];
         }];

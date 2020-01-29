@@ -153,6 +153,8 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 
 @property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
 
+- (void)setDatabaseMetadata:(DatabaseMetadata * _Nonnull)databaseMetadata;
+
 @end
 
 NS_ASSUME_NONNULL_END

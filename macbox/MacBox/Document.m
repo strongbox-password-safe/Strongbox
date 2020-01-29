@@ -229,4 +229,8 @@
     }
 }
 
+- (void)setDatabaseMetadata:(id)databaseMetadata {
+    [self.model setDatabaseMetadata:databaseMetadata];
+}
+
 @end

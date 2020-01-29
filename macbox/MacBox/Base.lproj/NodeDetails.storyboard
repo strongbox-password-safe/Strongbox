@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="1Me-d8-tJD">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="1Me-d8-tJD">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -365,15 +365,15 @@
                                                                 <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2mq-44-xpi">
                                                                     <rect key="frame" x="0.0" y="0.0" width="460" height="197"/>
                                                                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="TA6-fh-KrX">
-                                                                        <rect key="frame" x="1" y="1" width="458" height="195"/>
+                                                                        <rect key="frame" x="1" y="1" width="443" height="195"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="ho0-Ua-AJc">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="458" height="195"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="443" height="195"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                <size key="minSize" width="458" height="195"/>
+                                                                                <size key="minSize" width="443" height="195"/>
                                                                                 <size key="maxSize" width="607" height="10000000"/>
                                                                                 <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                             </textView>
@@ -387,7 +387,7 @@
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="BYP-zO-bMM">
-                                                                        <rect key="frame" x="443" y="1" width="16" height="195"/>
+                                                                        <rect key="frame" x="444" y="1" width="15" height="195"/>
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                 </scrollView>
@@ -637,7 +637,7 @@
                                                                 <tableColumns>
                                                                     <tableColumn identifier="CustomFieldKeyColumn" editable="NO" width="120" minWidth="10" maxWidth="3.4028234663852886e+38" id="UHh-8k-1PF">
                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Name">
-                                                                            <font key="font" metaFont="controlContent" size="11"/>
+                                                                            <font key="font" metaFont="label" size="11"/>
                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         </tableHeaderCell>
@@ -674,7 +674,7 @@
                                                                     </tableColumn>
                                                                     <tableColumn identifier="CustomFieldValueCellIdentifier" editable="NO" width="313" minWidth="10" maxWidth="3.4028234663852886e+38" id="4L7-g3-Z2B">
                                                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
-                                                                            <font key="font" metaFont="controlContent" size="11"/>
+                                                                            <font key="font" metaFont="label" size="11"/>
                                                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         </tableHeaderCell>
@@ -950,7 +950,7 @@
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="92" y="1361"/>
+            <point key="canvasLocation" x="206" y="1225"/>
         </scene>
         <!--QRCodePresenter-->
         <scene sceneID="RkM-jy-sZP">
@@ -958,7 +958,7 @@
                 <controllerPlaceholder storyboardName="QRCodePresenter" id="DS7-XK-YBZ" sceneMemberID="viewController"/>
                 <customObject id="VV7-zH-zwI" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="568" y="1360"/>
+            <point key="canvasLocation" x="734" y="1225"/>
         </scene>
     </scenes>
     <resources>

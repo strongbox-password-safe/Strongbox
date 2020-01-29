@@ -22,6 +22,7 @@
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
         self.isTouchIdEnabled = YES;
+        self.touchIdPasswordExpiryPeriodHours = -1; // No expiry
     }
     
     return self;
@@ -59,6 +60,7 @@
     [encoder encodeInteger:self.storageProvider forKey:@"storageProvider"];
     [encoder encodeBool:self.isTouchIdEnabled forKey:@"isTouchIdEnabled"];
     [encoder encodeBool:self.hasPromptedForTouchIdEnrol forKey:@"hasPromptedForTouchIdEnrol"];
+    [encoder encodeInteger:self.touchIdPasswordExpiryPeriodHours forKey:@"touchIdPasswordExpiryPeriodHours"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -72,6 +74,10 @@
         
         if([decoder containsValueForKey:@"hasPromptedForTouchIdEnrol"]) {
             self.hasPromptedForTouchIdEnrol = [decoder decodeBoolForKey:@"hasPromptedForTouchIdEnrol"];
+        }
+
+        if([decoder containsValueForKey:@"touchIdPasswordExpiryPeriodHours"]) {
+            self.touchIdPasswordExpiryPeriodHours = [decoder decodeIntegerForKey:@"touchIdPasswordExpiryPeriodHours"];
         }
     }
     
