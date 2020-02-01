@@ -2272,9 +2272,6 @@
 /* Could not open key file. */
 "mac_error_could_not_open_key_file" = "Could not open key file.";
 
-/* The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared. */
-"mac_could_not_find_stored_credentials" = "The stored credentials are unavailable. Please enter the password manually. Touch ID or Apple Watch Metadata for this database will be cleared.";
-
 /* The database has been changed by another application, would you like to reload this latest version and automatically unlock? */
 "mac_db_changed_externally_reload_yes_or_no" = "The database has been changed by another application, would you like to reload this latest version and automatically unlock?";
 
@@ -2284,8 +2281,8 @@
 /* Could Not Unlock Database */
 "mac_could_not_unlock_database" = "Could Not Unlock Database";
 
-/* Would you like to use %@ to open this database in the future? Note for translators (1st Param = "Touch ID") */
-"mac_use_biometric_to_open_in_future_fmt" = "Would you like to use %@ or your Apple Watch to open this database in the future?";
+/* Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be securely stored for %@ before you need to re-enter it. Note for translators (1st Param = "Touch ID", 2nd Param is a time span, default of "2 weeks") */
+"mac_use_biometric_to_open_in_future_fmt" = "Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be securely stored for %@ before you need to re-enter it.";
 
 /* Touch ID Considerations\n\nWhile this is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device or your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch ID. In addition, on your Mac, your master password will be securely stored in the Keychain. This means it is possible for someone with administrative privileges to search your Keychain for your master password. You should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox.\n\nPlease take all of this into account, and make your decision to use Touch ID based on your preferred balance of convenience and security. */
 "mac_touch_id_one_time_warning" = "Touch ID/Apple Watch Considerations\n\nWhile this is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device or your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch ID. In addition, on your Mac, your master password will be securely stored in the Keychain. This means it is possible for someone with administrative privileges to search your Keychain for your master password. You should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox.\n\nPlease take all of this into account, and make your decision to use Touch ID based on your preferred balance of convenience and security.";
@@ -2759,3 +2756,61 @@
 
 /* %@ [Configured] - (Translators Note: User is using a key file that has previously been set/remembered by Strongbox. First parameter is the filename of the key file. This appears on the unlock screen. */
 "mac_key_file_filename_configured_fmt" = "%@ [Configured]";
+
+/* Touch ID/Apple Watch Unlock is not possible at the moment because Biometrics/Apple Watch is not available. */
+"mac_info_biometric_unlock_not_possible_right_now" = "Touch ID/Apple Watch Unlock is not possible at the moment because Biometrics/Apple Watch is not available.";
+    
+/* Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually. */
+"mac_could_not_find_stored_credentials" = "Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually.";
+
+
+/* Convenience Unlock */
+"mac_convenience_unlock_title" = "Convenience Unlock";
+
+/* Convenience Unlock (Biometrics/Watch Unavailable) */
+"mac_convenience_unlock_title_bio_unavailable" = "Convenience Unlock (Biometrics/Watch Unavailable)";
+
+/* Convenience Unlock (Pro Feature Only) */
+"mac_convenience_unlock_title_pro_only" = "Convenience Unlock (Pro Feature Only)";
+
+/* Convenience Password is securely stored, protected by your device's Secure Enclave and will expire: %@. - Translators Note: 1st Parameter is a date, like "Today at 14:52" or "16 September 2020 at 16:54" */
+"mac_convenience_summary_secure_enclave_and_will_expire_fmt" = "Convenience Password is securely stored, protected by your device's Secure Enclave and will expire: %@.";
+
+/* Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device) and will expire: %@. - Translators Note: 1st Parameter is a date, like "Today at 14:52" or "16 September 2020 at 16:54" */
+"mac_convenience_summary_keychain_and_will_expire_fmt" = "Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device) and will expire: %@.";
+
+/* Convenience Password is securely stored, protected by your device's Secure Enclave and is configured not to expire. */
+"mac_convenience_summary_secure_enclave_and_will_not_expire" = "Convenience Password is securely stored, protected by your device's Secure Enclave and is configured not to expire.";
+
+/* Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device), and is configured not to expire. */
+"mac_convenience_summary_keychain_and_will_not_expire" = "Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device), and is configured not to expire.";
+
+/* Convenience Password is securely stored (in memory only) encrypted by your device's Secure Enclave and will expire on Strongbox Exit. */
+"mac_convenience_summary_secure_enclave_and_will_expire_on_exit" = "Convenience Password is securely stored (in memory only) encrypted by your device's Secure Enclave and will expire on Strongbox Exit.";
+
+/* Convenience Password is securely stored (in memory only) only and will expire on Strongbox Exit. */
+"mac_convenience_summary_keychain_and_will_expire_on_exit" = "Convenience Password is securely stored (in memory only) only and will expire on Strongbox Exit.";
+
+/* Convenience Unlock is Enabled but the securely stored master password has expired. */
+"mac_convenience_summary_enabled_but_expired" = "Convenience Unlock is enabled but the securely stored master password has expired.";
+
+/* Convenience Unlock Disabled */
+"mac_convenience_summary_disabled" = "Convenience Unlock Disabled";
+
+/* Convenience Unlock (Biometrics/Watch Unavailable) */
+"mac_convenience_summary_biometrics_unavailable" = "Convenience Unlock (Biometrics/Watch Unavailable)";
+
+/* Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development. */
+"mac_convenience_summary_only_available_on_pro" = "Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development.";
+
+/* Never */
+"mac_convenience_expiry_period_never" = "Never";
+
+/* App Exit */
+"mac_convenience_expiry_period_on_app_exit" = "App Exit";
+
+/* Unlock with Touch ID or Watch */
+"mac_unlock_screen_button_title_convenience_unlock" = "Unlock with Touch ID or Watch";
+
+/* Convenience Unlock Expired */
+"mac_unlock_screen_button_title_convenience_unlock_expired" = "Convenience Unlock Expired";

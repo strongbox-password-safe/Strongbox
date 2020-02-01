@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "StorageProvider.h"
+#import "SecretStore.h"
+
+extern const NSInteger kDefaultPasswordExpiryHours;
 
 @interface DatabaseMetadata : NSObject
 
@@ -23,11 +26,18 @@
 @property (nonatomic, strong) NSString *storageInfo;
 @property (nonatomic) StorageProvider storageProvider;
 
-@property (nonatomic, strong) NSString* touchIdPassword;
+@property (nonatomic, strong, readonly) NSString* touchIdPassword;
 @property (nonatomic, strong) NSString* keyFileBookmark;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
+@property (nonatomic) BOOL isTouchIdEnrolled;
 @property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
 @property (nonatomic) NSInteger touchIdPasswordExpiryPeriodHours;
+
+- (SecretExpiryMode)getConveniencePasswordExpiryMode;
+- (NSDate*)getConveniencePasswordExpiryDate;
+    
+- (NSString*)getConveniencePassword:(BOOL*)expired;
+- (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*)password;
 
 @end

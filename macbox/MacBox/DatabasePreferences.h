@@ -7,13 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
+#import "ViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabasePreferences : NSViewController
 
-@property (nonatomic) DatabaseMetadata* metadata;
+@property (nonatomic) ViewModel* model;
 
 @end
 

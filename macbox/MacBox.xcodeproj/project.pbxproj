@@ -105,7 +105,7 @@
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
 		4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */; };
-		4D6EB45B23DF23FB0045C8D5 /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D6EB45A23DF23FB0045C8D5 /* DatabaseProperties.storyboard */; };
+		4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */; };
 		4D6EB45E23DF26910045C8D5 /* DatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */; };
 		4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
 		4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
@@ -453,7 +453,13 @@
 		4D643B9E23B65075000C383A /* NodeDetailsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeDetailsViewController.m; path = MacBox/NodeDetailsViewController.m; sourceTree = "<group>"; };
 		4D643BA323B67E18000C383A /* MacKeePassHistoryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacKeePassHistoryViewController.h; path = MacBox/MacKeePassHistoryViewController.h; sourceTree = "<group>"; };
 		4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacKeePassHistoryViewController.m; path = MacBox/MacKeePassHistoryViewController.m; sourceTree = "<group>"; };
-		4D6EB45A23DF23FB0045C8D5 /* DatabaseProperties.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = DatabaseProperties.storyboard; path = MacBox/DatabaseProperties.storyboard; sourceTree = "<group>"; };
+		4D68255923E498D7002DC4FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DatabaseProperties.storyboard; sourceTree = "<group>"; };
+		4D68255E23E498E6002DC4FB /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DatabaseProperties.strings"; sourceTree = "<group>"; };
+		4D68256023E498E7002DC4FB /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		4D68256223E498E8002DC4FB /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		4D68256423E498E9002DC4FB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		4D68256623E498EA002DC4FB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		4D68256823E498EA002DC4FB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		4D6EB45C23DF26910045C8D5 /* DatabasePreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasePreferences.h; path = MacBox/DatabasePreferences.h; sourceTree = "<group>"; };
 		4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasePreferences.m; path = MacBox/DatabasePreferences.m; sourceTree = "<group>"; };
 		4D832A9923CE2AC000A7885E /* SecretStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SecretStore.h; path = ../model/SecretStore.h; sourceTree = "<group>"; };
@@ -1072,7 +1078,7 @@
 		4D6EB45923DF23750045C8D5 /* Database Properties */ = {
 			isa = PBXGroup;
 			children = (
-				4D6EB45A23DF23FB0045C8D5 /* DatabaseProperties.storyboard */,
+				4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */,
 				4D6EB45C23DF26910045C8D5 /* DatabasePreferences.h */,
 				4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */,
 				4D0BD69723DF4205004C48BB /* DatabasePropertiesController.h */,
@@ -1387,19 +1393,18 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
+				4D4A003B231317A900B69E09 /* Localizable.strings */,
+				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
+				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
+				4D524D2B219B503F00C22CB4 /* View */,
 				4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */,
 				4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */,
 				4D832A9923CE2AC000A7885E /* SecretStore.h */,
 				4DACA5BF23CCD40F00891366 /* SecretStore.m */,
-				4D4A003B231317A900B69E09 /* Localizable.strings */,
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
-				4D524D2B219B503F00C22CB4 /* View */,
 				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
 				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
-				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
-				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
-				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
-				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
 				4DC805D423A1176E001E742E /* CheckboxCell.xib */,
 				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
 				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
@@ -1418,6 +1423,7 @@
 				4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */,
 				4D92C8251F38A03500341A58 /* WindowController.h */,
 				4D92C8261F38A03500341A58 /* WindowController.m */,
+				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F651F30DB7A00D68BFE /* Info.plist */,
 				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4DFC06D5226467AA00A4254A /* libs */,
@@ -1597,7 +1603,7 @@
 				4DC805B823A1173D001E742E /* CollectionViewHeader.xib in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
-				4D6EB45B23DF23FB0045C8D5 /* DatabaseProperties.storyboard in Resources */,
+				4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */,
 				4D216F7822CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4DC805B323A1170E001E742E /* SelectPredefinedIconController.xib in Resources */,
 				4DC805C423A11752001E742E /* AttachmentItem.xib in Resources */,
@@ -1924,6 +1930,21 @@
 				4DD8D57723CC9D4000E7F57B /* zh-Hans */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D68255923E498D7002DC4FB /* Base */,
+				4D68255E23E498E6002DC4FB /* zh-Hans */,
+				4D68256023E498E7002DC4FB /* fr */,
+				4D68256223E498E8002DC4FB /* de */,
+				4D68256423E498E9002DC4FB /* ru */,
+				4D68256623E498EA002DC4FB /* sv */,
+				4D68256823E498EA002DC4FB /* uk */,
+			);
+			name = DatabaseProperties.storyboard;
+			path = MacBox;
 			sourceTree = "<group>";
 		};
 		4DC805A023A116D5001E742E /* PreferencesWindowController.xib */ = {

@@ -67,8 +67,6 @@
     }
 
     [super saveDocument:sender];
-
-    [self.model updateTouchIdPassword:self.model.compositeKeyFactors.password];
     
     if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
         AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;

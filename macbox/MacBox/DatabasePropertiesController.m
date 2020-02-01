@@ -9,31 +9,26 @@
 #import "DatabasePropertiesController.h"
 #import "DatabasePreferences.h"
 
-@interface DatabasePropertiesController ()
+@interface DatabasePropertiesController () <NSWindowDelegate>
 
 @end
 
 @implementation DatabasePropertiesController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-
-    NSLog(@"viewDidLoad %@", self.tabViewItems);
+- (void)cancel:(id)sender { // Pick up escape key
+   [self.view.window close];
 }
-
+    
 - (void)viewWillAppear {
     [super viewWillAppear];
     
-    NSLog(@"viewWillAppear %@", self.tabViewItems);
+    self.view.window.delegate = self; // Catch Window events like close / undo manager etc
 }
-          
 
-- (void)setModel:(DatabaseMetadata *)metadata {
-    NSLog(@"setModel %@", self.tabViewItems);
-    
+- (void)setModel:(ViewModel *)model {
     NSTabViewItem* item = [self.tabView tabViewItemAtIndex:0];
     DatabasePreferences* preferences = (DatabasePreferences*)item.viewController;
-    preferences.metadata = metadata;
+    preferences.model = model;
 }
 
 @end

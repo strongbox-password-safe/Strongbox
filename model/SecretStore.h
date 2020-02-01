@@ -14,6 +14,7 @@ typedef NS_ENUM (NSInteger, SecretExpiryMode) {
     kNeverExpires,
     kExpiresAtTime,
     kExpiresOnAppExitStoreSecretInMemoryOnly, // Reset
+    kUnknown,
 };
 
 @interface SecretStore : NSObject
@@ -33,6 +34,9 @@ typedef NS_ENUM (NSInteger, SecretExpiryMode) {
 - (NSString*_Nullable)getSecureString:(NSString*)identifier;
 
 - (void)deleteSecureItem:(NSString*)identifier;
+
+- (SecretExpiryMode)getSecureObjectExpiryMode:(NSString*)identifier;
+- (NSDate*_Nullable)getSecureObjectExpiryDate:(NSString*)identifier;
 
 @end
 

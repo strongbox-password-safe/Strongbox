@@ -7,13 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
+#import "ViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabasePropertiesController : NSTabViewController
 
-- (void)setModel:(DatabaseMetadata*)metadata;
+- (void)setModel:(ViewModel*)model;
 
 @end
 

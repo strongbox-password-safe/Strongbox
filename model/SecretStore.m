@@ -237,6 +237,44 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 ///////////////////////////////////////////////////////////////////
 
+- (SecretExpiryMode)getSecureObjectExpiryMode:(NSString *)identifier {
+    if ([SecretStore isUnsupportedOS]) {
+        NSLog(@"Unsupported OS...");
+        return kUnknown;
+    }
+
+    NSDictionary* wrapped = [self getWrappedObject:identifier];
+    if(wrapped == nil) {
+        return kUnknown;
+    }
+
+    NSNumber* expiryModeNumber = wrapped[kWrappedObjectExpiryModeKey];
+    return (SecretExpiryMode)expiryModeNumber.integerValue;
+}
+
+- (NSDate *)getSecureObjectExpiryDate:(NSString *)identifier {
+    if ([SecretStore isUnsupportedOS]) {
+        NSLog(@"Unsupported OS...");
+        return nil;
+    }
+
+    NSDictionary* wrapped = [self getWrappedObject:identifier];
+    if(wrapped == nil) {
+        return nil;
+    }
+
+    NSNumber* expiryModeNumber = wrapped[kWrappedObjectExpiryModeKey];
+    SecretExpiryMode mode = expiryModeNumber.integerValue;
+
+    if(mode == kExpiresAtTime) {
+        return wrapped[kWrappedObjectExpiryKey];
+    }
+    
+    return nil;
+}
+
+///////////////////////////////////////////////////////////////////
+
 + (CFStringRef)accessibility {
     return kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
 }

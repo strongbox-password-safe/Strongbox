@@ -94,11 +94,11 @@
             <rect key="contentRect" x="196" y="240" width="568" height="730"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" misplaced="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="568" height="775"/>
+                <rect key="frame" x="0.0" y="0.0" width="568" height="730"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="545" height="735"/>
+                        <rect key="frame" x="13" y="26" width="545" height="542"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="yNg-sv-E7G">
@@ -839,7 +839,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="checkbox" width="371" minWidth="11" maxWidth="1000" id="F03-Tp-4bM">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="menu" size="11"/>
+                                                                    <font key="font" metaFont="controlContent" size="11"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>

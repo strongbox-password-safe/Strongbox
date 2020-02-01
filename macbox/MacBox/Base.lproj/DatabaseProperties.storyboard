@@ -55,55 +55,51 @@
         <scene sceneID="wDZ-u9-4Qh">
             <objects>
                 <viewController title="Preferences" showSeguePresentationStyle="single" id="IEg-2b-tZr" customClass="DatabasePreferences" sceneMemberID="viewController">
-                    <view key="view" id="ZV6-Ub-4fn">
-                        <rect key="frame" x="0.0" y="0.0" width="550" height="340"/>
+                    <view key="view" misplaced="YES" id="ZV6-Ub-4fn">
+                        <rect key="frame" x="0.0" y="0.0" width="550" height="341"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AdW-2t-yYZ">
-                                <rect key="frame" x="18" y="182" width="128" height="16"/>
+                                <rect key="frame" x="18" y="183" width="136" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Convenience Unlock" id="gWd-sR-neq">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="systemBold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="qmE-Xf-0ul">
-                                <rect key="frame" x="20" y="171" width="510" height="5"/>
+                                <rect key="frame" x="20" y="172" width="510" height="5"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9q5-Wd-81o">
-                                <rect key="frame" x="18" y="304" width="110" height="16"/>
+                                <rect key="frame" x="18" y="305" width="118" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Basic Information" id="8MO-82-g4o">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="systemBold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="isM-Fn-5Ue">
-                                <rect key="frame" x="20" y="293" width="510" height="5"/>
+                                <rect key="frame" x="20" y="294" width="510" height="5"/>
                             </box>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wsQ-0c-swM">
-                                <rect key="frame" x="18" y="145" width="347" height="18"/>
-                                <buttonCell key="cell" type="check" title="Use Touch ID or Apple Watch to Unlock this Database" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cj4-Gu-u8g">
+                                <rect key="frame" x="18" y="146" width="321" height="18"/>
+                                <buttonCell key="cell" type="check" title="Use Touch ID or Watch to Unlock this Database" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cj4-Gu-u8g">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
-                            </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YbD-XF-lOj">
-                                <rect key="frame" x="18" y="111" width="268" height="18"/>
-                                <buttonCell key="cell" type="check" title="Require Master Password Re-Entry after:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ByJ-AD-3vy">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
+                                <connections>
+                                    <action selector="onTouchIdToggled:" target="IEg-2b-tZr" id="HFn-Y4-bhy"/>
+                                </connections>
                             </button>
                             <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VCC-Wy-ggk">
-                                <rect key="frame" x="18" y="81" width="514" height="19"/>
-                                <sliderCell key="cell" state="on" alignment="left" minValue="-1" maxValue="1344" doubleValue="392" tickMarkPosition="above" sliderType="linear" id="dUL-E0-F6I"/>
+                                <rect key="frame" x="18" y="90" width="514" height="24"/>
+                                <sliderCell key="cell" continuous="YES" alignment="left" maxValue="19" doubleValue="12" tickMarkPosition="below" numberOfTickMarks="20" allowsTickMarkValuesOnly="YES" sliderType="linear" id="dUL-E0-F6I"/>
                                 <connections>
                                     <action selector="onSlider:" target="IEg-2b-tZr" id="d5s-iI-IsD"/>
                                 </connections>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="21K-EC-Hi0">
-                                <rect key="frame" x="249" y="63" width="52" height="16"/>
+                                <rect key="frame" x="249" y="71" width="52" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="14 Days" id="x0B-5v-qfX">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -111,18 +107,19 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VIq-QW-1N2">
-                                <rect key="frame" x="18" y="20" width="514" height="35"/>
+                                <rect key="frame" x="18" y="29" width="514" height="30"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="35" id="CgZ-qw-U2O"/>
+                                    <constraint firstAttribute="width" constant="510" id="bva-QI-e7R"/>
                                 </constraints>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="justified" title="*Master Password currently securely stored until XYZ (protected by Secure Enclave)" id="ru3-gY-LUd">
-                                    <font key="font" metaFont="cellTitle"/>
+                                <textFieldCell key="cell" alignment="justified" id="ru3-gY-LUd">
+                                    <font key="font" metaFont="controlContent"/>
+                                    <string key="title">*Master Password currently securely stored until XYZ (protected by Secure Enclave) and this string can get quite long and does not need to be translated</string>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kil-Qm-U36">
-                                <rect key="frame" x="18" y="271" width="104" height="16"/>
+                                <rect key="frame" x="18" y="272" width="104" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="100" id="APR-wC-ETx"/>
                                 </constraints>
@@ -133,7 +130,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="04w-Ya-Wg5">
-                                <rect key="frame" x="18" y="247" width="104" height="16"/>
+                                <rect key="frame" x="18" y="248" width="104" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Path:" id="1nl-3S-XPa">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -141,7 +138,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hVZ-pV-gSH">
-                                <rect key="frame" x="130" y="271" width="402" height="16"/>
+                                <rect key="frame" x="130" y="272" width="402" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="pef-J9-bgm">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -149,7 +146,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Uuj-fQ-l9v">
-                                <rect key="frame" x="130" y="247" width="402" height="16"/>
+                                <rect key="frame" x="130" y="248" width="402" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="Ic0-xe-SmH">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -157,7 +154,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ngh-O7-Ziw">
-                                <rect key="frame" x="18" y="223" width="104" height="16"/>
+                                <rect key="frame" x="18" y="224" width="104" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Key File:" id="dVw-X1-fi4">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -165,38 +162,52 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="288-rl-8EO">
-                                <rect key="frame" x="130" y="223" width="410" height="16"/>
+                                <rect key="frame" x="130" y="224" width="410" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="dBY-Cy-CEl">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RVy-IE-dtK">
+                                <rect key="frame" x="149" y="120" width="252" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Require Master Password Re-Entry After:" id="lih-Rp-yz1">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Vdr-Wr-Jn1">
+                                <rect key="frame" x="20" y="18" width="510" height="5"/>
+                            </box>
                         </subviews>
                         <constraints>
                             <constraint firstItem="qmE-Xf-0ul" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="1d0-Fe-EOd"/>
                             <constraint firstItem="04w-Ya-Wg5" firstAttribute="trailing" secondItem="kil-Qm-U36" secondAttribute="trailing" id="BlQ-Et-xyj"/>
                             <constraint firstItem="Uuj-fQ-l9v" firstAttribute="leading" secondItem="04w-Ya-Wg5" secondAttribute="trailing" constant="12" id="DJD-yG-5Cn"/>
                             <constraint firstItem="04w-Ya-Wg5" firstAttribute="leading" secondItem="kil-Qm-U36" secondAttribute="leading" id="Fys-o4-R0x"/>
+                            <constraint firstItem="RVy-IE-dtK" firstAttribute="centerX" secondItem="VCC-Wy-ggk" secondAttribute="centerX" id="GyX-mm-iBB"/>
                             <constraint firstItem="9q5-Wd-81o" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="Hyq-TP-nIA"/>
                             <constraint firstItem="isM-Fn-5Ue" firstAttribute="top" secondItem="9q5-Wd-81o" secondAttribute="bottom" constant="8" id="IzZ-kO-j8o"/>
                             <constraint firstItem="kil-Qm-U36" firstAttribute="centerY" secondItem="hVZ-pV-gSH" secondAttribute="centerY" id="Jd2-Mr-t98"/>
+                            <constraint firstItem="RVy-IE-dtK" firstAttribute="top" secondItem="wsQ-0c-swM" secondAttribute="bottom" constant="12" id="Kaf-ZE-ucd"/>
+                            <constraint firstItem="VCC-Wy-ggk" firstAttribute="top" secondItem="RVy-IE-dtK" secondAttribute="bottom" constant="8" id="R62-Ol-9TN"/>
                             <constraint firstItem="isM-Fn-5Ue" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="RgI-Ba-Bzi"/>
                             <constraint firstItem="wsQ-0c-swM" firstAttribute="top" secondItem="qmE-Xf-0ul" secondAttribute="bottom" constant="12" id="S7T-fS-01m"/>
                             <constraint firstAttribute="trailing" secondItem="VIq-QW-1N2" secondAttribute="trailing" constant="20" id="Uxx-pY-IY4"/>
                             <constraint firstItem="ngh-O7-Ziw" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="V49-d6-uod"/>
                             <constraint firstItem="hVZ-pV-gSH" firstAttribute="leading" secondItem="kil-Qm-U36" secondAttribute="trailing" constant="12" id="b1S-bZ-jU5"/>
-                            <constraint firstItem="YbD-XF-lOj" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="b3L-4l-Mxe"/>
                             <constraint firstItem="wsQ-0c-swM" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="bHi-Ye-0En"/>
-                            <constraint firstItem="YbD-XF-lOj" firstAttribute="top" secondItem="wsQ-0c-swM" secondAttribute="bottom" constant="20" id="brR-sI-Lze"/>
                             <constraint firstItem="04w-Ya-Wg5" firstAttribute="centerY" secondItem="Uuj-fQ-l9v" secondAttribute="centerY" id="c7M-HN-Jk6"/>
+                            <constraint firstItem="Vdr-Wr-Jn1" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="cJp-0o-3CK"/>
+                            <constraint firstAttribute="bottom" secondItem="Vdr-Wr-Jn1" secondAttribute="bottom" constant="20" id="chN-YG-e1Z"/>
                             <constraint firstItem="AdW-2t-yYZ" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="dqX-oj-YDF"/>
-                            <constraint firstAttribute="bottom" secondItem="VIq-QW-1N2" secondAttribute="bottom" constant="20" id="ea8-de-eKY"/>
                             <constraint firstItem="288-rl-8EO" firstAttribute="leading" secondItem="ngh-O7-Ziw" secondAttribute="trailing" constant="12" id="fkS-mq-OBA"/>
                             <constraint firstAttribute="trailing" secondItem="Uuj-fQ-l9v" secondAttribute="trailing" constant="20" id="ggl-Ny-ehs"/>
                             <constraint firstItem="VCC-Wy-ggk" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="gqQ-is-xAM"/>
                             <constraint firstItem="9q5-Wd-81o" firstAttribute="top" secondItem="ZV6-Ub-4fn" secondAttribute="top" constant="20" id="hKg-Dk-1c3"/>
                             <constraint firstItem="ngh-O7-Ziw" firstAttribute="top" secondItem="04w-Ya-Wg5" secondAttribute="bottom" constant="8" id="jef-w1-DsT"/>
+                            <constraint firstAttribute="trailing" secondItem="Vdr-Wr-Jn1" secondAttribute="trailing" constant="20" id="k7w-Zf-2PT"/>
                             <constraint firstAttribute="trailing" secondItem="qmE-Xf-0ul" secondAttribute="trailing" constant="20" id="lbJ-xj-7c7"/>
                             <constraint firstItem="kil-Qm-U36" firstAttribute="top" secondItem="isM-Fn-5Ue" secondAttribute="bottom" constant="8" id="mYU-zK-Eme"/>
                             <constraint firstItem="ngh-O7-Ziw" firstAttribute="trailing" secondItem="04w-Ya-Wg5" secondAttribute="trailing" id="nMl-hT-jV9"/>
@@ -206,11 +217,11 @@
                             <constraint firstAttribute="trailing" secondItem="isM-Fn-5Ue" secondAttribute="trailing" constant="20" id="rRE-mV-77r"/>
                             <constraint firstItem="ngh-O7-Ziw" firstAttribute="centerY" secondItem="288-rl-8EO" secondAttribute="centerY" id="rxF-8j-YAc"/>
                             <constraint firstItem="kil-Qm-U36" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="tSS-dt-SK7"/>
-                            <constraint firstItem="VCC-Wy-ggk" firstAttribute="top" secondItem="YbD-XF-lOj" secondAttribute="bottom" constant="15" id="tdp-Uz-OBQ"/>
-                            <constraint firstItem="VIq-QW-1N2" firstAttribute="top" secondItem="21K-EC-Hi0" secondAttribute="bottom" constant="8" id="vcQ-Db-9CD"/>
+                            <constraint firstItem="VIq-QW-1N2" firstAttribute="top" secondItem="21K-EC-Hi0" secondAttribute="bottom" constant="12" id="vcQ-Db-9CD"/>
                             <constraint firstItem="VIq-QW-1N2" firstAttribute="leading" secondItem="ZV6-Ub-4fn" secondAttribute="leading" constant="20" id="vgT-LZ-7W7"/>
                             <constraint firstAttribute="trailing" secondItem="288-rl-8EO" secondAttribute="trailing" constant="12" id="wez-dB-9Ff"/>
                             <constraint firstItem="21K-EC-Hi0" firstAttribute="centerX" secondItem="VCC-Wy-ggk" secondAttribute="centerX" id="wgd-6Z-BxB"/>
+                            <constraint firstItem="Vdr-Wr-Jn1" firstAttribute="top" secondItem="VIq-QW-1N2" secondAttribute="bottom" constant="8" id="x7A-xR-Tfh"/>
                             <constraint firstItem="qmE-Xf-0ul" firstAttribute="top" secondItem="AdW-2t-yYZ" secondAttribute="bottom" constant="8" id="x9c-pL-Ulr"/>
                             <constraint firstAttribute="trailing" secondItem="hVZ-pV-gSH" secondAttribute="trailing" constant="20" id="xWd-wi-Cek"/>
                             <constraint firstItem="21K-EC-Hi0" firstAttribute="top" secondItem="VCC-Wy-ggk" secondAttribute="bottom" constant="4" id="xkb-ch-MQO"/>
@@ -218,9 +229,10 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="checkboxRequirePasswordAfter" destination="YbD-XF-lOj" id="3WD-Lb-FhZ"/>
                         <outlet property="checkboxUseTouchId" destination="wsQ-0c-swM" id="a2w-sO-vji"/>
                         <outlet property="labelExpiryPeriod" destination="21K-EC-Hi0" id="KGF-0P-xzE"/>
+                        <outlet property="labelHeaderConvenienceUnlock" destination="AdW-2t-yYZ" id="Rv5-hs-EBw"/>
+                        <outlet property="labelRequireReentry" destination="RVy-IE-dtK" id="DAD-p2-CAo"/>
                         <outlet property="passwordStorageSummary" destination="VIq-QW-1N2" id="EUb-uQ-Vci"/>
                         <outlet property="sliderExpiry" destination="VCC-Wy-ggk" id="5dT-cf-08G"/>
                         <outlet property="textFieldDatabaseName" destination="hVZ-pV-gSH" id="zel-2U-hm9"/>

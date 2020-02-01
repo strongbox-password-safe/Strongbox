@@ -9,6 +9,8 @@
 #import "DatabaseMetadata.h"
 #import "SecretStore.h"
 
+const NSInteger kDefaultPasswordExpiryHours = 14 * 24; // 2 weeks
+
 @implementation DatabaseMetadata
 
 - (instancetype)initWithNickName:(NSString *)nickName
@@ -22,7 +24,8 @@
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
         self.isTouchIdEnabled = YES;
-        self.touchIdPasswordExpiryPeriodHours = -1; // No expiry
+        self.isTouchIdEnrolled = NO;
+        self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
     }
     
     return self;
@@ -33,9 +36,53 @@
     return [SecretStore.sharedInstance getSecureString:account];
 }
 
-- (void)setTouchIdPassword:(NSString *)touchIdPassword {
+- (NSString*)getConveniencePassword:(BOOL*)expired {
     NSString* account = [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
-    [SecretStore.sharedInstance setSecureString:touchIdPassword forIdentifier:account];
+    return [SecretStore.sharedInstance getSecureObject:account expired:expired];
+}
+
+- (NSString*)getConveniencePasswordIdentifier {
+    return [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
+}
+
+- (void)setConveniencePassword:(NSString*)password expiringAfterHours:(NSInteger)expiringAfterHours {
+    NSString* identifier = [self getConveniencePasswordIdentifier];
+    if(expiringAfterHours == -1) {
+        [SecretStore.sharedInstance setSecureString:password forIdentifier:identifier];
+    }
+    else if(expiringAfterHours == 0) {
+        [SecretStore.sharedInstance setSecureEphemeralObject:password forIdentifer:identifier];
+    }
+    else {
+        NSCalendar *cal = [NSCalendar currentCalendar];
+        NSDate *date = [cal dateByAddingUnit:NSCalendarUnitHour value:expiringAfterHours toDate:[NSDate date] options:0];
+        [SecretStore.sharedInstance setSecureObject:password forIdentifier:identifier expiresAt:date];
+    }
+}
+
+- (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*)password {
+    if(self.isTouchIdEnabled) {
+        if(self.touchIdPasswordExpiryPeriodHours == -1) {
+            [self setConveniencePassword:password expiringAfterHours:-1];
+        }
+        else {
+            [self setConveniencePassword:password
+                      expiringAfterHours:self.touchIdPasswordExpiryPeriodHours];
+        }
+    }
+    else {
+        [self setConveniencePassword:nil expiringAfterHours:-1];
+    }
+}
+
+- (SecretExpiryMode)getConveniencePasswordExpiryMode {
+    NSString* identifier = [self getConveniencePasswordIdentifier];
+    return [SecretStore.sharedInstance getSecureObjectExpiryMode:identifier];
+}
+
+- (NSDate *)getConveniencePasswordExpiryDate {
+    NSString* identifier = [self getConveniencePasswordIdentifier];
+    return [SecretStore.sharedInstance getSecureObjectExpiryDate:identifier];
 }
 
 - (NSString *)keyFileBookmark {
@@ -61,6 +108,7 @@
     [encoder encodeBool:self.isTouchIdEnabled forKey:@"isTouchIdEnabled"];
     [encoder encodeBool:self.hasPromptedForTouchIdEnrol forKey:@"hasPromptedForTouchIdEnrol"];
     [encoder encodeInteger:self.touchIdPasswordExpiryPeriodHours forKey:@"touchIdPasswordExpiryPeriodHours"];
+    [encoder encodeBool:self.isTouchIdEnrolled forKey:@"isTouchIdEnrolled"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -78,6 +126,13 @@
 
         if([decoder containsValueForKey:@"touchIdPasswordExpiryPeriodHours"]) {
             self.touchIdPasswordExpiryPeriodHours = [decoder decodeIntegerForKey:@"touchIdPasswordExpiryPeriodHours"];
+        }
+    
+        if([decoder containsValueForKey:@"isTouchIdEnrolled"]) {
+            self.isTouchIdEnrolled = [decoder decodeBoolForKey:@"isTouchIdEnrolled"];
+        }
+        else {
+            self.isTouchIdEnrolled = self.touchIdPassword != nil;
         }
     }
     

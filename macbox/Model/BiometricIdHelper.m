@@ -36,7 +36,13 @@
         LAContext *localAuthContext = [[LAContext alloc] init];
         
         NSError *authError;
-        return [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
+        
+        
+        BOOL ret = [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
+        
+//        NSLog(@"DEBUG: Biometric available: [%d][%@]", ret, authError);
+        
+        return ret;
     }
     
     return NO;

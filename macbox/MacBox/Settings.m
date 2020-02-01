@@ -560,7 +560,7 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
 }
 
 - (void)setConcealEmptyProtectedFields:(BOOL)concealEmptyProtectedFields {
-    NSLog(@"Setting: %d", concealEmptyProtectedFields);
+//    NSLog(@"Setting: %d", concealEmptyProtectedFields);
     [self setBool:kConcealEmptyProtectedFields value:concealEmptyProtectedFields];
 }
 

@@ -92,8 +92,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     
     //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
     //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
-
-//    self.applicationHasFinishedLaunching = YES;
+    //    self.applicationHasFinishedLaunching = YES;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onPreferencesChanged:)
@@ -172,7 +171,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         NSData * ret = [SAMKeychain passwordDataForService:kKeychainService account:database.uuid error:&error];
         if(ret) {
             NSString* password = [[NSString alloc] initWithData:ret encoding:NSUTF8StringEncoding];
-            database.touchIdPassword = password;
+            [database resetConveniencePasswordWithCurrentConfiguration:password];
         }
         
         // Restore Enrolled Prompted Status

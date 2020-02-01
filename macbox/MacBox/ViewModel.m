@@ -1226,13 +1226,6 @@ NSString* getSmartFillNotes() {
     return [self.passwordDatabase getHtmlPrintString:databaseName];
 }
 
-- (void)updateTouchIdPassword:(NSString *)password {
-    if(self.databaseMetadata.isTouchIdEnabled && self.databaseMetadata.touchIdPassword) {
-        self.databaseMetadata.touchIdPassword = password;
-        [DatabasesManager.sharedInstance update:self.databaseMetadata];
-    }
-}
-
 - (void)setDatabaseMetadata:(DatabaseMetadata *)databaseMetadata {
     _databaseMetadata = databaseMetadata;
 }

@@ -120,6 +120,12 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property BOOL isPromptingAboutUnderlyingFileChange;
 @property NSArray* customFields;
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
+
+
+// TODO: Consider using the performSelector model...
+// Throttle changes - Only set after user leaves it for .5 seconds...
+// [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setExpiryDate:) object:nil];
+// [self performSelector:@selector(setExpiryDate:) withObject:nil afterDelay:0.5f];
 @property NSDate* lastAutoPromptForTouchIdThrottle; // HACK: Sigh
 
 @property (weak) IBOutlet NSPopUpButton *keyFilePopup;
@@ -130,7 +136,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 static NSImage* kStrongBox256Image;
 
 @implementation ViewController
-
+                        
 + (void)initialize {
     if(self == [ViewController class]) {
         kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
@@ -290,7 +296,8 @@ static NSImage* kStrongBox256Image;
         [wc.window center];
 
         DatabasePropertiesController *vc = (DatabasePropertiesController*)wc.contentViewController;
-        [vc setModel:self.model.databaseMetadata];
+        [vc setModel:self.model];
+        
     }
 }
 
@@ -1369,16 +1376,16 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)autoPromptForTouchIdIfDesired {
-    NSLog(@"autoPromptForTouchIdIfDesired: [%@]", self.model);
+//    NSLog(@"autoPromptForTouchIdIfDesired: [%@]", self.model);
     
     if(self.model && self.model.locked) {
         BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
 
-        NSLog(@"autoPromptForTouchIdIfDesired: weAreKeyWindow = [%d]", weAreKeyWindow);
+//        NSLog(@"autoPromptForTouchIdIfDesired: weAreKeyWindow = [%d]", weAreKeyWindow);
 
         if(weAreKeyWindow && [self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.lastAutoPromptForTouchIdThrottle];
-            NSLog(@"seconds: %f", secondsBetween);
+//            NSLog(@"seconds: %f", secondsBetween);
             if(self.lastAutoPromptForTouchIdThrottle != nil && secondsBetween < 1.5) {
                 NSLog(@"Too many auto biometric requests too soon - ignoring...");
                 return;
@@ -1426,13 +1433,19 @@ static NSImage* kStrongBox256Image;
             });
         }];
     }
-    else if(BiometricIdHelper.sharedInstance.biometricIdAvailable) { // Don't clear if user has just disabled Bio-Id / Watch
-        NSLog(@"Touch ID button pressed but no Touch ID Stored?");
+    else if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
+        NSLog(@"Touch ID button pressed but no Touch ID Stored? Probably Expired...");
         
-        NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"The stored credentials are unavailable. Please enter the password manually. Touch ID Metadata for this database will be cleared.");
+        NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually.");
+        
         [Alerts info:loc window:self.view.window];
+  
+        [self bindLockScreenUi];
+    }
+    else {
+        NSString* loc = NSLocalizedString(@"mac_info_biometric_unlock_not_possible_right_now", @"Touch ID/Apple Watch Unlock is not possible at the moment because Biometrics/Apple Watch is not available.");
         
-        [self clearTouchId];
+        [Alerts info:loc window:self.view.window];
     }
 }
 
@@ -1518,7 +1531,24 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self enableMasterCredentialsEntry:YES];
 
     if(success) {
-        [self maybePromptForBiometricEnrol:compositeKeyFactors];
+        if(!isBiometricUnlock) {
+            DatabaseMetadata* metaData = self.model.databaseMetadata;
+            
+            BOOL bioAvail = BiometricIdHelper.sharedInstance.biometricIdAvailable;
+            BOOL touchIdEnabledAndPossible = metaData.isTouchIdEnabled && bioAvail && (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
+            if(touchIdEnabledAndPossible) {
+                if(!metaData.isTouchIdEnrolled)
+                    if(!self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
+                        [self maybePromptForBiometricEnrol:compositeKeyFactors];
+                    }
+                    else {
+                        [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.model.compositeKeyFactors.password];
+                    }
+                else if(metaData.touchIdPassword == nil) { // Biometric ID has probably expired - reset in configured expiry mode...
+                    [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.model.compositeKeyFactors.password];
+                }
+            }
+        }
         
         // Record Key File if one was used...
         
@@ -1526,10 +1556,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
     }
     else {
-        if(isBiometricUnlock && self.model.databaseMetadata != nil) {
-            self.model.databaseMetadata.touchIdPassword = nil;
-            self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO;
-            [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+        if(isBiometricUnlock) {
+            [self clearTouchId];
         }
         
         NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
@@ -1540,21 +1568,37 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors {
-    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable &&
+    NSLog(@"hasPromptedForTouchIdEnrol: %d",self.model.databaseMetadata.hasPromptedForTouchIdEnrol);
+    
+    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable) {
+        if(
         (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) &&
         !self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
         NSLog(@"Biometric ID is available on Device. Should we enrol?");
 
-        NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ to open this database in the future?");        
-        NSString* message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName];
+        NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be securely stored for %@ before you need to re-enter it.");
+        
+
+        NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
+
+        NSInteger expiryPeriodInHours = self.model.databaseMetadata.touchIdPasswordExpiryPeriodHours;
+        expiryPeriodInHours = expiryPeriodInHours <= 0 ? kDefaultPasswordExpiryHours : expiryPeriodInHours;
+        
+        fmt.allowedUnits = expiryPeriodInHours > 23 ? (NSCalendarUnitDay | NSCalendarUnitWeekOfMonth) : (NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitWeekOfMonth);
+        fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
+        fmt.maximumUnitCount = 2;
+        fmt.collapsesLargestUnit = YES;
+        
+        NSString* timeSpan = [fmt stringFromTimeInterval:expiryPeriodInHours * 60 * 60];
+        NSString* message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName, timeSpan];
 
         [Alerts yesNo:message
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
                    self.model.databaseMetadata.isTouchIdEnabled = YES;
-                   self.model.databaseMetadata.touchIdPassword = compositeKeyFactors.password;
-                   
+                   self.model.databaseMetadata.isTouchIdEnrolled = YES;
+                   [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:compositeKeyFactors.password];
                    [self caveatAboutTouchId];
                }
                else {
@@ -1564,7 +1608,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                self.model.databaseMetadata.hasPromptedForTouchIdEnrol = YES;
                [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
            }];
-    }
+        }}
 }
 
 - (void)caveatAboutTouchId {
@@ -1644,6 +1688,30 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
+- (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
+    [self.model setCompositeKeyFactors:ckf];
+
+    DatabaseMetadata* metadata = self.model.databaseMetadata;
+    
+    if(self.changeMasterPassword.keyFileUrl && !Settings.sharedInstance.doNotRememberKeyFile) {
+        NSError* error;
+        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.changeMasterPassword.keyFileUrl error:&error];
+        if(bookmark) {
+            metadata.keyFileBookmark = bookmark;
+        }
+        else {
+            NSLog(@"Could not set key file bookmark for url... [%@]", error);
+        }
+    }
+    else {
+        metadata.keyFileBookmark = nil;
+    }
+    
+    [metadata resetConveniencePasswordWithCurrentConfiguration:ckf.password];
+    
+    [DatabasesManager.sharedInstance update:metadata];
+}
+
 - (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
     if(self.model && !self.model.locked) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1656,25 +1724,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             
             [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
-                    [self.model setCompositeKeyFactors:self.changeMasterPassword.confirmedCompositeKeyFactors];
-
-                    DatabaseMetadata* metadata = self.model.databaseMetadata;
-                    
-                    if(self.changeMasterPassword.keyFileUrl && !Settings.sharedInstance.doNotRememberKeyFile) {
-                        NSError* error;
-                        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.changeMasterPassword.keyFileUrl error:&error];
-                        if(bookmark) {
-                            metadata.keyFileBookmark = bookmark;
-                        }
-                        else {
-                            NSLog(@"Could not set key file bookmark for url... [%@]", error);
-                        }
-                    }
-                    else {
-                        metadata.keyFileBookmark = nil;
-                    }
-                    
-                    [DatabasesManager.sharedInstance update:metadata];
+                    [self changeMasterCredentials:self.changeMasterPassword.confirmedCompositeKeyFactors];
                 }
                 
                 if(completion) {
@@ -2725,8 +2775,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
-    else if (theAction == @selector(onDatabasePreferences:)) {
-        return NO; // TODO:
+    else if (theAction == @selector(onDatabaseProperties:)) {
+        return self.model && !self.model.locked;
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.model.locked;
@@ -2769,15 +2819,17 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)clearTouchId {
-    self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
-    self.model.databaseMetadata.touchIdPassword = nil;
+    NSLog(@"Clearing Touch ID data...");
     
+    self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
+    self.model.databaseMetadata.isTouchIdEnrolled = NO;
+    [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
     [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
     
     [self bindLockScreenUi];
 }
 
-- (IBAction)onDatabasePreferences:(id)sender {
+- (IBAction)onDatabaseProperties:(id)sender {
     [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:nil];
 }
 
@@ -3556,12 +3608,30 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (void)bindBiometricButtonsOnLockScreen {
-    if(![self biometricOpenIsAvailableForSafe]) {
+    DatabaseMetadata* metaData = self.model.databaseMetadata;
+    
+    BOOL possible =  (metaData.isTouchIdEnabled &&
+                      BiometricIdHelper.sharedInstance.biometricIdAvailable &&
+                      (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
+
+    BOOL expired;
+    NSString* password = [self.model.databaseMetadata getConveniencePassword:&expired];
+     
+    [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock", @"Unlock with Touch ID or Watch")];
+    
+    if(!possible || !metaData.isTouchIdEnrolled) {
         self.buttonUnlockWithTouchId.hidden = YES;
-            }
+    }
     else {
         self.buttonUnlockWithTouchId.hidden = NO;
-        [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
+        
+        if(password) {
+            [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
+        }
+        else {
+            self.buttonUnlockWithTouchId.enabled = NO;
+            [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Convenience Unlock Expired")];
+        }
     }
 }
 

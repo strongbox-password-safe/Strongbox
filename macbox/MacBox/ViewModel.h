@@ -149,8 +149,6 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
 
-- (void)updateTouchIdPassword:(NSString*)password;
-
 @property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
 
 - (void)setDatabaseMetadata:(DatabaseMetadata * _Nonnull)databaseMetadata;
