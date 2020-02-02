@@ -2757,8 +2757,8 @@
 /* %@ [Configured] - (Translators Note: User is using a key file that has previously been set/remembered by Strongbox. First parameter is the filename of the key file. This appears on the unlock screen. */
 "mac_key_file_filename_configured_fmt" = "%@ [Configured]";
 
-/* Touch ID/Apple Watch Unlock is not possible at the moment because Biometrics/Apple Watch is not available. */
-"mac_info_biometric_unlock_not_possible_right_now" = "Touch ID/Apple Watch Unlock is not possible at the moment because Biometrics/Apple Watch is not available.";
+/* Touch ID/Apple Watch Unlock is not possible at the moment because Touch ID/Apple Watch is not available. */
+"mac_info_biometric_unlock_not_possible_right_now" = "Touch ID/Apple Watch Unlock is not possible at the moment because Touch ID/Apple Watch is not available.";
     
 /* Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually. */
 "mac_could_not_find_stored_credentials" = "Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually.";
@@ -2767,8 +2767,8 @@
 /* Convenience Unlock */
 "mac_convenience_unlock_title" = "Convenience Unlock";
 
-/* Convenience Unlock (Biometrics/Watch Unavailable) */
-"mac_convenience_unlock_title_bio_unavailable" = "Convenience Unlock (Biometrics/Watch Unavailable)";
+/* Convenience Unlock (Touch ID/Watch Unavailable) */
+"mac_convenience_unlock_title_bio_unavailable" = "Convenience Unlock (Touch ID/Watch Unavailable)";
 
 /* Convenience Unlock (Pro Feature Only) */
 "mac_convenience_unlock_title_pro_only" = "Convenience Unlock (Pro Feature Only)";
@@ -2797,8 +2797,8 @@
 /* Convenience Unlock Disabled */
 "mac_convenience_summary_disabled" = "Convenience Unlock Disabled";
 
-/* Convenience Unlock (Biometrics/Watch Unavailable) */
-"mac_convenience_summary_biometrics_unavailable" = "Convenience Unlock (Biometrics/Watch Unavailable)";
+/* Convenience Unlock (Touch ID/Watch Unavailable) */
+"mac_convenience_summary_biometrics_unavailable" = "Convenience Unlock (Touch ID/Watch Unavailable)";
 
 /* Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development. */
 "mac_convenience_summary_only_available_on_pro" = "Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development.";
@@ -2814,3 +2814,9 @@
 
 /* Convenience Unlock Expired */
 "mac_unlock_screen_button_title_convenience_unlock_expired" = "Convenience Unlock Expired";
+
+/* Touch ID/Watch Unavailable */
+"mac_unlock_screen_button_title_convenience_unlock_bio_unavailable" = "Touch ID/Watch Unavailable";
+
+/* Touch ID/Watch Unlock (Pro Only) */
+"mac_unlock_screen_button_title_convenience_unlock_pro_only" = "Touch ID/Watch Unlock (Pro Only)";

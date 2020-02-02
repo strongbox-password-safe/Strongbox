@@ -84,6 +84,8 @@
 @property (weak) IBOutlet NSButton *checkboxExpires;
 @property (weak) IBOutlet NSDatePicker *datePickerExpires;
 
+@property BOOL hasLoaded;
+
 @end
 
 @implementation NodeDetailsViewController
@@ -96,9 +98,7 @@ static NSString* trimField(NSTextField* textField) {
     [self cancel:nil];
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
+- (void)doInitialSetup {
     [self setupUi];
     
     [self setupAutoCompletes];
@@ -111,22 +111,33 @@ static NSString* trimField(NSTextField* textField) {
     
     [self.view.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; // Take focus off Title so that edits require some effort...
 
+    [self updateTitle];
+}
+
+- (void)updateTitle {
     NSString* title = [self.model dereference:self.node.title node:self.node];
     
     NSString* loc = NSLocalizedString(@"mac_node_details_historical_item_suffix_fmt", @"%@ (Historical Item)");
     NSString* aTitle = [NSString stringWithFormat:self.historical ? loc : @"%@", title];
     
-    [self setTitle:aTitle];
+    [self.view.window setTitle:aTitle];
+}
+
+- (void)newWindowForTab:(id)sender {
+    // Disable the tab button
 }
 
 - (void)viewWillAppear {
     [super viewWillAppear];
-    self.view.window.delegate = self; // Catch Window events like close / undo manager etc
+
+    if(!self.hasLoaded) {
+        self.hasLoaded = YES;
+        [self doInitialSetup];
+    }
 }
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-    
     [self.view.window setLevel:Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSNormalWindowLevel : NSFloatingWindowLevel];
     [self.view.window setHidesOnDeactivate:YES];
 }
@@ -136,11 +147,8 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)promptToSaveSimpleUIChangesBeforeClose {
-    NSString* loc = (NO) ? NSLocalizedString(@"mac_node_details_discard_new_entry", @"Discard New Entry?") : NSLocalizedString(@"mac_node_details_save_changes", @"Save Changes?");
-
-    NSString* loc2 = (NO) ?
-    NSLocalizedString(@"mac_node_details_you_made_changes_discard", @"You have made no changes to this new entry, do you want to discard?") :
-    NSLocalizedString(@"mac_node_details_unsaved_changes_save", @"There are unsaved changes present. Would you like to save those before exiting?");
+    NSString* loc = NSLocalizedString(@"mac_node_details_save_changes", @"Save Changes?");
+    NSString* loc2 = NSLocalizedString(@"mac_node_details_unsaved_changes_save", @"There are unsaved changes present. Would you like to save those before exiting?");
 
     NSString* message = loc;
     NSString* informative = loc2;
@@ -151,15 +159,15 @@ static NSString* trimField(NSTextField* textField) {
        completion:^(BOOL yesNo) {
                if(self.newEntry) {
                    if(yesNo) {
-                       // Delete New Entry if discarding changes
                        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                       [self.model deleteItem:self.node];
+                       [self setModelForEditField:self.currentlyEditingUIControl];
                        [self.view.window close];
                        [self onWindowClosed];
                    }
                    else {
+                       // Delete New Entry if discarding changes
                        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                       [self setModelForEditField:self.currentlyEditingUIControl];
+                       [self.model deleteItem:self.node];
                        [self.view.window close];
                        [self onWindowClosed];
                    }
@@ -316,6 +324,12 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)setupUi {
+    NSUInteger doc = [NSDocumentController.sharedDocumentController.documents indexOfObject:self.model.document];
+//    NSLog(@"doc = %lu", (unsigned long)doc);
+    self.view.window.tabbingIdentifier = @(doc).stringValue;
+    
+    self.view.window.delegate = self; // Catch Window events like close / undo manager etc
+    
     [self showHideForDatabaseFormat];
     [self setupSimpleUI];
     [self setupCustomFieldsUI];
@@ -432,7 +446,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)bindUiToSimpleFields {
-    [self setTitle:self.node.title];
+    [self updateTitle];
     
     self.textFieldTitle.stringValue = self.node.title;
     self.textFieldUsername.stringValue = self.node.fields.username;
@@ -1410,5 +1424,12 @@ static NSString* trimField(NSTextField* textField) {
     [self.model setItemExpires:self.node expiry:self.datePickerExpires.dateValue];
 }
 
-@end
+- (IBAction)saveDocument:(id)sender {
+    // Save Current State as is...
+    [self setModelForEditField:self.currentlyEditingUIControl];
+    [self.model.document saveDocumentWithDelegate:self didSaveSelector:@selector(onSaveDone) contextInfo:nil];
+}
 
+- (void)onSaveDone { }
+
+@end

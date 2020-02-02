@@ -56,8 +56,9 @@
 
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToItemDetails"]) {
-        NodeDetailsViewController* vc = (NodeDetailsViewController*)segue.destinationController;
-
+        NSWindowController *wc = segue.destinationController;
+        NodeDetailsViewController* vc = (NodeDetailsViewController*)(wc.contentViewController);
+        
         vc.node = sender;
         vc.model = self.model;
         vc.newEntry = NO;

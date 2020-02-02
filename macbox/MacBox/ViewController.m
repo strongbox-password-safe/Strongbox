@@ -203,6 +203,10 @@ static NSImage* kStrongBox256Image;
 - (void)windowDidBecomeKey:(NSNotification *)notification {
     NSLog(@"[%@] Window Became Key!", self.model.databaseMetadata.nickName);
 
+    if(self.model && self.model.locked) {
+        [self bindLockScreenUi];
+    }
+
     // MMcG: Seems to be unfortunately required - as key window is not set if we call straight away... hack :(
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -262,7 +266,8 @@ static NSImage* kStrongBox256Image;
     if([segue.identifier isEqualToString:@"segueToShowItemDetails"]) {
         NSNumber* newEntry = params[kNewEntryKey];
         
-        NodeDetailsViewController* vc = (segue.destinationController);
+        NSWindowController *wc = segue.destinationController;
+        NodeDetailsViewController* vc = (NodeDetailsViewController*)(wc.contentViewController);
         
         vc.node = item;
         vc.model = self.model;
@@ -273,7 +278,7 @@ static NSImage* kStrongBox256Image;
             NSLog(@"Removing Details View from List: [%@]", item.title);
             [self.detailsViewControllers removeObjectForKey:item.uuid];
         };
-        
+                
         NSLog(@"Adding Details View to List: [%@]", item.title);
         
         self.detailsViewControllers[item.uuid] = vc;
@@ -3609,29 +3614,39 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 
 - (void)bindBiometricButtonsOnLockScreen {
     DatabaseMetadata* metaData = self.model.databaseMetadata;
-    
-    BOOL possible =  (metaData.isTouchIdEnabled &&
-                      BiometricIdHelper.sharedInstance.biometricIdAvailable &&
-                      (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
 
-    BOOL expired;
-    NSString* password = [self.model.databaseMetadata getConveniencePassword:&expired];
-     
     [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock", @"Unlock with Touch ID or Watch")];
-    
-    if(!possible || !metaData.isTouchIdEnrolled) {
-        self.buttonUnlockWithTouchId.hidden = YES;
-    }
-    else {
-        self.buttonUnlockWithTouchId.hidden = NO;
-        
-        if(password) {
-            [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
+    self.buttonUnlockWithTouchId.hidden = NO;
+    self.buttonUnlockWithTouchId.enabled = YES;
+
+    if(metaData.isTouchIdEnabled) {
+        if(metaData.isTouchIdEnrolled) {
+            if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
+                if (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) {
+                    if(self.model.databaseMetadata.touchIdPassword) {
+                        [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
+                    }
+                    else {
+                        self.buttonUnlockWithTouchId.enabled = NO;
+                        [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Convenience Unlock Expired")];
+                    }
+                }
+                else {
+                    [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_pro_only", @"Biometrics/Watch Unlock (Pro Only)")];
+                    self.buttonUnlockWithTouchId.enabled = NO;
+                }
+            }
+            else {
+                [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_bio_unavailable", @"Biometrics/Watch Unavailable")];
+                self.buttonUnlockWithTouchId.enabled = NO;
+            }
         }
         else {
-            self.buttonUnlockWithTouchId.enabled = NO;
-            [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Convenience Unlock Expired")];
+            self.buttonUnlockWithTouchId.hidden = YES;
         }
+    }
+    else {
+        self.buttonUnlockWithTouchId.hidden = YES;
     }
 }
 
