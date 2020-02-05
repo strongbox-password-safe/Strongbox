@@ -12,13 +12,6 @@
 
 @implementation IOsUtils
 
-+ (NSString *)getAppName {
-    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
-    NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleDisplayName"], info[@"CFBundleVersion"]];
-
-    return appName;
-}
-
 // https://stackoverflow.com/questions/8261961/better-way-to-get-the-users-name-from-device
 
 + (NSString*)nameFromDeviceName {

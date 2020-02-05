@@ -41,6 +41,7 @@
 #import "BackupsTableViewController.h"
 #import "ProUpgradeIAPManager.h"
 #import "BiometricsManager.h"
+#import "BookmarksHelper.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -1030,6 +1031,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         scVc.mode = createMode ? (expressMode ? kCASGModeCreateExpress : kCASGModeCreate) : kCASGModeAddExisting;
         scVc.initialFormat = kDefaultFormat;
         
+        if(params) {
+            if(params.method == kStorageMethodNativeStorageProvider && params.file.name.length) {
+                scVc.initialName = params.file.name.stringByDeletingPathExtension;
+            }
+        }
+        
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
@@ -1048,6 +1055,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         NSData* data = params[@"data"];
         NSNumber* numEIP = params[@"editInPlace"];
         BOOL editInPlace = numEIP.boolValue;
+        
+        if(url && url.lastPathComponent.length) {
+            NSString* suggestion = url.lastPathComponent.stringByDeletingPathExtension;
+            scVc.initialName = [SafesList.sharedInstance getUniqueNameFromSuggestedName:suggestion];
+        }
         
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
@@ -1794,21 +1806,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)addExternalFileReferenceSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url {
-    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
-    if (!securitySucceeded) {
-        NSLog(@"Could not access secure scoped resource!");
-        return;
-    }
-    
-    NSURLBookmarkCreationOptions options = 0;
-#ifdef NSURLBookmarkCreationWithSecurityScope
-    options |= NSURLBookmarkCreationWithSecurityScope;
-#endif
-    
     NSError* error;
-    NSData* bookMark = [url bookmarkDataWithOptions:options includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
-    
-    [url stopAccessingSecurityScopedResource];
+    NSData* bookMark = [BookmarksHelper getBookmarkDataFromUrl:url error:&error];
     
     if (error) {
         [Alerts error:self
@@ -1816,7 +1815,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                 error:error];
         return;
     }
-    
+
     NSString* filename = [url lastPathComponent];
     
     SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];

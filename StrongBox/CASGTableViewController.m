@@ -59,7 +59,7 @@
     self.switchReadOnly.on = self.initialReadOnly;
     self.switchOpenOffline.on = self.initialOfflineCache;
     
-    self.textFieldName.text = self.selectedName.length ? self.selectedName : [CASGTableViewController getSuggestedDatabaseName];
+    self.textFieldName.text = self.selectedName.length ? self.selectedName : [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
   
     [self bindUi];
 }
@@ -407,24 +407,6 @@
     self.cellFormat.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
     
     UIGraphicsEndImageContext();
-}
-
-+ (NSString*)getSuggestedDatabaseName {
-    NSString* name = [IOsUtils nameFromDeviceName];
-    name = [SafesList sanitizeSafeNickName:name];
-
-    NSString *suggestion = name.length ?
-    [NSString stringWithFormat:
-        NSLocalizedString(@"casg_suggested_database_name_users_database_fmt", @"%@'s Database"), name] :
-        NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
-   
-    int attempt = 2;
-    while(![[SafesList sharedInstance] isValidNickName:suggestion] && attempt < 100) {
-        suggestion = [NSString stringWithFormat:
-                      NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt", @"%@'s Database %d"), name, attempt++];
-    }
-    
-    return [[SafesList sharedInstance] isValidNickName:suggestion] ? suggestion : nil;
 }
 
 - (void)textFieldNameDidChange:(id)sender {

@@ -75,7 +75,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:URL];
             if(wizard.keyFileUrl) {
                 NSError* error;
-                NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:wizard.keyFileUrl error:&error];
+                NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:wizard.keyFileUrl readOnly:YES error:&error];
                 
                 if(bookmark) {
                     database.keyFileBookmark = bookmark;
@@ -121,7 +121,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     if(database.storageProvider == kLocalDevice) {
         NSError *error = nil;
         NSString* updatedBookmark;
-        NSURL* url = [BookmarksHelper getUrlFromBookmark:database.storageInfo updatedBookmark:&updatedBookmark error:&error];
+        NSURL* url = [BookmarksHelper getUrlFromBookmark:database.storageInfo readOnly:NO updatedBookmark:&updatedBookmark error:&error];
         
         if(url == nil) {
             completion(error);

@@ -167,7 +167,7 @@ static NSString* kDatabasesDefaultsKey = @"databases";
     }
     
     NSError* error;
-    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url error:&error];
+    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url readOnly:NO error:&error];
     if(!fileIdentifier) {
         NSLog(@"getBookmarkFromUrl: [%@]", error);
         return nil;

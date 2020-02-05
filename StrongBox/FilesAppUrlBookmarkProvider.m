@@ -9,6 +9,8 @@
 #import "FilesAppUrlBookmarkProvider.h"
 #import "StrongboxUIDocument.h"
 #import "Utils.h"
+#import "BookmarksHelper.h"
+#import "SafesList.h"
 
 @implementation FilesAppUrlBookmarkProvider
 
@@ -187,24 +189,30 @@ viewController:(UIViewController *)viewController
         return nil;
     }
     
-    NSError *error;
-    BOOL bookmarkIsStale; // https://stackoverflow.com/questions/23954662/what-is-the-correct-way-to-handle-stale-nsurl-bookmarks
-    NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI;
+    NSData* updatedBookmark; 
+    NSURL* url = [BookmarksHelper getUrlFromBookmarkData:bookmarkData updatedBookmark:&updatedBookmark error:ppError];
     
-    NSURL *url = [NSURL URLByResolvingBookmarkData:bookmarkData
-                                           options:options
-                                     relativeToURL:nil
-                               bookmarkDataIsStale:&bookmarkIsStale
-                                             error:&error];
-    
-    if(bookmarkIsStale) {
-        url = nil;
-        error = [Utils createNSError:NSLocalizedString(@"files_provider_stale_reference", @"Strongbox's reference to this external file is stale. Please remove and re-add this database.") errorCode:-45];   
+    if(url && !*ppError && updatedBookmark) {
+        NSLog(@"Bookmark was stale! Updating Database with new one...");
+        
+        NSData* mainAppBookmark;
+        NSData* autoFillBookmark;
+        
+        if(isAutoFill) {
+            mainAppBookmark = [self bookMarkFromMetadata:safeMetaData isAutoFill:NO];
+            autoFillBookmark = updatedBookmark;
+        }
+        else {
+            mainAppBookmark = updatedBookmark;
+            autoFillBookmark = [self bookMarkFromMetadata:safeMetaData isAutoFill:YES];
+        }
+
+        safeMetaData.fileIdentifier = [self getJsonFileIdentifier:mainAppBookmark autoFillBookmark:autoFillBookmark];
+
+        [SafesList.sharedInstance update:safeMetaData];
     }
     
-    if(error) {
-        *ppError = error;
-    }
+    NSLog(@"Got URL from Bookmark: [%@]", url);
     
     return url;
 }

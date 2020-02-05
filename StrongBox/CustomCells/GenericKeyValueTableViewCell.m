@@ -205,8 +205,8 @@ showGenerateButton:(BOOL)showGenerateButton {
 - (void)bindValue:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider editing:(BOOL)editing key:(NSString*)key {
     self.valueText.enabled = editing;
     self.valueText.suggestionProvider = suggestionProvider;
-    self.valueText.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
 
+    self.valueText.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
     self.valueLabel.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
 
     [self bindValueText];
@@ -226,7 +226,7 @@ showGenerateButton:(BOOL)showGenerateButton {
     if(self.concealed) {
         self.valueText.text = @"*****************";
         self.valueLabel.text = @"*****************";
-        
+
         if (@available(iOS 13.0, *)) {
             self.valueText.textColor = UIColor.secondaryLabelColor;
             self.valueLabel.textColor = UIColor.secondaryLabelColor;
@@ -242,7 +242,9 @@ showGenerateButton:(BOOL)showGenerateButton {
     else {
         self.valueText.text = self.value;
         self.valueLabel.text = self.value;
-        
+        self.valueText.accessibilityLabel = nil; //[key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
+        self.valueLabel.accessibilityLabel = nil; //[key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
+
         if (@available(iOS 13.0, *)) {
             self.valueText.textColor = UIColor.labelColor;
             self.valueLabel.textColor = UIColor.labelColor;

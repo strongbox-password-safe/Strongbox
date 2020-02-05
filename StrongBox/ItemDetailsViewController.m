@@ -56,9 +56,6 @@ static NSInteger const kMetadataSectionIdx = 4;
 static NSInteger const kOtherSectionIdx = 5;
 static NSInteger const kSectionCount = 6;
 
-
-
-
 static NSInteger const kRowTitleAndIcon = 0;
 static NSInteger const kRowUsername = 1;
 static NSInteger const kRowPassword = 2;

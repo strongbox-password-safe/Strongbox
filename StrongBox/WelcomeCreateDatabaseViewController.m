@@ -64,7 +64,7 @@
 
     self.nextButton.layer.cornerRadius = 5.0f;
 
-    self.textFieldName.text = [CASGTableViewController getSuggestedDatabaseName];
+    self.textFieldName.text = [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
     
     [self.textFieldName addTarget:self
                            action:@selector(validateUi)

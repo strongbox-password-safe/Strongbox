@@ -12,9 +12,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BookmarksHelper : NSObject
 
-+ (NSString*_Nullable)getBookmarkFromUrl:(NSURL*)url error:(NSError*_Nonnull*_Nonnull)error;
++ (NSData*_Nullable)getBookmarkDataFromUrl:(NSURL *)url error:(NSError *_Nonnull*_Nonnull)error;
++ (NSData*_Nullable)getBookmarkDataFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*_Nonnull)error;
++ (NSString*_Nullable)getBookmarkFromUrl:(NSURL*)url readOnly:(BOOL)readOnly error:(NSError*_Nonnull*_Nonnull)error;
+
++ (NSURL*_Nullable)getUrlFromBookmarkData:(NSData*)bookmark updatedBookmark:(NSData*_Nonnull*_Nonnull)updatedBookmark error:(NSError*_Nonnull*_Nonnull)error;
++ (NSURL*_Nullable)getUrlFromBookmarkData:(NSData*)bookmark readOnly:(BOOL)readOnly updatedBookmark:(NSData*_Nonnull*_Nonnull)updatedBookmark error:(NSError*_Nonnull*_Nonnull)error;
++ (NSURL*_Nullable)getUrlFromBookmark:(NSString*)bookmarkInB64 readOnly:(BOOL)readOnly updatedBookmark:(NSString*_Nonnull*_Nonnull)updatedBookmark error:(NSError*_Nonnull*_Nonnull)error;
+
 + (NSURL*_Nullable)getExpressUrlFromBookmark:(NSString *)bookmark;
-+ (NSURL*_Nullable)getUrlFromBookmark:(NSString*)bookmarkInB64 updatedBookmark:(NSString*_Nonnull*_Nonnull)updatedBookmark error:(NSError*_Nonnull*_Nonnull)error;
 + (NSData*_Nullable)dataWithContentsOfBookmark:(NSString*)bookmarkInB64 error:(NSError*_Nonnull*_Nonnull)error;
 
 @end

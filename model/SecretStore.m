@@ -151,7 +151,8 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     if (privateKey) { CFRelease(privateKey); }
     if (publicKey)  { CFRelease(publicKey);  }
     if (access)     { CFRelease(access);     }
-    
+    if (cipherText) { CFRelease(cipherText); }
+
     return YES;
 }
 

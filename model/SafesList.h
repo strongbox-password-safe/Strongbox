@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "SafeMetaData.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString* _Nonnull const kDatabasesListChangedNotification;
 
 @interface SafesList : NSObject
@@ -30,4 +32,9 @@ extern NSString* _Nonnull const kDatabasesListChangedNotification;
 
 - (void)deleteAll;
 
+- (NSString*_Nullable)getSuggestedDatabaseNameUsingDeviceName;
+- (NSString*_Nullable)getUniqueNameFromSuggestedName:(NSString*)suggested;
+
 @end
+
+NS_ASSUME_NONNULL_END

@@ -29,6 +29,7 @@
 #import "StrongboxUIDocument.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "BiometricsManager.h"
+#import "BookmarksHelper.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -1143,17 +1144,7 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
 
 - (void)setAutoFillBookmark:(NSURL*)url {
     NSError* error;
-    
-    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
-    if (!securitySucceeded) {
-        NSLog(@"Could not access secure scoped resource!");
-        return;
-    }
-    
-    NSURLBookmarkCreationOptions options = 0;
-    NSData* bookMark = [url bookmarkDataWithOptions:options includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
-    
-    [url stopAccessingSecurityScopedResource];
+    NSData* bookMark = [BookmarksHelper getBookmarkDataFromUrl:url error:&error];
     
     if (error) {
         [Alerts error:self.viewController

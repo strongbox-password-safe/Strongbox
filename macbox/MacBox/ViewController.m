@@ -637,6 +637,9 @@ static NSImage* kStrongBox256Image;
     
     if(self.model == nil || self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
+        
+        self.selectedKeyFileBookmark = self.model ? self.model.databaseMetadata.keyFileBookmark : nil;
+        
         [self bindLockScreenUi];
     }
     else {
@@ -1317,6 +1320,9 @@ static NSImage* kStrongBox256Image;
             keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.model.format != kKeePass1];
             // NSLog(@"Got key file digest: [%@]", [keyFileDigest base64EncodedStringWithOptions:kNilOptions]);
         }
+        else {
+            *error = [Utils createNSError:@"Could not read key file..."  errorCode:-1];
+        }
     }
     
     return keyFileDigest;
@@ -1700,7 +1706,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     if(self.changeMasterPassword.keyFileUrl && !Settings.sharedInstance.doNotRememberKeyFile) {
         NSError* error;
-        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.changeMasterPassword.keyFileUrl error:&error];
+        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.changeMasterPassword.keyFileUrl readOnly:YES error:&error];
         if(bookmark) {
             metadata.keyFileBookmark = bookmark;
         }
@@ -3475,7 +3481,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     if(database && database.keyFileBookmark) {
         NSString* updatedBookmark = nil;
         NSError* error;
-        configuredUrl = [BookmarksHelper getUrlFromBookmark:database.keyFileBookmark updatedBookmark:&updatedBookmark error:&error];
+        configuredUrl = [BookmarksHelper getUrlFromBookmark:database.keyFileBookmark readOnly:YES updatedBookmark:&updatedBookmark error:&error];
             
         if(!configuredUrl) {
             NSLog(@"getUrlFromBookmark: [%@]", error);
@@ -3497,7 +3503,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     if(bookmark) {
         NSString* updatedBookmark = nil;
         NSError* error;
-        currentlySelectedUrl = [BookmarksHelper getUrlFromBookmark:bookmark updatedBookmark:&updatedBookmark error:&error];
+        currentlySelectedUrl = [BookmarksHelper getUrlFromBookmark:bookmark readOnly:YES updatedBookmark:&updatedBookmark error:&error];
         
         if(currentlySelectedUrl == nil) {
             self.selectedKeyFileBookmark = nil;
@@ -3543,7 +3549,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
             NSLog(@"Open Key File: %@", openPanel.URL);
             
             NSError* error;
-            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL error:&error];
+            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
             
             if(!bookmark) {
                 [Alerts error:error window:self.view.window];
@@ -3601,14 +3607,9 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     BOOL enabled = [self manualCredentialsAreValid];
 
     [self.buttonUnlockWithPassword setEnabled:enabled];
-    
-    //self.keyFilePopup.hidden = [self getHeuristicFormat] == kPasswordSafe;
-    
+        
     [self bindBiometricButtonsOnLockScreen];
-    
-    DatabaseMetadata* database = self.model.databaseMetadata;
-    self.selectedKeyFileBookmark = database.keyFileBookmark ? database.keyFileBookmark : nil;
-    
+        
     [self refreshKeyFileDropdown];
 }
 

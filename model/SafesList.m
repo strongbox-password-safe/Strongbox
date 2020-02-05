@@ -8,6 +8,7 @@
 
 #import "SafesList.h"
 #import "Settings.h"
+#import "IOsUtils.h"
 
 @interface SafesList()
 
@@ -148,6 +149,37 @@ static NSUserDefaults* getUserDefaults() {
         
         [self serialize];
     });
+}
+
+- (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested {
+    suggested = [SafesList sanitizeSafeNickName:suggested];
+
+    NSString *suggestion = suggested;
+    
+    int attempt = 2;
+    while(![self isValidNickName:suggestion] && attempt < 100) {
+        suggestion = [NSString stringWithFormat:@"%@ %d", suggested, attempt++];
+    }
+    
+    return [self isValidNickName:suggestion] ? suggestion : nil;
+}
+
+- (NSString*)getSuggestedDatabaseNameUsingDeviceName {
+    NSString* name = [IOsUtils nameFromDeviceName];
+    name = [SafesList sanitizeSafeNickName:name];
+
+    NSString *suggestion = name.length ?
+    [NSString stringWithFormat:
+        NSLocalizedString(@"casg_suggested_database_name_users_database_fmt", @"%@'s Database"), name] :
+        NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
+   
+    int attempt = 2;
+    while(![self isValidNickName:suggestion] && attempt < 100) {
+        suggestion = [NSString stringWithFormat:
+                      NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt", @"%@'s Database %d"), name, attempt++];
+    }
+    
+    return [self isValidNickName:suggestion] ? suggestion : nil;
 }
 
 + (NSString *)sanitizeSafeNickName:(NSString *)string {

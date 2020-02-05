@@ -1267,6 +1267,10 @@
 		4DD696A8218F38EC0082DC08 /* AttachmentsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD696A4218F0B170082DC08 /* AttachmentsRationalizer.m */; };
 		4DD6CB53238E6491005B94CF /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
 		4DD6CB54238E6491005B94CF /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
+		4DD6E78F23E731AD00AC2A49 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */; };
+		4DD6E79023E731AD00AC2A49 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */; };
+		4DD6E79123E731AD00AC2A49 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */; };
+		4DD6E79223E731AD00AC2A49 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */; };
 		4DD755EB232F084900758824 /* ExportOptionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */; };
 		4DD755EE232F087A00758824 /* WelcomeUseICloudViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */; };
 		4DD755F3232F093900758824 /* XmlToDictionaryParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755F1232F093900758824 /* XmlToDictionaryParser.m */; };
@@ -2410,6 +2414,8 @@
 		4DD696A6218F13C80082DC08 /* AttachmentsRationalizerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AttachmentsRationalizerTests.m; path = StrongboxTests/AttachmentsRationalizerTests.m; sourceTree = "<group>"; };
 		4DD6CB51238E6491005B94CF /* FavIconBulkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconBulkViewController.h; path = StrongBox/FavIconBulkViewController.h; sourceTree = "<group>"; };
 		4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconBulkViewController.m; path = StrongBox/FavIconBulkViewController.m; sourceTree = "<group>"; };
+		4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BookmarksHelper.m; path = model/BookmarksHelper.m; sourceTree = "<group>"; };
+		4DD6E78E23E731AD00AC2A49 /* BookmarksHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BookmarksHelper.h; path = model/BookmarksHelper.h; sourceTree = "<group>"; };
 		4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExportOptionsTableViewController.m; path = StrongBox/ExportOptionsTableViewController.m; sourceTree = "<group>"; };
 		4DD755EA232F084900758824 /* ExportOptionsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExportOptionsTableViewController.h; path = StrongBox/ExportOptionsTableViewController.h; sourceTree = "<group>"; };
 		4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WelcomeUseICloudViewController.m; path = StrongBox/WelcomeUseICloudViewController.m; sourceTree = "<group>"; };
@@ -3485,6 +3491,8 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DD6E78E23E731AD00AC2A49 /* BookmarksHelper.h */,
+				4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */,
 				4D6BA68323CCB981008DCE8A /* StoredCredentialsManager */,
 				4D637C58236187A800C273B3 /* BiometricsManager.h */,
 				4D637C59236187A800C273B3 /* BiometricsManager.m */,
@@ -5279,6 +5287,7 @@
 				4D3E149521832C1500A41CA0 /* core.c in Sources */,
 				4D2561AF233FEAEA00179B84 /* YubiManager.m in Sources */,
 				4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */,
+				4DD6E78F23E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4D004CDD21F4C26700E2B194 /* OTPAlgorithm.m in Sources */,
 				4DE498B92271E2C4007EF98C /* SetIconModel.m in Sources */,
 				4D56D91321B837A20030E13A /* AddNewSafeHelper.m in Sources */,
@@ -5568,6 +5577,7 @@
 				4DC4E06123488BAA000743C4 /* core.c in Sources */,
 				4DC4E06223488BAA000743C4 /* YubiManager.m in Sources */,
 				4DC4E06323488BAA000743C4 /* RMStoreUserDefaultsPersistence.m in Sources */,
+				4DD6E79123E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4DC4E06423488BAA000743C4 /* OTPAlgorithm.m in Sources */,
 				4DC4E06523488BAA000743C4 /* SetIconModel.m in Sources */,
 				4DC4E06623488BAA000743C4 /* AddNewSafeHelper.m in Sources */,
@@ -5887,6 +5897,7 @@
 				4DC4E1D723488BAE000743C4 /* AddAttachmentHelper.m in Sources */,
 				4DC4E1D823488BAE000743C4 /* KdbGroup.m in Sources */,
 				4DC4E1D923488BAE000743C4 /* PasswordHistory.m in Sources */,
+				4DD6E79223E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4DC4E1DA23488BAE000743C4 /* ChaCha20Stream.m in Sources */,
 				4DC4E1DB23488BAE000743C4 /* BackupsTableViewController.m in Sources */,
 				4DC4E1DC23488BAE000743C4 /* SetIconModel.m in Sources */,
@@ -6106,6 +6117,7 @@
 				4DE498B62271B2AF007EF98C /* AddAttachmentHelper.m in Sources */,
 				4D5B1EA42194A56300ECAF0D /* KdbGroup.m in Sources */,
 				4D1884D721709E26001AE6B0 /* PasswordHistory.m in Sources */,
+				4DD6E79023E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4DB1B7D92188B22500CF1663 /* ChaCha20Stream.m in Sources */,
 				4D1F580A233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
 				4DE498BA2271E5C7007EF98C /* SetIconModel.m in Sources */,

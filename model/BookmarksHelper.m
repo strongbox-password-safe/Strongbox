@@ -15,11 +15,22 @@
     NSError* error;
     NSString* updated;
     
-    return [BookmarksHelper getUrlFromBookmark:bookmark updatedBookmark:&updated error:&error];
+    return [BookmarksHelper getUrlFromBookmark:bookmark readOnly:NO updatedBookmark:&updated error:&error];
 }
 
-+ (NSString *)getBookmarkFromUrl:(NSURL *)url error:(NSError *_Nonnull*)error {
-    NSData *bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
++ (NSData *)getBookmarkDataFromUrl:(NSURL *)url error:(NSError * _Nonnull __autoreleasing *)error {
+    return [BookmarksHelper getBookmarkDataFromUrl:url readOnly:NO error:error];
+}
+
++ (NSData *)getBookmarkDataFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*)error {
+    NSURLBookmarkCreationOptions options = kNilOptions;
+    
+    #if !TARGET_OS_IPHONE
+        options |= readOnly ? NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess : kNilOptions;
+        options |= NSURLBookmarkCreationWithSecurityScope;
+    #endif
+
+    NSData *bookmark = [url bookmarkDataWithOptions:options
                      includingResourceValuesForKeys:nil
                                       relativeToURL:nil
                                               error:error];
@@ -27,25 +38,52 @@
         NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
         return nil;
     }
-    
+
+    return bookmark;
+}
+
++ (NSString *)getBookmarkFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*)error {
+    NSData* bookmark = [BookmarksHelper getBookmarkDataFromUrl:url readOnly:readOnly error:error];
     return [bookmark base64EncodedStringWithOptions:kNilOptions];
 }
 
-+ (NSURL *)getUrlFromBookmark:(NSString *)bookmarkInB64 updatedBookmark:(NSString *_Nonnull*)updatedBookmark error:(NSError *_Nonnull*)error {
-    BOOL bookmarkDataIsStale;
-
++ (NSURL *)getUrlFromBookmark:(NSString *)bookmarkInB64 readOnly:(BOOL)readOnly updatedBookmark:(NSString *_Nonnull*)updatedBookmark error:(NSError *_Nonnull*)error {
     NSData* bookmarkData = [[NSData alloc] initWithBase64EncodedString:bookmarkInB64 options:kNilOptions];
-    
     if(bookmarkData == nil) {
-        *error = [Utils createNSError:@"Could not decode bookmark." errorCode:-1];
+        if(error) {
+            *error = [Utils createNSError:@"Could not decode bookmark." errorCode:-1];
+        }
         return nil;
     }
+
+    NSData* updated = nil;
+    NSURL* ret = [BookmarksHelper getUrlFromBookmarkData:bookmarkData readOnly:readOnly updatedBookmark:&updated error:error];
     
-    NSURL* bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmarkData
-                                                       options:NSURLBookmarkResolutionWithSecurityScope
+    if(updated) {
+        *updatedBookmark = [updated base64EncodedStringWithOptions:kNilOptions];
+    }
+    
+    return ret;
+}
+
++ (NSURL *)getUrlFromBookmarkData:(NSData *)bookmark updatedBookmark:(NSData * _Nonnull __autoreleasing *)updatedBookmark error:(NSError * _Nonnull __autoreleasing *)error {
+    return [BookmarksHelper getUrlFromBookmarkData:bookmark readOnly:NO updatedBookmark:updatedBookmark error:error];
+}
+
++ (NSURL *)getUrlFromBookmarkData:(NSData *)bookmark readOnly:(BOOL)readOnly updatedBookmark:(NSData * _Nonnull __autoreleasing *)updatedBookmark error:(NSError * _Nonnull __autoreleasing *)error {
+    NSURLBookmarkResolutionOptions options = kNilOptions;
+    //     NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI; // TODO: I'm not sure this is actually right - worth testing soon... iOS only
+    #if !TARGET_OS_IPHONE
+        options |= NSURLBookmarkResolutionWithSecurityScope;
+    #endif
+
+    BOOL bookmarkDataIsStale;
+    NSURL* bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmark
+                                                       options:options
                                                  relativeToURL:nil
                                            bookmarkDataIsStale:&bookmarkDataIsStale
                                                          error:error];
+
     if(!bookmarkFileURL) {
         NSLog(@"Could not get bookmark URL.");
         return nil;
@@ -55,7 +93,7 @@
         if ([bookmarkFileURL startAccessingSecurityScopedResource]) {
             NSLog(@"Regenerating Bookmark -> bookmarkDataIsStale = %d => [%@]", bookmarkDataIsStale, bookmarkFileURL);
             
-            NSString* fileIdentifier = [BookmarksHelper getBookmarkFromUrl:bookmarkFileURL error:error];
+            NSData* fileIdentifier = [BookmarksHelper getBookmarkDataFromUrl:bookmarkFileURL readOnly:readOnly error:error];
             
             [bookmarkFileURL stopAccessingSecurityScopedResource];
             
@@ -69,7 +107,9 @@
         }
         else {
             NSLog(@"Regen Bookmark security failed....");
-            *error = [Utils createNSError:@"Regen Bookmark security failed." errorCode:-1];
+            if(error) {
+                *error = [Utils createNSError:@"Regen Bookmark security failed." errorCode:-1];
+            }
             return nil;
         }
     }
@@ -80,7 +120,7 @@
 + (NSData *)dataWithContentsOfBookmark:(NSString *)bookmarkInB64 error:(NSError**)error {
     NSString* updatedBookmark;
     
-    NSURL* url = [BookmarksHelper getUrlFromBookmark:bookmarkInB64 updatedBookmark:&updatedBookmark error:error];
+    NSURL* url = [BookmarksHelper getUrlFromBookmark:bookmarkInB64 readOnly:NO updatedBookmark:&updatedBookmark error:error];
 
     if(url && [url startAccessingSecurityScopedResource]) {
         //NSLog(@"Reading File at [%@]", url);
