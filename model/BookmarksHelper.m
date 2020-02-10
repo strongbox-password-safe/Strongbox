@@ -30,16 +30,26 @@
         options |= NSURLBookmarkCreationWithSecurityScope;
     #endif
 
-    NSData *bookmark = [url bookmarkDataWithOptions:options
-                     includingResourceValuesForKeys:nil
-                                      relativeToURL:nil
-                                              error:error];
-    if (!bookmark) {
-        NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
+    if ([url startAccessingSecurityScopedResource]) {
+        NSData *bookmark = [url bookmarkDataWithOptions:options
+                         includingResourceValuesForKeys:nil
+                                          relativeToURL:nil
+                                                  error:error];
+
+        [url stopAccessingSecurityScopedResource];
+
+        if (!bookmark) {
+            NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
+            return nil;
+        }
+
+        return bookmark;
+    }
+    else {
+        *error = [Utils createNSError:@"Error while trying to start accessing security scoped resource" errorCode:-1];
+        NSLog(@"Error while trying to start accessing security scoped resource (%@)", url);
         return nil;
     }
-
-    return bookmark;
 }
 
 + (NSString *)getBookmarkFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*)error {
